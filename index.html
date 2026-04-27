@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KBS 스토어 상세 v3 — 구조 정리</title>
+<style>
+  :root {
+    --bg: #fafafa;
+    --card: #ffffff;
+    --border: #e5e7eb;
+    --text: #111827;
+    --muted: #6b7280;
+    --header-bg: #374151;
+    --section-bg: #f3f4f6;
+    --new: #dcfce7;
+    --new-text: #166534;
+    --update: #fef3c7;
+    --update-text: #92400e;
+    --keep: #e0e7ff;
+    --keep-text: #3730a3;
+    --group-border: #9ca3af;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .wrap { max-width: 1480px; margin: 0 auto; padding: 24px; }
+  h1 { margin: 0 0 4px; font-size: 18px; font-weight: 700; }
+  .sub { color: var(--muted); font-size: 12px; margin-bottom: 16px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 13px;
+  }
+  thead th {
+    background: var(--header-bg);
+    color: #fff;
+    font-weight: 600;
+    text-align: left;
+    padding: 10px 12px;
+    font-size: 12px;
+    letter-spacing: 0.2px;
+  }
+  tbody td {
+    padding: 10px 12px;
+    vertical-align: middle;
+    border-top: 1px solid var(--border);
+  }
+  tbody tr.section-main td {
+    border-top: 2px solid var(--group-border);
+    background: var(--section-bg);
+  }
+  tbody tr.section-main td.col-tobe { font-weight: 700; }
+  tbody tr:hover td { background: #eff6ff; }
+  tbody tr.section-main:hover td { background: #e0e7ff; }
+  .col-tobe { width: 160px; }
+  .col-component { width: 230px; }
+  .col-type { width: 68px; text-align: center; }
+  .col-asis { width: 180px; }
+  .col-existing { width: 280px; }
+  tbody td.col-asis,
+  tbody td.col-existing,
+  tbody td.col-desc { color: var(--text); }
+  tbody td.empty { color: #d1d5db; }
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .badge.new { background: var(--new); color: var(--new-text); }
+  .badge.update { background: var(--update); color: var(--update-text); }
+  .badge.keep { background: var(--keep); color: var(--keep-text); }
+  .comp-icon { color: #9ca3af; margin-right: 6px; font-family: monospace; font-size: 11px; }
+  .muted-dash { color: #d1d5db; }
+  nav.top-nav { display: flex; gap: 2px; margin-bottom: 16px; border-bottom: 1px solid var(--border); }
+  nav.top-nav a { padding: 10px 16px; text-decoration: none; color: var(--muted); font-size: 13px; font-weight: 500; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  nav.top-nav a:hover { color: var(--text); }
+  nav.top-nav a.active { color: #2563eb; border-bottom-color: #2563eb; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="top-nav">
+    <a href="/decisions.html">결정 &amp; 확인 리스트</a>
+    <a href="/" class="active">구조 정리 (Gap Analysis)</a>
+    <a href="/spec.html">기능정의서</a>
+  </nav>
+  <h1>KBS 스토어 상세 v3 — 구조 정리</h1>
+  <div class="sub">디자인 컨펌본 기반 섹션·구성요소 리스트 (구분은 섹션·구성요소 각각 판단)</div>
+  <table>
+    <thead>
+      <tr>
+        <th class="col-tobe">TO-BE</th>
+        <th class="col-component">구성요소</th>
+        <th class="col-type">구분</th>
+        <th class="col-asis">AS-IS</th>
+        <th class="col-existing">기존내용</th>
+        <th class="col-desc">간략설명</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- 1. Header -->
+      <tr class="section-main">
+        <td class="col-tobe">Header</td>
+        <td class="col-component empty">—</td>
+        <td class="col-type"><span class="badge update">개편</span></td>
+        <td class="col-asis">Header (단일 상태)</td>
+        <td class="col-existing">스크롤 상태와 관계없이 항상 동일한 고정 헤더</td>
+        <td class="col-desc">스크롤 시 축소되는 2상태 헤더 구조</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>Status Bar</td>
+        <td class="col-type"><span class="badge keep">유지</span></td>
+        <td class="col-asis">Status Bar</td>
+        <td class="col-existing">OS 시스템 상태바 영역</td>
+        <td class="col-desc">시스템 상태바 (변경 없음)</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>로고 / 상단 컨테이너</td>
+        <td class="col-type"><span class="badge update">개편</span></td>
+        <td class="col-asis">로고 / 상단 영역</td>
+        <td class="col-existing">KBS 로고 + 뒤로가기·공유 버튼</td>
+        <td class="col-desc">동일 구성을 2상태(디폴트/축소) 모두 지원</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>Navigation</td>
+        <td class="col-type"><span class="badge keep">유지</span></td>
+        <td class="col-asis">Navigation</td>
+        <td class="col-existing">카테고리·검색 진입 영역</td>
+        <td class="col-desc">동일 구성 유지</td>
+      </tr>
+
+      <!-- 2. Hero -->
+      <tr class="section-main">
+        <td class="col-tobe">Hero</td>
+        <td class="col-component empty">—</td>
+        <td class="col-type"><span class="badge update">개편</span></td>
+        <td class="col-asis">Store Hero</td>
+        <td class="col-existing">작은 단일 썸네일 이미지만 노출, 스토어 식별 정보는 아래 별도 블록에 분리 배치</td>
+        <td class="col-desc">풀 히어로 이미지 + 정보 오버레이 2단 구성으로 식별·요약 정보를 Hero 내부로 통합</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>히어로 이미지 (풀 사이즈)</td>
+        <td class="col-type"><span class="badge update">개편</span></td>
+        <td class="col-asis">썸네일 이미지</td>
+        <td class="col-existing">작은 단일 썸네일 1장</td>
+        <td class="col-desc">입점사 대표 이미지 풀 사이즈 노출</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>상단 정보 카드</td>
+        <td class="col-type"><span class="badge update">개편</span></td>
+        <td class="col-asis">스토어명 / 평점·리뷰수 블록</td>
+        <td class="col-existing">Hero 바깥 별도 블록에 텍스트로 나열</td>
+        <td class="col-desc">Hero 이미지 위 오버레이 카드로 스토어명·평점·태그 배치</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>하단 요약 바</td>
+        <td class="col-type"><span class="badge update">개편</span></td>
+        <td class="col-asis">영업상태 / 운영시간 / 주소 블록</td>
+        <td class="col-existing">Hero 바깥 별도 블록에 텍스트로 나열 (+ 드롭다운)</td>
+        <td class="col-desc">Hero 이미지 위 하단 오버레이 바로 영업 상태·주소·최근역 요약</td>
+      </tr>
+
+      <!-- 3. SNS & 채널 (상단) -->
+      <tr class="section-main">
+        <td class="col-tobe">SNS &amp; 채널 (상단)</td>
+        <td class="col-component empty">—</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">Hero 하단에 입점사 SNS 채널 링크를 노출하는 섹션</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>채널 리스트 (Instagram / YouTube / TikTok …)</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">채널 카드 형태로 나열, 탭 시 외부 앱/웹 이동</td>
+      </tr>
+
+      <!-- 4. Testimonials -->
+      <tr class="section-main">
+        <td class="col-tobe">Testimonials</td>
+        <td class="col-component empty">—</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">상단 pinned 대표 후기 블록 (이미지·요약·혜택 구성)</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>대표 후기 이미지 #1</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">큐레이션(관리자 지정) or 자동 룰 상위 후기 이미지</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>Summary 카드</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">후기 요약 텍스트 + 점수·통계</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>대표 후기 이미지 #2</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">추가 대표 후기 이미지</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>Special Benefits</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">해당 스토어 특별 혜택 강조 영역</td>
+      </tr>
+
+      <!-- 5. 핵심 정보 -->
+      <tr class="section-main">
+        <td class="col-tobe">핵심 정보 (Info Summary)</td>
+        <td class="col-component empty">—</td>
+        <td class="col-type"><span class="badge update">개편</span></td>
+        <td class="col-asis">특징 Pills / 영업시간 / 주소 블록</td>
+        <td class="col-existing">Private, Hair Specialist 등의 pills + 영업 상태·주소 등이 텍스트·태그로 나열</td>
+        <td class="col-desc">Grid + 전문시술 그룹 + 진료 분야 그룹으로 구조화된 핵심 정보</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>섹션 타이틀</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">"핵심 정보" 헤딩</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>Info Grid (4칸)</td>
+        <td class="col-type"><span class="badge update">개편</span></td>
+        <td class="col-asis">특징 Pills + 텍스트 정보</td>
+        <td class="col-existing">Private / Hair Specialist 등 pills + 주소·영업시간 텍스트</td>
+        <td class="col-desc">핵심 속성 4개(가격대·결제·언어·주차 등) 아이콘 + 값 Grid</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>전문 시술 그룹</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">입점사 전문 시술 태그 그룹</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>진료 분야 그룹</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">진료 가능 분야 태그 그룹</td>
+      </tr>
+
+      <!-- 6. 원장 소개 -->
+      <tr class="section-main">
+        <td class="col-tobe">원장 소개</td>
+        <td class="col-component empty">—</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">원장 이미지 중심의 소개 섹션</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>원장 이미지</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">원장 단독 이미지 (이름·직함 오버레이 가능)</td>
+      </tr>
+
+      <!-- 7. 제공 시술 -->
+      <tr class="section-main">
+        <td class="col-tobe">제공 시술</td>
+        <td class="col-component empty">—</td>
+        <td class="col-type"><span class="badge update">개편</span></td>
+        <td class="col-asis">Store Info 탭 내 시술 리스트</td>
+        <td class="col-existing">Store Info 탭에서 스크롤하면 나오는 시술 이름 12개 평면 리스트 (이름만, 이미지·가격 없음)</td>
+        <td class="col-desc">카테고리 탭 + 구조화 시술 리스트 + 전체보기 버튼으로 재구성</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>섹션 헤더</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">"시술 &amp; 가격" 등 타이틀</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>카테고리 탭</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">시술 카테고리별 필터 탭 (선택 시 리스트 갱신)</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>Treatment List</td>
+        <td class="col-type"><span class="badge update">개편</span></td>
+        <td class="col-asis">시술 리스트</td>
+        <td class="col-existing">시술 이름 12개 평면 리스트 (이미지·가격 없음)</td>
+        <td class="col-desc">카테고리별 시술 리스트 (이름·가격·이미지 포함)</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>전체보기 버튼</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">시술 전체보기 페이지로 진입</td>
+      </tr>
+
+      <!-- 8. 결과 하이라이트 -->
+      <tr class="section-main">
+        <td class="col-tobe">결과 하이라이트 (갤러리)</td>
+        <td class="col-component empty">—</td>
+        <td class="col-type"><span class="badge update">개편</span></td>
+        <td class="col-asis">Gallery 탭</td>
+        <td class="col-existing">별도 Gallery 탭 내 정형 그리드 이미지 8장</td>
+        <td class="col-desc">Masonry Grid로 홈 섹션에 노출 + 전체보기 연결</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>섹션 헤더</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">"결과 하이라이트" 타이틀</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>Masonry 갤러리 그리드</td>
+        <td class="col-type"><span class="badge update">개편</span></td>
+        <td class="col-asis">Gallery 이미지 그리드</td>
+        <td class="col-existing">정형 그리드 이미지 8장 평면 배치</td>
+        <td class="col-desc">비정형(Masonry) 그리드로 이미지 배치</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>전체보기 버튼</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">갤러리 전체보기 페이지로 진입</td>
+      </tr>
+
+      <!-- 9. User Post (IG형) -->
+      <tr class="section-main">
+        <td class="col-tobe">User Post (Instagram형)</td>
+        <td class="col-component empty">—</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">인스타그램 포스트 형태의 콘텐츠 블록 (프로필·미디어·반응)</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>유저 헤더</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">작성자 프로필 이미지·이름·작성일</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>포스트 컨테이너</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">이미지/동영상·슬라이드·캡션</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>반응 컨테이너</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">좋아요·댓글 수 + 액션 버튼</td>
+      </tr>
+
+      <!-- 10. 대표원장 한마디 -->
+      <tr class="section-main">
+        <td class="col-tobe">대표원장 한마디</td>
+        <td class="col-component empty">—</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">원장 상세 정보 + 대표원장 인용문 블록</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>Expert Details</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">원장 경력·전문 분야 등 상세 정보</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>Quote</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">대표원장 인용문 (메시지 형태)</td>
+      </tr>
+
+      <!-- 11. FAQ -->
+      <tr class="section-main">
+        <td class="col-tobe">FAQ</td>
+        <td class="col-component empty">—</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">자주 묻는 질문 아코디언 섹션 (5개 기본)</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>FAQ 타이틀</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">"자주 묻는 질문" 헤딩</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>FAQ Item ×5</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">질문-답변 아코디언 아이템 (탭 시 펼침/접힘)</td>
+      </tr>
+
+      <!-- 12. SNS & 채널 (하단) -->
+      <tr class="section-main">
+        <td class="col-tobe">SNS &amp; 채널 (하단)</td>
+        <td class="col-component empty">—</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">하단 SNS 채널 섹션 (상단과 동일 데이터 재사용)</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>섹션 헤더</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">"채널 바로가기" 등 타이틀</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>채널 리스트</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">상단과 동일한 채널 카드 리스트 (배치만 다름)</td>
+      </tr>
+
+      <!-- 13. 예약 & 취소 안내 (요약) -->
+      <tr class="section-main">
+        <td class="col-tobe">예약 &amp; 취소 안내 (요약)</td>
+        <td class="col-component empty">—</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">예약 방법 요약 블록 (상세 정책은 별도 섹션)</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>섹션 타이틀</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">"예약 &amp; 취소 안내" 헤딩</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>예약 방법 카드</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">예약 방법 간단 안내 (채팅·전화 등 채널)</td>
+      </tr>
+
+      <!-- 14. 예약 & 취소 정책 (상세) -->
+      <tr class="section-main">
+        <td class="col-tobe">예약 &amp; 취소 정책 (상세)</td>
+        <td class="col-component empty">—</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">예약·취소 상세 정책 블록 + 확인 버튼</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>섹션 타이틀</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">"예약 &amp; 취소 정책" 헤딩</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>상세 정책 블록</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">정책 본문 (예약 가능 시간·취소 기한·환불 기준 등)</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>확인 버튼</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">정책 동의 / 닫기 액션</td>
+      </tr>
+
+      <!-- 15. Sticky Bottom CTA -->
+      <tr class="section-main">
+        <td class="col-tobe">Sticky Bottom CTA</td>
+        <td class="col-component empty">—</td>
+        <td class="col-type"><span class="badge update">개편</span></td>
+        <td class="col-asis">WhatsApp 플로팅 버튼</td>
+        <td class="col-existing">화면 우하단에 고정된 WhatsApp 아이콘 플로팅 버튼 (WhatsApp 직링크 단독)</td>
+        <td class="col-desc">풀폭 Sticky 채팅·예약 버튼</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>아이콘</td>
+        <td class="col-type"><span class="badge update">개편</span></td>
+        <td class="col-asis">WhatsApp 아이콘</td>
+        <td class="col-existing">WhatsApp 브랜드 아이콘 단독</td>
+        <td class="col-desc">좌측 액션 아이콘 (저장·공유 등 범용 아이콘으로 변경)</td>
+      </tr>
+      <tr>
+        <td class="col-tobe empty">⋮</td>
+        <td class="col-component"><span class="comp-icon">└</span>Chat / Social 버튼</td>
+        <td class="col-type"><span class="badge new">신규</span></td>
+        <td class="col-asis"><span class="muted-dash">—</span></td>
+        <td class="col-existing"><span class="muted-dash">—</span></td>
+        <td class="col-desc">메인 CTA (채팅·문의·예약)</td>
+      </tr>
+
+      <!-- 16. 탭 네비게이션 -->
+      <tr class="section-main">
+        <td class="col-tobe">탭 네비게이션</td>
+        <td class="col-component empty">—</td>
+        <td class="col-type"><span class="badge update">개편</span></td>
+        <td class="col-asis">탭 네비 (Info / Products / Gallery / Reviews)</td>
+        <td class="col-existing">상단에 4개 탭 전환형 (탭별 별도 콘텐츠 영역)</td>
+        <td class="col-desc">홈탭 롱스크롤로 통합 (Products / Gallery / Reviews는 전체보기 페이지로 분리). 별도 구성요소 없음.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+</body>
+</html>

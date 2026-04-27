@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KBS 스토어 상세 v3 — 기능정의서</title>
+<style>
+  :root {
+    --bg: #fafafa;
+    --card: #ffffff;
+    --border: #e5e7eb;
+    --text: #111827;
+    --muted: #6b7280;
+    --accent: #2563eb;
+    --accent-bg: #eff6ff;
+    --new: #dcfce7;
+    --new-text: #166534;
+    --update: #fef3c7;
+    --update-text: #92400e;
+    --keep: #e0e7ff;
+    --keep-text: #3730a3;
+    --tbd-bg: #fef2f2;
+    --tbd-text: #991b1b;
+    --decided-bg: #ecfdf5;
+    --decided-text: #065f46;
+    --header-bg: #374151;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .layout { display: flex; max-width: 1480px; margin: 0 auto; padding: 24px; gap: 24px; }
+  aside {
+    width: 220px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 24px;
+    align-self: flex-start;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+  }
+  aside h3 { margin: 0 0 8px; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
+  aside ol { list-style: none; padding: 0; margin: 0; counter-reset: toc; }
+  aside li { counter-increment: toc; margin: 0; }
+  aside li a {
+    display: block;
+    padding: 6px 10px;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 12px;
+    border-radius: 4px;
+  }
+  aside li a:hover { background: var(--accent-bg); color: var(--accent); }
+  aside li a::before { content: counter(toc) ". "; color: var(--muted); margin-right: 4px; }
+  main { flex: 1; min-width: 0; }
+  nav.top-nav { display: flex; gap: 2px; margin-bottom: 16px; border-bottom: 1px solid var(--border); }
+  nav.top-nav a { padding: 10px 16px; text-decoration: none; color: var(--muted); font-size: 13px; font-weight: 500; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  nav.top-nav a:hover { color: var(--text); }
+  nav.top-nav a.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+  h1 { margin: 0 0 4px; font-size: 20px; font-weight: 700; }
+  .sub { color: var(--muted); font-size: 12px; margin-bottom: 24px; }
+  .section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    scroll-margin-top: 20px;
+  }
+  .section-head {
+    padding: 14px 18px;
+    background: #f3f4f6;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-head .num { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .section-head h2 { margin: 0; font-size: 15px; font-weight: 700; }
+  .section-body { padding: 16px 18px; }
+  .meta-grid {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 4px 16px;
+    margin-bottom: 14px;
+  }
+  .meta-grid dt { color: var(--muted); font-size: 12px; padding: 4px 0; }
+  .meta-grid dd { margin: 0; font-size: 13px; padding: 4px 0; }
+  h3.block-title {
+    margin: 18px 0 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin-bottom: 8px;
+  }
+  thead th {
+    background: var(--header-bg);
+    color: #fff;
+    font-weight: 600;
+    text-align: left;
+    padding: 8px 10px;
+    font-size: 11px;
+    letter-spacing: 0.2px;
+  }
+  tbody td {
+    padding: 8px 10px;
+    border-top: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tbody tr:nth-child(even) { background: #f9fafb; }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .badge.new { background: var(--new); color: var(--new-text); }
+  .badge.update { background: var(--update); color: var(--update-text); }
+  .badge.keep { background: var(--keep); color: var(--keep-text); }
+  .tbd {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 3px;
+    background: var(--tbd-bg);
+    color: var(--tbd-text);
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .decided {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 3px;
+    background: var(--decided-bg);
+    color: var(--decided-text);
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .note {
+    margin-top: 8px;
+    padding: 10px 12px;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #78350f;
+  }
+  .note.bo {
+    background: #f0f9ff;
+    border-color: #bae6fd;
+    color: #075985;
+  }
+  ul.policy-list { margin: 0; padding-left: 18px; }
+  ul.policy-list li { margin-bottom: 4px; }
+  code { background: #f3f4f6; padding: 1px 5px; border-radius: 3px; font-family: 'SF Mono', Consolas, monospace; font-size: 11px; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside>
+    <h3>목차</h3>
+    <ol>
+      <li><a href="#common">공통 정책</a></li>
+      <li><a href="#header">Header</a></li>
+      <li><a href="#hero">Hero</a></li>
+      <li><a href="#sns-top">SNS &amp; 채널 (상단)</a></li>
+      <li><a href="#testimonials">Testimonials</a></li>
+      <li><a href="#info-summary">핵심 정보</a></li>
+      <li><a href="#doctor-intro">원장 소개</a></li>
+      <li><a href="#treatments">제공 시술</a></li>
+      <li><a href="#gallery">결과 하이라이트</a></li>
+      <li><a href="#user-post">User Post</a></li>
+      <li><a href="#doctor-quote">대표원장 한마디</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#sns-bottom">SNS &amp; 채널 (하단)</a></li>
+      <li><a href="#policy-summary">예약 &amp; 취소 안내 (요약)</a></li>
+      <li><a href="#policy-detail">예약 &amp; 취소 정책 (상세)</a></li>
+      <li><a href="#sticky-cta">Sticky Bottom CTA</a></li>
+      <li><a href="#tab-nav">탭 네비게이션</a></li>
+    </ol>
+  </aside>
+
+  <main>
+    <nav class="top-nav">
+      <a href="/decisions.html">결정 &amp; 확인 리스트</a>
+      <a href="/">구조 정리 (Gap Analysis)</a>
+      <a href="/spec.html" class="active">기능정의서</a>
+    </nav>
+    <h1>KBS 스토어 상세 v3 — 기능정의서</h1>
+    <div class="sub">디자인 컨펌본 기반 섹션·구성요소별 기능 정의 · 노출 조건 · 데이터 소스 · 상호작용 정의</div>
+
+    <!-- 공통 정책 -->
+    <section class="section" id="common">
+      <div class="section-head">
+        <span class="num">공통</span>
+        <h2>공통 정책</h2>
+      </div>
+      <div class="section-body">
+        <h3 class="block-title">화면 구조</h3>
+        <ul class="policy-list">
+          <li>홈탭 롱스크롤 구조 (AS-IS의 Info/Products/Gallery/Reviews 4탭 폐지)</li>
+          <li><strong>별도 전체보기 페이지 없음</strong> — 앵커 기반 홈탭 내 통합. "전체보기" 버튼은 해당 섹션 전체 펼침으로 동작</li>
+          <li>상단 Header는 스크롤 위치에 따라 Default / Scrolled(축소) 2상태 전환</li>
+        </ul>
+
+        <h3 class="block-title">로그인 정책</h3>
+        <ul class="policy-list">
+          <li>스토어 상세 페이지 자체는 <strong>비로그인 접근 가능</strong></li>
+          <li>Sticky CTA의 채팅 진입도 <strong>비로그인 게스트 가능</strong> (KBS 채팅 정책)</li>
+          <li><strong>예약·리뷰 작성은 로그인 필수</strong></li>
+          <li>저장·공유 등 기타 액션의 로그인 분기는 각 액션별로 별도 검토</li>
+        </ul>
+
+        <h3 class="block-title">데이터 소스 구분</h3>
+        <ul class="policy-list">
+          <li><strong>입점사 입력</strong>: 이미지·소개·시술·SNS·FAQ 등 대부분의 콘텐츠</li>
+          <li><strong>시스템 자동</strong>: 평점·리뷰수·영업상태(운영시간 기반)·거리</li>
+          <li><strong>KBS·입점사 작성</strong>: Testimonials 대표 후기는 KBS 또는 입점사가 직접 작성·지정</li>
+          <li><strong>KBS 템플릿</strong>: 예약/취소 정책·FAQ 기본 템플릿 제공 (FAQ는 입점사 커스텀 가능)</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 1. Header -->
+    <section class="section" id="header">
+      <div class="section-head">
+        <span class="num">1</span>
+        <h2>Header <span class="badge update">개편</span></h2>
+      </div>
+      <div class="section-body">
+        <dl class="meta-grid">
+          <dt>위치</dt><dd>화면 최상단 (고정)</dd>
+          <dt>노출 조건</dt><dd>항상 노출</dd>
+          <dt>상태</dt><dd>Default (스크롤 0) / Scrolled (스크롤 y &gt; <span class="tbd">TBD: 임계값 — 개발·디자인 협의로 확정</span>)</dd>
+          <dt>AS-IS 대비</dt><dd>고정 단일 상태 → 2상태 (축소 전환 추가)</dd>
+        </dl>
+
+        <h3 class="block-title">구성요소 스펙</h3>
+        <table>
+          <thead><tr><th style="width:160px">컴포넌트</th><th style="width:60px">구분</th><th>필드·동작</th><th>예외</th></tr></thead>
+          <tbody>
+            <tr><td>Status Bar</td><td><span class="badge keep">유지</span></td><td>OS 시스템 상태바 영역 (앱 영역 아님)</td><td>—</td></tr>
+            <tr><td>로고 / 상단 컨테이너</td><td><span class="badge update">개편</span></td><td>KBS 로고 + 뒤로가기·공유 아이콘. Scrolled 상태에서 높이 축소</td><td>뒤로가기 히스토리 없을 시 홈으로</td></tr>
+            <tr><td>Navigation</td><td><span class="badge keep">유지</span></td><td>카테고리·검색 진입 (AS-IS와 동일)</td><td>—</td></tr>
+          </tbody>
+        </table>
+
+        <div class="note"><strong>결정 보류</strong> · Scrolled 전환 임계값·전환 애니메이션은 개발·디자인 협의 단계에서 확정</div>
+      </div>
+    </section>
+
+    <!-- 2. Hero -->
+    <section class="section" id="hero">
+      <div class="section-head">
+        <span class="num">2</span>
+        <h2>Hero <span class="badge update">개편</span></h2>
+      </div>
+      <div class="section-body">
+        <dl class="meta-grid">
+          <dt>위치</dt><dd>Header 바로 아래</dd>
+          <dt>높이</dt><dd>554px (디자인 기준)</dd>
+          <dt>노출 조건</dt><dd>항상 노출</dd>
+          <dt>필수 데이터</dt><dd>대표 이미지 1장 (없을 시 기본 이미지 <span class="tbd">TBD</span>)</dd>
+        </dl>
+
+        <h3 class="block-title">구성요소 스펙</h3>
+        <table>
+          <thead><tr><th style="width:160px">컴포넌트</th><th style="width:60px">구분</th><th>필드·동작</th><th>예외</th></tr></thead>
+          <tbody>
+            <tr><td>히어로 이미지</td><td><span class="badge update">개편</span></td><td>입점사 대표 이미지 풀 사이즈. 탭 시 확대 뷰어 <span class="tbd">TBD</span></td><td>이미지 없을 시 기본 이미지</td></tr>
+            <tr><td>상단 정보 카드</td><td><span class="badge update">개편</span></td><td>필드: 스토어명, 평점(0-5), 리뷰수, 태그(최대 <span class="tbd">N</span>개). 탭 시 동작 <span class="tbd">TBD</span></td><td>평점·리뷰수 없을 시 "New" 표기 <span class="tbd">TBD</span></td></tr>
+            <tr><td>하단 요약 바</td><td><span class="badge update">개편</span></td><td>필드: 영업 상태(OPEN/CLOSED/BREAK), 최근역, 주소. <strong>무동작 (표시 전용)</strong></td><td>영업시간 미입력 시 상태 숨김</td></tr>
+          </tbody>
+        </table>
+
+        <div class="note"><strong>결정 필요</strong> · 태그 최대 노출 개수 · 평점/리뷰 빈 상태 표기 · 이미지 확대 뷰어 여부</div>
+      </div>
+    </section>
+
+    <!-- 3. SNS & 채널 (상단) -->
+    <section class="section" id="sns-top">
+      <div class="section-head">
+        <span class="num">3</span>
+        <h2>SNS &amp; 채널 (상단) <span class="badge new">신규</span></h2>
+      </div>
+      <div class="section-body">
+        <dl class="meta-grid">
+          <dt>위치</dt><dd>Hero 바로 아래</dd>
+          <dt>노출 조건</dt><dd>입점사 등록 채널 ≥ 1개일 때만. 0개면 섹션 전체 미노출</dd>
+          <dt>데이터 소스</dt><dd>입점사 입력 (채널 타입 + URL)</dd>
+          <dt>지원 채널</dt><dd><strong>Instagram / YouTube / TikTok / 매거진</strong> — 총 4개 확정 (매거진 = KBS 자체 블로그 서비스)</dd>
+        </dl>
+
+        <h3 class="block-title">구성요소 스펙</h3>
+        <table>
+          <thead><tr><th style="width:160px">컴포넌트</th><th style="width:60px">구분</th><th>필드·동작</th><th>예외</th></tr></thead>
+          <tbody>
+            <tr><td>채널 리스트</td><td><span class="badge new">신규</span></td><td>카드 리스트 (채널 아이콘 + 채널명 or 핸들). 탭 시 해당 SNS 딥링크 또는 인앱 브라우저 open. 매거진은 KBS 내부 페이지로 이동</td><td>앱 미설치 시 웹으로 fallback</td></tr>
+          </tbody>
+        </table>
+
+        <div class="note"><strong>결정 필요</strong> · 채널 순서 규칙 (입력순 / 고정 우선순위) · 동일 플랫폼 복수 채널 허용 여부</div>
+      </div>
+    </section>
+
+    <!-- 4. Testimonials -->
+    <section class="section" id="testimonials">
+      <div class="section-head">
+        <span class="num">4</span>
+        <h2>Testimonials <span class="badge new">신규</span></h2>
+      </div>
+      <div class="section-body">
+        <dl class="meta-grid">
+          <dt>위치</dt><dd>SNS 채널 하단</dd>
+          <dt>노출 조건</dt><dd>KBS 또는 입점사가 작성·지정한 대표 후기 ≥ 1개일 때. 없으면 섹션 숨김</dd>
+          <dt>데이터 소스</dt><dd><strong>KBS 또는 입점사가 직접 작성·지정 (수동)</strong></dd>
+        </dl>
+
+        <h3 class="block-title">구성요소 스펙</h3>
+        <table>
+          <thead><tr><th style="width:160px">컴포넌트</th><th style="width:60px">구분</th><th>필드·동작</th><th>예외</th></tr></thead>
+          <tbody>
+            <tr><td>대표 후기 이미지 #1</td><td><span class="badge new">신규</span></td><td>등록된 대표 후기의 이미지. 탭 시 해당 후기 상세로 이동</td><td>이미지 없는 후기는 제외</td></tr>
+            <tr><td>Summary 카드</td><td><span class="badge new">신규</span></td><td>필드: 요약 텍스트, 평균 점수, 후기 통계(n건)</td><td>통계 0건 시 숫자 대신 "첫 후기 남기기" CTA</td></tr>
+            <tr><td>대표 후기 이미지 #2</td><td><span class="badge new">신규</span></td><td>동일 동작 (대표 후기 2번째)</td><td>1개만 있을 시 이 슬롯 생략 or 대체 디자인</td></tr>
+            <tr><td>Special Benefits</td><td><span class="badge new">신규</span></td><td>입점사 등록 혜택 (예: 첫 방문 할인, KBS 전용 프로모)</td><td>혜택 미등록 시 슬롯 생략</td></tr>
+          </tbody>
+        </table>
+
+        <div class="note"><strong>결정 필요</strong> · Summary 텍스트 작성 주체·자동 생성 여부 · 1개 후기만 등록 시 레이아웃</div>
+      </div>
+    </section>
+
+    <!-- 5. 핵심 정보 -->
+    <section class="section" id="info-summary">
+      <div class="section-head">
+        <span class="num">5</span>
+        <h2>핵심 정보 (Info Summary) <span class="badge update">개편</span></h2>
+      </div>
+      <div class="section-body">
+        <dl class="meta-grid">
+          <dt>위치</dt><dd>Testimonials 하단</dd>
+          <dt>노출 조건</dt><dd>항상 노출 (필수 필드 입력 강제)</dd>
+          <dt>데이터 소스</dt><dd>입점사 입력 + 시스템 자동(영업상태) + BO 관리(시술·분야 마스터)</dd>
+        </dl>
+
+        <h3 class="block-title">구성요소 스펙</h3>
+        <table>
+          <thead><tr><th style="width:160px">컴포넌트</th><th style="width:60px">구분</th><th>필드·동작</th><th>예외</th></tr></thead>
+          <tbody>
+            <tr><td>섹션 타이틀</td><td><span class="badge new">신규</span></td><td>"핵심 정보" 헤딩 (고정 텍스트)</td><td>—</td></tr>
+            <tr><td>Info Grid (6칸)</td><td><span class="badge update">개편</span></td><td><strong>노출 항목 6개 확정: 가격대 / 결제 수단 / 사용 언어 / 주차 / 예약 방식 / 소요시간</strong></td><td>값 미입력 시 슬롯 숨김</td></tr>
+            <tr><td>전문 시술 그룹</td><td><span class="badge new">신규</span></td><td>태그 칩 나열. BO에서 관리되는 마스터 태그 기반, 입점사가 직접 선택</td><td>0개 시 그룹 숨김</td></tr>
+            <tr><td>진료 분야 그룹</td><td><span class="badge new">신규</span></td><td>태그 칩 나열. BO에서 관리되는 마스터 태그 기반</td><td>0개 시 그룹 숨김</td></tr>
+          </tbody>
+        </table>
+
+        <div class="note bo"><strong>BO 점검 대상</strong> · 전문 시술·진료 분야 태그 마스터 스키마 점검 (이번 사이클에서 수행)</div>
+      </div>
+    </section>
+
+    <!-- 6. 원장 소개 -->
+    <section class="section" id="doctor-intro">
+      <div class="section-head">
+        <span class="num">6</span>
+        <h2>원장 소개 <span class="badge new">신규</span></h2>
+      </div>
+      <div class="section-body">
+        <dl class="meta-grid">
+          <dt>위치</dt><dd>핵심 정보 하단</dd>
+          <dt>노출 조건</dt><dd>원장 이미지 등록 시에만 노출 (미등록 시 섹션 숨김)</dd>
+          <dt>데이터 소스</dt><dd>입점사 입력 (원장 프로필)</dd>
+        </dl>
+
+        <h3 class="block-title">구성요소 스펙</h3>
+        <table>
+          <thead><tr><th style="width:160px">컴포넌트</th><th style="width:60px">구분</th><th>필드·동작</th><th>예외</th></tr></thead>
+          <tbody>
+            <tr><td>원장 이미지</td><td><span class="badge new">신규</span></td><td>필드: 이미지, 이름, 직함 (오버레이). 탭 시 "대표원장 한마디" 섹션으로 스크롤 <span class="tbd">TBD</span></td><td>이름·직함 없을 시 이미지만 노출</td></tr>
+          </tbody>
+        </table>
+
+        <div class="note"><strong>결정 필요</strong> · 원장이 복수일 때 처리 (캐러셀/리스트/대표 1인만)</div>
+      </div>
+    </section>
+
+    <!-- 7. 제공 시술 -->
+    <section class="section" id="treatments">
+      <div class="section-head">
+        <span class="num">7</span>
+        <h2>제공 시술 <span class="badge update">개편</span></h2>
+      </div>
+      <div class="section-body">
+        <dl class="meta-grid">
+          <dt>위치</dt><dd>원장 소개 하단</dd>
+          <dt>노출 조건</dt><dd>등록 시술 ≥ 1개일 때</dd>
+          <dt>데이터 소스</dt><dd>입점사 입력 (시술 마스터 + 카테고리 매핑, 카테고리는 BO 관리)</dd>
+          <dt>마이그레이션</dt><dd>BO 점검 시 기존 12개 시술 카테고리 재분류 수행</dd>
+        </dl>
+
+        <h3 class="block-title">구성요소 스펙</h3>
+        <table>
+          <thead><tr><th style="width:160px">컴포넌트</th><th style="width:60px">구분</th><th>필드·동작</th><th>예외</th></tr></thead>
+          <tbody>
+            <tr><td>섹션 헤더</td><td><span class="badge new">신규</span></td><td>"시술 &amp; 가격" 등 타이틀</td><td>—</td></tr>
+            <tr><td>카테고리 탭</td><td><span class="badge new">신규</span></td><td>입점사가 등록한 시술의 카테고리만 노출 (빈 카테고리 숨김). 첫 탭 디폴트 활성</td><td>카테고리 1개만 있을 시 탭 숨김 <span class="tbd">TBD</span></td></tr>
+            <tr><td>Treatment List</td><td><span class="badge update">개편</span></td><td>필드: 이미지, 이름, 가격(KRW), 소요시간, 설명 요약. 홈 노출은 디자인 기준 개수 그대로</td><td>가격 미입력 시 "문의"</td></tr>
+            <tr><td>전체보기 버튼</td><td><span class="badge new">신규</span></td><td>탭 시 <strong>해당 섹션 내 전체 시술 펼침</strong> (별도 페이지 없음)</td><td>홈 노출 개수로 이미 다 보일 시 숨김</td></tr>
+          </tbody>
+        </table>
+
+        <div class="note bo"><strong>BO 점검 대상</strong> · 카테고리 마스터 체계 점검 + 기존 12개 시술 재분류 (이번 사이클에서 진행)</div>
+      </div>
+    </section>
+
+    <!-- 8. 결과 하이라이트 -->
+    <section class="section" id="gallery">
+      <div class="section-head">
+        <span class="num">8</span>
+        <h2>결과 하이라이트 (갤러리) <span class="badge update">개편</span></h2>
+      </div>
+      <div class="section-body">
+        <dl class="meta-grid">
+          <dt>위치</dt><dd>제공 시술 하단</dd>
+          <dt>노출 조건</dt><dd>등록 이미지 ≥ 1장일 때. 없으면 섹션 숨김</dd>
+          <dt>데이터 소스</dt><dd>입점사 입력</dd>
+        </dl>
+
+        <h3 class="block-title">구성요소 스펙</h3>
+        <table>
+          <thead><tr><th style="width:160px">컴포넌트</th><th style="width:60px">구분</th><th>필드·동작</th><th>예외</th></tr></thead>
+          <tbody>
+            <tr><td>섹션 헤더</td><td><span class="badge new">신규</span></td><td>"결과 하이라이트" 타이틀</td><td>—</td></tr>
+            <tr><td>Masonry 갤러리 그리드</td><td><span class="badge update">개편</span></td><td>비정형 Masonry 그리드. 홈 노출은 디자인 기준 개수 그대로. 탭 시 라이트박스 뷰어</td><td>이미지 1-2장 시 Masonry 대신 단순 그리드 fallback</td></tr>
+            <tr><td>전체보기 버튼</td><td><span class="badge new">신규</span></td><td>탭 시 <strong>해당 섹션 내 전체 이미지 펼침</strong> (별도 페이지 없음)</td><td>홈 노출 개수로 이미 다 보일 시 숨김</td></tr>
+          </tbody>
+        </table>
+
+        <div class="note"><strong>결정 필요</strong> · 개인정보 포함 이미지 검수 프로세스</div>
+      </div>
+    </section>
+
+    <!-- 9. User Post -->
+    <section class="section" id="user-post">
+      <div class="section-head">
+        <span class="num">9</span>
+        <h2>User Post (Instagram형) <span class="badge new">신규</span></h2>
+      </div>
+      <div class="section-body">
+        <dl class="meta-grid">
+          <dt>위치</dt><dd>결과 하이라이트 하단</dd>
+          <dt>노출 조건</dt><dd>연결된 포스트 ≥ 1개일 때. 미연결 시 섹션 숨김</dd>
+          <dt>데이터 소스</dt><dd><strong>KBS 제작 컨텐츠만 수동 연동</strong> (IG API 자동 수집·입점사 직접 등록 아님)</dd>
+        </dl>
+
+        <h3 class="block-title">구성요소 스펙</h3>
+        <table>
+          <thead><tr><th style="width:160px">컴포넌트</th><th style="width:60px">구분</th><th>필드·동작</th><th>예외</th></tr></thead>
+          <tbody>
+            <tr><td>유저 헤더</td><td><span class="badge new">신규</span></td><td>필드: 프로필 이미지, 사용자명·핸들(KBS 계정 or 작성자), 작성일</td><td>—</td></tr>
+            <tr><td>포스트 컨테이너</td><td><span class="badge new">신규</span></td><td>필드: 이미지/동영상, 슬라이드(복수 미디어), 캡션. 탭 시 원본 포스트 or 상세로 이동</td><td>원본 삭제된 경우 처리 <span class="tbd">TBD</span></td></tr>
+            <tr><td>반응 컨테이너</td><td><span class="badge new">신규</span></td><td>필드: 좋아요 수, 댓글 수, 공유 버튼. 반응 소스 <span class="tbd">TBD: KBS 내부 반응 or 외부 IG 반응</span></td><td>—</td></tr>
+          </tbody>
+        </table>
+
+        <div class="note"><strong>후속 검토</strong> · 원본 포스트 삭제 시 노출 처리 · 좋아요/댓글 수의 소스 · 저작권·개인정보 동의 프로세스 (KBS 제작 기준)</div>
+      </div>
+    </section>
+
+    <!-- 10. 대표원장 한마디 -->
+    <section class="section" id="doctor-quote">
+      <div class="section-head">
+        <span class="num">10</span>
+        <h2>대표원장 한마디 <span class="badge new">신규</span></h2>
+      </div>
+      <div class="section-body">
+        <dl class="meta-grid">
+          <dt>위치</dt><dd>User Post 하단</dd>
+          <dt>노출 조건</dt><dd>Expert Details 또는 Quote 중 하나 이상 등록 시</dd>
+          <dt>데이터 소스</dt><dd>입점사 입력</dd>
+        </dl>
+
+        <h3 class="block-title">구성요소 스펙</h3>
+        <table>
+          <thead><tr><th style="width:160px">컴포넌트</th><th style="width:60px">구분</th><th>필드·동작</th><th>예외</th></tr></thead>
+          <tbody>
+            <tr><td>Expert Details</td><td><span class="badge new">신규</span></td><td>필드: 이미지, 이름, 직함, 경력 항목(여러 개), 전문 분야</td><td>경력 0개 시 블록 축소</td></tr>
+            <tr><td>Quote</td><td><span class="badge new">신규</span></td><td>필드: 인용문 텍스트 (max 글자수 <span class="tbd">TBD</span>)</td><td>빈 값일 시 블록 숨김</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 11. FAQ -->
+    <section class="section" id="faq">
+      <div class="section-head">
+        <span class="num">11</span>
+        <h2>FAQ <span class="badge new">신규</span></h2>
+      </div>
+      <div class="section-body">
+        <dl class="meta-grid">
+          <dt>위치</dt><dd>대표원장 한마디 하단</dd>
+          <dt>노출 조건</dt><dd>등록 FAQ ≥ 1개일 때</dd>
+          <dt>데이터 소스</dt><dd><strong>KBS 기본 템플릿 제공 + 입점사 커스텀 편집 가능</strong></dd>
+          <dt>기본 개수</dt><dd>5개 (디자인 기준). 초과 시 "더보기" <span class="tbd">TBD</span></dd>
+        </dl>
+
+        <h3 class="block-title">구성요소 스펙</h3>
+        <table>
+          <thead><tr><th style="width:160px">컴포넌트</th><th style="width:60px">구분</th><th>필드·동작</th><th>예외</th></tr></thead>
+          <tbody>
+            <tr><td>FAQ 타이틀</td><td><span class="badge new">신규</span></td><td>"자주 묻는 질문" 헤딩</td><td>—</td></tr>
+            <tr><td>FAQ Item ×N</td><td><span class="badge new">신규</span></td><td>필드: 질문, 답변. 탭 시 아코디언 펼침·접힘. 초기 전부 접힘</td><td>—</td></tr>
+          </tbody>
+        </table>
+
+        <div class="note"><strong>결정 필요</strong> · 기본 템플릿 FAQ 내용 구체화 · 입점사 커스텀 편집 시 승인 프로세스 필요 여부</div>
+      </div>
+    </section>
+
+    <!-- 12. SNS & 채널 (하단) -->
+    <section class="section" id="sns-bottom">
+      <div class="section-head">
+        <span class="num">12</span>
+        <h2>SNS &amp; 채널 (하단) <span class="badge new">신규</span></h2>
+      </div>
+      <div class="section-body">
+        <dl class="meta-grid">
+          <dt>위치</dt><dd>FAQ 하단</dd>
+          <dt>노출 조건</dt><dd>상단 SNS 섹션과 동일 (채널 ≥ 1개)</dd>
+          <dt>데이터 소스</dt><dd>상단과 동일 데이터 재사용</dd>
+        </dl>
+
+        <h3 class="block-title">구성요소 스펙</h3>
+        <table>
+          <thead><tr><th style="width:160px">컴포넌트</th><th style="width:60px">구분</th><th>필드·동작</th><th>예외</th></tr></thead>
+          <tbody>
+            <tr><td>섹션 헤더</td><td><span class="badge new">신규</span></td><td>"채널 바로가기" 등 타이틀</td><td>—</td></tr>
+            <tr><td>채널 리스트</td><td><span class="badge new">신규</span></td><td>상단과 동일 데이터 · 동일 탭 동작. 시각적 배치만 다름 (세로 리스트형 <span class="tbd">TBD</span>)</td><td>—</td></tr>
+          </tbody>
+        </table>
+
+        <div class="note"><strong>결정 필요</strong> · 상단과 동일 섹션이 하단에 재노출되는 의도 (체류 유도 / 전환 유도) 및 차별화 요소</div>
+      </div>
+    </section>
+
+    <!-- 13. 예약 & 취소 안내 (요약) -->
+    <section class="section" id="policy-summary">
+      <div class="section-head">
+        <span class="num">13</span>
+        <h2>예약 &amp; 취소 안내 (요약) <span class="badge new">신규</span></h2>
+      </div>
+      <div class="section-body">
+        <dl class="meta-grid">
+          <dt>위치</dt><dd>하단 SNS 아래</dd>
+          <dt>노출 조건</dt><dd>항상 노출</dd>
+          <dt>데이터 소스</dt><dd><strong>KBS 공통 템플릿</strong></dd>
+        </dl>
+
+        <h3 class="block-title">구성요소 스펙</h3>
+        <table>
+          <thead><tr><th style="width:160px">컴포넌트</th><th style="width:60px">구분</th><th>필드·동작</th><th>예외</th></tr></thead>
+          <tbody>
+            <tr><td>섹션 타이틀</td><td><span class="badge new">신규</span></td><td>"예약 &amp; 취소 안내" 헤딩</td><td>—</td></tr>
+            <tr><td>예약 방법 카드</td><td><span class="badge new">신규</span></td><td>예약 경로 안내 (KBS 채팅 기반). 탭 시 채팅 진입</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 14. 예약 & 취소 정책 (상세) -->
+    <section class="section" id="policy-detail">
+      <div class="section-head">
+        <span class="num">14</span>
+        <h2>예약 &amp; 취소 정책 (상세) <span class="badge new">신규</span></h2>
+      </div>
+      <div class="section-body">
+        <dl class="meta-grid">
+          <dt>위치</dt><dd>예약 안내 하단</dd>
+          <dt>노출 조건</dt><dd>항상 노출</dd>
+          <dt>데이터 소스</dt><dd><strong>KBS 공통 템플릿</strong></dd>
+        </dl>
+
+        <h3 class="block-title">구성요소 스펙</h3>
+        <table>
+          <thead><tr><th style="width:160px">컴포넌트</th><th style="width:60px">구분</th><th>필드·동작</th><th>예외</th></tr></thead>
+          <tbody>
+            <tr><td>섹션 타이틀</td><td><span class="badge new">신규</span></td><td>"예약 &amp; 취소 정책" 헤딩</td><td>—</td></tr>
+            <tr><td>상세 정책 블록</td><td><span class="badge new">신규</span></td><td>본문: 예약 가능 시간, 취소 기한, 환불 기준, 노쇼 정책 등 (공통 템플릿)</td><td>—</td></tr>
+            <tr><td>확인 버튼</td><td><span class="badge new">신규</span></td><td>"확인" 버튼 (해당 섹션을 접는 UX <span class="tbd">TBD</span>)</td><td>—</td></tr>
+          </tbody>
+        </table>
+
+        <div class="note"><strong>결정 필요</strong> · 정책 버전 관리 (변경 시 기존 예약 영향)</div>
+      </div>
+    </section>
+
+    <!-- 15. Sticky Bottom CTA -->
+    <section class="section" id="sticky-cta">
+      <div class="section-head">
+        <span class="num">15</span>
+        <h2>Sticky Bottom CTA <span class="badge update">개편</span></h2>
+      </div>
+      <div class="section-body">
+        <dl class="meta-grid">
+          <dt>위치</dt><dd>화면 최하단 고정 (sticky)</dd>
+          <dt>높이</dt><dd>91px (디자인 기준)</dd>
+          <dt>노출 조건</dt><dd>항상 노출</dd>
+          <dt>CTA 구성</dt><dd><strong>메인 CTA 단일 버튼 (채팅)</strong> — 예약 전용 버튼 없음</dd>
+          <dt>로그인 분기</dt><dd>채팅 진입 = 비로그인 게스트 가능 (KBS 채팅 정책)</dd>
+        </dl>
+
+        <h3 class="block-title">구성요소 스펙</h3>
+        <table>
+          <thead><tr><th style="width:160px">컴포넌트</th><th style="width:60px">구분</th><th>필드·동작</th><th>예외</th></tr></thead>
+          <tbody>
+            <tr><td>아이콘</td><td><span class="badge update">개편</span></td><td>좌측 액션 아이콘 (스토어 저장·공유 <span class="tbd">TBD: 최종 액션</span>). 탭 시 해당 기능 실행</td><td>비로그인 저장 시 로그인 유도</td></tr>
+            <tr><td>Chat 버튼</td><td><span class="badge new">신규</span></td><td>메인 CTA 단일 버튼 — 라벨 "채팅하기" 등. 탭 시 KBS 채팅 진입 (게스트 가능)</td><td>—</td></tr>
+          </tbody>
+        </table>
+
+        <div class="note"><strong>결정 필요</strong> · 좌측 아이콘 최종 액션 (저장·공유·기타)</div>
+      </div>
+    </section>
+
+    <!-- 16. 탭 네비게이션 -->
+    <section class="section" id="tab-nav">
+      <div class="section-head">
+        <span class="num">16</span>
+        <h2>탭 네비게이션 (제거/통합) <span class="badge update">개편</span></h2>
+      </div>
+      <div class="section-body">
+        <dl class="meta-grid">
+          <dt>변경 유형</dt><dd>AS-IS 4탭 전환형 → 홈탭 롱스크롤 통합 (구성요소 없음)</dd>
+          <dt>영향</dt><dd><strong>전체보기 페이지 별도 분리 없음</strong> — 모든 콘텐츠는 홈탭 내 섹션에 통합. "전체보기" 버튼은 해당 섹션 내 펼침으로 동작</dd>
+        </dl>
+
+        <h3 class="block-title">이관 계획</h3>
+        <table>
+          <thead><tr><th style="width:140px">AS-IS 탭</th><th>TO-BE 배치</th><th>페이지 분리</th></tr></thead>
+          <tbody>
+            <tr><td>Store Info</td><td>홈탭 각 섹션(핵심 정보·원장·시술·FAQ 등)에 분산</td><td>분리 불필요</td></tr>
+            <tr><td>Products</td><td>"제공 시술" 섹션 (홈 롱스크롤 통합)</td><td>별도 페이지 없음. "전체보기" = 섹션 내 펼침</td></tr>
+            <tr><td>Gallery</td><td>"결과 하이라이트" 섹션 (홈 롱스크롤 통합)</td><td>별도 페이지 없음. "전체보기" = 섹션 내 펼침</td></tr>
+            <tr><td>Reviews</td><td>Testimonials (홈 pinned) + 전체 후기 <span class="tbd">TBD: 진입점</span></td><td>전체 후기 페이지 유지 가정 (진입점 확정 필요)</td></tr>
+          </tbody>
+        </table>
+
+        <div class="note"><strong>결정 필요</strong> · 전체 후기 페이지 진입점 · 리뷰 작성 플로우 진입점</div>
+      </div>
+    </section>
+
+  </main>
+</div>
+</body>
+</html>

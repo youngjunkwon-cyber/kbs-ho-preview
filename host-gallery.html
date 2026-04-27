@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>갤러리 관리 — KBS Host (구조 초안)</title>
+<style>
+:root {
+  --primary: #E8537A;
+  --primary-l: #FDF0F3;
+  --bg: #F5F5F5;
+  --card: #ffffff;
+  --border: #DDDDDD;
+  --text1: #222222;
+  --text2: #555555;
+  --text3: #888888;
+  --sidebar-active: #FDF0F3;
+  --green: #059669;
+  --green-bg: #ECFDF5;
+  --yellow: #D97706;
+  --yellow-bg: #FFFBEB;
+  --gray-bg: #F3F4F6;
+  --blue: #1E40AF;
+  --blue-bg: #EFF6FF;
+  --blue-border: #BFDBFE;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: Inter, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  background: var(--bg);
+  color: var(--text1);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.app { display: flex; min-height: 100vh; max-width: 1440px; margin: 0 auto; background: var(--bg); }
+
+/* ── Sidebar ── */
+.sidebar { width: 200px; flex-shrink: 0; background: #fff; border-right: 1px solid var(--border); min-height: 100vh; display: flex; flex-direction: column; }
+.sidebar-logo { padding: 0 16px; height: 52px; display: flex; align-items: center; font-weight: 800; font-size: 15px; color: var(--primary); border-bottom: 1px solid var(--border); letter-spacing: -0.3px; }
+.sidebar-menu { padding: 8px 0; }
+.menu-item { display: flex; align-items: center; padding: 9px 16px; font-size: 13px; color: var(--text2); cursor: pointer; border-left: 3px solid transparent; gap: 8px; }
+.menu-item:hover { background: #fafafa; }
+.menu-item.active { background: var(--sidebar-active); color: var(--primary); border-left-color: var(--primary); font-weight: 700; }
+.menu-item.sub { padding-left: 32px; font-size: 12px; color: var(--text3); }
+.menu-item.sub.active { color: var(--primary); background: var(--sidebar-active); border-left-color: var(--primary); font-weight: 600; }
+
+/* ── Main ── */
+.main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.topbar { height: 52px; background: #fff; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; gap: 10px; }
+.topbar-title { font-size: 15px; font-weight: 700; flex: 1; }
+.content { flex: 1; padding: 20px 24px; }
+
+/* ── Buttons ── */
+.btn { padding: 7px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; line-height: 1.4; display: inline-flex; align-items: center; gap: 6px; }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: #d4476c; }
+.btn-secondary { background: #fff; color: var(--text2); border: 1px solid var(--border); }
+.btn-secondary:hover { background: #fafafa; }
+.btn-sm { padding: 4px 12px; font-size: 12px; }
+.btn-danger-ghost { background: none; border: 1px solid #FCA5A5; color: #EF4444; border-radius: 5px; padding: 4px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
+.btn-danger-ghost:hover { background: #FEF2F2; }
+
+/* ── Sub Tab ── */
+.sub-tab-bar { display: flex; border-bottom: 2px solid var(--border); background: #fff; border-radius: 8px 8px 0 0; padding: 0 4px; }
+.sub-tab-btn { padding: 13px 20px; font-size: 13px; font-weight: 500; color: var(--text3); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; background: none; border-top: none; border-left: none; border-right: none; white-space: nowrap; transition: color 0.15s; }
+.sub-tab-btn:hover { color: var(--text1); }
+.sub-tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 700; }
+.sub-tab-panel { display: none; padding-top: 20px; }
+.sub-tab-panel.active { display: block; }
+
+/* ── Cards ── */
+.card { background: #fff; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 16px; }
+.card-header { padding: 13px 20px; border-bottom: 1px solid var(--border); font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.card-header-note { font-size: 11px; font-weight: 400; color: var(--text3); margin-left: 4px; }
+.card-body { padding: 20px; }
+
+/* ── Form ── */
+.form-row { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px; }
+.form-row:last-child { margin-bottom: 0; }
+.form-label { width: 100px; flex-shrink: 0; font-size: 12px; font-weight: 600; color: var(--text2); padding-top: 7px; }
+.req { color: var(--primary); }
+.form-control { flex: 1; }
+.input { width: 100%; padding: 7px 10px; border: 1px solid var(--border); border-radius: 5px; font-size: 13px; color: var(--text1); background: #fff; outline: none; }
+.input:focus { border-color: var(--primary); }
+.select { padding: 7px 10px; border: 1px solid var(--border); border-radius: 5px; font-size: 13px; color: var(--text1); background: #fff; cursor: pointer; outline: none; }
+.text-muted { color: var(--text3); font-size: 12px; }
+.char-hint { font-size: 11px; color: var(--text3); margin-top: 4px; }
+
+/* ── Badges ── */
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+.badge-ok { background: var(--green-bg); color: var(--green); }
+.badge-warn { background: var(--yellow-bg); color: var(--yellow); }
+.badge-gray { background: var(--gray-bg); color: var(--text3); }
+.badge-cat { background: #EDE9FE; color: #5B21B6; }
+
+/* ── Info/Warn banners ── */
+.info-banner { background: var(--blue-bg); border: 1px solid var(--blue-border); border-radius: 6px; padding: 10px 14px; font-size: 12px; color: var(--blue); margin-bottom: 16px; line-height: 1.6; }
+.warn-banner { background: var(--yellow-bg); border: 1px solid #FCD34D; border-radius: 6px; padding: 10px 14px; font-size: 12px; color: var(--yellow); margin-bottom: 16px; line-height: 1.6; }
+
+/* ── Upload zone ── */
+.upload-zone { border: 2px dashed var(--border); border-radius: 8px; padding: 24px 16px; text-align: center; color: var(--text3); font-size: 12px; cursor: pointer; background: #FAFAFA; transition: all 0.15s; }
+.upload-zone:hover { border-color: var(--primary); background: var(--primary-l); color: var(--primary); }
+.upload-icon { font-size: 22px; margin-bottom: 6px; }
+
+/* ── B/A Entry card ── */
+.ba-entry { background: #fff; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+.ba-entry-header { padding: 10px 16px; background: #FAFAFA; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.ba-entry-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ba-subtitle { font-size: 13px; font-weight: 600; color: var(--text1); }
+.ba-entry-body { padding: 16px; }
+.ba-photos { display: flex; gap: 12px; }
+.ba-photo-slot { flex: 1; }
+.ba-photo-label { font-size: 10px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; color: var(--text3); margin-bottom: 6px; }
+.ba-photo-img { width: 100%; aspect-ratio: 4/3; background: #E5E7EB; border: 1px solid var(--border); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: var(--text3); font-size: 11px; position: relative; overflow: hidden; }
+.ba-photo-img img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ── Gallery grid ── */
+.gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+.gallery-item { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: #fff; }
+.gallery-thumb { aspect-ratio: 1; background: #E5E7EB; display: flex; align-items: center; justify-content: center; color: var(--text3); font-size: 11px; }
+.gallery-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.gallery-item-footer { padding: 6px 10px; display: flex; align-items: center; justify-content: space-between; }
+.gallery-add { border: 2px dashed var(--border); border-radius: 8px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 6px; font-size: 12px; color: var(--text3); cursor: pointer; background: #FAFAFA; transition: all 0.15s; }
+.gallery-add:hover { border-color: var(--primary); background: var(--primary-l); color: var(--primary); }
+
+/* ── Add Form ── */
+.add-form-card { border: 2px dashed var(--primary); border-radius: 8px; background: var(--primary-l); margin-bottom: 16px; }
+.add-form-card .card-header { background: var(--primary-l); border-bottom: 1px solid #F5C6D5; color: var(--primary); font-weight: 700; }
+.add-form-card .card-body { background: #fff; border-radius: 0 0 6px 6px; }
+
+/* ── Photo pair layout ── */
+.photo-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+/* ── Drag handle ── */
+.drag-handle { color: var(--text3); cursor: grab; font-size: 14px; padding: 0 4px; }
+.drag-handle:active { cursor: grabbing; }
+
+/* ── Divider ── */
+.divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+/* ── Empty state ── */
+.empty-state { text-align: center; padding: 48px 20px; color: var(--text3); }
+.empty-state-icon { font-size: 36px; margin-bottom: 12px; }
+.empty-state-title { font-size: 14px; font-weight: 600; color: var(--text2); margin-bottom: 6px; }
+.empty-state-desc { font-size: 12px; }
+
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">KBS Host</div>
+    <div class="sidebar-menu">
+      <div class="menu-item">홈</div>
+      <div class="menu-item">채팅 관리</div>
+      <div class="menu-item">상담 관리</div>
+      <div class="menu-item active">갤러리 관리</div>
+      <div class="menu-item sub active" onclick="showTab('ba')">전/후 사진</div>
+      <div class="menu-item sub" id="sidebar-general" onclick="showTab('general')">일반 사진</div>
+      <div class="menu-item" onclick="window.location='host-store-settings.html'">스토어 설정</div>
+      <div class="menu-item">리뷰 관리</div>
+      <div class="menu-item">챗봇 설정</div>
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <main class="main">
+    <div class="topbar">
+      <span class="topbar-title" id="topbar-title">갤러리 관리 — 전/후 사진</span>
+    </div>
+
+    <div class="content">
+
+      <!-- ════════════════════════════════
+           전/후 사진 패널
+      ════════════════════════════════ -->
+      <div id="panel-ba">
+
+        <div class="info-banner">
+          비포애프터 사진은 <strong>FO 스토어 상세 &gt; 비포애프터 섹션</strong>에 노출됩니다.<br>
+          각 항목은 연결된 <strong>상품의 세부분류 + 상품명</strong>이 자동 표기되며, 소제목 한 줄을 직접 입력합니다.
+        </div>
+
+        <!-- Add New Form -->
+        <div class="add-form-card card" id="add-ba-form" style="display:none;">
+          <div class="card-header">
+            + 새 비포애프터 추가
+            <button class="btn btn-sm btn-secondary" onclick="toggleAddForm()">취소</button>
+          </div>
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-label">시술 카테고리 <span class="req">*</span></div>
+              <div class="form-control">
+                <select class="select" style="width:100%;" onchange="filterProducts(this)">
+                  <option value="">세부분류 선택</option>
+                  <option value="lifting">리프팅</option>
+                  <option value="filler">필러</option>
+                  <option value="botox">보톡스</option>
+                  <option value="skin">피부관리</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-label">상품 <span class="req">*</span></div>
+              <div class="form-control">
+                <select class="select" style="width:100%;" id="product-select">
+                  <option value="">카테고리를 먼저 선택하세요</option>
+                </select>
+                <div class="text-muted" style="margin-top:5px;">상품명은 FO에 그대로 노출됩니다</div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-label">소제목 <span class="req">*</span></div>
+              <div class="form-control">
+                <input class="input" id="ba-subtitle-input" placeholder="예: 올쎄라 600샷 시술 3개월 후" maxlength="30" oninput="updateCharCount(this,'ba-char-count')" />
+                <div class="char-hint"><span id="ba-char-count">0</span>/30자</div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-label">사진 업로드 <span class="req">*</span></div>
+              <div class="form-control">
+                <div class="photo-pair">
+                  <div>
+                    <div class="ba-photo-label">BEFORE</div>
+                    <div class="upload-zone">
+                      <div class="upload-icon">📷</div>
+                      Before 사진<br>
+                      <span class="text-muted">JPG/PNG · 최대 10MB</span>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="ba-photo-label">AFTER</div>
+                    <div class="upload-zone">
+                      <div class="upload-icon">✨</div>
+                      After 사진<br>
+                      <span class="text-muted">JPG/PNG · 최대 10MB</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="text-muted" style="margin-top:8px;">FO에서는 Before → After 순으로 세로 배치됩니다</div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px;">
+              <button class="btn btn-secondary" onclick="toggleAddForm()">취소</button>
+              <button class="btn btn-primary">저장</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- List Header -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <span style="font-size:13px;color:var(--text2);">총 <strong>4</strong>개</span>
+          <button class="btn btn-primary" onclick="toggleAddForm()">+ 비포애프터 추가</button>
+        </div>
+
+        <!-- Entry 1 -->
+        <div class="ba-entry">
+          <div class="ba-entry-header">
+            <div class="ba-entry-meta">
+              <span class="drag-handle">⠿</span>
+              <span class="badge badge-cat">리프팅</span>
+              <span style="font-size:12px;color:var(--text2);font-weight:600;">올쎄라 듀얼 600샷</span>
+              <span style="color:var(--text3);font-size:11px;">·</span>
+              <span class="ba-subtitle">올쎄라 600샷 시술 3개월 후</span>
+            </div>
+            <div style="display:flex;gap:6px;flex-shrink:0;">
+              <button class="btn btn-secondary btn-sm">수정</button>
+              <button class="btn-danger-ghost">삭제</button>
+            </div>
+          </div>
+          <div class="ba-entry-body">
+            <div class="ba-photos">
+              <div class="ba-photo-slot">
+                <div class="ba-photo-label">BEFORE</div>
+                <div class="ba-photo-img" style="background:#D1D5DB;font-size:12px;">Before 이미지</div>
+              </div>
+              <div class="ba-photo-slot">
+                <div class="ba-photo-label">AFTER</div>
+                <div class="ba-photo-img" style="background:#C7D2FE;font-size:12px;">After 이미지</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Entry 2 -->
+        <div class="ba-entry">
+          <div class="ba-entry-header">
+            <div class="ba-entry-meta">
+              <span class="drag-handle">⠿</span>
+              <span class="badge badge-cat">필러</span>
+              <span style="font-size:12px;color:var(--text2);font-weight:600;">코 필러 1cc</span>
+              <span style="color:var(--text3);font-size:11px;">·</span>
+              <span class="ba-subtitle">코 필러 시술 1주 후 붓기 완전 빠짐</span>
+            </div>
+            <div style="display:flex;gap:6px;flex-shrink:0;">
+              <button class="btn btn-secondary btn-sm">수정</button>
+              <button class="btn-danger-ghost">삭제</button>
+            </div>
+          </div>
+          <div class="ba-entry-body">
+            <div class="ba-photos">
+              <div class="ba-photo-slot">
+                <div class="ba-photo-label">BEFORE</div>
+                <div class="ba-photo-img" style="background:#D1D5DB;font-size:12px;">Before 이미지</div>
+              </div>
+              <div class="ba-photo-slot">
+                <div class="ba-photo-label">AFTER</div>
+                <div class="ba-photo-img" style="background:#BBF7D0;font-size:12px;">After 이미지</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Entry 3 -->
+        <div class="ba-entry">
+          <div class="ba-entry-header">
+            <div class="ba-entry-meta">
+              <span class="drag-handle">⠿</span>
+              <span class="badge badge-cat">보톡스</span>
+              <span style="font-size:12px;color:var(--text2);font-weight:600;">이마 보톡스 50U</span>
+              <span style="color:var(--text3);font-size:11px;">·</span>
+              <span class="ba-subtitle">이마 주름 보톡스 4주 경과</span>
+            </div>
+            <div style="display:flex;gap:6px;flex-shrink:0;">
+              <button class="btn btn-secondary btn-sm">수정</button>
+              <button class="btn-danger-ghost">삭제</button>
+            </div>
+          </div>
+          <div class="ba-entry-body">
+            <div class="ba-photos">
+              <div class="ba-photo-slot">
+                <div class="ba-photo-label">BEFORE</div>
+                <div class="ba-photo-img" style="background:#D1D5DB;font-size:12px;">Before 이미지</div>
+              </div>
+              <div class="ba-photo-slot">
+                <div class="ba-photo-label">AFTER</div>
+                <div class="ba-photo-img" style="background:#FDE68A;font-size:12px;">After 이미지</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Entry 4 -->
+        <div class="ba-entry">
+          <div class="ba-entry-header">
+            <div class="ba-entry-meta">
+              <span class="drag-handle">⠿</span>
+              <span class="badge badge-cat">리프팅</span>
+              <span style="font-size:12px;color:var(--text2);font-weight:600;">인모드 FX 전신</span>
+              <span style="color:var(--text3);font-size:11px;">·</span>
+              <span class="ba-subtitle">인모드 FX 복부 1회 시술 2주 후</span>
+            </div>
+            <div style="display:flex;gap:6px;flex-shrink:0;">
+              <button class="btn btn-secondary btn-sm">수정</button>
+              <button class="btn-danger-ghost">삭제</button>
+            </div>
+          </div>
+          <div class="ba-entry-body">
+            <div class="ba-photos">
+              <div class="ba-photo-slot">
+                <div class="ba-photo-label">BEFORE</div>
+                <div class="ba-photo-img" style="background:#D1D5DB;font-size:12px;">Before 이미지</div>
+              </div>
+              <div class="ba-photo-slot">
+                <div class="ba-photo-label">AFTER</div>
+                <div class="ba-photo-img" style="background:#FBCFE8;font-size:12px;">After 이미지</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-muted" style="margin-top:8px;text-align:center;">⠿ 드래그하여 FO 노출 순서를 변경할 수 있습니다</div>
+
+      </div>
+
+      <!-- ════════════════════════════════
+           일반 사진 패널
+      ════════════════════════════════ -->
+      <div id="panel-general" style="display:none;">
+
+        <div class="warn-banner">
+          ⚠️ <strong>Q-GL1 · Q-GL2 결정 대기</strong><br>
+          갤러리 섹션의 구체적인 노출 방식(레이아웃, 카테고리 구분 여부 등)이 아직 확정되지 않았습니다.<br>
+          현재는 기존 구조 기준으로 표시됩니다. 확정 후 업데이트 예정.
+        </div>
+
+        <!-- Upload & count header -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <span style="font-size:13px;color:var(--text2);">총 <strong>9</strong>장 · 최대 30장</span>
+          <button class="btn btn-primary">+ 사진 업로드</button>
+        </div>
+
+        <!-- Gallery grid -->
+        <div class="gallery-grid">
+
+          <!-- 업로드된 사진 아이템 × 9 -->
+          <div class="gallery-item">
+            <div class="gallery-thumb" style="background:#BFDBFE;">이미지 1</div>
+            <div class="gallery-item-footer">
+              <span class="drag-handle" style="font-size:12px;">⠿</span>
+              <button class="btn-danger-ghost btn-sm" style="padding:2px 8px;font-size:11px;">삭제</button>
+            </div>
+          </div>
+          <div class="gallery-item">
+            <div class="gallery-thumb" style="background:#BBF7D0;">이미지 2</div>
+            <div class="gallery-item-footer">
+              <span class="drag-handle" style="font-size:12px;">⠿</span>
+              <button class="btn-danger-ghost btn-sm" style="padding:2px 8px;font-size:11px;">삭제</button>
+            </div>
+          </div>
+          <div class="gallery-item">
+            <div class="gallery-thumb" style="background:#FDE68A;">이미지 3</div>
+            <div class="gallery-item-footer">
+              <span class="drag-handle" style="font-size:12px;">⠿</span>
+              <button class="btn-danger-ghost btn-sm" style="padding:2px 8px;font-size:11px;">삭제</button>
+            </div>
+          </div>
+          <div class="gallery-item">
+            <div class="gallery-thumb" style="background:#FBCFE8;">이미지 4</div>
+            <div class="gallery-item-footer">
+              <span class="drag-handle" style="font-size:12px;">⠿</span>
+              <button class="btn-danger-ghost btn-sm" style="padding:2px 8px;font-size:11px;">삭제</button>
+            </div>
+          </div>
+          <div class="gallery-item">
+            <div class="gallery-thumb" style="background:#DDD6FE;">이미지 5</div>
+            <div class="gallery-item-footer">
+              <span class="drag-handle" style="font-size:12px;">⠿</span>
+              <button class="btn-danger-ghost btn-sm" style="padding:2px 8px;font-size:11px;">삭제</button>
+            </div>
+          </div>
+          <div class="gallery-item">
+            <div class="gallery-thumb" style="background:#A7F3D0;">이미지 6</div>
+            <div class="gallery-item-footer">
+              <span class="drag-handle" style="font-size:12px;">⠿</span>
+              <button class="btn-danger-ghost btn-sm" style="padding:2px 8px;font-size:11px;">삭제</button>
+            </div>
+          </div>
+          <div class="gallery-item">
+            <div class="gallery-thumb" style="background:#FCA5A5;">이미지 7</div>
+            <div class="gallery-item-footer">
+              <span class="drag-handle" style="font-size:12px;">⠿</span>
+              <button class="btn-danger-ghost btn-sm" style="padding:2px 8px;font-size:11px;">삭제</button>
+            </div>
+          </div>
+          <div class="gallery-item">
+            <div class="gallery-thumb" style="background:#C7D2FE;">이미지 8</div>
+            <div class="gallery-item-footer">
+              <span class="drag-handle" style="font-size:12px;">⠿</span>
+              <button class="btn-danger-ghost btn-sm" style="padding:2px 8px;font-size:11px;">삭제</button>
+            </div>
+          </div>
+          <div class="gallery-item">
+            <div class="gallery-thumb" style="background:#FEF08A;">이미지 9</div>
+            <div class="gallery-item-footer">
+              <span class="drag-handle" style="font-size:12px;">⠿</span>
+              <button class="btn-danger-ghost btn-sm" style="padding:2px 8px;font-size:11px;">삭제</button>
+            </div>
+          </div>
+
+          <!-- Add slot -->
+          <div class="gallery-add" style="aspect-ratio:unset;min-height:120px;">
+            <span style="font-size:22px;">+</span>
+            <span>사진 추가</span>
+          </div>
+
+        </div>
+
+        <div class="text-muted" style="margin-top:12px;text-align:center;">⠿ 드래그하여 FO 노출 순서를 변경할 수 있습니다</div>
+
+      </div>
+
+    </div><!-- /content -->
+  </main>
+</div>
+
+<script>
+const PRODUCTS = {
+  lifting: ['올쎄라 듀얼 600샷', '올쎄라 듀얼 400샷', '인모드 FX 전신', '인모드 바디'],
+  filler: ['코 필러 1cc', '팔자 필러 2cc', '입술 필러 0.5cc', '눈밑 필러 1cc'],
+  botox: ['이마 보톡스 50U', '눈가 보톡스 30U', '사각턱 보톡스 100U', '종아리 보톡스 200U'],
+  skin: ['물광 주사 기본', '레이저 토닝 5회', '탄력 앰풀 케어']
+};
+
+function showTab(tab) {
+  const isBa = tab === 'ba';
+  document.getElementById('panel-ba').style.display = isBa ? 'block' : 'none';
+  document.getElementById('panel-general').style.display = isBa ? 'none' : 'block';
+  document.getElementById('topbar-title').textContent = isBa
+    ? '갤러리 관리 — 전/후 사진'
+    : '갤러리 관리 — 일반 사진';
+  // sidebar highlight
+  document.querySelectorAll('.menu-item.sub').forEach((el, i) => {
+    el.classList.toggle('active', isBa ? i === 0 : i === 1);
+  });
+}
+
+function toggleAddForm() {
+  const form = document.getElementById('add-ba-form');
+  form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+
+function filterProducts(sel) {
+  const pSel = document.getElementById('product-select');
+  const cat = sel.value;
+  pSel.innerHTML = cat
+    ? PRODUCTS[cat].map(p => `<option>${p}</option>`).join('')
+    : '<option>카테고리를 먼저 선택하세요</option>';
+}
+
+function updateCharCount(input, countId) {
+  document.getElementById(countId).textContent = input.value.length;
+}
+</script>
+
+</body>
+</html>
