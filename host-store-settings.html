@@ -365,6 +365,73 @@ body {
 
 .fo-preview-note { text-align: center; font-size: 10px; color: var(--text3); padding: 12px 0 16px; background: #f0f0f2; }
 
+/* ══ v3 업그레이드 CSS ══ */
+
+/* 탭 스트립 */
+.fo-tab-strip { display: flex; border-bottom: 1px solid var(--fbr,#e4e4e4); background: #fff; position: sticky; top: 0; z-index: 10; }
+.fo-tab-strip-btn { flex: 1; height: 38px; font-size: 11px; font-weight: 500; color: var(--fc,#8e8e8e); border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; font-family: inherit; transition: all 0.12s; }
+.fo-tab-strip-btn.active { color: var(--fp,#fb6f92); font-weight: 700; border-bottom-color: var(--fp,#fb6f92); }
+
+/* AI 카드 (핑크 테두리) */
+.fo-ai-card { margin: 16px; border: 1.5px solid var(--fp,#fb6f92); border-radius: 12px; padding: 14px; background: linear-gradient(135deg, #fff 60%, #fff5f8 100%); }
+.fo-ai-card-hd { display: flex; align-items: center; gap: 7px; margin-bottom: 8px; }
+.fo-ai-card-label { font-size: 11px; font-weight: 800; color: var(--fp,#fb6f92); letter-spacing: 0.3px; }
+.fo-ai-card-beta { margin-left: auto; background: #fde8ef; color: var(--fp,#fb6f92); font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 10px; letter-spacing: 0.4px; }
+.fo-ai-card-text { font-size: 12px; color: var(--fb,#555); line-height: 1.65; }
+
+/* 피처 뱃지 */
+.fo-feature-badges { display: flex; gap: 7px; flex-wrap: wrap; padding: 0 16px 20px; }
+.fo-feature-badge { display: flex; align-items: center; gap: 5px; padding: 6px 11px; border: 1px solid var(--fbr,#e4e4e4); border-radius: 20px; background: #fff; font-size: 11px; font-weight: 600; color: var(--fb,#555); }
+
+/* info 2×2 grid */
+.fo-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.fo-info-cell-label { font-size: 10px; font-weight: 600; color: var(--fc,#8e8e8e); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+.fo-info-cell-value { font-size: 12px; font-weight: 600; color: var(--fh,#2d2d2d); line-height: 1.3; }
+.fo-info-cell-sub { font-size: 10px; color: var(--fc,#8e8e8e); }
+
+/* 영업시간 아코디언 */
+.fo-hours-acc { border: 1px solid var(--fbr,#e4e4e4); border-radius: 8px; overflow: hidden; margin-bottom: 14px; }
+.fo-hours-hd { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; cursor: pointer; background: #fff; user-select: none; }
+.fo-hours-hd-left { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--fh,#2d2d2d); }
+.fo-hours-dot { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; flex-shrink: 0; }
+.fo-hours-open { font-size: 10px; color: #22c55e; font-weight: 600; }
+.fo-hours-chevron { font-size: 10px; color: var(--fc,#8e8e8e); transition: transform 0.2s; }
+.fo-hours-acc.open .fo-hours-chevron { transform: rotate(180deg); }
+.fo-hours-bd { display: none; padding: 0 12px 10px; }
+.fo-hours-acc.open .fo-hours-bd { display: block; }
+.fo-hours-row { display: flex; justify-content: space-between; font-size: 11px; color: var(--fb,#555); padding: 4px 0; border-bottom: 1px solid var(--fbr,#e4e4e4); }
+.fo-hours-row:last-child { border-bottom: none; }
+.fo-hours-day { color: var(--fc,#8e8e8e); }
+
+/* 필터 칩 */
+.fo-filter-row { display: flex; gap: 6px; overflow-x: auto; padding: 0 16px 12px; }
+.fo-filter-row::-webkit-scrollbar { display: none; }
+.fo-filter-chip { flex-shrink: 0; padding: 5px 11px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1.5px solid var(--fbr,#e4e4e4); background: #fff; color: var(--fc,#8e8e8e); cursor: pointer; font-family: inherit; }
+.fo-filter-chip.active { border-color: var(--fh,#2d2d2d); background: var(--fh,#2d2d2d); color: #fff; }
+
+/* B/A 하이라이트 */
+.fo-ba-strip { display: flex; gap: 8px; overflow-x: auto; padding: 0 16px 16px; }
+.fo-ba-strip::-webkit-scrollbar { display: none; }
+.fo-ba-card { flex-shrink: 0; width: 140px; height: 170px; border-radius: 10px; overflow: hidden; position: relative; background: linear-gradient(135deg, #fde8ef, #c94372); }
+.fo-ba-card-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 55%); display: flex; flex-direction: column; justify-content: flex-end; padding: 8px; }
+.fo-ba-card-tag { display: inline-block; background: var(--fp,#fb6f92); color: #fff; font-size: 8px; font-weight: 700; padding: 2px 6px; border-radius: 8px; margin-bottom: 3px; letter-spacing: 0.5px; }
+.fo-ba-card-title { font-size: 11px; font-weight: 700; color: #fff; line-height: 1.3; margin-bottom: 1px; }
+.fo-ba-card-sub { font-size: 9px; color: rgba(255,255,255,0.7); }
+
+/* 갤러리 미니 */
+.fo-gallery-mini { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 0 16px 20px; }
+.fo-gallery-cell { border-radius: 7px; overflow: hidden; background: var(--flg,#f8f8f8); }
+.fo-gallery-cell-inner { width: 100%; height: 78px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+.fo-gallery-cell.tall .fo-gallery-cell-inner { height: 160px; }
+.fo-gallery-more { position: relative; }
+.fo-gallery-more-badge { position: absolute; inset: 0; background: rgba(0,0,0,0.42); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: #fff; }
+
+/* CTA 고정바 */
+.fo-cta-strip { background: #fff; border-top: 1px solid var(--fbr,#e4e4e4); padding: 10px 12px; display: flex; gap: 7px; box-shadow: 0 -3px 10px rgba(0,0,0,0.07); }
+.fo-cta-fav { width: 40px; height: 40px; border-radius: 9px; border: 1.5px solid var(--fbr,#e4e4e4); background: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; flex-shrink: 0; }
+.fo-cta-line { flex: 1; height: 40px; border-radius: 9px; border: none; background: #06C755; color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 5px; cursor: pointer; font-family: inherit; }
+.fo-cta-book { flex: 1; height: 40px; border-radius: 9px; border: none; background: var(--fp,#fb6f92); color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer; font-family: inherit; }
+
 /* ── Responsive breakpoints ── */
 
 /* 1400px 이하: preview panel */
@@ -1643,128 +1710,211 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
               <div class="fo-navbar">
                 <span class="fo-navbar-back">←</span>
                 <span class="fo-navbar-title" id="prev-name-en">Hanmiyeok Clinic</span>
-                <div class="fo-navbar-icons"><span>⎙</span><span>♡</span></div>
+                <div class="fo-navbar-icons"><span>🌐</span><span>♡</span></div>
               </div>
+
               <!-- 01 히어로 -->
               <div class="fo-hero" data-fo-anchor="s-image">
                 <div class="fo-hero-slide"><span>1</span><span class="fo-hero-slide-sep"></span><span>10</span></div>
                 <div class="fo-hero-overlay">
-                  <div class="fo-hero-sub">Hello! We invite you to discover Korea's finest lifting clinic.<br>Feel free to ask us anything below.</div>
-                  <div class="fo-hero-name">Korea's No.1<br>Lifting Specialist Clinic</div>
+                  <div class="fo-hero-sub" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                    <span style="color:#FFD94A;">★</span>
+                    <span style="font-size:12px;font-weight:700;">4.9</span>
+                    <span style="font-size:11px;opacity:0.7;">(2,341)</span>
+                    <span style="opacity:0.5;margin:0 2px;">·</span>
+                    <span style="font-size:11px;opacity:0.8;">📍 Gangnam-gu</span>
+                  </div>
+                  <div class="fo-hero-name">Korea's No.1<br>Lifting Specialist</div>
                 </div>
               </div>
-              <!-- 08 SNS & 채널 -->
-              <div class="fo-contact-wrap" data-fo-anchor="s-text">
-                <div class="fo-contact-sub">Still making up your mind? That's OK</div>
-                <div class="fo-contact-title">Don't leave without asking.<br>Even small questions are welcome</div>
-                <div class="fo-contact-body">Price, location, treatment info—<br>our consultants will help you fast</div>
+
+              <!-- 탭 스트립 -->
+              <div class="fo-tab-strip">
+                <button class="fo-tab-strip-btn active">소개</button>
+                <button class="fo-tab-strip-btn">상품</button>
+                <button class="fo-tab-strip-btn">B/A</button>
+                <button class="fo-tab-strip-btn">FAQ</button>
               </div>
-              <div class="fo-channel-scroll" style="padding: 0 16px 20px;" data-fo-anchor="s-channel">
+
+              <!-- 08 SNS 채널 -->
+              <div class="fo-contact-wrap" data-fo-anchor="s-channel">
+                <div class="fo-contact-sub">Consult via SNS</div>
+                <div class="fo-contact-title">Get answers fast —<br>even small questions welcome</div>
+              </div>
+              <div class="fo-channel-scroll" style="padding: 0 16px 16px;">
                 <div class="fo-channel-card">
                   <div><div class="fo-channel-icon" style="background:#25d366;">💬</div><div class="fo-channel-name">WhatsApp</div></div>
                   <div class="fo-channel-link">Connect now</div>
                 </div>
                 <div class="fo-channel-card">
-                  <div><div class="fo-channel-icon" style="background:#06c755;">L</div><div class="fo-channel-name">LINE<span style="font-size:10px;font-weight:400;"> (JP)</span></div></div>
+                  <div><div class="fo-channel-icon" style="background:#06c755;color:#fff;font-weight:800;font-size:14px;">L</div><div class="fo-channel-name">LINE</div></div>
                   <div class="fo-channel-link">Connect now</div>
                 </div>
                 <div class="fo-channel-card">
                   <div><div class="fo-channel-icon" style="background:#07c160;">💬</div><div class="fo-channel-name">WeChat</div></div>
                   <div class="fo-channel-link">Open</div>
                 </div>
-                <div class="fo-channel-card">
-                  <div><div class="fo-channel-icon" style="background:#06c755;">L</div><div class="fo-channel-name">LINE<span style="font-size:10px;font-weight:400;"> (ZH)</span></div></div>
-                  <div class="fo-channel-link">Connect now</div>
+              </div>
+
+              <!-- AI 요약 카드 -->
+              <div class="fo-ai-card" data-fo-anchor="s-ai">
+                <div class="fo-ai-card-hd">
+                  <span style="font-size:14px;">✦</span>
+                  <span class="fo-ai-card-label">AI Summary</span>
+                  <span class="fo-ai-card-beta">BETA</span>
                 </div>
+                <div class="fo-ai-card-text">Gangnam lifting clinic with 20-year veteran doctor performing all procedures directly. Specializes in Ultherapy, InMode, Botox &amp; fillers. Interpreter &amp; airport pickup available for international patients.</div>
               </div>
 
-              <!-- AI 소개 -->
-              <div class="fo-ai-wrap" data-fo-anchor="s-ai">
-                <div class="fo-ai-badge">✦ About</div>
-                <div class="fo-ai-body">A Gangnam lifting specialist clinic led by a 20-year veteran doctor directly performing all procedures. Specializing in Ultherapy, InMode, Botox, and fillers, with interpreter accompaniment and airport pickup services for foreign patients. Currently running an InMode discount event with rising reservation rates.</div>
-              </div>
-
-              <!-- Special Benefits -->
-              <div class="fo-benefits-wrap" data-fo-anchor="s-feature">
-                <div class="fo-benefits-title">Special Benefits for Foreign Visitors</div>
-                <div class="fo-benefits-row">
-                  <div class="fo-benefit-card">
-                    <div><div class="fo-benefit-icon">🌐</div><div class="fo-benefit-name">3-Language Support</div></div>
-                    <div class="fo-benefit-sub">KO · EN · ZH</div>
-                  </div>
-                  <div class="fo-benefit-card">
-                    <div><div class="fo-benefit-icon">🚗</div><div class="fo-benefit-name">Airport Pickup</div></div>
-                    <div class="fo-benefit-sub">Reservation req.</div>
-                  </div>
-                  <div class="fo-benefit-card">
-                    <div><div class="fo-benefit-icon">🗣</div><div class="fo-benefit-name">Interpreter</div></div>
-                    <div class="fo-benefit-sub">Partial fee</div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 리뷰 인라인 -->
-              <div class="fo-review-inline">
-                <span class="fo-review-score">4.4</span>
-                <span class="fo-review-stars-sm">★★★★★</span>
-                <span class="fo-review-count">(1,312)</span>
-                <span class="fo-review-chevron">›</span>
-              </div>
-
-              <!-- 핵심 정보 -->
-              <div class="fo-keyinfo-wrap" data-fo-anchor="s-location">
-                <div class="fo-keyinfo-title">Key Info</div>
-                <div class="fo-keyinfo-card">
-                  <div class="fo-ki-row">
-                    <div class="fo-ki-label">Location</div>
-                    <div class="fo-ki-value">123 Teheran-ro, Gangnam-gu<br>5 min walk from Sinnonhyeon Stn (Line 9)</div>
-                  </div>
-                  <div class="fo-ki-2col">
-                    <div class="fo-ki-row">
-                      <div class="fo-ki-label">Price Range</div>
-                      <div class="fo-ki-value">₩150K ~ ₩1.5M</div>
-                    </div>
-                    <div class="fo-ki-row">
-                      <div class="fo-ki-label">Languages</div>
-                      <div class="fo-ki-value">5 languages</div>
-                    </div>
-                  </div>
-                  <div class="fo-ki-row">
-                    <div class="fo-ki-label">Hours</div>
-                    <div class="fo-ki-value">Mon–Fri 09:00–18:00 · Sat 10:00–15:00 · Sun Closed</div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 시술 칩 (핑크 solid) -->
-              <div class="fo-tx-chips-wrap">
-                <div class="fo-tx-chip-label">Specialty Treatments</div>
-                <span class="fo-tx-chip">Ultherapy</span>
-                <span class="fo-tx-chip">InMode FX</span>
-                <span class="fo-tx-chip">Botox</span>
-                <span class="fo-tx-chip">V-RO</span>
-                <span class="fo-tx-chip">Rejuran</span>
-                <span class="fo-tx-chip">Filler</span>
-                <span class="fo-tx-chip">AHA Boost</span>
-              </div>
-
-              <!-- 키워드 칩 (gray) -->
-              <div class="fo-kw-chips-wrap">
-                <div class="fo-kw-chip-label">Keywords</div>
-                <span class="fo-kw-chip">Medical Aesthetics</span>
-                <span class="fo-kw-chip">Dermatology</span>
-                <span class="fo-kw-chip">Specialist</span>
-                <span class="fo-kw-chip">Female Doctor</span>
-                <span class="fo-kw-chip">Lifting</span>
-                <span class="fo-kw-chip">Anti-aging</span>
-                <span class="fo-kw-chip">Skin Care</span>
+              <!-- 피처 뱃지 -->
+              <div class="fo-feature-badges" data-fo-anchor="s-feature">
+                <div class="fo-feature-badge">👨‍⚕️ Specialist Direct</div>
+                <div class="fo-feature-badge">🚪 Private Room</div>
+                <div class="fo-feature-badge">📅 Weekend Open</div>
+                <div class="fo-feature-badge">🌐 5 Languages</div>
               </div>
 
               <!-- 원장 이미지 -->
               <div class="fo-doctor-img" data-fo-anchor="s-intro">👨‍⚕️</div>
 
+              <!-- 핵심정보 v3 -->
+              <div style="padding:20px 16px 0;" data-fo-anchor="s-location">
+                <div style="font-size:14px;font-weight:700;color:var(--fh,#2d2d2d);margin-bottom:12px;">Key Info</div>
+                <div class="fo-info-grid">
+                  <div>
+                    <div class="fo-info-cell-label">Location</div>
+                    <div class="fo-info-cell-value">Gangnam-gu</div>
+                    <div class="fo-info-cell-sub">Seoul, Korea</div>
+                  </div>
+                  <div>
+                    <div class="fo-info-cell-label">Subway</div>
+                    <div class="fo-info-cell-value">Gangnam Stn</div>
+                    <div class="fo-info-cell-sub">Exit 3 · 5 min walk</div>
+                  </div>
+                  <div>
+                    <div class="fo-info-cell-label">Price Range</div>
+                    <div class="fo-info-cell-value">₩150K~</div>
+                    <div class="fo-info-cell-sub">Varies by treatment</div>
+                  </div>
+                  <div>
+                    <div class="fo-info-cell-label">Booking</div>
+                    <div class="fo-info-cell-value">Online · LINE</div>
+                    <div class="fo-info-cell-sub">Same-day available</div>
+                  </div>
+                </div>
+
+                <!-- 영업시간 아코디언 -->
+                <div class="fo-hours-acc" id="fo-hours-en" onclick="this.classList.toggle('open')">
+                  <div class="fo-hours-hd">
+                    <div class="fo-hours-hd-left">
+                      <div class="fo-hours-dot"></div>
+                      Hours
+                      <span class="fo-hours-open">· Open now</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:6px;">
+                      <span style="font-size:11px;color:var(--fc,#8e8e8e);">09:00–20:00</span>
+                      <span class="fo-hours-chevron">▼</span>
+                    </div>
+                  </div>
+                  <div class="fo-hours-bd">
+                    <div class="fo-hours-row"><span class="fo-hours-day" style="font-weight:700;color:var(--fh,#2d2d2d);">Mon (Today)</span><span style="font-weight:700;">09:00–20:00</span></div>
+                    <div class="fo-hours-row"><span class="fo-hours-day">Tue</span><span>09:00–20:00</span></div>
+                    <div class="fo-hours-row"><span class="fo-hours-day">Wed</span><span>09:00–20:00</span></div>
+                    <div class="fo-hours-row"><span class="fo-hours-day">Thu</span><span>09:00–20:00</span></div>
+                    <div class="fo-hours-row"><span class="fo-hours-day">Fri</span><span>09:00–20:00</span></div>
+                    <div class="fo-hours-row"><span class="fo-hours-day">Sat</span><span>10:00–18:00</span></div>
+                    <div class="fo-hours-row"><span class="fo-hours-day">Sun</span><span>10:00–16:00</span></div>
+                  </div>
+                </div>
+
+                <!-- 시술 칩 -->
+                <div style="display:flex;flex-wrap:wrap;gap:6px;padding-bottom:20px;">
+                  <span class="fo-tx-chip">Ultherapy</span>
+                  <span class="fo-tx-chip">InMode FX</span>
+                  <span class="fo-tx-chip">Botox</span>
+                  <span class="fo-tx-chip">Filler</span>
+                  <span class="fo-kw-chip">Lifting</span>
+                  <span class="fo-kw-chip">Anti-aging</span>
+                  <span class="fo-kw-chip">Skin Care</span>
+                </div>
+              </div>
+
+              <!-- 대표 상품 -->
+              <div class="fo-treatments-wrap" data-fo-anchor="s-products">
+                <div class="fo-treatments-title">Treatments (40)</div>
+                <div class="fo-filter-row">
+                  <button class="fo-filter-chip active">All</button>
+                  <button class="fo-filter-chip">Lifting</button>
+                  <button class="fo-filter-chip">Botox</button>
+                  <button class="fo-filter-chip">Laser</button>
+                  <button class="fo-filter-chip">Filler</button>
+                </div>
+                <div class="fo-tx-card">
+                  <div class="fo-tx-thumb">✨</div>
+                  <div class="fo-tx-info">
+                    <div class="fo-tx-name">Ultherapy Full Face</div>
+                    <div class="fo-tx-desc">HIFU non-surgical lifting · 90 min</div>
+                  </div>
+                  <div class="fo-tx-right">
+                    <div class="fo-tx-price">₩680K</div>
+                    <button class="fo-tx-book">Book</button>
+                  </div>
+                </div>
+                <div class="fo-tx-card">
+                  <div class="fo-tx-thumb">💫</div>
+                  <div class="fo-tx-info">
+                    <div class="fo-tx-name">Pico Laser</div>
+                    <div class="fo-tx-desc">Pore &amp; pigment · 40 min</div>
+                  </div>
+                  <div class="fo-tx-right">
+                    <div class="fo-tx-price">₩220K</div>
+                    <button class="fo-tx-book">Book</button>
+                  </div>
+                </div>
+                <div class="fo-tx-card" style="margin-bottom:4px;">
+                  <div class="fo-tx-thumb">💉</div>
+                  <div class="fo-tx-info">
+                    <div class="fo-tx-name">Botox 3-Zone Set</div>
+                    <div class="fo-tx-desc">Forehead · Glabella · Crow's feet</div>
+                  </div>
+                  <div class="fo-tx-right">
+                    <div class="fo-tx-price">₩150K</div>
+                    <button class="fo-tx-book">Book</button>
+                  </div>
+                </div>
+                <button style="width:100%;height:36px;border:1px solid var(--fbr,#e4e4e4);border-radius:8px;background:#fff;font-size:12px;font-weight:600;color:var(--fb,#555);cursor:pointer;margin-bottom:20px;font-family:inherit;">View all treatments ›</button>
+              </div>
+
+              <!-- B/A 결과 하이라이트 -->
+              <div style="padding:20px 0 0;border-top:8px solid var(--flg,#f8f8f8);" data-fo-anchor="s-ba">
+                <div style="padding:0 16px;font-size:14px;font-weight:700;color:var(--fh,#2d2d2d);margin-bottom:12px;">Result Highlights</div>
+                <div class="fo-ba-strip">
+                  <div class="fo-ba-card" style="background:linear-gradient(135deg,#fde8ef,#c94372);">
+                    <div class="fo-ba-card-overlay">
+                      <span class="fo-ba-card-tag">LIFTING</span>
+                      <div class="fo-ba-card-title">Ultherapy<br>Before &amp; After</div>
+                      <div class="fo-ba-card-sub">4 weeks · 1 session</div>
+                    </div>
+                  </div>
+                  <div class="fo-ba-card" style="background:linear-gradient(135deg,#fce8f5,#c06090);">
+                    <div class="fo-ba-card-overlay">
+                      <span class="fo-ba-card-tag">LASER</span>
+                      <div class="fo-ba-card-title">Pico Laser<br>Pore &amp; Skin</div>
+                      <div class="fo-ba-card-sub">2 weeks · 2 sessions</div>
+                    </div>
+                  </div>
+                  <div class="fo-ba-card" style="background:linear-gradient(135deg,#f5e8fe,#8060c0);">
+                    <div class="fo-ba-card-overlay">
+                      <span class="fo-ba-card-tag">FILLER</span>
+                      <div class="fo-ba-card-title">Filler<br>Before &amp; After</div>
+                      <div class="fo-ba-card-sub">Immediate · 1 session</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <!-- 대표원장 한마디 -->
-              <div class="fo-doctor-msg">
+              <div class="fo-doctor-msg" style="background:var(--flg,#f8f8f8);border-top:8px solid var(--flg,#f8f8f8);">
                 <div class="fo-doctor-name-row">
                   <div class="fo-doctor-avatar">👤</div>
                   <div>
@@ -1775,67 +1925,46 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
                 <div class="fo-doctor-quote">"Every patient deserves the same care I would give to my own family. I personally oversee each procedure to ensure you receive the best possible results."</div>
               </div>
 
-              <!-- 04 제공 시술 -->
-              <div class="fo-treatments-wrap">
-                <div class="fo-treatments-title">Treatments (40)</div>
-                <div class="fo-tx-tabs">
-                  <button class="fo-tx-tab active">Lifting</button>
-                  <button class="fo-tx-tab">Botox</button>
-                  <button class="fo-tx-tab">Body</button>
-                  <button class="fo-tx-tab">Picotoning</button>
-                  <button class="fo-tx-tab">Skin Care</button>
-                </div>
-                <div class="fo-tx-card">
-                  <div class="fo-tx-thumb">✨</div>
-                  <div class="fo-tx-info">
-                    <div class="fo-tx-name">Ultherapy (Full Face)</div>
-                    <div class="fo-tx-desc">HIFU non-surgical lifting · 90 min</div>
-                  </div>
-                  <div class="fo-tx-right">
-                    <div class="fo-tx-price">₩800K~</div>
-                    <button class="fo-tx-book">Book</button>
-                  </div>
-                </div>
-                <div class="fo-tx-card">
-                  <div class="fo-tx-thumb">💫</div>
-                  <div class="fo-tx-info">
-                    <div class="fo-tx-name">InMode FX Lifting</div>
-                    <div class="fo-tx-desc">RF skin tightening · 60 min</div>
-                  </div>
-                  <div class="fo-tx-right">
-                    <div class="fo-tx-price">₩600K~</div>
-                    <button class="fo-tx-book">Book</button>
-                  </div>
-                </div>
-                <div class="fo-tx-card" style="margin-bottom:20px;">
-                  <div class="fo-tx-thumb">💉</div>
-                  <div class="fo-tx-info">
-                    <div class="fo-tx-name">Botox (Forehead)</div>
-                    <div class="fo-tx-desc">Wrinkle relaxing · 20 min</div>
-                  </div>
-                  <div class="fo-tx-right">
-                    <div class="fo-tx-price">₩80K~</div>
-                    <button class="fo-tx-book">Book</button>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 09 FAQ -->
+              <!-- FAQ -->
               <div class="fo-faq-wrap" data-fo-anchor="s-faq">
                 <div class="fo-faq-title">FAQ</div>
                 <div class="fo-faq-item">
                   <div class="fo-faq-q"><span>Can foreigners make a reservation?</span><span class="fo-faq-q-icon">▾</span></div>
-                  <div class="fo-faq-a">Yes, foreign guests can reserve and receive treatments just like domestic customers.</div>
+                  <div class="fo-faq-a">Yes, foreign guests can reserve and receive treatments just like domestic customers. Bring your passport on the day of visit.</div>
                 </div>
                 <div class="fo-faq-item">
-                  <div class="fo-faq-q"><span>What should I prepare before my visit?</span><span class="fo-faq-q-icon">▸</span></div>
-                </div>
-                <div class="fo-faq-item">
-                  <div class="fo-faq-q"><span>Can I resume daily activities right after?</span><span class="fo-faq-q-icon">▸</span></div>
+                  <div class="fo-faq-q"><span>Is same-day booking available?</span><span class="fo-faq-q-icon">▸</span></div>
                 </div>
                 <div class="fo-faq-item">
                   <div class="fo-faq-q"><span>What payment methods are accepted?</span><span class="fo-faq-q-icon">▸</span></div>
                 </div>
+                <div class="fo-faq-item">
+                  <div class="fo-faq-q"><span>How long is the downtime?</span><span class="fo-faq-q-icon">▸</span></div>
+                </div>
+              </div>
+
+              <!-- 갤러리 미니 -->
+              <div style="padding:20px 0 0;border-top:8px solid var(--flg,#f8f8f8);">
+                <div style="padding:0 16px;font-size:14px;font-weight:700;color:var(--fh,#2d2d2d);margin-bottom:10px;">Gallery</div>
+                <div class="fo-gallery-mini">
+                  <div class="fo-gallery-cell tall" style="grid-row:span 2;">
+                    <div class="fo-gallery-cell-inner" style="height:160px;background:linear-gradient(135deg,#fde8ef,#e8bfcf);">🏥</div>
+                  </div>
+                  <div class="fo-gallery-cell">
+                    <div class="fo-gallery-cell-inner" style="background:linear-gradient(135deg,#e8f0fe,#c8d8f0);">🛋️</div>
+                  </div>
+                  <div class="fo-gallery-cell fo-gallery-more" style="position:relative;">
+                    <div class="fo-gallery-cell-inner" style="background:linear-gradient(135deg,#e8fef4,#c8f0de);">✨</div>
+                    <div class="fo-gallery-more-badge">+24</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- CTA 바 -->
+              <div class="fo-cta-strip">
+                <div class="fo-cta-fav">♡</div>
+                <button class="fo-cta-line">L&nbsp;LINE Chat</button>
+                <button class="fo-cta-book">📅 Book Now</button>
               </div>
             </div><!-- /fo-en -->
 
