@@ -704,16 +704,8 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
     <div class="menu-item sub">일반 사진</div>
     <div class="menu-item active has-sub" id="sidebar-store-menu"><span class="menu-icon">◫</span>스토어 설정<span class="menu-chevron"></span></div>
     <div id="sidebar-store-sub-v3" style="display:none;">
-      <div class="v3-lnb-group-label">기본정보</div>
-      <div class="menu-item sub" data-section="s-location" onclick="lnbScrollToSection('s-location')">위치·운영</div>
-      <div class="menu-item sub" data-section="s-feature" onclick="lnbScrollToSection('s-feature')">스토어 특징</div>
-      <div class="v3-lnb-group-label" style="margin-top:4px;">노출설정</div>
-      <div class="menu-item sub" data-section="s-image" onclick="lnbScrollToSection('s-image')">대표이미지</div>
-      <div class="menu-item sub" data-section="s-text" onclick="lnbScrollToSection('s-text')">스토어 텍스트</div>
-      <div class="menu-item sub" data-section="s-channel" onclick="lnbScrollToSection('s-channel')">채팅 채널</div>
-      <div class="menu-item sub" data-section="s-ai" onclick="lnbScrollToSection('s-ai')">AI 소개</div>
-      <div class="menu-item sub" data-section="s-intro" onclick="lnbScrollToSection('s-intro')">소개글</div>
-      <div class="menu-item sub" data-section="s-faq" onclick="lnbScrollToSection('s-faq')">FAQ</div>
+      <div class="menu-item sub active" data-v3-section="basic" onclick="switchV3Section('basic', this)">기본정보</div>
+      <div class="menu-item sub" data-v3-section="expose" onclick="switchV3Section('expose', this)">노출설정</div>
     </div>
     <div class="menu-item"><span class="menu-icon">👤</span>마이페이지</div>
   </aside>
@@ -748,14 +740,14 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
       </div>
       <div class="anchor-bar" id="v2-anchor-bar">
         <div class="anchor-scroll-inner">
-          <button class="anchor-btn active" onclick="scrollToSection('s-image', this)">대표이미지</button>
-          <button class="anchor-btn" onclick="scrollToSection('s-text', this)">스토어 텍스트</button>
-          <button class="anchor-btn" onclick="scrollToSection('s-location', this)">위치·운영</button>
-          <button class="anchor-btn" onclick="scrollToSection('s-feature', this)">스토어 특징</button>
-          <button class="anchor-btn" onclick="scrollToSection('s-channel', this)">채팅 채널</button>
-          <button class="anchor-btn" onclick="scrollToSection('s-ai', this)">AI 소개</button>
-          <button class="anchor-btn" onclick="scrollToSection('s-intro', this)">소개글</button>
-          <button class="anchor-btn" onclick="scrollToSection('s-faq', this)">FAQ</button>
+          <button class="anchor-btn active" data-v3-group="expose" onclick="scrollToSection('s-image', this)">대표이미지</button>
+          <button class="anchor-btn" data-v3-group="expose" onclick="scrollToSection('s-text', this)">스토어 텍스트</button>
+          <button class="anchor-btn" data-v3-group="basic" onclick="scrollToSection('s-location', this)">위치·운영</button>
+          <button class="anchor-btn" data-v3-group="basic" onclick="scrollToSection('s-feature', this)">스토어 특징</button>
+          <button class="anchor-btn" data-v3-group="expose" onclick="scrollToSection('s-channel', this)">채팅 채널</button>
+          <button class="anchor-btn" data-v3-group="expose" onclick="scrollToSection('s-ai', this)">AI 소개</button>
+          <button class="anchor-btn" data-v3-group="expose" onclick="scrollToSection('s-intro', this)">소개글</button>
+          <button class="anchor-btn" data-v3-group="expose" onclick="scrollToSection('s-faq', this)">FAQ</button>
         </div>
         <div class="bar-actions">
           <button class="action-bar-preview preview-toggle-btn active" onclick="togglePreview()">FO 미리보기</button>
@@ -1280,7 +1272,7 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
         <div id="v2-form" style="display:none; padding-top:20px;">
 
           <!-- ① 대표이미지 -->
-          <div class="card v2-section" id="s-image">
+          <div class="card v2-section" data-v3-group="expose" id="s-image">
             <div class="card-header">대표 이미지 <span class="card-header-note">FO 스토어 상단 헤더에 노출</span></div>
             <div class="card-body">
               <div class="form-row">
@@ -1306,7 +1298,7 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
           </div>
 
           <!-- ② 스토어 기본 텍스트 (언어별) -->
-          <div class="card v2-section" id="s-text">
+          <div class="card v2-section" data-v3-group="expose" id="s-text">
             <div class="card-header">스토어 기본 텍스트 <span class="card-header-note">스토어명 · 주소 · 채팅 메시지</span></div>
             <div class="card-lang-bar">
               <button class="card-lang-btn active" onclick="switchCardLang(this,'ct-ko')">원본</button>
@@ -1359,14 +1351,14 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
           </div>
 
           <!-- ③ 위치 정보 + 운영시간 -->
-          <div class="card v2-section" id="s-location">
+          <div class="card v2-section" data-v3-group="basic" id="s-location">
             <div class="card-header">위치 정보 <span class="card-header-note">FO 핵심 정보 섹션에 노출</span></div>
             <div class="card-body">
               <div class="form-row"><div class="form-label">가까운 지하철역</div><div class="form-control"><select class="select" style="width:100%;margin-bottom:8px;"><option>지하철 노선 선택</option></select><div class="tag-list"><span class="tag-item">명동역 4호선 <span class="del">×</span></span><span class="tag-item">을지로입구역 2호선 <span class="del">×</span></span></div><div style="margin-top:8px;"><button class="btn btn-secondary btn-sm">+ 역 추가</button></div></div></div>
               <div class="form-row"><div class="form-label">지도 링크 <span style="font-size:11px;font-weight:400;color:var(--text3);">(선택)</span></div><div class="form-control"><input class="input" placeholder="Google Maps URL" /></div></div>
             </div>
           </div>
-          <div class="card v2-section" id="s-hours" style="margin-top:-8px;">
+          <div class="card v2-section" data-v3-group="basic" id="s-hours" style="margin-top:-8px;">
             <div class="card-header">운영시간 <span class="card-header-note">FO 핵심 정보 섹션에 노출</span></div>
             <div class="card-body">
               <div class="form-row"><div class="form-label">요일별 운영시간</div><div class="form-control">
@@ -1380,7 +1372,7 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
           </div>
 
           <!-- ④ 스토어 특징 -->
-          <div class="card v2-section" id="s-feature">
+          <div class="card v2-section" data-v3-group="basic" id="s-feature">
             <div class="card-header">스토어 특징 <span class="card-header-note">FO 외국인 특별 혜택 섹션에 노출</span></div>
             <div class="card-body">
               <div class="checkbox-grid">
@@ -1397,7 +1389,7 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
           </div>
 
           <!-- ⑤ 채팅 채널 -->
-          <div class="card v2-section" id="s-channel">
+          <div class="card v2-section" data-v3-group="expose" id="s-channel">
             <div class="card-header">SNS 채팅 채널 <button class="btn btn-secondary btn-sm" style="margin-left:auto;">+ 채널 추가</button></div>
             <div class="card-body">
               <div class="channel-row"><select class="select" style="width:120px;"><option>WhatsApp</option></select><select class="select" style="width:110px;"><option>English</option></select><input class="input" style="flex:1;" value="+82-10-1234-5678" /><button class="btn btn-secondary btn-sm" style="color:#EF4444;flex-shrink:0;">삭제</button></div>
@@ -1421,7 +1413,7 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
           </div>
 
           <!-- ⑥ AI 소개 카드 (언어별) -->
-          <div class="card v2-section" id="s-ai">
+          <div class="card v2-section" data-v3-group="expose" id="s-ai">
             <div class="card-header">AI 소개 카드 <span class="card-header-note">FO 상단 About 섹션에 노출</span></div>
             <div class="card-lang-bar">
               <button class="card-lang-btn active" onclick="switchCardLang(this,'ai-ko')">원본</button>
@@ -1452,7 +1444,7 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
           </div>
 
           <!-- ⑦ 스토어 소개글 (언어별) -->
-          <div class="card v2-section" id="s-intro">
+          <div class="card v2-section" data-v3-group="expose" id="s-intro">
             <div class="card-header">스토어 소개글 <span class="card-header-note">FO 소개 섹션에 노출</span></div>
             <div class="card-lang-bar">
               <button class="card-lang-btn active" onclick="switchCardLang(this,'intro-ko')">원본</button>
@@ -1485,7 +1477,7 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
           </div>
 
           <!-- ⑧ FAQ (언어별) -->
-          <div class="card v2-section" id="s-faq">
+          <div class="card v2-section" data-v3-group="expose" id="s-faq">
             <div class="card-header">FAQ <span class="card-header-note">한국어 입력 후 언어별 번역</span> <button class="btn btn-secondary btn-sm" style="margin-left:auto;">+ 질문 추가</button></div>
             <div class="card-lang-bar">
               <button class="card-lang-btn active" onclick="switchCardLang(this,'faq2-ko')">원본</button>
@@ -1960,6 +1952,12 @@ function switchVersion(v, btn) {
   document.getElementById('v1-form').style.display = v === 1 ? '' : 'none';
   document.getElementById('v2-form').style.display = (v === 2 || v === 3) ? '' : 'none';
 
+  // v2 → 모든 섹션·앵커 복원
+  if (v !== 3) {
+    document.querySelectorAll('.v2-section[data-v3-group]').forEach(el => el.style.display = '');
+    document.querySelectorAll('.anchor-btn[data-v3-group]').forEach(btn => btn.style.display = '');
+  }
+
   // 사이드바 서브메뉴 처리
   const storeMenu = document.getElementById('sidebar-store-menu');
   const storeSubV3 = document.getElementById('sidebar-store-sub-v3');
@@ -1967,36 +1965,41 @@ function switchVersion(v, btn) {
     storeMenu.classList.remove('active');
     storeMenu.querySelector('.menu-chevron').textContent = '▲';
     storeSubV3.style.display = '';
-    updateV3LnbActive('s-image');
+    switchV3Section('basic');
   } else {
     storeMenu.classList.add('active');
     storeMenu.querySelector('.menu-chevron').textContent = '';
     storeSubV3.style.display = 'none';
+    lastSyncedSection = null;
+    document.querySelector('.form-area').scrollTo({ top: 0 });
+    document.querySelectorAll('.anchor-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
   }
+}
 
-  // form-area 스크롤 초기화 & 앵커 active 초기화
+/* ── 3안 LNB 분기 전환 ── */
+function switchV3Section(group, btn) {
+  // LNB active 업데이트
+  document.querySelectorAll('#sidebar-store-sub-v3 .menu-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.v3Section === group);
+  });
+
+  // 섹션 show/hide
+  document.querySelectorAll('.v2-section[data-v3-group]').forEach(el => {
+    el.style.display = el.dataset.v3Group === group ? '' : 'none';
+  });
+
+  // 앵커 버튼 show/hide + 첫 버튼 active
+  document.querySelectorAll('.anchor-btn').forEach(b => b.classList.remove('active'));
+  let firstActive = true;
+  document.querySelectorAll('.anchor-btn[data-v3-group]').forEach(b => {
+    const show = b.dataset.v3Group === group;
+    b.style.display = show ? '' : 'none';
+    if (show && firstActive) { b.classList.add('active'); firstActive = false; }
+  });
+
+  // 스크롤 초기화
   lastSyncedSection = null;
   document.querySelector('.form-area').scrollTo({ top: 0 });
-  document.querySelectorAll('.anchor-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
-}
-
-/* ── 3안 LNB 섹션 내비게이션 ── */
-function lnbScrollToSection(id) {
-  const anchorBtn = document.querySelector(`.anchor-btn[onclick*="'${id}'"]`);
-  if (anchorBtn) {
-    scrollToSection(id, anchorBtn);
-  } else {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    syncFoToSection(id);
-  }
-  updateV3LnbActive(id);
-}
-
-function updateV3LnbActive(sectionId) {
-  document.querySelectorAll('#sidebar-store-sub-v3 .menu-item[data-section]').forEach(el => {
-    el.classList.toggle('active', el.dataset.section === sectionId);
-  });
 }
 
 /* ── 2안 앵커 스크롤 ── */
@@ -2221,13 +2224,11 @@ let lastSyncedSection = null;
       if (!active || active.id === lastSyncedSection) return;
       lastSyncedSection = active.id;
 
-      // 앵커 버튼 active 업데이트
+      // 앵커 버튼 active 업데이트 (display:none 버튼 제외)
       document.querySelectorAll('.anchor-btn').forEach(b => {
+        if (b.style.display === 'none') return;
         b.classList.toggle('active', (b.getAttribute('onclick') || '').includes(`'${active.id}'`));
       });
-
-      // 3안 LNB active 업데이트
-      if (currentVersion === 3) updateV3LnbActive(active.id);
 
       // FO 동기 스크롤
       syncFoToSection(active.id);
