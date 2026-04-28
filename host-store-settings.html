@@ -650,6 +650,16 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
 /* ── Channel ── */
 .channel-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
 
+/* ── 3안 섹션 레이블 ── */
+.v3-section-label {
+  font-size: 11px; font-weight: 700; color: var(--text2);
+  letter-spacing: 0.04em; text-transform: uppercase;
+  padding: 6px 0 10px; margin-bottom: 4px;
+  border-bottom: 2px solid var(--border-strong);
+  display: flex; align-items: baseline; gap: 8px;
+}
+.v3-section-sub { font-size: 11px; font-weight: 400; color: var(--text3); text-transform: none; letter-spacing: 0; }
+
 /* ── 언어별 플로팅 CTA ── */
 .card-inner-divider { height: 1px; background: var(--border); margin: 16px -20px 20px; }
 .cta-section-title {
@@ -684,7 +694,11 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
     <div class="menu-item has-sub"><span class="menu-icon">⊞</span>갤러리 관리<span class="menu-chevron">▲</span></div>
     <div class="menu-item sub">전/후 사진</div>
     <div class="menu-item sub">일반 사진</div>
-    <div class="menu-item active"><span class="menu-icon">◫</span>스토어 설정</div>
+    <div class="menu-item active has-sub" id="sidebar-store-menu"><span class="menu-icon">◫</span>스토어 설정<span class="menu-chevron"></span></div>
+    <div id="sidebar-store-sub-v3" style="display:none;">
+      <div class="menu-item sub active" onclick="switchV3Tab(0, document.querySelectorAll('#v3-tab-bar .tab-btn')[0])">기본정보</div>
+      <div class="menu-item sub" onclick="switchV3Tab(1, document.querySelectorAll('#v3-tab-bar .tab-btn')[1])">노출설정</div>
+    </div>
     <div class="menu-item"><span class="menu-icon">👤</span>마이페이지</div>
   </aside>
 
@@ -698,6 +712,7 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
         <div class="version-tabs">
           <button class="version-tab active" onclick="switchVersion(1, this)">1안</button>
           <button class="version-tab" onclick="switchVersion(2, this)">2안</button>
+          <button class="version-tab" onclick="switchVersion(3, this)">3안</button>
         </div>
         <div class="topbar-right">
           <div class="topbar-bell">🔔<div class="topbar-notif"></div></div>
@@ -726,6 +741,16 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
           <button class="anchor-btn" onclick="scrollToSection('s-intro', this)">소개글</button>
           <button class="anchor-btn" onclick="scrollToSection('s-faq', this)">FAQ</button>
         </div>
+        <div class="bar-actions">
+          <button class="action-bar-preview preview-toggle-btn active" onclick="togglePreview()">FO 미리보기</button>
+          <button class="btn btn-sm btn-secondary">취소</button>
+          <button class="btn btn-sm btn-primary">저장</button>
+        </div>
+      </div>
+      <!-- 3안 tab-bar -->
+      <div class="tab-bar" id="v3-tab-bar" style="display:none;">
+        <button class="tab-btn active" onclick="switchV3Tab(0, this)">기본정보</button>
+        <button class="tab-btn" onclick="switchV3Tab(1, this)">노출설정</button>
         <div class="bar-actions">
           <button class="action-bar-preview preview-toggle-btn active" onclick="togglePreview()">FO 미리보기</button>
           <button class="btn btn-sm btn-secondary">취소</button>
@@ -1486,6 +1511,264 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
 
         </div><!-- /v2-form -->
 
+        <!-- ════════════════════════════════
+             3안 — 기본정보 / 노출설정 분리
+        ════════════════════════════════ -->
+        <div id="v3-form" style="display:none; padding-top:20px;">
+
+          <!-- ── 3안 Tab 0: 기본정보 ── -->
+          <div id="v3-tab-0" class="v3-tab-panel" style="display:block;">
+
+            <!-- 담당자 및 연락처 -->
+            <div class="card">
+              <div class="card-header">담당자 및 연락처</div>
+              <div class="card-body">
+                <div class="form-row"><div class="form-label">담당자</div><div class="form-control">
+                  <div style="display:flex;gap:8px;margin-bottom:8px;">
+                    <input class="input" placeholder="담당자 이름" style="flex:1;" value="김담당" />
+                    <input class="input" placeholder="전화번호" style="flex:1;" value="02-1234-5678" />
+                  </div>
+                  <div style="display:flex;gap:8px;">
+                    <input class="input" placeholder="담당자 이름 2 (선택)" style="flex:1;" />
+                    <input class="input" placeholder="전화번호" style="flex:1;" />
+                  </div>
+                </div></div>
+              </div>
+            </div>
+
+            <!-- 위치 정보 -->
+            <div class="card">
+              <div class="card-header">위치 정보 <span class="card-header-note">FO 핵심 정보 섹션에 노출</span></div>
+              <div class="card-body">
+                <div class="form-row"><div class="form-label">가까운 지하철역</div><div class="form-control">
+                  <select class="select" style="width:100%;margin-bottom:8px;"><option>지하철 노선 선택</option></select>
+                  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
+                    <span class="tag tag-removable">명동역 4호선 ✕</span>
+                    <span class="tag tag-removable">을지로입구역 2호선 ✕</span>
+                  </div>
+                  <button class="btn btn-sm btn-secondary">+ 역 추가</button>
+                </div></div>
+                <div class="form-row"><div class="form-label">지도 링크 <span class="text-muted">(선택)</span></div><div class="form-control"><input class="input" placeholder="Google Maps URL" /></div></div>
+              </div>
+            </div>
+
+            <!-- 운영시간 -->
+            <div class="card">
+              <div class="card-header">운영시간 <span class="card-header-note">FO 핵심 정보 섹션에 노출</span></div>
+              <div class="card-body">
+                <div class="form-row"><div class="form-label">요일별 운영시간</div><div class="form-control">
+                  <table style="border-collapse:collapse;width:100%;">
+                    <tr style="margin-bottom:8px;"><td style="width:40px;font-size:12px;color:var(--text2);padding:4px 0;">월</td><td><div style="display:flex;align-items:center;gap:6px;"><select class="select" style="width:90px;"><option>09:00</option></select><span style="color:var(--text3);">~</span><select class="select" style="width:90px;"><option>18:00</option></select><label style="display:flex;align-items:center;gap:4px;font-size:12px;"><input type="checkbox"> 휴무</label></div></td></tr>
+                    <tr><td style="font-size:12px;color:var(--text2);padding:4px 0;">화</td><td><div style="display:flex;align-items:center;gap:6px;"><select class="select" style="width:90px;"><option>09:00</option></select><span style="color:var(--text3);">~</span><select class="select" style="width:90px;"><option>18:00</option></select><label style="display:flex;align-items:center;gap:4px;font-size:12px;"><input type="checkbox"> 휴무</label></div></td></tr>
+                    <tr><td style="font-size:12px;color:var(--text2);padding:4px 0;">수~금</td><td><div style="display:flex;align-items:center;gap:6px;"><select class="select" style="width:90px;"><option>09:00</option></select><span style="color:var(--text3);">~</span><select class="select" style="width:90px;"><option>18:00</option></select><label style="display:flex;align-items:center;gap:4px;font-size:12px;"><input type="checkbox"> 휴무</label></div></td></tr>
+                    <tr><td style="font-size:12px;color:var(--text2);padding:4px 0;">토</td><td><div style="display:flex;align-items:center;gap:6px;"><select class="select" style="width:90px;"><option>10:00</option></select><span style="color:var(--text3);">~</span><select class="select" style="width:90px;"><option>15:00</option></select><label style="display:flex;align-items:center;gap:4px;font-size:12px;"><input type="checkbox"> 휴무</label></div></td></tr>
+                    <tr><td style="font-size:12px;color:var(--text2);padding:4px 0;">일·공휴일</td><td><div style="display:flex;align-items:center;gap:6px;"><select class="select" style="width:90px;"><option>-</option></select><span style="color:var(--text3);">~</span><select class="select" style="width:90px;"><option>-</option></select><label style="display:flex;align-items:center;gap:4px;font-size:12px;"><input type="checkbox" checked> 휴무</label></div></td></tr>
+                  </table>
+                </div></div>
+              </div>
+            </div>
+
+          </div><!-- /v3-tab-0 -->
+
+          <!-- ── 3안 Tab 1: 노출설정 ── -->
+          <div id="v3-tab-1" class="v3-tab-panel" style="display:none;">
+
+            <!-- 공통 섹션 헤더 -->
+            <div class="v3-section-label">공통 설정 <span class="v3-section-sub">언어와 무관하게 모든 고객에게 동일하게 노출</span></div>
+
+            <!-- 대표 이미지 -->
+            <div class="card">
+              <div class="card-header">대표 이미지 <span class="card-header-note">FO 스토어 상단 헤더에 노출</span></div>
+              <div class="card-body">
+                <div class="form-row"><div class="form-label">이미지</div><div class="form-control">
+                  <div class="img-picker-area" id="hero-picker-v3">
+                    <div class="img-picker-preview" onclick="openGalleryPicker('hero-picker-v3')">
+                      <span class="img-picker-placeholder">클릭하여 갤러리에서 선택</span>
+                      <div class="img-selected-preview"></div>
+                    </div>
+                    <div class="img-picker-actions">
+                      <button class="btn btn-sm btn-secondary" onclick="openGalleryPicker('hero-picker-v3')">갤러리에서 선택</button>
+                      <button class="btn btn-sm btn-ghost">직접 업로드</button>
+                    </div>
+                    <div class="source-note" style="flex-direction:column;align-items:flex-start;gap:3px;">
+                      <span>출처: 갤러리 관리 &gt; 일반 사진 · <a href="#" onclick="return false;">관리 페이지 바로가기 ↗</a></span>
+                      <span>직접 업로드한 이미지는 갤러리 관리 &gt; 일반 사진에도 자동으로 저장됩니다.</span>
+                    </div>
+                  </div>
+                </div></div>
+              </div>
+            </div>
+
+            <!-- 스토어 특징 -->
+            <div class="card">
+              <div class="card-header">스토어 특징 <span class="card-header-note">FO 외국인 특별 혜택 섹션에 노출</span></div>
+              <div class="card-body">
+                <div class="form-row"><div class="form-label">특징 선택</div><div class="form-control">
+                  <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                    <div class="chip-check" onclick="this.classList.toggle('on')">프라이빗 공간</div>
+                    <div class="chip-check on" onclick="this.classList.toggle('on')">✓ 여의사</div>
+                    <div class="chip-check on" onclick="this.classList.toggle('on')">✓ 전문의</div>
+                    <div class="chip-check" onclick="this.classList.toggle('on')">야간 진료</div>
+                    <div class="chip-check" onclick="this.classList.toggle('on')">주말 진료</div>
+                    <div class="chip-check on" onclick="this.classList.toggle('on')">✓ 외국어 상담</div>
+                    <div class="chip-check on" onclick="this.classList.toggle('on')">✓ 공항 픽업</div>
+                    <div class="chip-check on" onclick="this.classList.toggle('on')">✓ 통역사 동행</div>
+                    <div class="chip-check" onclick="this.classList.toggle('on')">당일 예약</div>
+                    <div class="chip-check" onclick="this.classList.toggle('on')">무통증 시술</div>
+                    <div class="chip-check" onclick="this.classList.toggle('on')">비급여 전문</div>
+                  </div>
+                </div></div>
+              </div>
+            </div>
+
+            <!-- 인앱 채팅 -->
+            <div class="card">
+              <div class="card-header">인앱 채팅</div>
+              <div class="card-body">
+                <div class="form-row"><div class="form-label">사용 여부</div><div class="form-control">
+                  <div class="radio-group">
+                    <label class="radio-item"><input type="radio" name="v3chat" checked> 사용</label>
+                    <label class="radio-item"><input type="radio" name="v3chat"> 미사용</label>
+                  </div>
+                  <div class="text-muted" style="margin-top:5px;">미사용 시 채팅 버튼이 FO에 노출되지 않습니다</div>
+                </div></div>
+              </div>
+            </div>
+
+            <!-- SNS 채팅 채널 -->
+            <div class="card">
+              <div class="card-header">SNS 채팅 채널 <button class="btn btn-secondary btn-sm">+ 채널 추가</button></div>
+              <div class="card-body">
+                <div class="channel-row"><select class="select" style="width:120px;"><option>WhatsApp</option></select><select class="select" style="width:110px;"><option>English</option></select><input class="input" style="flex:1;" value="+82-10-1234-5678" /><button class="btn btn-secondary btn-sm" style="color:#EF4444;flex-shrink:0;">삭제</button></div>
+                <div class="channel-row"><select class="select" style="width:120px;"><option>LINE</option></select><select class="select" style="width:110px;"><option>繁體中文</option></select><input class="input" style="flex:1;" value="@hanmiyeok_tw" /><button class="btn btn-secondary btn-sm" style="color:#EF4444;flex-shrink:0;">삭제</button></div>
+                <div class="channel-row"><select class="select" style="width:120px;"><option>WeChat</option></select><select class="select" style="width:110px;"><option>简体中文</option></select><input class="input" style="flex:1;" value="hanmiyeok_cn" /><button class="btn btn-secondary btn-sm" style="color:#EF4444;flex-shrink:0;">삭제</button></div>
+                <div class="card-inner-divider"></div>
+                <div class="cta-section-title">언어별 플로팅 CTA <span class="cta-section-note">FO 스토어 하단 플로팅 버튼에 노출될 채널을 언어별로 설정하세요</span></div>
+                <div class="cta-lang-table">
+                  <div class="cta-lang-row"><span class="cta-lang-label">EN</span><select class="select" style="flex:1;"><option value="">설정 안함</option><option selected>WhatsApp · +82-10-1234-5678</option><option>LINE · @hanmiyeok_tw</option><option>WeChat · hanmiyeok_cn</option></select></div>
+                  <div class="cta-lang-row"><span class="cta-lang-label">简体</span><select class="select" style="flex:1;"><option value="">설정 안함</option><option>WhatsApp · +82-10-1234-5678</option><option>LINE · @hanmiyeok_tw</option><option selected>WeChat · hanmiyeok_cn</option></select></div>
+                  <div class="cta-lang-row"><span class="cta-lang-label">繁體</span><select class="select" style="flex:1;"><option value="">설정 안함</option><option>WhatsApp · +82-10-1234-5678</option><option selected>LINE · @hanmiyeok_tw</option><option>WeChat · hanmiyeok_cn</option></select></div>
+                  <div class="cta-lang-row"><span class="cta-lang-label cta-lang-unset">JP</span><select class="select" style="flex:1;"><option value="" selected>설정 안함</option><option>WhatsApp · +82-10-1234-5678</option><option>LINE · @hanmiyeok_tw</option><option>WeChat · hanmiyeok_cn</option></select></div>
+                  <div class="cta-lang-row"><span class="cta-lang-label cta-lang-unset">ID</span><select class="select" style="flex:1;"><option value="" selected>설정 안함</option><option>WhatsApp · +82-10-1234-5678</option><option>LINE · @hanmiyeok_tw</option><option>WeChat · hanmiyeok_cn</option></select></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 콘텐츠 채널 -->
+            <div class="card">
+              <div class="card-header">콘텐츠 채널</div>
+              <div class="card-body">
+                <div class="form-row"><div class="form-label">YouTube</div><div class="form-control"><input class="input" value="https://youtube.com/@clinicstory" /></div></div>
+                <div class="form-row"><div class="form-label">Instagram</div><div class="form-control"><input class="input" value="@clinic_kbeauty" /></div></div>
+                <div class="form-row"><div class="form-label">블로그</div><div class="form-control"><input class="input" placeholder="블로그 URL" /></div></div>
+              </div>
+            </div>
+
+            <!-- 언어별 섹션 헤더 -->
+            <div class="v3-section-label" style="margin-top:8px;">언어별 설정 <span class="v3-section-sub">언어별로 다른 내용을 입력 · 미입력 시 원본 기준으로 자동번역</span></div>
+
+            <!-- 스토어 텍스트 (언어별) -->
+            <div class="card">
+              <div class="card-header">스토어 기본 텍스트 <span class="card-header-note">스토어명 · 주소 · 채팅 메시지</span></div>
+              <div class="card-lang-bar">
+                <button class="card-lang-btn active" onclick="switchCardLang(this,'v3t-ko')">원본</button>
+                <button class="card-lang-btn" onclick="switchCardLang(this,'v3t-en')"><span class="dot dot-ok"></span>EN</button>
+                <button class="card-lang-btn" onclick="switchCardLang(this,'v3t-zh')"><span class="dot dot-ok"></span>简</button>
+                <button class="card-lang-btn" onclick="switchCardLang(this,'v3t-tw')"><span class="dot dot-ok"></span>繁</button>
+                <button class="card-lang-btn" onclick="switchCardLang(this,'v3t-jp')"><span class="dot dot-warn"></span>JP</button>
+                <button class="card-lang-btn" onclick="switchCardLang(this,'v3t-id')"><span class="dot dot-warn"></span>ID</button>
+              </div>
+              <div class="card-body">
+                <div id="v3t-ko" class="card-lang-panel active">
+                  <div class="form-row"><div class="form-label">스토어명 <span class="req">*</span></div><div class="form-control"><input class="input" value="한미역 의원" /></div></div>
+                  <div class="form-row"><div class="form-label">기본 주소 <span class="req">*</span></div><div class="form-control"><input class="input" value="서울특별시 강남구 테헤란로 123" /></div></div>
+                  <div class="form-row"><div class="form-label">상세 주소</div><div class="form-control"><input class="input" value="9호선 신논현역 도보 5분" /></div></div>
+                  <div class="form-row"><div class="form-label">채팅 첫 메시지</div><div class="form-control"><div class="radio-group" style="margin-bottom:8px;"><label class="radio-item"><input type="radio" name="v3msg" checked> 전송</label><label class="radio-item"><input type="radio" name="v3msg"> 미전송</label></div><textarea class="textarea" style="min-height:72px;">안녕하세요! 한미역 의원입니다. 궁금하신 점은 편하게 문의해 주세요.</textarea></div></div>
+                </div>
+                <div id="v3t-en" class="card-lang-panel">
+                  <div class="form-row"><div class="form-label">Store Name</div><div class="form-control"><input class="input" value="Hanmiyeok Clinic" /></div></div>
+                  <div class="form-row"><div class="form-label">Address</div><div class="form-control"><input class="input" value="123 Teheran-ro, Gangnam-gu, Seoul" /></div></div>
+                  <div class="form-row"><div class="form-label">Chat Message</div><div class="form-control"><textarea class="textarea" style="min-height:72px;">Hello! We'd love to hear from you. Feel free to ask us anything!</textarea></div></div>
+                </div>
+                <div id="v3t-zh" class="card-lang-panel"><div class="form-row"><div class="form-label">店铺名称</div><div class="form-control"><input class="input" value="韩美易诊所" /></div></div></div>
+                <div id="v3t-tw" class="card-lang-panel"><div class="form-row"><div class="form-label">店名</div><div class="form-control"><input class="input" value="韓美易診所" /></div></div></div>
+                <div id="v3t-jp" class="card-lang-panel"><div class="form-row"><div class="form-label">店舗名</div><div class="form-control"><input class="input" placeholder="번역 미입력" /></div></div></div>
+                <div id="v3t-id" class="card-lang-panel"><div class="form-row"><div class="form-label">Nama Toko</div><div class="form-control"><input class="input" placeholder="번역 미입력" /></div></div></div>
+              </div>
+            </div>
+
+            <!-- AI 소개 (언어별) -->
+            <div class="card">
+              <div class="card-header">AI 소개 카드 <span class="card-header-note">FO 상단 About 섹션에 노출</span></div>
+              <div class="card-lang-bar">
+                <button class="card-lang-btn active" onclick="switchCardLang(this,'v3ai-ko')">원본</button>
+                <button class="card-lang-btn" onclick="switchCardLang(this,'v3ai-en')"><span class="dot dot-ok"></span>EN</button>
+                <button class="card-lang-btn" onclick="switchCardLang(this,'v3ai-zh')"><span class="dot dot-ok"></span>简</button>
+                <button class="card-lang-btn" onclick="switchCardLang(this,'v3ai-tw')"><span class="dot dot-ok"></span>繁</button>
+                <button class="card-lang-btn" onclick="switchCardLang(this,'v3ai-jp')"><span class="dot dot-warn"></span>JP</button>
+                <button class="card-lang-btn" onclick="switchCardLang(this,'v3ai-id')"><span class="dot dot-warn"></span>ID</button>
+              </div>
+              <div class="card-body">
+                <div id="v3ai-ko" class="card-lang-panel active">
+                  <div class="banner banner-yellow" style="margin-bottom:12px;"><span class="banner-icon">✦</span><div class="banner-body"><div class="banner-title">AI 생성 소개 (원본 기준)</div></div></div>
+                  <div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea" style="min-height:80px;">경력 20년 대표원장이 직접 시술하는 강남 리프팅 전문 클리닉. 울쎄라·인모드·보톡스·필러 전문이며, 외국인 문자를 위한 통역 동행 및 공항 픽업 서비스를 제공합니다.</textarea><div style="margin-top:8px;display:flex;gap:8px;"><button class="btn btn-sm btn-secondary">✦ AI 재생성</button><button class="btn btn-sm btn-secondary">직접 수정</button></div></div></div>
+                </div>
+                <div id="v3ai-en" class="card-lang-panel"><div class="form-row"><div class="form-label">Content</div><div class="form-control"><textarea class="textarea" style="min-height:80px;">A Gangnam lifting specialist clinic led by a 20-year veteran doctor directly performing all procedures. Specializing in Ultherapy, InMode, Botox, and fillers.</textarea></div></div></div>
+                <div id="v3ai-zh" class="card-lang-panel"><div class="form-row"><div class="form-label">内容</div><div class="form-control"><textarea class="textarea" style="min-height:80px;" placeholder="번역 미입력"></textarea></div></div></div>
+                <div id="v3ai-tw" class="card-lang-panel"><div class="form-row"><div class="form-label">內容</div><div class="form-control"><textarea class="textarea" style="min-height:80px;" placeholder="번역 미입력"></textarea></div></div></div>
+                <div id="v3ai-jp" class="card-lang-panel"><div class="form-row"><div class="form-label">内容</div><div class="form-control"><textarea class="textarea" style="min-height:80px;" placeholder="번역 미입력"></textarea></div></div></div>
+                <div id="v3ai-id" class="card-lang-panel"><div class="form-row"><div class="form-label">Konten</div><div class="form-control"><textarea class="textarea" style="min-height:80px;" placeholder="번역 미입력"></textarea></div></div></div>
+              </div>
+            </div>
+
+            <!-- 소개글 (언어별) -->
+            <div class="card">
+              <div class="card-header">스토어 소개글 <span class="card-header-note">FO 소개 섹션에 노출</span></div>
+              <div class="card-lang-bar">
+                <button class="card-lang-btn active" onclick="switchCardLang(this,'v3intro-ko')">원본</button>
+                <button class="card-lang-btn" onclick="switchCardLang(this,'v3intro-en')"><span class="dot dot-ok"></span>EN</button>
+                <button class="card-lang-btn" onclick="switchCardLang(this,'v3intro-zh')"><span class="dot dot-warn"></span>简</button>
+                <button class="card-lang-btn" onclick="switchCardLang(this,'v3intro-tw')"><span class="dot dot-warn"></span>繁</button>
+                <button class="card-lang-btn" onclick="switchCardLang(this,'v3intro-jp')"><span class="dot dot-warn"></span>JP</button>
+                <button class="card-lang-btn" onclick="switchCardLang(this,'v3intro-id')"><span class="dot dot-warn"></span>ID</button>
+              </div>
+              <div class="card-body">
+                <div id="v3intro-ko" class="card-lang-panel active">
+                  <div class="form-row"><div class="form-label">소개 이미지</div><div class="form-control"><div class="upload-zone">+ 이미지 업로드 (선택)<br><span class="text-muted" style="display:block;margin-top:4px;">권장: 1:1 비율 · JPG/PNG</span></div></div></div>
+                  <div class="form-row"><div class="form-label">제목 <span class="req">*</span></div><div class="form-control"><input class="input" value="경력 20년 리프팅 전문 클리닉" /></div></div>
+                  <div class="form-row"><div class="form-label">내용 <span class="req">*</span></div><div class="form-control"><textarea class="textarea" style="min-height:100px;">올쎄라 1세대 도입부터 개원하여 현재까지 많은 사랑을 받고 있습니다.</textarea></div></div>
+                </div>
+                <div id="v3intro-en" class="card-lang-panel"><div class="form-row"><div class="form-label">Title</div><div class="form-control"><input class="input" value="20-Year Lifting Specialist Clinic" /></div></div><div class="form-row"><div class="form-label">Content</div><div class="form-control"><textarea class="textarea" style="min-height:80px;" placeholder="번역 미입력"></textarea></div></div></div>
+                <div id="v3intro-zh" class="card-lang-panel"><div class="form-row"><div class="form-label">标题</div><div class="form-control"><input class="input" placeholder="번역 미입력" /></div></div></div>
+                <div id="v3intro-tw" class="card-lang-panel"><div class="form-row"><div class="form-label">標題</div><div class="form-control"><input class="input" placeholder="번역 미입력" /></div></div></div>
+                <div id="v3intro-jp" class="card-lang-panel"><div class="form-row"><div class="form-label">タイトル</div><div class="form-control"><input class="input" placeholder="번역 미입력" /></div></div></div>
+                <div id="v3intro-id" class="card-lang-panel"><div class="form-row"><div class="form-label">Judul</div><div class="form-control"><input class="input" placeholder="번역 미입력" /></div></div></div>
+              </div>
+            </div>
+
+            <!-- FAQ -->
+            <div class="card">
+              <div class="card-header">FAQ <span class="card-header-note">한국어 입력 후 언어별 번역</span> <button class="btn btn-secondary btn-sm" style="margin-left:auto;">+ 질문 추가</button></div>
+              <div class="card-body">
+                <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:10px;">
+                  <div style="padding:12px 16px;background:var(--gray-bg);font-size:12px;font-weight:600;">Q. 외국인도 예약하고 사용할 수 있나요?</div>
+                  <div style="padding:12px 16px;font-size:12px;color:var(--text2);">네, 외국인 고객도 동일하게 예약 및 시술 가능합니다.</div>
+                  <div class="lang-tab-bar" style="border-top:1px solid var(--border);padding:0 12px;">
+                    <button class="lang-tab active" onclick="this.closest('.lang-tab-bar').querySelectorAll('.lang-tab').forEach(b=>b.classList.remove('active'));this.classList.add('active');">EN</button>
+                    <button class="lang-tab" onclick="this.closest('.lang-tab-bar').querySelectorAll('.lang-tab').forEach(b=>b.classList.remove('active'));this.classList.add('active');">简体</button>
+                    <button class="lang-tab" onclick="this.closest('.lang-tab-bar').querySelectorAll('.lang-tab').forEach(b=>b.classList.remove('active'));this.classList.add('active');">繁體</button>
+                    <button class="lang-tab" onclick="this.closest('.lang-tab-bar').querySelectorAll('.lang-tab').forEach(b=>b.classList.remove('active'));this.classList.add('active');">JP</button>
+                    <button class="lang-tab" onclick="this.closest('.lang-tab-bar').querySelectorAll('.lang-tab').forEach(b=>b.classList.remove('active'));this.classList.add('active');">ID</button>
+                  </div>
+                  <div style="padding:12px 16px;"><textarea class="textarea" style="min-height:56px;">Yes, foreign customers can book and receive treatments just like any other customer. KBS handles the entire booking process seamlessly.</textarea></div>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /v3-tab-1 -->
+
+        </div><!-- /v3-form -->
+
 
       </div><!-- /form-area -->
 
@@ -1909,18 +2192,52 @@ function switchTab(idx, btn) {
   document.querySelectorAll('.tab-panel').forEach((p, i) => p.classList.toggle('active', i === idx));
 }
 
-/* ── 1안 / 2안 버전 전환 ── */
+/* ── 버전 전환 (1안 / 2안 / 3안) ── */
 function switchVersion(v, btn) {
   document.querySelectorAll('.version-tab').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  const isV2 = v === 2;
-  // tab-bar / anchor-bar
-  document.getElementById('v1-tab-bar').style.display = isV2 ? 'none' : '';
+
+  // nav bars
+  document.getElementById('v1-tab-bar').style.display = v === 1 ? '' : 'none';
   const ab = document.getElementById('v2-anchor-bar');
-  ab.classList.toggle('visible', isV2);
+  ab.classList.toggle('visible', v === 2);
+  document.getElementById('v3-tab-bar').style.display = v === 3 ? '' : 'none';
+
   // form areas
-  document.getElementById('v1-form').style.display = isV2 ? 'none' : '';
-  document.getElementById('v2-form').style.display = isV2 ? '' : 'none';
+  document.getElementById('v1-form').style.display = v === 1 ? '' : 'none';
+  document.getElementById('v2-form').style.display = v === 2 ? '' : 'none';
+  document.getElementById('v3-form').style.display = v === 3 ? '' : 'none';
+
+  // 사이드바 서브메뉴 처리
+  const storeMenu = document.getElementById('sidebar-store-menu');
+  const storeSubV3 = document.getElementById('sidebar-store-sub-v3');
+  if (v === 3) {
+    storeMenu.classList.remove('active');
+    storeMenu.querySelector('.menu-chevron').textContent = '▲';
+    storeSubV3.style.display = '';
+    updateV3SidebarActive(0);
+  } else {
+    storeMenu.classList.add('active');
+    storeMenu.querySelector('.menu-chevron').textContent = '';
+    storeSubV3.style.display = 'none';
+  }
+
+  // form-area 스크롤 초기화
+  document.querySelector('.form-area').scrollTo({ top: 0 });
+}
+
+/* ── 3안 탭 전환 ── */
+function switchV3Tab(idx, btn) {
+  document.querySelectorAll('#v3-tab-bar .tab-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+  document.querySelectorAll('.v3-tab-panel').forEach((p, i) => p.style.display = i === idx ? 'block' : 'none');
+  document.querySelector('.form-area').scrollTo({ top: 0 });
+  updateV3SidebarActive(idx);
+}
+
+function updateV3SidebarActive(idx) {
+  document.querySelectorAll('#sidebar-store-sub-v3 .menu-item').forEach((el, i) => {
+    el.classList.toggle('active', i === idx);
+  });
 }
 
 /* ── 2안 앵커 스크롤 ── */
