@@ -755,15 +755,9 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
           <button class="btn btn-sm btn-primary">저장</button>
         </div>
       </div>
-      <!-- 3안 기본정보 anchor-bar (FO 미리보기 버튼 없음) -->
+      <!-- 3안 기본정보 actions-bar (앵커 없음) -->
       <div class="anchor-bar" id="v3-basic-anchor-bar">
-        <div class="anchor-scroll-inner">
-          <button class="anchor-btn active" onclick="scrollToV3Basic('s3-contact', this)">담당자/연락처</button>
-          <button class="anchor-btn" onclick="scrollToV3Basic('s3-location', this)">위치 정보</button>
-          <button class="anchor-btn" onclick="scrollToV3Basic('s3-hours', this)">운영시간</button>
-          <button class="anchor-btn" onclick="scrollToV3Basic('s3-feature', this)">스토어 특징</button>
-        </div>
-        <div class="bar-actions">
+        <div class="bar-actions" style="margin-left:auto;">
           <button class="btn btn-sm btn-secondary">취소</button>
           <button class="btn btn-sm btn-primary">저장</button>
         </div>
@@ -2149,17 +2143,6 @@ function switchV3Section(group) {
   document.querySelector('.form-area').scrollTo({ top: 0 });
 }
 
-/* ── 3안 기본정보 앵커 스크롤 ── */
-function scrollToV3Basic(id, btn) {
-  document.querySelectorAll('#v3-basic-anchor-bar .anchor-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  clearTimeout(anchorScrollTimer);
-  anchorScrollLock = true;
-  anchorScrollTimer = setTimeout(() => { anchorScrollLock = false; }, 900);
-  const el = document.getElementById(id);
-  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  // FO 미리보기 없으므로 syncFoToSection 호출 안 함
-}
 
 /* ── 2안 앵커 스크롤 ── */
 let anchorScrollLock = false;
@@ -2371,19 +2354,7 @@ let lastSyncedSection = null;
       const formArea = document.querySelector('.form-area');
       const triggerY = formArea.getBoundingClientRect().top + 140;
 
-      if (currentVersion === 3 && currentV3Section === 'basic') {
-        // v3 기본정보: v3b-section 기준 앵커 업데이트
-        const sections = [...document.querySelectorAll('.v3b-section')];
-        let active = null;
-        for (const s of sections) {
-          if (s.getBoundingClientRect().top <= triggerY) active = s;
-        }
-        if (!active || active.id === lastSyncedSection) return;
-        lastSyncedSection = active.id;
-        document.querySelectorAll('#v3-basic-anchor-bar .anchor-btn').forEach(b => {
-          b.classList.toggle('active', (b.getAttribute('onclick') || '').includes(`'${active.id}'`));
-        });
-      } else if (document.getElementById('v2-form').style.display !== 'none') {
+      if (document.getElementById('v2-form').style.display !== 'none') {
         // v2 또는 v3+노출설정: visible v2-section 기준
         const sections = [...document.querySelectorAll('.v2-section')].filter(s => s.style.display !== 'none');
         let active = null;
