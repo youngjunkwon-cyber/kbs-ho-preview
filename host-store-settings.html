@@ -755,6 +755,19 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
           <button class="btn btn-sm btn-primary">저장</button>
         </div>
       </div>
+      <!-- 3안 기본정보 anchor-bar (FO 미리보기 버튼 없음) -->
+      <div class="anchor-bar" id="v3-basic-anchor-bar">
+        <div class="anchor-scroll-inner">
+          <button class="anchor-btn active" onclick="scrollToV3Basic('s3-contact', this)">담당자/연락처</button>
+          <button class="anchor-btn" onclick="scrollToV3Basic('s3-location', this)">위치 정보</button>
+          <button class="anchor-btn" onclick="scrollToV3Basic('s3-hours', this)">운영시간</button>
+          <button class="anchor-btn" onclick="scrollToV3Basic('s3-feature', this)">스토어 특징</button>
+        </div>
+        <div class="bar-actions">
+          <button class="btn btn-sm btn-secondary">취소</button>
+          <button class="btn btn-sm btn-primary">저장</button>
+        </div>
+      </div>
     </div>
 
     <!-- Content wrap: form + FO preview panel -->
@@ -1509,7 +1522,96 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
 
         </div><!-- /v2-form -->
 
-        <!-- 3안: v2-form 재사용 — 별도 form 없음 -->
+        <!-- ════════════════════════════════
+             3안 기본정보 전용 폼 (담당자·위치·운영·특징)
+        ════════════════════════════════ -->
+        <div id="v3-basic-form" style="display:none; padding-top:20px;">
+
+          <!-- 담당자 및 연락처 -->
+          <div class="card v3b-section" id="s3-contact">
+            <div class="card-header">담당자 및 연락처</div>
+            <div class="card-body">
+              <div class="form-row">
+                <div class="form-label">담당자</div>
+                <div class="form-control">
+                  <div style="display:flex;gap:8px;margin-bottom:8px;">
+                    <input class="input" placeholder="담당자 이름" style="flex:1;" value="김담당" />
+                    <input class="input" placeholder="전화번호" style="flex:1;" value="02-1234-5678" />
+                  </div>
+                  <div style="display:flex;gap:8px;">
+                    <input class="input" placeholder="담당자 이름 2 (선택)" style="flex:1;" />
+                    <input class="input" placeholder="전화번호" style="flex:1;" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 위치 정보 -->
+          <div class="card v3b-section" id="s3-location">
+            <div class="card-header">위치 정보 <span class="card-header-note">FO 핵심 정보 섹션에 노출</span></div>
+            <div class="card-body">
+              <div class="form-row">
+                <div class="form-label">가까운 지하철역</div>
+                <div class="form-control">
+                  <select class="select" style="width:100%;margin-bottom:8px;"><option>지하철 노선 선택</option></select>
+                  <div class="tag-list">
+                    <span class="tag-item">명동역 4호선 <span class="del">×</span></span>
+                    <span class="tag-item">을지로입구역 2호선 <span class="del">×</span></span>
+                  </div>
+                  <div style="margin-top:8px;"><button class="btn btn-secondary btn-sm">+ 역 추가</button></div>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-label">지도 링크 <span style="font-size:11px;font-weight:400;color:var(--text3);">(선택)</span></div>
+                <div class="form-control"><input class="input" placeholder="Google Maps URL" /></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 운영시간 -->
+          <div class="card v3b-section" id="s3-hours">
+            <div class="card-header">운영시간 <span class="card-header-note">FO 핵심 정보 섹션에 노출</span></div>
+            <div class="card-body">
+              <div class="form-row">
+                <div class="form-label">요일별 운영시간</div>
+                <div class="form-control">
+                  <div class="time-row"><span class="time-label">월</span><select class="select"><option>09:00</option></select><span class="time-divider">~</span><select class="select"><option>18:00</option></select><label class="holiday-check"><input type="checkbox"> 휴무</label></div>
+                  <div class="time-row"><span class="time-label">화</span><select class="select"><option>09:00</option></select><span class="time-divider">~</span><select class="select"><option>18:00</option></select><label class="holiday-check"><input type="checkbox"> 휴무</label></div>
+                  <div class="time-row"><span class="time-label">수</span><select class="select"><option>09:00</option></select><span class="time-divider">~</span><select class="select"><option>18:00</option></select><label class="holiday-check"><input type="checkbox"> 휴무</label></div>
+                  <div class="time-row"><span class="time-label">목</span><select class="select"><option>09:00</option></select><span class="time-divider">~</span><select class="select"><option>18:00</option></select><label class="holiday-check"><input type="checkbox"> 휴무</label></div>
+                  <div class="time-row"><span class="time-label">금</span><select class="select"><option>09:00</option></select><span class="time-divider">~</span><select class="select"><option>18:00</option></select><label class="holiday-check"><input type="checkbox"> 휴무</label></div>
+                  <div class="time-row"><span class="time-label">토</span><select class="select"><option>10:00</option></select><span class="time-divider">~</span><select class="select"><option>15:00</option></select><label class="holiday-check"><input type="checkbox"> 휴무</label></div>
+                  <div class="time-row"><span class="time-label">일</span><select class="select"><option>-</option></select><span class="time-divider">~</span><select class="select"><option>-</option></select><label class="holiday-check"><input type="checkbox" checked> 휴무</label></div>
+                  <div class="time-row"><span class="time-label">공휴일</span><select class="select"><option>-</option></select><span class="time-divider">~</span><select class="select"><option>-</option></select><label class="holiday-check"><input type="checkbox" checked> 휴무</label></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 스토어 특징 -->
+          <div class="card v3b-section" id="s3-feature">
+            <div class="card-header">스토어 특징 <span class="card-header-note">FO 외국인 특별 혜택 섹션에 노출</span></div>
+            <div class="card-body">
+              <div class="checkbox-grid">
+                <div class="chip-check" onclick="this.classList.toggle('on')">프라이빗 공간</div>
+                <div class="chip-check on" onclick="this.classList.toggle('on')">✓ 여의사</div>
+                <div class="chip-check on" onclick="this.classList.toggle('on')">✓ 전문의</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">야간 진료</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">주말 진료</div>
+                <div class="chip-check on" onclick="this.classList.toggle('on')">✓ 외국어 상담</div>
+                <div class="chip-check on" onclick="this.classList.toggle('on')">✓ 공항 픽업</div>
+                <div class="chip-check on" onclick="this.classList.toggle('on')">✓ 통역사 동행</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">당일 예약</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">무통증 시술</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">비급여 전문</div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /v3-basic-form -->
+
+        <!-- 3안 노출설정: v2-form 재사용 (data-v3-group="expose" 섹션만 표시) -->
         <div id="v3-form" style="display:none;"></div>
 
 
@@ -1937,28 +2039,50 @@ function switchTab(idx, btn) {
 
 /* ── 버전 전환 (1안 / 2안 / 3안) ── */
 let currentVersion = 1;
+let currentV3Section = 'basic';
 
 function switchVersion(v, btn) {
   currentVersion = v;
   document.querySelectorAll('.version-tab').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 
-  // nav bars: 2안·3안 모두 anchor-bar 사용
-  document.getElementById('v1-tab-bar').style.display = v === 1 ? '' : 'none';
-  const ab = document.getElementById('v2-anchor-bar');
-  ab.classList.toggle('visible', v === 2 || v === 3);
+  const v1Bar   = document.getElementById('v1-tab-bar');
+  const v2Bar   = document.getElementById('v2-anchor-bar');
+  const v3BBar  = document.getElementById('v3-basic-anchor-bar');
+  const v1Form  = document.getElementById('v1-form');
+  const v2Form  = document.getElementById('v2-form');
+  const v3BForm = document.getElementById('v3-basic-form');
+  const foPanel = document.getElementById('fo-panel');
 
-  // form areas: 3안은 v2-form 재사용
-  document.getElementById('v1-form').style.display = v === 1 ? '' : 'none';
-  document.getElementById('v2-form').style.display = (v === 2 || v === 3) ? '' : 'none';
+  // v3-basic 고유 요소는 먼저 닫기
+  v3BBar.classList.remove('visible');
+  v3BForm.style.display = 'none';
 
-  // v2 → 모든 섹션·앵커 복원
-  if (v !== 3) {
-    document.querySelectorAll('.v2-section[data-v3-group]').forEach(el => el.style.display = '');
-    document.querySelectorAll('.anchor-btn[data-v3-group]').forEach(btn => btn.style.display = '');
+  // 공통 리셋: v2-form 섹션·앵커 모두 복원
+  document.querySelectorAll('.v2-section[data-v3-group]').forEach(el => el.style.display = '');
+  document.querySelectorAll('.anchor-btn[data-v3-group]').forEach(b => b.style.display = '');
+
+  if (v === 1) {
+    v1Bar.style.display = '';
+    v2Bar.classList.remove('visible');
+    v1Form.style.display = '';
+    v2Form.style.display = 'none';
+    foPanel.style.display = '';
+  } else if (v === 2) {
+    v1Bar.style.display = 'none';
+    v2Bar.classList.add('visible');
+    v1Form.style.display = 'none';
+    v2Form.style.display = '';
+    foPanel.style.display = '';
+    document.querySelectorAll('#v2-anchor-bar .anchor-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
+  } else { // v === 3
+    v1Bar.style.display = 'none';
+    v2Bar.classList.remove('visible');
+    v1Form.style.display = 'none';
+    v2Form.style.display = 'none';
   }
 
-  // 사이드바 서브메뉴 처리
+  // 사이드바 서브메뉴
   const storeMenu = document.getElementById('sidebar-store-menu');
   const storeSubV3 = document.getElementById('sidebar-store-sub-v3');
   if (v === 3) {
@@ -1966,40 +2090,75 @@ function switchVersion(v, btn) {
     storeMenu.querySelector('.menu-chevron').textContent = '▲';
     storeSubV3.style.display = '';
     switchV3Section('basic');
+    return; // switchV3Section 에서 스크롤 초기화
   } else {
     storeMenu.classList.add('active');
     storeMenu.querySelector('.menu-chevron').textContent = '';
     storeSubV3.style.display = 'none';
-    lastSyncedSection = null;
-    document.querySelector('.form-area').scrollTo({ top: 0 });
-    document.querySelectorAll('.anchor-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
   }
+
+  lastSyncedSection = null;
+  document.querySelector('.form-area').scrollTo({ top: 0 });
 }
 
-/* ── 3안 LNB 분기 전환 ── */
-function switchV3Section(group, btn) {
-  // LNB active 업데이트
+/* ── 3안 LNB: 기본정보 / 노출설정 분기 ── */
+function switchV3Section(group) {
+  currentV3Section = group;
+
+  // LNB active
   document.querySelectorAll('#sidebar-store-sub-v3 .menu-item').forEach(el => {
     el.classList.toggle('active', el.dataset.v3Section === group);
   });
 
-  // 섹션 show/hide
-  document.querySelectorAll('.v2-section[data-v3-group]').forEach(el => {
-    el.style.display = el.dataset.v3Group === group ? '' : 'none';
-  });
+  const v2Bar   = document.getElementById('v2-anchor-bar');
+  const v3BBar  = document.getElementById('v3-basic-anchor-bar');
+  const v2Form  = document.getElementById('v2-form');
+  const v3BForm = document.getElementById('v3-basic-form');
+  const foPanel = document.getElementById('fo-panel');
 
-  // 앵커 버튼 show/hide + 첫 버튼 active
-  document.querySelectorAll('.anchor-btn').forEach(b => b.classList.remove('active'));
-  let firstActive = true;
-  document.querySelectorAll('.anchor-btn[data-v3-group]').forEach(b => {
-    const show = b.dataset.v3Group === group;
-    b.style.display = show ? '' : 'none';
-    if (show && firstActive) { b.classList.add('active'); firstActive = false; }
-  });
+  if (group === 'basic') {
+    // 기본정보: 전용 앵커바 + 전용 폼, FO 미리보기 없음
+    v2Bar.classList.remove('visible');
+    v3BBar.classList.add('visible');
+    v2Form.style.display = 'none';
+    v3BForm.style.display = '';
+    foPanel.style.display = 'none';
+    document.querySelectorAll('#v3-basic-anchor-bar .anchor-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
+  } else {
+    // 노출설정: v2-anchor-bar(expose 필터) + v2-form(expose 필터) + FO 미리보기
+    v3BBar.classList.remove('visible');
+    v2Bar.classList.add('visible');
+    v3BForm.style.display = 'none';
+    v2Form.style.display = '';
+    foPanel.style.display = '';
+    // expose 섹션만 표시
+    document.querySelectorAll('.v2-section[data-v3-group]').forEach(el => {
+      el.style.display = el.dataset.v3Group === 'expose' ? '' : 'none';
+    });
+    // expose 앵커만 표시 + 첫 번째 active
+    let firstActive = true;
+    document.querySelectorAll('.anchor-btn[data-v3-group]').forEach(b => {
+      const show = b.dataset.v3Group === 'expose';
+      b.style.display = show ? '' : 'none';
+      b.classList.toggle('active', show && firstActive);
+      if (show && firstActive) firstActive = false;
+    });
+  }
 
-  // 스크롤 초기화
   lastSyncedSection = null;
   document.querySelector('.form-area').scrollTo({ top: 0 });
+}
+
+/* ── 3안 기본정보 앵커 스크롤 ── */
+function scrollToV3Basic(id, btn) {
+  document.querySelectorAll('#v3-basic-anchor-bar .anchor-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  clearTimeout(anchorScrollTimer);
+  anchorScrollLock = true;
+  anchorScrollTimer = setTimeout(() => { anchorScrollLock = false; }, 900);
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // FO 미리보기 없으므로 syncFoToSection 호출 안 함
 }
 
 /* ── 2안 앵커 스크롤 ── */
@@ -2200,7 +2359,7 @@ function confirmGallerySelection() {
   });
 })();
 
-/* ── v2/v3 폼 스크롤 → FO 미리보기 섹션 동기화 ── */
+/* ── 폼 스크롤 → 앵커 active 동기화 ── */
 let lastSyncedSection = null;
 (function() {
   let scrollDebounce = null;
@@ -2208,30 +2367,37 @@ let lastSyncedSection = null;
   document.querySelector('.form-area').addEventListener('scroll', function() {
     if (scrollDebounce) clearTimeout(scrollDebounce);
     scrollDebounce = setTimeout(() => {
-      // v2·v3 모드에서 동작 (둘 다 v2-form을 사용)
-      if (document.getElementById('v2-form').style.display === 'none') return;
       if (anchorScrollLock) return;
-
       const formArea = document.querySelector('.form-area');
       const triggerY = formArea.getBoundingClientRect().top + 140;
 
-      // 트리거 라인 위에 있는 섹션 중 가장 마지막(하단) 섹션 = 현재 보이는 섹션
-      const sections = [...document.querySelectorAll('.v2-section')];
-      let active = null;
-      for (const s of sections) {
-        if (s.getBoundingClientRect().top <= triggerY) active = s;
+      if (currentVersion === 3 && currentV3Section === 'basic') {
+        // v3 기본정보: v3b-section 기준 앵커 업데이트
+        const sections = [...document.querySelectorAll('.v3b-section')];
+        let active = null;
+        for (const s of sections) {
+          if (s.getBoundingClientRect().top <= triggerY) active = s;
+        }
+        if (!active || active.id === lastSyncedSection) return;
+        lastSyncedSection = active.id;
+        document.querySelectorAll('#v3-basic-anchor-bar .anchor-btn').forEach(b => {
+          b.classList.toggle('active', (b.getAttribute('onclick') || '').includes(`'${active.id}'`));
+        });
+      } else if (document.getElementById('v2-form').style.display !== 'none') {
+        // v2 또는 v3+노출설정: visible v2-section 기준
+        const sections = [...document.querySelectorAll('.v2-section')].filter(s => s.style.display !== 'none');
+        let active = null;
+        for (const s of sections) {
+          if (s.getBoundingClientRect().top <= triggerY) active = s;
+        }
+        if (!active || active.id === lastSyncedSection) return;
+        lastSyncedSection = active.id;
+        document.querySelectorAll('.anchor-btn[data-v3-group]').forEach(b => {
+          if (b.style.display === 'none') return;
+          b.classList.toggle('active', (b.getAttribute('onclick') || '').includes(`'${active.id}'`));
+        });
+        syncFoToSection(active.id);
       }
-      if (!active || active.id === lastSyncedSection) return;
-      lastSyncedSection = active.id;
-
-      // 앵커 버튼 active 업데이트 (display:none 버튼 제외)
-      document.querySelectorAll('.anchor-btn').forEach(b => {
-        if (b.style.display === 'none') return;
-        b.classList.toggle('active', (b.getAttribute('onclick') || '').includes(`'${active.id}'`));
-      });
-
-      // FO 동기 스크롤
-      syncFoToSection(active.id);
     }, 80);
   });
 })();
