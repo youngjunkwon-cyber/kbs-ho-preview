@@ -1,0 +1,1969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Store Detail — K-Beauty Station</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ─── Reset & Base ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; }
+body {
+  font-family: 'Pretendard', -apple-system, 'Apple SD Gothic Neo', sans-serif;
+  background: #f0f0f0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 24px 0 0;
+}
+
+/* ─── Phone Shell ─── */
+.phone-shell {
+  width: 375px;
+  min-height: 812px;
+  background: #fff;
+  border-radius: 40px;
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.18);
+  position: relative;
+  margin-bottom: 40px;
+}
+
+/* ─── Scrollable Content ─── */
+.phone-scroll {
+  height: 812px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+.phone-scroll::-webkit-scrollbar { display: none; }
+
+/* ─── Variables ─── */
+:root {
+  --primary: #fb6f92;
+  --primary-light: #fff0f4;
+  --primary-mid: #fde8ef;
+  --text1: #1a1a1a;
+  --text2: #3d3d3d;
+  --text3: #777;
+  --text4: #aaa;
+  --border: #e8e8e8;
+  --border2: #f0f0f0;
+  --gray-bg: #f7f7f7;
+  --gray-mid: #f2f2f2;
+  --white: #ffffff;
+  --section-gap: 8px;
+}
+
+/* ─── Header ─── */
+.fo-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 375px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background: rgba(255,255,255,0.0);
+  transition: background 0.25s;
+}
+.fo-header.scrolled {
+  background: rgba(255,255,255,0.96);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+}
+.fo-header.hero-zone {
+  background: transparent;
+}
+.hdr-btn {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  border: none; background: rgba(255,255,255,0.25);
+  cursor: pointer;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 300;
+  transition: background 0.15s;
+  backdrop-filter: blur(4px);
+}
+.fo-header.scrolled .hdr-btn {
+  background: var(--gray-bg);
+  color: var(--text1);
+}
+.hdr-logo {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  color: #fff;
+}
+.fo-header.scrolled .hdr-logo { color: var(--primary); }
+.hdr-right { display: flex; align-items: center; gap: 4px; }
+.hdr-globe {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  border: none; background: rgba(255,255,255,0.25);
+  cursor: pointer;
+  font-size: 17px;
+  backdrop-filter: blur(4px);
+  transition: background 0.15s;
+}
+.fo-header.scrolled .hdr-globe {
+  background: var(--gray-bg);
+  color: var(--text1);
+}
+.fo-header.scrolled .hdr-btn-fav {
+  background: var(--gray-bg);
+  color: var(--text1);
+}
+.hdr-btn-fav {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  border: none; background: rgba(255,255,255,0.25);
+  cursor: pointer;
+  font-size: 17px;
+  backdrop-filter: blur(4px);
+}
+
+/* ─── Tab Bar ─── */
+.fo-tabbar {
+  position: sticky;
+  top: 56px;
+  z-index: 99;
+  background: #fff;
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+.fo-tab {
+  flex: 1;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text3);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.15s;
+}
+.fo-tab.active {
+  font-weight: 700;
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+/* ─── Hero ─── */
+.hero-wrap {
+  position: relative;
+  height: 480px;
+  margin-top: -56px; /* overlap header */
+  overflow: hidden;
+}
+.hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.hero-gradient {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom,
+    rgba(0,0,0,0.28) 0%,
+    rgba(0,0,0,0.04) 40%,
+    rgba(0,0,0,0.0) 55%,
+    rgba(0,0,0,0.55) 100%);
+}
+.hero-counter {
+  position: absolute;
+  top: 72px; right: 14px;
+  background: rgba(0,0,0,0.45);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
+}
+.hero-dots {
+  position: absolute;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 5px;
+}
+.hero-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.45);
+}
+.hero-dot.active {
+  width: 16px;
+  border-radius: 3px;
+  background: #fff;
+}
+.hero-body {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 0 20px 24px;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(251,111,146,0.9);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+  margin-bottom: 8px;
+  letter-spacing: 0.3px;
+}
+.hero-badge::before {
+  content: '★';
+  font-size: 9px;
+}
+.hero-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.3;
+  margin-bottom: 6px;
+  letter-spacing: -0.3px;
+}
+.hero-desc {
+  font-size: 12px;
+  color: rgba(255,255,255,0.82);
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+.hero-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.hero-rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+}
+.hero-rating-star { color: #FFD94A; font-size: 13px; }
+.hero-reviews { color: rgba(255,255,255,0.7); font-size: 11px; }
+.hero-location {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  color: rgba(255,255,255,0.8);
+  font-size: 11px;
+}
+
+/* ─── Section common ─── */
+.fo-section {
+  background: #fff;
+  padding: 24px 20px;
+}
+.fo-section + .fo-section {
+  margin-top: var(--section-gap);
+}
+.fo-section-divider {
+  height: var(--section-gap);
+  background: var(--gray-mid);
+}
+.section-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text1);
+  margin-bottom: 14px;
+  letter-spacing: -0.3px;
+}
+.section-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.section-more {
+  font-size: 12px;
+  color: var(--text3);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+}
+
+/* ─── SNS Channels ─── */
+.sns-row {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  margin-bottom: 14px;
+}
+.sns-row::-webkit-scrollbar { display: none; }
+.sns-card {
+  flex-shrink: 0;
+  width: 96px;
+  padding: 12px 10px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.sns-card:hover { border-color: var(--primary); background: var(--primary-light); }
+.sns-logo { width: 28px; height: 28px; object-fit: contain; }
+.sns-name { font-size: 11px; font-weight: 600; color: var(--text2); }
+.sns-handle { font-size: 10px; color: var(--text3); }
+
+.checklist-box {
+  background: var(--gray-bg);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.checklist-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text1);
+  margin-bottom: 10px;
+}
+.checklist-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 7px;
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.4;
+}
+.checklist-item:last-child { margin-bottom: 0; }
+.check-icon { color: var(--primary); font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+
+/* ─── AI Summary ─── */
+.ai-card {
+  border: 1.5px solid var(--primary);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 14px;
+  background: linear-gradient(135deg, #fff 60%, #fff5f8 100%);
+}
+.ai-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.ai-icon { width: 22px; height: 22px; object-fit: contain; }
+.ai-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: 0.3px;
+}
+.ai-badge {
+  margin-left: auto;
+  background: var(--primary-mid);
+  color: var(--primary);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+  letter-spacing: 0.5px;
+}
+.ai-text {
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.65;
+}
+
+.feature-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.feature-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 12px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text2);
+}
+.feature-badge img { width: 16px; height: 16px; object-fit: contain; }
+
+/* ─── Doctor Full Image ─── */
+.doctor-img-wrap {
+  width: 375px;
+  height: 406px;
+  overflow: hidden;
+  position: relative;
+}
+.doctor-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+}
+.doctor-img-overlay {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 20px;
+  background: linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 100%);
+}
+.doctor-img-name {
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 3px;
+}
+.doctor-img-title {
+  font-size: 12px;
+  color: rgba(255,255,255,0.8);
+}
+
+/* ─── Info Summary Card ─── */
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.info-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.info-cell-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text4);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.info-cell-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text1);
+  line-height: 1.35;
+}
+.info-cell-sub {
+  font-size: 11px;
+  color: var(--text3);
+}
+
+.hours-accordion {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.hours-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 14px;
+  background: #fff;
+  cursor: pointer;
+  user-select: none;
+}
+.hours-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text1);
+}
+.hours-open-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #22c55e;
+  flex-shrink: 0;
+}
+.hours-status {
+  font-size: 11px;
+  color: #22c55e;
+  font-weight: 600;
+}
+.hours-chevron {
+  font-size: 11px;
+  color: var(--text3);
+  transition: transform 0.2s;
+}
+.hours-accordion.open .hours-chevron { transform: rotate(180deg); }
+.hours-body {
+  display: none;
+  padding: 0 14px 14px;
+  background: #fff;
+}
+.hours-accordion.open .hours-body { display: block; }
+.hours-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text2);
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border2);
+}
+.hours-row:last-child { border-bottom: none; }
+.hours-day { font-weight: 500; color: var(--text3); }
+.hours-today { font-weight: 700; color: var(--text1); }
+
+.treatment-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.chip {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text2);
+  cursor: pointer;
+}
+.chip.pink {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* ─── 대표 상품 ─── */
+.filter-chips {
+  display: flex;
+  gap: 7px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  margin-bottom: 14px;
+}
+.filter-chips::-webkit-scrollbar { display: none; }
+.filter-chip {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1.5px solid var(--border);
+  background: #fff;
+  color: var(--text3);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.filter-chip.active {
+  border-color: var(--text1);
+  color: var(--text1);
+  background: var(--text1);
+  color: #fff;
+}
+
+.product-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 10px;
+  background: #fff;
+}
+.product-card-inner {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  align-items: flex-start;
+}
+.product-thumb {
+  width: 72px;
+  height: 72px;
+  border-radius: 8px;
+  background: var(--gray-mid);
+  flex-shrink: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.product-thumb-inner {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #fde8ef, #fff0f4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+.product-info { flex: 1; min-width: 0; }
+.product-category {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 3px;
+}
+.product-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text1);
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+.product-desc {
+  font-size: 11px;
+  color: var(--text3);
+  line-height: 1.4;
+  margin-bottom: 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.product-price-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.product-price {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text1);
+}
+.product-price-orig {
+  font-size: 11px;
+  color: var(--text4);
+  text-decoration: line-through;
+}
+.product-discount {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--primary);
+}
+.product-book-btn {
+  width: 100%;
+  height: 40px;
+  border: none;
+  border-top: 1px solid var(--border);
+  background: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: background 0.15s;
+  font-family: inherit;
+}
+.product-book-btn:hover { background: var(--primary-light); }
+
+.view-all-btn {
+  width: 100%;
+  height: 44px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 4px;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.view-all-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+/* ─── BA Results ─── */
+.ba-results-row {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  margin: 0 -20px;
+  padding: 0 20px 4px;
+}
+.ba-results-row::-webkit-scrollbar { display: none; }
+.ba-result-card {
+  flex-shrink: 0;
+  width: 180px;
+  height: 220px;
+  border-radius: 14px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+}
+.ba-result-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s;
+}
+.ba-result-card:hover img { transform: scale(1.04); }
+.ba-result-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.0) 55%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 12px;
+}
+.ba-result-tag {
+  display: inline-block;
+  background: var(--primary);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+  margin-bottom: 5px;
+  letter-spacing: 0.5px;
+}
+.ba-result-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.3;
+  margin-bottom: 3px;
+}
+.ba-result-sub {
+  font-size: 10px;
+  color: rgba(255,255,255,0.75);
+}
+
+/* ─── Instagram Post ─── */
+.insta-post {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.insta-post-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+}
+.insta-avatar {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: #fff;
+}
+.insta-username { font-size: 13px; font-weight: 700; color: var(--text1); }
+.insta-time { font-size: 11px; color: var(--text4); }
+.insta-video {
+  width: 100%;
+  aspect-ratio: 1/1;
+  background: #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.insta-video-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #fde8ef 0%, #f3d3e0 50%, #e8bfcf 100%);
+  opacity: 0.3;
+}
+.insta-play {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: var(--text1);
+  z-index: 1;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+.insta-post-footer {
+  padding: 12px 14px;
+}
+.insta-actions {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 8px;
+}
+.insta-action {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--text2);
+  cursor: pointer;
+}
+.insta-caption {
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.5;
+}
+
+/* ─── 대표원장 한마디 ─── */
+.doctor-quote-card {
+  background: var(--gray-bg);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.doctor-quote-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.doctor-quote-photo {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--primary);
+}
+.doctor-quote-name {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text1);
+  margin-bottom: 2px;
+}
+.doctor-quote-title {
+  font-size: 11px;
+  color: var(--text3);
+}
+.doctor-quote-text {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.7;
+  padding-left: 14px;
+  border-left: 3px solid var(--primary);
+}
+.doctor-quote-text::before {
+  content: '"';
+  font-size: 22px;
+  color: var(--primary);
+  font-weight: 800;
+  line-height: 1;
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* ─── FAQ ─── */
+.faq-item {
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+.faq-item:last-child { border-bottom: none; }
+.faq-q {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 16px 0;
+  cursor: pointer;
+  user-select: none;
+}
+.faq-q-icon {
+  width: 22px; height: 22px;
+  object-fit: contain;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.faq-q-text {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text1);
+  line-height: 1.4;
+}
+.faq-chevron {
+  font-size: 11px;
+  color: var(--text3);
+  transition: transform 0.2s;
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+.faq-item.open .faq-chevron { transform: rotate(180deg); color: var(--primary); }
+.faq-item.open .faq-q-text { color: var(--primary); }
+.faq-a {
+  display: none;
+  padding: 0 0 16px 32px;
+  font-size: 12px;
+  color: var(--text3);
+  line-height: 1.65;
+}
+.faq-item.open .faq-a { display: block; }
+
+/* ─── 예약 방법 ─── */
+.reservation-card {
+  background: var(--primary-light);
+  border: 1px solid var(--primary-mid);
+  border-radius: 14px;
+  padding: 20px;
+}
+.reservation-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.res-step {
+  display: flex;
+  gap: 14px;
+  position: relative;
+}
+.res-step-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.res-step-num {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.res-step-line {
+  width: 2px;
+  flex: 1;
+  background: var(--primary-mid);
+  margin: 4px 0;
+  min-height: 20px;
+}
+.res-step:last-child .res-step-line { display: none; }
+.res-step-body {
+  padding-bottom: 18px;
+  padding-top: 4px;
+}
+.res-step:last-child .res-step-body { padding-bottom: 0; }
+.res-step-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text1);
+  margin-bottom: 3px;
+}
+.res-step-desc {
+  font-size: 11px;
+  color: var(--text3);
+  line-height: 1.5;
+}
+
+/* ─── Gallery ─── */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.gallery-item {
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+}
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s;
+}
+.gallery-item:hover img { transform: scale(1.06); }
+.gallery-item.tall { grid-row: span 2; }
+.gallery-item.tall { height: 310px; }
+.gallery-item:not(.tall) { height: 150px; }
+
+/* ─── Blog & SNS ─── */
+.blog-card {
+  display: flex;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+.blog-card:last-of-type { border-bottom: none; margin-bottom: 0; }
+.blog-thumb {
+  width: 70px; height: 70px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--gray-mid);
+}
+.blog-info { flex: 1; min-width: 0; }
+.blog-category {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+.blog-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text1);
+  line-height: 1.35;
+  margin-bottom: 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.blog-date {
+  font-size: 10px;
+  color: var(--text4);
+}
+
+.sns-follow-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+.sns-follow-btn {
+  flex: 1;
+  height: 40px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.sns-follow-btn:hover { border-color: var(--primary); color: var(--primary); }
+.sns-follow-icon { width: 18px; height: 18px; object-fit: contain; }
+
+/* ─── Fixed CTA Bar ─── */
+.fo-cta-bar {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  border-top: 1px solid var(--border);
+  padding: 12px 16px;
+  display: flex;
+  gap: 10px;
+  z-index: 200;
+  box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
+}
+.cta-fav {
+  width: 48px; height: 48px;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.cta-fav:hover { border-color: var(--primary); color: var(--primary); }
+.cta-fav.active { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
+.cta-line {
+  flex: 1;
+  height: 48px;
+  border: none;
+  border-radius: 12px;
+  background: #06C755;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.cta-line:hover { background: #05a847; }
+.cta-line-icon { width: 22px; height: 22px; object-fit: contain; filter: brightness(0) invert(1); }
+.cta-book {
+  flex: 1;
+  height: 48px;
+  border: none;
+  border-radius: 12px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.cta-book:hover { background: #f05070; }
+
+/* ─── Bottom Safe Area ─── */
+.safe-area-bottom { height: 20px; background: #fff; }
+
+/* ─── Pill Divider ─── */
+.pill-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0 16px;
+}
+.pill-divider-line { flex: 1; height: 1px; background: var(--border); }
+.pill-divider-text {
+  font-size: 11px;
+  color: var(--text4);
+  font-weight: 500;
+  white-space: nowrap;
+}
+</style>
+</head>
+<body>
+
+<div class="phone-shell">
+<div class="phone-scroll" id="mainScroll">
+
+  <!-- ══════════════════════════════ HERO ══════════════════════════════ -->
+  <div style="position:relative;">
+
+    <!-- Sticky Header (overlays hero) -->
+    <header class="fo-header hero-zone" id="foHeader">
+      <button class="hdr-btn" onclick="history.back()">‹</button>
+      <span class="hdr-logo">K-Beauty Station</span>
+      <div class="hdr-right">
+        <button class="hdr-globe">🌐</button>
+        <button class="hdr-btn-fav" id="headerFav" onclick="toggleFav()">♡</button>
+      </div>
+    </header>
+
+    <!-- Hero Image -->
+    <div class="hero-wrap">
+      <img class="hero-img"
+        src="https://www.figma.com/api/mcp/asset/dfb218af-45cc-4faf-9b9a-d1335f6d8da8"
+        alt="Store hero"
+        onerror="this.style.background='linear-gradient(135deg,#fde8ef,#e8c3cf)';this.removeAttribute('src')">
+      <div class="hero-gradient"></div>
+      <div class="hero-counter">1 | 10</div>
+      <div class="hero-dots">
+        <div class="hero-dot active"></div>
+        <div class="hero-dot"></div>
+        <div class="hero-dot"></div>
+        <div class="hero-dot"></div>
+      </div>
+      <div class="hero-body">
+        <div class="hero-badge">BEST CLINIC</div>
+        <div class="hero-title">CIEL Aesthetic<br>Clinic</div>
+        <div class="hero-desc">Premium dermatology & aesthetic clinic<br>in the heart of Gangnam</div>
+        <div class="hero-meta">
+          <div class="hero-rating">
+            <span class="hero-rating-star">★</span>
+            4.9
+            <span class="hero-reviews">(2,341)</span>
+          </div>
+          <div class="hero-location">📍 Gangnam-gu, Seoul</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /hero wrapper -->
+
+  <!-- ══════════════════════════════ TAB BAR ══════════════════════════════ -->
+  <div class="fo-tabbar" id="foTabbar">
+    <div class="fo-tab active" onclick="switchTab(this,'intro')">소개</div>
+    <div class="fo-tab" onclick="switchTab(this,'products')">상품</div>
+    <div class="fo-tab" onclick="switchTab(this,'ba')">B/A</div>
+    <div class="fo-tab" onclick="switchTab(this,'faq')">FAQ</div>
+  </div>
+
+  <!-- ══════════════════════════════ SNS 채널 ══════════════════════════════ -->
+  <div class="fo-section" id="section-intro">
+    <div class="section-title">SNS 채널로 상담받기</div>
+
+    <div class="sns-row">
+      <div class="sns-card">
+        <img class="sns-logo"
+          src="https://www.figma.com/api/mcp/asset/f599b35d-6f8a-4102-98ee-af92e333be9f"
+          alt="WhatsApp"
+          onerror="this.style.cssText='width:28px;height:28px;background:#25D366;border-radius:50%;display:flex'">
+        <div class="sns-name">WhatsApp</div>
+        <div class="sns-handle">@ciel_clinic</div>
+      </div>
+      <div class="sns-card">
+        <img class="sns-logo"
+          src="https://www.figma.com/api/mcp/asset/5d53ffb6-3c95-48c5-8f98-5be05f391f2b"
+          alt="LINE"
+          onerror="this.style.cssText='width:28px;height:28px;background:#06C755;border-radius:6px'">
+        <div class="sns-name">LINE</div>
+        <div class="sns-handle">@cielclinic</div>
+      </div>
+      <div class="sns-card">
+        <img class="sns-logo"
+          src="https://www.figma.com/api/mcp/asset/59512bbb-e657-4be5-9b9e-172f3d8b1184"
+          alt="WeChat"
+          onerror="this.style.cssText='width:28px;height:28px;background:#07C160;border-radius:6px'">
+        <div class="sns-name">WeChat</div>
+        <div class="sns-handle">ciel_beauty</div>
+      </div>
+    </div>
+
+    <div class="checklist-box">
+      <div class="checklist-title">✅ 실시간 상담 가능 사항</div>
+      <div class="checklist-item">
+        <span class="check-icon">✓</span>
+        시술 전 상담 및 맞춤 시술 추천
+      </div>
+      <div class="checklist-item">
+        <span class="check-icon">✓</span>
+        견적 및 프로모션 문의
+      </div>
+      <div class="checklist-item">
+        <span class="check-icon">✓</span>
+        예약 날짜·시간 조율 및 예약 확인
+      </div>
+      <div class="checklist-item">
+        <span class="check-icon">✓</span>
+        시술 후 케어 및 회복 문의
+      </div>
+    </div>
+  </div>
+
+  <div class="fo-section-divider"></div>
+
+  <!-- ══════════════════════════════ AI SUMMARY + FEATURES ══════════════════════════════ -->
+  <div class="fo-section">
+    <div class="section-title">AI 클리닉 요약</div>
+
+    <div class="ai-card">
+      <div class="ai-card-header">
+        <img class="ai-icon"
+          src="https://www.figma.com/api/mcp/asset/a3f25a70-20b7-41b2-b298-8512421b1aef"
+          alt="AI"
+          onerror="this.textContent='✨';this.style.cssText='font-size:18px;width:22px;height:22px'">
+        <span class="ai-label">AI Summary</span>
+        <span class="ai-badge">BETA</span>
+      </div>
+      <div class="ai-text">
+        CIEL 클리닉은 강남 한복판에 위치한 프리미엄 피부·미용 전문 클리닉으로,
+        피부과 전문의 3인이 직접 시술을 담당합니다. 리뷰 분석 결과 <strong>모공·피부결
+        개선</strong>과 <strong>리프팅 효과</strong>에 대한 만족도가 특히 높으며,
+        외국어 상담(영어·중국어·일본어)이 가능해 외국인 방문객에게도 적합합니다.
+        예약은 LINE 또는 플랫폼 내 예약 기능을 통해 쉽게 진행할 수 있습니다.
+      </div>
+    </div>
+
+    <div class="feature-badges">
+      <div class="feature-badge">
+        <img src="https://www.figma.com/api/mcp/asset/8b60a526-89e6-429a-9bf5-493cd08c7472"
+          alt="Specialist"
+          onerror="this.textContent='👨‍⚕️';this.style.cssText='font-size:14px'">
+        전문의 직접시술
+      </div>
+      <div class="feature-badge">
+        <img src="https://www.figma.com/api/mcp/asset/e5de8cda-4f15-4238-a6a0-fd2b8f413edc"
+          alt="Private Room"
+          onerror="this.textContent='🚪';this.style.cssText='font-size:14px'">
+        프라이빗 룸
+      </div>
+      <div class="feature-badge">
+        <img src="https://www.figma.com/api/mcp/asset/bfcb7029-896f-4cc0-9c64-22592089ff1f"
+          alt="Weekend"
+          onerror="this.textContent='📅';this.style.cssText='font-size:14px'">
+        휴일진료
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════ DOCTOR IMAGE ══════════════════════════════ -->
+  <div class="doctor-img-wrap">
+    <img src="https://www.figma.com/api/mcp/asset/bcfe82ba-c8f0-422a-b9b3-c614c53390f1"
+      alt="Doctor"
+      onerror="this.style.cssText='width:375px;height:406px;background:linear-gradient(160deg,#fde8ef,#e8bfcf);display:block'">
+    <div class="doctor-img-overlay">
+      <div class="doctor-img-name">Dr. Kim Sooyeon</div>
+      <div class="doctor-img-title">피부과 전문의 · 대표원장</div>
+    </div>
+  </div>
+
+  <div class="fo-section-divider"></div>
+
+  <!-- ══════════════════════════════ INFO SUMMARY ══════════════════════════════ -->
+  <div class="fo-section">
+    <div class="section-title">클리닉 핵심정보</div>
+
+    <div class="info-grid">
+      <div class="info-cell">
+        <div class="info-cell-label">위치</div>
+        <div class="info-cell-value">강남구 논현동</div>
+        <div class="info-cell-sub">서울특별시</div>
+      </div>
+      <div class="info-cell">
+        <div class="info-cell-label">지하철역</div>
+        <div class="info-cell-value">강남역 3번 출구</div>
+        <div class="info-cell-sub">도보 5분</div>
+      </div>
+      <div class="info-cell">
+        <div class="info-cell-label">가격대</div>
+        <div class="info-cell-value">₩150,000~</div>
+        <div class="info-cell-sub">시술별 상이</div>
+      </div>
+      <div class="info-cell">
+        <div class="info-cell-label">예약방법</div>
+        <div class="info-cell-value">온라인 · LINE</div>
+        <div class="info-cell-sub">당일 예약 가능</div>
+      </div>
+    </div>
+
+    <div class="hours-accordion" id="hoursAccordion" onclick="toggleHours()">
+      <div class="hours-header">
+        <div class="hours-header-left">
+          <div class="hours-open-dot"></div>
+          영업시간
+          <span class="hours-status">· 영업 중</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:12px;color:var(--text3);">오늘 09:00 – 20:00</span>
+          <span class="hours-chevron">▼</span>
+        </div>
+      </div>
+      <div class="hours-body">
+        <div class="hours-row">
+          <span class="hours-day hours-today">월요일 (오늘)</span>
+          <span class="hours-today">09:00 – 20:00</span>
+        </div>
+        <div class="hours-row">
+          <span class="hours-day">화요일</span>
+          <span>09:00 – 20:00</span>
+        </div>
+        <div class="hours-row">
+          <span class="hours-day">수요일</span>
+          <span>09:00 – 20:00</span>
+        </div>
+        <div class="hours-row">
+          <span class="hours-day">목요일</span>
+          <span>09:00 – 20:00</span>
+        </div>
+        <div class="hours-row">
+          <span class="hours-day">금요일</span>
+          <span>09:00 – 20:00</span>
+        </div>
+        <div class="hours-row">
+          <span class="hours-day">토요일</span>
+          <span>10:00 – 18:00</span>
+        </div>
+        <div class="hours-row">
+          <span class="hours-day">일요일</span>
+          <span>10:00 – 16:00</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="treatment-chips">
+      <div class="chip pink">리프팅</div>
+      <div class="chip pink">모공개선</div>
+      <div class="chip pink">보톡스</div>
+      <div class="chip">피부관리</div>
+      <div class="chip">레이저</div>
+      <div class="chip">필러</div>
+      <div class="chip">실리프팅</div>
+      <div class="chip">색소</div>
+    </div>
+  </div>
+
+  <div class="fo-section-divider"></div>
+
+  <!-- ══════════════════════════════ 대표 상품 ══════════════════════════════ -->
+  <div class="fo-section" id="section-products">
+    <div class="section-title-row">
+      <div class="section-title" style="margin-bottom:0;">대표 상품</div>
+      <div class="section-more">전체보기 ›</div>
+    </div>
+
+    <div class="filter-chips">
+      <div class="filter-chip active" onclick="selectChip(this)">전체</div>
+      <div class="filter-chip" onclick="selectChip(this)">리프팅</div>
+      <div class="filter-chip" onclick="selectChip(this)">보톡스</div>
+      <div class="filter-chip" onclick="selectChip(this)">레이저</div>
+      <div class="filter-chip" onclick="selectChip(this)">필러</div>
+      <div class="filter-chip" onclick="selectChip(this)">피부관리</div>
+    </div>
+
+    <!-- Product 1 -->
+    <div class="product-card">
+      <div class="product-card-inner">
+        <div class="product-thumb">
+          <div class="product-thumb-inner">💆‍♀️</div>
+        </div>
+        <div class="product-info">
+          <div class="product-category">LIFTING</div>
+          <div class="product-name">울쎄라 Full Face 리프팅</div>
+          <div class="product-desc">HIFU 기반 비침습 리프팅. 이마·눈가·볼·턱선 전체 케어</div>
+          <div class="product-price-row">
+            <span class="product-price">₩680,000</span>
+            <span class="product-price-orig">₩980,000</span>
+            <span class="product-discount">30% OFF</span>
+          </div>
+        </div>
+      </div>
+      <button class="product-book-btn">📅 예약하기</button>
+    </div>
+
+    <!-- Product 2 -->
+    <div class="product-card">
+      <div class="product-card-inner">
+        <div class="product-thumb">
+          <div class="product-thumb-inner">✨</div>
+        </div>
+        <div class="product-info">
+          <div class="product-category">LASER</div>
+          <div class="product-name">피코 레이저 모공·피부결</div>
+          <div class="product-desc">피코초 레이저로 모공 축소·색소·잡티 개선. 다운타임 최소화</div>
+          <div class="product-price-row">
+            <span class="product-price">₩220,000</span>
+            <span class="product-price-orig">₩280,000</span>
+            <span class="product-discount">21% OFF</span>
+          </div>
+        </div>
+      </div>
+      <button class="product-book-btn">📅 예약하기</button>
+    </div>
+
+    <!-- Product 3 -->
+    <div class="product-card">
+      <div class="product-card-inner">
+        <div class="product-thumb">
+          <div class="product-thumb-inner">💉</div>
+        </div>
+        <div class="product-info">
+          <div class="product-category">BOTOX</div>
+          <div class="product-name">보톡스 3부위 패키지</div>
+          <div class="product-desc">이마·미간·눈가 3부위 세트. 전문의 직접 시술</div>
+          <div class="product-price-row">
+            <span class="product-price">₩150,000</span>
+          </div>
+        </div>
+      </div>
+      <button class="product-book-btn">📅 예약하기</button>
+    </div>
+
+    <!-- Product 4 -->
+    <div class="product-card">
+      <div class="product-card-inner">
+        <div class="product-thumb">
+          <div class="product-thumb-inner">🌟</div>
+        </div>
+        <div class="product-info">
+          <div class="product-category">FILLER</div>
+          <div class="product-name">히알루론산 필러 (팔자·입술)</div>
+          <div class="product-desc">자연스러운 볼륨감. 팔자주름·입술·턱·코 등 맞춤 시술</div>
+          <div class="product-price-row">
+            <span class="product-price">₩250,000</span>
+            <span class="product-price-orig">₩320,000</span>
+            <span class="product-discount">22% OFF</span>
+          </div>
+        </div>
+      </div>
+      <button class="product-book-btn">📅 예약하기</button>
+    </div>
+
+    <!-- Product 5 -->
+    <div class="product-card">
+      <div class="product-card-inner">
+        <div class="product-thumb">
+          <div class="product-thumb-inner">🌸</div>
+        </div>
+        <div class="product-info">
+          <div class="product-category">SKIN CARE</div>
+          <div class="product-name">수분광 피부관리 (1회)</div>
+          <div class="product-desc">수분 집중 공급 + 진정·광채 케어. 민감성 피부 OK</div>
+          <div class="product-price-row">
+            <span class="product-price">₩95,000</span>
+          </div>
+        </div>
+      </div>
+      <button class="product-book-btn">📅 예약하기</button>
+    </div>
+
+    <button class="view-all-btn">시술 전체보기 ›</button>
+  </div>
+
+  <div class="fo-section-divider"></div>
+
+  <!-- ══════════════════════════════ B/A 결과 하이라이트 ══════════════════════════════ -->
+  <div class="fo-section" id="section-ba">
+    <div class="section-title-row">
+      <div class="section-title" style="margin-bottom:0;">결과 하이라이트</div>
+      <div class="section-more">더보기 ›</div>
+    </div>
+
+    <div class="ba-results-row">
+      <div class="ba-result-card">
+        <img src="https://www.figma.com/api/mcp/asset/cc2da749-10e9-485b-ba36-df16c39ed2e3"
+          alt="BA result 1"
+          onerror="this.style.cssText='width:100%;height:100%;background:linear-gradient(135deg,#fde8ef,#e8bfcf);display:block'">
+        <div class="ba-result-overlay">
+          <span class="ba-result-tag">LIFTING</span>
+          <div class="ba-result-title">울쎄라 리프팅<br>Before & After</div>
+          <div class="ba-result-sub">4주 경과 · 1회 시술</div>
+        </div>
+      </div>
+      <div class="ba-result-card">
+        <img src="https://www.figma.com/api/mcp/asset/3e69faac-81dd-4025-9e05-5d662f391aca"
+          alt="BA result 2"
+          onerror="this.style.cssText='width:100%;height:100%;background:linear-gradient(135deg,#fce8f5,#e8c3e8);display:block'">
+        <div class="ba-result-overlay">
+          <span class="ba-result-tag">LASER</span>
+          <div class="ba-result-title">피코 레이저<br>모공 개선</div>
+          <div class="ba-result-sub">2주 경과 · 2회 시술</div>
+        </div>
+      </div>
+      <div class="ba-result-card">
+        <img src="https://www.figma.com/api/mcp/asset/c47e827d-0ae4-4407-b5a2-d2481b5afcc0"
+          alt="BA result 3"
+          onerror="this.style.cssText='width:100%;height:100%;background:linear-gradient(135deg,#f5e8fe,#d3c3e8);display:block'">
+        <div class="ba-result-overlay">
+          <span class="ba-result-tag">FILLER</span>
+          <div class="ba-result-title">필러 시술<br>Before & After</div>
+          <div class="ba-result-sub">즉시 효과 · 1회 시술</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="fo-section-divider"></div>
+
+  <!-- ══════════════════════════════ SNS 포스트 ══════════════════════════════ -->
+  <div class="fo-section">
+    <div class="section-title-row">
+      <div class="section-title" style="margin-bottom:0;">리얼 고객 후기</div>
+      <div class="section-more">전체보기 ›</div>
+    </div>
+
+    <div class="insta-post">
+      <div class="insta-post-header">
+        <div class="insta-avatar">★</div>
+        <div>
+          <div class="insta-username">j_beauty_traveler</div>
+          <div class="insta-time">3일 전</div>
+        </div>
+      </div>
+      <div class="insta-video">
+        <div class="insta-video-bg"></div>
+        <div class="insta-play">▶</div>
+      </div>
+      <div class="insta-post-footer">
+        <div class="insta-actions">
+          <div class="insta-action">♡ 1,204</div>
+          <div class="insta-action">💬 87</div>
+          <div class="insta-action">🔖 312</div>
+        </div>
+        <div class="insta-caption">
+          강남 피부과 리프팅 후기 🌸 울쎄라 맞고 1달 지났는데 진짜 확실히 달라졌어요!
+          외국인인데 영어로 상담해줘서 너무 편했고 원장님이 직접 설명해주셨어요.
+          <span style="color:var(--primary)">#CIEL클리닉 #강남피부과 #울쎄라 #KBeauty</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="fo-section-divider"></div>
+
+  <!-- ══════════════════════════════ 대표원장 한마디 ══════════════════════════════ -->
+  <div class="fo-section">
+    <div class="section-title">대표원장 한마디</div>
+    <div class="doctor-quote-card">
+      <div class="doctor-quote-header">
+        <img class="doctor-quote-photo"
+          src="https://www.figma.com/api/mcp/asset/bcfe82ba-c8f0-422a-b9b3-c614c53390f1"
+          alt="Doctor photo"
+          onerror="this.style.cssText='width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#fde8ef,#e8bfcf);border:2px solid var(--primary);display:block'">
+        <div>
+          <div class="doctor-quote-name">김수연 원장</div>
+          <div class="doctor-quote-title">피부과 전문의 · 연세대학교 의과대학</div>
+        </div>
+      </div>
+      <div class="doctor-quote-text">
+        모든 피부는 다릅니다. 저는 10년간의 임상 경험을 바탕으로,
+        획일화된 시술이 아닌 개개인의 피부 상태와 라이프스타일에 맞는
+        맞춤형 솔루션을 제공합니다. 한국을 방문하시는 모든 분들께
+        안전하고 만족스러운 경험을 드릴 것을 약속드립니다.
+      </div>
+    </div>
+  </div>
+
+  <div class="fo-section-divider"></div>
+
+  <!-- ══════════════════════════════ FAQ ══════════════════════════════ -->
+  <div class="fo-section" id="section-faq">
+    <div class="section-title">자주 묻는 질문</div>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">
+        <img class="faq-q-icon"
+          src="https://www.figma.com/api/mcp/asset/8f944df8-4fd6-4d49-8cea-4f14d3c49301"
+          alt="Q"
+          onerror="this.textContent='Q';this.style.cssText='width:22px;height:22px;background:var(--primary);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800'">
+        <div class="faq-q-text">외국인도 예약·방문이 가능한가요?</div>
+        <div class="faq-chevron">▼</div>
+      </div>
+      <div class="faq-a">
+        네, 물론입니다. 영어·중국어·일본어 상담이 가능하며,
+        예약은 플랫폼 내 예약 기능 또는 LINE을 통해 진행할 수 있습니다.
+        방문 시 여권을 지참해 주세요.
+      </div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">
+        <img class="faq-q-icon"
+          src="https://www.figma.com/api/mcp/asset/8f944df8-4fd6-4d49-8cea-4f14d3c49301"
+          alt="Q"
+          onerror="this.textContent='Q';this.style.cssText='width:22px;height:22px;background:var(--primary);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800'">
+        <div class="faq-q-text">시술 당일 예약도 가능한가요?</div>
+        <div class="faq-chevron">▼</div>
+      </div>
+      <div class="faq-a">
+        당일 예약은 잔여 슬롯 여부에 따라 가능합니다.
+        확실한 예약을 원하신다면 최소 1–2일 전 온라인 예약을 권장합니다.
+        피크 시즌(주말, 공휴일)에는 미리 예약하시는 것을 추천드립니다.
+      </div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">
+        <img class="faq-q-icon"
+          src="https://www.figma.com/api/mcp/asset/8f944df8-4fd6-4d49-8cea-4f14d3c49301"
+          alt="Q"
+          onerror="this.textContent='Q';this.style.cssText='width:22px;height:22px;background:var(--primary);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800'">
+        <div class="faq-q-text">결제는 어떤 방식으로 가능한가요?</div>
+        <div class="faq-chevron">▼</div>
+      </div>
+      <div class="faq-a">
+        현금(원화), 신용카드(Visa/MasterCard/UnionPay), 카카오페이, 네이버페이 등이 가능합니다.
+        일부 시술은 플랫폼 내 선결제로 할인 혜택을 받으실 수 있습니다.
+      </div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">
+        <img class="faq-q-icon"
+          src="https://www.figma.com/api/mcp/asset/8f944df8-4fd6-4d49-8cea-4f14d3c49301"
+          alt="Q"
+          onerror="this.textContent='Q';this.style.cssText='width:22px;height:22px;background:var(--primary);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800'">
+        <div class="faq-q-text">시술 후 다운타임이 얼마나 되나요?</div>
+        <div class="faq-chevron">▼</div>
+      </div>
+      <div class="faq-a">
+        시술 종류에 따라 다릅니다. 피코 레이저·보톡스 등 경미한 시술은 당일 일상 복귀가 가능하며,
+        울쎄라 리프팅이나 필러 등은 1–3일 정도의 가벼운 붓기가 있을 수 있습니다.
+        상담 시 자세히 안내드립니다.
+      </div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">
+        <img class="faq-q-icon"
+          src="https://www.figma.com/api/mcp/asset/8f944df8-4fd6-4d49-8cea-4f14d3c49301"
+          alt="Q"
+          onerror="this.textContent='Q';this.style.cssText='width:22px;height:22px;background:var(--primary);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800'">
+        <div class="faq-q-text">의료 관광 패키지가 있나요?</div>
+        <div class="faq-chevron">▼</div>
+      </div>
+      <div class="faq-a">
+        네, K-Beauty Station 플랫폼을 통해 예약 시 공항 픽업·호텔 연계·
+        통역 서비스 등을 포함한 의료 관광 패키지 이용이 가능합니다.
+        자세한 사항은 LINE 채팅으로 문의해 주세요.
+      </div>
+    </div>
+  </div>
+
+  <div class="fo-section-divider"></div>
+
+  <!-- ══════════════════════════════ 예약 방법 ══════════════════════════════ -->
+  <div class="fo-section">
+    <div class="section-title">예약 방법</div>
+    <div class="reservation-card">
+      <div class="reservation-steps">
+
+        <div class="res-step">
+          <div class="res-step-left">
+            <div class="res-step-num">1</div>
+            <div class="res-step-line"></div>
+          </div>
+          <div class="res-step-body">
+            <div class="res-step-title">원하는 시술 선택</div>
+            <div class="res-step-desc">상품 목록에서 원하는 시술을 선택하고 상세 정보를 확인하세요.</div>
+          </div>
+        </div>
+
+        <div class="res-step">
+          <div class="res-step-left">
+            <div class="res-step-num">2</div>
+            <div class="res-step-line"></div>
+          </div>
+          <div class="res-step-body">
+            <div class="res-step-title">날짜 & 시간 선택</div>
+            <div class="res-step-desc">원하는 날짜와 시간을 선택하세요. 실시간으로 가능한 슬롯을 확인할 수 있습니다.</div>
+          </div>
+        </div>
+
+        <div class="res-step">
+          <div class="res-step-left">
+            <div class="res-step-num">3</div>
+            <div class="res-step-line"></div>
+          </div>
+          <div class="res-step-body">
+            <div class="res-step-title">예약 정보 입력</div>
+            <div class="res-step-desc">이름·연락처·특이사항(알레르기 등)을 입력해 주세요.</div>
+          </div>
+        </div>
+
+        <div class="res-step">
+          <div class="res-step-left">
+            <div class="res-step-num">4</div>
+            <div class="res-step-line"></div>
+          </div>
+          <div class="res-step-body">
+            <div class="res-step-title">예약 확정</div>
+            <div class="res-step-desc">예약이 확정되면 LINE 또는 이메일로 확인 메시지가 발송됩니다.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="fo-section-divider"></div>
+
+  <!-- ══════════════════════════════ GALLERY ══════════════════════════════ -->
+  <div class="fo-section">
+    <div class="section-title-row">
+      <div class="section-title" style="margin-bottom:0;">클리닉 갤러리</div>
+      <div class="section-more">전체보기 ›</div>
+    </div>
+
+    <div class="gallery-grid">
+      <!-- tall left -->
+      <div class="gallery-item tall">
+        <img src="https://www.figma.com/api/mcp/asset/30819371-c3b2-4e36-b073-9735fd1ff417"
+          alt="Gallery 1"
+          onerror="this.style.cssText='width:100%;height:100%;background:linear-gradient(135deg,#fde8ef,#f0c8d8);display:block'">
+      </div>
+      <!-- right column -->
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <div class="gallery-item" style="height:150px;">
+          <img src="https://www.figma.com/api/mcp/asset/2ca3dac0-855e-4877-978a-dc5d36e3188d"
+            alt="Gallery 2"
+            onerror="this.style.cssText='width:100%;height:100%;background:linear-gradient(135deg,#e8f0fe,#c8d8f0);display:block'">
+        </div>
+        <div class="gallery-item" style="height:150px;">
+          <img src="https://www.figma.com/api/mcp/asset/8079163c-4528-4949-b828-572f5cf61a8c"
+            alt="Gallery 3"
+            onerror="this.style.cssText='width:100%;height:100%;background:linear-gradient(135deg,#fef4e8,#f0dfc8);display:block'">
+        </div>
+      </div>
+      <!-- bottom row -->
+      <div class="gallery-item" style="height:150px;">
+        <img src="https://www.figma.com/api/mcp/asset/a6bfe4a9-4ba1-40e3-8c91-3bc1ab70dfcf"
+          alt="Gallery 4"
+          onerror="this.style.cssText='width:100%;height:100%;background:linear-gradient(135deg,#e8fef4,#c8f0de);display:block'">
+      </div>
+      <div class="gallery-item" style="height:150px;position:relative;">
+        <img src="https://www.figma.com/api/mcp/asset/72b36f9c-6eba-48b5-bd9f-49f557325f88"
+          alt="Gallery 5"
+          onerror="this.style.cssText='width:100%;height:100%;background:linear-gradient(135deg,#f4e8fe,#dfc8f0);display:block'">
+        <div style="position:absolute;inset:0;background:rgba(0,0,0,0.42);display:flex;align-items:center;justify-content:center;border-radius:10px;">
+          <span style="color:#fff;font-size:16px;font-weight:800;">+24</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="fo-section-divider"></div>
+
+  <!-- ══════════════════════════════ BLOG & SNS ══════════════════════════════ -->
+  <div class="fo-section">
+    <div class="section-title-row">
+      <div class="section-title" style="margin-bottom:0;">매거진 & SNS</div>
+      <div class="section-more">더보기 ›</div>
+    </div>
+
+    <div class="blog-card">
+      <img class="blog-thumb"
+        src="https://www.figma.com/api/mcp/asset/bd39ea77-2bef-498b-978e-7482eec1ad4d"
+        alt="Blog"
+        onerror="this.style.cssText='width:70px;height:70px;border-radius:10px;background:linear-gradient(135deg,#fde8ef,#e8bfcf);flex-shrink:0'">
+      <div class="blog-info">
+        <div class="blog-category">LIFTING</div>
+        <div class="blog-title">울쎄라 vs 써마지 — 어떤 리프팅이 나에게 맞을까?</div>
+        <div class="blog-date">2026.04.15</div>
+      </div>
+    </div>
+
+    <div class="blog-card">
+      <div class="blog-thumb" style="background:linear-gradient(135deg,#e8f0fe,#c8d8f0);display:flex;align-items:center;justify-content:center;font-size:24px;">💡</div>
+      <div class="blog-info">
+        <div class="blog-category">SKIN CARE</div>
+        <div class="blog-title">봄철 피부 트러블 완벽 가이드 — 피부과 전문의가 알려주는 관리법</div>
+        <div class="blog-date">2026.04.08</div>
+      </div>
+    </div>
+
+    <div class="sns-follow-row">
+      <button class="sns-follow-btn">
+        <img class="sns-follow-icon"
+          src="https://www.figma.com/api/mcp/asset/657b4ab3-e9ab-4ebf-9c11-7f0093c818c7"
+          alt="Instagram"
+          onerror="this.textContent='📸';this.style.fontSize='16px'">
+        Instagram
+      </button>
+      <button class="sns-follow-btn">
+        <img class="sns-follow-icon"
+          src="https://www.figma.com/api/mcp/asset/c666c8ed-d7ad-4214-b2e7-ffd49a8d7c05"
+          alt="YouTube"
+          onerror="this.textContent='▶';this.style.fontSize='16px'">
+        YouTube
+      </button>
+      <button class="sns-follow-btn">
+        <img class="sns-follow-icon"
+          src="https://www.figma.com/api/mcp/asset/c5da4106-3cfc-4a00-bb9d-c93c2c8e5812"
+          alt="Blog"
+          onerror="this.textContent='📝';this.style.fontSize='16px'">
+        블로그
+      </button>
+    </div>
+  </div>
+
+  <div class="safe-area-bottom"></div>
+
+  <!-- ══════════════════════════════ FIXED CTA ══════════════════════════════ -->
+  <div class="fo-cta-bar">
+    <button class="cta-fav" id="ctaFav" onclick="toggleFav()" title="찜하기">♡</button>
+    <button class="cta-line">
+      <img class="cta-line-icon"
+        src="https://www.figma.com/api/mcp/asset/e77f07d2-481e-4e17-a28e-a5b4afc482f9"
+        alt="LINE"
+        onerror="this.textContent='L';this.style.cssText='font-size:14px;font-weight:800;color:#fff'">
+      LINE 상담
+    </button>
+    <button class="cta-book">📅 예약하기</button>
+  </div>
+
+</div><!-- /phone-scroll -->
+</div><!-- /phone-shell -->
+
+<script>
+/* ─── Header scroll behavior ─── */
+const scroll = document.getElementById('mainScroll');
+const header = document.getElementById('foHeader');
+scroll.addEventListener('scroll', () => {
+  const y = scroll.scrollTop;
+  if (y > 360) {
+    header.classList.add('scrolled');
+    header.classList.remove('hero-zone');
+  } else {
+    header.classList.remove('scrolled');
+    header.classList.add('hero-zone');
+  }
+});
+
+/* ─── Tab switching ─── */
+function switchTab(el, id) {
+  document.querySelectorAll('.fo-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  const targets = {
+    intro: 'section-intro',
+    products: 'section-products',
+    ba: 'section-ba',
+    faq: 'section-faq'
+  };
+  const target = document.getElementById(targets[id]);
+  if (target) {
+    const tabbarBottom = document.getElementById('foTabbar').offsetTop + 44;
+    const scrollTarget = target.offsetTop - tabbarBottom - 60;
+    scroll.scrollTo({ top: scrollTarget, behavior: 'smooth' });
+  }
+}
+
+/* ─── FAQ accordion ─── */
+function toggleFaq(item) {
+  const isOpen = item.classList.contains('open');
+  // close all
+  document.querySelectorAll('.faq-item.open').forEach(f => f.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+
+/* ─── Hours accordion ─── */
+function toggleHours() {
+  document.getElementById('hoursAccordion').classList.toggle('open');
+}
+
+/* ─── Filter chips ─── */
+function selectChip(el) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+/* ─── Fav toggle ─── */
+let isFav = false;
+function toggleFav() {
+  isFav = !isFav;
+  const ctaFav = document.getElementById('ctaFav');
+  const hdrFav = document.getElementById('headerFav');
+  if (isFav) {
+    ctaFav.textContent = '♥';
+    ctaFav.classList.add('active');
+    hdrFav.textContent = '♥';
+    hdrFav.style.color = 'var(--primary)';
+  } else {
+    ctaFav.textContent = '♡';
+    ctaFav.classList.remove('active');
+    hdrFav.textContent = '♡';
+    hdrFav.style.color = '';
+  }
+}
+</script>
+</body>
+</html>
