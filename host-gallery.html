@@ -196,6 +196,66 @@ body {
 .ba-photo-label { font-size: 10px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; color: var(--text3); margin-bottom: 6px; }
 .ba-photo-img { width: 100%; aspect-ratio: 4/3; background: #E5E7EB; border: 1px solid var(--border); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: var(--text3); font-size: 11px; }
 
+/* ── BA 패널 헤더 ── */
+.ba-panel-hd { display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
+.ba-total-label { font-size:13px; color:var(--text2); }
+
+/* ── 카드/리스트 뷰 토글 버튼 ── */
+.ba-view-toggle { display:flex; }
+.ba-vtbtn {
+  width:32px; height:32px; border:1px solid var(--border); background:#fff;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; color:var(--text3); transition:all 0.15s; padding:0;
+}
+.ba-vtbtn:first-child { border-radius:6px 0 0 6px; }
+.ba-vtbtn:last-child  { border-radius:0 6px 6px 0; border-left:none; }
+.ba-vtbtn.active { background:var(--primary); border-color:var(--primary); color:#fff; }
+.ba-vtbtn:hover:not(.active) { background:var(--gray-bg); color:var(--text1); }
+
+/* ── BA 카드 그리드 ── */
+.ba-card-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:14px; margin-top:16px; }
+.ba-card { background:#fff; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+.ba-card-photos { display:grid; grid-template-columns:1fr 1fr; height:120px; }
+.ba-card-photo { position:relative; overflow:hidden; }
+.ba-card-photo-img { width:100%; height:100%; }
+.ba-card-photo-label {
+  position:absolute; top:6px; left:6px;
+  background:rgba(0,0,0,0.55); color:#fff;
+  font-size:9px; font-weight:700; padding:2px 6px; border-radius:3px; letter-spacing:0.4px;
+}
+.ba-card-body { padding:10px 12px 8px; }
+.ba-card-row1 { display:flex; align-items:center; justify-content:space-between; margin-bottom:5px; }
+.ba-card-product { font-size:12px; font-weight:600; color:var(--text1); margin-bottom:2px; }
+.ba-card-sub { font-size:11px; color:var(--text3); margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ba-card-date { font-size:10px; color:var(--text-disabled); }
+.ba-card-foot {
+  display:flex; align-items:center; justify-content:flex-end;
+  gap:4px; padding:7px 10px; border-top:1px solid var(--border);
+}
+.ba-icon-btn {
+  width:26px; height:26px; background:none; border:none; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  border-radius:5px; color:var(--text3); font-size:13px; transition:all 0.15s;
+}
+.ba-icon-btn:hover { background:var(--gray-bg); color:var(--text1); }
+.ba-icon-btn.danger:hover { background:var(--red-bg); color:var(--red); }
+
+/* ── BA 리스트 테이블 ── */
+.ba-list-wrap { margin-top:16px; background:#fff; border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+.ba-list-table { width:100%; border-collapse:collapse; }
+.ba-list-table th {
+  height:38px; padding:0 14px; text-align:left;
+  font-size:11px; font-weight:600; color:var(--text2);
+  background:var(--gray-bg); border-bottom:1px solid var(--border); white-space:nowrap;
+}
+.ba-list-table td {
+  height:62px; padding:0 14px; font-size:12px; color:var(--text2);
+  border-bottom:1px solid var(--border); vertical-align:middle;
+}
+.ba-list-table tbody tr:last-child td { border-bottom:none; }
+.ba-list-table tbody tr:hover td { background:#fafafa; }
+.ba-list-thumb { width:44px; height:44px; border-radius:6px; display:block; }
+
 /* ── Add Form ── */
 .add-form-card { border: 1.5px dashed var(--primary); border-radius: 8px; background: var(--primary-l); margin-bottom: 16px; }
 .add-form-card .card-header { background: var(--primary-l); border-bottom: 1px solid #f5c6d5; color: var(--primary); }
@@ -456,129 +516,215 @@ body {
           </div>
         </div>
 
-        <!-- List Header -->
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-          <span style="font-size:13px;color:var(--text2);">총 <strong>4</strong>개</span>
-          <button class="btn btn-primary" onclick="toggleAddForm()">+ 비포애프터 추가</button>
-        </div>
-
-        <!-- Entry 1 -->
-        <div class="ba-entry">
-          <div class="ba-entry-header">
-            <div class="ba-entry-meta">
-              <span class="drag-handle">⠿</span>
-              <span class="badge badge-cat">리프팅</span>
-              <span style="font-size:12px;color:var(--text2);font-weight:600;">올쎄라 듀얼 600샷</span>
-              <span style="color:var(--text3);font-size:11px;">·</span>
-              <span class="ba-subtitle">올쎄라 600샷 시술 3개월 후</span>
+        <!-- 패널 헤더: 건수 + 뷰 토글 + 추가 버튼 -->
+        <div class="ba-panel-hd">
+          <span class="ba-total-label">총 <strong>4</strong>건</span>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="ba-view-toggle">
+              <button class="ba-vtbtn active" id="ba-vt-card" onclick="switchBaView('card')" title="카드뷰">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="currentColor"><rect x="0" y="0" width="5.5" height="5.5" rx="1"/><rect x="7.5" y="0" width="5.5" height="5.5" rx="1"/><rect x="0" y="7.5" width="5.5" height="5.5" rx="1"/><rect x="7.5" y="7.5" width="5.5" height="5.5" rx="1"/></svg>
+              </button>
+              <button class="ba-vtbtn" id="ba-vt-list" onclick="switchBaView('list')" title="리스트뷰">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="currentColor"><rect x="0" y="0.5" width="13" height="2" rx="1"/><rect x="0" y="5.5" width="13" height="2" rx="1"/><rect x="0" y="10.5" width="13" height="2" rx="1"/></svg>
+              </button>
             </div>
-            <div style="display:flex;gap:6px;flex-shrink:0;">
-              <button class="btn btn-secondary btn-sm">수정</button>
-              <button class="btn-danger-ghost">삭제</button>
-            </div>
-          </div>
-          <div class="ba-entry-body">
-            <div class="ba-photos">
-              <div class="ba-photo-slot">
-                <div class="ba-photo-label">BEFORE</div>
-                <div class="ba-photo-img" style="background:#D1D5DB;font-size:12px;">Before 이미지</div>
-              </div>
-              <div class="ba-photo-slot">
-                <div class="ba-photo-label">AFTER</div>
-                <div class="ba-photo-img" style="background:#C7D2FE;font-size:12px;">After 이미지</div>
-              </div>
-            </div>
+            <button class="btn btn-primary" onclick="toggleAddForm()">+ 비포애프터 추가</button>
           </div>
         </div>
 
-        <!-- Entry 2 -->
-        <div class="ba-entry">
-          <div class="ba-entry-header">
-            <div class="ba-entry-meta">
-              <span class="drag-handle">⠿</span>
-              <span class="badge badge-cat">필러</span>
-              <span style="font-size:12px;color:var(--text2);font-weight:600;">코 필러 1cc</span>
-              <span style="color:var(--text3);font-size:11px;">·</span>
-              <span class="ba-subtitle">코 필러 시술 1주 후 붓기 완전 빠짐</span>
-            </div>
-            <div style="display:flex;gap:6px;flex-shrink:0;">
-              <button class="btn btn-secondary btn-sm">수정</button>
-              <button class="btn-danger-ghost">삭제</button>
-            </div>
-          </div>
-          <div class="ba-entry-body">
-            <div class="ba-photos">
-              <div class="ba-photo-slot">
-                <div class="ba-photo-label">BEFORE</div>
-                <div class="ba-photo-img" style="background:#D1D5DB;font-size:12px;">Before 이미지</div>
-              </div>
-              <div class="ba-photo-slot">
-                <div class="ba-photo-label">AFTER</div>
-                <div class="ba-photo-img" style="background:#BBF7D0;font-size:12px;">After 이미지</div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <!-- ── 카드 뷰 ── -->
+        <div id="ba-card-view" class="ba-card-grid">
 
-        <!-- Entry 3 -->
-        <div class="ba-entry">
-          <div class="ba-entry-header">
-            <div class="ba-entry-meta">
-              <span class="drag-handle">⠿</span>
-              <span class="badge badge-cat">보톡스</span>
-              <span style="font-size:12px;color:var(--text2);font-weight:600;">이마 보톡스 50U</span>
-              <span style="color:var(--text3);font-size:11px;">·</span>
-              <span class="ba-subtitle">이마 주름 보톡스 4주 경과</span>
-            </div>
-            <div style="display:flex;gap:6px;flex-shrink:0;">
-              <button class="btn btn-secondary btn-sm">수정</button>
-              <button class="btn-danger-ghost">삭제</button>
-            </div>
-          </div>
-          <div class="ba-entry-body">
-            <div class="ba-photos">
-              <div class="ba-photo-slot">
-                <div class="ba-photo-label">BEFORE</div>
-                <div class="ba-photo-img" style="background:#D1D5DB;font-size:12px;">Before 이미지</div>
+          <!-- 카드 1 -->
+          <div class="ba-card">
+            <div class="ba-card-photos">
+              <div class="ba-card-photo">
+                <span class="ba-card-photo-label">Before</span>
+                <div class="ba-card-photo-img" style="background:#c8cdd4;"></div>
               </div>
-              <div class="ba-photo-slot">
-                <div class="ba-photo-label">AFTER</div>
-                <div class="ba-photo-img" style="background:#FDE68A;font-size:12px;">After 이미지</div>
+              <div class="ba-card-photo">
+                <span class="ba-card-photo-label">After</span>
+                <div class="ba-card-photo-img" style="background:#C7D2FE;"></div>
               </div>
             </div>
+            <div class="ba-card-body">
+              <div class="ba-card-row1">
+                <span class="badge badge-cat">리프팅</span>
+                <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+              </div>
+              <div class="ba-card-product">올쎄라 듀얼 600샷</div>
+              <div class="ba-card-sub">올쎄라 600샷 시술 3개월 후</div>
+              <div class="ba-card-date">2025.01.15</div>
+            </div>
+            <div class="ba-card-foot">
+              <button class="ba-icon-btn" title="수정">✏</button>
+              <button class="ba-icon-btn danger" title="삭제">🗑</button>
+            </div>
           </div>
-        </div>
 
-        <!-- Entry 4 -->
-        <div class="ba-entry">
-          <div class="ba-entry-header">
-            <div class="ba-entry-meta">
-              <span class="drag-handle">⠿</span>
-              <span class="badge badge-cat">리프팅</span>
-              <span style="font-size:12px;color:var(--text2);font-weight:600;">인모드 FX 전신</span>
-              <span style="color:var(--text3);font-size:11px;">·</span>
-              <span class="ba-subtitle">인모드 FX 복부 1회 시술 2주 후</span>
-            </div>
-            <div style="display:flex;gap:6px;flex-shrink:0;">
-              <button class="btn btn-secondary btn-sm">수정</button>
-              <button class="btn-danger-ghost">삭제</button>
-            </div>
-          </div>
-          <div class="ba-entry-body">
-            <div class="ba-photos">
-              <div class="ba-photo-slot">
-                <div class="ba-photo-label">BEFORE</div>
-                <div class="ba-photo-img" style="background:#D1D5DB;font-size:12px;">Before 이미지</div>
+          <!-- 카드 2 -->
+          <div class="ba-card">
+            <div class="ba-card-photos">
+              <div class="ba-card-photo">
+                <span class="ba-card-photo-label">Before</span>
+                <div class="ba-card-photo-img" style="background:#c8cdd4;"></div>
               </div>
-              <div class="ba-photo-slot">
-                <div class="ba-photo-label">AFTER</div>
-                <div class="ba-photo-img" style="background:#FBCFE8;font-size:12px;">After 이미지</div>
+              <div class="ba-card-photo">
+                <span class="ba-card-photo-label">After</span>
+                <div class="ba-card-photo-img" style="background:#BBF7D0;"></div>
               </div>
             </div>
+            <div class="ba-card-body">
+              <div class="ba-card-row1">
+                <span class="badge badge-cat">필러</span>
+                <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+              </div>
+              <div class="ba-card-product">코 필러 1cc</div>
+              <div class="ba-card-sub">코 필러 시술 1주 후 붓기 완전 빠짐</div>
+              <div class="ba-card-date">2025.02.03</div>
+            </div>
+            <div class="ba-card-foot">
+              <button class="ba-icon-btn" title="수정">✏</button>
+              <button class="ba-icon-btn danger" title="삭제">🗑</button>
+            </div>
           </div>
-        </div>
 
-        <div class="text-muted" style="margin-top:8px;text-align:center;">⠿ 드래그하여 앱 노출 순서를 변경할 수 있습니다</div>
+          <!-- 카드 3 -->
+          <div class="ba-card">
+            <div class="ba-card-photos">
+              <div class="ba-card-photo">
+                <span class="ba-card-photo-label">Before</span>
+                <div class="ba-card-photo-img" style="background:#c8cdd4;"></div>
+              </div>
+              <div class="ba-card-photo">
+                <span class="ba-card-photo-label">After</span>
+                <div class="ba-card-photo-img" style="background:#FDE68A;"></div>
+              </div>
+            </div>
+            <div class="ba-card-body">
+              <div class="ba-card-row1">
+                <span class="badge badge-cat">보톡스</span>
+                <div class="toggle" onclick="this.classList.toggle('on')"></div>
+              </div>
+              <div class="ba-card-product">이마 보톡스 50U</div>
+              <div class="ba-card-sub">이마 주름 보톡스 4주 경과</div>
+              <div class="ba-card-date">2025.02.20</div>
+            </div>
+            <div class="ba-card-foot">
+              <button class="ba-icon-btn" title="수정">✏</button>
+              <button class="ba-icon-btn danger" title="삭제">🗑</button>
+            </div>
+          </div>
+
+          <!-- 카드 4 -->
+          <div class="ba-card">
+            <div class="ba-card-photos">
+              <div class="ba-card-photo">
+                <span class="ba-card-photo-label">Before</span>
+                <div class="ba-card-photo-img" style="background:#c8cdd4;"></div>
+              </div>
+              <div class="ba-card-photo">
+                <span class="ba-card-photo-label">After</span>
+                <div class="ba-card-photo-img" style="background:#FBCFE8;"></div>
+              </div>
+            </div>
+            <div class="ba-card-body">
+              <div class="ba-card-row1">
+                <span class="badge badge-cat">리프팅</span>
+                <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+              </div>
+              <div class="ba-card-product">인모드 FX 전신</div>
+              <div class="ba-card-sub">인모드 FX 복부 1회 시술 2주 후</div>
+              <div class="ba-card-date">2025.03.08</div>
+            </div>
+            <div class="ba-card-foot">
+              <button class="ba-icon-btn" title="수정">✏</button>
+              <button class="ba-icon-btn danger" title="삭제">🗑</button>
+            </div>
+          </div>
+
+        </div><!-- /ba-card-view -->
+
+        <!-- ── 리스트 뷰 ── -->
+        <div id="ba-list-view" style="display:none;">
+          <div class="ba-list-wrap">
+            <table class="ba-list-table">
+              <thead>
+                <tr>
+                  <th>No.</th>
+                  <th>등록일</th>
+                  <th>전사진</th>
+                  <th>후사진</th>
+                  <th>카테고리</th>
+                  <th>상품명</th>
+                  <th>소제목</th>
+                  <th>활성화</th>
+                  <th style="text-align:right;">관리</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="color:var(--text3);">4</td>
+                  <td>2025.01.15</td>
+                  <td><div class="ba-list-thumb" style="background:#c8cdd4;"></div></td>
+                  <td><div class="ba-list-thumb" style="background:#C7D2FE;"></div></td>
+                  <td><span class="badge badge-cat">리프팅</span></td>
+                  <td style="font-weight:600;">올쎄라 듀얼 600샷</td>
+                  <td style="color:var(--text3);">올쎄라 600샷 시술 3개월 후</td>
+                  <td><div class="toggle on" onclick="this.classList.toggle('on')"></div></td>
+                  <td style="text-align:right;"><div style="display:flex;gap:6px;justify-content:flex-end;">
+                    <button class="btn btn-sm btn-secondary">수정</button>
+                    <button class="btn-ghost-danger">삭제</button>
+                  </div></td>
+                </tr>
+                <tr>
+                  <td style="color:var(--text3);">3</td>
+                  <td>2025.02.03</td>
+                  <td><div class="ba-list-thumb" style="background:#c8cdd4;"></div></td>
+                  <td><div class="ba-list-thumb" style="background:#BBF7D0;"></div></td>
+                  <td><span class="badge badge-cat">필러</span></td>
+                  <td style="font-weight:600;">코 필러 1cc</td>
+                  <td style="color:var(--text3);">코 필러 시술 1주 후 붓기 완전 빠짐</td>
+                  <td><div class="toggle on" onclick="this.classList.toggle('on')"></div></td>
+                  <td style="text-align:right;"><div style="display:flex;gap:6px;justify-content:flex-end;">
+                    <button class="btn btn-sm btn-secondary">수정</button>
+                    <button class="btn-ghost-danger">삭제</button>
+                  </div></td>
+                </tr>
+                <tr>
+                  <td style="color:var(--text3);">2</td>
+                  <td>2025.02.20</td>
+                  <td><div class="ba-list-thumb" style="background:#c8cdd4;"></div></td>
+                  <td><div class="ba-list-thumb" style="background:#FDE68A;"></div></td>
+                  <td><span class="badge badge-cat">보톡스</span></td>
+                  <td style="font-weight:600;">이마 보톡스 50U</td>
+                  <td style="color:var(--text3);">이마 주름 보톡스 4주 경과</td>
+                  <td><div class="toggle" onclick="this.classList.toggle('on')"></div></td>
+                  <td style="text-align:right;"><div style="display:flex;gap:6px;justify-content:flex-end;">
+                    <button class="btn btn-sm btn-secondary">수정</button>
+                    <button class="btn-ghost-danger">삭제</button>
+                  </div></td>
+                </tr>
+                <tr>
+                  <td style="color:var(--text3);">1</td>
+                  <td>2025.03.08</td>
+                  <td><div class="ba-list-thumb" style="background:#c8cdd4;"></div></td>
+                  <td><div class="ba-list-thumb" style="background:#FBCFE8;"></div></td>
+                  <td><span class="badge badge-cat">리프팅</span></td>
+                  <td style="font-weight:600;">인모드 FX 전신</td>
+                  <td style="color:var(--text3);">인모드 FX 복부 1회 시술 2주 후</td>
+                  <td><div class="toggle on" onclick="this.classList.toggle('on')"></div></td>
+                  <td style="text-align:right;"><div style="display:flex;gap:6px;justify-content:flex-end;">
+                    <button class="btn btn-sm btn-secondary">수정</button>
+                    <button class="btn-ghost-danger">삭제</button>
+                  </div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div><!-- /ba-list-view -->
+
+        <div id="ba-drag-hint" class="text-muted" style="margin-top:8px;text-align:center;font-size:11px;">⠿ 드래그하여 앱 노출 순서를 변경할 수 있습니다</div>
 
       </div><!-- /panel-ba -->
 
@@ -742,6 +888,16 @@ const PRODUCTS = {
   botox: ['이마 보톡스 50U', '눈가 보톡스 30U', '사각턱 보톡스 100U', '종아리 보톡스 200U'],
   skin: ['물광 주사 기본', '레이저 토닝 5회', '탄력 앰풀 케어']
 };
+
+/* ── 전/후 사진 카드/리스트 뷰 전환 ── */
+function switchBaView(view) {
+  const isCard = view === 'card';
+  document.getElementById('ba-card-view').style.display  = isCard ? '' : 'none';
+  document.getElementById('ba-list-view').style.display  = isCard ? 'none' : '';
+  document.getElementById('ba-drag-hint').style.display  = isCard ? '' : 'none';
+  document.getElementById('ba-vt-card').classList.toggle('active', isCard);
+  document.getElementById('ba-vt-list').classList.toggle('active', !isCard);
+}
 
 function toggleLnbMenu(which) {
   const gMenu = document.getElementById('sidebar-gallery-menu');
