@@ -1845,10 +1845,14 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
       <div class="gallery-modal-dialog">
         <div class="gallery-modal-header">
           <span>갤러리 — 일반 사진</span>
+          <div style="display:flex;align-items:center;gap:8px;margin-left:auto;margin-right:12px;">
+            <button class="btn btn-sm btn-secondary" onclick="document.getElementById('gallery-file-input').click()">직접 업로드</button>
+            <input id="gallery-file-input" type="file" accept="image/*" style="display:none;" onchange="handleGalleryUpload(this)" />
+          </div>
           <button class="gallery-modal-close" onclick="closeGalleryPicker()">✕</button>
         </div>
         <div class="gallery-modal-body">
-          <div class="gallery-grid">
+          <div class="gallery-grid" id="gallery-grid">
             <div class="gallery-item" onclick="selectGalleryItem(this)">
               <div class="gallery-thumb" style="background:linear-gradient(135deg,#f5c6d5,#e8537a);"></div>
               <div class="gallery-item-name">clinic_exterior.jpg</div>
@@ -1881,6 +1885,10 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
               <div class="gallery-thumb" style="background:linear-gradient(135deg,#f5d5e8,#b44a8a);"></div>
               <div class="gallery-item-name">store_interior.jpg</div>
             </div>
+          </div>
+          <div style="margin-top:14px;font-size:11px;color:var(--text3);display:flex;align-items:center;gap:4px;">
+            <span style="color:var(--blue);font-size:13px;">ℹ</span>
+            직접 업로드한 이미지는 <strong style="color:var(--text2);">갤러리 관리 &gt; 일반 사진</strong>에도 자동으로 저장됩니다.
           </div>
         </div>
         <div class="gallery-modal-footer">
@@ -2033,6 +2041,26 @@ function selectGalleryItem(item) {
   confirmBtn.disabled = false;
   confirmBtn.style.opacity = '1';
   confirmBtn.style.cursor = 'pointer';
+}
+
+function handleGalleryUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const grid = document.getElementById('gallery-grid');
+    const item = document.createElement('div');
+    item.className = 'gallery-item';
+    item.onclick = function() { selectGalleryItem(this); };
+    item.innerHTML = `
+      <div class="gallery-thumb" style="background:url('${e.target.result}') center/cover;"></div>
+      <div class="gallery-item-name">${file.name}</div>`;
+    // 그리드 맨 앞에 삽입
+    grid.insertBefore(item, grid.firstChild);
+    selectGalleryItem(item);
+  };
+  reader.readAsDataURL(file);
+  input.value = ''; // reset
 }
 
 function confirmGallerySelection() {
