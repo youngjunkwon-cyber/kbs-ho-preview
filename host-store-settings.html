@@ -1694,22 +1694,32 @@ function switchVersion(v, btn) {
 }
 
 /* ── 2안 앵커 스크롤 ── */
-function scrollToSection(id, btn) {
-  document.querySelectorAll('.anchor-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  // 폼 스크롤
-  const el = document.getElementById(id);
-  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  // FO 미리보기 동기 스크롤 — 현재 표시 중인 fo-* 화면에서 대응 앵커 요소 찾기
+let anchorScrollLock = false;
+let anchorScrollTimer = null;
+
+function syncFoToSection(id) {
   const foScreen = document.querySelector('#fo-panel [id^="fo-"][style*="block"], #fo-panel [id^="fo-"]:not([style])');
   const foScroll = document.querySelector('.fo-panel-scroll');
   if (foScroll && foScreen) {
     const target = foScreen.querySelector(`[data-fo-anchor="${id}"]`);
     if (target) {
-      const offset = target.offsetTop - foScroll.offsetTop;
-      foScroll.scrollTo({ top: offset, behavior: 'smooth' });
+      foScroll.scrollTo({ top: target.offsetTop - foScroll.offsetTop, behavior: 'smooth' });
     }
   }
+}
+
+function scrollToSection(id, btn) {
+  document.querySelectorAll('.anchor-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // 앵커 클릭 시 폼 scroll 이벤트 오발 방지
+  clearTimeout(anchorScrollTimer);
+  anchorScrollLock = true;
+  anchorScrollTimer = setTimeout(() => { anchorScrollLock = false; }, 900);
+  // 폼 스크롤
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // FO 미리보기 동기 스크롤
+  syncFoToSection(id);
 }
 
 /* ── 2안 카드 내 언어 탭 전환 ── */
@@ -1771,6 +1781,41 @@ function updatePreview() {
   const name = document.getElementById('store-name-ko').value || '';
   // EN preview name is managed separately; KO name used for reference
 }
+
+/* ── v2 폼 스크롤 → FO 미리보기 섹션 동기화 ── */
+(function() {
+  let scrollDebounce = null;
+  let lastSyncedSection = null;
+
+  document.querySelector('.form-area').addEventListener('scroll', function() {
+    if (scrollDebounce) clearTimeout(scrollDebounce);
+    scrollDebounce = setTimeout(() => {
+      // v2 모드에서만 동작
+      if (document.getElementById('v2-form').style.display === 'none') return;
+      if (anchorScrollLock) return;
+
+      const formArea = document.querySelector('.form-area');
+      const triggerY = formArea.getBoundingClientRect().top + 140;
+
+      // 트리거 라인 위에 있는 섹션 중 가장 마지막(하단) 섹션 = 현재 보이는 섹션
+      const sections = [...document.querySelectorAll('.v2-section')];
+      let active = null;
+      for (const s of sections) {
+        if (s.getBoundingClientRect().top <= triggerY) active = s;
+      }
+      if (!active || active.id === lastSyncedSection) return;
+      lastSyncedSection = active.id;
+
+      // 앵커 버튼 active 업데이트
+      document.querySelectorAll('.anchor-btn').forEach(b => {
+        b.classList.toggle('active', (b.getAttribute('onclick') || '').includes(`'${active.id}'`));
+      });
+
+      // FO 동기 스크롤
+      syncFoToSection(active.id);
+    }, 80);
+  });
+})();
 </script>
 </body>
 </html>
