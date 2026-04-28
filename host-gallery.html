@@ -49,21 +49,21 @@ body {
   border-right: 1px solid #ddd; display: flex; flex-direction: column;
   height: 100vh; overflow-y: auto;
 }
-.sidebar-logo {
-  padding: 0 16px; height: 56px; display: flex; align-items: center;
-  border-bottom: 1px solid #ddd;
-  font-size: 13px; font-weight: 700; color: var(--primary);
-}
-.sidebar-menu { padding: 4px 0; }
+.sidebar-brand { padding: 0 16px; height: 56px; display: flex; align-items: center; border-bottom: 1px solid #ddd; }
+.sidebar-brand-name { font-size: 13px; font-weight: 700; color: var(--primary); }
+.sidebar-divider { height: 1px; background: #ddd; flex-shrink: 0; }
 .menu-item {
   display: flex; align-items: center; height: 36px; padding: 0 14px;
   font-size: 12px; color: var(--text2); cursor: pointer;
-  border-left: 3px solid transparent; gap: 6px;
+  border-left: 3px solid transparent;
 }
 .menu-item:hover { background: #fafafa; }
 .menu-item.active { background: var(--sidebar-active); color: var(--primary); border-left-color: var(--primary); font-weight: 700; }
 .menu-item.sub { height: 30px; padding: 0 24px; font-size: 11px; color: var(--text3); }
 .menu-item.sub.active { background: var(--sidebar-active); color: var(--primary); border-left-color: var(--primary); font-weight: 700; }
+.menu-icon { width: 18px; font-size: 13px; flex-shrink: 0; opacity: 0.7; margin-right: 6px; }
+.menu-item.active .menu-icon { opacity: 1; }
+.menu-chevron { margin-left: auto; font-size: 10px; color: var(--text3); }
 
 /* ── Main ── */
 .main { flex: 1; min-width: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
@@ -352,17 +352,23 @@ body {
 
   <!-- ── Sidebar ── -->
   <aside class="sidebar">
-    <div class="sidebar-logo">KBS Host</div>
-    <div class="sidebar-menu">
-      <div class="menu-item">홈</div>
-      <div class="menu-item">채팅 관리</div>
-      <div class="menu-item">상담 관리</div>
-      <div class="menu-item active">갤러리 관리</div>
+    <div class="sidebar-brand"><div class="sidebar-brand-name">K-Beauty Station</div></div>
+    <div class="sidebar-divider"></div>
+    <div class="menu-item"><span class="menu-icon">⌂</span>홈</div>
+    <div class="menu-item"><span class="menu-icon">💬</span>채팅 관리</div>
+    <div class="menu-item"><span class="menu-icon">📋</span>상담 관리</div>
+    <div class="menu-item"><span class="menu-icon">✉</span>메신저 상담 관리</div>
+    <div class="menu-item"><span class="menu-icon">☆</span>리뷰 관리</div>
+    <div class="menu-item"><span class="menu-icon">⚙</span>챗봇 설정</div>
+    <div class="menu-item has-sub" id="sidebar-gallery-menu" onclick="toggleLnbMenu('gallery')"><span class="menu-icon">⊞</span>갤러리 관리<span class="menu-chevron">▲</span></div>
+    <div id="sidebar-gallery-sub">
       <div class="menu-item sub active" id="sidebar-ba" onclick="showTab('ba')">전/후 사진</div>
       <div class="menu-item sub" id="sidebar-general" onclick="showTab('general')">일반 사진</div>
-      <div class="menu-item" onclick="window.location='host-store-settings.html'">스토어 설정</div>
-      <div class="menu-item">리뷰 관리</div>
-      <div class="menu-item">챗봇 설정</div>
+    </div>
+    <div class="menu-item has-sub" id="sidebar-store-menu" onclick="toggleLnbMenu('store')"><span class="menu-icon">◫</span>스토어 설정<span class="menu-chevron">▼</span></div>
+    <div id="sidebar-store-sub" style="display:none;">
+      <div class="menu-item sub" onclick="window.location='host-store-settings.html'">기본정보</div>
+      <div class="menu-item sub" onclick="window.location='host-store-settings.html'">노출설정</div>
     </div>
   </aside>
 
@@ -736,6 +742,22 @@ const PRODUCTS = {
   botox: ['이마 보톡스 50U', '눈가 보톡스 30U', '사각턱 보톡스 100U', '종아리 보톡스 200U'],
   skin: ['물광 주사 기본', '레이저 토닝 5회', '탄력 앰풀 케어']
 };
+
+function toggleLnbMenu(which) {
+  const gMenu = document.getElementById('sidebar-gallery-menu');
+  const gSub  = document.getElementById('sidebar-gallery-sub');
+  const sMenu = document.getElementById('sidebar-store-menu');
+  const sSub  = document.getElementById('sidebar-store-sub');
+  if (which === 'gallery') {
+    const open = gSub.style.display !== 'none';
+    gSub.style.display = open ? 'none' : '';
+    gMenu.querySelector('.menu-chevron').textContent = open ? '▼' : '▲';
+  } else {
+    const open = sSub.style.display !== 'none';
+    sSub.style.display = open ? 'none' : '';
+    sMenu.querySelector('.menu-chevron').textContent = open ? '▼' : '▲';
+  }
+}
 
 function showTab(tab) {
   const isBa = tab === 'ba';

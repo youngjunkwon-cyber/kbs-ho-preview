@@ -699,13 +699,15 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
     <div class="menu-item"><span class="menu-icon">✉</span>메신저 상담 관리</div>
     <div class="menu-item"><span class="menu-icon">☆</span>리뷰 관리</div>
     <div class="menu-item"><span class="menu-icon">⚙</span>챗봇 설정</div>
-    <div class="menu-item has-sub" onclick="window.location='host-gallery.html'"><span class="menu-icon">⊞</span>갤러리 관리<span class="menu-chevron">▲</span></div>
-    <div class="menu-item sub" onclick="window.location='host-gallery.html'">전/후 사진</div>
-    <div class="menu-item sub" onclick="window.location='host-gallery.html?tab=general'">일반 사진</div>
-    <div class="menu-item active has-sub" id="sidebar-store-menu"><span class="menu-icon">◫</span>스토어 설정<span class="menu-chevron"></span></div>
-    <div id="sidebar-store-sub-v3" style="display:none;">
-      <div class="menu-item sub active" data-v3-section="basic" onclick="switchV3Section('basic', this)">기본정보</div>
-      <div class="menu-item sub" data-v3-section="expose" onclick="switchV3Section('expose', this)">노출설정</div>
+    <div class="menu-item has-sub" id="sidebar-gallery-menu" onclick="toggleLnbMenu('gallery')"><span class="menu-icon">⊞</span>갤러리 관리<span class="menu-chevron">▼</span></div>
+    <div id="sidebar-gallery-sub" style="display:none;">
+      <div class="menu-item sub" onclick="window.location='host-gallery.html'">전/후 사진</div>
+      <div class="menu-item sub" onclick="window.location='host-gallery.html?tab=general'">일반 사진</div>
+    </div>
+    <div class="menu-item has-sub" id="sidebar-store-menu" onclick="toggleLnbMenu('store')"><span class="menu-icon">◫</span>스토어 설정<span class="menu-chevron">▲</span></div>
+    <div id="sidebar-store-sub">
+      <div class="menu-item sub active" data-v3-section="basic" onclick="switchV3Section('basic')">기본정보</div>
+      <div class="menu-item sub" data-v3-section="expose" onclick="switchV3Section('expose')">노출설정</div>
     </div>
 
   </aside>
@@ -2025,6 +2027,23 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
 </div>
 
 <script>
+/* ── LNB 아코디언 토글 ── */
+function toggleLnbMenu(which) {
+  const gMenu = document.getElementById('sidebar-gallery-menu');
+  const gSub  = document.getElementById('sidebar-gallery-sub');
+  const sMenu = document.getElementById('sidebar-store-menu');
+  const sSub  = document.getElementById('sidebar-store-sub');
+  if (which === 'gallery') {
+    const open = gSub.style.display !== 'none';
+    gSub.style.display = open ? 'none' : '';
+    gMenu.querySelector('.menu-chevron').textContent = open ? '▼' : '▲';
+  } else {
+    const open = sSub.style.display !== 'none';
+    sSub.style.display = open ? 'none' : '';
+    sMenu.querySelector('.menu-chevron').textContent = open ? '▼' : '▲';
+  }
+}
+
 /* ── Tab switch ── */
 function switchTab(idx, btn) {
   document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
@@ -2076,20 +2095,15 @@ function switchVersion(v, btn) {
     v2Form.style.display = 'none';
   }
 
-  // 사이드바 서브메뉴
-  const storeMenu = document.getElementById('sidebar-store-menu');
-  const storeSubV3 = document.getElementById('sidebar-store-sub-v3');
+  // v3: 섹션 분기 (LNB 서브메뉴는 항상 열려있음)
   if (v === 3) {
-    storeMenu.classList.remove('active');
-    storeMenu.querySelector('.menu-chevron').textContent = '▲';
-    storeSubV3.style.display = '';
     switchV3Section('basic');
     return; // switchV3Section 에서 스크롤 초기화
-  } else {
-    storeMenu.classList.add('active');
-    storeMenu.querySelector('.menu-chevron').textContent = '';
-    storeSubV3.style.display = 'none';
   }
+  // v1/v2: 기본정보 sub-item active로 초기화
+  document.querySelectorAll('#sidebar-store-sub .menu-item').forEach((el, i) => {
+    el.classList.toggle('active', i === 0);
+  });
 
   lastSyncedSection = null;
   document.querySelector('.form-area').scrollTo({ top: 0 });
@@ -2100,7 +2114,7 @@ function switchV3Section(group) {
   currentV3Section = group;
 
   // LNB active
-  document.querySelectorAll('#sidebar-store-sub-v3 .menu-item').forEach(el => {
+  document.querySelectorAll('#sidebar-store-sub .menu-item').forEach(el => {
     el.classList.toggle('active', el.dataset.v3Section === group);
   });
 
