@@ -563,7 +563,14 @@ body {
 
         <div class="info-banner">
           💡 일반 사진은 <strong>앱 스토어 상세화면 — 갤러리 섹션</strong>에 노출됩니다.
-          최대 <strong>10장</strong>까지 등록 가능합니다. 노출 순서는 번호 순서이며, 순서 조정 방식에 대한 두 가지 안을 비교합니다.
+          신규 등록은 최대 <strong>10장</strong>까지 가능합니다. 노출 순서는 번호 순서이며, 순서 조정 방식에 대한 두 가지 안을 비교합니다.
+        </div>
+
+        <!-- 10장 초과 경고 배너 (등록 수 > 10일 때만 표시) -->
+        <div class="warn-banner" id="gen-over-banner" style="display:none;">
+          ⚠️ <strong>등록 사진이 10장을 초과했습니다.</strong>
+          기존 등록분은 모두 유지되지만, <strong>10장 이하로 줄이기 전까지 새 사진을 추가할 수 없습니다.</strong>
+          우선순위가 낮은 사진을 삭제하거나 비활성으로 전환해 주세요.
         </div>
 
         <!-- 안 선택 -->
@@ -607,6 +614,7 @@ body {
             <div style="display:flex;align-items:center;gap:14px;">
               <span style="font-size:14px;font-weight:700;color:var(--text1);">
                 <span id="gen-count-cur">8</span><span style="color:var(--text3);font-weight:400;font-size:13px;"> / 10</span>
+
               </span>
               <div class="sort-action-bar" id="sort-action-bar">
                 <span style="font-size:12px;color:var(--text2);">드래그로 순서를 변경하세요</span>
@@ -802,15 +810,20 @@ const CAT_CLASS = {
 };
 
 // Sample data: {id, color, active, date, cat, sub}
+// 12장 — 10장 초과 상태 시연
 let genPhotos = [
-  { id: 1, color: '#BFDBFE', active: true,  date: '2025.03.12', cat: '시술 사진',    sub: '리프팅' },
-  { id: 2, color: '#BBF7D0', active: true,  date: '2025.03.15', cat: '시술 사진',    sub: '필러' },
-  { id: 3, color: '#FDE68A', active: true,  date: '2025.03.20', cat: '원내 시설',   sub: '대기실' },
-  { id: 4, color: '#FBCFE8', active: true,  date: '2025.03.22', cat: '원내 시설',   sub: '시술실' },
-  { id: 5, color: '#DDD6FE', active: true,  date: '2025.04.01', cat: '시술 사진',    sub: '보톡스' },
-  { id: 6, color: '#A7F3D0', active: false, date: '2025.04.05', cat: '의료진·스태프', sub: '원장' },
-  { id: 7, color: '#FCA5A5', active: true,  date: '2025.04.10', cat: '이벤트',      sub: '시즌 프로모션' },
-  { id: 8, color: '#C7D2FE', active: true,  date: '2025.04.18', cat: '시술 사진',    sub: '피부관리' },
+  { id:  1, color: '#BFDBFE', active: true,  date: '2025.01.08', cat: '시술 사진',    sub: '리프팅' },
+  { id:  2, color: '#BBF7D0', active: true,  date: '2025.01.15', cat: '시술 사진',    sub: '필러' },
+  { id:  3, color: '#FDE68A', active: true,  date: '2025.02.03', cat: '원내 시설',    sub: '대기실' },
+  { id:  4, color: '#FBCFE8', active: true,  date: '2025.02.11', cat: '원내 시설',    sub: '시술실' },
+  { id:  5, color: '#DDD6FE', active: true,  date: '2025.02.20', cat: '시술 사진',    sub: '보톡스' },
+  { id:  6, color: '#A7F3D0', active: false, date: '2025.03.05', cat: '의료진·스태프', sub: '원장' },
+  { id:  7, color: '#FCA5A5', active: true,  date: '2025.03.12', cat: '이벤트',       sub: '시즌 프로모션' },
+  { id:  8, color: '#C7D2FE', active: true,  date: '2025.03.22', cat: '시술 사진',    sub: '피부관리' },
+  { id:  9, color: '#FEF08A', active: true,  date: '2025.04.01', cat: '원내 시설',    sub: '외관·로비' },
+  { id: 10, color: '#FECDD3', active: true,  date: '2025.04.07', cat: '시술 사진',    sub: '레이저' },
+  { id: 11, color: '#D1FAE5', active: false, date: '2025.04.14', cat: '이벤트',       sub: '수료·인증' },
+  { id: 12, color: '#E0E7FF', active: true,  date: '2025.04.18', cat: '의료진·스태프', sub: '의료진' },
 ];
 
 // 필터 상태
@@ -854,18 +867,26 @@ let dragSrcIdx = null;
 function renderGenGrid() {
   const grid = document.getElementById('gen-grid');
   const total = genPhotos.length;
-  const isMax = total >= MAX_PHOTOS;
+  const isOver = total > MAX_PHOTOS;
+  const isMax  = total >= MAX_PHOTOS;
   const filtered = getFilteredPhotos();
 
-  // 카운트 표시
-  document.getElementById('gen-count-cur').textContent = total;
+  // 카운트 표시 + 초과 색상
+  const countEl = document.getElementById('gen-count-cur');
+  countEl.textContent = total;
+  countEl.style.color = isOver ? 'var(--red)' : 'var(--text1)';
+
+  // 초과 경고 배너
+  const overBanner = document.getElementById('gen-over-banner');
+  if (overBanner) overBanner.style.display = isOver ? 'block' : 'none';
+
   const rc = document.getElementById('filter-result-count');
   if (rc) rc.textContent = (filterCat || filterSub) ? `${filtered.length}장 표시 중` : '';
 
   const uploadBtn = document.getElementById('btn-upload');
   if (uploadBtn) {
     uploadBtn.disabled = isMax;
-    uploadBtn.title = isMax ? '최대 10장까지 등록 가능합니다' : '';
+    uploadBtn.title = isOver ? `${total - MAX_PHOTOS}장 초과 — 삭제 후 등록 가능합니다` : isMax ? '최대 10장까지 등록 가능합니다' : '';
   }
 
   grid.innerHTML = '';
@@ -1162,15 +1183,25 @@ let drag2SrcIdx = null;
 function renderGenGrid2() {
   const grid = document.getElementById('gen-grid-2');
   const total = genPhotos.length;
-  const isMax = total >= MAX_PHOTOS;
+  const isOver = total > MAX_PHOTOS;
+  const isMax  = total >= MAX_PHOTOS;
   const filtered = getFilteredPhotos();
 
-  document.getElementById('gen2-count-cur').textContent = total;
+  const countEl2 = document.getElementById('gen2-count-cur');
+  countEl2.textContent = total;
+  countEl2.style.color = isOver ? 'var(--red)' : 'var(--text1)';
+
+  const overBanner = document.getElementById('gen-over-banner');
+  if (overBanner) overBanner.style.display = isOver ? 'block' : 'none';
+
   const rc = document.getElementById('filter-result-count');
   if (rc) rc.textContent = (filterCat || filterSub) ? `${filtered.length}장 표시 중` : '';
 
   const uploadBtn2 = document.getElementById('btn-upload-2');
-  if (uploadBtn2) { uploadBtn2.disabled = isMax; }
+  if (uploadBtn2) {
+    uploadBtn2.disabled = isMax;
+    uploadBtn2.title = isOver ? `${total - MAX_PHOTOS}장 초과 — 삭제 후 등록 가능합니다` : '';
+  }
 
   grid.innerHTML = '';
 
