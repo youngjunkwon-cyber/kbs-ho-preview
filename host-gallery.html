@@ -318,6 +318,27 @@ body {
 .confirm-desc { font-size: 12px; color: var(--text3); margin-bottom: 22px; line-height: 1.7; }
 .confirm-btns { display: flex; gap: 8px; justify-content: center; }
 
+/* ── 섹션 헤더 ── */
+.gen-section-hd {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.gen-section-title { font-size: 14px; font-weight: 700; color: var(--text1); }
+.gen-exposed-badge {
+  display: inline-flex; align-items: center;
+  height: 22px; padding: 0 9px; border-radius: 11px;
+  font-size: 12px; font-weight: 700;
+  background: var(--text1); color: #fff;
+}
+.gen-exposed-badge.full { background: var(--red); }
+
+/* 앱 노출 카드 — 지정됨 오버레이 */
+.gen-card.exposed-check::after {
+  content: ''; position: absolute; inset: 0;
+  border: 2.5px solid var(--text1); border-radius: 8px;
+  pointer-events: none; z-index: 1;
+}
+
 /* ── Photo preview overlay ── */
 .photo-view-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.82); z-index: 300; align-items: center; justify-content: center; }
 .photo-view-overlay.open { display: flex; }
@@ -561,102 +582,59 @@ body {
       ════════════════════════════════ -->
       <div id="panel-general" style="display:none;">
 
-        <div class="info-banner">
-          💡 일반 사진은 <strong>앱 스토어 상세화면 — 갤러리 섹션</strong>에 노출됩니다.
-          신규 등록은 최대 <strong>10장</strong>까지 가능합니다. 노출 순서는 번호 순서이며, 순서 조정 방식에 대한 두 가지 안을 비교합니다.
-        </div>
-
-        <!-- 10장 초과 경고 배너 (등록 수 > 10일 때만 표시) -->
-        <div class="warn-banner" id="gen-over-banner" style="display:none;">
-          ⚠️ <strong>등록 사진이 10장을 초과했습니다.</strong>
-          기존 등록분은 모두 유지되지만, <strong>10장 이하로 줄이기 전까지 새 사진을 추가할 수 없습니다.</strong>
-          우선순위가 낮은 사진을 삭제하거나 비활성으로 전환해 주세요.
-        </div>
-
-        <!-- 안 선택 -->
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px;">
-          <span style="font-size:12px;color:var(--text3);font-weight:600;margin-right:2px;">안 선택</span>
-          <button class="gen-alt-btn active" id="gen-alt-1" onclick="switchGenAlt(1)">
-            <span class="gen-alt-num">1안</span>
-            <span class="gen-alt-desc">그리드 · 순서 변경 모드</span>
-          </button>
-          <button class="gen-alt-btn" id="gen-alt-2" onclick="switchGenAlt(2)">
-            <span class="gen-alt-num">2안</span>
-            <span class="gen-alt-desc">그리드 · 상시 드래그</span>
-          </button>
-        </div>
-
-        <!-- ── 공통 필터 바 ── -->
-        <div class="gen-filter-bar">
-          <select class="select" id="filter-cat" onchange="applyFilter()">
-            <option value="">카테고리 전체</option>
-            <option value="시술 사진">시술 사진</option>
-            <option value="원내 시설">원내 시설</option>
-            <option value="의료진·스태프">의료진·스태프</option>
-            <option value="이벤트">이벤트</option>
-          </select>
-          <select class="select" id="filter-sub" onchange="applyFilter()" disabled>
-            <option value="">세부분류 전체</option>
-          </select>
-          <span class="gen-filter-count" id="filter-result-count"></span>
-        </div>
-
-        <!-- ── 1안: 그리드 + 순서 변경 모드 버튼 ── -->
-        <div id="gen-view-1">
-          <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--text2);line-height:1.7;">
-            <strong style="color:var(--text1);">1안 — 순서 변경 모드</strong><br>
-            평소에는 그리드를 조회·관리하고, '순서 변경' 버튼을 눌렀을 때만 드래그 모드로 진입합니다.
-            실수로 순서가 바뀌는 것을 방지할 수 있습니다.
-          </div>
-
-          <!-- Header -->
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-            <div style="display:flex;align-items:center;gap:14px;">
-              <span style="font-size:14px;font-weight:700;color:var(--text1);">
-                <span id="gen-count-cur">8</span><span style="color:var(--text3);font-weight:400;font-size:13px;"> / 10</span>
-
-              </span>
-              <div class="sort-action-bar" id="sort-action-bar">
+        <!-- ══ 섹션 1: 앱 노출 사진 ══ -->
+        <div class="gen-section">
+          <div class="gen-section-hd">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span class="gen-section-title">앱 노출 사진</span>
+              <span class="gen-exposed-badge" id="exposed-count-badge">0 / 10</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div class="sort-action-bar" id="exposed-sort-bar">
                 <span style="font-size:12px;color:var(--text2);">드래그로 순서를 변경하세요</span>
-                <button class="btn btn-sm btn-secondary" onclick="cancelSort()">취소</button>
-                <button class="btn btn-sm btn-primary" onclick="confirmSort()">완료</button>
+                <button class="btn btn-sm btn-secondary" onclick="cancelExposedSort()">취소</button>
+                <button class="btn btn-sm btn-primary" onclick="confirmExposedSort()">완료</button>
               </div>
-            </div>
-            <div id="gen-normal-actions" style="display:flex;gap:8px;">
-              <button class="btn btn-secondary btn-sm" id="btn-sort-mode" onclick="enterSortMode()">순서 변경</button>
-              <button class="btn btn-primary btn-sm" id="btn-upload" onclick="openUploadModal()">+ 사진 등록</button>
+              <button class="btn btn-secondary btn-sm" id="btn-exposed-sort" onclick="enterExposedSort()">순서 변경</button>
             </div>
           </div>
 
-          <!-- Photo grid -->
-          <div class="gen-grid" id="gen-grid">
-            <!-- Cards injected by JS -->
+          <!-- 노출 사진 없을 때 empty state -->
+          <div id="exposed-empty" style="display:none;text-align:center;padding:28px 20px;background:#fff;border:1px solid var(--border);border-radius:8px;color:var(--text3);">
+            <div style="font-size:28px;margin-bottom:8px;">🖼️</div>
+            <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:4px;">앱 노출 사진이 없습니다</div>
+            <div style="font-size:12px;">아래 전체 사진에서 '앱 노출 지정'을 눌러 추가하세요</div>
           </div>
+
+          <div class="gen-grid" id="exposed-grid"></div>
         </div>
 
-        <!-- ── 2안: 그리드 + 상시 드래그 핸들 ── -->
-        <div id="gen-view-2" style="display:none;">
-          <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--text2);line-height:1.7;">
-            <strong style="color:var(--text1);">2안 — 상시 드래그</strong><br>
-            별도 모드 전환 없이 카드의 <strong>⠿ 핸들</strong>을 잡아 바로 순서를 변경합니다.
-            클릭 수가 적고 직관적이지만, 실수로 순서가 바뀔 수 있습니다.
-          </div>
+        <!-- ══ 섹션 구분 ══ -->
+        <div style="height:1px;background:var(--border);margin:24px 0;"></div>
 
-          <!-- Header -->
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-            <span style="font-size:14px;font-weight:700;color:var(--text1);">
-              <span id="gen2-count-cur">8</span><span style="color:var(--text3);font-weight:400;font-size:13px;"> / 10</span>
-            </span>
-            <div style="display:flex;gap:8px;">
-              <button class="btn btn-primary btn-sm" id="btn-upload-2" onclick="openUploadModal()">+ 사진 등록</button>
+        <!-- ══ 섹션 2: 전체 사진 (라이브러리) ══ -->
+        <div class="gen-section">
+          <div class="gen-section-hd">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span class="gen-section-title">전체 사진</span>
+              <span style="font-size:13px;color:var(--text3);" id="all-count-label">0장</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <select class="select" id="filter-cat" onchange="applyFilter()" style="font-size:12px;height:34px;">
+                <option value="">카테고리 전체</option>
+                <option value="시술 사진">시술 사진</option>
+                <option value="원내 시설">원내 시설</option>
+                <option value="의료진·스태프">의료진·스태프</option>
+                <option value="이벤트">이벤트</option>
+              </select>
+              <select class="select" id="filter-sub" onchange="applyFilter()" disabled style="font-size:12px;height:34px;">
+                <option value="">세부분류 전체</option>
+              </select>
+              <button class="btn btn-primary btn-sm" onclick="openUploadModal()">+ 사진 등록</button>
             </div>
           </div>
 
-          <!-- Photo grid (always-drag) -->
-          <div class="gen-grid gen-grid-always-drag" id="gen-grid-2">
-            <!-- Cards injected by JS -->
-          </div>
-          <div class="text-muted" style="margin-top:10px;text-align:center;">⠿ 핸들을 잡고 드래그하면 바로 순서가 변경됩니다</div>
+          <div class="gen-grid" id="all-grid" style="margin-top:14px;"></div>
         </div>
 
       </div><!-- /panel-general -->
@@ -788,10 +766,10 @@ function updateCharCount(input, countId) {
 }
 
 
-/* ─────────────────────────────────
-   일반 사진 데이터 & 렌더
-───────────────────────────────── */
-const MAX_PHOTOS = 10;
+/* ═══════════════════════════════════════
+   일반 사진 — 라이브러리 + 앱 노출 지정
+═══════════════════════════════════════ */
+const MAX_EXPOSED = 10;
 
 // 카테고리 taxonomy
 const GEN_CATS = {
@@ -809,256 +787,250 @@ const CAT_CLASS = {
   '이벤트':      'cat-event',
 };
 
-// Sample data: {id, color, active, date, cat, sub}
-// 12장 — 10장 초과 상태 시연
-let genPhotos = [
-  { id:  1, color: '#BFDBFE', active: true,  date: '2025.01.08', cat: '시술 사진',    sub: '리프팅' },
-  { id:  2, color: '#BBF7D0', active: true,  date: '2025.01.15', cat: '시술 사진',    sub: '필러' },
-  { id:  3, color: '#FDE68A', active: true,  date: '2025.02.03', cat: '원내 시설',    sub: '대기실' },
-  { id:  4, color: '#FBCFE8', active: true,  date: '2025.02.11', cat: '원내 시설',    sub: '시술실' },
-  { id:  5, color: '#DDD6FE', active: true,  date: '2025.02.20', cat: '시술 사진',    sub: '보톡스' },
-  { id:  6, color: '#A7F3D0', active: false, date: '2025.03.05', cat: '의료진·스태프', sub: '원장' },
-  { id:  7, color: '#FCA5A5', active: true,  date: '2025.03.12', cat: '이벤트',       sub: '시즌 프로모션' },
-  { id:  8, color: '#C7D2FE', active: true,  date: '2025.03.22', cat: '시술 사진',    sub: '피부관리' },
-  { id:  9, color: '#FEF08A', active: true,  date: '2025.04.01', cat: '원내 시설',    sub: '외관·로비' },
-  { id: 10, color: '#FECDD3', active: true,  date: '2025.04.07', cat: '시술 사진',    sub: '레이저' },
-  { id: 11, color: '#D1FAE5', active: false, date: '2025.04.14', cat: '이벤트',       sub: '수료·인증' },
-  { id: 12, color: '#E0E7FF', active: true,  date: '2025.04.18', cat: '의료진·스태프', sub: '의료진' },
+// ── 라이브러리 (전체 사진, 무제한)
+let allPhotos = [
+  { id:  1, color: '#BFDBFE', date: '2025.01.08', cat: '시술 사진',    sub: '리프팅' },
+  { id:  2, color: '#BBF7D0', date: '2025.01.15', cat: '시술 사진',    sub: '필러' },
+  { id:  3, color: '#FDE68A', date: '2025.02.03', cat: '원내 시설',    sub: '대기실' },
+  { id:  4, color: '#FBCFE8', date: '2025.02.11', cat: '원내 시설',    sub: '시술실' },
+  { id:  5, color: '#DDD6FE', date: '2025.02.20', cat: '시술 사진',    sub: '보톡스' },
+  { id:  6, color: '#A7F3D0', date: '2025.03.05', cat: '의료진·스태프', sub: '원장' },
+  { id:  7, color: '#FCA5A5', date: '2025.03.12', cat: '이벤트',       sub: '시즌 프로모션' },
+  { id:  8, color: '#C7D2FE', date: '2025.03.22', cat: '시술 사진',    sub: '피부관리' },
+  { id:  9, color: '#FEF08A', date: '2025.04.01', cat: '원내 시설',    sub: '외관·로비' },
+  { id: 10, color: '#FECDD3', date: '2025.04.07', cat: '시술 사진',    sub: '레이저' },
+  { id: 11, color: '#D1FAE5', date: '2025.04.14', cat: '이벤트',       sub: '수료·인증' },
+  { id: 12, color: '#E0E7FF', date: '2025.04.18', cat: '의료진·스태프', sub: '의료진' },
 ];
 
-// 필터 상태
+// ── 앱 노출 지정 (ID 순서 배열, max 10)
+let exposedIds = [1, 3, 5, 8, 10];
+
+// ── 필터 상태
 let filterCat = '';
 let filterSub = '';
 
-function getFilteredPhotos() {
-  return genPhotos.filter(p =>
+// ── 노출 정렬 모드 상태
+let exposedSortMode = false;
+let exposedSortSnapshot = null;
+let exposedDragSrcIdx = null;
+
+// ── 헬퍼
+const photoById = id => allPhotos.find(p => p.id === id);
+const isExposed = id => exposedIds.includes(id);
+
+/* ─────────────────────────────────
+   앱 노출 섹션 렌더
+───────────────────────────────── */
+function renderExposedGrid() {
+  const grid   = document.getElementById('exposed-grid');
+  const empty  = document.getElementById('exposed-empty');
+  const badge  = document.getElementById('exposed-count-badge');
+  const sortBtn = document.getElementById('btn-exposed-sort');
+
+  const count = exposedIds.length;
+  const isFull = count >= MAX_EXPOSED;
+
+  badge.textContent = `${count} / ${MAX_EXPOSED}`;
+  badge.className = 'gen-exposed-badge' + (isFull ? ' full' : '');
+
+  empty.style.display  = count === 0 ? 'block' : 'none';
+  grid.style.display   = count === 0 ? 'none'  : 'grid';
+  if (sortBtn) sortBtn.style.display = count < 2 ? 'none' : '';
+
+  grid.innerHTML = '';
+  grid.classList.toggle('sort-mode', exposedSortMode);
+
+  exposedIds.forEach((id, pos) => {
+    const photo = photoById(id);
+    if (!photo) return;
+    const catClass = CAT_CLASS[photo.cat] || '';
+    const card = document.createElement('div');
+    card.className = 'gen-card';
+    card.dataset.expPos = pos;
+
+    if (exposedSortMode) {
+      card.draggable = true;
+      card.addEventListener('dragstart', function(e) {
+        exposedDragSrcIdx = parseInt(this.dataset.expPos);
+        setTimeout(() => this.classList.add('dragging'), 0);
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      card.addEventListener('dragover',  e => { e.preventDefault(); });
+      card.addEventListener('dragenter', function(e) {
+        e.preventDefault();
+        if (parseInt(this.dataset.expPos) !== exposedDragSrcIdx) this.classList.add('drag-over');
+      });
+      card.addEventListener('dragleave', function() { this.classList.remove('drag-over'); });
+      card.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('drag-over');
+        const to = parseInt(this.dataset.expPos);
+        if (to === exposedDragSrcIdx) return;
+        const moved = exposedIds.splice(exposedDragSrcIdx, 1)[0];
+        exposedIds.splice(to, 0, moved);
+        renderExposedGrid();
+      });
+      card.addEventListener('dragend', function() {
+        this.classList.remove('dragging');
+        document.querySelectorAll('#exposed-grid .gen-card').forEach(c => c.classList.remove('drag-over'));
+        exposedDragSrcIdx = null;
+      });
+    }
+
+    card.innerHTML = `
+      <div class="gen-thumb" style="background:${photo.color};">
+        <span style="font-size:11px;color:#666;">${photo.cat}</span>
+        <div class="priority-badge">${pos + 1}</div>
+      </div>
+      <div class="gen-card-body">
+        <div class="gen-card-cat">
+          <span class="gen-cat-badge ${catClass}">${photo.cat}</span>
+          <div class="gen-sub-text">${photo.sub || ''}</div>
+        </div>
+        <div class="gen-card-meta">
+          <span class="gen-card-date">${photo.date}</span>
+        </div>
+        <div class="gen-card-actions" style="${exposedSortMode ? 'visibility:hidden' : ''}">
+          <button class="btn-view btn-sm" onclick="viewPhotoById(${id})">보기</button>
+          <button class="btn-ghost-danger" onclick="undesignate(${id})">해제</button>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  // 전체 사진 그리드도 다시 그려 지정 상태 동기화
+  renderAllGrid();
+}
+
+/* ─────────────────────────────────
+   전체 사진(라이브러리) 렌더
+───────────────────────────────── */
+function renderAllGrid() {
+  const grid = document.getElementById('all-grid');
+  const countLabel = document.getElementById('all-count-label');
+  const isFull = exposedIds.length >= MAX_EXPOSED;
+
+  const filtered = allPhotos.filter(p =>
     (!filterCat || p.cat === filterCat) &&
     (!filterSub || p.sub === filterSub)
   );
+  countLabel.textContent = `${allPhotos.length}장` + (filterCat ? ` · ${filtered.length}장 표시` : '');
+
+  grid.innerHTML = '';
+  filtered.forEach(photo => {
+    const exposed = isExposed(photo.id);
+    const expPos  = exposed ? exposedIds.indexOf(photo.id) + 1 : null;
+    const catClass = CAT_CLASS[photo.cat] || '';
+    const card = document.createElement('div');
+    card.className = 'gen-card' + (exposed ? ' exposed-check' : '');
+
+    card.innerHTML = `
+      <div class="gen-thumb" style="background:${photo.color};${exposed ? 'filter:brightness(0.92)' : ''}">
+        <span style="font-size:11px;color:#666;">${photo.cat}</span>
+        ${exposed
+          ? `<div class="priority-badge" style="background:var(--text1);">${expPos}</div>`
+          : ''}
+      </div>
+      <div class="gen-card-body">
+        <div class="gen-card-cat">
+          <span class="gen-cat-badge ${catClass}">${photo.cat}</span>
+          <div class="gen-sub-text">${photo.sub || ''}</div>
+        </div>
+        <div class="gen-card-meta">
+          <span class="gen-card-date">${photo.date}</span>
+        </div>
+        <div class="gen-card-actions">
+          <button class="btn-view btn-sm" onclick="viewPhotoById(${photo.id})">보기</button>
+          ${exposed
+            ? `<button class="btn-ghost-danger" onclick="undesignate(${photo.id})">해제</button>`
+            : `<button class="btn btn-secondary btn-sm" onclick="designate(${photo.id})" ${isFull ? 'disabled title="10장 모두 지정됨"' : ''}>+ 노출 지정</button>`}
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
 }
 
+/* ─────────────────────────────────
+   지정 / 해제
+───────────────────────────────── */
+function designate(id) {
+  if (exposedIds.length >= MAX_EXPOSED) return;
+  if (isExposed(id)) return;
+  exposedIds.push(id);
+  renderExposedGrid();
+}
+
+function undesignate(id) {
+  exposedIds = exposedIds.filter(x => x !== id);
+  renderExposedGrid();
+}
+
+/* ─────────────────────────────────
+   노출 순서 변경 모드
+───────────────────────────────── */
+function enterExposedSort() {
+  exposedSortMode = true;
+  exposedSortSnapshot = [...exposedIds];
+  document.getElementById('exposed-sort-bar').classList.add('visible');
+  document.getElementById('btn-exposed-sort').style.display = 'none';
+  renderExposedGrid();
+}
+
+function cancelExposedSort() {
+  exposedSortMode = false;
+  exposedIds = exposedSortSnapshot;
+  exposedSortSnapshot = null;
+  document.getElementById('exposed-sort-bar').classList.remove('visible');
+  document.getElementById('btn-exposed-sort').style.display = '';
+  renderExposedGrid();
+}
+
+function confirmExposedSort() {
+  exposedSortMode = false;
+  exposedSortSnapshot = null;
+  document.getElementById('exposed-sort-bar').classList.remove('visible');
+  document.getElementById('btn-exposed-sort').style.display = '';
+  renderExposedGrid();
+}
+
+/* ─────────────────────────────────
+   필터
+───────────────────────────────── */
 function applyFilter() {
   filterCat = document.getElementById('filter-cat').value;
-  filterSub = document.getElementById('filter-sub').value;
-  // 서브 필터 드롭다운 갱신
   const subSel = document.getElementById('filter-sub');
   if (filterCat && GEN_CATS[filterCat]) {
     subSel.disabled = false;
     const curSub = subSel.value;
     subSel.innerHTML = '<option value="">세부분류 전체</option>' +
-      GEN_CATS[filterCat].map(s => `<option value="${s}" ${s === curSub ? 'selected' : ''}>${s}</option>`).join('');
-    filterSub = subSel.value;
+      GEN_CATS[filterCat].map(s => `<option value="${s}" ${s === curSub ? 'selected':''}>${s}</option>`).join('');
   } else {
     subSel.disabled = true;
     subSel.innerHTML = '<option value="">세부분류 전체</option>';
-    filterSub = '';
   }
-  if (currentGenAlt === 2) renderGenGrid2();
-  else renderGenGrid();
-}
-
-// Snapshot for cancel-sort
-let sortSnapshot = null;
-let isSortMode = false;
-
-// Drag state
-let dragSrcIdx = null;
-
-function renderGenGrid() {
-  const grid = document.getElementById('gen-grid');
-  const total = genPhotos.length;
-  const isOver = total > MAX_PHOTOS;
-  const isMax  = total >= MAX_PHOTOS;
-  const filtered = getFilteredPhotos();
-
-  // 카운트 표시 + 초과 색상
-  const countEl = document.getElementById('gen-count-cur');
-  countEl.textContent = total;
-  countEl.style.color = isOver ? 'var(--red)' : 'var(--text1)';
-
-  // 초과 경고 배너
-  const overBanner = document.getElementById('gen-over-banner');
-  if (overBanner) overBanner.style.display = isOver ? 'block' : 'none';
-
-  const rc = document.getElementById('filter-result-count');
-  if (rc) rc.textContent = (filterCat || filterSub) ? `${filtered.length}장 표시 중` : '';
-
-  const uploadBtn = document.getElementById('btn-upload');
-  if (uploadBtn) {
-    uploadBtn.disabled = isMax;
-    uploadBtn.title = isOver ? `${total - MAX_PHOTOS}장 초과 — 삭제 후 등록 가능합니다` : isMax ? '최대 10장까지 등록 가능합니다' : '';
-  }
-
-  grid.innerHTML = '';
-
-  filtered.forEach((photo) => {
-    const idx = genPhotos.indexOf(photo); // 실제 배열 인덱스 (삭제·정렬용)
-    const dispNum = genPhotos.indexOf(photo) + 1;
-    const catClass = CAT_CLASS[photo.cat] || '';
-    const card = document.createElement('div');
-    card.className = 'gen-card' + (photo.active ? '' : ' inactive');
-    card.dataset.idx = idx;
-
-    if (isSortMode) {
-      card.draggable = true;
-      card.addEventListener('dragstart', onDragStart);
-      card.addEventListener('dragover',  onDragOver);
-      card.addEventListener('dragenter', onDragEnter);
-      card.addEventListener('dragleave', onDragLeave);
-      card.addEventListener('drop',      onDrop);
-      card.addEventListener('dragend',   onDragEnd);
-    }
-
-    card.innerHTML = `
-      <div class="gen-thumb" style="background:${photo.color};">
-        <span style="font-size:12px;color:#666;">이미지 ${dispNum}</span>
-        <div class="priority-badge">${dispNum}</div>
-      </div>
-      <div class="gen-card-body">
-        <div class="gen-card-cat">
-          <span class="gen-cat-badge ${catClass}">${photo.cat || '—'}</span>
-          <div class="gen-sub-text">${photo.sub || ''}</div>
-        </div>
-        <div class="gen-card-meta">
-          <span class="gen-card-date">${photo.date}</span>
-          <div class="gen-card-toggle">
-            <div class="toggle ${photo.active ? 'on' : ''}" onclick="togglePhotoActive(${idx}, this)" title="${photo.active ? '비활성으로 전환' : '활성으로 전환'}"></div>
-          </div>
-        </div>
-        <div class="gen-card-actions">
-          <button class="btn-view btn-sm" onclick="viewPhoto(${idx})">보기</button>
-          <button class="btn-ghost-danger" onclick="openDeleteConfirm(${idx})">삭제</button>
-        </div>
-      </div>
-    `;
-
-    grid.appendChild(card);
-  });
-
-  grid.classList.toggle('sort-mode', isSortMode);
-}
-
-function togglePhotoActive(idx, el) {
-  const active = !genPhotos[idx].active;
-  genPhotos[idx].active = active;
-  el.classList.toggle('on', active);
-  // gen-card inactive 반영 (부모 카드 찾기)
-  const card = el.closest('.gen-card');
-  if (card) card.classList.toggle('inactive', !active);
-}
-
-/* ─────────────────────────────────
-   정렬 모드
-───────────────────────────────── */
-function enterSortMode() {
-  isSortMode = true;
-  sortSnapshot = JSON.parse(JSON.stringify(genPhotos));
-  document.getElementById('sort-action-bar').classList.add('visible');
-  document.getElementById('gen-normal-actions').style.visibility = 'hidden';
-  renderGenGrid();
-}
-
-function cancelSort() {
-  isSortMode = false;
-  genPhotos = sortSnapshot;
-  sortSnapshot = null;
-  document.getElementById('sort-action-bar').classList.remove('visible');
-  document.getElementById('gen-normal-actions').style.visibility = '';
-  renderGenGrid();
-}
-
-function confirmSort() {
-  isSortMode = false;
-  sortSnapshot = null;
-  document.getElementById('sort-action-bar').classList.remove('visible');
-  document.getElementById('gen-normal-actions').style.visibility = '';
-  renderGenGrid();
-  // (실제 구현에서는 여기서 API 호출)
-}
-
-/* ─────────────────────────────────
-   Drag & Drop
-───────────────────────────────── */
-function onDragStart(e) {
-  dragSrcIdx = parseInt(this.dataset.idx);
-  this.classList.add('dragging');
-  e.dataTransfer.effectAllowed = 'move';
-  e.dataTransfer.setData('text/plain', dragSrcIdx);
-}
-
-function onDragOver(e) {
-  e.preventDefault();
-  e.dataTransfer.dropEffect = 'move';
-}
-
-function onDragEnter(e) {
-  e.preventDefault();
-  if (parseInt(this.dataset.idx) !== dragSrcIdx) {
-    this.classList.add('drag-over');
-  }
-}
-
-function onDragLeave() {
-  this.classList.remove('drag-over');
-}
-
-function onDrop(e) {
-  e.preventDefault();
-  this.classList.remove('drag-over');
-  const targetIdx = parseInt(this.dataset.idx);
-  if (targetIdx === dragSrcIdx) return;
-
-  // Reorder array
-  const moved = genPhotos.splice(dragSrcIdx, 1)[0];
-  genPhotos.splice(targetIdx, 0, moved);
-  renderGenGrid();
-}
-
-function onDragEnd() {
-  this.classList.remove('dragging');
-  document.querySelectorAll('#gen-grid .gen-card').forEach(c => c.classList.remove('drag-over'));
-  dragSrcIdx = null;
-}
-
-/* ─────────────────────────────────
-   삭제
-───────────────────────────────── */
-let pendingDeleteIdx = null;
-
-function openDeleteConfirm(idx) {
-  pendingDeleteIdx = idx;
-  document.getElementById('delete-confirm').classList.add('open');
-}
-
-function closeDeleteConfirm() {
-  pendingDeleteIdx = null;
-  document.getElementById('delete-confirm').classList.remove('open');
-}
-
-function executeDelete() {
-  if (pendingDeleteIdx === null) return;
-  genPhotos.splice(pendingDeleteIdx, 1);
-  closeDeleteConfirm();
-  renderGenGrid();
+  filterSub = subSel.value;
+  renderAllGrid();
 }
 
 /* ─────────────────────────────────
    사진 보기
 ───────────────────────────────── */
-function viewPhoto(idx) {
-  // 실제 구현에서는 photo URL 사용. 여기서는 색상 SVG placeholder
-  const photo = genPhotos[idx];
-  const svg = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='600'><rect width='800' height='600' fill='${encodeURIComponent(photo.color)}'/><text x='400' y='310' text-anchor='middle' font-size='32' fill='%23666' font-family='sans-serif'>이미지 ${idx + 1}</text></svg>`;
+function viewPhotoById(id) {
+  const photo = photoById(id);
+  if (!photo) return;
+  const svg = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='600'><rect width='800' height='600' fill='${encodeURIComponent(photo.color)}'/><text x='400' y='310' text-anchor='middle' font-size='28' fill='%23555' font-family='sans-serif'>${encodeURIComponent(photo.cat + ' · ' + (photo.sub || ''))}</text></svg>`;
   document.getElementById('photo-view-img').src = svg;
   document.getElementById('photo-view-overlay').classList.add('open');
 }
-
 function closePhotoView() {
   document.getElementById('photo-view-overlay').classList.remove('open');
 }
 
 /* ─────────────────────────────────
-   업로드 모달
+   업로드 모달 (라이브러리에 추가)
 ───────────────────────────────── */
 function onUploadCatChange(sel) {
   const sub = document.getElementById('upload-sub');
@@ -1074,13 +1046,11 @@ function onUploadCatChange(sel) {
 }
 
 function openUploadModal() {
-  if (genPhotos.length >= MAX_PHOTOS) return;
   document.getElementById('upload-modal').classList.add('open');
   document.getElementById('upload-preview-area').style.display = 'none';
   document.getElementById('upload-preview-list').innerHTML = '';
   document.getElementById('upload-submit-btn').disabled = true;
   document.getElementById('upload-file-input').value = '';
-  // 모달 초기화
   document.getElementById('upload-cat').value = '';
   const sub = document.getElementById('upload-sub');
   sub.disabled = true;
@@ -1092,9 +1062,8 @@ function closeUploadModal() {
 }
 
 function handleFileSelect(input) {
-  const files = Array.from(input.files).slice(0, MAX_PHOTOS - genPhotos.length);
+  const files = Array.from(input.files);
   if (!files.length) return;
-  const previewArea = document.getElementById('upload-preview-area');
   const previewList = document.getElementById('upload-preview-list');
   previewList.innerHTML = '';
   files.forEach(file => {
@@ -1107,11 +1076,10 @@ function handleFileSelect(input) {
     reader.readAsDataURL(file);
     previewList.appendChild(item);
   });
-  previewArea.style.display = 'block';
+  document.getElementById('upload-preview-area').style.display = 'block';
   document.getElementById('upload-submit-btn').disabled = false;
 }
 
-// Drag-and-drop into upload zone
 (function() {
   const zone = document.getElementById('upload-drop-zone');
   if (!zone) return;
@@ -1120,194 +1088,61 @@ function handleFileSelect(input) {
   zone.addEventListener('drop', e => {
     e.preventDefault();
     zone.classList.remove('dragover');
-    const input = document.getElementById('upload-file-input');
-    // DataTransfer files를 input에 직접 못 넣으므로 handleFileSelect equivalent
     const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
-    if (!files.length) return;
-    const fakeInput = { files };
-    handleFileSelect(fakeInput);
+    if (files.length) handleFileSelect({ files });
   });
 })();
 
 function submitUpload() {
-  const SAMPLE_COLORS = ['#FEF3C7','#D1FAE5','#E0E7FF','#FCE7F3','#FEE2E2'];
-  const dateStr = `${new Date().getFullYear()}.${String(new Date().getMonth()+1).padStart(2,'0')}.${String(new Date().getDate()).padStart(2,'0')}`;
-  const newId = (genPhotos[genPhotos.length - 1]?.id ?? 0) + 1;
-  const selCat = document.getElementById('upload-cat').value;
-  const selSub = document.getElementById('upload-sub').value;
-  if (genPhotos.length < MAX_PHOTOS) {
-    genPhotos.push({
-      id: newId,
-      color: SAMPLE_COLORS[newId % SAMPLE_COLORS.length],
-      active: true,
-      date: dateStr,
-      cat: selCat || '시술 사진',
-      sub: selSub || '',
-    });
-  }
-  closeUploadModal();
-  if (currentGenAlt === 2) renderGenGrid2();
-  else renderGenGrid();
-}
-
-/* ─────────────────────────────────
-   ESC closes modals
-───────────────────────────────── */
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    closeUploadModal();
-    closeDeleteConfirm();
-    closePhotoView();
-  }
-});
-
-/* ─────────────────────────────────
-   안 선택 스위처
-───────────────────────────────── */
-let currentGenAlt = 1;
-
-function switchGenAlt(n) {
-  currentGenAlt = n;
-  document.getElementById('gen-alt-1').classList.toggle('active', n === 1);
-  document.getElementById('gen-alt-2').classList.toggle('active', n === 2);
-  document.getElementById('gen-view-1').style.display = n === 1 ? 'block' : 'none';
-  document.getElementById('gen-view-2').style.display = n === 2 ? 'block' : 'none';
-  if (n === 2) renderGenGrid2();
-}
-
-/* ─────────────────────────────────
-   2안 렌더 (상시 드래그)
-───────────────────────────────── */
-let drag2SrcIdx = null;
-
-function renderGenGrid2() {
-  const grid = document.getElementById('gen-grid-2');
-  const total = genPhotos.length;
-  const isOver = total > MAX_PHOTOS;
-  const isMax  = total >= MAX_PHOTOS;
-  const filtered = getFilteredPhotos();
-
-  const countEl2 = document.getElementById('gen2-count-cur');
-  countEl2.textContent = total;
-  countEl2.style.color = isOver ? 'var(--red)' : 'var(--text1)';
-
-  const overBanner = document.getElementById('gen-over-banner');
-  if (overBanner) overBanner.style.display = isOver ? 'block' : 'none';
-
-  const rc = document.getElementById('filter-result-count');
-  if (rc) rc.textContent = (filterCat || filterSub) ? `${filtered.length}장 표시 중` : '';
-
-  const uploadBtn2 = document.getElementById('btn-upload-2');
-  if (uploadBtn2) {
-    uploadBtn2.disabled = isMax;
-    uploadBtn2.title = isOver ? `${total - MAX_PHOTOS}장 초과 — 삭제 후 등록 가능합니다` : '';
-  }
-
-  grid.innerHTML = '';
-
-  filtered.forEach((photo) => {
-    const idx = genPhotos.indexOf(photo);
-    const dispNum = idx + 1;
-    const catClass = CAT_CLASS[photo.cat] || '';
-    const card = document.createElement('div');
-    card.className = 'gen-card' + (photo.active ? '' : ' inactive');
-    card.dataset.idx = idx;
-    card.draggable = true;
-    card.style.position = 'relative';
-
-    card.addEventListener('dragstart', function(e) {
-      drag2SrcIdx = parseInt(this.dataset.idx);
-      setTimeout(() => this.classList.add('dragging'), 0);
-      e.dataTransfer.effectAllowed = 'move';
-    });
-    card.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; });
-    card.addEventListener('dragenter', function(e) {
-      e.preventDefault();
-      if (parseInt(this.dataset.idx) !== drag2SrcIdx) this.classList.add('drag-over');
-    });
-    card.addEventListener('dragleave', function() { this.classList.remove('drag-over'); });
-    card.addEventListener('drop', function(e) {
-      e.preventDefault();
-      this.classList.remove('drag-over');
-      const targetIdx = parseInt(this.dataset.idx);
-      if (targetIdx === drag2SrcIdx) return;
-      const moved = genPhotos.splice(drag2SrcIdx, 1)[0];
-      genPhotos.splice(targetIdx, 0, moved);
-      renderGenGrid2();
-    });
-    card.addEventListener('dragend', function() {
-      this.classList.remove('dragging');
-      document.querySelectorAll('#gen-grid-2 .gen-card').forEach(c => c.classList.remove('drag-over'));
-      drag2SrcIdx = null;
-    });
-
-    card.innerHTML = `
-      <div class="gen-thumb" style="background:${photo.color};">
-        <span style="font-size:12px;color:#666;">이미지 ${dispNum}</span>
-        <div class="priority-badge">${dispNum}</div>
-        <div class="gen-card-drag-area" title="드래그하여 순서 변경">
-          <span class="drag-dots">⠿</span>
-        </div>
-      </div>
-      <div class="gen-card-body">
-        <div class="gen-card-cat">
-          <span class="gen-cat-badge ${catClass}">${photo.cat || '—'}</span>
-          <div class="gen-sub-text">${photo.sub || ''}</div>
-        </div>
-        <div class="gen-card-meta">
-          <span class="gen-card-date">${photo.date}</span>
-          <div class="gen-card-toggle">
-            <div class="toggle ${photo.active ? 'on' : ''}" onclick="togglePhotoActive2(${idx}, this)" title="${photo.active ? '비활성으로 전환' : '활성으로 전환'}"></div>
-          </div>
-        </div>
-        <div class="gen-card-actions">
-          <button class="btn-view btn-sm" onclick="viewPhoto(${idx})">보기</button>
-          <button class="btn-ghost-danger" onclick="openDeleteConfirm2(${idx})">삭제</button>
-        </div>
-      </div>
-    `;
-    grid.appendChild(card);
+  const COLORS = ['#FEF3C7','#D1FAE5','#E0E7FF','#FCE7F3','#FEE2E2','#CCFBF1'];
+  const dateStr = new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\.\s?/g,'.').slice(0,-1);
+  const newId = Math.max(...allPhotos.map(p => p.id), 0) + 1;
+  allPhotos.push({
+    id: newId,
+    color: COLORS[newId % COLORS.length],
+    date: dateStr,
+    cat: document.getElementById('upload-cat').value || '시술 사진',
+    sub: document.getElementById('upload-sub').value || '',
   });
+  closeUploadModal();
+  renderAllGrid();
 }
 
-function togglePhotoActive2(idx, el) {
-  const active = !genPhotos[idx].active;
-  genPhotos[idx].active = active;
-  el.classList.toggle('on', active);
-  const card = el.closest('.gen-card');
-  if (card) card.classList.toggle('inactive', !active);
-}
+/* ─────────────────────────────────
+   삭제 (라이브러리에서 제거)
+───────────────────────────────── */
+let pendingDeleteId = null;
 
-let pendingDeleteIdx2 = null;
-
-function openDeleteConfirm2(idx) {
-  // Reuse same confirm modal, but track which grid
-  pendingDeleteIdx2 = idx;
-  pendingDeleteIdx = null;
+function openDeleteConfirm(id) {
+  pendingDeleteId = id;
   document.getElementById('delete-confirm').classList.add('open');
 }
 
-// Patch executeDelete to handle both grids
-const _origExecuteDelete = executeDelete;
-window.executeDelete = function() {
-  if (pendingDeleteIdx !== null) {
-    genPhotos.splice(pendingDeleteIdx, 1);
-    closeDeleteConfirm();
-    renderGenGrid();
-  } else if (pendingDeleteIdx2 !== null) {
-    genPhotos.splice(pendingDeleteIdx2, 1);
-    pendingDeleteIdx2 = null;
-    closeDeleteConfirm();
-    renderGenGrid2();
-  }
-};
+function closeDeleteConfirm() {
+  pendingDeleteId = null;
+  document.getElementById('delete-confirm').classList.remove('open');
+}
+
+function executeDelete() {
+  if (pendingDeleteId === null) return;
+  allPhotos = allPhotos.filter(p => p.id !== pendingDeleteId);
+  exposedIds = exposedIds.filter(id => id !== pendingDeleteId);
+  closeDeleteConfirm();
+  renderExposedGrid();
+}
+
+/* ─────────────────────────────────
+   ESC
+───────────────────────────────── */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeUploadModal(); closeDeleteConfirm(); closePhotoView(); }
+});
 
 /* ─────────────────────────────────
    Init
 ───────────────────────────────── */
-renderGenGrid();
+renderExposedGrid();
 
-// URL 파라미터로 탭 자동 전환 (?tab=general)
 (function() {
   const params = new URLSearchParams(window.location.search);
   if (params.get('tab') === 'general') showTab('general');
