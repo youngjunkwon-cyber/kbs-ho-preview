@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>갤러리 관리 — KBS Host (구조 초안)</title>
+<title>갤러리 관리 — KBS Host</title>
 <style>
 :root {
   --primary: #E8537A;
@@ -54,24 +54,18 @@ body {
 .btn { padding: 7px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; line-height: 1.4; display: inline-flex; align-items: center; gap: 6px; }
 .btn-primary { background: var(--primary); color: #fff; }
 .btn-primary:hover { background: #d4476c; }
+.btn-primary:disabled { background: #F2B8C8; cursor: not-allowed; }
 .btn-secondary { background: #fff; color: var(--text2); border: 1px solid var(--border); }
 .btn-secondary:hover { background: #fafafa; }
-.btn-sm { padding: 4px 12px; font-size: 12px; }
+.btn-sm { padding: 5px 12px; font-size: 12px; }
 .btn-danger-ghost { background: none; border: 1px solid #FCA5A5; color: #EF4444; border-radius: 5px; padding: 4px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
 .btn-danger-ghost:hover { background: #FEF2F2; }
-
-/* ── Sub Tab ── */
-.sub-tab-bar { display: flex; border-bottom: 2px solid var(--border); background: #fff; border-radius: 8px 8px 0 0; padding: 0 4px; }
-.sub-tab-btn { padding: 13px 20px; font-size: 13px; font-weight: 500; color: var(--text3); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; background: none; border-top: none; border-left: none; border-right: none; white-space: nowrap; transition: color 0.15s; }
-.sub-tab-btn:hover { color: var(--text1); }
-.sub-tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 700; }
-.sub-tab-panel { display: none; padding-top: 20px; }
-.sub-tab-panel.active { display: block; }
+.btn-view { background: none; border: 1px solid var(--border); border-radius: 4px; padding: 3px 9px; font-size: 11px; font-weight: 600; color: var(--text2); cursor: pointer; }
+.btn-view:hover { background: #f5f5f5; }
 
 /* ── Cards ── */
 .card { background: #fff; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 16px; }
 .card-header { padding: 13px 20px; border-bottom: 1px solid var(--border); font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.card-header-note { font-size: 11px; font-weight: 400; color: var(--text3); margin-left: 4px; }
 .card-body { padding: 20px; }
 
 /* ── Form ── */
@@ -99,7 +93,7 @@ body {
 
 /* ── Upload zone ── */
 .upload-zone { border: 2px dashed var(--border); border-radius: 8px; padding: 24px 16px; text-align: center; color: var(--text3); font-size: 12px; cursor: pointer; background: #FAFAFA; transition: all 0.15s; }
-.upload-zone:hover { border-color: var(--primary); background: var(--primary-l); color: var(--primary); }
+.upload-zone:hover, .upload-zone.dragover { border-color: var(--primary); background: var(--primary-l); color: var(--primary); }
 .upload-icon { font-size: 22px; margin-bottom: 6px; }
 
 /* ── B/A Entry card ── */
@@ -113,15 +107,6 @@ body {
 .ba-photo-label { font-size: 10px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; color: var(--text3); margin-bottom: 6px; }
 .ba-photo-img { width: 100%; aspect-ratio: 4/3; background: #E5E7EB; border: 1px solid var(--border); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: var(--text3); font-size: 11px; position: relative; overflow: hidden; }
 .ba-photo-img img { width: 100%; height: 100%; object-fit: cover; }
-
-/* ── Gallery grid ── */
-.gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
-.gallery-item { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: #fff; }
-.gallery-thumb { aspect-ratio: 1; background: #E5E7EB; display: flex; align-items: center; justify-content: center; color: var(--text3); font-size: 11px; }
-.gallery-thumb img { width: 100%; height: 100%; object-fit: cover; }
-.gallery-item-footer { padding: 6px 10px; display: flex; align-items: center; justify-content: space-between; }
-.gallery-add { border: 2px dashed var(--border); border-radius: 8px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 6px; font-size: 12px; color: var(--text3); cursor: pointer; background: #FAFAFA; transition: all 0.15s; }
-.gallery-add:hover { border-color: var(--primary); background: var(--primary-l); color: var(--primary); }
 
 /* ── Add Form ── */
 .add-form-card { border: 2px dashed var(--primary); border-radius: 8px; background: var(--primary-l); margin-bottom: 16px; }
@@ -144,6 +129,182 @@ body {
 .empty-state-title { font-size: 14px; font-weight: 600; color: var(--text2); margin-bottom: 6px; }
 .empty-state-desc { font-size: 12px; }
 
+/* ════════════════════════════
+   일반 사진 그리드
+════════════════════════════ */
+.gen-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+.gen-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  transition: box-shadow 0.15s, border-color 0.15s;
+  user-select: none;
+}
+.gen-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.gen-card.inactive { opacity: 0.5; }
+.gen-card.dragging { opacity: 0.35; box-shadow: 0 6px 20px rgba(0,0,0,0.18); }
+.gen-card.drag-over { border-color: var(--primary) !important; box-shadow: 0 0 0 2px rgba(232,83,122,0.2); }
+
+/* Thumbnail */
+.gen-thumb {
+  aspect-ratio: 4/3;
+  position: relative;
+  overflow: hidden;
+  background: #E5E7EB;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; color: var(--text3);
+}
+.gen-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Priority badge */
+.priority-badge {
+  position: absolute;
+  top: 7px; left: 7px;
+  width: 22px; height: 22px;
+  background: rgba(0,0,0,0.52);
+  color: #fff;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700;
+  z-index: 2;
+  transition: background 0.15s;
+}
+
+/* Sort mode */
+.gen-grid.sort-mode .gen-card { cursor: grab; }
+.gen-grid.sort-mode .gen-card:active { cursor: grabbing; }
+.gen-grid.sort-mode .priority-badge { background: var(--primary); }
+.gen-grid.sort-mode .gen-card-actions { visibility: hidden; }
+.gen-grid.sort-mode .gen-toggle-wrap { visibility: hidden; }
+
+/* Card body */
+.gen-card-body { padding: 8px 10px 10px; }
+.gen-card-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; }
+.gen-card-date { font-size: 11px; color: var(--text3); }
+.gen-card-actions { display: flex; align-items: center; gap: 6px; justify-content: flex-end; }
+
+/* Toggle switch */
+.gen-toggle-wrap { display: flex; align-items: center; gap: 5px; }
+.gen-toggle-label { font-size: 11px; color: var(--text3); white-space: nowrap; }
+.gen-toggle { position: relative; width: 28px; height: 16px; flex-shrink: 0; }
+.gen-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+.gen-toggle-slider {
+  position: absolute; inset: 0;
+  background: #D1D5DB; border-radius: 16px; cursor: pointer;
+  transition: background 0.2s;
+}
+.gen-toggle-slider:before {
+  content: '';
+  position: absolute; width: 12px; height: 12px;
+  left: 2px; top: 2px;
+  background: white; border-radius: 50%;
+  transition: transform 0.2s;
+}
+.gen-toggle input:checked + .gen-toggle-slider { background: var(--green); }
+.gen-toggle input:checked + .gen-toggle-slider:before { transform: translateX(12px); }
+
+/* Sort action bar */
+.sort-action-bar {
+  display: none;
+  align-items: center;
+  gap: 8px;
+}
+.sort-action-bar.visible { display: flex; }
+
+/* ── Modal overlay ── */
+.modal-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 100;
+  align-items: center; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: #fff; border-radius: 10px;
+  width: 460px; max-width: calc(100vw - 32px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  animation: modalIn 0.15s ease;
+}
+@keyframes modalIn { from { transform: scale(0.96); opacity:0; } to { transform: scale(1); opacity:1; } }
+.modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-title { font-size: 14px; font-weight: 700; }
+.modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text3); padding: 0; line-height: 1; }
+.modal-close:hover { color: var(--text1); }
+.modal-body { padding: 20px; }
+.modal-footer { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+
+/* ── Confirm modal ── */
+.confirm-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 200;
+  align-items: center; justify-content: center;
+}
+.confirm-overlay.open { display: flex; }
+.confirm-box {
+  background: #fff; border-radius: 10px;
+  width: 320px; max-width: calc(100vw - 32px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  padding: 28px 24px 20px;
+  text-align: center;
+  animation: modalIn 0.15s ease;
+}
+.confirm-icon { font-size: 32px; margin-bottom: 12px; }
+.confirm-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+.confirm-desc { font-size: 12px; color: var(--text3); margin-bottom: 22px; line-height: 1.7; }
+.confirm-btns { display: flex; gap: 8px; justify-content: center; }
+
+/* ── 안 선택 버튼 ── */
+.gen-alt-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 14px; border-radius: 6px; cursor: pointer;
+  border: 1.5px solid var(--border); background: #fff;
+  transition: all 0.15s;
+}
+.gen-alt-btn:hover { border-color: var(--primary); }
+.gen-alt-btn.active { border-color: var(--primary); background: var(--primary-l); }
+.gen-alt-num { font-size: 12px; font-weight: 800; color: var(--text3); }
+.gen-alt-btn.active .gen-alt-num { color: var(--primary); }
+.gen-alt-desc { font-size: 12px; color: var(--text2); }
+
+/* 2안 always-drag grid: drag handle visible on card */
+.gen-grid-always-drag .gen-card { padding-top: 0; }
+.gen-card-drag-area {
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 26px; display: flex; align-items: center;
+  padding: 0 8px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.38) 0%, transparent 100%);
+  cursor: grab; z-index: 3;
+}
+.gen-card-drag-area:active { cursor: grabbing; }
+.gen-card-drag-area .drag-dots { color: rgba(255,255,255,0.9); font-size: 13px; }
+.gen-grid-always-drag .gen-card.dragging { opacity: 0.35; }
+.gen-grid-always-drag .gen-card.drag-over { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(232,83,122,0.2); }
+
+/* Photo preview overlay */
+.photo-view-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.82);
+  z-index: 300;
+  align-items: center; justify-content: center;
+}
+.photo-view-overlay.open { display: flex; }
+.photo-view-inner { position: relative; max-width: 80vw; max-height: 80vh; }
+.photo-view-inner img { max-width: 80vw; max-height: 80vh; border-radius: 6px; display: block; }
+.photo-view-close { position: absolute; top: -14px; right: -14px; width: 28px; height: 28px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; font-weight: 700; color: var(--text1); border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
 </style>
 </head>
 <body>
@@ -157,7 +318,7 @@ body {
       <div class="menu-item">채팅 관리</div>
       <div class="menu-item">상담 관리</div>
       <div class="menu-item active">갤러리 관리</div>
-      <div class="menu-item sub active" onclick="showTab('ba')">전/후 사진</div>
+      <div class="menu-item sub active" id="sidebar-ba" onclick="showTab('ba')">전/후 사진</div>
       <div class="menu-item sub" id="sidebar-general" onclick="showTab('general')">일반 사진</div>
       <div class="menu-item" onclick="window.location='host-store-settings.html'">스토어 설정</div>
       <div class="menu-item">리뷰 관리</div>
@@ -179,7 +340,7 @@ body {
       <div id="panel-ba">
 
         <div class="info-banner">
-          비포애프터 사진은 <strong>FO 스토어 상세 &gt; 비포애프터 섹션</strong>에 노출됩니다.<br>
+          전/후 사진은 <strong>앱 스토어 상세화면 — 비포애프터 섹션</strong>에 노출됩니다.<br>
           각 항목은 연결된 <strong>상품의 세부분류 + 상품명</strong>이 자동 표기되며, 소제목 한 줄을 직접 입력합니다.
         </div>
 
@@ -208,7 +369,6 @@ body {
                 <select class="select" style="width:100%;" id="product-select">
                   <option value="">카테고리를 먼저 선택하세요</option>
                 </select>
-                <div class="text-muted" style="margin-top:5px;">상품명은 FO에 그대로 노출됩니다</div>
               </div>
             </div>
             <div class="form-row">
@@ -239,7 +399,6 @@ body {
                     </div>
                   </div>
                 </div>
-                <div class="text-muted" style="margin-top:8px;">FO에서는 Before → After 순으로 세로 배치됩니다</div>
               </div>
             </div>
             <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px;">
@@ -371,112 +530,161 @@ body {
           </div>
         </div>
 
-        <div class="text-muted" style="margin-top:8px;text-align:center;">⠿ 드래그하여 FO 노출 순서를 변경할 수 있습니다</div>
+        <div class="text-muted" style="margin-top:8px;text-align:center;">⠿ 드래그하여 앱 노출 순서를 변경할 수 있습니다</div>
 
-      </div>
+      </div><!-- /panel-ba -->
+
 
       <!-- ════════════════════════════════
            일반 사진 패널
       ════════════════════════════════ -->
       <div id="panel-general" style="display:none;">
 
-        <div class="warn-banner">
-          ⚠️ <strong>Q-GL1 · Q-GL2 결정 대기</strong><br>
-          갤러리 섹션의 구체적인 노출 방식(레이아웃, 카테고리 구분 여부 등)이 아직 확정되지 않았습니다.<br>
-          현재는 기존 구조 기준으로 표시됩니다. 확정 후 업데이트 예정.
+        <div class="info-banner">
+          💡 일반 사진은 <strong>앱 스토어 상세화면 — 갤러리 섹션</strong>에 노출됩니다.
+          최대 <strong>10장</strong>까지 등록 가능합니다. 노출 순서는 번호 순서이며, 순서 조정 방식에 대한 두 가지 안을 비교합니다.
         </div>
 
-        <!-- Upload & count header -->
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-          <span style="font-size:13px;color:var(--text2);">총 <strong>9</strong>장 · 최대 30장</span>
-          <button class="btn btn-primary">+ 사진 업로드</button>
+        <!-- 안 선택 -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px;">
+          <span style="font-size:12px;color:var(--text3);font-weight:600;margin-right:2px;">안 선택</span>
+          <button class="gen-alt-btn active" id="gen-alt-1" onclick="switchGenAlt(1)">
+            <span class="gen-alt-num">1안</span>
+            <span class="gen-alt-desc">그리드 · 순서 변경 모드</span>
+          </button>
+          <button class="gen-alt-btn" id="gen-alt-2" onclick="switchGenAlt(2)">
+            <span class="gen-alt-num">2안</span>
+            <span class="gen-alt-desc">그리드 · 상시 드래그</span>
+          </button>
         </div>
 
-        <!-- Gallery grid -->
-        <div class="gallery-grid">
+        <!-- ── 1안: 그리드 + 순서 변경 모드 버튼 ── -->
+        <div id="gen-view-1">
+          <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--text2);line-height:1.7;">
+            <strong style="color:var(--text1);">1안 — 순서 변경 모드</strong><br>
+            평소에는 그리드를 조회·관리하고, '순서 변경' 버튼을 눌렀을 때만 드래그 모드로 진입합니다.
+            실수로 순서가 바뀌는 것을 방지할 수 있습니다.
+          </div>
 
-          <!-- 업로드된 사진 아이템 × 9 -->
-          <div class="gallery-item">
-            <div class="gallery-thumb" style="background:#BFDBFE;">이미지 1</div>
-            <div class="gallery-item-footer">
-              <span class="drag-handle" style="font-size:12px;">⠿</span>
-              <button class="btn-danger-ghost btn-sm" style="padding:2px 8px;font-size:11px;">삭제</button>
+          <!-- Header -->
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div style="display:flex;align-items:center;gap:14px;">
+              <span style="font-size:14px;font-weight:700;color:var(--text1);">
+                <span id="gen-count-cur">8</span><span style="color:var(--text3);font-weight:400;font-size:13px;"> / 10</span>
+              </span>
+              <div class="sort-action-bar" id="sort-action-bar">
+                <span style="font-size:12px;color:var(--text2);">드래그로 순서를 변경하세요</span>
+                <button class="btn btn-sm btn-secondary" onclick="cancelSort()">취소</button>
+                <button class="btn btn-sm btn-primary" onclick="confirmSort()">완료</button>
+              </div>
             </div>
-          </div>
-          <div class="gallery-item">
-            <div class="gallery-thumb" style="background:#BBF7D0;">이미지 2</div>
-            <div class="gallery-item-footer">
-              <span class="drag-handle" style="font-size:12px;">⠿</span>
-              <button class="btn-danger-ghost btn-sm" style="padding:2px 8px;font-size:11px;">삭제</button>
-            </div>
-          </div>
-          <div class="gallery-item">
-            <div class="gallery-thumb" style="background:#FDE68A;">이미지 3</div>
-            <div class="gallery-item-footer">
-              <span class="drag-handle" style="font-size:12px;">⠿</span>
-              <button class="btn-danger-ghost btn-sm" style="padding:2px 8px;font-size:11px;">삭제</button>
-            </div>
-          </div>
-          <div class="gallery-item">
-            <div class="gallery-thumb" style="background:#FBCFE8;">이미지 4</div>
-            <div class="gallery-item-footer">
-              <span class="drag-handle" style="font-size:12px;">⠿</span>
-              <button class="btn-danger-ghost btn-sm" style="padding:2px 8px;font-size:11px;">삭제</button>
-            </div>
-          </div>
-          <div class="gallery-item">
-            <div class="gallery-thumb" style="background:#DDD6FE;">이미지 5</div>
-            <div class="gallery-item-footer">
-              <span class="drag-handle" style="font-size:12px;">⠿</span>
-              <button class="btn-danger-ghost btn-sm" style="padding:2px 8px;font-size:11px;">삭제</button>
-            </div>
-          </div>
-          <div class="gallery-item">
-            <div class="gallery-thumb" style="background:#A7F3D0;">이미지 6</div>
-            <div class="gallery-item-footer">
-              <span class="drag-handle" style="font-size:12px;">⠿</span>
-              <button class="btn-danger-ghost btn-sm" style="padding:2px 8px;font-size:11px;">삭제</button>
-            </div>
-          </div>
-          <div class="gallery-item">
-            <div class="gallery-thumb" style="background:#FCA5A5;">이미지 7</div>
-            <div class="gallery-item-footer">
-              <span class="drag-handle" style="font-size:12px;">⠿</span>
-              <button class="btn-danger-ghost btn-sm" style="padding:2px 8px;font-size:11px;">삭제</button>
-            </div>
-          </div>
-          <div class="gallery-item">
-            <div class="gallery-thumb" style="background:#C7D2FE;">이미지 8</div>
-            <div class="gallery-item-footer">
-              <span class="drag-handle" style="font-size:12px;">⠿</span>
-              <button class="btn-danger-ghost btn-sm" style="padding:2px 8px;font-size:11px;">삭제</button>
-            </div>
-          </div>
-          <div class="gallery-item">
-            <div class="gallery-thumb" style="background:#FEF08A;">이미지 9</div>
-            <div class="gallery-item-footer">
-              <span class="drag-handle" style="font-size:12px;">⠿</span>
-              <button class="btn-danger-ghost btn-sm" style="padding:2px 8px;font-size:11px;">삭제</button>
+            <div id="gen-normal-actions" style="display:flex;gap:8px;">
+              <button class="btn btn-secondary btn-sm" id="btn-sort-mode" onclick="enterSortMode()">순서 변경</button>
+              <button class="btn btn-primary btn-sm" id="btn-upload" onclick="openUploadModal()">+ 사진 등록</button>
             </div>
           </div>
 
-          <!-- Add slot -->
-          <div class="gallery-add" style="aspect-ratio:unset;min-height:120px;">
-            <span style="font-size:22px;">+</span>
-            <span>사진 추가</span>
+          <!-- Photo grid -->
+          <div class="gen-grid" id="gen-grid">
+            <!-- Cards injected by JS -->
           </div>
-
         </div>
 
-        <div class="text-muted" style="margin-top:12px;text-align:center;">⠿ 드래그하여 FO 노출 순서를 변경할 수 있습니다</div>
+        <!-- ── 2안: 그리드 + 상시 드래그 핸들 ── -->
+        <div id="gen-view-2" style="display:none;">
+          <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--text2);line-height:1.7;">
+            <strong style="color:var(--text1);">2안 — 상시 드래그</strong><br>
+            별도 모드 전환 없이 카드의 <strong>⠿ 핸들</strong>을 잡아 바로 순서를 변경합니다.
+            클릭 수가 적고 직관적이지만, 실수로 순서가 바뀔 수 있습니다.
+          </div>
 
-      </div>
+          <!-- Header -->
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <span style="font-size:14px;font-weight:700;color:var(--text1);">
+              <span id="gen2-count-cur">8</span><span style="color:var(--text3);font-weight:400;font-size:13px;"> / 10</span>
+            </span>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-primary btn-sm" id="btn-upload-2" onclick="openUploadModal()">+ 사진 등록</button>
+            </div>
+          </div>
+
+          <!-- Photo grid (always-drag) -->
+          <div class="gen-grid gen-grid-always-drag" id="gen-grid-2">
+            <!-- Cards injected by JS -->
+          </div>
+          <div class="text-muted" style="margin-top:10px;text-align:center;">⠿ 핸들을 잡고 드래그하면 바로 순서가 변경됩니다</div>
+        </div>
+
+      </div><!-- /panel-general -->
 
     </div><!-- /content -->
   </main>
+</div><!-- /app -->
+
+
+<!-- ═══════════════════════════════════
+     업로드 모달
+═══════════════════════════════════ -->
+<div class="modal-overlay" id="upload-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title">사진 등록</span>
+      <button class="modal-close" onclick="closeUploadModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="upload-zone" id="upload-drop-zone" onclick="document.getElementById('upload-file-input').click()">
+        <div class="upload-icon">📷</div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:4px;">사진을 드래그하거나 클릭하여 업로드</div>
+        <div class="text-muted">JPG · PNG · 최대 10MB · 가로형(4:3) 권장</div>
+      </div>
+      <input type="file" id="upload-file-input" accept="image/jpeg,image/png" multiple style="display:none;" onchange="handleFileSelect(this)">
+      <div id="upload-preview-area" style="display:none;margin-top:14px;">
+        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;">선택된 파일</div>
+        <div id="upload-preview-list" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+      </div>
+      <div style="margin-top:14px;padding:10px 12px;background:var(--gray-bg);border-radius:6px;font-size:11px;color:var(--text3);line-height:1.7;">
+        • 등록 후 즉시 앱에 반영됩니다<br>
+        • 10장 한도 초과 시 등록되지 않습니다<br>
+        • 부적절한 이미지는 관리자에 의해 삭제될 수 있습니다
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeUploadModal()">취소</button>
+      <button class="btn btn-primary" id="upload-submit-btn" disabled onclick="submitUpload()">등록</button>
+    </div>
+  </div>
 </div>
 
+<!-- ═══════════════════════════════════
+     삭제 확인 모달
+═══════════════════════════════════ -->
+<div class="confirm-overlay" id="delete-confirm">
+  <div class="confirm-box">
+    <div class="confirm-icon">🗑️</div>
+    <div class="confirm-title">사진을 삭제하시겠습니까?</div>
+    <div class="confirm-desc">삭제한 사진은 복구할 수 없으며,<br>앱에서 즉시 내려집니다.</div>
+    <div class="confirm-btns">
+      <button class="btn btn-secondary" onclick="closeDeleteConfirm()">취소</button>
+      <button class="btn" style="background:#EF4444;color:#fff;" onclick="executeDelete()">삭제</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     사진 보기 오버레이
+═══════════════════════════════════ -->
+<div class="photo-view-overlay" id="photo-view-overlay" onclick="closePhotoView()">
+  <div class="photo-view-inner" onclick="event.stopPropagation()">
+    <button class="photo-view-close" onclick="closePhotoView()">×</button>
+    <img id="photo-view-img" src="" alt="사진 보기" style="background:#333;">
+  </div>
+</div>
+
+
 <script>
+/* ─────────────────────────────────
+   전/후 사진 탭
+───────────────────────────────── */
 const PRODUCTS = {
   lifting: ['올쎄라 듀얼 600샷', '올쎄라 듀얼 400샷', '인모드 FX 전신', '인모드 바디'],
   filler: ['코 필러 1cc', '팔자 필러 2cc', '입술 필러 0.5cc', '눈밑 필러 1cc'],
@@ -491,10 +699,8 @@ function showTab(tab) {
   document.getElementById('topbar-title').textContent = isBa
     ? '갤러리 관리 — 전/후 사진'
     : '갤러리 관리 — 일반 사진';
-  // sidebar highlight
-  document.querySelectorAll('.menu-item.sub').forEach((el, i) => {
-    el.classList.toggle('active', isBa ? i === 0 : i === 1);
-  });
+  document.getElementById('sidebar-ba').classList.toggle('active', isBa);
+  document.getElementById('sidebar-general').classList.toggle('active', !isBa);
 }
 
 function toggleAddForm() {
@@ -513,7 +719,408 @@ function filterProducts(sel) {
 function updateCharCount(input, countId) {
   document.getElementById(countId).textContent = input.value.length;
 }
-</script>
 
+
+/* ─────────────────────────────────
+   일반 사진 데이터 & 렌더
+───────────────────────────────── */
+const MAX_PHOTOS = 10;
+
+// Sample data: {id, color, active, date}
+let genPhotos = [
+  { id: 1, color: '#BFDBFE', active: true,  date: '2025.03.12' },
+  { id: 2, color: '#BBF7D0', active: true,  date: '2025.03.15' },
+  { id: 3, color: '#FDE68A', active: true,  date: '2025.03.20' },
+  { id: 4, color: '#FBCFE8', active: true,  date: '2025.03.22' },
+  { id: 5, color: '#DDD6FE', active: true,  date: '2025.04.01' },
+  { id: 6, color: '#A7F3D0', active: false, date: '2025.04.05' },
+  { id: 7, color: '#FCA5A5', active: true,  date: '2025.04.10' },
+  { id: 8, color: '#C7D2FE', active: true,  date: '2025.04.18' },
+];
+
+// Snapshot for cancel-sort
+let sortSnapshot = null;
+let isSortMode = false;
+
+// Drag state
+let dragSrcIdx = null;
+
+function renderGenGrid() {
+  const grid = document.getElementById('gen-grid');
+  const cur = genPhotos.length;
+  const isMax = cur >= MAX_PHOTOS;
+
+  // Update count
+  document.getElementById('gen-count-cur').textContent = cur;
+  // Disable upload btn at limit
+  const uploadBtn = document.getElementById('btn-upload');
+  if (uploadBtn) {
+    uploadBtn.disabled = isMax;
+    uploadBtn.title = isMax ? '최대 10장까지 등록 가능합니다' : '';
+  }
+
+  grid.innerHTML = '';
+
+  genPhotos.forEach((photo, idx) => {
+    const card = document.createElement('div');
+    card.className = 'gen-card' + (photo.active ? '' : ' inactive');
+    card.dataset.idx = idx;
+
+    if (isSortMode) {
+      card.draggable = true;
+      card.addEventListener('dragstart', onDragStart);
+      card.addEventListener('dragover',  onDragOver);
+      card.addEventListener('dragenter', onDragEnter);
+      card.addEventListener('dragleave', onDragLeave);
+      card.addEventListener('drop',      onDrop);
+      card.addEventListener('dragend',   onDragEnd);
+    }
+
+    card.innerHTML = `
+      <div class="gen-thumb" style="background:${photo.color};">
+        <span style="font-size:12px;color:#666;">이미지 ${idx + 1}</span>
+        <div class="priority-badge">${idx + 1}</div>
+      </div>
+      <div class="gen-card-body">
+        <div class="gen-card-meta">
+          <span class="gen-card-date">${photo.date}</span>
+          <label class="gen-toggle gen-toggle-wrap" title="${photo.active ? '비활성으로 전환' : '활성으로 전환'}">
+            <input type="checkbox" ${photo.active ? 'checked' : ''} onchange="togglePhotoActive(${idx}, this.checked)">
+            <span class="gen-toggle-slider"></span>
+          </label>
+        </div>
+        <div class="gen-card-actions">
+          <button class="btn-view" onclick="viewPhoto(${idx})">보기</button>
+          <button class="btn-danger-ghost" style="padding:3px 9px;font-size:11px;" onclick="openDeleteConfirm(${idx})">삭제</button>
+        </div>
+      </div>
+    `;
+
+    grid.appendChild(card);
+  });
+
+  // Apply sort-mode class to grid
+  grid.classList.toggle('sort-mode', isSortMode);
+}
+
+function togglePhotoActive(idx, checked) {
+  genPhotos[idx].active = checked;
+  // Re-render only that card's inactive class without full rebuild
+  const cards = document.querySelectorAll('#gen-grid .gen-card');
+  if (cards[idx]) {
+    cards[idx].classList.toggle('inactive', !checked);
+  }
+}
+
+/* ─────────────────────────────────
+   정렬 모드
+───────────────────────────────── */
+function enterSortMode() {
+  isSortMode = true;
+  sortSnapshot = JSON.parse(JSON.stringify(genPhotos));
+  document.getElementById('sort-action-bar').classList.add('visible');
+  document.getElementById('gen-normal-actions').style.visibility = 'hidden';
+  renderGenGrid();
+}
+
+function cancelSort() {
+  isSortMode = false;
+  genPhotos = sortSnapshot;
+  sortSnapshot = null;
+  document.getElementById('sort-action-bar').classList.remove('visible');
+  document.getElementById('gen-normal-actions').style.visibility = '';
+  renderGenGrid();
+}
+
+function confirmSort() {
+  isSortMode = false;
+  sortSnapshot = null;
+  document.getElementById('sort-action-bar').classList.remove('visible');
+  document.getElementById('gen-normal-actions').style.visibility = '';
+  renderGenGrid();
+  // (실제 구현에서는 여기서 API 호출)
+}
+
+/* ─────────────────────────────────
+   Drag & Drop
+───────────────────────────────── */
+function onDragStart(e) {
+  dragSrcIdx = parseInt(this.dataset.idx);
+  this.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', dragSrcIdx);
+}
+
+function onDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+}
+
+function onDragEnter(e) {
+  e.preventDefault();
+  if (parseInt(this.dataset.idx) !== dragSrcIdx) {
+    this.classList.add('drag-over');
+  }
+}
+
+function onDragLeave() {
+  this.classList.remove('drag-over');
+}
+
+function onDrop(e) {
+  e.preventDefault();
+  this.classList.remove('drag-over');
+  const targetIdx = parseInt(this.dataset.idx);
+  if (targetIdx === dragSrcIdx) return;
+
+  // Reorder array
+  const moved = genPhotos.splice(dragSrcIdx, 1)[0];
+  genPhotos.splice(targetIdx, 0, moved);
+  renderGenGrid();
+}
+
+function onDragEnd() {
+  this.classList.remove('dragging');
+  document.querySelectorAll('#gen-grid .gen-card').forEach(c => c.classList.remove('drag-over'));
+  dragSrcIdx = null;
+}
+
+/* ─────────────────────────────────
+   삭제
+───────────────────────────────── */
+let pendingDeleteIdx = null;
+
+function openDeleteConfirm(idx) {
+  pendingDeleteIdx = idx;
+  document.getElementById('delete-confirm').classList.add('open');
+}
+
+function closeDeleteConfirm() {
+  pendingDeleteIdx = null;
+  document.getElementById('delete-confirm').classList.remove('open');
+}
+
+function executeDelete() {
+  if (pendingDeleteIdx === null) return;
+  genPhotos.splice(pendingDeleteIdx, 1);
+  closeDeleteConfirm();
+  renderGenGrid();
+}
+
+/* ─────────────────────────────────
+   사진 보기
+───────────────────────────────── */
+function viewPhoto(idx) {
+  // 실제 구현에서는 photo URL 사용. 여기서는 색상 SVG placeholder
+  const photo = genPhotos[idx];
+  const svg = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='600'><rect width='800' height='600' fill='${encodeURIComponent(photo.color)}'/><text x='400' y='310' text-anchor='middle' font-size='32' fill='%23666' font-family='sans-serif'>이미지 ${idx + 1}</text></svg>`;
+  document.getElementById('photo-view-img').src = svg;
+  document.getElementById('photo-view-overlay').classList.add('open');
+}
+
+function closePhotoView() {
+  document.getElementById('photo-view-overlay').classList.remove('open');
+}
+
+/* ─────────────────────────────────
+   업로드 모달
+───────────────────────────────── */
+function openUploadModal() {
+  if (genPhotos.length >= MAX_PHOTOS) return;
+  document.getElementById('upload-modal').classList.add('open');
+  document.getElementById('upload-preview-area').style.display = 'none';
+  document.getElementById('upload-preview-list').innerHTML = '';
+  document.getElementById('upload-submit-btn').disabled = true;
+  document.getElementById('upload-file-input').value = '';
+}
+
+function closeUploadModal() {
+  document.getElementById('upload-modal').classList.remove('open');
+}
+
+function handleFileSelect(input) {
+  const files = Array.from(input.files).slice(0, MAX_PHOTOS - genPhotos.length);
+  if (!files.length) return;
+  const previewArea = document.getElementById('upload-preview-area');
+  const previewList = document.getElementById('upload-preview-list');
+  previewList.innerHTML = '';
+  files.forEach(file => {
+    const item = document.createElement('div');
+    item.style.cssText = 'width:72px;text-align:center;';
+    const reader = new FileReader();
+    reader.onload = e => {
+      item.innerHTML = `<img src="${e.target.result}" style="width:72px;height:54px;object-fit:cover;border-radius:5px;border:1px solid #ddd;"><div style="font-size:10px;color:#888;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${file.name}</div>`;
+    };
+    reader.readAsDataURL(file);
+    previewList.appendChild(item);
+  });
+  previewArea.style.display = 'block';
+  document.getElementById('upload-submit-btn').disabled = false;
+}
+
+// Drag-and-drop into upload zone
+(function() {
+  const zone = document.getElementById('upload-drop-zone');
+  if (!zone) return;
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('dragover');
+    const input = document.getElementById('upload-file-input');
+    // DataTransfer files를 input에 직접 못 넣으므로 handleFileSelect equivalent
+    const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+    if (!files.length) return;
+    const fakeInput = { files };
+    handleFileSelect(fakeInput);
+  });
+})();
+
+function submitUpload() {
+  // 실제 구현: API 호출. 여기서는 샘플 사진 추가
+  const SAMPLE_COLORS = ['#FEF3C7','#D1FAE5','#E0E7FF','#FCE7F3','#FEE2E2'];
+  const today = new Date().toLocaleDateString('ko-KR', { year:'numeric', month:'2-digit', day:'2-digit' }).replace(/\. /g,'.').replace('.','');
+  const dateStr = `${new Date().getFullYear()}.${String(new Date().getMonth()+1).padStart(2,'0')}.${String(new Date().getDate()).padStart(2,'0')}`;
+  const newId = (genPhotos[genPhotos.length - 1]?.id ?? 0) + 1;
+  if (genPhotos.length < MAX_PHOTOS) {
+    genPhotos.push({ id: newId, color: SAMPLE_COLORS[newId % SAMPLE_COLORS.length], active: true, date: dateStr });
+  }
+  closeUploadModal();
+  renderGenGrid();
+}
+
+/* ─────────────────────────────────
+   ESC closes modals
+───────────────────────────────── */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeUploadModal();
+    closeDeleteConfirm();
+    closePhotoView();
+  }
+});
+
+/* ─────────────────────────────────
+   안 선택 스위처
+───────────────────────────────── */
+let currentGenAlt = 1;
+
+function switchGenAlt(n) {
+  currentGenAlt = n;
+  document.getElementById('gen-alt-1').classList.toggle('active', n === 1);
+  document.getElementById('gen-alt-2').classList.toggle('active', n === 2);
+  document.getElementById('gen-view-1').style.display = n === 1 ? 'block' : 'none';
+  document.getElementById('gen-view-2').style.display = n === 2 ? 'block' : 'none';
+  if (n === 2) renderGenGrid2();
+}
+
+/* ─────────────────────────────────
+   2안 렌더 (상시 드래그)
+───────────────────────────────── */
+let drag2SrcIdx = null;
+
+function renderGenGrid2() {
+  const grid = document.getElementById('gen-grid-2');
+  const isMax = genPhotos.length >= MAX_PHOTOS;
+  document.getElementById('gen2-count-cur').textContent = genPhotos.length;
+  const uploadBtn2 = document.getElementById('btn-upload-2');
+  if (uploadBtn2) { uploadBtn2.disabled = isMax; }
+
+  grid.innerHTML = '';
+
+  genPhotos.forEach((photo, idx) => {
+    const card = document.createElement('div');
+    card.className = 'gen-card' + (photo.active ? '' : ' inactive');
+    card.dataset.idx = idx;
+    card.draggable = true;
+    card.style.position = 'relative';
+
+    card.addEventListener('dragstart', function(e) {
+      drag2SrcIdx = parseInt(this.dataset.idx);
+      setTimeout(() => this.classList.add('dragging'), 0);
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    card.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; });
+    card.addEventListener('dragenter', function(e) {
+      e.preventDefault();
+      if (parseInt(this.dataset.idx) !== drag2SrcIdx) this.classList.add('drag-over');
+    });
+    card.addEventListener('dragleave', function() { this.classList.remove('drag-over'); });
+    card.addEventListener('drop', function(e) {
+      e.preventDefault();
+      this.classList.remove('drag-over');
+      const targetIdx = parseInt(this.dataset.idx);
+      if (targetIdx === drag2SrcIdx) return;
+      const moved = genPhotos.splice(drag2SrcIdx, 1)[0];
+      genPhotos.splice(targetIdx, 0, moved);
+      renderGenGrid2();
+    });
+    card.addEventListener('dragend', function() {
+      this.classList.remove('dragging');
+      document.querySelectorAll('#gen-grid-2 .gen-card').forEach(c => c.classList.remove('drag-over'));
+      drag2SrcIdx = null;
+    });
+
+    card.innerHTML = `
+      <div class="gen-thumb" style="background:${photo.color};">
+        <span style="font-size:12px;color:#666;">이미지 ${idx + 1}</span>
+        <div class="priority-badge">${idx + 1}</div>
+        <div class="gen-card-drag-area" title="드래그하여 순서 변경">
+          <span class="drag-dots">⠿</span>
+        </div>
+      </div>
+      <div class="gen-card-body">
+        <div class="gen-card-meta">
+          <span class="gen-card-date">${photo.date}</span>
+          <label class="gen-toggle gen-toggle-wrap" title="${photo.active ? '비활성으로 전환' : '활성으로 전환'}">
+            <input type="checkbox" ${photo.active ? 'checked' : ''} onchange="togglePhotoActive2(${idx}, this.checked)">
+            <span class="gen-toggle-slider"></span>
+          </label>
+        </div>
+        <div class="gen-card-actions">
+          <button class="btn-view" onclick="viewPhoto(${idx})">보기</button>
+          <button class="btn-danger-ghost" style="padding:3px 9px;font-size:11px;" onclick="openDeleteConfirm2(${idx})">삭제</button>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function togglePhotoActive2(idx, checked) {
+  genPhotos[idx].active = checked;
+  const cards = document.querySelectorAll('#gen-grid-2 .gen-card');
+  if (cards[idx]) cards[idx].classList.toggle('inactive', !checked);
+}
+
+let pendingDeleteIdx2 = null;
+
+function openDeleteConfirm2(idx) {
+  // Reuse same confirm modal, but track which grid
+  pendingDeleteIdx2 = idx;
+  pendingDeleteIdx = null;
+  document.getElementById('delete-confirm').classList.add('open');
+}
+
+// Patch executeDelete to handle both grids
+const _origExecuteDelete = executeDelete;
+window.executeDelete = function() {
+  if (pendingDeleteIdx !== null) {
+    genPhotos.splice(pendingDeleteIdx, 1);
+    closeDeleteConfirm();
+    renderGenGrid();
+  } else if (pendingDeleteIdx2 !== null) {
+    genPhotos.splice(pendingDeleteIdx2, 1);
+    pendingDeleteIdx2 = null;
+    closeDeleteConfirm();
+    renderGenGrid2();
+  }
+};
+
+/* ─────────────────────────────────
+   Init
+───────────────────────────────── */
+renderGenGrid();
+</script>
 </body>
 </html>
