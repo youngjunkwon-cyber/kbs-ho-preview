@@ -581,6 +581,54 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
 .upload-zone:hover { border-color: var(--primary); background: var(--primary-l); color: var(--primary); }
 .img-thumb { width: 72px; height: 72px; border-radius: 6px; background: var(--gray-chip); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--text3); font-size: 10px; flex-shrink: 0; }
 
+/* ── Gallery Picker ── */
+.img-picker-preview {
+  border: 2px dashed var(--border-input); border-radius: 8px;
+  height: 110px; display: flex; align-items: center; justify-content: center;
+  background: #fafafa; margin-bottom: 10px; cursor: pointer;
+  overflow: hidden; transition: all 0.15s; position: relative;
+}
+.img-picker-preview:hover { border-color: var(--primary); background: var(--primary-l); }
+.img-picker-preview.has-image { border-style: solid; border-color: var(--border); cursor: default; }
+.img-picker-placeholder { color: var(--text3); font-size: 12px; }
+.img-selected-preview { display: none; width: 100%; height: 100%; background-size: cover; background-position: center; }
+.img-picker-actions { display: flex; gap: 8px; margin-bottom: 8px; }
+.btn-ghost { background: none; border: 1px solid var(--border); color: var(--text2); }
+.btn-ghost:hover { background: var(--gray-bg); }
+.source-note { font-size: 11px; color: var(--text3); display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+.source-note a { color: var(--blue); text-decoration: none; }
+.source-note a:hover { text-decoration: underline; }
+
+/* ── Gallery Modal ── */
+.gallery-modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 900; }
+.gallery-modal-dialog {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  z-index: 901; background: #fff; border-radius: 12px;
+  width: 560px; max-height: 520px; display: flex; flex-direction: column;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.25);
+}
+.gallery-modal-header {
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 14px; font-weight: 700; flex-shrink: 0;
+}
+.gallery-modal-close { background: none; border: none; cursor: pointer; font-size: 18px; color: var(--text3); line-height: 1; padding: 0 2px; }
+.gallery-modal-close:hover { color: var(--text1); }
+.gallery-modal-body { padding: 16px 20px; overflow-y: auto; flex: 1; }
+.gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.gallery-item {
+  border: 2px solid transparent; border-radius: 8px; overflow: hidden;
+  cursor: pointer; transition: all 0.12s; background: var(--gray-bg);
+}
+.gallery-item:hover { border-color: var(--border-input); }
+.gallery-item.selected { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-l); }
+.gallery-thumb { width: 100%; aspect-ratio: 3/2; }
+.gallery-item-name { padding: 4px 7px 6px; font-size: 10px; color: var(--text3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gallery-modal-footer {
+  padding: 12px 20px; border-top: 1px solid var(--border);
+  display: flex; justify-content: flex-end; gap: 8px; flex-shrink: 0;
+}
+
 /* ── Tag ── */
 .tag-list { display: flex; flex-wrap: wrap; gap: 6px; }
 .tag-item { background: var(--gray-chip); padding: 3px 10px; border-radius: 12px; font-size: 12px; color: var(--text2); display: flex; align-items: center; gap: 4px; }
@@ -694,10 +742,18 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
               <div class="form-row">
                 <div class="form-label">이미지</div>
                 <div class="form-control">
-                  <div style="display:flex;gap:12px;align-items:flex-start;">
-                    <div class="img-thumb">미리보기</div>
-                    <div style="flex:1;">
-                      <div class="upload-zone">+ 이미지 교체<br><span class="text-muted" style="margin-top:4px;display:block;">권장: 1200×800px 이상 · JPG/PNG</span></div>
+                  <div class="img-picker-area" id="hero-picker-v1">
+                    <div class="img-picker-preview" onclick="openGalleryPicker('hero-picker-v1')">
+                      <span class="img-picker-placeholder">클릭하여 갤러리에서 선택</span>
+                      <div class="img-selected-preview"></div>
+                    </div>
+                    <div class="img-picker-actions">
+                      <button class="btn btn-sm btn-secondary" onclick="openGalleryPicker('hero-picker-v1')">갤러리에서 선택</button>
+                      <button class="btn btn-sm btn-ghost">직접 업로드</button>
+                    </div>
+                    <div class="source-note">
+                      출처: 갤러리 관리 &gt; 일반 사진
+                      <a href="#" onclick="return false;">관리 페이지 바로가기 ↗</a>
                     </div>
                   </div>
                 </div>
@@ -1133,9 +1189,19 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
               <div class="form-row">
                 <div class="form-label">이미지</div>
                 <div class="form-control">
-                  <div style="display:flex;gap:12px;align-items:flex-start;">
-                    <div class="img-thumb">미리보기</div>
-                    <div style="flex:1;"><div class="upload-zone">+ 이미지 교체<br><span class="text-muted" style="margin-top:4px;display:block;">권장: 1200×800px 이상 · JPG/PNG</span></div></div>
+                  <div class="img-picker-area" id="hero-picker-v2">
+                    <div class="img-picker-preview" onclick="openGalleryPicker('hero-picker-v2')">
+                      <span class="img-picker-placeholder">클릭하여 갤러리에서 선택</span>
+                      <div class="img-selected-preview"></div>
+                    </div>
+                    <div class="img-picker-actions">
+                      <button class="btn btn-sm btn-secondary" onclick="openGalleryPicker('hero-picker-v2')">갤러리에서 선택</button>
+                      <button class="btn btn-sm btn-ghost">직접 업로드</button>
+                    </div>
+                    <div class="source-note">
+                      출처: 갤러리 관리 &gt; 일반 사진
+                      <a href="#" onclick="return false;">관리 페이지 바로가기 ↗</a>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1693,6 +1759,57 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
         </div><!-- /fo-panel-scroll -->
       </div><!-- /fo-panel -->
 
+    <!-- ════════ 갤러리 피커 모달 ════════ -->
+    <div id="gallery-modal" style="display:none;">
+      <div class="gallery-modal-backdrop" onclick="closeGalleryPicker()"></div>
+      <div class="gallery-modal-dialog">
+        <div class="gallery-modal-header">
+          <span>갤러리 — 일반 사진</span>
+          <button class="gallery-modal-close" onclick="closeGalleryPicker()">✕</button>
+        </div>
+        <div class="gallery-modal-body">
+          <div class="gallery-grid">
+            <div class="gallery-item" onclick="selectGalleryItem(this)">
+              <div class="gallery-thumb" style="background:linear-gradient(135deg,#f5c6d5,#e8537a);"></div>
+              <div class="gallery-item-name">clinic_exterior.jpg</div>
+            </div>
+            <div class="gallery-item" onclick="selectGalleryItem(this)">
+              <div class="gallery-thumb" style="background:linear-gradient(135deg,#b5d8f7,#4a90c4);"></div>
+              <div class="gallery-item-name">reception_desk.jpg</div>
+            </div>
+            <div class="gallery-item" onclick="selectGalleryItem(this)">
+              <div class="gallery-thumb" style="background:linear-gradient(135deg,#c5e1c0,#5aab5a);"></div>
+              <div class="gallery-item-name">treatment_room.jpg</div>
+            </div>
+            <div class="gallery-item" onclick="selectGalleryItem(this)">
+              <div class="gallery-thumb" style="background:linear-gradient(135deg,#f7e0b5,#d4964a);"></div>
+              <div class="gallery-item-name">waiting_area.jpg</div>
+            </div>
+            <div class="gallery-item" onclick="selectGalleryItem(this)">
+              <div class="gallery-thumb" style="background:linear-gradient(135deg,#ddc5f7,#8e44c4);"></div>
+              <div class="gallery-item-name">doctor_profile.jpg</div>
+            </div>
+            <div class="gallery-item" onclick="selectGalleryItem(this)">
+              <div class="gallery-thumb" style="background:linear-gradient(135deg,#f5e0d5,#c4724a);"></div>
+              <div class="gallery-item-name">equipment_01.jpg</div>
+            </div>
+            <div class="gallery-item" onclick="selectGalleryItem(this)">
+              <div class="gallery-thumb" style="background:linear-gradient(135deg,#d5e8f5,#4a8ab4);"></div>
+              <div class="gallery-item-name">banner_main.jpg</div>
+            </div>
+            <div class="gallery-item" onclick="selectGalleryItem(this)">
+              <div class="gallery-thumb" style="background:linear-gradient(135deg,#f5d5e8,#b44a8a);"></div>
+              <div class="gallery-item-name">store_interior.jpg</div>
+            </div>
+          </div>
+        </div>
+        <div class="gallery-modal-footer">
+          <button class="btn btn-sm btn-secondary" onclick="closeGalleryPicker()">취소</button>
+          <button class="btn btn-sm btn-primary" id="gallery-confirm-btn" onclick="confirmGallerySelection()" style="opacity:0.4;cursor:default;" disabled>선택 완료</button>
+        </div>
+      </div>
+    </div>
+
     </div><!-- /content-wrap -->
   </main>
 </div>
@@ -1805,6 +1922,58 @@ function switchPreviewLang(btn, screenId) {
 function updatePreview() {
   const name = document.getElementById('store-name-ko').value || '';
   // EN preview name is managed separately; KO name used for reference
+}
+
+/* ── 갤러리 피커 ── */
+let galleryTargetId = null;
+let gallerySelectedItem = null;
+
+function openGalleryPicker(targetId) {
+  galleryTargetId = targetId;
+  gallerySelectedItem = null;
+  document.querySelectorAll('.gallery-item').forEach(i => i.classList.remove('selected'));
+  const confirmBtn = document.getElementById('gallery-confirm-btn');
+  confirmBtn.disabled = true;
+  confirmBtn.style.opacity = '0.4';
+  confirmBtn.style.cursor = 'default';
+  document.getElementById('gallery-modal').style.display = 'block';
+}
+
+function closeGalleryPicker() {
+  document.getElementById('gallery-modal').style.display = 'none';
+  galleryTargetId = null;
+  gallerySelectedItem = null;
+}
+
+function selectGalleryItem(item) {
+  document.querySelectorAll('.gallery-item').forEach(i => i.classList.remove('selected'));
+  item.classList.add('selected');
+  gallerySelectedItem = item;
+  const confirmBtn = document.getElementById('gallery-confirm-btn');
+  confirmBtn.disabled = false;
+  confirmBtn.style.opacity = '1';
+  confirmBtn.style.cursor = 'pointer';
+}
+
+function confirmGallerySelection() {
+  if (!gallerySelectedItem || !galleryTargetId) return;
+  const bg = gallerySelectedItem.querySelector('.gallery-thumb').style.background;
+  const area = document.getElementById(galleryTargetId);
+  if (area) {
+    const preview = area.querySelector('.img-picker-preview');
+    const placeholder = area.querySelector('.img-picker-placeholder');
+    const selected = area.querySelector('.img-selected-preview');
+    if (selected) {
+      selected.style.background = bg;
+      selected.style.display = 'block';
+    }
+    if (placeholder) placeholder.style.display = 'none';
+    if (preview) {
+      preview.classList.add('has-image');
+      preview.onclick = null; // 선택 후 클릭 비활성
+    }
+  }
+  closeGalleryPicker();
 }
 
 /* ── 섹션 툴팁 자동 주입 ── */
