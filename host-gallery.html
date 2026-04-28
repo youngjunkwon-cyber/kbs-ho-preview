@@ -1121,6 +1121,12 @@ window.executeDelete = function() {
    Init
 ───────────────────────────────── */
 renderGenGrid();
+
+// URL 파라미터로 탭 자동 전환 (?tab=general)
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('tab') === 'general') showTab('general');
+})();
 </script>
 </body>
 </html>
