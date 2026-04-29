@@ -122,6 +122,35 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
 .filter-row { background:#fff; padding:16px 20px; border-radius:4px; border:1px solid #f0f0f0; margin-bottom:16px; display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
 .filter-row .form-select, .filter-row .form-input { width:160px; }
 
+/* ── Advanced filter card ── */
+.filter-card { background:#fff; border-radius:6px; border:1px solid #f0f0f0; margin-bottom:16px; }
+.filter-card-head { padding:12px 18px; border-bottom:1px solid #f0f0f0; display:flex; justify-content:space-between; align-items:center; }
+.filter-card-title { font-size:13px; font-weight:600; color:#262626; }
+.filter-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px 24px; padding:14px 18px; }
+.filter-grid-3 { grid-template-columns:1fr 1fr 1fr; }
+.filter-grid-4 { grid-template-columns:1fr 1fr 1fr 1fr; }
+.filter-cell { display:flex; flex-direction:column; gap:6px; }
+.filter-label { font-size:12px; font-weight:500; color:#595959; }
+.filter-cell .form-input, .filter-cell .form-select { width:100%; }
+
+.chip-row { display:flex; flex-wrap:wrap; gap:5px; }
+.filter-chip { display:inline-flex; align-items:center; padding:4px 10px; border:1px solid #d9d9d9; border-radius:14px; font-size:12px; color:#595959; background:#fff; cursor:pointer; user-select:none; transition:all 0.12s; }
+.filter-chip:hover { border-color:#1890ff; color:#1890ff; }
+.filter-chip.on { background:#1890ff; border-color:#1890ff; color:#fff; }
+
+.filter-advanced { display:none; border-top:1px dashed #f0f0f0; }
+.filter-advanced.open { display:block; }
+
+.check-grid { display:grid; grid-template-columns:repeat(6, 1fr); gap:8px 12px; padding:6px 0; }
+.check-grid label { display:flex; align-items:center; gap:5px; font-size:12px; color:#595959; cursor:pointer; }
+.check-grid input { margin:0; }
+
+.filter-foot { padding:12px 18px; border-top:1px solid #f0f0f0; display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; background:#fafafa; }
+.filter-tags { display:flex; flex-wrap:wrap; gap:5px; align-items:center; }
+.active-tag { display:inline-flex; align-items:center; gap:4px; padding:3px 4px 3px 10px; background:#e6f7ff; border:1px solid #91d5ff; border-radius:3px; font-size:11px; color:#0050b3; }
+.active-tag button { background:transparent; border:none; color:#1890ff; cursor:pointer; font-size:14px; padding:0 6px; line-height:1; }
+.active-tag button:hover { color:#ff4d4f; }
+
 /* ── Modal ── */
 .modal-mask { position:fixed; inset:0; background:rgba(0,0,0,0.45); display:flex; align-items:flex-start; justify-content:center; z-index:1000; padding:60px 20px 20px; overflow-y:auto; }
 .modal { background:#fff; border-radius:8px; width:760px; max-width:100%; box-shadow:0 8px 24px rgba(0,0,0,0.15); }
@@ -202,12 +231,146 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
 
         <div class="page-title">스토어 &gt; 번역정보관리</div>
 
-        <div class="filter-row">
-          <select class="form-select"><option>언어 ▼</option></select>
-          <select class="form-select"><option>카테고리 선택 ▼</option></select>
-          <select class="form-select"><option>상점 선택 ▼</option></select>
-          <input class="form-input" placeholder="검색어">
-          <button class="btn btn-primary">검색</button>
+        <div class="filter-card">
+          <div class="filter-card-head">
+            <span class="filter-card-title">검색 / 필터</span>
+            <div style="display:flex;gap:6px;">
+              <button class="btn btn-sm" onclick="document.getElementById('filter-advanced').classList.toggle('open')">고급 필터 ▼</button>
+              <button class="btn btn-sm" onclick="resetFilters()">초기화</button>
+              <button class="btn btn-sm">검색 조건 저장</button>
+            </div>
+          </div>
+
+          <!-- 1행: 기본 검색 ── -->
+          <div class="filter-grid">
+            <div class="filter-cell">
+              <label class="filter-label">언어 (다중)</label>
+              <div class="chip-row" id="lang-chips">
+                <span class="filter-chip on" data-v="ko">한국어</span>
+                <span class="filter-chip on" data-v="en">영어</span>
+                <span class="filter-chip on" data-v="zh">중국어</span>
+                <span class="filter-chip" data-v="tw">중국어(번체)</span>
+                <span class="filter-chip" data-v="jp">일본어</span>
+                <span class="filter-chip" data-v="id">인도네시아어</span>
+              </div>
+            </div>
+
+            <div class="filter-cell">
+              <label class="filter-label">카테고리 (다중)</label>
+              <div class="chip-row">
+                <span class="filter-chip on">피부과</span>
+                <span class="filter-chip on">성형외과</span>
+                <span class="filter-chip">치과</span>
+                <span class="filter-chip">헤어/메이크업</span>
+                <span class="filter-chip">에스테틱</span>
+                <span class="filter-chip">팝업스토어</span>
+                <span class="filter-chip">스튜디오</span>
+                <span class="filter-chip">메디컬체크</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="filter-grid filter-grid-4">
+            <div class="filter-cell">
+              <label class="filter-label">상점 검색</label>
+              <input class="form-input" placeholder="상점명 또는 코드로 검색">
+            </div>
+            <div class="filter-cell">
+              <label class="filter-label">활성 여부</label>
+              <select class="form-select"><option>전체</option><option>활성만</option><option>비활성만</option></select>
+            </div>
+            <div class="filter-cell">
+              <label class="filter-label">번역 상태</label>
+              <select class="form-select"><option>전체</option><option>번역 완료</option><option>일부 미번역</option><option>전체 미번역</option></select>
+            </div>
+            <div class="filter-cell">
+              <label class="filter-label">정렬</label>
+              <select class="form-select"><option>최근 수정 순</option><option>등록일 순</option><option>상점명 가나다 순</option><option>번역 미완료 우선</option></select>
+            </div>
+          </div>
+
+          <!-- 고급 필터 ── -->
+          <div id="filter-advanced" class="filter-advanced">
+            <div class="filter-grid filter-grid-4">
+              <div class="filter-cell">
+                <label class="filter-label">등록일</label>
+                <div style="display:flex;gap:4px;align-items:center;">
+                  <input class="form-input" type="date" value="2026-01-01">
+                  <span style="color:#bfbfbf;">~</span>
+                  <input class="form-input" type="date" value="2026-04-29">
+                </div>
+              </div>
+              <div class="filter-cell">
+                <label class="filter-label">최종 수정일</label>
+                <div style="display:flex;gap:4px;align-items:center;">
+                  <input class="form-input" type="date">
+                  <span style="color:#bfbfbf;">~</span>
+                  <input class="form-input" type="date">
+                </div>
+              </div>
+              <div class="filter-cell">
+                <label class="filter-label">최종 번역일</label>
+                <select class="form-select"><option>전체</option><option>오늘</option><option>최근 7일</option><option>최근 30일</option><option>30일 이상 미번역</option></select>
+              </div>
+              <div class="filter-cell">
+                <label class="filter-label">지역</label>
+                <select class="form-select"><option>전체</option><option>강남구</option><option>서초구</option><option>마포구</option><option>중구</option></select>
+              </div>
+            </div>
+
+            <div class="filter-cell" style="margin-top:14px;">
+              <label class="filter-label">필수 입력 누락 (체크 시 해당 항목이 비어있는 레코드만 노출)</label>
+              <div class="check-grid">
+                <label><input type="checkbox"> 대표 이미지</label>
+                <label><input type="checkbox"> 스토어 로고</label>
+                <label><input type="checkbox"> 상점명</label>
+                <label><input type="checkbox"> AI 소개 카드</label>
+                <label><input type="checkbox"> 스토어 소개글</label>
+                <label><input type="checkbox"> 인트로 이미지</label>
+                <label><input type="checkbox"> 인앱 채팅 채널</label>
+                <label><input type="checkbox"> SNS 채팅 채널</label>
+                <label><input type="checkbox"> 콘텐츠 채널</label>
+                <label><input type="checkbox"> FAQ</label>
+                <label><input type="checkbox"> 담당자</label>
+              </div>
+            </div>
+
+            <div class="filter-cell" style="margin-top:14px;">
+              <label class="filter-label">설정 상태 (다중 선택)</label>
+              <div class="check-grid">
+                <label><input type="checkbox"> 인앱 채팅 ON</label>
+                <label><input type="checkbox"> 환영 메시지 발송</label>
+                <label><input type="checkbox"> 외부링크 ON</label>
+                <label><input type="checkbox"> 메신저 ON</label>
+                <label><input type="checkbox"> 관리자 일괄적용</label>
+                <label><input type="checkbox"> 상품에 일괄적용</label>
+              </div>
+            </div>
+
+            <div class="filter-grid filter-grid-3" style="margin-top:14px;">
+              <div class="filter-cell">
+                <label class="filter-label">FAQ 개수</label>
+                <select class="form-select"><option>전체</option><option>0개</option><option>1~4개</option><option>5개</option><option>5개 초과</option></select>
+              </div>
+              <div class="filter-cell">
+                <label class="filter-label">SNS 채팅 채널 개수</label>
+                <select class="form-select"><option>전체</option><option>없음</option><option>1개</option><option>2~3개</option><option>3개 초과</option></select>
+              </div>
+              <div class="filter-cell">
+                <label class="filter-label">담당자 수</label>
+                <select class="form-select"><option>전체</option><option>1명</option><option>2명</option><option>3명</option></select>
+              </div>
+            </div>
+          </div>
+
+          <div class="filter-foot">
+            <div class="filter-tags">
+              <span class="active-tag">언어: 한/영/중 <button>×</button></span>
+              <span class="active-tag">카테고리: 피부과/성형외과 <button>×</button></span>
+              <span class="active-tag">번역상태: 일부 미번역 <button>×</button></span>
+            </div>
+            <button class="btn btn-primary">검색 (예상 23건)</button>
+          </div>
         </div>
 
         <div class="card">
@@ -603,6 +766,19 @@ function showView(name) {
   document.getElementById('view-' + name).classList.add('active');
   document.querySelectorAll('.menu-sub').forEach(el => el.classList.remove('active'));
   document.getElementById('nav-' + name).classList.add('active');
+}
+
+/* ── Filter chip toggle ── */
+document.querySelectorAll('.filter-chip').forEach(c => {
+  c.addEventListener('click', () => c.classList.toggle('on'));
+});
+
+function resetFilters() {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('on'));
+  document.querySelectorAll('.filter-card input[type="checkbox"]').forEach(c => c.checked = false);
+  document.querySelectorAll('.filter-card .form-input').forEach(c => c.value = '');
+  document.querySelectorAll('.filter-card .form-select').forEach(c => c.selectedIndex = 0);
+  document.querySelectorAll('.active-tag').forEach(t => t.remove());
 }
 </script>
 </body>
