@@ -365,6 +365,60 @@ body {
 
 .fo-preview-note { text-align: center; font-size: 10px; color: var(--text3); padding: 12px 0 16px; background: #f0f0f2; }
 
+/* ══ 이미지 비율 & 가이드 ══ */
+.img-picker-preview.ratio-16-9 { aspect-ratio: 16/9; height: auto; min-height: 0; max-width: 240px; }
+.img-picker-preview.ratio-4-3  { aspect-ratio: 4/3;  height: auto; min-height: 0; max-width: 180px; }
+.img-size-guide { font-size: 11px; color: var(--text3); margin-top: 6px; line-height: 1.7; }
+.img-size-guide strong { color: var(--text2); font-weight: 600; }
+
+/* ══ 로고 업로더 ══ */
+.logo-upload-area { display: flex; gap: 14px; align-items: flex-start; }
+.logo-upload-preview {
+  width: 180px; height: 60px; border: 1.5px dashed var(--border-input);
+  border-radius: 6px; display: flex; align-items: center; justify-content: center;
+  color: var(--text3); font-size: 11px; cursor: pointer; flex-shrink: 0;
+  background: var(--gray-bg); transition: border-color 0.15s;
+}
+.logo-upload-preview:hover { border-color: var(--primary); }
+.logo-upload-guide { font-size: 11px; color: var(--text3); line-height: 1.8; padding-top: 2px; }
+.logo-upload-guide strong { color: var(--text2); font-weight: 600; }
+
+/* ══ 담당자 행 ══ */
+.contact-rows { display: flex; flex-direction: column; gap: 8px; }
+.contact-row-item { display: flex; gap: 8px; align-items: center; }
+.contact-req-badge { font-size: 10px; font-weight: 700; color: var(--red); flex-shrink: 0; width: 28px; text-align: center; }
+
+/* ══ 채널 언어탭 구조 ══ */
+.channel-lang-tabs { display: flex; gap: 4px; margin-bottom: 14px; flex-wrap: wrap; }
+.channel-lang-tab {
+  padding: 4px 12px; border: 1px solid var(--border); border-radius: 100px;
+  font-size: 11px; font-weight: 600; color: var(--text3); cursor: pointer;
+  background: #fff; font-family: inherit; transition: all 0.12s;
+}
+.channel-lang-tab.active { background: var(--text1); border-color: var(--text1); color: #fff; }
+.channel-lang-panel { display: none; }
+.channel-lang-panel.active { display: block; }
+.channel-row-new { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
+.channel-cta-badge {
+  font-size: 9px; font-weight: 700; background: var(--primary-l); color: var(--primary);
+  padding: 2px 6px; border-radius: 4px; flex-shrink: 0; letter-spacing: 0.3px;
+}
+
+/* ══ 언어 노출 토글 (간소화) ══ */
+.lang-expose-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0 12px; border-bottom: 1px solid var(--border); margin-bottom: 14px;
+}
+.lang-expose-left { display: flex; align-items: center; gap: 8px; }
+.lang-expose-right { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text2); }
+
+/* ══ 자동번역 안내 ══ */
+.auto-trans-note {
+  font-size: 11px; color: var(--text3); background: var(--gray-bg);
+  border-radius: 6px; padding: 7px 10px; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 5px;
+}
+
 /* ══ v3 업그레이드 CSS ══ */
 
 /* 탭 스트립 */
@@ -824,19 +878,6 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
           <button class="btn btn-sm btn-primary">저장</button>
         </div>
       </div>
-      <!-- 3안 기본정보 anchor-bar -->
-      <div class="anchor-bar" id="v3-basic-anchor-bar">
-        <div class="anchor-scroll-inner">
-          <button class="anchor-btn active" onclick="scrollToSection('s3-contact', this)">담당자·연락처</button>
-          <button class="anchor-btn" onclick="scrollToSection('s3-location', this)">위치정보</button>
-          <button class="anchor-btn" onclick="scrollToSection('s3-hours', this)">운영시간</button>
-          <button class="anchor-btn" onclick="scrollToSection('s3-feature', this)">스토어특징</button>
-        </div>
-        <div class="bar-actions">
-          <button class="btn btn-sm btn-secondary">취소</button>
-          <button class="btn btn-sm btn-primary">저장</button>
-        </div>
-      </div>
     </div>
 
     <!-- Content wrap: form + FO preview panel -->
@@ -860,7 +901,7 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
                 <div class="form-label">이미지</div>
                 <div class="form-control">
                   <div class="img-picker-area" id="hero-picker-v1">
-                    <div class="img-picker-preview" onclick="openGalleryPicker('hero-picker-v1')">
+                    <div class="img-picker-preview ratio-16-9" onclick="openGalleryPicker('hero-picker-v1')">
                       <span class="img-picker-placeholder">클릭하여 갤러리에서 선택</span>
                       <div class="img-selected-preview"></div>
                     </div>
@@ -868,6 +909,7 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
                       <button class="btn btn-sm btn-secondary" onclick="openGalleryPicker('hero-picker-v1')">갤러리에서 선택</button>
                       <button class="btn btn-sm btn-ghost">직접 업로드</button>
                     </div>
+                    <div class="img-size-guide">권장 비율: <strong>16:9</strong> · 권장 해상도: 1920×1080px 이상 · 최대 10MB · JPG/PNG<br>앱 스토어 상단 슬라이드에 가로형으로 표시됩니다.</div>
                     <div class="source-note" style="flex-direction:column;align-items:flex-start;gap:3px;">
                       <span>출처: 갤러리 관리 &gt; 일반 사진 · <a href="host-gallery.html?tab=general">관리 페이지 바로가기 ↗</a></span>
                       <span>직접 업로드한 이미지는 갤러리 관리 &gt; 일반 사진에도 자동으로 저장됩니다.</span>
@@ -878,27 +920,52 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
             </div>
           </div>
 
-          <!-- 2. 담당자 및 연락처 -->
+          <!-- 2. 스토어 로고 -->
           <div class="card">
-            <div class="card-header">담당자 및 연락처</div>
+            <div class="card-header">스토어 로고</div>
             <div class="card-body">
               <div class="form-row">
-                <div class="form-label">담당자</div>
+                <div class="form-label">로고 이미지 <span class="req">*</span></div>
                 <div class="form-control">
-                  <div style="display:flex;gap:8px;margin-bottom:8px;">
-                    <input class="input" placeholder="담당자 이름" style="flex:1;" value="김담당" />
-                    <input class="input" placeholder="전화번호" style="flex:1;" value="02-1234-5678" />
-                  </div>
-                  <div style="display:flex;gap:8px;">
-                    <input class="input" placeholder="담당자 이름 2 (선택)" style="flex:1;" />
-                    <input class="input" placeholder="전화번호" style="flex:1;" />
+                  <div class="logo-upload-area">
+                    <div class="logo-upload-preview" onclick="this.classList.toggle('has-logo')">
+                      <span>로고 업로드</span>
+                    </div>
+                    <div>
+                      <div style="display:flex;gap:6px;margin-bottom:8px;">
+                        <button class="btn btn-sm btn-secondary">갤러리에서 선택</button>
+                        <button class="btn btn-sm btn-ghost">직접 업로드</button>
+                      </div>
+                      <div class="img-size-guide">권장 크기: <strong>가로형</strong> (3:1 ~ 5:1 비율)<br>투명 배경(PNG) 권장 · 최대 5MB<br>앱 내 스토어명 자리에 로고가 표시됩니다.</div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- 3. 위치 정보 (지하철) -->
+          <!-- 3. 담당자 및 연락처 -->
+          <div class="card">
+            <div class="card-header">담당자 및 연락처</div>
+            <div class="card-body">
+              <div class="form-row">
+                <div class="form-label">담당자</div>
+                <div class="form-control">
+                  <div class="contact-rows" id="v1-contact-rows">
+                    <div class="contact-row-item">
+                      <span class="contact-req-badge">필수</span>
+                      <input class="input" placeholder="담당자 이름" style="flex:1;" value="김담당" />
+                      <input class="input" placeholder="전화번호" style="flex:1.2;" value="02-1234-5678" />
+                      <div style="width:32px;flex-shrink:0;"></div>
+                    </div>
+                  </div>
+                  <button class="btn btn-secondary btn-sm" style="margin-top:8px;" onclick="addContactRow('v1-contact-rows')">+ 담당자 추가 (최대 3명)</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. 위치 정보 (지하철) -->
           <div class="card">
             <div class="card-header">위치 정보 </div>
             <div class="card-body">
@@ -912,10 +979,6 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
                   </div>
                   <div style="margin-top:8px;"><button class="btn btn-secondary btn-sm">+ 역 추가</button></div>
                 </div>
-              </div>
-              <div class="form-row">
-                <div class="form-label">지도 링크 <span style="font-size:11px;font-weight:400;color:var(--text3);">(선택)</span></div>
-                <div class="form-control"><input class="input" placeholder="Google Maps URL" /></div>
               </div>
             </div>
           </div>
@@ -977,92 +1040,103 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
             </div>
           </div>
 
-          <!-- 9. SNS 채팅 채널 -->
+          <!-- SNS 채팅 채널 -->
           <div class="card">
-            <div class="card-header">
-              SNS 채팅 채널
-              <button class="btn btn-secondary btn-sm">+ 채널 추가</button>
-            </div>
+            <div class="card-header">SNS 채팅 채널</div>
             <div class="card-body">
-              <div class="banner banner-info">
+              <div class="banner banner-info" style="margin-bottom:14px;">
                 <span class="banner-icon">ℹ️</span>
                 <div class="banner-body">
-                  <div class="banner-title">고객 앱 채팅 버튼에 표시됩니다.</div>
-                  <div class="banner-desc">언어별로 다른 채널을 설정할 수 있으며, 해당 언어가 활성화된 경우에만 버튼이 노출됩니다.</div>
+                  <div class="banner-title">언어별로 각각 N개 채널을 등록할 수 있습니다.</div>
+                  <div class="banner-desc">해당 언어 고객에게 표시되는 채팅 버튼이 언어별로 달라집니다. 노출 중인 언어에만 표시됩니다.</div>
                 </div>
-              </div>
-              <div class="channel-row">
-                <select class="select" style="width:120px;"><option>WhatsApp</option></select>
-                <select class="select" style="width:110px;"><option>English</option></select>
-                <input class="input" style="flex:1;" value="+82-10-1234-5678" />
-                <button class="btn btn-secondary btn-sm" style="color:#EF4444;flex-shrink:0;">삭제</button>
-              </div>
-              <div class="channel-row">
-                <select class="select" style="width:120px;"><option>LINE</option></select>
-                <select class="select" style="width:110px;"><option>繁體中文</option></select>
-                <input class="input" style="flex:1;" value="@hanmiyeok_tw" />
-                <button class="btn btn-secondary btn-sm" style="color:#EF4444;flex-shrink:0;">삭제</button>
-              </div>
-              <div class="channel-row">
-                <select class="select" style="width:120px;"><option>WeChat</option></select>
-                <select class="select" style="width:110px;"><option>简体中文</option></select>
-                <input class="input" style="flex:1;" value="hanmiyeok_cn" />
-                <button class="btn btn-secondary btn-sm" style="color:#EF4444;flex-shrink:0;">삭제</button>
               </div>
 
-              <!-- 언어별 플로팅 CTA -->
-              <div class="card-inner-divider"></div>
-              <div class="cta-section-title">
-                언어별 플로팅 CTA
-                <span class="cta-section-note">고객 앱 하단 플로팅 버튼에 표시할 채널을 언어별로 설정하세요</span>
+              <!-- 언어 탭 -->
+              <div class="channel-lang-tabs">
+                <button class="channel-lang-tab active" onclick="switchChannelLang(this,'ch-en-v1')">EN</button>
+                <button class="channel-lang-tab" onclick="switchChannelLang(this,'ch-zh-v1')">简体</button>
+                <button class="channel-lang-tab" onclick="switchChannelLang(this,'ch-tw-v1')">繁體</button>
+                <button class="channel-lang-tab" onclick="switchChannelLang(this,'ch-jp-v1')">JP</button>
+                <button class="channel-lang-tab" onclick="switchChannelLang(this,'ch-id-v1')">ID</button>
               </div>
-              <div class="cta-lang-table">
-                <div class="cta-lang-row">
-                  <span class="cta-lang-label">EN</span>
-                  <select class="select" style="flex:1;">
-                    <option value="">설정 안함</option>
-                    <option selected>WhatsApp · +82-10-1234-5678</option>
-                    <option>LINE · @hanmiyeok_tw</option>
-                    <option>WeChat · hanmiyeok_cn</option>
-                  </select>
+
+              <!-- EN -->
+              <div id="ch-en-v1" class="channel-lang-panel active">
+                <div class="channel-row-new">
+                  <select class="select" style="width:120px;"><option>WhatsApp</option><option>LINE</option><option>WeChat</option><option>KakaoTalk</option><option>Telegram</option></select>
+                  <input class="input" style="flex:1;" value="+82-10-1234-5678" placeholder="채널 ID / 번호" />
+                  <button class="btn btn-secondary btn-sm" style="color:#EF4444;flex-shrink:0;">삭제</button>
                 </div>
-                <div class="cta-lang-row">
-                  <span class="cta-lang-label">简体</span>
-                  <select class="select" style="flex:1;">
-                    <option value="">설정 안함</option>
-                    <option>WhatsApp · +82-10-1234-5678</option>
-                    <option>LINE · @hanmiyeok_tw</option>
-                    <option selected>WeChat · hanmiyeok_cn</option>
-                  </select>
-                </div>
-                <div class="cta-lang-row">
-                  <span class="cta-lang-label">繁體</span>
-                  <select class="select" style="flex:1;">
-                    <option value="">설정 안함</option>
-                    <option>WhatsApp · +82-10-1234-5678</option>
-                    <option selected>LINE · @hanmiyeok_tw</option>
-                    <option>WeChat · hanmiyeok_cn</option>
-                  </select>
-                </div>
-                <div class="cta-lang-row">
-                  <span class="cta-lang-label cta-lang-unset">JP</span>
-                  <select class="select" style="flex:1;">
-                    <option value="" selected>설정 안함</option>
-                    <option>WhatsApp · +82-10-1234-5678</option>
-                    <option>LINE · @hanmiyeok_tw</option>
-                    <option>WeChat · hanmiyeok_cn</option>
-                  </select>
-                </div>
-                <div class="cta-lang-row">
-                  <span class="cta-lang-label cta-lang-unset">ID</span>
-                  <select class="select" style="flex:1;">
-                    <option value="" selected>설정 안함</option>
-                    <option>WhatsApp · +82-10-1234-5678</option>
-                    <option>LINE · @hanmiyeok_tw</option>
-                    <option>WeChat · hanmiyeok_cn</option>
-                  </select>
+                <button class="btn btn-secondary btn-sm" style="margin-bottom:12px;" onclick="addChannelRow(this)">+ 채널 추가</button>
+                <div class="card-inner-divider"></div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:10px;">
+                  <span style="font-size:12px;font-weight:600;color:var(--text2);white-space:nowrap;">플로팅 CTA</span>
+                  <select class="select" style="flex:1;"><option selected>WhatsApp · +82-10-1234-5678</option><option value="">설정 안함</option></select>
                 </div>
               </div>
+
+              <!-- 简体 -->
+              <div id="ch-zh-v1" class="channel-lang-panel">
+                <div class="channel-row-new">
+                  <select class="select" style="width:120px;"><option>WeChat</option><option>WhatsApp</option><option>LINE</option><option>KakaoTalk</option><option>Telegram</option></select>
+                  <input class="input" style="flex:1;" value="hanmiyeok_cn" placeholder="채널 ID / 번호" />
+                  <button class="btn btn-secondary btn-sm" style="color:#EF4444;flex-shrink:0;">삭제</button>
+                </div>
+                <div class="channel-row-new">
+                  <select class="select" style="width:120px;"><option>WhatsApp</option><option>WeChat</option><option>LINE</option><option>KakaoTalk</option><option>Telegram</option></select>
+                  <input class="input" style="flex:1;" value="+82-10-1234-5678" placeholder="채널 ID / 번호" />
+                  <button class="btn btn-secondary btn-sm" style="color:#EF4444;flex-shrink:0;">삭제</button>
+                </div>
+                <button class="btn btn-secondary btn-sm" style="margin-bottom:12px;" onclick="addChannelRow(this)">+ 채널 추가</button>
+                <div class="card-inner-divider"></div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:10px;">
+                  <span style="font-size:12px;font-weight:600;color:var(--text2);white-space:nowrap;">플로팅 CTA</span>
+                  <select class="select" style="flex:1;"><option selected>WeChat · hanmiyeok_cn</option><option>WhatsApp · +82-10-1234-5678</option><option value="">설정 안함</option></select>
+                </div>
+              </div>
+
+              <!-- 繁體 -->
+              <div id="ch-tw-v1" class="channel-lang-panel">
+                <div class="channel-row-new">
+                  <select class="select" style="width:120px;"><option>LINE</option><option>WhatsApp</option><option>WeChat</option><option>KakaoTalk</option><option>Telegram</option></select>
+                  <input class="input" style="flex:1;" value="@hanmiyeok_tw" placeholder="채널 ID / 번호" />
+                  <button class="btn btn-secondary btn-sm" style="color:#EF4444;flex-shrink:0;">삭제</button>
+                </div>
+                <button class="btn btn-secondary btn-sm" style="margin-bottom:12px;" onclick="addChannelRow(this)">+ 채널 추가</button>
+                <div class="card-inner-divider"></div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:10px;">
+                  <span style="font-size:12px;font-weight:600;color:var(--text2);white-space:nowrap;">플로팅 CTA</span>
+                  <select class="select" style="flex:1;"><option selected>LINE · @hanmiyeok_tw</option><option value="">설정 안함</option></select>
+                </div>
+              </div>
+
+              <!-- JP -->
+              <div id="ch-jp-v1" class="channel-lang-panel">
+                <div style="padding:20px 0;text-align:center;color:var(--text3);font-size:12px;">등록된 채널이 없습니다</div>
+                <button class="btn btn-secondary btn-sm" style="margin-bottom:12px;width:100%;" onclick="addChannelRow(this)">+ 채널 추가</button>
+                <div class="card-inner-divider"></div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:10px;">
+                  <span style="font-size:12px;font-weight:600;color:var(--text2);white-space:nowrap;">플로팅 CTA</span>
+                  <select class="select" style="flex:1;"><option selected value="">설정 안함</option></select>
+                </div>
+              </div>
+
+              <!-- ID -->
+              <div id="ch-id-v1" class="channel-lang-panel">
+                <div class="channel-row-new">
+                  <select class="select" style="width:120px;"><option>WhatsApp</option><option>LINE</option><option>WeChat</option><option>KakaoTalk</option><option>Telegram</option></select>
+                  <input class="input" style="flex:1;" value="+62-812-3456-7890" placeholder="채널 ID / 번호" />
+                  <button class="btn btn-secondary btn-sm" style="color:#EF4444;flex-shrink:0;">삭제</button>
+                </div>
+                <button class="btn btn-secondary btn-sm" style="margin-bottom:12px;" onclick="addChannelRow(this)">+ 채널 추가</button>
+                <div class="card-inner-divider"></div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:10px;">
+                  <span style="font-size:12px;font-weight:600;color:var(--text2);white-space:nowrap;">플로팅 CTA</span>
+                  <select class="select" style="flex:1;"><option selected>WhatsApp · +62-812-3456-7890</option><option value="">설정 안함</option></select>
+                </div>
+              </div>
+
             </div>
           </div>
 
@@ -1090,9 +1164,9 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
             <button class="lang-tab active" onclick="switchLangPanel(this,'lp-ko')">원본</button>
             <button class="lang-tab" onclick="switchLangPanel(this,'lp-en')"><span class="dot dot-ok"></span>EN</button>
             <button class="lang-tab" onclick="switchLangPanel(this,'lp-zh')"><span class="dot dot-ok"></span>简体</button>
-            <button class="lang-tab" onclick="switchLangPanel(this,'lp-tw')"><span class="dot dot-none"></span>繁體</button>
-            <button class="lang-tab" onclick="switchLangPanel(this,'lp-jp')"><span class="dot dot-none"></span>日本語</button>
-            <button class="lang-tab" onclick="switchLangPanel(this,'lp-id')"><span class="dot dot-none"></span>Indonesia</button>
+            <button class="lang-tab" onclick="switchLangPanel(this,'lp-tw')"><span class="dot dot-ok"></span>繁體</button>
+            <button class="lang-tab" onclick="switchLangPanel(this,'lp-jp')"><span class="dot dot-ok"></span>日本語</button>
+            <button class="lang-tab" onclick="switchLangPanel(this,'lp-id')"><span class="dot dot-ok"></span>Indonesia</button>
           </div>
 
           <!-- ── 원본 (한국어) ── -->
@@ -1100,7 +1174,6 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
             <div class="card">
               <div class="card-header">스토어 기본 텍스트 </div>
               <div class="card-body">
-                <div class="form-row"><div class="form-label">스토어명 <span class="req">*</span></div><div class="form-control"><input class="input" id="store-name-ko" value="한미역 의원" oninput="updatePreview()" /></div></div>
                 <div class="form-row"><div class="form-label">기본 주소 <span class="req">*</span></div><div class="form-control"><input class="input" value="서울특별시 강남구 테헤란로 123" /></div></div>
                 <div class="form-row"><div class="form-label">상세 주소</div><div class="form-control"><input class="input" value="9호선 신논현역 도보 5분" /></div></div>
                 <div class="form-row"><div class="form-label">채팅 첫 메시지</div><div class="form-control"><div class="radio-group" style="margin-bottom:8px;"><label class="radio-item"><input type="radio" name="fmsg" checked> 전송</label><label class="radio-item"><input type="radio" name="fmsg"> 미전송</label></div><textarea class="textarea">안녕하세요! 한미역 의원입니다. 궁금하신 점은 편하게 문의해 주세요.</textarea></div></div>
@@ -1115,9 +1188,21 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
               </div>
             </div>
             <div class="card">
-              <div class="card-header">스토어 소개글 </div>
+              <div class="card-header">스토어 소개글 <span style="font-size:11px;font-weight:400;color:var(--text3);">(선택)</span></div>
               <div class="card-body">
-                <div class="form-row"><div class="form-label">소개 이미지</div><div class="form-control"><div class="upload-zone">+ 이미지 업로드 (선택)<br><span class="text-muted" style="margin-top:4px;display:block;">권장: 1:1 비율 · JPG/PNG</span></div></div></div>
+                <div class="form-row">
+                  <div class="form-label">소개 이미지 <span style="font-size:11px;font-weight:400;color:var(--text3);">(선택)</span></div>
+                  <div class="form-control">
+                    <div class="img-picker-area" id="intro-picker-v1ko">
+                      <div class="img-picker-preview ratio-4-3" onclick="openGalleryPicker('intro-picker-v1ko')">
+                        <span class="img-picker-placeholder">클릭하여 갤러리에서 선택</span>
+                        <div class="img-selected-preview"></div>
+                      </div>
+                      <div class="img-picker-actions"><button class="btn btn-sm btn-secondary" onclick="openGalleryPicker('intro-picker-v1ko')">갤러리에서 선택</button><button class="btn btn-sm btn-ghost">직접 업로드</button></div>
+                      <div class="img-size-guide">권장 비율: <strong>4:3</strong> · 권장 해상도: 1200×900px 이상 · 최대 10MB · JPG/PNG</div>
+                    </div>
+                  </div>
+                </div>
                 <div class="form-row"><div class="form-label">제목 <span class="req">*</span></div><div class="form-control"><input class="input" value="경력 20년 리프팅 전문 클리닉" /></div></div>
                 <div class="form-row"><div class="form-label">내용 <span class="req">*</span></div><div class="form-control"><textarea class="textarea" style="min-height:100px;">올쎄라 1세대 도입부터 개원하여 현재까지 많은 사랑을 받고 있습니다. 한국의 최신 의료 기술의 정수를 저희 클리닉에서 만나보실 수 있습니다. 특히 외국인 여러분의 방문 시 불편함이 없도록 각별히 신경쓰고 있습니다.</textarea></div></div>
               </div>
@@ -1126,11 +1211,14 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
 
           <!-- ── English ── -->
           <div id="lp-en" class="lp-panel" style="display:none;">
-            <div class="lang-header"><div class="lang-header-left"><span class="lang-name">English</span><span class="badge badge-ok">노출 중</span></div><div class="lang-header-right"><button class="btn-ghost-primary">🔄 전체 번역</button><span class="text-muted" style="font-size:11px;">오늘 1 / 3회</span><span class="text-muted">앱 노출</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div></div>
+            <div class="lang-expose-row">
+              <div class="lang-expose-left"><span class="lang-name" style="font-size:14px;font-weight:700;">English</span><span class="badge badge-ok">노출 중</span></div>
+              <div class="lang-expose-right"><span>앱 노출</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            </div>
+            <div class="auto-trans-note"><span>✦</span> 한국어 원본 기준으로 자동 번역이 적용됩니다. 직접 수정도 가능합니다.</div>
             <div class="card">
               <div class="card-header">스토어 기본 텍스트</div>
               <div class="card-body">
-                <div class="form-row"><div class="form-label">스토어명</div><div class="form-control"><input class="input" value="Hanmiyeok Clinic" /></div></div>
                 <div class="form-row"><div class="form-label">기본 주소</div><div class="form-control"><input class="input" value="123 Teheran-ro, Gangnam-gu, Seoul" /></div></div>
                 <div class="form-row"><div class="form-label">상세 주소</div><div class="form-control"><input class="input" value="5 min walk from Sinnonhyeon Station (Line 9)" /></div></div>
                 <div class="form-row"><div class="form-label">채팅 첫 메시지</div><div class="form-control"><textarea class="textarea">Hello! Welcome to Hanmiyeok Clinic. Feel free to ask us anything.</textarea></div></div>
@@ -1151,14 +1239,17 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
 
           <!-- ── 简体中文 ── -->
           <div id="lp-zh" class="lp-panel" style="display:none;">
-            <div class="lang-header"><div class="lang-header-left"><span class="lang-name">简体中文</span><span class="badge badge-ok">노출 중</span></div><div class="lang-header-right"><button class="btn-ghost-primary">🔄 전체 번역</button><span class="text-muted" style="font-size:11px;">오늘 1 / 3회</span><span class="text-muted">앱 노출</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div></div>
+            <div class="lang-expose-row">
+              <div class="lang-expose-left"><span class="lang-name" style="font-size:14px;font-weight:700;">简体中文</span><span class="badge badge-ok">노출 중</span></div>
+              <div class="lang-expose-right"><span>앱 노출</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            </div>
+            <div class="auto-trans-note"><span>✦</span> 한국어 원본 기준으로 자동 번역이 적용됩니다. 직접 수정도 가능합니다.</div>
             <div class="card">
               <div class="card-header">스토어 기본 텍스트</div>
               <div class="card-body">
-                <div class="form-row"><div class="form-label">스토어명</div><div class="form-control"><input class="input" value="韩美域诊所" /></div></div>
-                <div class="form-row"><div class="form-label">기본 주소</div><div class="form-control"><input class="input" placeholder="번역 미입력" /></div></div>
-                <div class="form-row"><div class="form-label">상세 주소</div><div class="form-control"><input class="input" placeholder="번역 미입력" /></div></div>
-                <div class="form-row"><div class="form-label">채팅 첫 메시지</div><div class="form-control"><textarea class="textarea" placeholder="번역 미입력"></textarea></div></div>
+                <div class="form-row"><div class="form-label">기본 주소</div><div class="form-control"><input class="input" value="首尔特别市江南区德黑兰路123号" /></div></div>
+                <div class="form-row"><div class="form-label">상세 주소</div><div class="form-control"><input class="input" value="9号线新论铉站步行5分钟" /></div></div>
+                <div class="form-row"><div class="form-label">채팅 첫 메시지</div><div class="form-control"><textarea class="textarea">您好！欢迎来到韩美域诊所。有任何疑问都可以随时咨询我们。</textarea></div></div>
               </div>
             </div>
             <div class="card">
@@ -1168,37 +1259,46 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
             <div class="card">
               <div class="card-header">스토어 소개글</div>
               <div class="card-body">
-                <div class="form-row"><div class="form-label">제목</div><div class="form-control"><input class="input" placeholder="번역 미입력" /></div></div>
-                <div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea" style="min-height:100px;" placeholder="번역 미입력"></textarea></div></div>
+                <div class="form-row"><div class="form-label">제목</div><div class="form-control"><input class="input" value="20年经验的提升专科诊所" /></div></div>
+                <div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea" style="min-height:100px;">自引进第一代超声刀以来，我们一直深受顾客信赖。在我们诊所，您能体验韩国最前沿的医疗美容技术。我们特别为外国访客提供专属服务。</textarea></div></div>
               </div>
             </div>
           </div><!-- /lp-zh -->
 
           <!-- ── 繁體中文 ── -->
           <div id="lp-tw" class="lp-panel" style="display:none;">
-            <div class="lang-header"><div class="lang-header-left"><span class="lang-name">繁體中文</span><span class="badge badge-none">비활성</span></div><div class="lang-header-right"><button class="btn-ghost-primary">🔄 전체 번역</button><span class="text-muted" style="font-size:11px;">오늘 0 / 3회</span><span class="text-muted">앱 노출</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div></div>
-            <div class="banner banner-warn"><span class="banner-icon">⚠️</span><div class="banner-body"><div class="banner-title">번역이 완료되지 않았습니다.</div><div class="banner-desc">번역 버튼을 눌러 자동 번역을 생성하세요.</div></div></div>
-            <div class="card"><div class="card-header">스토어 기본 텍스트</div><div class="card-body"><div class="form-row"><div class="form-label">스토어명</div><div class="form-control"><input class="input" placeholder="번역 미입력" /></div></div><div class="form-row"><div class="form-label">기본 주소</div><div class="form-control"><input class="input" placeholder="번역 미입력" /></div></div><div class="form-row"><div class="form-label">상세 주소</div><div class="form-control"><input class="input" placeholder="번역 미입력" /></div></div><div class="form-row"><div class="form-label">채팅 첫 메시지</div><div class="form-control"><textarea class="textarea" placeholder="번역 미입력"></textarea></div></div></div></div>
-            <div class="card"><div class="card-header">AI 소개 카드</div><div class="card-body"><div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea" placeholder="번역 미입력"></textarea></div></div></div></div>
-            <div class="card"><div class="card-header">스토어 소개글</div><div class="card-body"><div class="form-row"><div class="form-label">제목</div><div class="form-control"><input class="input" placeholder="번역 미입력" /></div></div><div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea" style="min-height:100px;" placeholder="번역 미입력"></textarea></div></div></div></div>
+            <div class="lang-expose-row">
+              <div class="lang-expose-left"><span class="lang-name" style="font-size:14px;font-weight:700;">繁體中文</span><span class="badge badge-ok">노출 중</span></div>
+              <div class="lang-expose-right"><span>앱 노출</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            </div>
+            <div class="auto-trans-note"><span>✦</span> 한국어 원본 기준으로 자동 번역이 적용됩니다. 직접 수정도 가능합니다.</div>
+            <div class="card"><div class="card-header">스토어 기본 텍스트</div><div class="card-body"><div class="form-row"><div class="form-label">기본 주소</div><div class="form-control"><input class="input" value="首爾特別市江南區德黑蘭路123號" /></div></div><div class="form-row"><div class="form-label">상세 주소</div><div class="form-control"><input class="input" value="9號線新論鉉站步行5分鐘" /></div></div><div class="form-row"><div class="form-label">채팅 첫 메시지</div><div class="form-control"><textarea class="textarea">您好！歡迎來到韓美域診所。如有任何疑問，請隨時與我們聯繫。</textarea></div></div></div></div>
+            <div class="card"><div class="card-header">AI 소개 카드</div><div class="card-body"><div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea">由擁有20年經驗的院長親自操刀，專注於超音波提拉的江南專業診所。提供外語諮詢、翻譯陪同及機場接送服務。</textarea></div></div></div></div>
+            <div class="card"><div class="card-header">스토어 소개글</div><div class="card-body"><div class="form-row"><div class="form-label">제목</div><div class="form-control"><input class="input" value="20年經驗的提拉專科診所" /></div></div><div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea" style="min-height:100px;">自引進第一代超音波儀器以來，我們一直深受顧客信賴。在我們診所，您能體驗韓國最前沿的醫療美容技術。我們特別為外國訪客提供專屬服務。</textarea></div></div></div></div>
           </div><!-- /lp-tw -->
 
           <!-- ── 日本語 ── -->
           <div id="lp-jp" class="lp-panel" style="display:none;">
-            <div class="lang-header"><div class="lang-header-left"><span class="lang-name">日本語</span><span class="badge badge-none">비활성</span></div><div class="lang-header-right"><button class="btn-ghost-primary">🔄 전체 번역</button><span class="text-muted" style="font-size:11px;">오늘 0 / 3회</span><span class="text-muted">앱 노출</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div></div>
-            <div class="banner banner-warn"><span class="banner-icon">⚠️</span><div class="banner-body"><div class="banner-title">번역이 완료되지 않았습니다.</div><div class="banner-desc">번역 버튼을 눌러 자동 번역을 생성하세요.</div></div></div>
-            <div class="card"><div class="card-header">스토어 기본 텍스트</div><div class="card-body"><div class="form-row"><div class="form-label">스토어명</div><div class="form-control"><input class="input" placeholder="번역 미입력" /></div></div><div class="form-row"><div class="form-label">기본 주소</div><div class="form-control"><input class="input" placeholder="번역 미입력" /></div></div><div class="form-row"><div class="form-label">상세 주소</div><div class="form-control"><input class="input" placeholder="번역 미입력" /></div></div><div class="form-row"><div class="form-label">채팅 첫 메시지</div><div class="form-control"><textarea class="textarea" placeholder="번역 미입력"></textarea></div></div></div></div>
-            <div class="card"><div class="card-header">AI 소개 카드</div><div class="card-body"><div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea" placeholder="번역 미입력"></textarea></div></div></div></div>
-            <div class="card"><div class="card-header">스토어 소개글</div><div class="card-body"><div class="form-row"><div class="form-label">제목</div><div class="form-control"><input class="input" placeholder="번역 미입력" /></div></div><div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea" style="min-height:100px;" placeholder="번역 미입력"></textarea></div></div></div></div>
+            <div class="lang-expose-row">
+              <div class="lang-expose-left"><span class="lang-name" style="font-size:14px;font-weight:700;">日本語</span><span class="badge badge-ok">노출 중</span></div>
+              <div class="lang-expose-right"><span>앱 노출</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            </div>
+            <div class="auto-trans-note"><span>✦</span> 한국어 원본 기준으로 자동 번역이 적용됩니다. 직접 수정도 가능합니다.</div>
+            <div class="card"><div class="card-header">스토어 기본 텍스트</div><div class="card-body"><div class="form-row"><div class="form-label">기본 주소</div><div class="form-control"><input class="input" value="ソウル特別市江南区テヘラン路123番地" /></div></div><div class="form-row"><div class="form-label">상세 주소</div><div class="form-control"><input class="input" value="9号線新論峴駅から徒歩5分" /></div></div><div class="form-row"><div class="form-label">채팅 첫 메시지</div><div class="form-control"><textarea class="textarea">こんにちは！ハンミヨククリニックです。ご不明な点はお気軽にご相談ください。</textarea></div></div></div></div>
+            <div class="card"><div class="card-header">AI 소개 카드</div><div class="card-body"><div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea">20年のキャリアを持つ院長が直接施術する、江南のリフティング専門クリニック。ウルセラ・インモード・ボトックス・フィラーを専門とし、外国人患者向けの通訳同行・空港送迎サービスを提供。</textarea></div></div></div></div>
+            <div class="card"><div class="card-header">스토어 소개글</div><div class="card-body"><div class="form-row"><div class="form-label">제목</div><div class="form-control"><input class="input" value="20年の経験を持つリフティング専門クリニック" /></div></div><div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea" style="min-height:100px;">第一世代のウルセラ導入から開院し、現在も多くの方にご愛顧いただいています。韓国最新の医療技術の粋をご体験ください。外国人のお客様が不便なく過ごせるよう特別に配慮しています。</textarea></div></div></div></div>
           </div><!-- /lp-jp -->
 
           <!-- ── Indonesia ── -->
           <div id="lp-id" class="lp-panel" style="display:none;">
-            <div class="lang-header"><div class="lang-header-left"><span class="lang-name">Indonesia</span><span class="badge badge-none">비활성</span></div><div class="lang-header-right"><button class="btn-ghost-primary">🔄 전체 번역</button><span class="text-muted" style="font-size:11px;">오늘 0 / 3회</span><span class="text-muted">앱 노출</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div></div>
-            <div class="banner banner-warn"><span class="banner-icon">⚠️</span><div class="banner-body"><div class="banner-title">번역이 완료되지 않았습니다.</div><div class="banner-desc">번역 버튼을 눌러 자동 번역을 생성하세요.</div></div></div>
-            <div class="card"><div class="card-header">스토어 기본 텍스트</div><div class="card-body"><div class="form-row"><div class="form-label">스토어명</div><div class="form-control"><input class="input" placeholder="번역 미입력" /></div></div><div class="form-row"><div class="form-label">기본 주소</div><div class="form-control"><input class="input" placeholder="번역 미입력" /></div></div><div class="form-row"><div class="form-label">상세 주소</div><div class="form-control"><input class="input" placeholder="번역 미입력" /></div></div><div class="form-row"><div class="form-label">채팅 첫 메시지</div><div class="form-control"><textarea class="textarea" placeholder="번역 미입력"></textarea></div></div></div></div>
-            <div class="card"><div class="card-header">AI 소개 카드</div><div class="card-body"><div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea" placeholder="번역 미입력"></textarea></div></div></div></div>
-            <div class="card"><div class="card-header">스토어 소개글</div><div class="card-body"><div class="form-row"><div class="form-label">제목</div><div class="form-control"><input class="input" placeholder="번역 미입력" /></div></div><div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea" style="min-height:100px;" placeholder="번역 미입력"></textarea></div></div></div></div>
+            <div class="lang-expose-row">
+              <div class="lang-expose-left"><span class="lang-name" style="font-size:14px;font-weight:700;">Indonesia</span><span class="badge badge-ok">노출 중</span></div>
+              <div class="lang-expose-right"><span>앱 노출</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            </div>
+            <div class="auto-trans-note"><span>✦</span> 한국어 원본 기준으로 자동 번역이 적용됩니다. 직접 수정도 가능합니다.</div>
+            <div class="card"><div class="card-header">스토어 기본 텍스트</div><div class="card-body"><div class="form-row"><div class="form-label">기본 주소</div><div class="form-control"><input class="input" value="123 Jalan Teheran-ro, Gangnam-gu, Seoul" /></div></div><div class="form-row"><div class="form-label">상세 주소</div><div class="form-control"><input class="input" value="5 menit berjalan dari Stasiun Sinnonhyeon (Line 9)" /></div></div><div class="form-row"><div class="form-label">채팅 첫 메시지</div><div class="form-control"><textarea class="textarea">Halo! Selamat datang di Klinik Hanmiyeok. Jangan ragu untuk bertanya kepada kami.</textarea></div></div></div></div>
+            <div class="card"><div class="card-header">AI 소개 카드</div><div class="card-body"><div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea">Klinik spesialis lifting di Gangnam yang ditangani langsung oleh dokter berpengalaman 20 tahun. Spesialis Ultherapy, InMode, Botox, dan filler, dengan layanan penerjemah dan jemput bandara untuk pasien asing.</textarea></div></div></div></div>
+            <div class="card"><div class="card-header">스토어 소개글</div><div class="card-body"><div class="form-row"><div class="form-label">제목</div><div class="form-control"><input class="input" value="Klinik Spesialis Lifting 20 Tahun Pengalaman" /></div></div><div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea" style="min-height:100px;">Kami telah dipercaya sejak memperkenalkan Ultherapy generasi pertama. Rasakan teknologi medis Korea terkini di klinik kami. Kami memberikan perhatian khusus agar pengunjung asing merasa nyaman.</textarea></div></div></div></div>
           </div><!-- /lp-id -->
 
         </div><!-- /tab-1 -->
@@ -1240,20 +1340,13 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
                 <button class="lang-tab active" onclick="switchFaqLang(this,'faq-en')"><span class="dot dot-ok"></span>EN</button>
                 <button class="lang-tab" onclick="switchFaqLang(this,'faq-zh')"><span class="dot dot-ok"></span>简体</button>
                 <button class="lang-tab" onclick="switchFaqLang(this,'faq-tw')"><span class="dot dot-ok"></span>繁體</button>
-                <button class="lang-tab" onclick="switchFaqLang(this,'faq-jp')"><span class="dot dot-none"></span>日本語</button>
-                <button class="lang-tab" onclick="switchFaqLang(this,'faq-id')"><span class="dot dot-none"></span>Indonesia</button>
+                <button class="lang-tab" onclick="switchFaqLang(this,'faq-jp')"><span class="dot dot-ok"></span>日本語</button>
+                <button class="lang-tab" onclick="switchFaqLang(this,'faq-id')"><span class="dot dot-ok"></span>Indonesia</button>
               </div>
 
               <div id="faq-en" class="faq-lang-panel">
-                <div class="lang-header">
-                  <div class="lang-header-left"><span class="lang-name">English</span><span class="badge badge-ok">노출 중</span></div>
-                  <div class="lang-header-right">
-                    <button class="btn-ghost-primary">🔄 번역</button>
-                    <span class="text-muted" style="font-size:11px;">오늘 1 / 3회</span>
-                    <span class="text-muted">앱 노출</span>
-                    <div class="toggle on" onclick="this.classList.toggle('on')"></div>
-                  </div>
-                </div>
+                <div class="lang-expose-row"><div class="lang-expose-left"><span class="lang-name">English</span><span class="badge badge-ok">노출 중</span></div><div class="lang-expose-right"><span>앱 노출</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div></div>
+                <div class="auto-trans-note"><span>✦</span> 자동 번역 적용됨</div>
                 <div class="faq-item" style="margin-bottom:8px;">
                   <div class="faq-q" style="font-weight:600;font-size:12px;">Q. Can foreigners make a reservation and receive treatment?</div>
                   <div class="faq-a"><textarea class="textarea" style="min-height:48px;">Yes, foreign customers can make reservations and receive treatments just like anyone else. Book easily through the KBS app or contact us via chat.</textarea></div>
@@ -1273,15 +1366,8 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
               </div>
 
               <div id="faq-zh" class="faq-lang-panel" style="display:none;">
-                <div class="lang-header">
-                  <div class="lang-header-left"><span class="lang-name">简体中文</span><span class="badge badge-ok">노출 중</span></div>
-                  <div class="lang-header-right">
-                    <button class="btn-ghost-primary">🔄 번역</button>
-                    <span class="text-muted" style="font-size:11px;">오늘 1 / 3회</span>
-                    <span class="text-muted">앱 노출</span>
-                    <div class="toggle on" onclick="this.classList.toggle('on')"></div>
-                  </div>
-                </div>
+                <div class="lang-expose-row"><div class="lang-expose-left"><span class="lang-name">简体中文</span><span class="badge badge-ok">노출 중</span></div><div class="lang-expose-right"><span>앱 노출</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div></div>
+                <div class="auto-trans-note"><span>✦</span> 자동 번역 적용됨</div>
                 <div class="faq-item" style="margin-bottom:8px;">
                   <div class="faq-q" style="font-weight:600;font-size:12px;">Q. 外国人也可以预约和接受治疗吗？</div>
                   <div class="faq-a"><textarea class="textarea" style="min-height:48px;">是的，外国客户可以像其他人一样预约和接受治疗。请通过KBS应用程序预约或通过聊天咨询。</textarea></div>
@@ -1289,15 +1375,8 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
               </div>
 
               <div id="faq-tw" class="faq-lang-panel" style="display:none;">
-                <div class="lang-header">
-                  <div class="lang-header-left"><span class="lang-name">繁體中文</span><span class="badge badge-ok">노출 중</span></div>
-                  <div class="lang-header-right">
-                    <button class="btn-ghost-primary">🔄 번역</button>
-                    <span class="text-muted" style="font-size:11px;">오늘 0 / 3회</span>
-                    <span class="text-muted">앱 노출</span>
-                    <div class="toggle on" onclick="this.classList.toggle('on')"></div>
-                  </div>
-                </div>
+                <div class="lang-expose-row"><div class="lang-expose-left"><span class="lang-name">繁體中文</span><span class="badge badge-ok">노출 중</span></div><div class="lang-expose-right"><span>앱 노출</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div></div>
+                <div class="auto-trans-note"><span>✦</span> 자동 번역 적용됨</div>
                 <div class="faq-item" style="margin-bottom:8px;">
                   <div class="faq-q" style="font-weight:600;font-size:12px;">Q. 外國人也可以預約和接受治療嗎？</div>
                   <div class="faq-a"><textarea class="textarea" style="min-height:48px;">是的，外國客戶可以像其他人一樣預約和接受治療。請透過KBS應用程式預約或透過聊天詢問。</textarea></div>
@@ -1305,41 +1384,21 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
               </div>
 
               <div id="faq-jp" class="faq-lang-panel" style="display:none;">
-                <div class="lang-header">
-                  <div class="lang-header-left"><span class="lang-name">日本語</span><span class="badge badge-none">비활성</span></div>
-                  <div class="lang-header-right">
-                    <button class="btn-ghost-primary">🔄 번역</button>
-                    <span class="text-muted" style="font-size:11px;">오늘 0 / 3회</span>
-                    <span class="text-muted">앱 노출</span>
-                    <div class="toggle" onclick="this.classList.toggle('on')"></div>
-                  </div>
-                </div>
-                <div class="banner banner-warn">
-                  <span class="banner-icon">⚠️</span>
-                  <div class="banner-body">
-                    <div class="banner-title">번역이 완료되지 않았습니다.</div>
-                    <div class="banner-desc">번역 버튼을 눌러 한국어 기준으로 자동 번역을 생성하세요.</div>
-                  </div>
-                </div>
+                <div class="lang-expose-row"><div class="lang-expose-left"><span class="lang-name">日本語</span><span class="badge badge-ok">노출 중</span></div><div class="lang-expose-right"><span>앱 노출</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div></div>
+                <div class="auto-trans-note"><span>✦</span> 자동 번역 적용됨</div>
+                <div class="faq-item" style="margin-bottom:8px;"><div class="faq-q" style="font-weight:600;font-size:12px;">Q. 外国人も予約・施術を受けられますか？</div><div class="faq-a"><textarea class="textarea" style="min-height:48px;">はい、外国のお客様も国内のお客様と同様に予約・施術を受けていただけます。KBSアプリからご予約いただくか、チャットでお問い合わせください。</textarea></div></div>
+                <div class="faq-item" style="margin-bottom:8px;"><div class="faq-q" style="font-weight:600;font-size:12px;">Q. 来院当日の準備は何ですか？</div><div class="faq-a"><textarea class="textarea" style="min-height:48px;">メイクを落としてご来院ください。予約確認書をご持参ください。</textarea></div></div>
+                <div class="faq-item" style="margin-bottom:8px;"><div class="faq-q" style="font-weight:600;font-size:12px;">Q. 施術後すぐに日常生活に戻れますか？</div><div class="faq-a"><textarea class="textarea" style="min-height:48px;">ほとんどの施術は施術直後から日常生活に戻ることができます。施術の種類によってダウンタイムが異なる場合があります。</textarea></div></div>
+                <div class="faq-item" style="margin-bottom:8px;"><div class="faq-q" style="font-weight:600;font-size:12px;">Q. 支払い方法は？</div><div class="faq-a"><textarea class="textarea" style="min-height:48px;">クレジットカード（Visa、Mastercard等の海外カード含む）および現金でお支払いいただけます。</textarea></div></div>
               </div>
 
               <div id="faq-id" class="faq-lang-panel" style="display:none;">
-                <div class="lang-header">
-                  <div class="lang-header-left"><span class="lang-name">Indonesia</span><span class="badge badge-none">비활성</span></div>
-                  <div class="lang-header-right">
-                    <button class="btn-ghost-primary">🔄 번역</button>
-                    <span class="text-muted" style="font-size:11px;">오늘 0 / 3회</span>
-                    <span class="text-muted">앱 노출</span>
-                    <div class="toggle" onclick="this.classList.toggle('on')"></div>
-                  </div>
-                </div>
-                <div class="banner banner-warn">
-                  <span class="banner-icon">⚠️</span>
-                  <div class="banner-body">
-                    <div class="banner-title">번역이 완료되지 않았습니다.</div>
-                    <div class="banner-desc">번역 버튼을 눌러 한국어 기준으로 자동 번역을 생성하세요.</div>
-                  </div>
-                </div>
+                <div class="lang-expose-row"><div class="lang-expose-left"><span class="lang-name">Indonesia</span><span class="badge badge-ok">노출 중</span></div><div class="lang-expose-right"><span>앱 노출</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div></div>
+                <div class="auto-trans-note"><span>✦</span> 자동 번역 적용됨</div>
+                <div class="faq-item" style="margin-bottom:8px;"><div class="faq-q" style="font-weight:600;font-size:12px;">Q. Apakah orang asing bisa membuat reservasi dan menerima perawatan?</div><div class="faq-a"><textarea class="textarea" style="min-height:48px;">Ya, pelanggan asing dapat membuat reservasi dan menerima perawatan seperti pelanggan lokal. Pesan melalui aplikasi KBS atau hubungi kami via chat.</textarea></div></div>
+                <div class="faq-item" style="margin-bottom:8px;"><div class="faq-q" style="font-weight:600;font-size:12px;">Q. Apa yang perlu dipersiapkan saat kunjungan?</div><div class="faq-a"><textarea class="textarea" style="min-height:48px;">Harap datang tanpa makeup. Bawa konfirmasi reservasi Anda.</textarea></div></div>
+                <div class="faq-item" style="margin-bottom:8px;"><div class="faq-q" style="font-weight:600;font-size:12px;">Q. Bisa langsung beraktivitas setelah perawatan?</div><div class="faq-a"><textarea class="textarea" style="min-height:48px;">Sebagian besar perawatan memungkinkan Anda langsung beraktivitas. Waktu pemulihan bervariasi tergantung jenis perawatan.</textarea></div></div>
+                <div class="faq-item" style="margin-bottom:8px;"><div class="faq-q" style="font-weight:600;font-size:12px;">Q. Metode pembayaran apa yang diterima?</div><div class="faq-a"><textarea class="textarea" style="min-height:48px;">Kami menerima kartu kredit (termasuk Visa, Mastercard) dan uang tunai.</textarea></div></div>
               </div>
 
             </div>
@@ -1361,7 +1420,7 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
                 <div class="form-label">이미지</div>
                 <div class="form-control">
                   <div class="img-picker-area" id="hero-picker-v2">
-                    <div class="img-picker-preview" onclick="openGalleryPicker('hero-picker-v2')">
+                    <div class="img-picker-preview ratio-16-9" onclick="openGalleryPicker('hero-picker-v2')">
                       <span class="img-picker-placeholder">클릭하여 갤러리에서 선택</span>
                       <div class="img-selected-preview"></div>
                     </div>
@@ -1369,6 +1428,7 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
                       <button class="btn btn-sm btn-secondary" onclick="openGalleryPicker('hero-picker-v2')">갤러리에서 선택</button>
                       <button class="btn btn-sm btn-ghost">직접 업로드</button>
                     </div>
+                    <div class="img-size-guide">권장 비율: <strong>16:9</strong> · 권장 해상도: 1920×1080px 이상 · 최대 10MB · JPG/PNG<br>앱 스토어 상단 슬라이드에 가로형으로 표시됩니다.</div>
                     <div class="source-note" style="flex-direction:column;align-items:flex-start;gap:3px;">
                       <span>출처: 갤러리 관리 &gt; 일반 사진 · <a href="host-gallery.html?tab=general">관리 페이지 바로가기 ↗</a></span>
                       <span>직접 업로드한 이미지는 갤러리 관리 &gt; 일반 사진에도 자동으로 저장됩니다.</span>
@@ -1386,48 +1446,50 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
               <button class="card-lang-btn active" onclick="switchCardLang(this,'ct-ko')">원본</button>
               <button class="card-lang-btn" onclick="switchCardLang(this,'ct-en')"><span class="dot dot-ok"></span>EN</button>
               <button class="card-lang-btn" onclick="switchCardLang(this,'ct-zh')"><span class="dot dot-ok"></span>简体</button>
-              <button class="card-lang-btn" onclick="switchCardLang(this,'ct-tw')"><span class="dot dot-none"></span>繁體</button>
-              <button class="card-lang-btn" onclick="switchCardLang(this,'ct-jp')"><span class="dot dot-none"></span>日本語</button>
-              <button class="card-lang-btn" onclick="switchCardLang(this,'ct-id')"><span class="dot dot-none"></span>Indonesia</button>
+              <button class="card-lang-btn" onclick="switchCardLang(this,'ct-tw')"><span class="dot dot-ok"></span>繁體</button>
+              <button class="card-lang-btn" onclick="switchCardLang(this,'ct-jp')"><span class="dot dot-ok"></span>日本語</button>
+              <button class="card-lang-btn" onclick="switchCardLang(this,'ct-id')"><span class="dot dot-ok"></span>Indonesia</button>
             </div>
             <div class="card-body">
               <div id="ct-ko" class="card-lang-panel active">
-                <div class="form-row"><div class="form-label">스토어명 <span class="req">*</span></div><div class="form-control"><input class="input" value="한미역 의원" /></div></div>
                 <div class="form-row"><div class="form-label">기본 주소 <span class="req">*</span></div><div class="form-control"><input class="input" value="서울특별시 강남구 테헤란로 123" /></div></div>
                 <div class="form-row"><div class="form-label">상세 주소</div><div class="form-control"><input class="input" value="9호선 신논현역 도보 5분" /></div></div>
                 <div class="form-row"><div class="form-label">채팅 첫 메시지</div><div class="form-control"><div class="radio-group" style="margin-bottom:8px;"><label class="radio-item"><input type="radio" name="fmsg2" checked> 전송</label><label class="radio-item"><input type="radio" name="fmsg2"> 미전송</label></div><textarea class="textarea">안녕하세요! 한미역 의원입니다. 궁금하신 점은 편하게 문의해 주세요.</textarea></div></div>
               </div>
               <div id="ct-en" class="card-lang-panel">
-                <div class="lang-header" style="margin-bottom:12px;"><div class="lang-header-left"><span class="lang-name">English</span><span class="badge badge-ok">노출 중</span></div><div class="lang-header-right"><button class="btn-ghost-primary">🔄 번역</button><span class="text-muted">앱 노출</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div></div>
-                <div class="form-row"><div class="form-label">스토어명</div><div class="form-control"><input class="input" value="Hanmiyeok Clinic" /></div></div>
+                <div class="lang-expose-row"><div class="lang-expose-left"><span class="lang-name">English</span><span class="badge badge-ok">노출 중</span></div><div class="lang-expose-right"><span>앱 노출</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div></div>
+                <div class="auto-trans-note"><span>✦</span> 자동 번역 적용됨</div>
                 <div class="form-row"><div class="form-label">기본 주소</div><div class="form-control"><input class="input" value="123 Teheran-ro, Gangnam-gu, Seoul" /></div></div>
                 <div class="form-row"><div class="form-label">상세 주소</div><div class="form-control"><input class="input" value="5 min walk from Sinnonhyeon Station (Line 9)" /></div></div>
                 <div class="form-row"><div class="form-label">채팅 첫 메시지</div><div class="form-control"><textarea class="textarea">Hello! Welcome to Hanmiyeok Clinic. Feel free to ask us anything.</textarea></div></div>
               </div>
               <div id="ct-zh" class="card-lang-panel">
-                <div class="lang-header" style="margin-bottom:12px;"><div class="lang-header-left"><span class="lang-name">简体中文</span><span class="badge badge-ok">노출 중</span></div><div class="lang-header-right"><button class="btn-ghost-primary">🔄 번역</button><span class="text-muted">앱 노출</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div></div>
-                <div class="form-row"><div class="form-label">스토어명</div><div class="form-control"><input class="input" value="韩美域诊所" /></div></div>
-                <div class="form-row"><div class="form-label">기본 주소</div><div class="form-control"><input class="input" placeholder="번역 미입력" /></div></div>
-                <div class="form-row"><div class="form-label">채팅 첫 메시지</div><div class="form-control"><textarea class="textarea" placeholder="번역 미입력"></textarea></div></div>
+                <div class="lang-expose-row"><div class="lang-expose-left"><span class="lang-name">简体中文</span><span class="badge badge-ok">노출 중</span></div><div class="lang-expose-right"><span>앱 노출</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div></div>
+                <div class="auto-trans-note"><span>✦</span> 자동 번역 적용됨</div>
+                <div class="form-row"><div class="form-label">기본 주소</div><div class="form-control"><input class="input" value="首尔特别市江南区德黑兰路123号" /></div></div>
+                <div class="form-row"><div class="form-label">상세 주소</div><div class="form-control"><input class="input" value="9号线新论铉站步行5分钟" /></div></div>
+                <div class="form-row"><div class="form-label">채팅 첫 메시지</div><div class="form-control"><textarea class="textarea">您好！欢迎来到韩美域诊所。有任何疑问都可以随时咨询我们。</textarea></div></div>
               </div>
               <div id="ct-tw" class="card-lang-panel">
-                <div class="lang-header" style="margin-bottom:12px;"><div class="lang-header-left"><span class="lang-name">繁體中文</span><span class="badge badge-none">비활성</span></div><div class="lang-header-right"><button class="btn-ghost-primary">🔄 번역</button><span class="text-muted">앱 노출</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div></div>
-                <div class="banner banner-warn" style="margin-bottom:12px;"><span class="banner-icon">⚠️</span><div class="banner-body"><div class="banner-title">번역이 완료되지 않았습니다.</div></div></div>
-                <div class="form-row"><div class="form-label">스토어명</div><div class="form-control"><input class="input" placeholder="번역 미입력" /></div></div>
-                <div class="form-row"><div class="form-label">기본 주소</div><div class="form-control"><input class="input" placeholder="번역 미입력" /></div></div>
-                <div class="form-row"><div class="form-label">채팅 첫 메시지</div><div class="form-control"><textarea class="textarea" placeholder="번역 미입력"></textarea></div></div>
+                <div class="lang-expose-row"><div class="lang-expose-left"><span class="lang-name">繁體中文</span><span class="badge badge-ok">노출 중</span></div><div class="lang-expose-right"><span>앱 노출</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div></div>
+                <div class="auto-trans-note"><span>✦</span> 자동 번역 적용됨</div>
+                <div class="form-row"><div class="form-label">기본 주소</div><div class="form-control"><input class="input" value="首爾特別市江南區德黑蘭路123號" /></div></div>
+                <div class="form-row"><div class="form-label">상세 주소</div><div class="form-control"><input class="input" value="9號線新論鉉站步行5分鐘" /></div></div>
+                <div class="form-row"><div class="form-label">채팅 첫 메시지</div><div class="form-control"><textarea class="textarea">您好！歡迎來到韓美域診所。如有任何疑問，請隨時與我們聯繫。</textarea></div></div>
               </div>
               <div id="ct-jp" class="card-lang-panel">
-                <div class="lang-header" style="margin-bottom:12px;"><div class="lang-header-left"><span class="lang-name">日本語</span><span class="badge badge-none">비활성</span></div><div class="lang-header-right"><button class="btn-ghost-primary">🔄 번역</button><span class="text-muted">앱 노출</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div></div>
-                <div class="banner banner-warn" style="margin-bottom:12px;"><span class="banner-icon">⚠️</span><div class="banner-body"><div class="banner-title">번역이 완료되지 않았습니다.</div></div></div>
-                <div class="form-row"><div class="form-label">스토어명</div><div class="form-control"><input class="input" placeholder="번역 미입력" /></div></div>
-                <div class="form-row"><div class="form-label">채팅 첫 메시지</div><div class="form-control"><textarea class="textarea" placeholder="번역 미입력"></textarea></div></div>
+                <div class="lang-expose-row"><div class="lang-expose-left"><span class="lang-name">日本語</span><span class="badge badge-ok">노출 중</span></div><div class="lang-expose-right"><span>앱 노출</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div></div>
+                <div class="auto-trans-note"><span>✦</span> 자동 번역 적용됨</div>
+                <div class="form-row"><div class="form-label">기본 주소</div><div class="form-control"><input class="input" value="ソウル特別市江南区テヘラン路123番地" /></div></div>
+                <div class="form-row"><div class="form-label">상세 주소</div><div class="form-control"><input class="input" value="9号線新論峴駅から徒歩5分" /></div></div>
+                <div class="form-row"><div class="form-label">채팅 첫 메시지</div><div class="form-control"><textarea class="textarea">こんにちは！ハンミヨククリニックです。ご不明な点はお気軽にご相談ください。</textarea></div></div>
               </div>
               <div id="ct-id" class="card-lang-panel">
-                <div class="lang-header" style="margin-bottom:12px;"><div class="lang-header-left"><span class="lang-name">Indonesia</span><span class="badge badge-none">비활성</span></div><div class="lang-header-right"><button class="btn-ghost-primary">🔄 번역</button><span class="text-muted">앱 노출</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div></div>
-                <div class="banner banner-warn" style="margin-bottom:12px;"><span class="banner-icon">⚠️</span><div class="banner-body"><div class="banner-title">번역이 완료되지 않았습니다.</div></div></div>
-                <div class="form-row"><div class="form-label">스토어명</div><div class="form-control"><input class="input" placeholder="번역 미입력" /></div></div>
-                <div class="form-row"><div class="form-label">채팅 첫 메시지</div><div class="form-control"><textarea class="textarea" placeholder="번역 미입력"></textarea></div></div>
+                <div class="lang-expose-row"><div class="lang-expose-left"><span class="lang-name">Indonesia</span><span class="badge badge-ok">노출 중</span></div><div class="lang-expose-right"><span>앱 노출</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div></div>
+                <div class="auto-trans-note"><span>✦</span> 자동 번역 적용됨</div>
+                <div class="form-row"><div class="form-label">기본 주소</div><div class="form-control"><input class="input" value="123 Jalan Teheran-ro, Gangnam-gu, Seoul" /></div></div>
+                <div class="form-row"><div class="form-label">상세 주소</div><div class="form-control"><input class="input" value="5 menit berjalan dari Stasiun Sinnonhyeon (Line 9)" /></div></div>
+                <div class="form-row"><div class="form-label">채팅 첫 메시지</div><div class="form-control"><textarea class="textarea">Halo! Selamat datang di Klinik Hanmiyeok. Jangan ragu untuk bertanya kepada kami.</textarea></div></div>
               </div>
             </div>
           </div>
@@ -1437,7 +1499,6 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
             <div class="card-header">위치 정보 </div>
             <div class="card-body">
               <div class="form-row"><div class="form-label">가까운 지하철역</div><div class="form-control"><select class="select" style="width:100%;margin-bottom:8px;"><option>지하철 노선 선택</option></select><div class="tag-list"><span class="tag-item">명동역 4호선 <span class="del">×</span></span><span class="tag-item">을지로입구역 2호선 <span class="del">×</span></span></div><div style="margin-top:8px;"><button class="btn btn-secondary btn-sm">+ 역 추가</button></div></div></div>
-              <div class="form-row"><div class="form-label">지도 링크 <span style="font-size:11px;font-weight:400;color:var(--text3);">(선택)</span></div><div class="form-control"><input class="input" placeholder="Google Maps URL" /></div></div>
             </div>
           </div>
           <div class="card v2-section" data-v3-group="basic" id="s-hours" style="margin-top:-8px;">
@@ -1472,24 +1533,52 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
 
           <!-- ⑤ 채팅 채널 -->
           <div class="card v2-section" data-v3-group="expose" id="s-channel">
-            <div class="card-header">SNS 채팅 채널 <button class="btn btn-secondary btn-sm" style="margin-left:auto;">+ 채널 추가</button></div>
+            <div class="card-header">SNS 채팅 채널</div>
             <div class="card-body">
-              <div class="channel-row"><select class="select" style="width:120px;"><option>WhatsApp</option></select><select class="select" style="width:110px;"><option>English</option></select><input class="input" style="flex:1;" value="+82-10-1234-5678" /><button class="btn btn-secondary btn-sm" style="color:#EF4444;flex-shrink:0;">삭제</button></div>
-              <div class="channel-row"><select class="select" style="width:120px;"><option>LINE</option></select><select class="select" style="width:110px;"><option>繁體中文</option></select><input class="input" style="flex:1;" value="@hanmiyeok_tw" /><button class="btn btn-secondary btn-sm" style="color:#EF4444;flex-shrink:0;">삭제</button></div>
-              <div class="channel-row"><select class="select" style="width:120px;"><option>WeChat</option></select><select class="select" style="width:110px;"><option>简体中文</option></select><input class="input" style="flex:1;" value="hanmiyeok_cn" /><button class="btn btn-secondary btn-sm" style="color:#EF4444;flex-shrink:0;">삭제</button></div>
-
-              <!-- 언어별 플로팅 CTA -->
-              <div class="card-inner-divider"></div>
-              <div class="cta-section-title">
-                언어별 플로팅 CTA
-                <span class="cta-section-note">고객 앱 하단 플로팅 버튼에 표시할 채널을 언어별로 설정하세요</span>
+              <div class="banner banner-info" style="margin-bottom:14px;">
+                <span class="banner-icon">ℹ️</span>
+                <div class="banner-body">
+                  <div class="banner-title">언어별로 각각 N개 채널을 등록할 수 있습니다.</div>
+                  <div class="banner-desc">해당 언어 고객에게 표시되는 채팅 버튼이 언어별로 달라집니다. 노출 중인 언어에만 표시됩니다.</div>
+                </div>
               </div>
-              <div class="cta-lang-table">
-                <div class="cta-lang-row"><span class="cta-lang-label">EN</span><select class="select" style="flex:1;"><option value="">설정 안함</option><option selected>WhatsApp · +82-10-1234-5678</option><option>LINE · @hanmiyeok_tw</option><option>WeChat · hanmiyeok_cn</option></select></div>
-                <div class="cta-lang-row"><span class="cta-lang-label">简体</span><select class="select" style="flex:1;"><option value="">설정 안함</option><option>WhatsApp · +82-10-1234-5678</option><option>LINE · @hanmiyeok_tw</option><option selected>WeChat · hanmiyeok_cn</option></select></div>
-                <div class="cta-lang-row"><span class="cta-lang-label">繁體</span><select class="select" style="flex:1;"><option value="">설정 안함</option><option>WhatsApp · +82-10-1234-5678</option><option selected>LINE · @hanmiyeok_tw</option><option>WeChat · hanmiyeok_cn</option></select></div>
-                <div class="cta-lang-row"><span class="cta-lang-label cta-lang-unset">JP</span><select class="select" style="flex:1;"><option value="" selected>설정 안함</option><option>WhatsApp · +82-10-1234-5678</option><option>LINE · @hanmiyeok_tw</option><option>WeChat · hanmiyeok_cn</option></select></div>
-                <div class="cta-lang-row"><span class="cta-lang-label cta-lang-unset">ID</span><select class="select" style="flex:1;"><option value="" selected>설정 안함</option><option>WhatsApp · +82-10-1234-5678</option><option>LINE · @hanmiyeok_tw</option><option>WeChat · hanmiyeok_cn</option></select></div>
+              <div class="channel-lang-tabs">
+                <button class="channel-lang-tab active" onclick="switchChannelLang(this,'ch-en-v2')">EN</button>
+                <button class="channel-lang-tab" onclick="switchChannelLang(this,'ch-zh-v2')">简体</button>
+                <button class="channel-lang-tab" onclick="switchChannelLang(this,'ch-tw-v2')">繁體</button>
+                <button class="channel-lang-tab" onclick="switchChannelLang(this,'ch-jp-v2')">JP</button>
+                <button class="channel-lang-tab" onclick="switchChannelLang(this,'ch-id-v2')">ID</button>
+              </div>
+              <div id="ch-en-v2" class="channel-lang-panel active">
+                <div class="channel-row-new"><select class="select" style="width:120px;"><option>WhatsApp</option><option>LINE</option><option>WeChat</option><option>KakaoTalk</option><option>Telegram</option></select><input class="input" style="flex:1;" value="+82-10-1234-5678" /><button class="btn btn-secondary btn-sm" style="color:#EF4444;flex-shrink:0;">삭제</button></div>
+                <button class="btn btn-secondary btn-sm" style="margin-bottom:12px;" onclick="addChannelRow(this)">+ 채널 추가</button>
+                <div class="card-inner-divider"></div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:10px;"><span style="font-size:12px;font-weight:600;color:var(--text2);white-space:nowrap;">플로팅 CTA</span><select class="select" style="flex:1;"><option selected>WhatsApp · +82-10-1234-5678</option><option value="">설정 안함</option></select></div>
+              </div>
+              <div id="ch-zh-v2" class="channel-lang-panel">
+                <div class="channel-row-new"><select class="select" style="width:120px;"><option>WeChat</option><option>WhatsApp</option><option>LINE</option><option>KakaoTalk</option><option>Telegram</option></select><input class="input" style="flex:1;" value="hanmiyeok_cn" /><button class="btn btn-secondary btn-sm" style="color:#EF4444;flex-shrink:0;">삭제</button></div>
+                <div class="channel-row-new"><select class="select" style="width:120px;"><option>WhatsApp</option><option>WeChat</option><option>LINE</option><option>KakaoTalk</option><option>Telegram</option></select><input class="input" style="flex:1;" value="+82-10-1234-5678" /><button class="btn btn-secondary btn-sm" style="color:#EF4444;flex-shrink:0;">삭제</button></div>
+                <button class="btn btn-secondary btn-sm" style="margin-bottom:12px;" onclick="addChannelRow(this)">+ 채널 추가</button>
+                <div class="card-inner-divider"></div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:10px;"><span style="font-size:12px;font-weight:600;color:var(--text2);white-space:nowrap;">플로팅 CTA</span><select class="select" style="flex:1;"><option selected>WeChat · hanmiyeok_cn</option><option>WhatsApp · +82-10-1234-5678</option><option value="">설정 안함</option></select></div>
+              </div>
+              <div id="ch-tw-v2" class="channel-lang-panel">
+                <div class="channel-row-new"><select class="select" style="width:120px;"><option>LINE</option><option>WhatsApp</option><option>WeChat</option><option>KakaoTalk</option><option>Telegram</option></select><input class="input" style="flex:1;" value="@hanmiyeok_tw" /><button class="btn btn-secondary btn-sm" style="color:#EF4444;flex-shrink:0;">삭제</button></div>
+                <button class="btn btn-secondary btn-sm" style="margin-bottom:12px;" onclick="addChannelRow(this)">+ 채널 추가</button>
+                <div class="card-inner-divider"></div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:10px;"><span style="font-size:12px;font-weight:600;color:var(--text2);white-space:nowrap;">플로팅 CTA</span><select class="select" style="flex:1;"><option selected>LINE · @hanmiyeok_tw</option><option value="">설정 안함</option></select></div>
+              </div>
+              <div id="ch-jp-v2" class="channel-lang-panel">
+                <div style="padding:20px 0;text-align:center;color:var(--text3);font-size:12px;">등록된 채널이 없습니다</div>
+                <button class="btn btn-secondary btn-sm" style="margin-bottom:12px;width:100%;" onclick="addChannelRow(this)">+ 채널 추가</button>
+                <div class="card-inner-divider"></div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:10px;"><span style="font-size:12px;font-weight:600;color:var(--text2);white-space:nowrap;">플로팅 CTA</span><select class="select" style="flex:1;"><option selected value="">설정 안함</option></select></div>
+              </div>
+              <div id="ch-id-v2" class="channel-lang-panel">
+                <div class="channel-row-new"><select class="select" style="width:120px;"><option>WhatsApp</option><option>LINE</option><option>WeChat</option><option>KakaoTalk</option><option>Telegram</option></select><input class="input" style="flex:1;" value="+62-812-3456-7890" /><button class="btn btn-secondary btn-sm" style="color:#EF4444;flex-shrink:0;">삭제</button></div>
+                <button class="btn btn-secondary btn-sm" style="margin-bottom:12px;" onclick="addChannelRow(this)">+ 채널 추가</button>
+                <div class="card-inner-divider"></div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:10px;"><span style="font-size:12px;font-weight:600;color:var(--text2);white-space:nowrap;">플로팅 CTA</span><select class="select" style="flex:1;"><option selected>WhatsApp · +62-812-3456-7890</option><option value="">설정 안함</option></select></div>
               </div>
             </div>
           </div>
@@ -1501,9 +1590,9 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
               <button class="card-lang-btn active" onclick="switchCardLang(this,'ai-ko')">원본</button>
               <button class="card-lang-btn" onclick="switchCardLang(this,'ai-en')"><span class="dot dot-ok"></span>EN</button>
               <button class="card-lang-btn" onclick="switchCardLang(this,'ai-zh')"><span class="dot dot-ok"></span>简体</button>
-              <button class="card-lang-btn" onclick="switchCardLang(this,'ai-tw')"><span class="dot dot-none"></span>繁體</button>
-              <button class="card-lang-btn" onclick="switchCardLang(this,'ai-jp')"><span class="dot dot-none"></span>日本語</button>
-              <button class="card-lang-btn" onclick="switchCardLang(this,'ai-id')"><span class="dot dot-none"></span>Indonesia</button>
+              <button class="card-lang-btn" onclick="switchCardLang(this,'ai-tw')"><span class="dot dot-ok"></span>繁體</button>
+              <button class="card-lang-btn" onclick="switchCardLang(this,'ai-jp')"><span class="dot dot-ok"></span>日本語</button>
+              <button class="card-lang-btn" onclick="switchCardLang(this,'ai-id')"><span class="dot dot-ok"></span>Indonesia</button>
             </div>
             <div class="card-body">
               <div id="ai-ko" class="card-lang-panel active">
@@ -1512,49 +1601,82 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
                 <div class="ai-actions"><button class="btn btn-secondary btn-sm">✦ AI 재생성</button><button class="btn btn-secondary btn-sm">직접 수정</button><span class="text-muted" style="font-size:11px;">오늘 1 / 3회 사용</span></div>
               </div>
               <div id="ai-en" class="card-lang-panel">
-                <div class="lang-header" style="margin-bottom:12px;"><div class="lang-header-left"><span class="lang-name">English</span><span class="badge badge-ok">노출 중</span></div><div class="lang-header-right"><button class="btn-ghost-primary">🔄 번역</button><span class="text-muted">앱 노출</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div></div>
+                <div class="auto-trans-note" style="margin-bottom:10px;"><span>✦</span> 자동 번역 적용됨</div>
                 <div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea">A Gangnam lifting specialist clinic led by a 20-year veteran doctor. Specializing in Ultherapy, InMode, Botox, and fillers, with interpreter and airport pickup services for foreign patients.</textarea></div></div>
               </div>
               <div id="ai-zh" class="card-lang-panel">
-                <div class="lang-header" style="margin-bottom:12px;"><div class="lang-header-left"><span class="lang-name">简体中文</span><span class="badge badge-ok">노출 중</span></div><div class="lang-header-right"><button class="btn-ghost-primary">🔄 번역</button><span class="text-muted">앱 노출</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div></div>
+                <div class="auto-trans-note" style="margin-bottom:10px;"><span>✦</span> 자동 번역 적용됨</div>
                 <div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea">由拥有20年经验的院长亲自操刀，专注于超声刀提升的江南专业诊所。提供外语咨询、翻译陪同及机场接送服务。</textarea></div></div>
               </div>
-              <div id="ai-tw" class="card-lang-panel"><div class="banner banner-warn" style="margin-bottom:12px;"><span class="banner-icon">⚠️</span><div class="banner-body"><div class="banner-title">번역이 완료되지 않았습니다.</div></div></div><div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea" placeholder="번역 미입력"></textarea></div></div></div>
-              <div id="ai-jp" class="card-lang-panel"><div class="banner banner-warn" style="margin-bottom:12px;"><span class="banner-icon">⚠️</span><div class="banner-body"><div class="banner-title">번역이 완료되지 않았습니다.</div></div></div><div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea" placeholder="번역 미입력"></textarea></div></div></div>
-              <div id="ai-id" class="card-lang-panel"><div class="banner banner-warn" style="margin-bottom:12px;"><span class="banner-icon">⚠️</span><div class="banner-body"><div class="banner-title">번역이 완료되지 않았습니다.</div></div></div><div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea" placeholder="번역 미입력"></textarea></div></div></div>
+              <div id="ai-tw" class="card-lang-panel">
+                <div class="auto-trans-note" style="margin-bottom:10px;"><span>✦</span> 자동 번역 적용됨</div>
+                <div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea">由擁有20年經驗的院長親自操刀，專注於超音波提拉的江南專業診所。提供外語諮詢、翻譯陪同及機場接送服務。</textarea></div></div>
+              </div>
+              <div id="ai-jp" class="card-lang-panel">
+                <div class="auto-trans-note" style="margin-bottom:10px;"><span>✦</span> 자동 번역 적용됨</div>
+                <div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea">20年のキャリアを持つ院長が直接施術する、江南のリフティング専門クリニック。ウルセラ・インモード・ボトックス・フィラーを専門とし、外国人患者向けの通訳同行・空港送迎サービスを提供。</textarea></div></div>
+              </div>
+              <div id="ai-id" class="card-lang-panel">
+                <div class="auto-trans-note" style="margin-bottom:10px;"><span>✦</span> 자동 번역 적용됨</div>
+                <div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea">Klinik spesialis lifting di Gangnam yang ditangani langsung oleh dokter berpengalaman 20 tahun. Spesialis Ultherapy, InMode, Botox, dan filler, dengan layanan penerjemah dan jemput bandara untuk pasien asing.</textarea></div></div>
+              </div>
             </div>
           </div>
 
           <!-- ⑦ 스토어 소개글 (언어별) -->
           <div class="card v2-section" data-v3-group="expose" id="s-intro">
-            <div class="card-header">스토어 소개글 </div>
+            <div class="card-header">스토어 소개글 <span style="font-size:11px;font-weight:400;color:var(--text3);">(선택)</span></div>
             <div class="card-lang-bar">
               <button class="card-lang-btn active" onclick="switchCardLang(this,'intro-ko')">원본</button>
               <button class="card-lang-btn" onclick="switchCardLang(this,'intro-en')"><span class="dot dot-ok"></span>EN</button>
               <button class="card-lang-btn" onclick="switchCardLang(this,'intro-zh')"><span class="dot dot-ok"></span>简体</button>
-              <button class="card-lang-btn" onclick="switchCardLang(this,'intro-tw')"><span class="dot dot-none"></span>繁體</button>
-              <button class="card-lang-btn" onclick="switchCardLang(this,'intro-jp')"><span class="dot dot-none"></span>日本語</button>
-              <button class="card-lang-btn" onclick="switchCardLang(this,'intro-id')"><span class="dot dot-none"></span>Indonesia</button>
+              <button class="card-lang-btn" onclick="switchCardLang(this,'intro-tw')"><span class="dot dot-ok"></span>繁體</button>
+              <button class="card-lang-btn" onclick="switchCardLang(this,'intro-jp')"><span class="dot dot-ok"></span>日本語</button>
+              <button class="card-lang-btn" onclick="switchCardLang(this,'intro-id')"><span class="dot dot-ok"></span>Indonesia</button>
             </div>
             <div class="card-body">
               <div id="intro-ko" class="card-lang-panel active">
-                <div class="form-row"><div class="form-label">소개 이미지</div><div class="form-control"><div class="upload-zone">+ 이미지 업로드 (선택)<br><span class="text-muted" style="margin-top:4px;display:block;">권장: 1:1 비율 · JPG/PNG</span></div></div></div>
+                <div class="form-row">
+                  <div class="form-label">소개 이미지 <span style="font-size:11px;font-weight:400;color:var(--text3);">(선택)</span></div>
+                  <div class="form-control">
+                    <div class="img-picker-area" id="intro-picker-ko">
+                      <div class="img-picker-preview ratio-4-3" onclick="openGalleryPicker('intro-picker-ko')">
+                        <span class="img-picker-placeholder">클릭하여 갤러리에서 선택</span>
+                        <div class="img-selected-preview"></div>
+                      </div>
+                      <div class="img-picker-actions"><button class="btn btn-sm btn-secondary" onclick="openGalleryPicker('intro-picker-ko')">갤러리에서 선택</button><button class="btn btn-sm btn-ghost">직접 업로드</button></div>
+                      <div class="img-size-guide">권장 비율: <strong>4:3</strong> · 권장 해상도: 1200×900px 이상 · 최대 10MB · JPG/PNG</div>
+                    </div>
+                  </div>
+                </div>
                 <div class="form-row"><div class="form-label">제목 <span class="req">*</span></div><div class="form-control"><input class="input" value="경력 20년 리프팅 전문 클리닉" /></div></div>
-                <div class="form-row"><div class="form-label">내용 <span class="req">*</span></div><div class="form-control"><textarea class="textarea" style="min-height:80px;">올쎄라 1세대 도입부터 개원하여 현재까지 많은 사랑을 받고 있습니다.</textarea></div></div>
+                <div class="form-row"><div class="form-label">내용 <span class="req">*</span></div><div class="form-control"><textarea class="textarea" style="min-height:80px;">올쎄라 1세대 도입부터 개원하여 현재까지 많은 사랑을 받고 있습니다. 한국의 최신 의료 기술의 정수를 저희 클리닉에서 만나보실 수 있습니다.</textarea></div></div>
               </div>
               <div id="intro-en" class="card-lang-panel">
-                <div class="lang-header" style="margin-bottom:12px;"><div class="lang-header-left"><span class="lang-name">English</span><span class="badge badge-ok">노출 중</span></div><div class="lang-header-right"><button class="btn-ghost-primary">🔄 번역</button><span class="text-muted">앱 노출</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div></div>
+                <div class="auto-trans-note" style="margin-bottom:10px;"><span>✦</span> 자동 번역 적용됨</div>
                 <div class="form-row"><div class="form-label">제목</div><div class="form-control"><input class="input" value="20-Year Lifting Specialist Clinic" /></div></div>
-                <div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea" style="min-height:80px;">We have been a trusted clinic since introducing first-generation Ultherapy.</textarea></div></div>
+                <div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea" style="min-height:80px;">We have been a trusted clinic since introducing first-generation Ultherapy. Experience the pinnacle of Korean medical aesthetics at our clinic.</textarea></div></div>
               </div>
               <div id="intro-zh" class="card-lang-panel">
-                <div class="lang-header" style="margin-bottom:12px;"><div class="lang-header-left"><span class="lang-name">简体中文</span><span class="badge badge-ok">노출 중</span></div><div class="lang-header-right"><button class="btn-ghost-primary">🔄 번역</button><span class="text-muted">앱 노출</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div></div>
-                <div class="form-row"><div class="form-label">제목</div><div class="form-control"><input class="input" placeholder="번역 미입력" /></div></div>
-                <div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea" style="min-height:80px;" placeholder="번역 미입력"></textarea></div></div>
+                <div class="auto-trans-note" style="margin-bottom:10px;"><span>✦</span> 자동 번역 적용됨</div>
+                <div class="form-row"><div class="form-label">제목</div><div class="form-control"><input class="input" value="20年经验的提升专科诊所" /></div></div>
+                <div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea" style="min-height:80px;">自引进第一代超声刀以来，我们一直深受顾客信赖。在我们诊所，您能体验韩国最前沿的医疗美容技术。</textarea></div></div>
               </div>
-              <div id="intro-tw" class="card-lang-panel"><div class="banner banner-warn" style="margin-bottom:12px;"><span class="banner-icon">⚠️</span><div class="banner-body"><div class="banner-title">번역이 완료되지 않았습니다.</div></div></div><div class="form-row"><div class="form-label">제목</div><div class="form-control"><input class="input" placeholder="번역 미입력" /></div></div><div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea" style="min-height:80px;" placeholder="번역 미입력"></textarea></div></div></div>
-              <div id="intro-jp" class="card-lang-panel"><div class="banner banner-warn" style="margin-bottom:12px;"><span class="banner-icon">⚠️</span><div class="banner-body"><div class="banner-title">번역이 완료되지 않았습니다.</div></div></div><div class="form-row"><div class="form-label">제목</div><div class="form-control"><input class="input" placeholder="번역 미입력" /></div></div><div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea" style="min-height:80px;" placeholder="번역 미입력"></textarea></div></div></div>
-              <div id="intro-id" class="card-lang-panel"><div class="banner banner-warn" style="margin-bottom:12px;"><span class="banner-icon">⚠️</span><div class="banner-body"><div class="banner-title">번역이 완료되지 않았습니다.</div></div></div><div class="form-row"><div class="form-label">제목</div><div class="form-control"><input class="input" placeholder="번역 미입력" /></div></div><div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea" style="min-height:80px;" placeholder="번역 미입력"></textarea></div></div></div>
+              <div id="intro-tw" class="card-lang-panel">
+                <div class="auto-trans-note" style="margin-bottom:10px;"><span>✦</span> 자동 번역 적용됨</div>
+                <div class="form-row"><div class="form-label">제목</div><div class="form-control"><input class="input" value="20年經驗的提拉專科診所" /></div></div>
+                <div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea" style="min-height:80px;">自引進第一代超音波儀器以來，我們一直深受顧客信賴。在我們診所，您能體驗韓國最前沿的醫療美容技術。</textarea></div></div>
+              </div>
+              <div id="intro-jp" class="card-lang-panel">
+                <div class="auto-trans-note" style="margin-bottom:10px;"><span>✦</span> 자동 번역 적용됨</div>
+                <div class="form-row"><div class="form-label">제목</div><div class="form-control"><input class="input" value="20年の経験を持つリフティング専門クリニック" /></div></div>
+                <div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea" style="min-height:80px;">第一世代のウルセラ導入から開院し、現在も多くの方にご愛顧いただいています。韓国最新の医療技術の粋をご体験ください。</textarea></div></div>
+              </div>
+              <div id="intro-id" class="card-lang-panel">
+                <div class="auto-trans-note" style="margin-bottom:10px;"><span>✦</span> 자동 번역 적용됨</div>
+                <div class="form-row"><div class="form-label">제목</div><div class="form-control"><input class="input" value="Klinik Spesialis Lifting 20 Tahun Pengalaman" /></div></div>
+                <div class="form-row"><div class="form-label">내용</div><div class="form-control"><textarea class="textarea" style="min-height:80px;">Kami telah dipercaya sejak memperkenalkan Ultherapy generasi pertama. Rasakan teknologi medis Korea terkini di klinik kami.</textarea></div></div>
+              </div>
             </div>
           </div>
 
@@ -1565,9 +1687,9 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
               <button class="card-lang-btn active" onclick="switchCardLang(this,'faq2-ko')">원본</button>
               <button class="card-lang-btn" onclick="switchCardLang(this,'faq2-en')"><span class="dot dot-ok"></span>EN</button>
               <button class="card-lang-btn" onclick="switchCardLang(this,'faq2-zh')"><span class="dot dot-ok"></span>简体</button>
-              <button class="card-lang-btn" onclick="switchCardLang(this,'faq2-tw')"><span class="dot dot-none"></span>繁體</button>
-              <button class="card-lang-btn" onclick="switchCardLang(this,'faq2-jp')"><span class="dot dot-none"></span>日本語</button>
-              <button class="card-lang-btn" onclick="switchCardLang(this,'faq2-id')"><span class="dot dot-none"></span>Indonesia</button>
+              <button class="card-lang-btn" onclick="switchCardLang(this,'faq2-tw')"><span class="dot dot-ok"></span>繁體</button>
+              <button class="card-lang-btn" onclick="switchCardLang(this,'faq2-jp')"><span class="dot dot-ok"></span>日本語</button>
+              <button class="card-lang-btn" onclick="switchCardLang(this,'faq2-id')"><span class="dot dot-ok"></span>Indonesia</button>
             </div>
             <div class="card-body">
               <div id="faq2-ko" class="card-lang-panel active">
@@ -1575,17 +1697,30 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
                 <div class="faq-item" style="margin-bottom:8px;"><div class="faq-q" style="font-weight:600;font-size:12px;">Q. 시술 당일 방문 시 준비물이 있나요?</div><div class="faq-a"><textarea class="textarea" style="min-height:48px;">메이크업을 지우고 방문해 주세요. 예약 확인서를 지참하시면 됩니다.</textarea></div></div>
               </div>
               <div id="faq2-en" class="card-lang-panel">
-                <div class="lang-header" style="margin-bottom:12px;"><div class="lang-header-left"><span class="lang-name">English</span><span class="badge badge-ok">노출 중</span></div><div class="lang-header-right"><button class="btn-ghost-primary">🔄 번역</button><span class="text-muted">앱 노출</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div></div>
+                <div class="auto-trans-note" style="margin-bottom:10px;"><span>✦</span> 자동 번역 적용됨</div>
                 <div class="faq-item" style="margin-bottom:8px;"><div class="faq-q" style="font-weight:600;font-size:12px;">Q. Can foreigners make reservations and receive treatments?</div><div class="faq-a"><textarea class="textarea" style="min-height:48px;">Yes, foreign customers can make reservations and receive treatments. Please book via the KBS app or contact us through chat.</textarea></div></div>
                 <div class="faq-item" style="margin-bottom:8px;"><div class="faq-q" style="font-weight:600;font-size:12px;">Q. What should I prepare for a same-day visit?</div><div class="faq-a"><textarea class="textarea" style="min-height:48px;">Please come with your makeup removed. Bring your reservation confirmation.</textarea></div></div>
               </div>
               <div id="faq2-zh" class="card-lang-panel">
-                <div class="lang-header" style="margin-bottom:12px;"><div class="lang-header-left"><span class="lang-name">简体中文</span><span class="badge badge-ok">노출 중</span></div><div class="lang-header-right"><button class="btn-ghost-primary">🔄 번역</button><span class="text-muted">앱 노출</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div></div>
-                <div class="faq-item" style="margin-bottom:8px;"><div class="faq-q" style="font-weight:600;font-size:12px;">Q. 外国人也可以预约和接受治疗吗？</div><div class="faq-a"><textarea class="textarea" style="min-height:48px;">是的，外国客户可以像其他人一样预约和接受治疗。</textarea></div></div>
+                <div class="auto-trans-note" style="margin-bottom:10px;"><span>✦</span> 자동 번역 적용됨</div>
+                <div class="faq-item" style="margin-bottom:8px;"><div class="faq-q" style="font-weight:600;font-size:12px;">Q. 外国人也可以预约和接受治疗吗？</div><div class="faq-a"><textarea class="textarea" style="min-height:48px;">是的，外国客户可以像其他人一样预约和接受治疗。请通过KBS应用预约或通过聊天联系我们。</textarea></div></div>
+                <div class="faq-item" style="margin-bottom:8px;"><div class="faq-q" style="font-weight:600;font-size:12px;">Q. 来诊当天需要准备什么？</div><div class="faq-a"><textarea class="textarea" style="min-height:48px;">请卸妆后来诊。请携带预约确认书。</textarea></div></div>
               </div>
-              <div id="faq2-tw" class="card-lang-panel"><div class="banner banner-warn" style="margin-bottom:12px;"><span class="banner-icon">⚠️</span><div class="banner-body"><div class="banner-title">번역이 완료되지 않았습니다.</div></div></div></div>
-              <div id="faq2-jp" class="card-lang-panel"><div class="banner banner-warn" style="margin-bottom:12px;"><span class="banner-icon">⚠️</span><div class="banner-body"><div class="banner-title">번역이 완료되지 않았습니다.</div></div></div></div>
-              <div id="faq2-id" class="card-lang-panel"><div class="banner banner-warn" style="margin-bottom:12px;"><span class="banner-icon">⚠️</span><div class="banner-body"><div class="banner-title">번역이 완료되지 않았습니다.</div></div></div></div>
+              <div id="faq2-tw" class="card-lang-panel">
+                <div class="auto-trans-note" style="margin-bottom:10px;"><span>✦</span> 자동 번역 적용됨</div>
+                <div class="faq-item" style="margin-bottom:8px;"><div class="faq-q" style="font-weight:600;font-size:12px;">Q. 外國人也可以預約和接受治療嗎？</div><div class="faq-a"><textarea class="textarea" style="min-height:48px;">是的，外國顧客可以和國內顧客一樣預約和接受治療。請透過KBS應用程式預約或透過聊天聯繫我們。</textarea></div></div>
+                <div class="faq-item" style="margin-bottom:8px;"><div class="faq-q" style="font-weight:600;font-size:12px;">Q. 就診當天需要準備什麼？</div><div class="faq-a"><textarea class="textarea" style="min-height:48px;">請卸妝後前來就診。請攜帶預約確認書。</textarea></div></div>
+              </div>
+              <div id="faq2-jp" class="card-lang-panel">
+                <div class="auto-trans-note" style="margin-bottom:10px;"><span>✦</span> 자동 번역 적용됨</div>
+                <div class="faq-item" style="margin-bottom:8px;"><div class="faq-q" style="font-weight:600;font-size:12px;">Q. 外国人も予約・施術を受けられますか？</div><div class="faq-a"><textarea class="textarea" style="min-height:48px;">はい、外国のお客様も国内のお客様と同様に予約・施術を受けていただけます。KBSアプリからご予約いただくか、チャットでお問い合わせください。</textarea></div></div>
+                <div class="faq-item" style="margin-bottom:8px;"><div class="faq-q" style="font-weight:600;font-size:12px;">Q. 来院当日の持ち物は何ですか？</div><div class="faq-a"><textarea class="textarea" style="min-height:48px;">メイクを落としてご来院ください。予約確認書をご持参ください。</textarea></div></div>
+              </div>
+              <div id="faq2-id" class="card-lang-panel">
+                <div class="auto-trans-note" style="margin-bottom:10px;"><span>✦</span> 자동 번역 적용됨</div>
+                <div class="faq-item" style="margin-bottom:8px;"><div class="faq-q" style="font-weight:600;font-size:12px;">Q. Apakah orang asing bisa membuat reservasi dan menerima perawatan?</div><div class="faq-a"><textarea class="textarea" style="min-height:48px;">Ya, pelanggan asing dapat membuat reservasi dan menerima perawatan. Silakan pesan melalui aplikasi KBS atau hubungi kami melalui chat.</textarea></div></div>
+                <div class="faq-item" style="margin-bottom:8px;"><div class="faq-q" style="font-weight:600;font-size:12px;">Q. Apa yang perlu dipersiapkan saat kunjungan?</div><div class="faq-a"><textarea class="textarea" style="min-height:48px;">Harap datang tanpa makeup. Bawa konfirmasi reservasi Anda.</textarea></div></div>
+              </div>
             </div>
           </div>
 
@@ -1603,14 +1738,15 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
               <div class="form-row">
                 <div class="form-label">담당자</div>
                 <div class="form-control">
-                  <div style="display:flex;gap:8px;margin-bottom:8px;">
-                    <input class="input" placeholder="담당자 이름" style="flex:1;" value="김담당" />
-                    <input class="input" placeholder="전화번호" style="flex:1;" value="02-1234-5678" />
+                  <div class="contact-rows" id="v3-contact-rows">
+                    <div class="contact-row-item">
+                      <span class="contact-req-badge">필수</span>
+                      <input class="input" placeholder="담당자 이름" style="flex:1;" value="김담당" />
+                      <input class="input" placeholder="전화번호" style="flex:1.2;" value="02-1234-5678" />
+                      <div style="width:32px;flex-shrink:0;"></div>
+                    </div>
                   </div>
-                  <div style="display:flex;gap:8px;">
-                    <input class="input" placeholder="담당자 이름 2 (선택)" style="flex:1;" />
-                    <input class="input" placeholder="전화번호" style="flex:1;" />
-                  </div>
+                  <button class="btn btn-secondary btn-sm" style="margin-top:8px;" onclick="addContactRow('v3-contact-rows')">+ 담당자 추가 (최대 3명)</button>
                 </div>
               </div>
             </div>
@@ -1630,10 +1766,6 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
                   </div>
                   <div style="margin-top:8px;"><button class="btn btn-secondary btn-sm">+ 역 추가</button></div>
                 </div>
-              </div>
-              <div class="form-row">
-                <div class="form-label">지도 링크 <span style="font-size:11px;font-weight:400;color:var(--text3);">(선택)</span></div>
-                <div class="form-control"><input class="input" placeholder="Google Maps URL" /></div>
               </div>
             </div>
           </div>
@@ -1715,7 +1847,9 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
               <!-- 네비바 -->
               <div class="fo-navbar">
                 <span class="fo-navbar-back">←</span>
-                <span class="fo-navbar-title" id="prev-name-en">Hanmiyeok Clinic</span>
+                <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0;">
+                  <div style="height:22px;min-width:60px;max-width:100px;background:linear-gradient(90deg,#f0f0f0,#e0e0e0);border-radius:4px;flex-shrink:0;"></div>
+                </div>
                 <div class="fo-navbar-icons"><span>🌐</span><span>♡</span></div>
               </div>
 
@@ -1742,7 +1876,7 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
                 <button class="fo-tab-strip-btn">FAQ</button>
               </div>
 
-              <!-- 08 SNS 채널 -->
+              <!-- 08 SNS 채널 — EN: WhatsApp only -->
               <div class="fo-contact-wrap" data-fo-anchor="s-channel">
                 <div class="fo-contact-sub">Consult via SNS</div>
                 <div class="fo-contact-title">Get answers fast —<br>even small questions welcome</div>
@@ -1751,14 +1885,6 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
                 <div class="fo-channel-card">
                   <div><div class="fo-channel-icon" style="background:#25d366;">💬</div><div class="fo-channel-name">WhatsApp</div></div>
                   <div class="fo-channel-link">Connect now</div>
-                </div>
-                <div class="fo-channel-card">
-                  <div><div class="fo-channel-icon" style="background:#06c755;color:#fff;font-weight:800;font-size:14px;">L</div><div class="fo-channel-name">LINE</div></div>
-                  <div class="fo-channel-link">Connect now</div>
-                </div>
-                <div class="fo-channel-card">
-                  <div><div class="fo-channel-icon" style="background:#07c160;">💬</div><div class="fo-channel-name">WeChat</div></div>
-                  <div class="fo-channel-link">Open</div>
                 </div>
               </div>
 
@@ -1977,7 +2103,7 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
             <!-- ── 简体 ── -->
             <div id="fo-zh" style="display:none;">
               <div class="fo-statusbar"><span class="fo-statusbar-time">9:41</span><span class="fo-statusbar-icons">▲ ■ 🔋</span></div>
-              <div class="fo-navbar"><span class="fo-navbar-back">←</span><span class="fo-navbar-title">韩美域诊所</span><div class="fo-navbar-icons"><span>⎙</span><span>♡</span></div></div>
+              <div class="fo-navbar"><span class="fo-navbar-back">←</span><div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0;"><div style="height:22px;min-width:60px;max-width:100px;background:linear-gradient(90deg,#f0f0f0,#e0e0e0);border-radius:4px;flex-shrink:0;"></div></div><div class="fo-navbar-icons"><span>⎙</span><span>♡</span></div></div>
               <div class="fo-hero">
                 <div class="fo-hero-slide"><span>1</span><span class="fo-hero-slide-sep"></span><span>10</span></div>
                 <div class="fo-hero-overlay">
@@ -2028,68 +2154,205 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
             <!-- ── 繁體 ── -->
             <div id="fo-tw" style="display:none;">
               <div class="fo-statusbar"><span class="fo-statusbar-time">9:41</span><span class="fo-statusbar-icons">▲ ■ 🔋</span></div>
-              <div class="fo-navbar"><span class="fo-navbar-back">←</span><span class="fo-navbar-title">韓美域診所</span><div class="fo-navbar-icons"><span>⎙</span><span>♡</span></div></div>
+              <div class="fo-navbar"><span class="fo-navbar-back">←</span><div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0;"><div style="height:22px;min-width:60px;max-width:100px;background:linear-gradient(90deg,#f0f0f0,#e0e0e0);border-radius:4px;flex-shrink:0;"></div></div><div class="fo-navbar-icons"><span>⎙</span><span>♡</span></div></div>
               <div class="fo-hero">
                 <div class="fo-hero-slide"><span>1</span><span class="fo-hero-slide-sep"></span><span>10</span></div>
                 <div class="fo-hero-overlay">
-                  <div class="fo-hero-sub">您好！歡迎了解韓國頂級提升專科診所</div>
+                  <div class="fo-hero-sub" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;"><span style="color:#FFD94A;">★</span><span style="font-size:12px;font-weight:700;">4.9</span><span style="font-size:11px;opacity:0.7;">(2,341)</span><span style="opacity:0.5;margin:0 2px;">·</span><span style="font-size:11px;opacity:0.8;">📍 江南區</span></div>
                   <div class="fo-hero-name">韓國NO.1<br>提升專科診所</div>
                 </div>
               </div>
-              <div class="fo-ai-wrap" style="border-top:1px solid #e4e4e4;">
-                <div class="fo-ai-badge">✦ 關於我們</div>
-                <div class="fo-ai-body" style="color:#8e8e8e;font-style:italic;">번역 미완료 — 번역 버튼을 눌러 생성하세요</div>
+              <div class="fo-tab-strip">
+                <button class="fo-tab-strip-btn active">介紹</button>
+                <button class="fo-tab-strip-btn">商品</button>
+                <button class="fo-tab-strip-btn">B/A</button>
+                <button class="fo-tab-strip-btn">FAQ</button>
+              </div>
+              <div class="fo-contact-wrap" data-fo-anchor="s-channel">
+                <div class="fo-contact-sub">透過SNS諮詢</div>
+                <div class="fo-contact-title">有任何疑問都歡迎詢問</div>
+              </div>
+              <div class="fo-channel-scroll" style="padding: 0 16px 16px;">
+                <div class="fo-channel-card"><div><div class="fo-channel-icon" style="background:#06c755;color:#fff;font-weight:800;font-size:14px;">L</div><div class="fo-channel-name">LINE</div></div><div class="fo-channel-link">立即聯繫</div></div>
+              </div>
+              <div class="fo-ai-card" data-fo-anchor="s-ai">
+                <div class="fo-ai-card-hd"><span style="font-size:14px;">✦</span><span class="fo-ai-card-label">AI 摘要</span><span class="fo-ai-card-beta">BETA</span></div>
+                <div class="fo-ai-card-text">由擁有20年經驗的院長親自操刀，專注於超音波提拉的江南專業診所。提供外語諮詢、翻譯陪同及機場接送服務。</div>
+              </div>
+              <div class="fo-feature-badges" data-fo-anchor="s-feature">
+                <div class="fo-feature-badge">👨‍⚕️ 專科直診</div>
+                <div class="fo-feature-badge">🚪 私人空間</div>
+                <div class="fo-feature-badge">🌐 5種語言</div>
+                <div class="fo-feature-badge">🚗 機場接送</div>
+              </div>
+              <div style="padding:20px 16px 0;" data-fo-anchor="s-location">
+                <div style="font-size:14px;font-weight:700;color:var(--fh,#2d2d2d);margin-bottom:12px;">核心資訊</div>
+                <div class="fo-info-grid">
+                  <div><div class="fo-info-cell-label">位置</div><div class="fo-info-cell-value">江南區</div><div class="fo-info-cell-sub">首爾，韓國</div></div>
+                  <div><div class="fo-info-cell-label">地鐵</div><div class="fo-info-cell-value">新論鉉站</div><div class="fo-info-cell-sub">步行5分鐘</div></div>
+                  <div><div class="fo-info-cell-label">價格範圍</div><div class="fo-info-cell-value">₩150K~</div><div class="fo-info-cell-sub">依療程而異</div></div>
+                  <div><div class="fo-info-cell-label">預約</div><div class="fo-info-cell-value">線上·LINE</div><div class="fo-info-cell-sub">當日預約可</div></div>
+                </div>
+                <div class="fo-hours-acc" onclick="this.classList.toggle('open')">
+                  <div class="fo-hours-hd"><div class="fo-hours-hd-left"><div class="fo-hours-dot"></div>營業時間<span class="fo-hours-open">· 營業中</span></div><div style="display:flex;align-items:center;gap:6px;"><span style="font-size:11px;color:var(--fc,#8e8e8e);">09:00–20:00</span><span class="fo-hours-chevron">▼</span></div></div>
+                  <div class="fo-hours-bd">
+                    <div class="fo-hours-row"><span class="fo-hours-day" style="font-weight:700;color:var(--fh,#2d2d2d);">週一</span><span style="font-weight:700;">09:00–20:00</span></div>
+                    <div class="fo-hours-row"><span class="fo-hours-day">週二~五</span><span>09:00–20:00</span></div>
+                    <div class="fo-hours-row"><span class="fo-hours-day">週六</span><span>10:00–18:00</span></div>
+                    <div class="fo-hours-row"><span class="fo-hours-day">週日</span><span>公休</span></div>
+                  </div>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;padding-bottom:20px;">
+                  <span class="fo-tx-chip">超音波</span><span class="fo-tx-chip">InMode FX</span><span class="fo-tx-chip">肉毒素</span><span class="fo-tx-chip">玻尿酸</span>
+                  <span class="fo-kw-chip">醫療美容</span><span class="fo-kw-chip">提拉</span>
+                </div>
+              </div>
+              <div class="fo-faq-wrap" data-fo-anchor="s-faq">
+                <div class="fo-faq-title">FAQ</div>
+                <div class="fo-faq-item"><div class="fo-faq-q"><span>外國人也可以預約嗎？</span><span class="fo-faq-q-icon">▾</span></div><div class="fo-faq-a">是的，外國顧客可以和國內顧客一樣預約和接受治療。</div></div>
+                <div class="fo-faq-item"><div class="fo-faq-q"><span>接受哪些付款方式？</span><span class="fo-faq-q-icon">▸</span></div></div>
+              </div>
+              <div class="fo-cta-strip">
+                <div class="fo-cta-fav">♡</div>
+                <button class="fo-cta-line">L&nbsp;LINE 聯繫</button>
+                <button class="fo-cta-book">📅 立即預約</button>
               </div>
             </div><!-- /fo-tw -->
 
             <!-- ── 日本語 ── -->
             <div id="fo-jp" style="display:none;">
               <div class="fo-statusbar"><span class="fo-statusbar-time">9:41</span><span class="fo-statusbar-icons">▲ ■ 🔋</span></div>
-              <div class="fo-navbar"><span class="fo-navbar-back">←</span><span class="fo-navbar-title">ハンミヨク クリニック</span><div class="fo-navbar-icons"><span>⎙</span><span>♡</span></div></div>
+              <div class="fo-navbar"><span class="fo-navbar-back">←</span><div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0;"><div style="height:22px;min-width:60px;max-width:100px;background:linear-gradient(90deg,#f0f0f0,#e0e0e0);border-radius:4px;flex-shrink:0;"></div></div><div class="fo-navbar-icons"><span>⎙</span><span>♡</span></div></div>
               <div class="fo-hero">
                 <div class="fo-hero-slide"><span>1</span><span class="fo-hero-slide-sep"></span><span>10</span></div>
                 <div class="fo-hero-overlay">
-                  <div class="fo-hero-sub">こんにちは！韓国No.1のリフティング専門クリニックです</div>
+                  <div class="fo-hero-sub" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;"><span style="color:#FFD94A;">★</span><span style="font-size:12px;font-weight:700;">4.9</span><span style="font-size:11px;opacity:0.7;">(2,341)</span><span style="opacity:0.5;margin:0 2px;">·</span><span style="font-size:11px;opacity:0.8;">📍 江南区</span></div>
                   <div class="fo-hero-name">韓国No.1<br>リフティング専門クリニック</div>
                 </div>
               </div>
-              <div class="fo-contact-wrap">
-                <div class="fo-contact-sub">まだ迷っていても大丈夫</div>
-                <div class="fo-contact-title">考えたまま帰らないでください。<br>些細なご質問でもどうぞ</div>
-                <div class="fo-contact-body">料金、場所、施術情報など—<br>専門コンサルタントがすぐにお答えします</div>
+              <div class="fo-tab-strip">
+                <button class="fo-tab-strip-btn active">紹介</button>
+                <button class="fo-tab-strip-btn">商品</button>
+                <button class="fo-tab-strip-btn">B/A</button>
+                <button class="fo-tab-strip-btn">FAQ</button>
               </div>
-              <div class="fo-channel-scroll" style="padding: 0 16px 20px;">
-                <div class="fo-channel-card"><div><div class="fo-channel-icon" style="background:#06c755;">L</div><div class="fo-channel-name">LINE</div></div><div class="fo-channel-link">今すぐ連絡</div></div>
+              <div class="fo-contact-wrap" data-fo-anchor="s-channel">
+                <div class="fo-contact-sub">SNSでご相談ください</div>
+                <div class="fo-contact-title">些細なご質問でもお気軽に</div>
+              </div>
+              <div class="fo-channel-scroll" style="padding: 0 16px 16px;">
+                <div class="fo-channel-card"><div><div class="fo-channel-icon" style="background:#06c755;color:#fff;font-weight:800;font-size:14px;">L</div><div class="fo-channel-name">LINE</div></div><div class="fo-channel-link">今すぐ連絡</div></div>
                 <div class="fo-channel-card"><div><div class="fo-channel-icon" style="background:#25d366;">💬</div><div class="fo-channel-name">WhatsApp</div></div><div class="fo-channel-link">今すぐ連絡</div></div>
               </div>
-              <div class="fo-ai-wrap">
-                <div class="fo-ai-badge">✦ About</div>
-                <div class="fo-ai-body" style="color:#8e8e8e;font-style:italic;">번역 미완료 — 번역 버튼을 눌러 생성하세요</div>
+              <div class="fo-ai-card" data-fo-anchor="s-ai">
+                <div class="fo-ai-card-hd"><span style="font-size:14px;">✦</span><span class="fo-ai-card-label">AI サマリー</span><span class="fo-ai-card-beta">BETA</span></div>
+                <div class="fo-ai-card-text">20年のキャリアを持つ院長が直接施術する江南のリフティング専門クリニック。ウルセラ・インモード・ボトックス・フィラー専門。外国人向けの通訳同行・空港送迎サービスあり。</div>
+              </div>
+              <div class="fo-feature-badges" data-fo-anchor="s-feature">
+                <div class="fo-feature-badge">👨‍⚕️ 院長直接施術</div>
+                <div class="fo-feature-badge">🌐 5言語対応</div>
+                <div class="fo-feature-badge">🚗 空港送迎</div>
+                <div class="fo-feature-badge">🗣 通訳同行</div>
+              </div>
+              <div style="padding:20px 16px 0;" data-fo-anchor="s-location">
+                <div style="font-size:14px;font-weight:700;color:var(--fh,#2d2d2d);margin-bottom:12px;">基本情報</div>
+                <div class="fo-info-grid">
+                  <div><div class="fo-info-cell-label">場所</div><div class="fo-info-cell-value">江南区</div><div class="fo-info-cell-sub">ソウル，韓国</div></div>
+                  <div><div class="fo-info-cell-label">最寄り駅</div><div class="fo-info-cell-value">新論峴駅</div><div class="fo-info-cell-sub">徒歩5分</div></div>
+                  <div><div class="fo-info-cell-label">料金目安</div><div class="fo-info-cell-value">₩150K~</div><div class="fo-info-cell-sub">施術により異なる</div></div>
+                  <div><div class="fo-info-cell-label">予約</div><div class="fo-info-cell-value">オンライン</div><div class="fo-info-cell-sub">当日予約可</div></div>
+                </div>
+                <div class="fo-hours-acc" onclick="this.classList.toggle('open')">
+                  <div class="fo-hours-hd"><div class="fo-hours-hd-left"><div class="fo-hours-dot"></div>営業時間<span class="fo-hours-open">· 営業中</span></div><div style="display:flex;align-items:center;gap:6px;"><span style="font-size:11px;color:var(--fc,#8e8e8e);">09:00–20:00</span><span class="fo-hours-chevron">▼</span></div></div>
+                  <div class="fo-hours-bd">
+                    <div class="fo-hours-row"><span class="fo-hours-day" style="font-weight:700;color:var(--fh,#2d2d2d);">月曜日</span><span style="font-weight:700;">09:00–20:00</span></div>
+                    <div class="fo-hours-row"><span class="fo-hours-day">火~金</span><span>09:00–20:00</span></div>
+                    <div class="fo-hours-row"><span class="fo-hours-day">土曜日</span><span>10:00–18:00</span></div>
+                    <div class="fo-hours-row"><span class="fo-hours-day">日曜日</span><span>休診</span></div>
+                  </div>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;padding-bottom:20px;">
+                  <span class="fo-tx-chip">ウルセラ</span><span class="fo-tx-chip">インモード</span><span class="fo-tx-chip">ボトックス</span><span class="fo-tx-chip">フィラー</span>
+                  <span class="fo-kw-chip">リフティング</span><span class="fo-kw-chip">美容医療</span>
+                </div>
+              </div>
+              <div class="fo-faq-wrap" data-fo-anchor="s-faq">
+                <div class="fo-faq-title">FAQ</div>
+                <div class="fo-faq-item"><div class="fo-faq-q"><span>外国人も予約・施術を受けられますか？</span><span class="fo-faq-q-icon">▾</span></div><div class="fo-faq-a">はい、外国のお客様も国内のお客様と同様にご予約・施術を受けていただけます。</div></div>
+                <div class="fo-faq-item"><div class="fo-faq-q"><span>支払い方法は？</span><span class="fo-faq-q-icon">▸</span></div></div>
+              </div>
+              <div class="fo-cta-strip">
+                <div class="fo-cta-fav">♡</div>
+                <button class="fo-cta-line">L&nbsp;LINE 連絡</button>
+                <button class="fo-cta-book">📅 今すぐ予約</button>
               </div>
             </div><!-- /fo-jp -->
 
             <!-- ── Indonesia ── -->
             <div id="fo-id" style="display:none;">
               <div class="fo-statusbar"><span class="fo-statusbar-time">9:41</span><span class="fo-statusbar-icons">▲ ■ 🔋</span></div>
-              <div class="fo-navbar"><span class="fo-navbar-back">←</span><span class="fo-navbar-title">Klinik Hanmiyeok</span><div class="fo-navbar-icons"><span>⎙</span><span>♡</span></div></div>
+              <div class="fo-navbar"><span class="fo-navbar-back">←</span><div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0;"><div style="height:22px;min-width:60px;max-width:100px;background:linear-gradient(90deg,#f0f0f0,#e0e0e0);border-radius:4px;flex-shrink:0;"></div></div><div class="fo-navbar-icons"><span>⎙</span><span>♡</span></div></div>
               <div class="fo-hero">
                 <div class="fo-hero-slide"><span>1</span><span class="fo-hero-slide-sep"></span><span>10</span></div>
                 <div class="fo-hero-overlay">
-                  <div class="fo-hero-sub">Halo! Selamat datang di klinik estetika No.1 Korea</div>
+                  <div class="fo-hero-sub" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;"><span style="color:#FFD94A;">★</span><span style="font-size:12px;font-weight:700;">4.9</span><span style="font-size:11px;opacity:0.7;">(2,341)</span><span style="opacity:0.5;margin:0 2px;">·</span><span style="font-size:11px;opacity:0.8;">📍 Gangnam-gu</span></div>
                   <div class="fo-hero-name">Klinik Estetika<br>No.1 Korea</div>
                 </div>
               </div>
-              <div class="fo-contact-wrap">
-                <div class="fo-contact-sub">Masih ragu? Tidak apa-apa</div>
-                <div class="fo-contact-title">Jangan pergi tanpa bertanya.<br>Pertanyaan kecil pun diterima</div>
+              <div class="fo-tab-strip">
+                <button class="fo-tab-strip-btn active">Profil</button>
+                <button class="fo-tab-strip-btn">Produk</button>
+                <button class="fo-tab-strip-btn">B/A</button>
+                <button class="fo-tab-strip-btn">FAQ</button>
               </div>
-              <div class="fo-channel-scroll" style="padding: 0 16px 20px;">
+              <div class="fo-contact-wrap" data-fo-anchor="s-channel">
+                <div class="fo-contact-sub">Konsultasi via SNS</div>
+                <div class="fo-contact-title">Pertanyaan kecil pun diterima</div>
+              </div>
+              <div class="fo-channel-scroll" style="padding: 0 16px 16px;">
                 <div class="fo-channel-card"><div><div class="fo-channel-icon" style="background:#25d366;">💬</div><div class="fo-channel-name">WhatsApp</div></div><div class="fo-channel-link">Hubungi</div></div>
-                <div class="fo-channel-card"><div><div class="fo-channel-icon" style="background:#06c755;">L</div><div class="fo-channel-name">LINE</div></div><div class="fo-channel-link">Hubungi</div></div>
               </div>
-              <div class="fo-ai-wrap">
-                <div class="fo-ai-badge">✦ Tentang Kami</div>
-                <div class="fo-ai-body" style="color:#8e8e8e;font-style:italic;">번역 미완료 — 번역 버튼을 눌러 생성하세요</div>
+              <div class="fo-ai-card" data-fo-anchor="s-ai">
+                <div class="fo-ai-card-hd"><span style="font-size:14px;">✦</span><span class="fo-ai-card-label">AI Ringkasan</span><span class="fo-ai-card-beta">BETA</span></div>
+                <div class="fo-ai-card-text">Klinik spesialis lifting di Gangnam yang ditangani langsung oleh dokter berpengalaman 20 tahun. Spesialis Ultherapy, InMode, Botox, dan filler, dengan layanan penerjemah dan jemput bandara untuk pasien asing.</div>
+              </div>
+              <div class="fo-feature-badges" data-fo-anchor="s-feature">
+                <div class="fo-feature-badge">👨‍⚕️ Dokter Langsung</div>
+                <div class="fo-feature-badge">🌐 5 Bahasa</div>
+                <div class="fo-feature-badge">🚗 Jemput Bandara</div>
+                <div class="fo-feature-badge">🗣 Penerjemah</div>
+              </div>
+              <div style="padding:20px 16px 0;" data-fo-anchor="s-location">
+                <div style="font-size:14px;font-weight:700;color:var(--fh,#2d2d2d);margin-bottom:12px;">Informasi Utama</div>
+                <div class="fo-info-grid">
+                  <div><div class="fo-info-cell-label">Lokasi</div><div class="fo-info-cell-value">Gangnam-gu</div><div class="fo-info-cell-sub">Seoul, Korea</div></div>
+                  <div><div class="fo-info-cell-label">Subway</div><div class="fo-info-cell-value">Sinnonhyeon</div><div class="fo-info-cell-sub">Jalan 5 menit</div></div>
+                  <div><div class="fo-info-cell-label">Harga</div><div class="fo-info-cell-value">₩150K~</div><div class="fo-info-cell-sub">Tergantung perawatan</div></div>
+                  <div><div class="fo-info-cell-label">Booking</div><div class="fo-info-cell-value">Online</div><div class="fo-info-cell-sub">Same-day tersedia</div></div>
+                </div>
+                <div class="fo-hours-acc" onclick="this.classList.toggle('open')">
+                  <div class="fo-hours-hd"><div class="fo-hours-hd-left"><div class="fo-hours-dot"></div>Jam Buka<span class="fo-hours-open">· Buka sekarang</span></div><div style="display:flex;align-items:center;gap:6px;"><span style="font-size:11px;color:var(--fc,#8e8e8e);">09:00–20:00</span><span class="fo-hours-chevron">▼</span></div></div>
+                  <div class="fo-hours-bd">
+                    <div class="fo-hours-row"><span class="fo-hours-day" style="font-weight:700;color:var(--fh,#2d2d2d);">Senin</span><span style="font-weight:700;">09:00–20:00</span></div>
+                    <div class="fo-hours-row"><span class="fo-hours-day">Sel–Jum</span><span>09:00–20:00</span></div>
+                    <div class="fo-hours-row"><span class="fo-hours-day">Sabtu</span><span>10:00–18:00</span></div>
+                    <div class="fo-hours-row"><span class="fo-hours-day">Minggu</span><span>Tutup</span></div>
+                  </div>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;padding-bottom:20px;">
+                  <span class="fo-tx-chip">Ultherapy</span><span class="fo-tx-chip">InMode FX</span><span class="fo-tx-chip">Botox</span><span class="fo-tx-chip">Filler</span>
+                  <span class="fo-kw-chip">Kecantikan</span><span class="fo-kw-chip">Lifting</span>
+                </div>
+              </div>
+              <div class="fo-faq-wrap" data-fo-anchor="s-faq">
+                <div class="fo-faq-title">FAQ</div>
+                <div class="fo-faq-item"><div class="fo-faq-q"><span>Apakah orang asing bisa membuat reservasi?</span><span class="fo-faq-q-icon">▾</span></div><div class="fo-faq-a">Ya, pelanggan asing dapat membuat reservasi dan menerima perawatan sama seperti pelanggan lokal.</div></div>
+                <div class="fo-faq-item"><div class="fo-faq-q"><span>Metode pembayaran apa yang diterima?</span><span class="fo-faq-q-icon">▸</span></div></div>
+              </div>
+              <div class="fo-cta-strip">
+                <div class="fo-cta-fav">♡</div>
+                <button class="fo-cta-line" style="background:var(--fp,#fb6f92);color:#fff;border:none;">💬 WhatsApp</button>
+                <button class="fo-cta-book">📅 Pesan Sekarang</button>
               </div>
             </div><!-- /fo-id -->
 
@@ -2196,14 +2459,12 @@ function switchVersion(v, btn) {
 
   const v1Bar   = document.getElementById('v1-tab-bar');
   const v2Bar   = document.getElementById('v2-anchor-bar');
-  const v3BBar  = document.getElementById('v3-basic-anchor-bar');
   const v1Form  = document.getElementById('v1-form');
   const v2Form  = document.getElementById('v2-form');
   const v3BForm = document.getElementById('v3-basic-form');
   const foPanel = document.getElementById('fo-panel');
 
-  // v3-basic 고유 요소는 먼저 닫기
-  v3BBar.classList.remove('visible');
+  // v3-basic 폼 닫기
   v3BForm.style.display = 'none';
 
   // 공통 리셋: v2-form 섹션·앵커 모두 복원
@@ -2254,22 +2515,18 @@ function switchV3Section(group) {
   });
 
   const v2Bar   = document.getElementById('v2-anchor-bar');
-  const v3BBar  = document.getElementById('v3-basic-anchor-bar');
   const v2Form  = document.getElementById('v2-form');
   const v3BForm = document.getElementById('v3-basic-form');
   const foPanel = document.getElementById('fo-panel');
 
   if (group === 'basic') {
-    // 기본정보: 전용 앵커바 + 전용 폼, 미리보기 없음
+    // 기본정보: 앵커바 없음 + 전용 폼, 미리보기 없음
     v2Bar.classList.remove('visible');
-    v3BBar.classList.add('visible');
     v2Form.style.display = 'none';
     v3BForm.style.display = '';
     foPanel.style.display = 'none';
-    document.querySelectorAll('#v3-basic-anchor-bar .anchor-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
   } else {
     // 노출설정: v2-anchor-bar(expose 필터) + v2-form(expose 필터) + 미리보기
-    v3BBar.classList.remove('visible');
     v2Bar.classList.add('visible');
     v3BForm.style.display = 'none';
     v2Form.style.display = '';
@@ -2369,6 +2626,37 @@ function _syncLangAll(lang, skipBar) {
   document.querySelectorAll('#fo-panel [id^="fo-"]').forEach(s => s.style.display = 'none');
   const screen = document.getElementById(foId);
   if (screen) screen.style.display = 'block';
+}
+
+/* ── SNS 채팅 채널 언어 탭 전환 ── */
+function switchChannelLang(btn, panelId) {
+  const container = btn.closest('.card-body');
+  container.querySelectorAll('.channel-lang-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  container.querySelectorAll('.channel-lang-panel').forEach(p => p.classList.remove('active'));
+  const panel = document.getElementById(panelId);
+  if (panel) panel.classList.add('active');
+}
+
+/* ── 담당자 행 추가 ── */
+function addContactRow(containerId) {
+  const container = document.getElementById(containerId);
+  const rows = container.querySelectorAll('.contact-row-item');
+  if (rows.length >= 3) { alert('담당자는 최대 3명까지 등록할 수 있습니다.'); return; }
+  const idx = rows.length + 1;
+  const row = document.createElement('div');
+  row.className = 'contact-row-item';
+  row.innerHTML = `<span class="contact-req-badge" style="color:var(--text3);">${idx}</span><input class="input" placeholder="담당자 이름 ${idx}" style="flex:1;" /><input class="input" placeholder="전화번호" style="flex:1.2;" /><button class="btn btn-secondary btn-sm" style="color:#EF4444;flex-shrink:0;width:32px;padding:0;" onclick="this.closest('.contact-row-item').remove()">×</button>`;
+  container.appendChild(row);
+}
+
+/* ── 채널 행 추가 ── */
+function addChannelRow(btn) {
+  const panel = btn.parentElement;
+  const newRow = document.createElement('div');
+  newRow.className = 'channel-row-new';
+  newRow.innerHTML = `<select class="select" style="width:120px;"><option>WhatsApp</option><option>LINE</option><option>WeChat</option><option>KakaoTalk</option><option>Telegram</option></select><input class="input" style="flex:1;" placeholder="채널 ID / 번호" /><button class="btn btn-secondary btn-sm" style="color:#EF4444;flex-shrink:0;" onclick="this.closest('.channel-row-new').remove()">삭제</button>`;
+  panel.insertBefore(newRow, btn);
 }
 
 /* ── 2안 카드 내 언어 탭 전환 ── */
