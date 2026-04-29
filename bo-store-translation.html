@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>BO 스토어 설정 시안 — KBS Admin</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; background:#f0f2f5; color:#262626; font-size:13px; }
+
+/* ── Layout ── */
+.layout { display:flex; min-height:100vh; }
+.sidebar { width:200px; background:#fff; border-right:1px solid #e8e8e8; flex-shrink:0; }
+.sidebar-brand { padding:18px 24px; font-size:18px; font-weight:700; color:#e85d75; letter-spacing:0.02em; }
+.menu-item { padding:10px 24px; font-size:13px; color:#595959; cursor:pointer; display:flex; align-items:center; justify-content:space-between; }
+.menu-item:hover { background:#fafafa; }
+.menu-item.has-sub::after { content:"▼"; font-size:9px; color:#bfbfbf; }
+.menu-item.has-sub.open::after { content:"▲"; }
+.menu-item.active { background:#fff1f3; color:#e85d75; font-weight:600; }
+.menu-section { padding:14px 24px 6px; font-size:11px; color:#bfbfbf; }
+.menu-sub { padding:9px 24px 9px 40px; font-size:13px; color:#595959; cursor:pointer; }
+.menu-sub:hover { background:#fafafa; }
+.menu-sub.active { background:#fff1f3; color:#e85d75; font-weight:600; }
+.sub-group { display:none; }
+.sub-group.open { display:block; }
+
+/* ── Main ── */
+.main { flex:1; display:flex; flex-direction:column; min-width:0; }
+.topbar { background:#fff; border-bottom:1px solid #e8e8e8; padding:0 24px; height:56px; display:flex; align-items:center; justify-content:space-between; }
+.topbar-title { font-size:14px; font-weight:600; color:#262626; }
+.topbar-user { display:flex; align-items:center; gap:8px; color:#595959; font-size:13px; }
+.topbar-user-avatar { width:28px; height:28px; border-radius:50%; background:#f0f0f0; display:flex; align-items:center; justify-content:center; font-size:14px; }
+
+.content { flex:1; padding:24px; overflow-y:auto; }
+.page-title { font-size:18px; font-weight:700; margin-bottom:16px; color:#262626; }
+
+/* ── Card ── */
+.card { background:#fff; border-radius:4px; box-shadow:0 1px 2px rgba(0,0,0,0.03); border:1px solid #f0f0f0; }
+.card + .card { margin-top:14px; }
+.card-header { padding:14px 20px; border-bottom:1px solid #f0f0f0; font-size:14px; font-weight:600; display:flex; justify-content:space-between; align-items:center; }
+.card-body { padding:20px; }
+
+/* ── Form ── */
+.form-row { display:grid; grid-template-columns:140px 1fr; gap:14px; align-items:flex-start; margin-bottom:16px; }
+.form-row.two-col { grid-template-columns:140px 1fr 140px 1fr; }
+.form-label { font-size:13px; font-weight:500; color:#262626; padding-top:8px; }
+.form-label .req { color:#ff4d4f; margin-right:3px; }
+.form-control { display:flex; flex-direction:column; gap:6px; }
+.form-input, .form-select, .form-textarea { width:100%; padding:7px 11px; border:1px solid #d9d9d9; border-radius:4px; font-size:13px; font-family:inherit; background:#fff; }
+.form-input:focus, .form-select:focus, .form-textarea:focus { outline:none; border-color:#1890ff; box-shadow:0 0 0 2px rgba(24,144,255,0.1); }
+.form-textarea { resize:vertical; min-height:72px; }
+.form-help { font-size:11px; color:#8c8c8c; margin-top:2px; line-height:1.6; }
+
+/* ── Buttons ── */
+.btn { padding:6px 16px; border-radius:4px; font-size:13px; cursor:pointer; border:1px solid #d9d9d9; background:#fff; color:#262626; font-family:inherit; transition:all 0.15s; }
+.btn:hover { color:#1890ff; border-color:#1890ff; }
+.btn-primary { background:#1890ff; border-color:#1890ff; color:#fff; }
+.btn-primary:hover { background:#40a9ff; border-color:#40a9ff; color:#fff; }
+.btn-danger-link { background:transparent; border:none; color:#ff4d4f; padding:6px 8px; font-size:12px; }
+.btn-sm { padding:3px 10px; font-size:12px; }
+.btn-ghost { background:transparent; border:1px dashed #d9d9d9; color:#8c8c8c; width:100%; padding:8px; font-size:12px; }
+.btn-ghost:hover { color:#1890ff; border-color:#1890ff; }
+
+/* ── Tabs ── */
+.tabs { display:flex; gap:32px; border-bottom:1px solid #f0f0f0; margin-bottom:20px; }
+.tab { padding:12px 0; font-size:14px; color:#595959; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; }
+.tab.active { color:#1890ff; border-bottom-color:#1890ff; font-weight:500; }
+
+/* ── Section divider ── */
+.section-title { font-size:13px; font-weight:600; color:#262626; margin:24px 0 12px; padding-bottom:8px; border-bottom:1px solid #f0f0f0; display:flex; justify-content:space-between; align-items:center; }
+.section-title:first-child { margin-top:0; }
+
+/* ── Image ── */
+.img-box { width:160px; height:90px; border:1px solid #d9d9d9; border-radius:4px; background:#fafafa; display:flex; align-items:center; justify-content:center; color:#bfbfbf; font-size:11px; overflow:hidden; }
+.img-box.ratio-4-3 { width:140px; height:105px; }
+.img-box.logo { width:160px; height:60px; }
+.img-actions { display:flex; gap:6px; margin-top:8px; }
+
+/* ── Multi-row (담당자, SNS 채널, FAQ, 콘텐츠 채널) ── */
+.multi-row { display:flex; gap:8px; margin-bottom:8px; align-items:flex-start; }
+.multi-row > .form-input, .multi-row > .form-select { flex:1; }
+.multi-row .row-remove { background:transparent; border:none; color:#bfbfbf; font-size:18px; cursor:pointer; padding:0 6px; align-self:center; }
+.multi-row .row-remove:hover { color:#ff4d4f; }
+.add-row-btn { background:transparent; border:1px dashed #d9d9d9; color:#8c8c8c; width:100%; padding:8px; font-size:12px; cursor:pointer; border-radius:4px; }
+.add-row-btn:hover { color:#1890ff; border-color:#1890ff; }
+
+/* ── FAQ block ── */
+.faq-item { border:1px solid #f0f0f0; border-radius:4px; padding:12px; margin-bottom:10px; background:#fafafa; position:relative; }
+.faq-item-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.faq-item-num { font-size:12px; font-weight:600; color:#595959; }
+
+/* ── Trans bar (per-section auto translate) ── */
+.trans-bar { display:flex; align-items:center; gap:12px; padding:10px 12px; background:#f6f8fa; border:1px solid #e8e8e8; border-radius:4px; margin-top:8px; flex-wrap:wrap; }
+.trans-bar-btn { background:#262626; color:#fff; border:none; padding:5px 12px; border-radius:4px; font-size:11px; cursor:pointer; font-weight:600; font-family:inherit; }
+.trans-bar-btn:hover { background:#000; }
+.trans-prog { display:flex; gap:8px; align-items:center; }
+.trans-prog-item { display:flex; align-items:center; gap:3px; font-size:11px; color:#595959; }
+.trans-prog-dot { width:7px; height:7px; border-radius:50%; background:#52c41a; }
+.trans-prog-dot.pending { background:#d9d9d9; }
+.trans-prog-label { font-size:11px; color:#8c8c8c; margin-left:auto; }
+
+/* ── Radio ── */
+.radio-group { display:flex; gap:18px; align-items:center; padding-top:4px; }
+.radio-group label { display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; }
+
+/* ── Lang badges ── */
+.lang-badge { display:inline-block; font-size:11px; padding:2px 7px; border-radius:3px; margin-right:4px; font-weight:500; }
+.lang-zh { background:#f6ffed; color:#52c41a; }
+.lang-en { background:#f5f5f5; color:#595959; }
+.lang-tw { background:#fff7e6; color:#fa8c16; }
+.lang-jp { background:#fff0f6; color:#eb2f96; }
+.lang-id { background:#e6f7ff; color:#1890ff; }
+
+/* ── Table ── */
+.table { width:100%; border-collapse:collapse; }
+.table th { text-align:left; padding:12px 14px; background:#fafafa; font-weight:500; color:#262626; border-bottom:1px solid #f0f0f0; font-size:13px; }
+.table td { padding:14px; border-bottom:1px solid #f5f5f5; color:#595959; }
+.table tr:hover td { background:#fafafa; }
+.table .name-link { color:#1890ff; text-decoration:none; cursor:pointer; }
+.table .name-link:hover { text-decoration:underline; }
+
+/* ── Filter row ── */
+.filter-row { background:#fff; padding:16px 20px; border-radius:4px; border:1px solid #f0f0f0; margin-bottom:16px; display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.filter-row .form-select, .filter-row .form-input { width:160px; }
+
+/* ── Modal ── */
+.modal-mask { position:fixed; inset:0; background:rgba(0,0,0,0.45); display:flex; align-items:flex-start; justify-content:center; z-index:1000; padding:60px 20px 20px; overflow-y:auto; }
+.modal { background:#fff; border-radius:8px; width:760px; max-width:100%; box-shadow:0 8px 24px rgba(0,0,0,0.15); }
+.modal-header { padding:18px 24px; border-bottom:1px solid #f0f0f0; display:flex; justify-content:space-between; align-items:center; }
+.modal-title { font-size:16px; font-weight:600; }
+.modal-close { background:transparent; border:none; font-size:18px; color:#bfbfbf; cursor:pointer; }
+.modal-body { padding:24px; max-height:calc(100vh - 200px); overflow-y:auto; }
+.modal-footer { padding:14px 24px; border-top:1px solid #f0f0f0; display:flex; justify-content:flex-end; gap:8px; }
+
+/* ── FAQ default page ── */
+.cat-tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:20px; }
+.cat-tab { padding:7px 14px; border:1px solid #d9d9d9; border-radius:4px; cursor:pointer; font-size:13px; background:#fff; color:#595959; }
+.cat-tab.active { background:#1890ff; border-color:#1890ff; color:#fff; }
+
+/* ── View switcher (page nav) ── */
+.view { display:none; }
+.view.active { display:block; }
+
+/* ── Auto-trans note ── */
+.auto-note { font-size:11px; color:#8c8c8c; padding:6px 10px; background:#fafafa; border-radius:3px; display:inline-block; }
+.auto-note.changed { color:#fa8c16; background:#fff7e6; }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ═══════════ Sidebar ═══════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">ADMIN</div>
+    <div class="menu-item">처음으로</div>
+    <div class="menu-item has-sub">고객지원</div>
+    <div class="menu-item has-sub">회원</div>
+    <div class="menu-item has-sub open" onclick="toggleSub('store-sub')">스토어</div>
+    <div id="store-sub" class="sub-group open">
+      <div class="menu-sub">기본정보관리</div>
+      <div class="menu-sub active" id="nav-translation" onclick="showView('translation')">번역정보관리</div>
+      <div class="menu-sub">채팅조회</div>
+      <div class="menu-sub">상담조회</div>
+      <div class="menu-sub">리뷰관리</div>
+      <div class="menu-section">이미지 관리</div>
+      <div class="menu-sub">전/후 사진 관리</div>
+      <div class="menu-section">옵션 관리</div>
+      <div class="menu-sub">지하철 관리</div>
+      <div class="menu-sub">특징 관리</div>
+      <div class="menu-sub">지역 관리</div>
+      <div class="menu-sub" id="nav-faq" onclick="showView('faq')" style="background:#fffbe6;color:#fa8c16;font-weight:600;">기본 FAQ 관리 <span style="font-size:10px;background:#fa8c16;color:#fff;padding:1px 5px;border-radius:8px;margin-left:4px;">NEW</span></div>
+    </div>
+    <div class="menu-item has-sub">상품</div>
+    <div class="menu-item has-sub">매거진</div>
+    <div class="menu-item has-sub">채팅</div>
+    <div class="menu-item has-sub">상담</div>
+    <div class="menu-item has-sub">리뷰</div>
+    <div class="menu-item has-sub">계정</div>
+    <div class="menu-item">광고정보관리</div>
+    <div class="menu-item has-sub">쿠폰</div>
+    <div class="menu-item has-sub">기획전</div>
+    <div class="menu-item has-sub">인플루언서</div>
+    <div class="menu-item has-sub">통계</div>
+  </aside>
+
+  <!-- ═══════════ Main ═══════════ -->
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-title">스토어 설정 시안 (BO 확장안)</div>
+      <div class="topbar-user">
+        <div class="topbar-user-avatar">A</div>
+        <span>관리자</span>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ════════════════════════════════
+           VIEW 1 — 번역정보관리 (확장 모달)
+      ════════════════════════════════ -->
+      <div id="view-translation" class="view active">
+
+        <div class="page-title">스토어 &gt; 번역정보관리</div>
+
+        <div class="filter-row">
+          <select class="form-select"><option>언어 ▼</option></select>
+          <select class="form-select"><option>카테고리 선택 ▼</option></select>
+          <select class="form-select"><option>상점 선택 ▼</option></select>
+          <input class="form-input" placeholder="검색어">
+          <button class="btn btn-primary">검색</button>
+        </div>
+
+        <div class="card">
+          <div class="card-header">스토어 언어별 목록</div>
+          <table class="table">
+            <thead>
+              <tr><th>No.</th><th>활성여부</th><th>상점코드</th><th>카테고리</th><th>언어</th><th>상점명</th><th>액션</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>130</td><td>활성</td><td>wonjin</td><td>성형외과</td><td><span class="lang-badge lang-zh">중국어</span></td><td><a class="name-link" onclick="document.getElementById('modal').style.display='flex'">원진</a></td><td><button class="btn btn-sm" onclick="document.getElementById('modal').style.display='flex'">수정</button></td></tr>
+              <tr><td>129</td><td>활성</td><td>beautynyoung</td><td>성형외과</td><td><span class="lang-badge lang-en">영어</span></td><td><a class="name-link">Beautynyoung</a></td><td><button class="btn btn-sm">수정</button></td></tr>
+              <tr><td>128</td><td>활성</td><td>jiyu</td><td>피부과</td><td><span class="lang-badge lang-tw">중국어(번체)</span></td><td><a class="name-link">지유</a></td><td><button class="btn btn-sm">수정</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="margin-top:20px;padding:14px 18px;background:#fff7e6;border:1px solid #ffe58f;border-radius:4px;font-size:12px;color:#874d00;line-height:1.7;">
+          <strong>📌 시안 안내</strong> — 위 목록의 <strong>수정</strong> 버튼 또는 상점명 링크를 클릭하면 확장된 번역정보 수정 모달이 열립니다.<br>
+          좌측 사이드바의 <strong style="color:#fa8c16;">기본 FAQ 관리 (NEW)</strong> 메뉴를 클릭하면 신규 추가될 메뉴 시안을 확인할 수 있습니다.
+        </div>
+
+      </div>
+
+      <!-- ════════════════════════════════
+           VIEW 2 — 기본 FAQ 관리 (신규 메뉴)
+      ════════════════════════════════ -->
+      <div id="view-faq" class="view">
+        <div class="page-title">옵션 관리 &gt; 기본 FAQ 관리 <span style="font-size:11px;background:#fa8c16;color:#fff;padding:2px 8px;border-radius:8px;margin-left:8px;font-weight:500;">NEW</span></div>
+
+        <div style="margin-bottom:16px;padding:12px 16px;background:#e6f7ff;border:1px solid #91d5ff;border-radius:4px;font-size:12px;color:#003a8c;line-height:1.7;">
+          호스트가 스토어 설정에서 FAQ 작성 시, 매칭되는 카테고리의 기본 FAQ 5개가 자동 채워집니다. 호스트는 이를 그대로 사용하거나 수정·삭제·추가할 수 있습니다.
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span>카테고리 선택</span>
+            <button class="btn btn-primary btn-sm">+ 카테고리 추가</button>
+          </div>
+          <div class="card-body">
+            <div class="cat-tabs">
+              <div class="cat-tab active">피부과</div>
+              <div class="cat-tab">성형외과</div>
+              <div class="cat-tab">치과</div>
+              <div class="cat-tab">헤어/메이크업</div>
+              <div class="cat-tab">에스테틱</div>
+              <div class="cat-tab">팝업스토어</div>
+              <div class="cat-tab">스튜디오</div>
+              <div class="cat-tab">메디컬체크</div>
+            </div>
+
+            <div class="section-title">
+              <span>피부과 — 기본 FAQ</span>
+              <span class="auto-note">현재 5개 등록 / 권장 5개</span>
+            </div>
+
+            <!-- FAQ 1 -->
+            <div class="faq-item">
+              <div class="faq-item-head">
+                <span class="faq-item-num">FAQ 01</span>
+                <button class="btn-danger-link">삭제</button>
+              </div>
+              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;">
+                <div class="form-label">질문 (한국어)</div>
+                <input class="form-input" value="시술 후 바로 일상생활이 가능한가요?">
+              </div>
+              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;">
+                <div class="form-label">답변 (한국어)</div>
+                <textarea class="form-textarea">시술 종류에 따라 다르지만 대부분 당일 일상생활이 가능합니다. 강도 높은 운동·사우나는 1주일 정도 피해 주세요.</textarea>
+              </div>
+              <div class="trans-bar" style="margin-top:10px;">
+                <button class="trans-bar-btn">저장 및 번역 실행</button>
+                <div class="trans-prog">
+                  <span class="trans-prog-item"><span class="trans-prog-dot"></span>EN</span>
+                  <span class="trans-prog-item"><span class="trans-prog-dot"></span>简</span>
+                  <span class="trans-prog-item"><span class="trans-prog-dot"></span>繁</span>
+                  <span class="trans-prog-item"><span class="trans-prog-dot"></span>JP</span>
+                  <span class="trans-prog-item"><span class="trans-prog-dot"></span>ID</span>
+                </div>
+                <span class="trans-prog-label">번역 완료 · 2026-04-29 14:21</span>
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-item-head"><span class="faq-item-num">FAQ 02</span><button class="btn-danger-link">삭제</button></div>
+              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">질문 (한국어)</div><input class="form-input" value="외국인도 진료를 받을 수 있나요?"></div>
+              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">답변 (한국어)</div><textarea class="form-textarea">네, 외국인 고객도 동일하게 진료받으실 수 있습니다. KBS 앱 채팅으로 사전 문의 가능합니다.</textarea></div>
+              <div class="trans-bar" style="margin-top:10px;">
+                <button class="trans-bar-btn">저장 및 번역 실행</button>
+                <div class="trans-prog">
+                  <span class="trans-prog-item"><span class="trans-prog-dot"></span>EN</span>
+                  <span class="trans-prog-item"><span class="trans-prog-dot"></span>简</span>
+                  <span class="trans-prog-item"><span class="trans-prog-dot"></span>繁</span>
+                  <span class="trans-prog-item"><span class="trans-prog-dot"></span>JP</span>
+                  <span class="trans-prog-item"><span class="trans-prog-dot"></span>ID</span>
+                </div>
+                <span class="trans-prog-label">번역 완료</span>
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-item-head"><span class="faq-item-num">FAQ 03</span><button class="btn-danger-link">삭제</button></div>
+              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">질문 (한국어)</div><input class="form-input" value="시술 시간은 얼마나 걸리나요?"></div>
+              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">답변 (한국어)</div><textarea class="form-textarea">시술 종류에 따라 30분~2시간까지 다양합니다. 상담 시 정확한 소요시간을 안내드립니다.</textarea></div>
+              <div class="trans-bar" style="margin-top:10px;">
+                <button class="trans-bar-btn">저장 및 번역 실행</button>
+                <div class="trans-prog">
+                  <span class="trans-prog-item"><span class="trans-prog-dot pending"></span>EN</span>
+                  <span class="trans-prog-item"><span class="trans-prog-dot pending"></span>简</span>
+                  <span class="trans-prog-item"><span class="trans-prog-dot pending"></span>繁</span>
+                  <span class="trans-prog-item"><span class="trans-prog-dot pending"></span>JP</span>
+                  <span class="trans-prog-item"><span class="trans-prog-dot pending"></span>ID</span>
+                </div>
+                <span class="trans-prog-label" style="color:#fa8c16;">미번역 — 저장 후 실행 필요</span>
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-item-head"><span class="faq-item-num">FAQ 04</span><button class="btn-danger-link">삭제</button></div>
+              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">질문 (한국어)</div><input class="form-input" value="시술 비용은 어떻게 결제하나요?"></div>
+              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">답변 (한국어)</div><textarea class="form-textarea">현장 결제(카드·현금)와 KBS 앱 내 사전 결제 모두 가능합니다.</textarea></div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-item-head"><span class="faq-item-num">FAQ 05</span><button class="btn-danger-link">삭제</button></div>
+              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">질문 (한국어)</div><input class="form-input" value="당일 예약도 가능한가요?"></div>
+              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">답변 (한국어)</div><textarea class="form-textarea">예약 상황에 따라 당일 진료도 가능합니다. KBS 앱 채팅으로 실시간 문의해 주세요.</textarea></div>
+            </div>
+
+            <button class="add-row-btn">+ FAQ 추가</button>
+
+            <div style="margin-top:24px;display:flex;justify-content:flex-end;gap:8px;">
+              <button class="btn">취소</button>
+              <button class="btn btn-primary">전체 저장 및 번역 실행</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ════════════════════════════════
+     모달 — 상점번역정보 수정 (확장)
+════════════════════════════════ -->
+<div id="modal" class="modal-mask" style="display:none;">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">상점번역정보 수정 <span style="font-size:12px;color:#8c8c8c;font-weight:400;margin-left:8px;">— 원진 / 중국어</span></div>
+      <button class="modal-close" onclick="document.getElementById('modal').style.display='none'">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="tabs">
+        <div class="tab active">번역정보</div>
+        <div class="tab">관리자설정</div>
+      </div>
+
+      <!-- ── 1. 대표 이미지 ── -->
+      <div class="section-title">① 대표 이미지 <span class="auto-note changed">신규 — 호스트 업로드 동기화</span></div>
+      <div class="form-row">
+        <div class="form-label"><span class="req">*</span>대표 이미지</div>
+        <div class="form-control">
+          <div class="img-box">📷 1920×1080</div>
+          <div class="img-actions">
+            <button class="btn btn-sm">교체</button>
+            <button class="btn btn-sm">갤러리에서 선택</button>
+            <button class="btn btn-sm">삭제</button>
+          </div>
+          <div class="form-help">권장 16:9 · 최대 10MB · JPG/PNG · 호스트가 직접 업로드한 이미지가 자동 동기화됩니다.</div>
+        </div>
+      </div>
+
+      <!-- ── 2. 스토어 로고 ── -->
+      <div class="section-title">② 스토어 로고 <span class="auto-note changed">신규</span></div>
+      <div class="form-row">
+        <div class="form-label">스토어 로고</div>
+        <div class="form-control">
+          <div class="img-box logo">🅻 LOGO</div>
+          <div class="img-actions">
+            <button class="btn btn-sm">교체</button>
+            <button class="btn btn-sm">삭제</button>
+          </div>
+          <div class="form-help">가로형 권장 (3:1~5:1) · PNG 투명배경 권장 · 최대 5MB</div>
+        </div>
+      </div>
+
+      <!-- ── 3. 스토어 기본 텍스트 ── -->
+      <div class="section-title">③ 스토어 기본 텍스트</div>
+      <div class="form-row">
+        <div class="form-label"><span class="req">*</span>상점명</div>
+        <input class="form-input" value="원진">
+      </div>
+      <div class="form-row">
+        <div class="form-label"><span class="req">*</span>기본주소</div>
+        <input class="form-input" value="서울 서초구 강남대로 419 (서초동, 파고다타워)">
+      </div>
+      <div class="trans-bar">
+        <button class="trans-bar-btn">저장 및 번역 실행</button>
+        <div class="trans-prog">
+          <span class="trans-prog-item"><span class="trans-prog-dot"></span>EN</span>
+          <span class="trans-prog-item"><span class="trans-prog-dot"></span>简</span>
+          <span class="trans-prog-item"><span class="trans-prog-dot"></span>繁</span>
+          <span class="trans-prog-item"><span class="trans-prog-dot"></span>JP</span>
+          <span class="trans-prog-item"><span class="trans-prog-dot"></span>ID</span>
+        </div>
+        <span class="trans-prog-label">번역 완료</span>
+      </div>
+
+      <!-- ── 4. AI 소개 카드 ── -->
+      <div class="section-title">④ AI 소개 카드 <span class="auto-note changed">신규</span></div>
+      <div class="form-row">
+        <div class="form-label">AI 소개</div>
+        <div class="form-control">
+          <textarea class="form-textarea" rows="3">경력 20년 대표원장이 직접 시술하는 강남 리프팅 전문 클리닉. 올쎄라·인모드·보톡스·필러 전문이며, 외국인 환자를 위한 통역 동행 및 공항 픽업 서비스를 제공합니다.</textarea>
+          <div class="form-help">호스트가 작성한 한국어 원본이 자동번역된 결과입니다. 어드민에서 직접 수정 가능.</div>
+        </div>
+      </div>
+      <div class="trans-bar">
+        <button class="trans-bar-btn">재번역 실행</button>
+        <div class="trans-prog">
+          <span class="trans-prog-item"><span class="trans-prog-dot"></span>EN</span>
+          <span class="trans-prog-item"><span class="trans-prog-dot"></span>简</span>
+          <span class="trans-prog-item"><span class="trans-prog-dot"></span>繁</span>
+          <span class="trans-prog-item"><span class="trans-prog-dot"></span>JP</span>
+          <span class="trans-prog-item"><span class="trans-prog-dot"></span>ID</span>
+        </div>
+        <span class="trans-prog-label">2026-04-29 13:42 번역</span>
+      </div>
+
+      <!-- ── 5. 스토어 소개글 + 인트로 이미지 ── -->
+      <div class="section-title">⑤ 스토어 소개글 <span class="auto-note changed">신규</span></div>
+      <div class="form-row">
+        <div class="form-label">인트로 이미지</div>
+        <div class="form-control">
+          <div class="img-box ratio-4-3">📷 4:3</div>
+          <div class="img-actions"><button class="btn btn-sm">교체</button><button class="btn btn-sm">삭제</button></div>
+          <div class="form-help">권장 4:3 · 1200×900px 이상 · 최대 10MB</div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-label">소개글</div>
+        <textarea class="form-textarea" rows="5">원진성형외과는 한국 성형 분야의 선구자로 20년 이상의 임상경험을 가진 전문 의료진이 8개 진료과 협진으로 미용에서 기능적 부위까지 진료합니다.</textarea>
+      </div>
+      <div class="trans-bar">
+        <button class="trans-bar-btn">저장 및 번역 실행</button>
+        <div class="trans-prog">
+          <span class="trans-prog-item"><span class="trans-prog-dot"></span>EN</span>
+          <span class="trans-prog-item"><span class="trans-prog-dot"></span>简</span>
+          <span class="trans-prog-item"><span class="trans-prog-dot"></span>繁</span>
+          <span class="trans-prog-item"><span class="trans-prog-dot"></span>JP</span>
+          <span class="trans-prog-item"><span class="trans-prog-dot"></span>ID</span>
+        </div>
+        <span class="trans-prog-label">번역 완료</span>
+      </div>
+
+      <!-- ── 6. 채팅 채널 ── -->
+      <div class="section-title">⑥ 채팅 채널 <span class="auto-note changed">구조 확장</span></div>
+
+      <div class="form-row">
+        <div class="form-label">인앱 채팅</div>
+        <select class="form-select">
+          <option>스토어 채팅 (기본)</option>
+          <option>상품별 채팅</option>
+          <option>비활성</option>
+        </select>
+      </div>
+
+      <div class="form-row" style="align-items:flex-start;">
+        <div class="form-label">SNS 채팅 채널<br><span style="font-weight:400;font-size:11px;color:#8c8c8c;">(언어별 N개)</span></div>
+        <div class="form-control">
+          <div class="multi-row">
+            <select class="form-select" style="max-width:160px;"><option>WhatsApp</option><option>LINE</option><option>WeChat</option><option>Telegram</option><option>KakaoTalk</option></select>
+            <input class="form-input" value="https://wa.me/821012345678" placeholder="채널 URL">
+            <button class="row-remove">×</button>
+          </div>
+          <div class="multi-row">
+            <select class="form-select" style="max-width:160px;"><option>LINE</option></select>
+            <input class="form-input" value="https://line.me/R/ti/p/@220upddy" placeholder="채널 URL">
+            <button class="row-remove">×</button>
+          </div>
+          <div class="multi-row">
+            <select class="form-select" style="max-width:160px;"><option>WeChat</option></select>
+            <input class="form-input" value="wonjin_official" placeholder="채널 URL 또는 ID">
+            <button class="row-remove">×</button>
+          </div>
+          <button class="add-row-btn">+ 채널 추가</button>
+        </div>
+      </div>
+
+      <div class="form-row" style="align-items:flex-start;">
+        <div class="form-label">콘텐츠 채널<br><span style="font-weight:400;font-size:11px;color:#8c8c8c;">(SNS 링크)</span></div>
+        <div class="form-control">
+          <div class="multi-row">
+            <select class="form-select" style="max-width:160px;"><option>Instagram</option><option>YouTube</option><option>TikTok</option><option>Facebook</option><option>매거진</option></select>
+            <input class="form-input" value="https://instagram.com/wonjin_official" placeholder="링크 URL">
+            <button class="row-remove">×</button>
+          </div>
+          <div class="multi-row">
+            <select class="form-select" style="max-width:160px;"><option>YouTube</option></select>
+            <input class="form-input" value="https://youtube.com/@wonjin" placeholder="링크 URL">
+            <button class="row-remove">×</button>
+          </div>
+          <button class="add-row-btn">+ 채널 추가</button>
+        </div>
+      </div>
+
+      <!-- ── 7. FAQ ── -->
+      <div class="section-title">⑦ FAQ <span class="auto-note changed">신규</span></div>
+
+      <div class="faq-item">
+        <div class="faq-item-head"><span class="faq-item-num">FAQ 01</span><button class="btn-danger-link">삭제</button></div>
+        <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">질문</div><input class="form-input" value="외국인도 예약하고 시술받을 수 있나요?"></div>
+        <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">답변</div><textarea class="form-textarea">네, 외국인 고객도 동일하게 예약 및 시술 가능합니다. KBS 앱을 통해 예약하거나 채팅으로 문의해 주세요.</textarea></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-item-head"><span class="faq-item-num">FAQ 02</span><button class="btn-danger-link">삭제</button></div>
+        <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">질문</div><input class="form-input" value="시술 당일 방문 시 준비물이 있나요?"></div>
+        <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">답변</div><textarea class="form-textarea">메이크업을 지우고 방문해 주세요. 예약 확인서를 지참하시면 됩니다.</textarea></div>
+      </div>
+      <button class="add-row-btn">+ FAQ 추가</button>
+      <div class="trans-bar" style="margin-top:12px;">
+        <button class="trans-bar-btn">FAQ 전체 저장 및 번역 실행</button>
+        <div class="trans-prog">
+          <span class="trans-prog-item"><span class="trans-prog-dot"></span>EN</span>
+          <span class="trans-prog-item"><span class="trans-prog-dot"></span>简</span>
+          <span class="trans-prog-item"><span class="trans-prog-dot"></span>繁</span>
+          <span class="trans-prog-item"><span class="trans-prog-dot"></span>JP</span>
+          <span class="trans-prog-item"><span class="trans-prog-dot"></span>ID</span>
+        </div>
+        <span class="trans-prog-label">번역 완료</span>
+      </div>
+
+      <!-- ── 8. 담당자 ── -->
+      <div class="section-title">⑧ 담당자 <span class="auto-note changed">1~3개 동적</span></div>
+
+      <div class="form-row" style="align-items:flex-start;">
+        <div class="form-label"><span class="req">*</span>담당자<br><span style="font-weight:400;font-size:11px;color:#8c8c8c;">(최소 1명, 최대 3명)</span></div>
+        <div class="form-control">
+          <div class="multi-row">
+            <input class="form-input" value="김원장" placeholder="성함">
+            <input class="form-input" value="02-1234-5678" placeholder="연락처">
+            <button class="row-remove" disabled style="opacity:0.3;cursor:not-allowed;">×</button>
+          </div>
+          <div class="multi-row">
+            <input class="form-input" value="박실장" placeholder="성함">
+            <input class="form-input" value="010-2345-6789" placeholder="연락처">
+            <button class="row-remove">×</button>
+          </div>
+          <button class="add-row-btn">+ 담당자 추가 (최대 3명)</button>
+        </div>
+      </div>
+
+      <!-- ── 9. 운영 상태 ── -->
+      <div class="section-title">⑨ 운영 상태</div>
+
+      <div class="form-row">
+        <div class="form-label"><span class="req">*</span>활성/비활성화</div>
+        <div class="radio-group">
+          <label><input type="radio" name="active" checked> 활성화</label>
+          <label><input type="radio" name="active"> 비활성화</label>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-label"><span class="req">*</span>스토어 상담 채팅 환영 메시지</div>
+        <div class="radio-group">
+          <label><input type="radio" name="welcome1"> 발송</label>
+          <label><input type="radio" name="welcome1" checked> 미발송</label>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-label"><span class="req">*</span>상품 상담 채팅 환영 메시지</div>
+        <div class="radio-group">
+          <label><input type="radio" name="welcome2"> 발송</label>
+          <label><input type="radio" name="welcome2" checked> 미발송</label>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="document.getElementById('modal').style.display='none'">Cancel</button>
+      <button class="btn btn-primary">OK</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleSub(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  document.querySelectorAll('.menu-sub').forEach(el => el.classList.remove('active'));
+  document.getElementById('nav-' + name).classList.add('active');
+}
+</script>
+</body>
+</html>
