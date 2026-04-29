@@ -2316,33 +2316,80 @@ function scrollToSection(id, btn) {
   syncFoToSection(id);
 }
 
+/* ══ 공통 언어 동기화 ══
+   lang: 'ko'|'en'|'zh'|'tw'|'jp'|'id'
+   skipBar: 이미 처리한 card-lang-bar (중복 방지, null 가능)
+═══════════════════════════════ */
+function _syncLangAll(lang, skipBar) {
+  // 1. 모든 card-lang-bar 동기화
+  document.querySelectorAll('.card-lang-bar').forEach(bar => {
+    if (bar === skipBar) return;
+    const btns = bar.querySelectorAll('.card-lang-btn');
+    let targetBtn = null;
+    btns.forEach(b => {
+      b.classList.remove('active');
+      const m = (b.getAttribute('onclick') || '').match(/switchCardLang\(this,'([^']+)'\)/);
+      if (m && m[1].split('-').pop() === lang) targetBtn = b;
+    });
+    if (!targetBtn) targetBtn = btns[0]; // fallback: 원본
+    if (targetBtn) {
+      targetBtn.classList.add('active');
+      const m = (targetBtn.getAttribute('onclick') || '').match(/switchCardLang\(this,'([^']+)'\)/);
+      if (m) {
+        const card = bar.closest('.card') || bar.parentElement;
+        card.querySelectorAll('.card-lang-panel').forEach(p => p.classList.remove('active'));
+        const panel = document.getElementById(m[1]);
+        if (panel) panel.classList.add('active');
+      }
+    }
+  });
+
+  // 2. 탑레벨 lang-tab-bar 동기화
+  const lpId = 'lp-' + lang; // lp-ko, lp-en, ...
+  document.querySelectorAll('.lang-tab-bar .lang-tab').forEach(b => b.classList.remove('active'));
+  const lpBtn = document.querySelector(`.lang-tab-bar .lang-tab[onclick*="${lpId}"]`);
+  if (lpBtn) {
+    lpBtn.classList.add('active');
+    document.querySelectorAll('#tab-1 .lp-panel').forEach(p => p.style.display = 'none');
+    const lpPanel = document.getElementById(lpId);
+    if (lpPanel) lpPanel.style.display = 'block';
+  }
+
+  // 3. 미리보기 패널 동기화 (ko → fo-en)
+  const foId = lang === 'ko' ? 'fo-en' : 'fo-' + lang;
+  document.querySelectorAll('.preview-lang-tab').forEach(b => b.classList.remove('active'));
+  const plBtn = document.querySelector(`.preview-lang-tab[onclick*="${foId}"]`);
+  if (plBtn) plBtn.classList.add('active');
+  document.querySelectorAll('#fo-panel [id^="fo-"]').forEach(s => s.style.display = 'none');
+  const screen = document.getElementById(foId);
+  if (screen) screen.style.display = 'block';
+}
+
 /* ── 2안 카드 내 언어 탭 전환 ── */
 function switchCardLang(btn, panelId) {
+  // 클릭된 카드 먼저 처리
   const bar = btn.closest('.card-lang-bar');
   bar.querySelectorAll('.card-lang-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  const card = bar.closest('.card');
+  const card = bar.closest('.card') || bar.parentElement;
   card.querySelectorAll('.card-lang-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById(panelId).classList.add('active');
+  const panel = document.getElementById(panelId);
+  if (panel) panel.classList.add('active');
+  // 나머지 탭 + 미리보기 동기화
+  const lang = panelId.split('-').pop(); // 'ct-en' → 'en'
+  _syncLangAll(lang, bar);
 }
 
 /* ── 언어별 설정 탭 서브탭 전환 ── */
 function switchLangPanel(btn, panelId) {
-  btn.closest('.lang-tab-bar').querySelectorAll('.lang-tab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('#tab-1 .lp-panel').forEach(p => p.style.display = 'none');
-  document.getElementById(panelId).style.display = 'block';
-  // 미리보기 동기화
-  const codeMap = { 'lp-ko':'fo-en', 'lp-en':'fo-en', 'lp-zh':'fo-zh', 'lp-tw':'fo-tw', 'lp-jp':'fo-jp', 'lp-id':'fo-id' };
-  const foId = codeMap[panelId];
-  if (foId) {
-    document.querySelectorAll('.preview-lang-tab').forEach(b => b.classList.remove('active'));
-    const plBtn = document.querySelector(`.preview-lang-tab[onclick*="${foId}"]`);
-    if (plBtn) plBtn.classList.add('active');
-    document.querySelectorAll('#fo-panel [id^="fo-"]').forEach(s => s.style.display = 'none');
-    const screen = document.getElementById(foId);
-    if (screen) screen.style.display = 'block';
-  }
+  const lang = panelId.replace(/^lp-/, ''); // 'lp-en' → 'en'
+  _syncLangAll(lang, null);
+}
+
+/* ── FO preview lang switch ── */
+function switchPreviewLang(btn, screenId) {
+  const lang = screenId.replace(/^fo-/, ''); // 'fo-zh' → 'zh'
+  _syncLangAll(lang, null);
 }
 
 /* ── FAQ lang switch ── */
@@ -2362,13 +2409,6 @@ function togglePreview() {
   document.querySelectorAll('.preview-toggle-btn').forEach(b => b.classList.toggle('active', previewOpen));
 }
 
-/* ── FO preview lang switch ── */
-function switchPreviewLang(btn, screenId) {
-  btn.closest('.preview-lang-tabs').querySelectorAll('.preview-lang-tab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('#fo-panel [id^="fo-"]').forEach(s => s.style.display = 'none');
-  document.getElementById(screenId).style.display = 'block';
-}
 
 /* ── Live preview update (스토어명) ── */
 function updatePreview() {
