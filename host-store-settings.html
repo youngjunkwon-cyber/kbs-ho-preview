@@ -419,6 +419,18 @@ body {
   display: flex; align-items: center; gap: 5px;
 }
 
+/* ══ 섹션별 번역 저장 바 ══ */
+.trans-save-bar { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.trans-prog-row { display: flex; gap: 8px; align-items: center; }
+.trans-prog-item { display: flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 600; color: var(--text2); }
+.trans-prog-dot { width: 7px; height: 7px; border-radius: 50%; background: #d1d5db; flex-shrink: 0; transition: background 0.2s; }
+.trans-prog-dot.done { background: #22c55e; }
+.trans-prog-dot.running { background: var(--primary,#e8537a); animation: tp-pulse 0.7s infinite; }
+@keyframes tp-pulse { 0%,100%{opacity:1;} 50%{opacity:0.25;} }
+.trans-save-btn { font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 6px; border: none; background: var(--text1,#121212); color: #fff; cursor: pointer; font-family: inherit; transition: opacity 0.15s; white-space: nowrap; }
+.trans-save-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.trans-save-label { font-size: 11px; color: var(--text3); }
+
 /* ══ v3 업그레이드 CSS ══ */
 
 /* 탭 스트립 */
@@ -820,11 +832,7 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
     <div class="menu-item"><span class="menu-icon">✉</span>메신저 상담 관리</div>
     <div class="menu-item"><span class="menu-icon">☆</span>리뷰 관리</div>
     <div class="menu-item"><span class="menu-icon">⚙</span>챗봇 설정</div>
-    <div class="menu-item has-sub" id="sidebar-gallery-menu" onclick="toggleLnbMenu('gallery')"><span class="menu-icon">⊞</span>갤러리 관리<span class="menu-chevron">▼</span></div>
-    <div id="sidebar-gallery-sub" style="display:none;">
-      <div class="menu-item sub" onclick="window.location='host-gallery.html'">전/후 사진</div>
-      <div class="menu-item sub" onclick="window.location='host-gallery.html?tab=general'">일반 사진</div>
-    </div>
+    <div class="menu-item" onclick="window.location='host-gallery.html'"><span class="menu-icon">⊞</span>전/후 사진 관리</div>
     <div class="menu-item has-sub" id="sidebar-store-menu" onclick="toggleLnbMenu('store')"><span class="menu-icon">◫</span>스토어 설정<span class="menu-chevron">▲</span></div>
     <div id="sidebar-store-sub">
       <div class="menu-item sub active" data-v3-section="basic" onclick="switchV3Section('basic')">기본정보</div>
@@ -841,9 +849,9 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
       <div class="topbar">
         <span class="topbar-title">스토어 설정</span>
         <div class="version-tabs">
-          <button class="version-tab active" onclick="switchVersion(1, this)">1안</button>
+          <button class="version-tab active" onclick="switchVersion(3, this)">확정안</button>
+          <button class="version-tab" onclick="switchVersion(1, this)">1안</button>
           <button class="version-tab" onclick="switchVersion(2, this)">2안</button>
-          <button class="version-tab" onclick="switchVersion(3, this)">3안</button>
         </div>
         <div class="topbar-right">
           <div class="topbar-bell">🔔<div class="topbar-notif"></div></div>
@@ -910,10 +918,6 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
                       <button class="btn btn-sm btn-ghost">직접 업로드</button>
                     </div>
                     <div class="img-size-guide">권장 비율: <strong>16:9</strong> · 권장 해상도: 1920×1080px 이상 · 최대 10MB · JPG/PNG<br>앱 스토어 상단 슬라이드에 가로형으로 표시됩니다.</div>
-                    <div class="source-note" style="flex-direction:column;align-items:flex-start;gap:3px;">
-                      <span>출처: 갤러리 관리 &gt; 일반 사진 · <a href="host-gallery.html?tab=general">관리 페이지 바로가기 ↗</a></span>
-                      <span>직접 업로드한 이미지는 갤러리 관리 &gt; 일반 사진에도 자동으로 저장됩니다.</span>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -1009,16 +1013,29 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
             <div class="card-body">
               <div class="checkbox-grid">
                 <div class="chip-check" onclick="this.classList.toggle('on')">프라이빗 공간</div>
-                <div class="chip-check on" onclick="this.classList.toggle('on')">✓ 여의사</div>
                 <div class="chip-check on" onclick="this.classList.toggle('on')">✓ 전문의</div>
-                <div class="chip-check" onclick="this.classList.toggle('on')">야간 진료</div>
-                <div class="chip-check" onclick="this.classList.toggle('on')">주말 진료</div>
-                <div class="chip-check on" onclick="this.classList.toggle('on')">✓ 외국어 상담</div>
-                <div class="chip-check on" onclick="this.classList.toggle('on')">✓ 공항 픽업</div>
-                <div class="chip-check on" onclick="this.classList.toggle('on')">✓ 통역사 동행</div>
-                <div class="chip-check" onclick="this.classList.toggle('on')">당일 예약</div>
-                <div class="chip-check" onclick="this.classList.toggle('on')">무통증 시술</div>
-                <div class="chip-check" onclick="this.classList.toggle('on')">비급여 전문</div>
+                <div class="chip-check on" onclick="this.classList.toggle('on')">✓ 여의사</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">휴일진료</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">야간진료</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">픽업서비스</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">수술실CCTV</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">시술전문병원</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">전담회복실</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">첫 전문</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">복구전문</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">1:1시술</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">뷰티/코스메틱</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">패션/잡화</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">캐릭터/애니메이션/게임</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">가전/라이프스타일</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">스포츠/아웃도어</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">푸드</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">자동차/테크</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">아트/전시/포토존</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">여행</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">콜라보</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">연예인</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">시술 전문</div>
               </div>
             </div>
           </div>
@@ -1429,10 +1446,6 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
                       <button class="btn btn-sm btn-ghost">직접 업로드</button>
                     </div>
                     <div class="img-size-guide">권장 비율: <strong>16:9</strong> · 권장 해상도: 1920×1080px 이상 · 최대 10MB · JPG/PNG<br>앱 스토어 상단 슬라이드에 가로형으로 표시됩니다.</div>
-                    <div class="source-note" style="flex-direction:column;align-items:flex-start;gap:3px;">
-                      <span>출처: 갤러리 관리 &gt; 일반 사진 · <a href="host-gallery.html?tab=general">관리 페이지 바로가기 ↗</a></span>
-                      <span>직접 업로드한 이미지는 갤러리 관리 &gt; 일반 사진에도 자동으로 저장됩니다.</span>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -1455,6 +1468,17 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
                 <div class="form-row"><div class="form-label">기본 주소 <span class="req">*</span></div><div class="form-control"><input class="input" value="서울특별시 강남구 테헤란로 123" /></div></div>
                 <div class="form-row"><div class="form-label">상세 주소</div><div class="form-control"><input class="input" value="9호선 신논현역 도보 5분" /></div></div>
                 <div class="form-row"><div class="form-label">채팅 첫 메시지</div><div class="form-control"><div class="radio-group" style="margin-bottom:8px;"><label class="radio-item"><input type="radio" name="fmsg2" checked> 전송</label><label class="radio-item"><input type="radio" name="fmsg2"> 미전송</label></div><textarea class="textarea">안녕하세요! 한미역 의원입니다. 궁금하신 점은 편하게 문의해 주세요.</textarea></div></div>
+                <div class="trans-save-bar">
+                  <button class="trans-save-btn" onclick="runSectionTranslation(this,'ct')">저장 및 번역 실행</button>
+                  <div class="trans-prog-row">
+                    <span class="trans-prog-item"><span class="trans-prog-dot done" id="tp-ct-en"></span>EN</span>
+                    <span class="trans-prog-item"><span class="trans-prog-dot done" id="tp-ct-zh"></span>简</span>
+                    <span class="trans-prog-item"><span class="trans-prog-dot done" id="tp-ct-tw"></span>繁</span>
+                    <span class="trans-prog-item"><span class="trans-prog-dot done" id="tp-ct-jp"></span>JP</span>
+                    <span class="trans-prog-item"><span class="trans-prog-dot done" id="tp-ct-id"></span>ID</span>
+                  </div>
+                  <span class="trans-save-label" id="tp-ct-label">번역 완료</span>
+                </div>
               </div>
               <div id="ct-en" class="card-lang-panel">
                 <div class="lang-expose-row"><div class="lang-expose-left"><span class="lang-name">English</span><span class="badge badge-ok">노출 중</span></div><div class="lang-expose-right"><span>앱 노출</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div></div>
@@ -1520,13 +1544,29 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
             <div class="card-body">
               <div class="checkbox-grid">
                 <div class="chip-check" onclick="this.classList.toggle('on')">프라이빗 공간</div>
-                <div class="chip-check on" onclick="this.classList.toggle('on')">✓ 여의사</div>
                 <div class="chip-check on" onclick="this.classList.toggle('on')">✓ 전문의</div>
-                <div class="chip-check" onclick="this.classList.toggle('on')">야간 진료</div>
-                <div class="chip-check" onclick="this.classList.toggle('on')">주말 진료</div>
-                <div class="chip-check on" onclick="this.classList.toggle('on')">✓ 외국어 상담</div>
-                <div class="chip-check on" onclick="this.classList.toggle('on')">✓ 공항 픽업</div>
-                <div class="chip-check on" onclick="this.classList.toggle('on')">✓ 통역사 동행</div>
+                <div class="chip-check on" onclick="this.classList.toggle('on')">✓ 여의사</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">휴일진료</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">야간진료</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">픽업서비스</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">수술실CCTV</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">시술전문병원</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">전담회복실</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">첫 전문</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">복구전문</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">1:1시술</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">뷰티/코스메틱</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">패션/잡화</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">캐릭터/애니메이션/게임</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">가전/라이프스타일</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">스포츠/아웃도어</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">푸드</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">자동차/테크</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">아트/전시/포토존</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">여행</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">콜라보</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">연예인</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">시술 전문</div>
               </div>
             </div>
           </div>
@@ -1599,6 +1639,17 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
                 <div class="ai-label">✦ AI 생성 초안 (한국어 기준)</div>
                 <div class="ai-preview">경력 20년 대표원장이 직접 시술하는 강남 리프팅 전문 클리닉. 올쎄라·인모드·보톡스·필러 전문이며, 외국인 환자를 위한 통역 동행 및 공항 픽업 서비스를 제공합니다.</div>
                 <div class="ai-actions"><button class="btn btn-secondary btn-sm">✦ AI 재생성</button><button class="btn btn-secondary btn-sm">직접 수정</button><span class="text-muted" style="font-size:11px;">오늘 1 / 3회 사용</span></div>
+                <div class="trans-save-bar">
+                  <button class="trans-save-btn" onclick="runSectionTranslation(this,'ai')">저장 및 번역 실행</button>
+                  <div class="trans-prog-row">
+                    <span class="trans-prog-item"><span class="trans-prog-dot done" id="tp-ai-en"></span>EN</span>
+                    <span class="trans-prog-item"><span class="trans-prog-dot done" id="tp-ai-zh"></span>简</span>
+                    <span class="trans-prog-item"><span class="trans-prog-dot done" id="tp-ai-tw"></span>繁</span>
+                    <span class="trans-prog-item"><span class="trans-prog-dot done" id="tp-ai-jp"></span>JP</span>
+                    <span class="trans-prog-item"><span class="trans-prog-dot done" id="tp-ai-id"></span>ID</span>
+                  </div>
+                  <span class="trans-save-label" id="tp-ai-label">번역 완료</span>
+                </div>
               </div>
               <div id="ai-en" class="card-lang-panel">
                 <div class="auto-trans-note" style="margin-bottom:10px;"><span>✦</span> 자동 번역 적용됨</div>
@@ -1651,6 +1702,17 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
                 </div>
                 <div class="form-row"><div class="form-label">제목 <span class="req">*</span></div><div class="form-control"><input class="input" value="경력 20년 리프팅 전문 클리닉" /></div></div>
                 <div class="form-row"><div class="form-label">내용 <span class="req">*</span></div><div class="form-control"><textarea class="textarea" style="min-height:80px;">올쎄라 1세대 도입부터 개원하여 현재까지 많은 사랑을 받고 있습니다. 한국의 최신 의료 기술의 정수를 저희 클리닉에서 만나보실 수 있습니다.</textarea></div></div>
+                <div class="trans-save-bar">
+                  <button class="trans-save-btn" onclick="runSectionTranslation(this,'intro')">저장 및 번역 실행</button>
+                  <div class="trans-prog-row">
+                    <span class="trans-prog-item"><span class="trans-prog-dot done" id="tp-intro-en"></span>EN</span>
+                    <span class="trans-prog-item"><span class="trans-prog-dot done" id="tp-intro-zh"></span>简</span>
+                    <span class="trans-prog-item"><span class="trans-prog-dot done" id="tp-intro-tw"></span>繁</span>
+                    <span class="trans-prog-item"><span class="trans-prog-dot done" id="tp-intro-jp"></span>JP</span>
+                    <span class="trans-prog-item"><span class="trans-prog-dot done" id="tp-intro-id"></span>ID</span>
+                  </div>
+                  <span class="trans-save-label" id="tp-intro-label">번역 완료</span>
+                </div>
               </div>
               <div id="intro-en" class="card-lang-panel">
                 <div class="auto-trans-note" style="margin-bottom:10px;"><span>✦</span> 자동 번역 적용됨</div>
@@ -1695,6 +1757,17 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
               <div id="faq2-ko" class="card-lang-panel active">
                 <div class="faq-item" style="margin-bottom:8px;"><div class="faq-q" style="font-weight:600;font-size:12px;">Q. 외국인도 예약하고 시술받을 수 있나요?</div><div class="faq-a"><textarea class="textarea" style="min-height:48px;">네, 외국인 고객도 동일하게 예약 및 시술 가능합니다. KBS 앱을 통해 예약하거나 채팅으로 문의해 주세요.</textarea></div></div>
                 <div class="faq-item" style="margin-bottom:8px;"><div class="faq-q" style="font-weight:600;font-size:12px;">Q. 시술 당일 방문 시 준비물이 있나요?</div><div class="faq-a"><textarea class="textarea" style="min-height:48px;">메이크업을 지우고 방문해 주세요. 예약 확인서를 지참하시면 됩니다.</textarea></div></div>
+                <div class="trans-save-bar">
+                  <button class="trans-save-btn" onclick="runSectionTranslation(this,'faq2')">저장 및 번역 실행</button>
+                  <div class="trans-prog-row">
+                    <span class="trans-prog-item"><span class="trans-prog-dot done" id="tp-faq2-en"></span>EN</span>
+                    <span class="trans-prog-item"><span class="trans-prog-dot done" id="tp-faq2-zh"></span>简</span>
+                    <span class="trans-prog-item"><span class="trans-prog-dot done" id="tp-faq2-tw"></span>繁</span>
+                    <span class="trans-prog-item"><span class="trans-prog-dot done" id="tp-faq2-jp"></span>JP</span>
+                    <span class="trans-prog-item"><span class="trans-prog-dot done" id="tp-faq2-id"></span>ID</span>
+                  </div>
+                  <span class="trans-save-label" id="tp-faq2-label">번역 완료</span>
+                </div>
               </div>
               <div id="faq2-en" class="card-lang-panel">
                 <div class="auto-trans-note" style="margin-bottom:10px;"><span>✦</span> 자동 번역 적용됨</div>
@@ -1796,16 +1869,29 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
             <div class="card-body">
               <div class="checkbox-grid">
                 <div class="chip-check" onclick="this.classList.toggle('on')">프라이빗 공간</div>
-                <div class="chip-check on" onclick="this.classList.toggle('on')">✓ 여의사</div>
                 <div class="chip-check on" onclick="this.classList.toggle('on')">✓ 전문의</div>
-                <div class="chip-check" onclick="this.classList.toggle('on')">야간 진료</div>
-                <div class="chip-check" onclick="this.classList.toggle('on')">주말 진료</div>
-                <div class="chip-check on" onclick="this.classList.toggle('on')">✓ 외국어 상담</div>
-                <div class="chip-check on" onclick="this.classList.toggle('on')">✓ 공항 픽업</div>
-                <div class="chip-check on" onclick="this.classList.toggle('on')">✓ 통역사 동행</div>
-                <div class="chip-check" onclick="this.classList.toggle('on')">당일 예약</div>
-                <div class="chip-check" onclick="this.classList.toggle('on')">무통증 시술</div>
-                <div class="chip-check" onclick="this.classList.toggle('on')">비급여 전문</div>
+                <div class="chip-check on" onclick="this.classList.toggle('on')">✓ 여의사</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">휴일진료</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">야간진료</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">픽업서비스</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">수술실CCTV</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">시술전문병원</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">전담회복실</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">첫 전문</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">복구전문</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">1:1시술</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">뷰티/코스메틱</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">패션/잡화</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">캐릭터/애니메이션/게임</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">가전/라이프스타일</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">스포츠/아웃도어</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">푸드</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">자동차/테크</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">아트/전시/포토존</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">여행</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">콜라보</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">연예인</div>
+                <div class="chip-check" onclick="this.classList.toggle('on')">시술 전문</div>
               </div>
             </div>
           </div>
@@ -2366,7 +2452,7 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
       <div class="gallery-modal-backdrop" onclick="closeGalleryPicker()"></div>
       <div class="gallery-modal-dialog">
         <div class="gallery-modal-header">
-          <span>갤러리 — 일반 사진</span>
+          <span>이미지 선택</span>
           <div style="display:flex;align-items:center;gap:8px;margin-left:auto;margin-right:12px;">
             <button class="btn btn-sm btn-secondary" onclick="document.getElementById('gallery-file-input').click()">직접 업로드</button>
             <input id="gallery-file-input" type="file" accept="image/*" style="display:none;" onchange="handleGalleryUpload(this)" />
@@ -2408,10 +2494,6 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
               <div class="gallery-item-name">store_interior.jpg</div>
             </div>
           </div>
-          <div style="margin-top:14px;font-size:11px;color:var(--text3);display:flex;align-items:center;gap:4px;">
-            <span style="color:var(--blue);font-size:13px;">ℹ</span>
-            직접 업로드한 이미지는 <strong style="color:var(--text2);">갤러리 관리 &gt; 일반 사진</strong>에도 자동으로 저장됩니다.
-          </div>
         </div>
         <div class="gallery-modal-footer">
           <button class="btn btn-sm btn-secondary" onclick="closeGalleryPicker()">취소</button>
@@ -2448,8 +2530,8 @@ function switchTab(idx, btn) {
   document.querySelectorAll('.tab-panel').forEach((p, i) => p.classList.toggle('active', i === idx));
 }
 
-/* ── 버전 전환 (1안 / 2안 / 3안) ── */
-let currentVersion = 1;
+/* ── 버전 전환 (확정안 / 1안 / 2안) ── */
+let currentVersion = 3;
 let currentV3Section = 'basic';
 
 function switchVersion(v, btn) {
@@ -2628,6 +2710,34 @@ function _syncLangAll(lang, skipBar) {
   if (screen) screen.style.display = 'block';
 }
 
+/* ── 섹션별 저장 및 자동번역 실행 ── */
+function runSectionTranslation(btn, prefix) {
+  const langs = ['en', 'zh', 'tw', 'jp', 'id'];
+  const label = document.getElementById('tp-' + prefix + '-label');
+
+  // 버튼·도트 초기화
+  btn.disabled = true;
+  btn.textContent = '번역 중...';
+  if (label) label.textContent = '번역 실행 중...';
+  langs.forEach(lang => {
+    const dot = document.getElementById('tp-' + prefix + '-' + lang);
+    if (dot) dot.className = 'trans-prog-dot running';
+  });
+
+  // 언어별 순차 완료 시뮬레이션 (언어당 700ms)
+  langs.forEach((lang, i) => {
+    setTimeout(() => {
+      const dot = document.getElementById('tp-' + prefix + '-' + lang);
+      if (dot) dot.className = 'trans-prog-dot done';
+      if (i === langs.length - 1) {
+        btn.disabled = false;
+        btn.textContent = '재번역 실행';
+        if (label) label.textContent = '번역 완료';
+      }
+    }, (i + 1) * 700);
+  });
+}
+
 /* ── SNS 채팅 채널 언어 탭 전환 ── */
 function switchChannelLang(btn, panelId) {
   const container = btn.closest('.card-body');
@@ -2781,6 +2891,12 @@ function confirmGallerySelection() {
   }
   closeGalleryPicker();
 }
+
+/* ── 페이지 초기화: 확정안(v3) 기본 활성 ── */
+(function() {
+  const defaultTab = document.querySelector('.version-tab.active');
+  if (defaultTab) switchVersion(3, defaultTab);
+})();
 
 /* ── 섹션 툴팁 자동 주입 ── */
 (function() {

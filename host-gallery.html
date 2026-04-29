@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>갤러리 관리 — KBS Host</title>
+<title>전/후 사진 관리 — KBS Host</title>
 <style>
 /* ══ 스토어 설정과 동일한 Design Token ══ */
 :root {
@@ -426,11 +426,7 @@ body {
     <div class="menu-item"><span class="menu-icon">✉</span>메신저 상담 관리</div>
     <div class="menu-item"><span class="menu-icon">☆</span>리뷰 관리</div>
     <div class="menu-item"><span class="menu-icon">⚙</span>챗봇 설정</div>
-    <div class="menu-item has-sub" id="sidebar-gallery-menu" onclick="toggleLnbMenu('gallery')"><span class="menu-icon">⊞</span>갤러리 관리<span class="menu-chevron">▲</span></div>
-    <div id="sidebar-gallery-sub">
-      <div class="menu-item sub active" id="sidebar-ba" onclick="showTab('ba')">전/후 사진</div>
-      <div class="menu-item sub" id="sidebar-general" onclick="showTab('general')">일반 사진</div>
-    </div>
+    <div class="menu-item active"><span class="menu-icon">⊞</span>전/후 사진 관리</div>
     <div class="menu-item has-sub" id="sidebar-store-menu" onclick="toggleLnbMenu('store')"><span class="menu-icon">◫</span>스토어 설정<span class="menu-chevron">▼</span></div>
     <div id="sidebar-store-sub" style="display:none;">
       <div class="menu-item sub" onclick="window.location='host-store-settings.html'">기본정보</div>
@@ -441,7 +437,7 @@ body {
   <!-- ── Main ── -->
   <main class="main">
     <div class="topbar">
-      <span class="topbar-title" id="topbar-title">갤러리 관리 — 전/후 사진</span>
+      <span class="topbar-title">전/후 사진 관리</span>
       <div class="topbar-right" style="display:flex;align-items:center;gap:8px;">
         <div class="topbar-bell" style="position:relative;">🔔<div class="topbar-notif"></div></div>
         <div class="topbar-avatar">A</div>
@@ -909,30 +905,13 @@ function switchBaView(view) {
 }
 
 function toggleLnbMenu(which) {
-  const gMenu = document.getElementById('sidebar-gallery-menu');
-  const gSub  = document.getElementById('sidebar-gallery-sub');
   const sMenu = document.getElementById('sidebar-store-menu');
   const sSub  = document.getElementById('sidebar-store-sub');
-  if (which === 'gallery') {
-    const open = gSub.style.display !== 'none';
-    gSub.style.display = open ? 'none' : '';
-    gMenu.querySelector('.menu-chevron').textContent = open ? '▼' : '▲';
-  } else {
+  if (which === 'store') {
     const open = sSub.style.display !== 'none';
     sSub.style.display = open ? 'none' : '';
     sMenu.querySelector('.menu-chevron').textContent = open ? '▼' : '▲';
   }
-}
-
-function showTab(tab) {
-  const isBa = tab === 'ba';
-  document.getElementById('panel-ba').style.display = isBa ? 'block' : 'none';
-  document.getElementById('panel-general').style.display = isBa ? 'none' : 'block';
-  document.getElementById('topbar-title').textContent = isBa
-    ? '갤러리 관리 — 전/후 사진'
-    : '갤러리 관리 — 일반 사진';
-  document.getElementById('sidebar-ba').classList.toggle('active', isBa);
-  document.getElementById('sidebar-general').classList.toggle('active', !isBa);
 }
 
 function toggleAddForm() {
