@@ -200,7 +200,7 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
     <div class="menu-item has-sub">회원</div>
     <div class="menu-item has-sub open" onclick="toggleSub('store-sub')">스토어</div>
     <div id="store-sub" class="sub-group open">
-      <div class="menu-sub">기본정보관리</div>
+      <div class="menu-sub" id="nav-basic" onclick="showView('basic')">기본정보관리</div>
       <div class="menu-sub active" id="nav-translation" onclick="showView('translation')">번역정보관리</div>
       <div class="menu-sub">채팅조회</div>
       <div class="menu-sub">상담조회</div>
@@ -237,6 +237,154 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
     </div>
 
     <div class="content">
+
+      <!-- ════════════════════════════════
+           VIEW 0 — 기본정보관리
+      ════════════════════════════════ -->
+      <div id="view-basic" class="view">
+        <div class="page-title">스토어 &gt; 기본정보관리</div>
+
+        <div style="margin-bottom:16px;padding:12px 16px;background:#fff7e6;border:1px solid #ffe58f;border-radius:4px;font-size:12px;color:#874d00;line-height:1.7;">
+          <strong>변경점 2가지:</strong>
+          ① <strong>담당자</strong>를 번역정보관리에서 기본정보관리로 이동 (언어 무관) · 1~3명 동적 입력 ·
+          ② <strong>지하철역</strong> 단일 → 다중 선택 (최대 3개, 노선 표시 포함)
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span>스토어 기본정보 수정 — 원진성형외과</span>
+            <button class="btn btn-primary btn-sm">신규 상점등록</button>
+          </div>
+          <div class="card-body">
+            <div class="tabs">
+              <div class="tab active">스토어정보</div>
+              <div class="tab">관리자설정</div>
+            </div>
+
+            <!-- 식별/메타 -->
+            <div class="section-title">식별 정보 <span class="auto-note">변경 없음</span></div>
+            <div class="form-row two-col">
+              <div class="form-label"><span class="req">*</span>상점코드</div>
+              <input class="form-input" value="wonjin">
+              <div class="form-label">카테고리</div>
+              <select class="form-select"><option>성형외과</option></select>
+            </div>
+            <div class="form-row two-col">
+              <div class="form-label">지역</div>
+              <select class="form-select"><option>서울 서초구</option></select>
+              <div class="form-label"><span class="req">*</span>대표번호</div>
+              <input class="form-input" value="02-1234-5678">
+            </div>
+            <div class="form-row two-col">
+              <div class="form-label"><span class="req">*</span>사업자번호</div>
+              <input class="form-input" value="123-45-67890">
+              <div class="form-label"><span class="req">*</span>이메일</div>
+              <input class="form-input" value="contact@wonjin.kr">
+            </div>
+
+            <!-- 주소/좌표 -->
+            <div class="section-title">주소 / 좌표 <span class="auto-note">변경 없음</span></div>
+            <div class="form-row two-col">
+              <div class="form-label"><span class="req">*</span>우편번호</div>
+              <input class="form-input" value="06158">
+              <div class="form-label"></div>
+              <input class="form-input" value="서울 서초구 강남대로 419 (서초동, 파고다타워)">
+            </div>
+            <div class="form-row">
+              <div class="form-label">지도</div>
+              <div style="background:#fafafa;border:1px solid #e8e8e8;border-radius:4px;height:140px;display:flex;align-items:center;justify-content:center;color:#bfbfbf;font-size:12px;">🗺 네이버 지도 미리보기</div>
+            </div>
+            <div class="form-row two-col">
+              <div class="form-label"><span class="req">*</span>위도</div>
+              <input class="form-input" value="37.4979">
+              <div class="form-label"><span class="req">*</span>경도</div>
+              <input class="form-input" value="127.0276">
+            </div>
+
+            <!-- 담당자 (신규 이동) -->
+            <div class="section-title">담당자 <span class="auto-note changed">번역정보관리 → 기본정보관리로 이동 · 1~3명 동적</span></div>
+            <div class="form-row" style="align-items:flex-start;">
+              <div class="form-label"><span class="req">*</span>담당자<br><span style="font-weight:400;font-size:11px;color:#8c8c8c;">(최소 1명, 최대 3명)</span></div>
+              <div class="form-control">
+                <div class="multi-row">
+                  <input class="form-input" value="김원장" placeholder="성함" style="max-width:180px;">
+                  <input class="form-input" value="02-1234-5678" placeholder="연락처" style="max-width:180px;">
+                  <input class="form-input" value="director@wonjin.kr" placeholder="이메일 (선택)">
+                  <button class="row-remove" disabled style="opacity:0.3;cursor:not-allowed;">×</button>
+                </div>
+                <div class="multi-row">
+                  <input class="form-input" value="박실장" placeholder="성함" style="max-width:180px;">
+                  <input class="form-input" value="010-2345-6789" placeholder="연락처" style="max-width:180px;">
+                  <input class="form-input" value="" placeholder="이메일 (선택)">
+                  <button class="row-remove">×</button>
+                </div>
+                <button class="add-row-btn">+ 담당자 추가 (최대 3명)</button>
+                <div class="form-help">고객 화면에는 노출되지 않습니다. 내부 운영·KBS 측 문의 연락처로 활용됩니다.</div>
+              </div>
+            </div>
+
+            <!-- 운영시간 -->
+            <div class="section-title">운영시간 <span class="auto-note">변경 없음</span></div>
+            <div class="form-row" style="align-items:flex-start;">
+              <div class="form-label">요일별 운영시간</div>
+              <div class="form-control" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px 18px;">
+                <div style="display:flex;gap:8px;align-items:center;"><span style="width:32px;font-size:12px;font-weight:600;">월</span><input class="form-input" type="time" value="09:00" style="width:100px;"><span>~</span><input class="form-input" type="time" value="18:00" style="width:100px;"><label style="font-size:12px;display:flex;gap:4px;align-items:center;"><input type="checkbox"> 휴무</label></div>
+                <div style="display:flex;gap:8px;align-items:center;"><span style="width:32px;font-size:12px;font-weight:600;">화</span><input class="form-input" type="time" value="09:00" style="width:100px;"><span>~</span><input class="form-input" type="time" value="18:00" style="width:100px;"><label style="font-size:12px;display:flex;gap:4px;align-items:center;"><input type="checkbox"> 휴무</label></div>
+                <div style="display:flex;gap:8px;align-items:center;"><span style="width:32px;font-size:12px;font-weight:600;">수</span><input class="form-input" type="time" value="09:00" style="width:100px;"><span>~</span><input class="form-input" type="time" value="18:00" style="width:100px;"><label style="font-size:12px;display:flex;gap:4px;align-items:center;"><input type="checkbox"> 휴무</label></div>
+                <div style="display:flex;gap:8px;align-items:center;"><span style="width:32px;font-size:12px;font-weight:600;">목</span><input class="form-input" type="time" value="09:00" style="width:100px;"><span>~</span><input class="form-input" type="time" value="18:00" style="width:100px;"><label style="font-size:12px;display:flex;gap:4px;align-items:center;"><input type="checkbox"> 휴무</label></div>
+                <div style="display:flex;gap:8px;align-items:center;"><span style="width:32px;font-size:12px;font-weight:600;">금</span><input class="form-input" type="time" value="09:00" style="width:100px;"><span>~</span><input class="form-input" type="time" value="18:00" style="width:100px;"><label style="font-size:12px;display:flex;gap:4px;align-items:center;"><input type="checkbox"> 휴무</label></div>
+                <div style="display:flex;gap:8px;align-items:center;"><span style="width:32px;font-size:12px;font-weight:600;">토</span><input class="form-input" type="time" value="10:00" style="width:100px;"><span>~</span><input class="form-input" type="time" value="15:00" style="width:100px;"><label style="font-size:12px;display:flex;gap:4px;align-items:center;"><input type="checkbox"> 휴무</label></div>
+                <div style="display:flex;gap:8px;align-items:center;"><span style="width:32px;font-size:12px;font-weight:600;">일</span><input class="form-input" type="time" style="width:100px;" disabled><span>~</span><input class="form-input" type="time" style="width:100px;" disabled><label style="font-size:12px;display:flex;gap:4px;align-items:center;"><input type="checkbox" checked> 휴무</label></div>
+                <div style="display:flex;gap:8px;align-items:center;"><span style="width:32px;font-size:12px;font-weight:600;">공휴일</span><input class="form-input" type="time" style="width:100px;" disabled><span>~</span><input class="form-input" type="time" style="width:100px;" disabled><label style="font-size:12px;display:flex;gap:4px;align-items:center;"><input type="checkbox" checked> 휴무</label></div>
+              </div>
+            </div>
+
+            <!-- 위치 정보: 지하철역 다중 -->
+            <div class="section-title">위치 정보 <span class="auto-note changed">지하철역 단일 → 다중 선택 (최대 3개)</span></div>
+            <div class="form-row" style="align-items:flex-start;">
+              <div class="form-label">가까운 지하철역<br><span style="font-weight:400;font-size:11px;color:#8c8c8c;">(최대 3개)</span></div>
+              <div class="form-control">
+                <select class="form-select"><option>지하철 노선 선택</option></select>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
+                  <span class="active-tag" style="font-size:12px;padding:4px 6px 4px 12px;">명동역 4호선 <button>×</button></span>
+                  <span class="active-tag" style="font-size:12px;padding:4px 6px 4px 12px;">을지로입구역 2호선 <button>×</button></span>
+                </div>
+                <div class="form-help">노선 정보가 함께 표시되어 고객 앱에서 노출됩니다.</div>
+              </div>
+            </div>
+
+            <!-- 운영 형태 -->
+            <div class="section-title">운영 형태 <span class="auto-note">변경 없음</span></div>
+            <div class="form-row">
+              <div class="form-label">프라이빗/퍼블릭</div>
+              <div class="radio-group">
+                <label><input type="radio" name="pp"> 미선택</label>
+                <label><input type="radio" name="pp"> 프라이빗</label>
+                <label><input type="radio" name="pp" checked> 퍼블릭</label>
+              </div>
+            </div>
+
+            <!-- 특징 -->
+            <div class="section-title">스토어 특징 <span class="auto-note">변경 없음 · 옵션관리 &gt; 특징 관리에서 통제</span></div>
+            <div class="form-row">
+              <div class="form-label">특징</div>
+              <div class="form-control">
+                <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+                  <span class="active-tag" style="font-size:12px;padding:4px 6px 4px 12px;">전문의 <button>×</button></span>
+                  <span class="active-tag" style="font-size:12px;padding:4px 6px 4px 12px;">여의사 <button>×</button></span>
+                  <span class="active-tag" style="font-size:12px;padding:4px 6px 4px 12px;">픽업서비스 <button>×</button></span>
+                  <button class="btn btn-sm">+ 특징 추가</button>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:24px;display:flex;justify-content:flex-end;gap:8px;">
+              <button class="btn">취소</button>
+              <button class="btn btn-primary">저장</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- ════════════════════════════════
            VIEW 1 — 번역정보관리 (확장 모달)
@@ -762,28 +910,8 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
         <span class="trans-prog-label">번역 완료</span>
       </div>
 
-      <!-- ── 8. 담당자 ── -->
-      <div class="section-title">⑧ 담당자 <span class="auto-note changed">1~3개 동적</span></div>
-
-      <div class="form-row" style="align-items:flex-start;">
-        <div class="form-label"><span class="req">*</span>담당자<br><span style="font-weight:400;font-size:11px;color:#8c8c8c;">(최소 1명, 최대 3명)</span></div>
-        <div class="form-control">
-          <div class="multi-row">
-            <input class="form-input" value="김원장" placeholder="성함">
-            <input class="form-input" value="02-1234-5678" placeholder="연락처">
-            <button class="row-remove" disabled style="opacity:0.3;cursor:not-allowed;">×</button>
-          </div>
-          <div class="multi-row">
-            <input class="form-input" value="박실장" placeholder="성함">
-            <input class="form-input" value="010-2345-6789" placeholder="연락처">
-            <button class="row-remove">×</button>
-          </div>
-          <button class="add-row-btn">+ 담당자 추가 (최대 3명)</button>
-        </div>
-      </div>
-
-      <!-- ── 9. 운영 상태 ── -->
-      <div class="section-title">⑨ 운영 상태</div>
+      <!-- ── 8. 운영 상태 ── -->
+      <div class="section-title">⑧ 운영 상태 <span class="auto-note changed">담당자는 기본정보관리로 이동</span></div>
 
       <div class="form-row">
         <div class="form-label"><span class="req">*</span>활성/비활성화</div>
