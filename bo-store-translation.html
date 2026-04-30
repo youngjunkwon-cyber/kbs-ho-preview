@@ -157,6 +157,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 /* ── Channel filter block ── */
 .ch-block { margin:14px 18px 0; padding:12px 14px; background:#fafafa; border:1px solid #f0f0f0; border-radius:4px; }
 .ch-block-head { display:flex; align-items:baseline; gap:10px; margin-bottom:8px; flex-wrap:wrap; }
+.ch-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px 24px; }
+.ch-col { display:flex; flex-direction:column; }
+@media (max-width:1280px) { .ch-grid { grid-template-columns:1fr; } }
 .ch-block-title { font-size:12px; font-weight:600; color:#262626; }
 .ch-block-help { font-size:11px; color:#8c8c8c; }
 .ch-line { display:flex; flex-wrap:wrap; align-items:center; gap:10px; padding:8px 0; border-bottom:1px dashed #f0f0f0; }
@@ -676,89 +679,91 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
               </div>
             </div>
 
-            <!-- 채널 설정 (유기적 검색) -->
+            <!-- 채널 설정 (유기적 검색) — 2-column 그리드 -->
             <div class="ch-block">
               <div class="ch-block-head">
                 <span class="ch-block-title">📡 채널 설정으로 검색</span>
                 <span class="ch-block-help">선택한 채널이 실제로 등록된 스토어만 노출. 매칭 모드로 조합 가능합니다.</span>
               </div>
 
-              <!-- SNS 채팅 채널 -->
-              <div class="ch-line">
-                <div class="ch-line-label">
-                  <span class="ch-line-title">SNS 채팅 채널</span>
-                  <select class="ch-mode form-select">
-                    <option>모두 포함 (AND)</option>
-                    <option selected>하나 이상 포함 (OR)</option>
-                    <option>정확히 일치</option>
-                    <option>제외</option>
-                  </select>
-                </div>
-                <div class="chip-row">
-                  <span class="filter-chip on" data-icon="💬">WhatsApp</span>
-                  <span class="filter-chip on" data-icon="💚">LINE</span>
-                  <span class="filter-chip" data-icon="🐉">WeChat</span>
-                  <span class="filter-chip" data-icon="🍓">샤오홍슈</span>
-                  <span class="filter-chip" data-icon="💛">KakaoTalk</span>
-                  <span class="filter-chip" data-icon="✉">기타</span>
-                </div>
-                <div class="ch-meta">
-                  <select class="ant-input" style="width:140px;"><option>채널 수: 전체</option><option>없음</option><option>1개</option><option>2~3개</option><option>3개 초과</option></select>
-                  <label class="ch-tgl"><input type="checkbox"> 미설정 스토어만</label>
-                </div>
-              </div>
+              <div class="ch-grid">
+                <!-- 좌측 컬럼: SNS 채팅 채널 + 채널 소유자 -->
+                <div class="ch-col">
+                  <div class="ch-line">
+                    <div class="ch-line-label">
+                      <span class="ch-line-title">SNS 채팅 채널</span>
+                      <select class="ch-mode ant-input">
+                        <option>모두 포함 (AND)</option>
+                        <option selected>하나 이상 포함 (OR)</option>
+                        <option>정확히 일치</option>
+                        <option>제외</option>
+                      </select>
+                    </div>
+                    <div class="chip-row">
+                      <span class="filter-chip on">WhatsApp</span>
+                      <span class="filter-chip on">LINE</span>
+                      <span class="filter-chip">WeChat</span>
+                      <span class="filter-chip">샤오홍슈</span>
+                      <span class="filter-chip">KakaoTalk</span>
+                      <span class="filter-chip">기타</span>
+                    </div>
+                    <div class="ch-meta">
+                      <select class="ant-input" style="width:130px;"><option>채널 수: 전체</option><option>없음</option><option>1개</option><option>2~3개</option><option>3개 초과</option></select>
+                      <label class="ch-tgl"><input type="checkbox"> 미설정만</label>
+                    </div>
+                  </div>
 
-              <!-- 채널 소유자 (신규) -->
-              <div class="ch-line" style="grid-template-columns:200px 1fr;">
-                <div class="ch-line-label">
-                  <span class="ch-line-title">채널 소유자</span>
-                  <span style="font-size:10px;color:#fa8c16;">NEW</span>
+                  <div class="ch-line">
+                    <div class="ch-line-label">
+                      <span class="ch-line-title">채널 소유자 <span style="font-size:9px;color:rgba(0,0,0,0.45);border:1px solid #d9d9d9;padding:0 4px;border-radius:2px;margin-left:3px;">NEW</span></span>
+                    </div>
+                    <div class="chip-row">
+                      <span class="owner-chip on">KBS 공식</span>
+                      <span class="owner-chip">입점사 자체</span>
+                      <span class="owner-chip">미설정 슬롯</span>
+                    </div>
+                  </div>
                 </div>
-                <div class="chip-row">
-                  <span class="owner-chip kbs on">KBS 공식 채널</span>
-                  <span class="owner-chip merchant">입점사 자체 채널</span>
-                  <span class="owner-chip empty">미설정 슬롯</span>
-                  <span style="font-size:11px;color:#8c8c8c;margin-left:8px;align-self:center;">선택한 소유자 모드인 슬롯이 1개 이상 있는 스토어</span>
-                </div>
-              </div>
 
-              <!-- 콘텐츠 채널 -->
-              <div class="ch-line">
-                <div class="ch-line-label">
-                  <span class="ch-line-title">콘텐츠 채널</span>
-                  <select class="ch-mode form-select">
-                    <option>모두 포함 (AND)</option>
-                    <option selected>하나 이상 포함 (OR)</option>
-                    <option>정확히 일치</option>
-                    <option>제외</option>
-                  </select>
-                </div>
-                <div class="chip-row">
-                  <span class="filter-chip on" data-icon="📷">Instagram</span>
-                  <span class="filter-chip" data-icon="▶">YouTube</span>
-                  <span class="filter-chip" data-icon="🎵">TikTok</span>
-                  <span class="filter-chip" data-icon="ⓕ">Facebook</span>
-                  <span class="filter-chip" data-icon="🍓">샤오홍슈</span>
-                  <span class="filter-chip" data-icon="📰">매거진(자체)</span>
-                </div>
-                <div class="ch-meta">
-                  <select class="ant-input" style="width:140px;"><option>채널 수: 전체</option><option>없음</option><option>1개</option><option>2~3개</option><option>3개 초과</option></select>
-                  <label class="ch-tgl"><input type="checkbox"> 미설정 스토어만</label>
-                </div>
-              </div>
+                <!-- 우측 컬럼: 콘텐츠 채널 + 인앱 채팅 -->
+                <div class="ch-col">
+                  <div class="ch-line">
+                    <div class="ch-line-label">
+                      <span class="ch-line-title">콘텐츠 채널</span>
+                      <select class="ch-mode ant-input">
+                        <option>모두 포함 (AND)</option>
+                        <option selected>하나 이상 포함 (OR)</option>
+                        <option>정확히 일치</option>
+                        <option>제외</option>
+                      </select>
+                    </div>
+                    <div class="chip-row">
+                      <span class="filter-chip on">Instagram</span>
+                      <span class="filter-chip">YouTube</span>
+                      <span class="filter-chip">TikTok</span>
+                      <span class="filter-chip">Facebook</span>
+                      <span class="filter-chip">샤오홍슈</span>
+                      <span class="filter-chip">매거진(자체)</span>
+                    </div>
+                    <div class="ch-meta">
+                      <select class="ant-input" style="width:130px;"><option>채널 수: 전체</option><option>없음</option><option>1개</option><option>2~3개</option><option>3개 초과</option></select>
+                      <label class="ch-tgl"><input type="checkbox"> 미설정만</label>
+                    </div>
+                  </div>
 
-              <!-- 인앱 채팅 -->
-              <div class="ch-line">
-                <div class="ch-line-label">
-                  <span class="ch-line-title">인앱 채팅</span>
-                </div>
-                <div class="chip-row">
-                  <span class="filter-chip on">스토어 채팅 (기본)</span>
-                  <span class="filter-chip">상품별 채팅</span>
-                  <span class="filter-chip">비활성</span>
-                </div>
-                <div class="ch-meta">
-                  <label class="ch-tgl"><input type="checkbox"> 환영 메시지 발송 ON</label>
+                  <div class="ch-line">
+                    <div class="ch-line-label">
+                      <span class="ch-line-title">인앱 채팅</span>
+                    </div>
+                    <div class="chip-row">
+                      <span class="filter-chip on">스토어 채팅</span>
+                      <span class="filter-chip">상품별 채팅</span>
+                      <span class="filter-chip">비활성</span>
+                    </div>
+                    <div class="ch-meta">
+                      <label class="ch-tgl"><input type="checkbox"> 환영 메시지 ON</label>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
