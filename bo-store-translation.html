@@ -134,9 +134,9 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
 .filter-cell .form-input, .filter-cell .form-select { width:100%; }
 
 .chip-row { display:flex; flex-wrap:wrap; gap:5px; }
-.filter-chip { display:inline-flex; align-items:center; padding:4px 10px; border:1px solid #d9d9d9; border-radius:14px; font-size:12px; color:#595959; background:#fff; cursor:pointer; user-select:none; transition:all 0.12s; }
-.filter-chip:hover { border-color:#1890ff; color:#1890ff; }
-.filter-chip.on { background:#1890ff; border-color:#1890ff; color:#fff; }
+.filter-chip { display:inline-flex; align-items:center; padding:3px 10px; border:1px solid #d9d9d9; border-radius:12px; font-size:12px; color:#595959; background:#fff; cursor:pointer; user-select:none; transition:all 0.12s; }
+.filter-chip:hover { border-color:#595959; color:#262626; }
+.filter-chip.on { background:#262626; border-color:#262626; color:#fff; }
 
 .filter-advanced { display:none; border-top:1px dashed #f0f0f0; }
 .filter-advanced.open { display:block; }
@@ -147,22 +147,22 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
 
 .filter-foot { padding:12px 18px; border-top:1px solid #f0f0f0; display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; background:#fafafa; }
 .filter-tags { display:flex; flex-wrap:wrap; gap:5px; align-items:center; }
-.active-tag { display:inline-flex; align-items:center; gap:4px; padding:3px 4px 3px 10px; background:#e6f7ff; border:1px solid #91d5ff; border-radius:3px; font-size:11px; color:#0050b3; }
-.active-tag button { background:transparent; border:none; color:#1890ff; cursor:pointer; font-size:14px; padding:0 6px; line-height:1; }
-.active-tag button:hover { color:#ff4d4f; }
+.active-tag { display:inline-flex; align-items:center; gap:4px; padding:3px 4px 3px 10px; background:#fafafa; border:1px solid #e8e8e8; border-radius:3px; font-size:11px; color:#595959; }
+.active-tag button { background:transparent; border:none; color:#bfbfbf; cursor:pointer; font-size:14px; padding:0 6px; line-height:1; }
+.active-tag button:hover { color:#262626; }
 
 /* ── Channel filter block ── */
-.ch-block { margin:14px 18px 0; padding:14px 16px; background:#fafbfc; border:1px solid #e8e8e8; border-radius:6px; }
-.ch-block-head { display:flex; align-items:baseline; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
-.ch-block-title { font-size:13px; font-weight:600; color:#262626; }
+.ch-block { margin:14px 18px 0; padding:12px 14px; background:#fafafa; border:1px solid #f0f0f0; border-radius:4px; }
+.ch-block-head { display:flex; align-items:baseline; gap:10px; margin-bottom:8px; flex-wrap:wrap; }
+.ch-block-title { font-size:12px; font-weight:600; color:#262626; }
 .ch-block-help { font-size:11px; color:#8c8c8c; }
-.ch-line { display:grid; grid-template-columns:200px 1fr 280px; gap:12px; align-items:center; padding:10px 0; border-bottom:1px dashed #f0f0f0; }
+.ch-line { display:flex; flex-wrap:wrap; align-items:center; gap:10px; padding:8px 0; border-bottom:1px dashed #f0f0f0; }
 .ch-line:last-child { border-bottom:none; }
-.ch-line-label { display:flex; flex-direction:column; gap:6px; }
+.ch-line-label { display:flex; align-items:center; gap:8px; min-width:140px; }
 .ch-line-title { font-size:12px; font-weight:600; color:#262626; }
-.ch-mode { font-size:11px; padding:4px 8px; }
-.ch-meta { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-.ch-tgl { display:flex; align-items:center; gap:5px; font-size:12px; color:#595959; cursor:pointer; }
+.ch-mode { font-size:11px; padding:3px 8px; width:auto; min-width:130px; }
+.ch-meta { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-left:auto; }
+.ch-tgl { display:flex; align-items:center; gap:5px; font-size:11px; color:#595959; cursor:pointer; }
 .ch-tgl input { margin:0; }
 
 /* ── Modal ── */
@@ -185,7 +185,7 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
 
 /* ── Auto-trans note ── */
 .auto-note { font-size:11px; color:#8c8c8c; padding:6px 10px; background:#fafafa; border-radius:3px; display:inline-block; }
-.auto-note.changed { color:#fa8c16; background:#fff7e6; }
+.auto-note.changed { color:#595959; background:#fafafa; border:1px dashed #d9d9d9; }
 
 /* ── Result table action bar ── */
 .tbl-actbar { background:#fafafa; border:1px solid #f0f0f0; border-bottom:none; border-radius:4px 4px 0 0; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
@@ -216,48 +216,50 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
 .tbl-rich th .sort-arrow { color:#bfbfbf; font-size:9px; margin-left:2px; }
 .tbl-rich th.active .sort-arrow { color:#1890ff; }
 .tbl-rich td { padding:11px 12px; border-bottom:1px solid #f5f5f5; color:#595959; vertical-align:middle; }
-.tbl-rich tr:hover td { background:#fafbfd; cursor:pointer; }
-.tbl-rich tr.checked td { background:#e6f7ff; }
-.tbl-rich .name-link { color:#1890ff; text-decoration:none; font-weight:500; }
+.tbl-rich tr:hover td { background:#fafafa; cursor:pointer; }
+.tbl-rich tr.checked td { background:#f5f5f5; }
+.tbl-rich .name-link { color:#262626; text-decoration:none; font-weight:500; }
 .tbl-rich .name-link:hover { text-decoration:underline; }
 .tbl-rich .name-sub { font-size:10px; color:#bfbfbf; margin-top:1px; }
 .tbl-rich .ck-cell { width:32px; padding-left:14px; }
 .tbl-rich .memo-cell { max-width:160px; }
 
-.cat-pill { display:inline-block; padding:2px 8px; background:#fff7e6; color:#fa8c16; border-radius:10px; font-size:10px; font-weight:500; }
-.cat-pill.derm { background:#e6f7ff; color:#1890ff; }
-.cat-pill.plastic { background:#f9f0ff; color:#722ed1; }
-.cat-pill.dent { background:#fff0f6; color:#eb2f96; }
-.cat-pill.haire { background:#fff7e6; color:#fa8c16; }
-.cat-pill.esthe { background:#f6ffed; color:#52c41a; }
+.cat-pill { display:inline-block; padding:2px 8px; background:#f5f5f5; color:#595959; border-radius:10px; font-size:10px; font-weight:500; }
+.cat-pill.derm,
+.cat-pill.plastic,
+.cat-pill.dent,
+.cat-pill.haire,
+.cat-pill.esthe { background:#f5f5f5; color:#595959; }
 
 .state-badge { display:inline-block; padding:2px 9px; border-radius:3px; font-size:11px; font-weight:500; }
-.state-badge.active { background:#f6ffed; color:#389e0d; border:1px solid #b7eb8f; }
-.state-badge.inactive { background:#fafafa; color:#8c8c8c; border:1px solid #d9d9d9; }
-.state-badge.left { background:#fff1f0; color:#cf1322; border:1px solid #ffa39e; }
+.state-badge.active { background:#fff; color:#262626; border:1px solid #d9d9d9; }
+.state-badge.inactive { background:#fafafa; color:#bfbfbf; border:1px solid #e8e8e8; }
+.state-badge.left { background:#fafafa; color:#8c8c8c; border:1px solid #d9d9d9; text-decoration:line-through; }
 
 .lang-dot { display:inline-flex; align-items:center; gap:3px; margin-right:6px; font-size:10px; color:#595959; }
-.lang-dot::before { content:""; width:7px; height:7px; border-radius:50%; display:inline-block; }
-.lang-dot.ok::before { background:#52c41a; }
-.lang-dot.partial::before { background:#faad14; }
-.lang-dot.missing::before { background:#ff4d4f; }
-.lang-dot.off::before { background:#d9d9d9; }
+.lang-dot::before { content:""; width:6px; height:6px; border-radius:50%; display:inline-block; }
+.lang-dot.ok::before { background:#595959; }
+.lang-dot.partial::before { background:#bfbfbf; }
+.lang-dot.missing::before { background:#fff; border:1px solid #bfbfbf; }
+.lang-dot.off::before { background:transparent; border:1px dashed #d9d9d9; }
+.lang-dot.missing { color:#bfbfbf; }
+.lang-dot.off { color:#d9d9d9; }
 
-.img-set { display:inline-flex; gap:6px; align-items:center; font-size:11px; color:#595959; }
-.img-set-icon { display:inline-flex; align-items:center; gap:2px; padding:2px 5px; border-radius:3px; }
-.img-set-icon.set { background:#f6ffed; color:#52c41a; }
-.img-set-icon.unset { background:#fff1f0; color:#cf1322; opacity:0.5; }
+.img-set { display:inline-flex; gap:5px; align-items:center; font-size:11px; color:#595959; }
+.img-set-icon { display:inline-flex; align-items:center; gap:2px; padding:1px 4px; border-radius:3px; font-size:10px; }
+.img-set-icon.set { color:#262626; }
+.img-set-icon.unset { color:#d9d9d9; text-decoration:line-through; }
 
 .ch-summary { display:inline-flex; gap:4px; align-items:center; font-size:11px; flex-wrap:wrap; }
-.ch-pill { padding:2px 7px; border-radius:10px; font-size:10px; font-weight:500; }
-.ch-pill.kbs { background:#e6f7ff; color:#1890ff; }
-.ch-pill.merchant { background:#fff7e6; color:#fa8c16; }
-.ch-pill.empty { background:#fafafa; color:#8c8c8c; }
+.ch-pill { padding:2px 7px; border-radius:10px; font-size:10px; font-weight:500; background:#f5f5f5; color:#595959; }
+.ch-pill.kbs { background:#f0f0f0; color:#262626; }
+.ch-pill.merchant { background:#fafafa; color:#595959; border:1px solid #e8e8e8; }
+.ch-pill.empty { background:transparent; color:#bfbfbf; }
 
 .stat-num { font-variant-numeric: tabular-nums; font-weight:500; color:#262626; }
 .stat-zero { color:#bfbfbf; font-weight:400; }
 
-.memo-tag { display:inline-block; max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding:2px 7px; background:#fffbe6; border:1px solid #ffe58f; border-radius:3px; font-size:11px; color:#874d00; }
+.memo-tag { display:inline-block; max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding:2px 7px; background:#fafafa; border:1px solid #e8e8e8; border-radius:3px; font-size:11px; color:#595959; }
 .memo-empty { color:#bfbfbf; font-size:11px; }
 
 /* ── Side drawer (replaces modal) ── */
@@ -285,14 +287,14 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
 .verify-row { padding:10px 18px 14px; }
 .verify-row-title { font-size:12px; font-weight:600; color:#595959; margin-bottom:6px; }
 .verify-chips { display:flex; flex-wrap:wrap; gap:6px; }
-.verify-chip { padding:4px 10px; border:1px solid #ffa39e; border-radius:14px; font-size:11px; color:#cf1322; background:#fff; cursor:pointer; }
-.verify-chip:hover, .verify-chip.on { background:#fff1f0; border-color:#ff7875; }
+.verify-chip { padding:3px 10px; border:1px solid #d9d9d9; border-radius:12px; font-size:11px; color:#595959; background:#fff; cursor:pointer; }
+.verify-chip:hover { border-color:#595959; color:#262626; }
+.verify-chip.on { background:#262626; border-color:#262626; color:#fff; }
 
 /* ── Channel owner chip set ── */
-.owner-chip { padding:4px 10px; border:1px solid #d9d9d9; border-radius:14px; font-size:11px; cursor:pointer; user-select:none; }
-.owner-chip.kbs.on { background:#1890ff; color:#fff; border-color:#1890ff; }
-.owner-chip.merchant.on { background:#fa8c16; color:#fff; border-color:#fa8c16; }
-.owner-chip.empty.on { background:#8c8c8c; color:#fff; border-color:#8c8c8c; }
+.owner-chip { padding:3px 10px; border:1px solid #d9d9d9; border-radius:12px; font-size:11px; color:#595959; cursor:pointer; user-select:none; background:#fff; }
+.owner-chip:hover { border-color:#595959; color:#262626; }
+.owner-chip.on { background:#262626; color:#fff; border-color:#262626; }
 </style>
 </head>
 <body>
@@ -318,9 +320,9 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
       <div class="menu-sub">지하철 관리</div>
       <div class="menu-sub">특징 관리</div>
       <div class="menu-sub">지역 관리</div>
-      <div class="menu-sub" id="nav-faq" onclick="showView('faq')" style="background:#fffbe6;color:#fa8c16;font-weight:600;">기본 FAQ 관리 <span style="font-size:10px;background:#fa8c16;color:#fff;padding:1px 5px;border-radius:8px;margin-left:4px;">NEW</span></div>
-      <div class="menu-sub" id="nav-channels" onclick="showView('channels')" style="background:#fffbe6;color:#fa8c16;font-weight:600;">KBS 공식 채널 <span style="font-size:10px;background:#fa8c16;color:#fff;padding:1px 5px;border-radius:8px;margin-left:4px;">NEW</span></div>
-      <div class="menu-sub" id="nav-guide" onclick="showView('guide')" style="background:#fffbe6;color:#fa8c16;font-weight:600;">예약 가이드 <span style="font-size:10px;background:#fa8c16;color:#fff;padding:1px 5px;border-radius:8px;margin-left:4px;">NEW</span></div>
+      <div class="menu-sub" id="nav-faq" onclick="showView('faq')">기본 FAQ 관리 <span style="font-size:9px;color:#8c8c8c;border:1px solid #d9d9d9;padding:0 4px;border-radius:3px;margin-left:4px;font-weight:500;">NEW</span></div>
+      <div class="menu-sub" id="nav-channels" onclick="showView('channels')">KBS 공식 채널 <span style="font-size:9px;color:#8c8c8c;border:1px solid #d9d9d9;padding:0 4px;border-radius:3px;margin-left:4px;font-weight:500;">NEW</span></div>
+      <div class="menu-sub" id="nav-guide" onclick="showView('guide')">예약 가이드 <span style="font-size:9px;color:#8c8c8c;border:1px solid #d9d9d9;padding:0 4px;border-radius:3px;margin-left:4px;font-weight:500;">NEW</span></div>
     </div>
     <div class="menu-item has-sub">상품</div>
     <div class="menu-item has-sub">매거진</div>
@@ -348,150 +350,278 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
     <div class="content">
 
       <!-- ════════════════════════════════
-           VIEW 0 — 기본정보관리
+           VIEW 0 — 기본정보관리 (목록 → 드로어)
       ════════════════════════════════ -->
       <div id="view-basic" class="view">
         <div class="page-title">스토어 &gt; 기본정보관리</div>
 
-        <div style="margin-bottom:16px;padding:12px 16px;background:#fff7e6;border:1px solid #ffe58f;border-radius:4px;font-size:12px;color:#874d00;line-height:1.7;">
-          <strong>변경점 2가지:</strong>
-          ① <strong>담당자</strong>를 번역정보관리에서 기본정보관리로 이동 (언어 무관) · 1~3명 동적 입력 ·
-          ② <strong>지하철역</strong> 단일 → 다중 선택 (최대 3개, 노선 표시 포함)
+        <!-- 검색 / 필터 -->
+        <div class="filter-card">
+          <div class="filter-card-head">
+            <span class="filter-card-title">검색 / 필터</span>
+            <div style="display:flex;gap:6px;">
+              <button class="btn btn-sm" onclick="document.getElementById('basic-filter-adv').classList.toggle('open')">고급 필터 ▼</button>
+              <button class="btn btn-sm" onclick="resetFilters()">초기화</button>
+            </div>
+          </div>
+
+          <div class="filter-grid">
+            <div class="filter-cell">
+              <label class="filter-label">카테고리 (다중)</label>
+              <div class="chip-row">
+                <span class="filter-chip on">피부과</span>
+                <span class="filter-chip on">성형외과</span>
+                <span class="filter-chip">치과</span>
+                <span class="filter-chip">헤어/메이크업</span>
+                <span class="filter-chip">에스테틱</span>
+                <span class="filter-chip">팝업스토어</span>
+                <span class="filter-chip">스튜디오</span>
+                <span class="filter-chip">메디컬체크</span>
+              </div>
+            </div>
+            <div class="filter-cell">
+              <label class="filter-label">계정 상태 <span style="color:#bfbfbf;font-size:10px;">NEW · 탈퇴 추적</span></label>
+              <div class="chip-row">
+                <span class="filter-chip on">활성</span>
+                <span class="filter-chip on">비활성</span>
+                <span class="filter-chip">탈퇴</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="filter-grid filter-grid-4">
+            <div class="filter-cell">
+              <label class="filter-label">상점 검색</label>
+              <input class="form-input" placeholder="상점명 또는 코드로 검색">
+            </div>
+            <div class="filter-cell">
+              <label class="filter-label">지역</label>
+              <select class="form-select"><option>전체</option><option>서울 강남구</option><option>서울 서초구</option><option>서울 마포구</option><option>서울 중구</option></select>
+            </div>
+            <div class="filter-cell">
+              <label class="filter-label">정렬</label>
+              <select class="form-select"><option>등록일 내림차순</option><option>등록일 오름차순</option><option>최종 수정일</option><option>상점명 가나다 순</option></select>
+            </div>
+            <div class="filter-cell">
+              <label class="filter-label">관리자 설정</label>
+              <select class="form-select"><option>전체</option><option>운영시간 미설정</option><option>담당자 미입력</option></select>
+            </div>
+          </div>
+
+          <div id="basic-filter-adv" class="filter-advanced">
+            <div class="filter-grid filter-grid-4">
+              <div class="filter-cell">
+                <label class="filter-label">등록일</label>
+                <div style="display:flex;gap:4px;align-items:center;">
+                  <input class="form-input" type="date">
+                  <span style="color:#bfbfbf;">~</span>
+                  <input class="form-input" type="date">
+                </div>
+              </div>
+              <div class="filter-cell">
+                <label class="filter-label">최종 수정일</label>
+                <div style="display:flex;gap:4px;align-items:center;">
+                  <input class="form-input" type="date">
+                  <span style="color:#bfbfbf;">~</span>
+                  <input class="form-input" type="date">
+                </div>
+              </div>
+              <div class="filter-cell">
+                <label class="filter-label">담당자 수</label>
+                <select class="form-select"><option>전체</option><option>1명</option><option>2명</option><option>3명</option></select>
+              </div>
+              <div class="filter-cell">
+                <label class="filter-label">지하철 태그 수</label>
+                <select class="form-select"><option>전체</option><option>없음</option><option>1개</option><option>2개</option><option>3개</option></select>
+              </div>
+            </div>
+            <div class="verify-row">
+              <div class="verify-row-title">⚠ 검증 케이스</div>
+              <div class="verify-chips">
+                <span class="verify-chip">운영시간 미입력</span>
+                <span class="verify-chip">담당자 0명</span>
+                <span class="verify-chip">지하철 태그 0개</span>
+                <span class="verify-chip">사업자번호 형식 오류</span>
+                <span class="verify-chip">위경도 미설정</span>
+                <span class="verify-chip">탈퇴 후 90일 경과</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="filter-foot">
+            <div class="filter-tags">
+              <span class="active-tag">카테고리: 피부과/성형외과 <button>×</button></span>
+              <span class="active-tag">계정 상태: 활성+비활성 <button>×</button></span>
+            </div>
+            <button class="btn btn-primary">검색 (예상 28건)</button>
+          </div>
         </div>
 
-        <div class="card">
-          <div class="card-header">
-            <span>스토어 기본정보 수정 — 원진성형외과</span>
-            <button class="btn btn-primary btn-sm">신규 상점등록</button>
-          </div>
-          <div class="card-body">
-            <div class="tabs">
-              <div class="tab active">스토어정보</div>
-              <div class="tab">관리자설정</div>
-            </div>
-
-            <!-- 식별/메타 -->
-            <div class="section-title">식별 정보 <span class="auto-note">변경 없음</span></div>
-            <div class="form-row two-col">
-              <div class="form-label"><span class="req">*</span>상점코드</div>
-              <input class="form-input" value="wonjin">
-              <div class="form-label">카테고리</div>
-              <select class="form-select"><option>성형외과</option></select>
-            </div>
-            <div class="form-row two-col">
-              <div class="form-label">지역</div>
-              <select class="form-select"><option>서울 서초구</option></select>
-              <div class="form-label"><span class="req">*</span>대표번호</div>
-              <input class="form-input" value="02-1234-5678">
-            </div>
-            <div class="form-row two-col">
-              <div class="form-label"><span class="req">*</span>사업자번호</div>
-              <input class="form-input" value="123-45-67890">
-              <div class="form-label"><span class="req">*</span>이메일</div>
-              <input class="form-input" value="contact@wonjin.kr">
-            </div>
-
-            <!-- 주소/좌표 -->
-            <div class="section-title">주소 / 좌표 <span class="auto-note">변경 없음</span></div>
-            <div class="form-row two-col">
-              <div class="form-label"><span class="req">*</span>우편번호</div>
-              <input class="form-input" value="06158">
-              <div class="form-label"></div>
-              <input class="form-input" value="서울 서초구 강남대로 419 (서초동, 파고다타워)">
-            </div>
-            <div class="form-row">
-              <div class="form-label">지도</div>
-              <div style="background:#fafafa;border:1px solid #e8e8e8;border-radius:4px;height:140px;display:flex;align-items:center;justify-content:center;color:#bfbfbf;font-size:12px;">🗺 네이버 지도 미리보기</div>
-            </div>
-            <div class="form-row two-col">
-              <div class="form-label"><span class="req">*</span>위도</div>
-              <input class="form-input" value="37.4979">
-              <div class="form-label"><span class="req">*</span>경도</div>
-              <input class="form-input" value="127.0276">
-            </div>
-
-            <!-- 담당자 (신규 이동) -->
-            <div class="section-title">담당자 <span class="auto-note changed">번역정보관리 → 기본정보관리로 이동 · 1~3명 동적</span></div>
-            <div class="form-row" style="align-items:flex-start;">
-              <div class="form-label"><span class="req">*</span>담당자<br><span style="font-weight:400;font-size:11px;color:#8c8c8c;">(최소 1명, 최대 3명)</span></div>
-              <div class="form-control">
-                <div class="multi-row">
-                  <input class="form-input" value="김원장" placeholder="성함" style="max-width:180px;">
-                  <input class="form-input" value="02-1234-5678" placeholder="연락처" style="max-width:180px;">
-                  <input class="form-input" value="director@wonjin.kr" placeholder="이메일 (선택)">
-                  <button class="row-remove" disabled style="opacity:0.3;cursor:not-allowed;">×</button>
-                </div>
-                <div class="multi-row">
-                  <input class="form-input" value="박실장" placeholder="성함" style="max-width:180px;">
-                  <input class="form-input" value="010-2345-6789" placeholder="연락처" style="max-width:180px;">
-                  <input class="form-input" value="" placeholder="이메일 (선택)">
-                  <button class="row-remove">×</button>
-                </div>
-                <button class="add-row-btn">+ 담당자 추가 (최대 3명)</button>
-                <div class="form-help">고객 화면에는 노출되지 않습니다. 내부 운영·KBS 측 문의 연락처로 활용됩니다.</div>
+        <!-- 액션 바 -->
+        <div class="tbl-actbar">
+          <div class="tbl-actbar-left">
+            <input type="checkbox" onclick="toggleAllRows(this, '.row-ck-basic')" style="margin:0;">
+            <span class="tbl-count">전체 <strong>28</strong>건 · 선택 <strong id="sel-count-basic">0</strong>건</span>
+            <div class="tbl-bulk">
+              <button class="tbl-bulk-btn" id="bulk-btn-basic" disabled onclick="document.getElementById('bulk-menu-basic').classList.toggle('open')">일괄 작업 ▼</button>
+              <div class="tbl-bulk-menu" id="bulk-menu-basic">
+                <div class="tbl-bulk-item">활성 / 비활성 토글</div>
+                <div class="tbl-bulk-item">카테고리 변경</div>
+                <div class="tbl-bulk-item">지역 변경</div>
+                <div class="tbl-bulk-item">메모 일괄 입력</div>
+                <div class="tbl-bulk-item" style="color:#cf1322;">탈퇴 처리 (어드민 전용)</div>
               </div>
-            </div>
-
-            <!-- 운영시간 -->
-            <div class="section-title">운영시간 <span class="auto-note">변경 없음</span></div>
-            <div class="form-row" style="align-items:flex-start;">
-              <div class="form-label">요일별 운영시간</div>
-              <div class="form-control" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px 18px;">
-                <div style="display:flex;gap:8px;align-items:center;"><span style="width:32px;font-size:12px;font-weight:600;">월</span><input class="form-input" type="time" value="09:00" style="width:100px;"><span>~</span><input class="form-input" type="time" value="18:00" style="width:100px;"><label style="font-size:12px;display:flex;gap:4px;align-items:center;"><input type="checkbox"> 휴무</label></div>
-                <div style="display:flex;gap:8px;align-items:center;"><span style="width:32px;font-size:12px;font-weight:600;">화</span><input class="form-input" type="time" value="09:00" style="width:100px;"><span>~</span><input class="form-input" type="time" value="18:00" style="width:100px;"><label style="font-size:12px;display:flex;gap:4px;align-items:center;"><input type="checkbox"> 휴무</label></div>
-                <div style="display:flex;gap:8px;align-items:center;"><span style="width:32px;font-size:12px;font-weight:600;">수</span><input class="form-input" type="time" value="09:00" style="width:100px;"><span>~</span><input class="form-input" type="time" value="18:00" style="width:100px;"><label style="font-size:12px;display:flex;gap:4px;align-items:center;"><input type="checkbox"> 휴무</label></div>
-                <div style="display:flex;gap:8px;align-items:center;"><span style="width:32px;font-size:12px;font-weight:600;">목</span><input class="form-input" type="time" value="09:00" style="width:100px;"><span>~</span><input class="form-input" type="time" value="18:00" style="width:100px;"><label style="font-size:12px;display:flex;gap:4px;align-items:center;"><input type="checkbox"> 휴무</label></div>
-                <div style="display:flex;gap:8px;align-items:center;"><span style="width:32px;font-size:12px;font-weight:600;">금</span><input class="form-input" type="time" value="09:00" style="width:100px;"><span>~</span><input class="form-input" type="time" value="18:00" style="width:100px;"><label style="font-size:12px;display:flex;gap:4px;align-items:center;"><input type="checkbox"> 휴무</label></div>
-                <div style="display:flex;gap:8px;align-items:center;"><span style="width:32px;font-size:12px;font-weight:600;">토</span><input class="form-input" type="time" value="10:00" style="width:100px;"><span>~</span><input class="form-input" type="time" value="15:00" style="width:100px;"><label style="font-size:12px;display:flex;gap:4px;align-items:center;"><input type="checkbox"> 휴무</label></div>
-                <div style="display:flex;gap:8px;align-items:center;"><span style="width:32px;font-size:12px;font-weight:600;">일</span><input class="form-input" type="time" style="width:100px;" disabled><span>~</span><input class="form-input" type="time" style="width:100px;" disabled><label style="font-size:12px;display:flex;gap:4px;align-items:center;"><input type="checkbox" checked> 휴무</label></div>
-                <div style="display:flex;gap:8px;align-items:center;"><span style="width:32px;font-size:12px;font-weight:600;">공휴일</span><input class="form-input" type="time" style="width:100px;" disabled><span>~</span><input class="form-input" type="time" style="width:100px;" disabled><label style="font-size:12px;display:flex;gap:4px;align-items:center;"><input type="checkbox" checked> 휴무</label></div>
-              </div>
-            </div>
-
-            <!-- 위치 정보: 지하철역 다중 -->
-            <div class="section-title">위치 정보 <span class="auto-note changed">지하철역 단일 → 다중 선택 (최대 3개)</span></div>
-            <div class="form-row" style="align-items:flex-start;">
-              <div class="form-label">가까운 지하철역<br><span style="font-weight:400;font-size:11px;color:#8c8c8c;">(최대 3개)</span></div>
-              <div class="form-control">
-                <select class="form-select"><option>지하철 노선 선택</option></select>
-                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
-                  <span class="active-tag" style="font-size:12px;padding:4px 6px 4px 12px;">명동역 4호선 <button>×</button></span>
-                  <span class="active-tag" style="font-size:12px;padding:4px 6px 4px 12px;">을지로입구역 2호선 <button>×</button></span>
-                </div>
-                <div class="form-help">노선 정보가 함께 표시되어 고객 앱에서 노출됩니다.</div>
-              </div>
-            </div>
-
-            <!-- 운영 형태 -->
-            <div class="section-title">운영 형태 <span class="auto-note">변경 없음</span></div>
-            <div class="form-row">
-              <div class="form-label">프라이빗/퍼블릭</div>
-              <div class="radio-group">
-                <label><input type="radio" name="pp"> 미선택</label>
-                <label><input type="radio" name="pp"> 프라이빗</label>
-                <label><input type="radio" name="pp" checked> 퍼블릭</label>
-              </div>
-            </div>
-
-            <!-- 특징 -->
-            <div class="section-title">스토어 특징 <span class="auto-note">변경 없음 · 옵션관리 &gt; 특징 관리에서 통제</span></div>
-            <div class="form-row">
-              <div class="form-label">특징</div>
-              <div class="form-control">
-                <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
-                  <span class="active-tag" style="font-size:12px;padding:4px 6px 4px 12px;">전문의 <button>×</button></span>
-                  <span class="active-tag" style="font-size:12px;padding:4px 6px 4px 12px;">여의사 <button>×</button></span>
-                  <span class="active-tag" style="font-size:12px;padding:4px 6px 4px 12px;">픽업서비스 <button>×</button></span>
-                  <button class="btn btn-sm">+ 특징 추가</button>
-                </div>
-              </div>
-            </div>
-
-            <div style="margin-top:24px;display:flex;justify-content:flex-end;gap:8px;">
-              <button class="btn">취소</button>
-              <button class="btn btn-primary">저장</button>
             </div>
           </div>
+          <div class="tbl-actbar-right">
+            <div class="tbl-col-toggle">
+              <button class="tbl-bulk-btn" onclick="document.getElementById('col-menu-basic').classList.toggle('open')">컬럼 ▼</button>
+              <div class="tbl-col-menu" id="col-menu-basic">
+                <div class="tbl-col-group-title">식별</div>
+                <label class="tbl-col-item"><input type="checkbox" checked> 상점명</label>
+                <label class="tbl-col-item"><input type="checkbox" checked> 카테고리</label>
+                <label class="tbl-col-item"><input type="checkbox" checked> 지역</label>
+                <label class="tbl-col-item"><input type="checkbox" checked> 계정 상태</label>
+                <div class="tbl-col-group-title">시간</div>
+                <label class="tbl-col-item"><input type="checkbox" checked> 등록일</label>
+                <label class="tbl-col-item"><input type="checkbox"> 최종 수정일</label>
+                <div class="tbl-col-group-title">기본 메타</div>
+                <label class="tbl-col-item"><input type="checkbox" checked> 대표번호</label>
+                <label class="tbl-col-item"><input type="checkbox"> 사업자번호</label>
+                <label class="tbl-col-item"><input type="checkbox"> 이메일</label>
+                <label class="tbl-col-item"><input type="checkbox" checked> 담당자 수</label>
+                <label class="tbl-col-item"><input type="checkbox" checked> 운영시간 설정</label>
+                <label class="tbl-col-item"><input type="checkbox" checked> 지하철 태그 수</label>
+                <label class="tbl-col-item"><input type="checkbox"> 특징 chip 수</label>
+                <label class="tbl-col-item"><input type="checkbox"> 운영 형태(P/P)</label>
+                <div class="tbl-col-group-title">기타</div>
+                <label class="tbl-col-item"><input type="checkbox"> 메모</label>
+              </div>
+            </div>
+            <button class="tbl-bulk-btn" style="background:#262626;color:#fff;border-color:#262626;">⬇ Excel 다운로드 (조회 결과 전체)</button>
+          </div>
+        </div>
+
+        <!-- 결과 테이블 -->
+        <div style="background:#fff;border:1px solid #f0f0f0;border-top:none;border-radius:0 0 4px 4px;overflow-x:auto;">
+          <table class="tbl-rich">
+            <thead>
+              <tr>
+                <th class="ck-cell"></th>
+                <th>상점명</th>
+                <th>카테고리</th>
+                <th>지역</th>
+                <th>계정 상태</th>
+                <th class="active">등록일 <span class="sort-arrow">▼</span></th>
+                <th>대표번호</th>
+                <th style="text-align:center;">담당자</th>
+                <th style="text-align:center;">운영시간</th>
+                <th style="text-align:center;">지하철</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr onclick="openBasicDrawer(event, '원진성형외과')">
+                <td class="ck-cell" onclick="event.stopPropagation();"><input type="checkbox" class="row-ck-basic" onclick="updateSelCountBasic()"></td>
+                <td><a class="name-link">원진성형외과</a><div class="name-sub">wonjin · 호스트A</div></td>
+                <td><span class="cat-pill">성형외과</span></td>
+                <td>서울 서초구</td>
+                <td><span class="state-badge active">활성</span></td>
+                <td>2025-03-12</td>
+                <td>02-1234-5678</td>
+                <td style="text-align:center;"><span class="stat-num">2명</span></td>
+                <td style="text-align:center;">설정 ✓</td>
+                <td style="text-align:center;"><span class="stat-num">2개</span></td>
+              </tr>
+              <tr onclick="openBasicDrawer(event, 'Beautynyoung')">
+                <td class="ck-cell" onclick="event.stopPropagation();"><input type="checkbox" class="row-ck-basic" onclick="updateSelCountBasic()"></td>
+                <td><a class="name-link">Beautynyoung</a><div class="name-sub">beautynyoung · 호스트B</div></td>
+                <td><span class="cat-pill">성형외과</span></td>
+                <td>서울 강남구</td>
+                <td><span class="state-badge active">활성</span></td>
+                <td>2025-08-22</td>
+                <td>02-2345-6789</td>
+                <td style="text-align:center;"><span class="stat-num">3명</span></td>
+                <td style="text-align:center;">설정 ✓</td>
+                <td style="text-align:center;"><span class="stat-num">1개</span></td>
+              </tr>
+              <tr onclick="openBasicDrawer(event, '지유피부과')">
+                <td class="ck-cell" onclick="event.stopPropagation();"><input type="checkbox" class="row-ck-basic" onclick="updateSelCountBasic()"></td>
+                <td><a class="name-link">지유피부과</a><div class="name-sub">jiyu · 호스트C</div></td>
+                <td><span class="cat-pill">피부과</span></td>
+                <td>서울 마포구</td>
+                <td><span class="state-badge active">활성</span></td>
+                <td>2025-11-04</td>
+                <td>02-3456-7890</td>
+                <td style="text-align:center;"><span class="stat-num">1명</span></td>
+                <td style="text-align:center;">설정 ✓</td>
+                <td style="text-align:center;"><span class="stat-num zero">0개</span></td>
+              </tr>
+              <tr onclick="openBasicDrawer(event, '닥터쁘띠 명동점')">
+                <td class="ck-cell" onclick="event.stopPropagation();"><input type="checkbox" class="row-ck-basic" onclick="updateSelCountBasic()"></td>
+                <td><a class="name-link">닥터쁘띠 명동점</a><div class="name-sub">drpetit_md · 호스트E</div></td>
+                <td><span class="cat-pill">피부과</span></td>
+                <td>서울 중구</td>
+                <td><span class="state-badge inactive">비활성</span></td>
+                <td>2025-09-09</td>
+                <td>02-4567-8901</td>
+                <td style="text-align:center;"><span class="stat-num">2명</span></td>
+                <td style="text-align:center;">설정 ✓</td>
+                <td style="text-align:center;"><span class="stat-num">3개</span></td>
+              </tr>
+              <tr onclick="openBasicDrawer(event, '대석 (탈퇴 호스트)')">
+                <td class="ck-cell" onclick="event.stopPropagation();"><input type="checkbox" class="row-ck-basic" onclick="updateSelCountBasic()"></td>
+                <td><a class="name-link" style="color:#bfbfbf;">대석test</a><div class="name-sub">daeseok · 호스트X</div></td>
+                <td><span class="cat-pill">피부과</span></td>
+                <td>서울 강남구</td>
+                <td><span class="state-badge left">탈퇴</span></td>
+                <td>2025-09-09</td>
+                <td>—</td>
+                <td style="text-align:center;"><span class="stat-num zero">0명</span></td>
+                <td style="text-align:center;">미설정</td>
+                <td style="text-align:center;"><span class="stat-num zero">0개</span></td>
+              </tr>
+              <tr onclick="openBasicDrawer(event, 'TU치과')">
+                <td class="ck-cell" onclick="event.stopPropagation();"><input type="checkbox" class="row-ck-basic" onclick="updateSelCountBasic()"></td>
+                <td><a class="name-link">TU치과</a><div class="name-sub">tu_dental · 호스트F</div></td>
+                <td><span class="cat-pill">치과</span></td>
+                <td>서울 강남구</td>
+                <td><span class="state-badge active">활성</span></td>
+                <td>2025-09-09</td>
+                <td>02-5678-9012</td>
+                <td style="text-align:center;"><span class="stat-num">2명</span></td>
+                <td style="text-align:center;">설정 ✓</td>
+                <td style="text-align:center;"><span class="stat-num">2개</span></td>
+              </tr>
+              <tr onclick="openBasicDrawer(event, 'K-Beauty 글램')">
+                <td class="ck-cell" onclick="event.stopPropagation();"><input type="checkbox" class="row-ck-basic" onclick="updateSelCountBasic()"></td>
+                <td><a class="name-link">K-Beauty 글램</a><div class="name-sub">kb_glam · 호스트G</div></td>
+                <td><span class="cat-pill">헤어/메이크업</span></td>
+                <td>서울 강남구</td>
+                <td><span class="state-badge active">활성</span></td>
+                <td>2025-12-15</td>
+                <td>02-6789-0123</td>
+                <td style="text-align:center;"><span class="stat-num">1명</span></td>
+                <td style="text-align:center;">설정 ✓</td>
+                <td style="text-align:center;"><span class="stat-num">1개</span></td>
+              </tr>
+              <tr onclick="openBasicDrawer(event, '셀럽에스테틱')">
+                <td class="ck-cell" onclick="event.stopPropagation();"><input type="checkbox" class="row-ck-basic" onclick="updateSelCountBasic()"></td>
+                <td><a class="name-link">셀럽에스테틱</a><div class="name-sub">celeb_esthe · 호스트H</div></td>
+                <td><span class="cat-pill">에스테틱</span></td>
+                <td>서울 강남구</td>
+                <td><span class="state-badge active">활성</span></td>
+                <td>2025-09-30</td>
+                <td>02-7890-1234</td>
+                <td style="text-align:center;"><span class="stat-num">2명</span></td>
+                <td style="text-align:center;">설정 ✓</td>
+                <td style="text-align:center;"><span class="stat-num">2개</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="margin-top:14px;padding:10px 14px;background:#fafafa;border:1px solid #f0f0f0;border-radius:4px;font-size:11px;color:#595959;line-height:1.7;">
+          <strong>📌 안내</strong> — 행 클릭 시 우측 사이드 드로어로 기본정보 편집 진입. 신규 컬럼: <strong>계정 상태(활성·비활성·탈퇴)</strong>·담당자/운영시간/지하철 설정 여부 표시.
         </div>
       </div>
 
@@ -769,7 +899,7 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
                 <label class="tbl-col-item"><input type="checkbox"> 메모</label>
               </div>
             </div>
-            <button class="tbl-bulk-btn" style="background:#1890ff;color:#fff;border-color:#1890ff;">⬇ Excel 다운로드 (조회 결과 전체)</button>
+            <button class="tbl-bulk-btn" style="background:#262626;color:#fff;border-color:#262626;">⬇ Excel 다운로드 (조회 결과 전체)</button>
           </div>
         </div>
 
@@ -1030,7 +1160,7 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
           </table>
         </div>
 
-        <div style="margin-top:20px;padding:14px 18px;background:#fff7e6;border:1px solid #ffe58f;border-radius:4px;font-size:12px;color:#874d00;line-height:1.7;">
+        <div style="margin-top:20px;padding:14px 18px;background:#fafafa;border:1px solid #f0f0f0;border-radius:4px;font-size:12px;color:#595959;line-height:1.7;">
           <strong>📌 시안 안내 (중간점검 v2)</strong><br>
           • 행 클릭 시 우측 사이드 드로어로 9개 섹션 편집 진입 (모달 → 드로어 변경)<br>
           • 결과 테이블: 디폴트 12개 컬럼, 우측 <strong>컬럼 ▼</strong>로 토글 풀에서 +/-<br>
@@ -1046,7 +1176,7 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
       <div id="view-faq" class="view">
         <div class="page-title">옵션 관리 &gt; 기본 FAQ 관리 <span style="font-size:11px;background:#fa8c16;color:#fff;padding:2px 8px;border-radius:8px;margin-left:8px;font-weight:500;">NEW</span></div>
 
-        <div style="margin-bottom:16px;padding:12px 16px;background:#e6f7ff;border:1px solid #91d5ff;border-radius:4px;font-size:12px;color:#003a8c;line-height:1.7;">
+        <div style="margin-bottom:16px;padding:12px 16px;background:#fafafa;border:1px solid #f0f0f0;border-radius:4px;font-size:12px;color:#595959;line-height:1.7;">
           호스트가 스토어 설정에서 FAQ 작성 시, 매칭되는 카테고리의 기본 FAQ 5개가 자동 채워집니다. 호스트는 이를 그대로 사용하거나 수정·삭제·추가할 수 있습니다.
         </div>
 
@@ -1161,7 +1291,7 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
       <div id="view-channels" class="view">
         <div class="page-title">옵션 관리 &gt; KBS 공식 채널 <span style="font-size:11px;background:#fa8c16;color:#fff;padding:2px 8px;border-radius:8px;margin-left:8px;font-weight:500;">NEW</span></div>
 
-        <div style="margin-bottom:16px;padding:12px 16px;background:#e6f7ff;border:1px solid #91d5ff;border-radius:4px;font-size:12px;color:#003a8c;line-height:1.7;">
+        <div style="margin-bottom:16px;padding:12px 16px;background:#fafafa;border:1px solid #f0f0f0;border-radius:4px;font-size:12px;color:#595959;line-height:1.7;">
           <strong>KBS가 운영하는 공식 채팅·콘텐츠 채널 마스터.</strong><br>
           • 신규 스토어 등록 시 모든 슬롯이 자동으로 ⓐ KBS 공식으로 채워짐<br>
           • 어드민이 마스터 링크 변경 시 ⓐ 모드 사용 중인 모든 스토어에 즉시 반영<br>
@@ -1251,7 +1381,7 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
       <div id="view-guide" class="view">
         <div class="page-title">옵션 관리 &gt; 예약 가이드 <span style="font-size:11px;background:#fa8c16;color:#fff;padding:2px 8px;border-radius:8px;margin-left:8px;font-weight:500;">NEW</span></div>
 
-        <div style="margin-bottom:16px;padding:12px 16px;background:#e6f7ff;border:1px solid #91d5ff;border-radius:4px;font-size:12px;color:#003a8c;line-height:1.7;">
+        <div style="margin-bottom:16px;padding:12px 16px;background:#fafafa;border:1px solid #f0f0f0;border-radius:4px;font-size:12px;color:#595959;line-height:1.7;">
           <strong>카테고리별 예약 가이드 마스터.</strong><br>
           • FO 스토어 상세 "예약 방법" 섹션에 자동 노출<br>
           • 카테고리(8개) × 단계 가변 × 다국어 6개<br>
@@ -1620,6 +1750,176 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
     </div>
 </aside>
 
+<!-- ════════════════════════════════
+     사이드 드로어 — 스토어 기본정보 수정
+════════════════════════════════ -->
+<div id="drawer-basic-mask" class="drawer-mask" onclick="closeBasicDrawer()"></div>
+<aside id="drawer-basic" class="drawer">
+    <div class="drawer-header">
+      <div>
+        <div class="drawer-title" id="drawer-basic-title">스토어 기본정보 수정 — 원진성형외과</div>
+        <div class="drawer-title-sub">스토어정보 / 관리자설정 (언어 무관 메타)</div>
+      </div>
+      <button class="drawer-close" onclick="closeBasicDrawer()">✕</button>
+    </div>
+    <div class="drawer-body">
+
+      <div class="tabs">
+        <div class="tab active">스토어정보</div>
+        <div class="tab">관리자설정</div>
+      </div>
+
+      <!-- 식별/메타 -->
+      <div class="section-title">식별 정보 <span class="auto-note">변경 없음</span></div>
+      <div class="form-row">
+        <div class="form-label"><span class="req">*</span>상점코드</div>
+        <input class="form-input" value="wonjin">
+      </div>
+      <div class="form-row">
+        <div class="form-label">카테고리</div>
+        <select class="form-select"><option>성형외과</option></select>
+      </div>
+      <div class="form-row">
+        <div class="form-label">지역</div>
+        <select class="form-select"><option>서울 서초구</option></select>
+      </div>
+      <div class="form-row">
+        <div class="form-label"><span class="req">*</span>대표번호</div>
+        <input class="form-input" value="02-1234-5678">
+      </div>
+      <div class="form-row">
+        <div class="form-label"><span class="req">*</span>사업자번호</div>
+        <input class="form-input" value="123-45-67890">
+      </div>
+      <div class="form-row">
+        <div class="form-label"><span class="req">*</span>이메일</div>
+        <input class="form-input" value="contact@wonjin.kr">
+      </div>
+
+      <!-- 계정 상태 (신규) -->
+      <div class="section-title">계정 상태 <span class="auto-note changed">신규 — 활성·비활성·탈퇴 3-state</span></div>
+      <div class="form-row">
+        <div class="form-label"><span class="req">*</span>상태</div>
+        <div class="radio-group">
+          <label><input type="radio" name="acct" checked> 활성</label>
+          <label><input type="radio" name="acct"> 비활성</label>
+          <label><input type="radio" name="acct"> 탈퇴 <span style="font-size:10px;color:#bfbfbf;">(어드민만)</span></label>
+        </div>
+      </div>
+
+      <!-- 주소/좌표 -->
+      <div class="section-title">주소 / 좌표 <span class="auto-note">변경 없음</span></div>
+      <div class="form-row">
+        <div class="form-label"><span class="req">*</span>우편번호</div>
+        <input class="form-input" value="06158">
+      </div>
+      <div class="form-row">
+        <div class="form-label">주소</div>
+        <input class="form-input" value="서울 서초구 강남대로 419 (서초동, 파고다타워)">
+      </div>
+      <div class="form-row">
+        <div class="form-label">지도</div>
+        <div style="background:#fafafa;border:1px solid #e8e8e8;border-radius:4px;height:140px;display:flex;align-items:center;justify-content:center;color:#bfbfbf;font-size:12px;">🗺 네이버 지도 미리보기</div>
+      </div>
+      <div class="form-row">
+        <div class="form-label"><span class="req">*</span>위도</div>
+        <input class="form-input" value="37.4979">
+      </div>
+      <div class="form-row">
+        <div class="form-label"><span class="req">*</span>경도</div>
+        <input class="form-input" value="127.0276">
+      </div>
+
+      <!-- 담당자 -->
+      <div class="section-title">담당자 <span class="auto-note changed">번역정보관리 → 기본정보관리로 이동 · 1~3명 동적</span></div>
+      <div class="form-row" style="align-items:flex-start;">
+        <div class="form-label"><span class="req">*</span>담당자<br><span style="font-weight:400;font-size:11px;color:#8c8c8c;">(최소 1명, 최대 3명)</span></div>
+        <div class="form-control">
+          <div class="multi-row">
+            <input class="form-input" value="김원장" placeholder="성함" style="max-width:120px;">
+            <input class="form-input" value="02-1234-5678" placeholder="연락처">
+            <button class="row-remove" disabled style="opacity:0.3;cursor:not-allowed;">×</button>
+          </div>
+          <input class="form-input" value="director@wonjin.kr" placeholder="이메일 (선택)" style="margin-bottom:8px;">
+          <div class="multi-row">
+            <input class="form-input" value="박실장" placeholder="성함" style="max-width:120px;">
+            <input class="form-input" value="010-2345-6789" placeholder="연락처">
+            <button class="row-remove">×</button>
+          </div>
+          <input class="form-input" value="" placeholder="이메일 (선택)" style="margin-bottom:8px;">
+          <button class="add-row-btn">+ 담당자 추가 (최대 3명)</button>
+          <div class="form-help">고객 화면에는 노출되지 않습니다. 내부 운영·KBS 측 문의 연락처로 활용됩니다.</div>
+        </div>
+      </div>
+
+      <!-- 운영시간 -->
+      <div class="section-title">운영시간 <span class="auto-note">변경 없음</span></div>
+      <div class="form-row" style="align-items:flex-start;">
+        <div class="form-label">요일별 운영시간</div>
+        <div class="form-control" style="display:flex;flex-direction:column;gap:6px;">
+          <div style="display:flex;gap:6px;align-items:center;"><span style="width:48px;font-size:12px;font-weight:600;">월</span><input class="form-input" type="time" value="09:00" style="width:90px;"><span>~</span><input class="form-input" type="time" value="18:00" style="width:90px;"><label style="font-size:11px;display:flex;gap:3px;align-items:center;"><input type="checkbox"> 휴무</label></div>
+          <div style="display:flex;gap:6px;align-items:center;"><span style="width:48px;font-size:12px;font-weight:600;">화</span><input class="form-input" type="time" value="09:00" style="width:90px;"><span>~</span><input class="form-input" type="time" value="18:00" style="width:90px;"><label style="font-size:11px;display:flex;gap:3px;align-items:center;"><input type="checkbox"> 휴무</label></div>
+          <div style="display:flex;gap:6px;align-items:center;"><span style="width:48px;font-size:12px;font-weight:600;">수</span><input class="form-input" type="time" value="09:00" style="width:90px;"><span>~</span><input class="form-input" type="time" value="18:00" style="width:90px;"><label style="font-size:11px;display:flex;gap:3px;align-items:center;"><input type="checkbox"> 휴무</label></div>
+          <div style="display:flex;gap:6px;align-items:center;"><span style="width:48px;font-size:12px;font-weight:600;">목</span><input class="form-input" type="time" value="09:00" style="width:90px;"><span>~</span><input class="form-input" type="time" value="18:00" style="width:90px;"><label style="font-size:11px;display:flex;gap:3px;align-items:center;"><input type="checkbox"> 휴무</label></div>
+          <div style="display:flex;gap:6px;align-items:center;"><span style="width:48px;font-size:12px;font-weight:600;">금</span><input class="form-input" type="time" value="09:00" style="width:90px;"><span>~</span><input class="form-input" type="time" value="18:00" style="width:90px;"><label style="font-size:11px;display:flex;gap:3px;align-items:center;"><input type="checkbox"> 휴무</label></div>
+          <div style="display:flex;gap:6px;align-items:center;"><span style="width:48px;font-size:12px;font-weight:600;">토</span><input class="form-input" type="time" value="10:00" style="width:90px;"><span>~</span><input class="form-input" type="time" value="15:00" style="width:90px;"><label style="font-size:11px;display:flex;gap:3px;align-items:center;"><input type="checkbox"> 휴무</label></div>
+          <div style="display:flex;gap:6px;align-items:center;"><span style="width:48px;font-size:12px;font-weight:600;">일</span><input class="form-input" type="time" style="width:90px;" disabled><span>~</span><input class="form-input" type="time" style="width:90px;" disabled><label style="font-size:11px;display:flex;gap:3px;align-items:center;"><input type="checkbox" checked> 휴무</label></div>
+          <div style="display:flex;gap:6px;align-items:center;"><span style="width:48px;font-size:12px;font-weight:600;">공휴일</span><input class="form-input" type="time" style="width:90px;" disabled><span>~</span><input class="form-input" type="time" style="width:90px;" disabled><label style="font-size:11px;display:flex;gap:3px;align-items:center;"><input type="checkbox" checked> 휴무</label></div>
+        </div>
+      </div>
+
+      <!-- 위치 정보: 지하철역 다중 -->
+      <div class="section-title">위치 정보 <span class="auto-note changed">지하철역 단일 → 다중 (최대 3개)</span></div>
+      <div class="form-row" style="align-items:flex-start;">
+        <div class="form-label">가까운 지하철역</div>
+        <div class="form-control">
+          <select class="form-select"><option>지하철 노선 선택</option></select>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
+            <span class="active-tag" style="font-size:12px;padding:4px 6px 4px 12px;">명동역 4호선 <button>×</button></span>
+            <span class="active-tag" style="font-size:12px;padding:4px 6px 4px 12px;">을지로입구역 2호선 <button>×</button></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 운영 형태 -->
+      <div class="section-title">운영 형태 <span class="auto-note">변경 없음</span></div>
+      <div class="form-row">
+        <div class="form-label">프라이빗/퍼블릭</div>
+        <div class="radio-group">
+          <label><input type="radio" name="pp"> 미선택</label>
+          <label><input type="radio" name="pp"> 프라이빗</label>
+          <label><input type="radio" name="pp" checked> 퍼블릭</label>
+        </div>
+      </div>
+
+      <!-- 특징 -->
+      <div class="section-title">스토어 특징 <span class="auto-note">옵션관리 &gt; 특징 관리에서 통제</span></div>
+      <div class="form-row">
+        <div class="form-label">특징</div>
+        <div class="form-control">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+            <span class="active-tag" style="font-size:12px;padding:4px 6px 4px 12px;">전문의 <button>×</button></span>
+            <span class="active-tag" style="font-size:12px;padding:4px 6px 4px 12px;">여의사 <button>×</button></span>
+            <span class="active-tag" style="font-size:12px;padding:4px 6px 4px 12px;">픽업서비스 <button>×</button></span>
+            <button class="btn btn-sm">+ 특징 추가</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 메모 -->
+      <div class="section-title">어드민 메모 <span class="auto-note changed">신규</span></div>
+      <div class="form-row">
+        <div class="form-label">내부 메모</div>
+        <textarea class="form-textarea" rows="3" placeholder="운영팀 내부 메모 (호스트에 노출 안 됨)"></textarea>
+      </div>
+
+    </div>
+    <div class="drawer-footer">
+      <button class="btn" onclick="closeBasicDrawer()">Cancel</button>
+      <button class="btn btn-primary">저장</button>
+    </div>
+</aside>
+
 <script>
 function toggleSub(id) {
   document.getElementById(id).classList.toggle('open');
@@ -1644,7 +1944,7 @@ function resetFilters() {
   document.querySelectorAll('.active-tag').forEach(t => t.remove());
 }
 
-/* ── Side Drawer ── */
+/* ── Side Drawer (번역) ── */
 function openDrawer(e, name) {
   if (e && e.target && (e.target.tagName === 'INPUT' || e.target.classList.contains('row-ck'))) return;
   document.getElementById('drawer-mask').classList.add('open');
@@ -1656,7 +1956,19 @@ function closeDrawer() {
   document.getElementById('drawer').classList.remove('open');
 }
 
-/* ── Row checkbox / bulk count ── */
+/* ── Side Drawer (기본정보) ── */
+function openBasicDrawer(e, name) {
+  if (e && e.target && (e.target.tagName === 'INPUT' || e.target.classList.contains('row-ck-basic'))) return;
+  document.getElementById('drawer-basic-mask').classList.add('open');
+  document.getElementById('drawer-basic').classList.add('open');
+  if (name) document.getElementById('drawer-basic-title').textContent = '스토어 기본정보 수정 — ' + name;
+}
+function closeBasicDrawer() {
+  document.getElementById('drawer-basic-mask').classList.remove('open');
+  document.getElementById('drawer-basic').classList.remove('open');
+}
+
+/* ── Row checkbox / bulk count (번역) ── */
 function updateSelCount() {
   const checked = document.querySelectorAll('.row-ck:checked').length;
   document.getElementById('sel-count').textContent = checked;
@@ -1667,21 +1979,47 @@ function updateSelCount() {
     ck.closest('tr').classList.toggle('checked', ck.checked);
   });
 }
-function toggleAllRows(master) {
-  document.querySelectorAll('.row-ck').forEach(ck => ck.checked = master.checked);
-  updateSelCount();
+
+/* ── Row checkbox / bulk count (기본정보) ── */
+function updateSelCountBasic() {
+  const checked = document.querySelectorAll('.row-ck-basic:checked').length;
+  const sel = document.getElementById('sel-count-basic');
+  if (sel) sel.textContent = checked;
+  const btn = document.getElementById('bulk-btn-basic');
+  if (btn) btn.disabled = checked === 0;
+  if (checked === 0) {
+    const m = document.getElementById('bulk-menu-basic');
+    if (m) m.classList.remove('open');
+  }
+  document.querySelectorAll('.row-ck-basic').forEach(ck => {
+    ck.closest('tr').classList.toggle('checked', ck.checked);
+  });
+}
+
+function toggleAllRows(master, selector) {
+  const sel = selector || '.row-ck';
+  document.querySelectorAll(sel).forEach(ck => ck.checked = master.checked);
+  if (sel === '.row-ck') updateSelCount();
+  else updateSelCountBasic();
 }
 
 /* ── Close menus on outside click ── */
 document.addEventListener('click', (e) => {
-  const bulkMenu = document.getElementById('bulk-menu');
-  const colMenu = document.getElementById('col-menu');
-  if (bulkMenu && !e.target.closest('.tbl-bulk')) bulkMenu.classList.remove('open');
-  if (colMenu && !e.target.closest('.tbl-col-toggle')) colMenu.classList.remove('open');
+  ['bulk-menu', 'col-menu', 'bulk-menu-basic', 'col-menu-basic'].forEach(id => {
+    const m = document.getElementById(id);
+    if (!m) return;
+    const outerSel = id.startsWith('bulk') ? '.tbl-bulk' : '.tbl-col-toggle';
+    if (!e.target.closest(outerSel)) m.classList.remove('open');
+  });
 });
 
-/* ── ESC closes drawer ── */
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDrawer(); });
+/* ── ESC closes drawers ── */
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeDrawer();
+    closeBasicDrawer();
+  }
+});
 </script>
 </body>
 </html>
