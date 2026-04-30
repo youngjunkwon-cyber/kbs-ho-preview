@@ -211,6 +211,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 .f2-channel .f2-label { min-width:0; }
 .f2-mode { width:100%; height:28px; font-size:11px; padding:3px 8px; }
 .f2-mode-empty { width:100px; }
+.f2-channel-block .ch-split { display:grid; grid-template-columns:1fr 320px; gap:16px; align-items:start; }
+.ch-split-left { display:flex; flex-direction:column; gap:8px; }
+.ch-split-right { padding:10px 12px; background:#fff; border:1px solid #f0f0f0; border-radius:2px; display:flex; flex-direction:column; gap:8px; }
+.chip-row.chip-row-stack { flex-direction:column; align-items:flex-start; gap:6px; }
+.chip-row.chip-row-stack .verify-chip { width:fit-content; }
+@media (max-width:1280px) { .f2-channel-block .ch-split { grid-template-columns:1fr; } }
 .f2-new { display:inline-block; font-size:9px; color:rgba(0,0,0,0.45); border:1px solid #d9d9d9; padding:0 4px; border-radius:2px; margin-left:4px; font-weight:500; vertical-align:middle; }
 
 /* ── Result table action bar ── */
@@ -667,52 +673,65 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
                 <div class="f2-cell"><div class="f2-label">지역</div><select class="ant-input"><option>전체</option><option>강남구</option><option>서초구</option><option>마포구</option><option>중구</option></select></div>
               </div>
 
-              <!-- 📡 채널 설정 (단일 컬럼, 칩만 + 매칭 모드만) -->
-              <div class="f2-section">
-                <div class="f2-section-title">📡 채널 설정</div>
-                <div class="f2-row f2-channel">
-                  <div class="f2-label">SNS 채팅</div>
-                  <select class="ant-input f2-mode"><option>AND</option><option selected>OR</option><option>정확히 일치</option><option>제외</option></select>
-                  <div class="chip-row">
-                    <span class="filter-chip on">WhatsApp</span>
-                    <span class="filter-chip on">LINE</span>
-                    <span class="filter-chip">WeChat</span>
-                    <span class="filter-chip">샤오홍슈</span>
-                    <span class="filter-chip">KakaoTalk</span>
-                    <span class="filter-chip">기타</span>
+              <!-- 📡 채널 설정 + 채널 관련 검증 (2-col split, 좌측 설정 / 우측 채널 검증) -->
+              <div class="f2-section f2-channel-block">
+                <div class="ch-split">
+                  <div class="ch-split-left">
+                    <div class="f2-section-title">📡 채널 설정</div>
+                    <div class="f2-row f2-channel">
+                      <div class="f2-label">SNS 채팅</div>
+                      <select class="ant-input f2-mode"><option>AND</option><option selected>OR</option><option>정확히 일치</option><option>제외</option></select>
+                      <div class="chip-row">
+                        <span class="filter-chip on">WhatsApp</span>
+                        <span class="filter-chip on">LINE</span>
+                        <span class="filter-chip">WeChat</span>
+                        <span class="filter-chip">샤오홍슈</span>
+                        <span class="filter-chip">KakaoTalk</span>
+                        <span class="filter-chip">기타</span>
+                      </div>
+                    </div>
+                    <div class="f2-row f2-channel">
+                      <div class="f2-label">채널 소유자 <span class="f2-new">NEW</span></div>
+                      <span></span>
+                      <div class="chip-row">
+                        <span class="owner-chip on">KBS 공식</span>
+                        <span class="owner-chip">입점사 자체</span>
+                        <span class="owner-chip">미설정 슬롯</span>
+                      </div>
+                      <span></span>
+                    </div>
+                    <div class="f2-row f2-channel">
+                      <div class="f2-label">콘텐츠</div>
+                      <select class="ant-input f2-mode"><option>AND</option><option selected>OR</option><option>정확히 일치</option><option>제외</option></select>
+                      <div class="chip-row">
+                        <span class="filter-chip on">Instagram</span>
+                        <span class="filter-chip">YouTube</span>
+                        <span class="filter-chip">TikTok</span>
+                        <span class="filter-chip">Facebook</span>
+                        <span class="filter-chip">샤오홍슈</span>
+                        <span class="filter-chip">매거진(자체)</span>
+                      </div>
+                    </div>
+                    <div class="f2-row f2-channel">
+                      <div class="f2-label">인앱 채팅</div>
+                      <span></span>
+                      <div class="chip-row">
+                        <span class="filter-chip on">스토어 채팅</span>
+                        <span class="filter-chip">상품별 채팅</span>
+                        <span class="filter-chip">비활성</span>
+                      </div>
+                      <label class="ch-tgl"><input type="checkbox"> 환영 메시지 ON</label>
+                    </div>
                   </div>
-                </div>
-                <div class="f2-row f2-channel">
-                  <div class="f2-label">채널 소유자 <span class="f2-new">NEW</span></div>
-                  <span></span>
-                  <div class="chip-row">
-                    <span class="owner-chip on">KBS 공식</span>
-                    <span class="owner-chip">입점사 자체</span>
-                    <span class="owner-chip">미설정 슬롯</span>
+                  <div class="ch-split-right">
+                    <div class="f2-section-title">⚠ 채널 검증</div>
+                    <div class="chip-row chip-row-stack">
+                      <span class="verify-chip">SNS 채팅 미설정</span>
+                      <span class="verify-chip">콘텐츠 채널 미설정</span>
+                      <span class="verify-chip">KBS 공식인데 마스터 링크 없음</span>
+                      <span class="verify-chip">입점사 자체인데 링크 비어있음</span>
+                    </div>
                   </div>
-                  <span></span>
-                </div>
-                <div class="f2-row f2-channel">
-                  <div class="f2-label">콘텐츠</div>
-                  <select class="ant-input f2-mode"><option>AND</option><option selected>OR</option><option>정확히 일치</option><option>제외</option></select>
-                  <div class="chip-row">
-                    <span class="filter-chip on">Instagram</span>
-                    <span class="filter-chip">YouTube</span>
-                    <span class="filter-chip">TikTok</span>
-                    <span class="filter-chip">Facebook</span>
-                    <span class="filter-chip">샤오홍슈</span>
-                    <span class="filter-chip">매거진(자체)</span>
-                  </div>
-                </div>
-                <div class="f2-row f2-channel">
-                  <div class="f2-label">인앱 채팅</div>
-                  <span></span>
-                  <div class="chip-row">
-                    <span class="filter-chip on">스토어 채팅</span>
-                    <span class="filter-chip">상품별 채팅</span>
-                    <span class="filter-chip">비활성</span>
-                  </div>
-                  <label class="ch-tgl"><input type="checkbox"> 환영 메시지 ON</label>
                 </div>
               </div>
 
@@ -722,14 +741,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
                 <div class="f2-cell"><div class="f2-label">관리자 설정</div><select class="ant-input"><option>전체</option><option>관리자 일괄적용 ON</option><option>상품에 일괄적용 ON</option><option>외부링크 ON</option></select></div>
               </div>
 
-              <!-- ⚠ 검증 케이스 -->
+              <!-- ⚠ 콘텐츠·번역 검증 (채널 검증은 위 채널 설정 섹션 우측으로 이동) -->
               <div class="f2-section">
-                <div class="f2-section-title">⚠ 검증 케이스 <span class="f2-new">NEW</span> <span class="f2-section-help">— 의심·점검 필요한 상태</span></div>
+                <div class="f2-section-title">⚠ 콘텐츠·번역 검증 <span class="f2-new">NEW</span> <span class="f2-section-help">— 의심·점검 필요한 상태</span></div>
                 <div class="chip-row">
-                  <span class="verify-chip">SNS 채팅 미설정</span>
-                  <span class="verify-chip">콘텐츠 채널 미설정</span>
-                  <span class="verify-chip">KBS 공식인데 마스터 링크 없음</span>
-                  <span class="verify-chip">입점사 자체인데 링크 비어있음</span>
                   <span class="verify-chip">활성인데 대표 이미지 없음</span>
                   <span class="verify-chip">활성인데 로고 없음</span>
                   <span class="verify-chip">스토어 소개글 없음</span>
