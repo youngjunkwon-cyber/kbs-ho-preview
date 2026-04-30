@@ -3,9 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <title>BO 스토어 설정 시안 — KBS Admin</title>
+<!-- Ant Design v4 CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@4.24.16/dist/antd.min.css">
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; background:#f0f2f5; color:#262626; font-size:13px; }
+/* ── Page base (antd 위에 얹는 레이아웃 보정) ── */
+* { box-sizing:border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji"; background:#f0f2f5; color:rgba(0,0,0,0.85); font-size:14px; line-height:1.5715; margin:0; }
 
 /* ── Layout ── */
 .layout { display:flex; min-height:100vh; }
@@ -262,6 +265,26 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
 .memo-tag { display:inline-block; max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding:2px 7px; background:#fafafa; border:1px solid #e8e8e8; border-radius:3px; font-size:11px; color:#595959; }
 .memo-empty { color:#bfbfbf; font-size:11px; }
 
+/* ── 라이브 매칭 — 그룹 헤더 wide table ── */
+.tbl-rich.tbl-wide { font-size:11px; min-width:2400px; }
+.tbl-rich.tbl-wide th, .tbl-rich.tbl-wide td { padding:8px 8px; white-space:nowrap; vertical-align:middle; }
+.tbl-rich.tbl-wide thead .grp-row th { background:#fafafa; font-weight:600; color:rgba(0,0,0,0.85); border-bottom:1px solid #f0f0f0; }
+.tbl-rich.tbl-wide thead .grp-row .grp-head { text-align:center; background:#f5f5f5; color:rgba(0,0,0,0.85); border-bottom:1px solid #f0f0f0; }
+.tbl-rich.tbl-wide thead .grp-row .grp-new { background:#fafafa; }
+.tbl-rich.tbl-wide thead tr:not(.grp-row) th { background:#fafafa; font-weight:500; color:rgba(0,0,0,0.65); border-bottom:1px solid #f0f0f0; padding:6px 8px; font-size:10px; }
+.tbl-rich.tbl-wide tbody td { font-size:11px; color:rgba(0,0,0,0.65); }
+.grp-new-tag { display:inline-block; font-size:9px; color:rgba(0,0,0,0.45); border:1px solid #d9d9d9; padding:0 4px; border-radius:2px; margin-left:3px; font-weight:500; vertical-align:middle; }
+
+/* antd v4 ant-pagination 보강 (CSS만으로) */
+.ant-pagination { padding:0; margin:0; }
+.ant-pagination li { display:inline-block; min-width:32px; height:32px; line-height:30px; text-align:center; border:1px solid transparent; border-radius:2px; font-size:14px; cursor:pointer; }
+.ant-pagination .ant-pagination-item { border:1px solid #d9d9d9; }
+.ant-pagination .ant-pagination-item a { color:rgba(0,0,0,0.85); padding:0 6px; }
+.ant-pagination .ant-pagination-item:hover { border-color:#1890ff; }
+.ant-pagination .ant-pagination-item-active { border-color:#1890ff; }
+.ant-pagination .ant-pagination-item-active a { color:#1890ff; }
+.ant-pagination .ant-pagination-item-link { background:transparent; border:1px solid #d9d9d9; height:32px; line-height:30px; padding:0 8px; cursor:pointer; }
+
 /* ── Side drawer (replaces modal) ── */
 .drawer-mask { position:fixed; inset:0; background:rgba(0,0,0,0.32); display:none; z-index:1000; }
 .drawer-mask.open { display:block; }
@@ -355,106 +378,44 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
       <div id="view-basic" class="view">
         <div class="page-title">스토어 &gt; 기본정보관리</div>
 
-        <!-- 검색 / 필터 -->
-        <div class="filter-card">
-          <div class="filter-card-head">
-            <span class="filter-card-title">검색 / 필터</span>
-            <div style="display:flex;gap:6px;">
-              <button class="btn btn-sm" onclick="document.getElementById('basic-filter-adv').classList.toggle('open')">고급 필터 ▼</button>
-              <button class="btn btn-sm" onclick="resetFilters()">초기화</button>
-            </div>
-          </div>
+        <!-- 필터 영역 (라이브 매칭 — 단일 행) -->
+        <div style="background:#fff;border:1px solid #f0f0f0;border-radius:2px;padding:14px 16px;margin-bottom:14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <select class="ant-input" style="width:120px;height:32px;"><option>언어</option><option>한국어</option><option>영어</option><option>중국어</option><option>중국어(번체)</option><option>일본어</option><option>인도네시아어</option></select>
+          <select class="ant-input" style="width:140px;height:32px;"><option>카테고리 선택</option><option>피부과</option><option>성형외과</option><option>치과</option><option>헤어/메이크업</option><option>에스테틱</option></select>
+          <select class="ant-input" style="width:140px;height:32px;"><option>상점 선택</option></select>
+          <select class="ant-input" style="width:140px;height:32px;"><option>지하철정보</option></select>
+          <select class="ant-input" style="width:120px;height:32px;"><option>지역</option></select>
+          <button class="ant-btn ant-btn-sm">오늘</button>
+          <button class="ant-btn ant-btn-sm">어제</button>
+          <button class="ant-btn ant-btn-sm">이번주</button>
+          <button class="ant-btn ant-btn-sm">이번달</button>
+          <input class="ant-input" type="date" style="width:140px;height:32px;">
+          <span style="color:#bfbfbf;">→</span>
+          <input class="ant-input" type="date" style="width:140px;height:32px;">
+          <input class="ant-input" placeholder="검색어" style="width:160px;height:32px;">
+          <button class="ant-btn ant-btn-primary">검색</button>
+          <button class="ant-btn">신규 상점등록</button>
+        </div>
 
-          <div class="filter-grid">
-            <div class="filter-cell">
-              <label class="filter-label">카테고리 (다중)</label>
-              <div class="chip-row">
-                <span class="filter-chip on">피부과</span>
-                <span class="filter-chip on">성형외과</span>
-                <span class="filter-chip">치과</span>
-                <span class="filter-chip">헤어/메이크업</span>
-                <span class="filter-chip">에스테틱</span>
-                <span class="filter-chip">팝업스토어</span>
-                <span class="filter-chip">스튜디오</span>
-                <span class="filter-chip">메디컬체크</span>
-              </div>
-            </div>
-            <div class="filter-cell">
-              <label class="filter-label">계정 상태 <span style="color:#bfbfbf;font-size:10px;">NEW · 탈퇴 추적</span></label>
-              <div class="chip-row">
-                <span class="filter-chip on">활성</span>
-                <span class="filter-chip on">비활성</span>
-                <span class="filter-chip">탈퇴</span>
-              </div>
-            </div>
+        <!-- 신규 추가: 계정 상태 + 검증 케이스 -->
+        <div style="background:#fff;border:1px solid #f0f0f0;border-radius:2px;padding:10px 16px;margin-bottom:14px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;">
+          <span style="font-size:12px;color:#595959;font-weight:600;">계정 상태 <span style="font-size:10px;color:#bfbfbf;">NEW</span>:</span>
+          <div class="chip-row">
+            <span class="filter-chip on">활성</span>
+            <span class="filter-chip on">비활성</span>
+            <span class="filter-chip">탈퇴</span>
           </div>
-
-          <div class="filter-grid filter-grid-4">
-            <div class="filter-cell">
-              <label class="filter-label">상점 검색</label>
-              <input class="form-input" placeholder="상점명 또는 코드로 검색">
-            </div>
-            <div class="filter-cell">
-              <label class="filter-label">지역</label>
-              <select class="form-select"><option>전체</option><option>서울 강남구</option><option>서울 서초구</option><option>서울 마포구</option><option>서울 중구</option></select>
-            </div>
-            <div class="filter-cell">
-              <label class="filter-label">정렬</label>
-              <select class="form-select"><option>등록일 내림차순</option><option>등록일 오름차순</option><option>최종 수정일</option><option>상점명 가나다 순</option></select>
-            </div>
-            <div class="filter-cell">
-              <label class="filter-label">관리자 설정</label>
-              <select class="form-select"><option>전체</option><option>운영시간 미설정</option><option>담당자 미입력</option></select>
-            </div>
+          <span style="border-left:1px solid #f0f0f0;height:18px;"></span>
+          <span style="font-size:12px;color:#595959;font-weight:600;">⚠ 검증:</span>
+          <div class="chip-row">
+            <span class="verify-chip">운영시간 미입력</span>
+            <span class="verify-chip">담당자 0명</span>
+            <span class="verify-chip">지하철 0개</span>
+            <span class="verify-chip">사업자번호 오류</span>
+            <span class="verify-chip">위경도 미설정</span>
+            <span class="verify-chip">탈퇴 90일 경과</span>
           </div>
-
-          <div id="basic-filter-adv" class="filter-advanced">
-            <div class="filter-grid filter-grid-4">
-              <div class="filter-cell">
-                <label class="filter-label">등록일</label>
-                <div style="display:flex;gap:4px;align-items:center;">
-                  <input class="form-input" type="date">
-                  <span style="color:#bfbfbf;">~</span>
-                  <input class="form-input" type="date">
-                </div>
-              </div>
-              <div class="filter-cell">
-                <label class="filter-label">최종 수정일</label>
-                <div style="display:flex;gap:4px;align-items:center;">
-                  <input class="form-input" type="date">
-                  <span style="color:#bfbfbf;">~</span>
-                  <input class="form-input" type="date">
-                </div>
-              </div>
-              <div class="filter-cell">
-                <label class="filter-label">담당자 수</label>
-                <select class="form-select"><option>전체</option><option>1명</option><option>2명</option><option>3명</option></select>
-              </div>
-              <div class="filter-cell">
-                <label class="filter-label">지하철 태그 수</label>
-                <select class="form-select"><option>전체</option><option>없음</option><option>1개</option><option>2개</option><option>3개</option></select>
-              </div>
-            </div>
-            <div class="verify-row">
-              <div class="verify-row-title">⚠ 검증 케이스</div>
-              <div class="verify-chips">
-                <span class="verify-chip">운영시간 미입력</span>
-                <span class="verify-chip">담당자 0명</span>
-                <span class="verify-chip">지하철 태그 0개</span>
-                <span class="verify-chip">사업자번호 형식 오류</span>
-                <span class="verify-chip">위경도 미설정</span>
-                <span class="verify-chip">탈퇴 후 90일 경과</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="filter-foot">
-            <div class="filter-tags">
-              <span class="active-tag">카테고리: 피부과/성형외과 <button>×</button></span>
-              <span class="active-tag">계정 상태: 활성+비활성 <button>×</button></span>
-            </div>
-            <button class="btn btn-primary">검색 (예상 28건)</button>
-          </div>
+          <span style="margin-left:auto;font-size:12px;color:#8c8c8c;">예상 결과 <strong style="color:#262626;">28건</strong></span>
         </div>
 
         <!-- 액션 바 -->
@@ -474,155 +435,151 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
             </div>
           </div>
           <div class="tbl-actbar-right">
-            <div class="tbl-col-toggle">
-              <button class="tbl-bulk-btn" onclick="document.getElementById('col-menu-basic').classList.toggle('open')">컬럼 ▼</button>
-              <div class="tbl-col-menu" id="col-menu-basic">
-                <div class="tbl-col-group-title">식별</div>
-                <label class="tbl-col-item"><input type="checkbox" checked> 상점명</label>
-                <label class="tbl-col-item"><input type="checkbox" checked> 카테고리</label>
-                <label class="tbl-col-item"><input type="checkbox" checked> 지역</label>
-                <label class="tbl-col-item"><input type="checkbox" checked> 계정 상태</label>
-                <div class="tbl-col-group-title">시간</div>
-                <label class="tbl-col-item"><input type="checkbox" checked> 등록일</label>
-                <label class="tbl-col-item"><input type="checkbox"> 최종 수정일</label>
-                <div class="tbl-col-group-title">기본 메타</div>
-                <label class="tbl-col-item"><input type="checkbox" checked> 대표번호</label>
-                <label class="tbl-col-item"><input type="checkbox"> 사업자번호</label>
-                <label class="tbl-col-item"><input type="checkbox"> 이메일</label>
-                <label class="tbl-col-item"><input type="checkbox" checked> 담당자 수</label>
-                <label class="tbl-col-item"><input type="checkbox" checked> 운영시간 설정</label>
-                <label class="tbl-col-item"><input type="checkbox" checked> 지하철 태그 수</label>
-                <label class="tbl-col-item"><input type="checkbox"> 특징 chip 수</label>
-                <label class="tbl-col-item"><input type="checkbox"> 운영 형태(P/P)</label>
-                <div class="tbl-col-group-title">기타</div>
-                <label class="tbl-col-item"><input type="checkbox"> 메모</label>
-              </div>
-            </div>
-            <button class="tbl-bulk-btn" style="background:#262626;color:#fff;border-color:#262626;">⬇ Excel 다운로드 (조회 결과 전체)</button>
+            <span style="font-size:12px;color:#595959;">컬럼 그룹:</span>
+            <label class="ant-checkbox-wrapper" style="font-size:12px;"><input type="checkbox" checked> 계약 정보</label>
+            <label class="ant-checkbox-wrapper" style="font-size:12px;"><input type="checkbox" checked> 위치정보</label>
+            <label class="ant-checkbox-wrapper" style="font-size:12px;"><input type="checkbox" checked> 운영시간</label>
+            <label class="ant-checkbox-wrapper" style="font-size:12px;"><input type="checkbox" checked> 특징</label>
+            <label class="ant-checkbox-wrapper" style="font-size:12px;"><input type="checkbox" checked> 통계</label>
+            <span style="border-left:1px solid #f0f0f0;height:18px;margin:0 4px;"></span>
+            <button class="ant-btn ant-btn-sm" style="background:#262626;color:#fff;border-color:#262626;">⬇ Excel 다운로드</button>
           </div>
         </div>
 
-        <!-- 결과 테이블 -->
-        <div style="background:#fff;border:1px solid #f0f0f0;border-top:none;border-radius:0 0 4px 4px;overflow-x:auto;">
-          <table class="tbl-rich">
+        <!-- 결과 테이블 (라이브 매칭 — 그룹 헤더 + 가로 스크롤) -->
+        <div style="background:#fff;border:1px solid #f0f0f0;border-top:none;border-radius:0 0 2px 2px;overflow-x:auto;">
+          <table class="tbl-rich tbl-wide">
             <thead>
+              <tr class="grp-row">
+                <th rowspan="2" class="ck-cell"></th>
+                <th rowspan="2">No.</th>
+                <th rowspan="2">등록일</th>
+                <th rowspan="2">스토어명</th>
+                <th rowspan="2">카테고리</th>
+                <th rowspan="2">지원 언어</th>
+                <th rowspan="2" class="grp-new">계정 상태 <span class="grp-new-tag">NEW</span></th>
+                <th colspan="3" class="grp-head">계약 정보</th>
+                <th colspan="6" class="grp-head">위치정보</th>
+                <th colspan="8" class="grp-head">운영시간</th>
+                <th colspan="2" class="grp-head">특징</th>
+                <th colspan="15" class="grp-head">통계 (조회 기간 합산)</th>
+                <th rowspan="2" class="grp-new">메모 <span class="grp-new-tag">NEW</span></th>
+              </tr>
               <tr>
-                <th class="ck-cell"></th>
-                <th>상점명</th>
-                <th>카테고리</th>
-                <th>지역</th>
-                <th>계정 상태</th>
-                <th class="active">등록일 <span class="sort-arrow">▼</span></th>
-                <th>대표번호</th>
-                <th style="text-align:center;">담당자</th>
-                <th style="text-align:center;">운영시간</th>
-                <th style="text-align:center;">지하철</th>
+                <th>대표번호</th><th>사업자등록번호</th><th>이메일</th>
+                <th>우편번호</th><th>지역</th><th>주소</th><th>위도</th><th>경도</th><th>지하철 정보</th>
+                <th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th><th>일</th><th>공휴일</th>
+                <th>프라이빗</th><th>특징</th>
+                <th>노출수</th><th>내부<br>진입수</th><th>직접<br>유입수</th><th>채팅수</th><th>상담수</th><th>버튼<br>클릭수</th><th>상담접수</th><th>인앱<br>채팅</th><th>외부<br>링크</th><th>위챗</th><th>샤오<br>홍슈</th><th>왓츠앱</th><th>라인</th><th>카카오톡</th><th>페이스북</th>
               </tr>
             </thead>
             <tbody>
               <tr onclick="openBasicDrawer(event, '원진성형외과')">
                 <td class="ck-cell" onclick="event.stopPropagation();"><input type="checkbox" class="row-ck-basic" onclick="updateSelCountBasic()"></td>
-                <td><a class="name-link">원진성형외과</a><div class="name-sub">wonjin · 호스트A</div></td>
-                <td><span class="cat-pill">성형외과</span></td>
-                <td>서울 서초구</td>
-                <td><span class="state-badge active">활성</span></td>
-                <td>2025-03-12</td>
-                <td>02-1234-5678</td>
-                <td style="text-align:center;"><span class="stat-num">2명</span></td>
-                <td style="text-align:center;">설정 ✓</td>
-                <td style="text-align:center;"><span class="stat-num">2개</span></td>
+                <td>47</td><td>2025-03-12 11:30</td>
+                <td><a class="name-link">원진성형외과</a></td>
+                <td><span class="ant-tag">성형외과</span></td>
+                <td><span class="ant-tag">중국어</span> <span class="ant-tag">영어</span> <span class="ant-tag">일본어</span></td>
+                <td><span class="ant-tag ant-tag-green">활성</span></td>
+                <td>02-1234-5678</td><td>123-45-67890</td><td>contact@wonjin.kr</td>
+                <td>06158</td><td>서초구</td><td>서울 서초구 강남대로 419</td><td>37.49790</td><td>127.02760</td><td><span class="ant-tag ant-tag-blue">강남역</span></td>
+                <td>09:00<br>~18:00</td><td>09:00<br>~18:00</td><td>09:00<br>~18:00</td><td>09:00<br>~18:00</td><td>09:00<br>~18:00</td><td>10:00<br>~15:00</td><td>휴무</td><td>휴무</td>
+                <td><span class="ant-tag ant-tag-green">퍼블릭</span></td>
+                <td><span class="ant-tag ant-tag-blue">전문의</span> <span class="ant-tag ant-tag-blue">여의사</span></td>
+                <td>2,453</td><td>821</td><td>1,632</td><td>52</td><td>14</td><td>94</td><td>11</td><td>3</td><td>89</td><td>0</td><td>0</td><td>12</td><td>21</td><td>32</td><td>0</td>
+                <td><span class="memo-empty">—</span></td>
               </tr>
               <tr onclick="openBasicDrawer(event, 'Beautynyoung')">
                 <td class="ck-cell" onclick="event.stopPropagation();"><input type="checkbox" class="row-ck-basic" onclick="updateSelCountBasic()"></td>
-                <td><a class="name-link">Beautynyoung</a><div class="name-sub">beautynyoung · 호스트B</div></td>
-                <td><span class="cat-pill">성형외과</span></td>
-                <td>서울 강남구</td>
-                <td><span class="state-badge active">활성</span></td>
-                <td>2025-08-22</td>
-                <td>02-2345-6789</td>
-                <td style="text-align:center;"><span class="stat-num">3명</span></td>
-                <td style="text-align:center;">설정 ✓</td>
-                <td style="text-align:center;"><span class="stat-num">1개</span></td>
+                <td>46</td><td>2025-08-22 14:05</td>
+                <td><a class="name-link">Beautynyoung</a></td>
+                <td><span class="ant-tag">성형외과</span></td>
+                <td><span class="ant-tag">영어</span> <span class="ant-tag">중국어</span> <span class="ant-tag">중국어(번체)</span> <span class="ant-tag">일본어</span> <span class="ant-tag">인도네시아</span></td>
+                <td><span class="ant-tag ant-tag-green">활성</span></td>
+                <td>02-2345-6789</td><td>234-56-78901</td><td>info@beautynyoung.kr</td>
+                <td>06253</td><td>강남구</td><td>서울 강남구 강남대로 302</td><td>37.49032</td><td>127.03168</td><td><span class="ant-tag ant-tag-blue">역삼역</span></td>
+                <td>10:00<br>~19:00</td><td>10:00<br>~19:00</td><td>10:00<br>~19:00</td><td>10:00<br>~19:00</td><td>10:00<br>~19:00</td><td>10:00<br>~15:00</td><td>휴무</td><td>휴무</td>
+                <td><span class="ant-tag ant-tag-green">퍼블릭</span></td>
+                <td><span class="ant-tag ant-tag-blue">야간진료</span></td>
+                <td>1,872</td><td>541</td><td>1,331</td><td>34</td><td>10</td><td>62</td><td>8</td><td>2</td><td>54</td><td>0</td><td>0</td><td>8</td><td>14</td><td>21</td><td>0</td>
+                <td><span class="memo-tag">호스트 연락 대기</span></td>
               </tr>
               <tr onclick="openBasicDrawer(event, '지유피부과')">
                 <td class="ck-cell" onclick="event.stopPropagation();"><input type="checkbox" class="row-ck-basic" onclick="updateSelCountBasic()"></td>
-                <td><a class="name-link">지유피부과</a><div class="name-sub">jiyu · 호스트C</div></td>
-                <td><span class="cat-pill">피부과</span></td>
-                <td>서울 마포구</td>
-                <td><span class="state-badge active">활성</span></td>
-                <td>2025-11-04</td>
-                <td>02-3456-7890</td>
-                <td style="text-align:center;"><span class="stat-num">1명</span></td>
-                <td style="text-align:center;">설정 ✓</td>
-                <td style="text-align:center;"><span class="stat-num zero">0개</span></td>
+                <td>45</td><td>2025-11-04 09:45</td>
+                <td><a class="name-link">지유피부과</a></td>
+                <td><span class="ant-tag">피부과</span></td>
+                <td><span class="ant-tag">중국어</span> <span class="ant-tag">영어</span> <span class="ant-tag">중국어(번체)</span></td>
+                <td><span class="ant-tag ant-tag-green">활성</span></td>
+                <td>02-3456-7890</td><td>345-67-89012</td><td>jiyu@jiyu.kr</td>
+                <td>03949</td><td>마포구</td><td>서울 마포구 양화로 45</td><td>37.55656</td><td>126.91456</td><td><span class="memo-empty">—</span></td>
+                <td>11:00<br>~20:00</td><td>11:00<br>~20:00</td><td>11:00<br>~20:00</td><td>11:00<br>~20:00</td><td>11:00<br>~20:00</td><td>11:00<br>~16:00</td><td>휴무</td><td>휴무</td>
+                <td><span class="ant-tag">미선택</span></td>
+                <td><span class="ant-tag ant-tag-blue">전문의</span></td>
+                <td>964</td><td>312</td><td>652</td><td>18</td><td>5</td><td>28</td><td>4</td><td>1</td><td>23</td><td>0</td><td>0</td><td>4</td><td>7</td><td>10</td><td>0</td>
+                <td><span class="memo-empty">—</span></td>
               </tr>
               <tr onclick="openBasicDrawer(event, '닥터쁘띠 명동점')">
                 <td class="ck-cell" onclick="event.stopPropagation();"><input type="checkbox" class="row-ck-basic" onclick="updateSelCountBasic()"></td>
-                <td><a class="name-link">닥터쁘띠 명동점</a><div class="name-sub">drpetit_md · 호스트E</div></td>
-                <td><span class="cat-pill">피부과</span></td>
-                <td>서울 중구</td>
-                <td><span class="state-badge inactive">비활성</span></td>
-                <td>2025-09-09</td>
-                <td>02-4567-8901</td>
-                <td style="text-align:center;"><span class="stat-num">2명</span></td>
-                <td style="text-align:center;">설정 ✓</td>
-                <td style="text-align:center;"><span class="stat-num">3개</span></td>
+                <td>44</td><td>2025-09-09 12:11</td>
+                <td><a class="name-link">닥터쁘띠 명동점</a></td>
+                <td><span class="ant-tag">피부과</span></td>
+                <td><span class="ant-tag">영어</span> <span class="ant-tag">일본어</span></td>
+                <td><span class="ant-tag">비활성</span></td>
+                <td>02-4567-8901</td><td>456-78-90123</td><td>—</td>
+                <td>04533</td><td>중구</td><td>서울 중구 남대문로 81</td><td>37.56477</td><td>126.98180</td><td><span class="ant-tag ant-tag-blue">명동역</span> <span class="ant-tag ant-tag-blue">을지로입구역</span></td>
+                <td>10:00<br>~19:00</td><td>10:00<br>~19:00</td><td>10:00<br>~19:00</td><td>10:00<br>~19:00</td><td>10:00<br>~19:00</td><td>휴무</td><td>휴무</td><td>휴무</td>
+                <td><span class="ant-tag ant-tag-green">퍼블릭</span></td>
+                <td><span class="ant-tag ant-tag-blue">픽업서비스</span> <span class="ant-tag ant-tag-blue">시술전문병원</span></td>
+                <td>23</td><td>3</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>
+                <td><span class="memo-tag">이미지 재요청</span></td>
               </tr>
-              <tr onclick="openBasicDrawer(event, '대석 (탈퇴 호스트)')">
+              <tr onclick="openBasicDrawer(event, '대석test')">
                 <td class="ck-cell" onclick="event.stopPropagation();"><input type="checkbox" class="row-ck-basic" onclick="updateSelCountBasic()"></td>
-                <td><a class="name-link" style="color:#bfbfbf;">대석test</a><div class="name-sub">daeseok · 호스트X</div></td>
-                <td><span class="cat-pill">피부과</span></td>
-                <td>서울 강남구</td>
-                <td><span class="state-badge left">탈퇴</span></td>
-                <td>2025-09-09</td>
-                <td>—</td>
-                <td style="text-align:center;"><span class="stat-num zero">0명</span></td>
-                <td style="text-align:center;">미설정</td>
-                <td style="text-align:center;"><span class="stat-num zero">0개</span></td>
+                <td>43</td><td>2025-09-09 10:27</td>
+                <td><a class="name-link" style="color:#bfbfbf;text-decoration:line-through;">대석test</a></td>
+                <td><span class="ant-tag">피부과</span></td>
+                <td><span class="memo-empty">—</span></td>
+                <td><span class="ant-tag ant-tag-red">탈퇴</span></td>
+                <td>—</td><td>—</td><td>—</td>
+                <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>
+                <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>
+                <td>—</td><td>—</td>
+                <td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>
+                <td><span class="memo-tag">탈퇴 90일 경과 — 정리 대상</span></td>
               </tr>
               <tr onclick="openBasicDrawer(event, 'TU치과')">
                 <td class="ck-cell" onclick="event.stopPropagation();"><input type="checkbox" class="row-ck-basic" onclick="updateSelCountBasic()"></td>
-                <td><a class="name-link">TU치과</a><div class="name-sub">tu_dental · 호스트F</div></td>
-                <td><span class="cat-pill">치과</span></td>
-                <td>서울 강남구</td>
-                <td><span class="state-badge active">활성</span></td>
-                <td>2025-09-09</td>
-                <td>02-5678-9012</td>
-                <td style="text-align:center;"><span class="stat-num">2명</span></td>
-                <td style="text-align:center;">설정 ✓</td>
-                <td style="text-align:center;"><span class="stat-num">2개</span></td>
-              </tr>
-              <tr onclick="openBasicDrawer(event, 'K-Beauty 글램')">
-                <td class="ck-cell" onclick="event.stopPropagation();"><input type="checkbox" class="row-ck-basic" onclick="updateSelCountBasic()"></td>
-                <td><a class="name-link">K-Beauty 글램</a><div class="name-sub">kb_glam · 호스트G</div></td>
-                <td><span class="cat-pill">헤어/메이크업</span></td>
-                <td>서울 강남구</td>
-                <td><span class="state-badge active">활성</span></td>
-                <td>2025-12-15</td>
-                <td>02-6789-0123</td>
-                <td style="text-align:center;"><span class="stat-num">1명</span></td>
-                <td style="text-align:center;">설정 ✓</td>
-                <td style="text-align:center;"><span class="stat-num">1개</span></td>
-              </tr>
-              <tr onclick="openBasicDrawer(event, '셀럽에스테틱')">
-                <td class="ck-cell" onclick="event.stopPropagation();"><input type="checkbox" class="row-ck-basic" onclick="updateSelCountBasic()"></td>
-                <td><a class="name-link">셀럽에스테틱</a><div class="name-sub">celeb_esthe · 호스트H</div></td>
-                <td><span class="cat-pill">에스테틱</span></td>
-                <td>서울 강남구</td>
-                <td><span class="state-badge active">활성</span></td>
-                <td>2025-09-30</td>
-                <td>02-7890-1234</td>
-                <td style="text-align:center;"><span class="stat-num">2명</span></td>
-                <td style="text-align:center;">설정 ✓</td>
-                <td style="text-align:center;"><span class="stat-num">2개</span></td>
+                <td>42</td><td>2025-09-09 12:04</td>
+                <td><a class="name-link">TU치과</a></td>
+                <td><span class="ant-tag">치과</span></td>
+                <td><span class="ant-tag">중국어</span> <span class="ant-tag">영어</span> <span class="ant-tag">일본어</span></td>
+                <td><span class="ant-tag ant-tag-green">활성</span></td>
+                <td>02-5678-9012</td><td>567-89-01234</td><td>tu@tudental.kr</td>
+                <td>06254</td><td>강남구</td><td>서울 강남구 도곡로3길 20-9</td><td>37.49177</td><td>127.03342</td><td><span class="ant-tag ant-tag-blue">강남역</span></td>
+                <td>10:00<br>~20:00</td><td>10:00<br>~20:00</td><td>10:00<br>~20:00</td><td>10:00<br>~20:00</td><td>10:00<br>~20:00</td><td>휴무</td><td>10:00<br>~20:00</td><td>10:00<br>~20:00</td>
+                <td><span class="ant-tag ant-tag-green">퍼블릭</span></td>
+                <td><span class="ant-tag ant-tag-blue">전문의</span> <span class="ant-tag ant-tag-blue">휴일진료</span> <span class="ant-tag ant-tag-blue">야간진료</span> <span class="ant-tag ant-tag-blue">수술실CCTV</span></td>
+                <td>3,124</td><td>1,022</td><td>2,102</td><td>78</td><td>22</td><td>152</td><td>18</td><td>5</td><td>132</td><td>0</td><td>0</td><td>18</td><td>32</td><td>48</td><td>0</td>
+                <td><span class="memo-empty">—</span></td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <div style="margin-top:14px;padding:10px 14px;background:#fafafa;border:1px solid #f0f0f0;border-radius:4px;font-size:11px;color:#595959;line-height:1.7;">
-          <strong>📌 안내</strong> — 행 클릭 시 우측 사이드 드로어로 기본정보 편집 진입. 신규 컬럼: <strong>계정 상태(활성·비활성·탈퇴)</strong>·담당자/운영시간/지하철 설정 여부 표시.
+        <!-- 페이지네이션 (라이브 매칭) -->
+        <div style="display:flex;justify-content:flex-end;padding:14px 0;">
+          <ul class="ant-pagination" style="display:flex;gap:6px;list-style:none;">
+            <li class="ant-pagination-prev"><button class="ant-pagination-item-link">‹</button></li>
+            <li class="ant-pagination-item ant-pagination-item-active"><a>1</a></li>
+            <li class="ant-pagination-item"><a>2</a></li>
+            <li class="ant-pagination-item"><a>3</a></li>
+            <li class="ant-pagination-item"><a>4</a></li>
+            <li class="ant-pagination-item"><a>5</a></li>
+            <li class="ant-pagination-next"><button class="ant-pagination-item-link">›</button></li>
+          </ul>
         </div>
+
       </div>
 
       <!-- ════════════════════════════════
@@ -636,9 +593,9 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
           <div class="filter-card-head">
             <span class="filter-card-title">검색 / 필터</span>
             <div style="display:flex;gap:6px;">
-              <button class="btn btn-sm" onclick="document.getElementById('filter-advanced').classList.toggle('open')">고급 필터 ▼</button>
-              <button class="btn btn-sm" onclick="resetFilters()">초기화</button>
-              <button class="btn btn-sm">검색 조건 저장</button>
+              <button class="ant-btn ant-btn-sm" onclick="document.getElementById('filter-advanced').classList.toggle('open')">고급 필터 ▼</button>
+              <button class="ant-btn ant-btn-sm" onclick="resetFilters()">초기화</button>
+              <button class="ant-btn ant-btn-sm">검색 조건 저장</button>
             </div>
           </div>
 
@@ -674,19 +631,19 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
           <div class="filter-grid filter-grid-4">
             <div class="filter-cell">
               <label class="filter-label">상점 검색</label>
-              <input class="form-input" placeholder="상점명 또는 코드로 검색">
+              <input class="ant-input" placeholder="상점명 또는 코드로 검색">
             </div>
             <div class="filter-cell">
               <label class="filter-label">활성 여부</label>
-              <select class="form-select"><option>전체</option><option>활성만</option><option>비활성만</option></select>
+              <select class="ant-input"><option>전체</option><option>활성만</option><option>비활성만</option></select>
             </div>
             <div class="filter-cell">
               <label class="filter-label">번역 상태</label>
-              <select class="form-select"><option>전체</option><option>번역 완료</option><option>일부 미번역</option><option>전체 미번역</option></select>
+              <select class="ant-input"><option>전체</option><option>번역 완료</option><option>일부 미번역</option><option>전체 미번역</option></select>
             </div>
             <div class="filter-cell">
               <label class="filter-label">정렬</label>
-              <select class="form-select"><option>최근 수정 순</option><option>등록일 순</option><option>상점명 가나다 순</option><option>번역 미완료 우선</option></select>
+              <select class="ant-input"><option>최근 수정 순</option><option>등록일 순</option><option>상점명 가나다 순</option><option>번역 미완료 우선</option></select>
             </div>
           </div>
 
@@ -696,26 +653,26 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
               <div class="filter-cell">
                 <label class="filter-label">등록일</label>
                 <div style="display:flex;gap:4px;align-items:center;">
-                  <input class="form-input" type="date" value="2026-01-01">
+                  <input class="ant-input" type="date" value="2026-01-01">
                   <span style="color:#bfbfbf;">~</span>
-                  <input class="form-input" type="date" value="2026-04-29">
+                  <input class="ant-input" type="date" value="2026-04-29">
                 </div>
               </div>
               <div class="filter-cell">
                 <label class="filter-label">최종 수정일</label>
                 <div style="display:flex;gap:4px;align-items:center;">
-                  <input class="form-input" type="date">
+                  <input class="ant-input" type="date">
                   <span style="color:#bfbfbf;">~</span>
-                  <input class="form-input" type="date">
+                  <input class="ant-input" type="date">
                 </div>
               </div>
               <div class="filter-cell">
                 <label class="filter-label">최종 번역일</label>
-                <select class="form-select"><option>전체</option><option>오늘</option><option>최근 7일</option><option>최근 30일</option><option>30일 이상 미번역</option></select>
+                <select class="ant-input"><option>전체</option><option>오늘</option><option>최근 7일</option><option>최근 30일</option><option>30일 이상 미번역</option></select>
               </div>
               <div class="filter-cell">
                 <label class="filter-label">지역</label>
-                <select class="form-select"><option>전체</option><option>강남구</option><option>서초구</option><option>마포구</option><option>중구</option></select>
+                <select class="ant-input"><option>전체</option><option>강남구</option><option>서초구</option><option>마포구</option><option>중구</option></select>
               </div>
             </div>
 
@@ -746,7 +703,7 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
                   <span class="filter-chip" data-icon="✉">기타</span>
                 </div>
                 <div class="ch-meta">
-                  <select class="form-select" style="width:140px;"><option>채널 수: 전체</option><option>없음</option><option>1개</option><option>2~3개</option><option>3개 초과</option></select>
+                  <select class="ant-input" style="width:140px;"><option>채널 수: 전체</option><option>없음</option><option>1개</option><option>2~3개</option><option>3개 초과</option></select>
                   <label class="ch-tgl"><input type="checkbox"> 미설정 스토어만</label>
                 </div>
               </div>
@@ -785,7 +742,7 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
                   <span class="filter-chip" data-icon="📰">매거진(자체)</span>
                 </div>
                 <div class="ch-meta">
-                  <select class="form-select" style="width:140px;"><option>채널 수: 전체</option><option>없음</option><option>1개</option><option>2~3개</option><option>3개 초과</option></select>
+                  <select class="ant-input" style="width:140px;"><option>채널 수: 전체</option><option>없음</option><option>1개</option><option>2~3개</option><option>3개 초과</option></select>
                   <label class="ch-tgl"><input type="checkbox"> 미설정 스토어만</label>
                 </div>
               </div>
@@ -810,15 +767,15 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
             <div class="filter-grid filter-grid-3" style="margin-top:14px;">
               <div class="filter-cell">
                 <label class="filter-label">FAQ 개수</label>
-                <select class="form-select"><option>전체</option><option>0개</option><option>1~4개</option><option>5개</option><option>5개 초과</option></select>
+                <select class="ant-input"><option>전체</option><option>0개</option><option>1~4개</option><option>5개</option><option>5개 초과</option></select>
               </div>
               <div class="filter-cell">
                 <label class="filter-label">담당자 수 <span style="color:#bfbfbf;font-size:10px;">(기본정보관리로 이동)</span></label>
-                <select class="form-select"><option>전체</option><option>1명</option><option>2명</option><option>3명</option></select>
+                <select class="ant-input"><option>전체</option><option>1명</option><option>2명</option><option>3명</option></select>
               </div>
               <div class="filter-cell">
                 <label class="filter-label">관리자 설정</label>
-                <select class="form-select"><option>전체</option><option>관리자 일괄적용 ON</option><option>상품에 일괄적용 ON</option><option>외부링크 ON</option></select>
+                <select class="ant-input"><option>전체</option><option>관리자 일괄적용 ON</option><option>상품에 일괄적용 ON</option><option>외부링크 ON</option></select>
               </div>
             </div>
 
@@ -844,7 +801,7 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
               <span class="active-tag">카테고리: 피부과/성형외과 <button>×</button></span>
               <span class="active-tag">번역상태: 일부 미번역 <button>×</button></span>
             </div>
-            <button class="btn btn-primary">검색 (예상 23건)</button>
+            <button class="ant-btn ant-btn-primary">검색 (예상 23건)</button>
           </div>
         </div>
 
@@ -1183,7 +1140,7 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
         <div class="card">
           <div class="card-header">
             <span>카테고리 선택</span>
-            <button class="btn btn-primary btn-sm">+ 카테고리 추가</button>
+            <button class="ant-btn ant-btn-primary ant-btn-sm">+ 카테고리 추가</button>
           </div>
           <div class="card-body">
             <div class="cat-tabs">
@@ -1206,15 +1163,15 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
             <div class="faq-item">
               <div class="faq-item-head">
                 <span class="faq-item-num">FAQ 01</span>
-                <button class="btn-danger-link">삭제</button>
+                <button class="ant-btn ant-btn-link ant-btn-dangerous ant-btn-sm">삭제</button>
               </div>
               <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;">
                 <div class="form-label">질문 (한국어)</div>
-                <input class="form-input" value="시술 후 바로 일상생활이 가능한가요?">
+                <input class="ant-input" value="시술 후 바로 일상생활이 가능한가요?">
               </div>
               <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;">
                 <div class="form-label">답변 (한국어)</div>
-                <textarea class="form-textarea">시술 종류에 따라 다르지만 대부분 당일 일상생활이 가능합니다. 강도 높은 운동·사우나는 1주일 정도 피해 주세요.</textarea>
+                <textarea class="ant-input">시술 종류에 따라 다르지만 대부분 당일 일상생활이 가능합니다. 강도 높은 운동·사우나는 1주일 정도 피해 주세요.</textarea>
               </div>
               <div class="trans-bar" style="margin-top:10px;">
                 <button class="trans-bar-btn">저장 및 번역 실행</button>
@@ -1230,9 +1187,9 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
             </div>
 
             <div class="faq-item">
-              <div class="faq-item-head"><span class="faq-item-num">FAQ 02</span><button class="btn-danger-link">삭제</button></div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">질문 (한국어)</div><input class="form-input" value="외국인도 진료를 받을 수 있나요?"></div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">답변 (한국어)</div><textarea class="form-textarea">네, 외국인 고객도 동일하게 진료받으실 수 있습니다. KBS 앱 채팅으로 사전 문의 가능합니다.</textarea></div>
+              <div class="faq-item-head"><span class="faq-item-num">FAQ 02</span><button class="ant-btn ant-btn-link ant-btn-dangerous ant-btn-sm">삭제</button></div>
+              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">질문 (한국어)</div><input class="ant-input" value="외국인도 진료를 받을 수 있나요?"></div>
+              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">답변 (한국어)</div><textarea class="ant-input">네, 외국인 고객도 동일하게 진료받으실 수 있습니다. KBS 앱 채팅으로 사전 문의 가능합니다.</textarea></div>
               <div class="trans-bar" style="margin-top:10px;">
                 <button class="trans-bar-btn">저장 및 번역 실행</button>
                 <div class="trans-prog">
@@ -1247,9 +1204,9 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
             </div>
 
             <div class="faq-item">
-              <div class="faq-item-head"><span class="faq-item-num">FAQ 03</span><button class="btn-danger-link">삭제</button></div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">질문 (한국어)</div><input class="form-input" value="시술 시간은 얼마나 걸리나요?"></div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">답변 (한국어)</div><textarea class="form-textarea">시술 종류에 따라 30분~2시간까지 다양합니다. 상담 시 정확한 소요시간을 안내드립니다.</textarea></div>
+              <div class="faq-item-head"><span class="faq-item-num">FAQ 03</span><button class="ant-btn ant-btn-link ant-btn-dangerous ant-btn-sm">삭제</button></div>
+              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">질문 (한국어)</div><input class="ant-input" value="시술 시간은 얼마나 걸리나요?"></div>
+              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">답변 (한국어)</div><textarea class="ant-input">시술 종류에 따라 30분~2시간까지 다양합니다. 상담 시 정확한 소요시간을 안내드립니다.</textarea></div>
               <div class="trans-bar" style="margin-top:10px;">
                 <button class="trans-bar-btn">저장 및 번역 실행</button>
                 <div class="trans-prog">
@@ -1264,22 +1221,22 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
             </div>
 
             <div class="faq-item">
-              <div class="faq-item-head"><span class="faq-item-num">FAQ 04</span><button class="btn-danger-link">삭제</button></div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">질문 (한국어)</div><input class="form-input" value="시술 비용은 어떻게 결제하나요?"></div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">답변 (한국어)</div><textarea class="form-textarea">현장 결제(카드·현금)와 KBS 앱 내 사전 결제 모두 가능합니다.</textarea></div>
+              <div class="faq-item-head"><span class="faq-item-num">FAQ 04</span><button class="ant-btn ant-btn-link ant-btn-dangerous ant-btn-sm">삭제</button></div>
+              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">질문 (한국어)</div><input class="ant-input" value="시술 비용은 어떻게 결제하나요?"></div>
+              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">답변 (한국어)</div><textarea class="ant-input">현장 결제(카드·현금)와 KBS 앱 내 사전 결제 모두 가능합니다.</textarea></div>
             </div>
 
             <div class="faq-item">
-              <div class="faq-item-head"><span class="faq-item-num">FAQ 05</span><button class="btn-danger-link">삭제</button></div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">질문 (한국어)</div><input class="form-input" value="당일 예약도 가능한가요?"></div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">답변 (한국어)</div><textarea class="form-textarea">예약 상황에 따라 당일 진료도 가능합니다. KBS 앱 채팅으로 실시간 문의해 주세요.</textarea></div>
+              <div class="faq-item-head"><span class="faq-item-num">FAQ 05</span><button class="ant-btn ant-btn-link ant-btn-dangerous ant-btn-sm">삭제</button></div>
+              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">질문 (한국어)</div><input class="ant-input" value="당일 예약도 가능한가요?"></div>
+              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">답변 (한국어)</div><textarea class="ant-input">예약 상황에 따라 당일 진료도 가능합니다. KBS 앱 채팅으로 실시간 문의해 주세요.</textarea></div>
             </div>
 
             <button class="add-row-btn">+ FAQ 추가</button>
 
             <div style="margin-top:24px;display:flex;justify-content:flex-end;gap:8px;">
-              <button class="btn">취소</button>
-              <button class="btn btn-primary">전체 저장 및 번역 실행</button>
+              <button class="ant-btn">취소</button>
+              <button class="ant-btn ant-btn-primary">전체 저장 및 번역 실행</button>
             </div>
           </div>
         </div>
@@ -1301,7 +1258,7 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
         <div class="card">
           <div class="card-header">
             <span>SNS 채팅 채널 마스터 (언어 × 채널)</span>
-            <button class="btn btn-primary btn-sm">+ 채널 추가</button>
+            <button class="ant-btn ant-btn-primary ant-btn-sm">+ 채널 추가</button>
           </div>
           <div class="card-body" style="padding:0;overflow-x:auto;">
             <table class="tbl-rich" style="font-size:12px;">
@@ -1318,43 +1275,43 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
               <tbody>
                 <tr>
                   <td><strong>💬 WhatsApp</strong></td>
-                  <td><input class="form-input" value="wa.me/+821044001234" style="width:100%;font-size:11px;"></td>
-                  <td><input class="form-input" value="wa.me/+821044001234" style="width:100%;font-size:11px;"></td>
-                  <td><input class="form-input" placeholder="미설정" style="width:100%;font-size:11px;"></td>
-                  <td><input class="form-input" value="wa.me/+8170123456" style="width:100%;font-size:11px;"></td>
-                  <td><input class="form-input" value="wa.me/+62812345678" style="width:100%;font-size:11px;"></td>
+                  <td><input class="ant-input" value="wa.me/+821044001234" style="width:100%;font-size:11px;"></td>
+                  <td><input class="ant-input" value="wa.me/+821044001234" style="width:100%;font-size:11px;"></td>
+                  <td><input class="ant-input" placeholder="미설정" style="width:100%;font-size:11px;"></td>
+                  <td><input class="ant-input" value="wa.me/+8170123456" style="width:100%;font-size:11px;"></td>
+                  <td><input class="ant-input" value="wa.me/+62812345678" style="width:100%;font-size:11px;"></td>
                 </tr>
                 <tr>
                   <td><strong>💚 LINE</strong></td>
-                  <td><input class="form-input" value="line.me/R/ti/p/@kbs_en" style="width:100%;font-size:11px;"></td>
-                  <td><input class="form-input" placeholder="미설정" style="width:100%;font-size:11px;"></td>
-                  <td><input class="form-input" placeholder="미설정" style="width:100%;font-size:11px;"></td>
-                  <td><input class="form-input" value="line.me/R/ti/p/@kbs_jp" style="width:100%;font-size:11px;"></td>
-                  <td><input class="form-input" placeholder="미설정" style="width:100%;font-size:11px;"></td>
+                  <td><input class="ant-input" value="line.me/R/ti/p/@kbs_en" style="width:100%;font-size:11px;"></td>
+                  <td><input class="ant-input" placeholder="미설정" style="width:100%;font-size:11px;"></td>
+                  <td><input class="ant-input" placeholder="미설정" style="width:100%;font-size:11px;"></td>
+                  <td><input class="ant-input" value="line.me/R/ti/p/@kbs_jp" style="width:100%;font-size:11px;"></td>
+                  <td><input class="ant-input" placeholder="미설정" style="width:100%;font-size:11px;"></td>
                 </tr>
                 <tr>
                   <td><strong>🐉 WeChat</strong></td>
-                  <td><input class="form-input" placeholder="미설정" style="width:100%;font-size:11px;"></td>
-                  <td><input class="form-input" value="kbs_official_zh" style="width:100%;font-size:11px;"></td>
-                  <td><input class="form-input" value="kbs_official_zh" style="width:100%;font-size:11px;"></td>
-                  <td><input class="form-input" placeholder="미설정" style="width:100%;font-size:11px;"></td>
-                  <td><input class="form-input" placeholder="미설정" style="width:100%;font-size:11px;"></td>
+                  <td><input class="ant-input" placeholder="미설정" style="width:100%;font-size:11px;"></td>
+                  <td><input class="ant-input" value="kbs_official_zh" style="width:100%;font-size:11px;"></td>
+                  <td><input class="ant-input" value="kbs_official_zh" style="width:100%;font-size:11px;"></td>
+                  <td><input class="ant-input" placeholder="미설정" style="width:100%;font-size:11px;"></td>
+                  <td><input class="ant-input" placeholder="미설정" style="width:100%;font-size:11px;"></td>
                 </tr>
                 <tr>
                   <td><strong>🍓 샤오홍슈</strong></td>
-                  <td><input class="form-input" placeholder="미설정" style="width:100%;font-size:11px;"></td>
-                  <td><input class="form-input" value="xhs.com/user/kbs" style="width:100%;font-size:11px;"></td>
-                  <td><input class="form-input" value="xhs.com/user/kbs" style="width:100%;font-size:11px;"></td>
-                  <td><input class="form-input" placeholder="미설정" style="width:100%;font-size:11px;"></td>
-                  <td><input class="form-input" placeholder="미설정" style="width:100%;font-size:11px;"></td>
+                  <td><input class="ant-input" placeholder="미설정" style="width:100%;font-size:11px;"></td>
+                  <td><input class="ant-input" value="xhs.com/user/kbs" style="width:100%;font-size:11px;"></td>
+                  <td><input class="ant-input" value="xhs.com/user/kbs" style="width:100%;font-size:11px;"></td>
+                  <td><input class="ant-input" placeholder="미설정" style="width:100%;font-size:11px;"></td>
+                  <td><input class="ant-input" placeholder="미설정" style="width:100%;font-size:11px;"></td>
                 </tr>
                 <tr>
                   <td><strong>💛 KakaoTalk</strong></td>
-                  <td><input class="form-input" value="pf.kakao.com/_kbsofficial" style="width:100%;font-size:11px;"></td>
-                  <td><input class="form-input" value="pf.kakao.com/_kbsofficial" style="width:100%;font-size:11px;"></td>
-                  <td><input class="form-input" value="pf.kakao.com/_kbsofficial" style="width:100%;font-size:11px;"></td>
-                  <td><input class="form-input" value="pf.kakao.com/_kbsofficial" style="width:100%;font-size:11px;"></td>
-                  <td><input class="form-input" value="pf.kakao.com/_kbsofficial" style="width:100%;font-size:11px;"></td>
+                  <td><input class="ant-input" value="pf.kakao.com/_kbsofficial" style="width:100%;font-size:11px;"></td>
+                  <td><input class="ant-input" value="pf.kakao.com/_kbsofficial" style="width:100%;font-size:11px;"></td>
+                  <td><input class="ant-input" value="pf.kakao.com/_kbsofficial" style="width:100%;font-size:11px;"></td>
+                  <td><input class="ant-input" value="pf.kakao.com/_kbsofficial" style="width:100%;font-size:11px;"></td>
+                  <td><input class="ant-input" value="pf.kakao.com/_kbsofficial" style="width:100%;font-size:11px;"></td>
                 </tr>
               </tbody>
             </table>
@@ -1406,13 +1363,13 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
 
             <div class="section-title">
               <span>피부과 — 예약 4단계</span>
-              <button class="btn btn-sm">+ 단계 추가</button>
+              <button class="ant-btn ant-btn-sm">+ 단계 추가</button>
             </div>
 
             <div class="faq-item">
-              <div class="faq-item-head"><span class="faq-item-num">단계 1</span><button class="btn-danger-link">삭제</button></div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">제목 (한국어)</div><input class="form-input" value="원하는 시술 선택"></div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">설명 (한국어)</div><textarea class="form-textarea">상품 목록에서 원하는 시술을 선택하고 상세 정보를 확인하세요.</textarea></div>
+              <div class="faq-item-head"><span class="faq-item-num">단계 1</span><button class="ant-btn ant-btn-link ant-btn-dangerous ant-btn-sm">삭제</button></div>
+              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">제목 (한국어)</div><input class="ant-input" value="원하는 시술 선택"></div>
+              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">설명 (한국어)</div><textarea class="ant-input">상품 목록에서 원하는 시술을 선택하고 상세 정보를 확인하세요.</textarea></div>
               <div class="trans-bar" style="margin-top:10px;">
                 <button class="trans-bar-btn">저장 및 번역 실행</button>
                 <div class="trans-prog">
@@ -1427,28 +1384,28 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
             </div>
 
             <div class="faq-item">
-              <div class="faq-item-head"><span class="faq-item-num">단계 2</span><button class="btn-danger-link">삭제</button></div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">제목 (한국어)</div><input class="form-input" value="날짜 & 시간 선택"></div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">설명 (한국어)</div><textarea class="form-textarea">원하는 날짜와 시간을 선택하세요. 실시간으로 가능한 슬롯을 확인할 수 있습니다.</textarea></div>
+              <div class="faq-item-head"><span class="faq-item-num">단계 2</span><button class="ant-btn ant-btn-link ant-btn-dangerous ant-btn-sm">삭제</button></div>
+              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">제목 (한국어)</div><input class="ant-input" value="날짜 & 시간 선택"></div>
+              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">설명 (한국어)</div><textarea class="ant-input">원하는 날짜와 시간을 선택하세요. 실시간으로 가능한 슬롯을 확인할 수 있습니다.</textarea></div>
             </div>
 
             <div class="faq-item">
-              <div class="faq-item-head"><span class="faq-item-num">단계 3</span><button class="btn-danger-link">삭제</button></div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">제목 (한국어)</div><input class="form-input" value="예약 정보 입력"></div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">설명 (한국어)</div><textarea class="form-textarea">이름·연락처·특이사항(알레르기 등)을 입력해 주세요.</textarea></div>
+              <div class="faq-item-head"><span class="faq-item-num">단계 3</span><button class="ant-btn ant-btn-link ant-btn-dangerous ant-btn-sm">삭제</button></div>
+              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">제목 (한국어)</div><input class="ant-input" value="예약 정보 입력"></div>
+              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">설명 (한국어)</div><textarea class="ant-input">이름·연락처·특이사항(알레르기 등)을 입력해 주세요.</textarea></div>
             </div>
 
             <div class="faq-item">
-              <div class="faq-item-head"><span class="faq-item-num">단계 4</span><button class="btn-danger-link">삭제</button></div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">제목 (한국어)</div><input class="form-input" value="예약 확정"></div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">설명 (한국어)</div><textarea class="form-textarea">예약이 확정되면 LINE 또는 이메일로 확인 메시지가 발송됩니다.</textarea></div>
+              <div class="faq-item-head"><span class="faq-item-num">단계 4</span><button class="ant-btn ant-btn-link ant-btn-dangerous ant-btn-sm">삭제</button></div>
+              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">제목 (한국어)</div><input class="ant-input" value="예약 확정"></div>
+              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">설명 (한국어)</div><textarea class="ant-input">예약이 확정되면 LINE 또는 이메일로 확인 메시지가 발송됩니다.</textarea></div>
             </div>
 
             <button class="add-row-btn">+ 단계 추가</button>
 
             <div style="margin-top:24px;display:flex;justify-content:flex-end;gap:8px;">
-              <button class="btn">취소</button>
-              <button class="btn btn-primary">전체 저장 및 번역 실행</button>
+              <button class="ant-btn">취소</button>
+              <button class="ant-btn ant-btn-primary">전체 저장 및 번역 실행</button>
             </div>
           </div>
         </div>
@@ -1484,9 +1441,9 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
         <div class="form-control">
           <div class="img-box">📷 1920×1080</div>
           <div class="img-actions">
-            <button class="btn btn-sm">교체</button>
-            <button class="btn btn-sm">갤러리에서 선택</button>
-            <button class="btn btn-sm">삭제</button>
+            <button class="ant-btn ant-btn-sm">교체</button>
+            <button class="ant-btn ant-btn-sm">갤러리에서 선택</button>
+            <button class="ant-btn ant-btn-sm">삭제</button>
           </div>
           <div class="form-help">권장 16:9 · 최대 10MB · JPG/PNG · 호스트가 직접 업로드한 이미지가 자동 동기화됩니다.</div>
         </div>
@@ -1499,8 +1456,8 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
         <div class="form-control">
           <div class="img-box logo">🅻 LOGO</div>
           <div class="img-actions">
-            <button class="btn btn-sm">교체</button>
-            <button class="btn btn-sm">삭제</button>
+            <button class="ant-btn ant-btn-sm">교체</button>
+            <button class="ant-btn ant-btn-sm">삭제</button>
           </div>
           <div class="form-help">가로형 권장 (3:1~5:1) · PNG 투명배경 권장 · 최대 5MB</div>
         </div>
@@ -1510,11 +1467,11 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
       <div class="section-title">③ 스토어 기본 텍스트</div>
       <div class="form-row">
         <div class="form-label"><span class="req">*</span>상점명</div>
-        <input class="form-input" value="원진">
+        <input class="ant-input" value="원진">
       </div>
       <div class="form-row">
         <div class="form-label"><span class="req">*</span>기본주소</div>
-        <input class="form-input" value="서울 서초구 강남대로 419 (서초동, 파고다타워)">
+        <input class="ant-input" value="서울 서초구 강남대로 419 (서초동, 파고다타워)">
       </div>
       <div class="trans-bar">
         <button class="trans-bar-btn">저장 및 번역 실행</button>
@@ -1533,7 +1490,7 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
       <div class="form-row">
         <div class="form-label">AI 소개</div>
         <div class="form-control">
-          <textarea class="form-textarea" rows="3">경력 20년 대표원장이 직접 시술하는 강남 리프팅 전문 클리닉. 올쎄라·인모드·보톡스·필러 전문이며, 외국인 환자를 위한 통역 동행 및 공항 픽업 서비스를 제공합니다.</textarea>
+          <textarea class="ant-input" rows="3">경력 20년 대표원장이 직접 시술하는 강남 리프팅 전문 클리닉. 올쎄라·인모드·보톡스·필러 전문이며, 외국인 환자를 위한 통역 동행 및 공항 픽업 서비스를 제공합니다.</textarea>
           <div class="form-help">호스트가 작성한 한국어 원본이 자동번역된 결과입니다. 어드민에서 직접 수정 가능.</div>
         </div>
       </div>
@@ -1555,13 +1512,13 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
         <div class="form-label">인트로 이미지</div>
         <div class="form-control">
           <div class="img-box ratio-4-3">📷 4:3</div>
-          <div class="img-actions"><button class="btn btn-sm">교체</button><button class="btn btn-sm">삭제</button></div>
+          <div class="img-actions"><button class="ant-btn ant-btn-sm">교체</button><button class="ant-btn ant-btn-sm">삭제</button></div>
           <div class="form-help">권장 4:3 · 1200×900px 이상 · 최대 10MB</div>
         </div>
       </div>
       <div class="form-row">
         <div class="form-label">소개글</div>
-        <textarea class="form-textarea" rows="5">원진성형외과는 한국 성형 분야의 선구자로 20년 이상의 임상경험을 가진 전문 의료진이 8개 진료과 협진으로 미용에서 기능적 부위까지 진료합니다.</textarea>
+        <textarea class="ant-input" rows="5">원진성형외과는 한국 성형 분야의 선구자로 20년 이상의 임상경험을 가진 전문 의료진이 8개 진료과 협진으로 미용에서 기능적 부위까지 진료합니다.</textarea>
       </div>
       <div class="trans-bar">
         <button class="trans-bar-btn">저장 및 번역 실행</button>
@@ -1580,7 +1537,7 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
 
       <div class="form-row">
         <div class="form-label">인앱 채팅</div>
-        <select class="form-select">
+        <select class="ant-input">
           <option>스토어 채팅 (기본)</option>
           <option>상품별 채팅</option>
           <option>비활성</option>
@@ -1667,8 +1624,8 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
             </div>
           </div>
           <div style="display:none;" class="multi-row">
-            <select class="form-select" style="max-width:160px;"><option>WeChat</option></select>
-            <input class="form-input" value="wonjin_official" placeholder="채널 URL 또는 ID">
+            <select class="ant-input" style="max-width:160px;"><option>WeChat</option></select>
+            <input class="ant-input" value="wonjin_official" placeholder="채널 URL 또는 ID">
             <button class="row-remove">×</button>
           </div>
           <button class="add-row-btn">+ 채널 추가</button>
@@ -1679,13 +1636,13 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
         <div class="form-label">콘텐츠 채널<br><span style="font-weight:400;font-size:11px;color:#8c8c8c;">(SNS 링크)</span></div>
         <div class="form-control">
           <div class="multi-row">
-            <select class="form-select" style="max-width:160px;"><option>Instagram</option><option>YouTube</option><option>TikTok</option><option>Facebook</option><option>매거진</option></select>
-            <input class="form-input" value="https://instagram.com/wonjin_official" placeholder="링크 URL">
+            <select class="ant-input" style="max-width:160px;"><option>Instagram</option><option>YouTube</option><option>TikTok</option><option>Facebook</option><option>매거진</option></select>
+            <input class="ant-input" value="https://instagram.com/wonjin_official" placeholder="링크 URL">
             <button class="row-remove">×</button>
           </div>
           <div class="multi-row">
-            <select class="form-select" style="max-width:160px;"><option>YouTube</option></select>
-            <input class="form-input" value="https://youtube.com/@wonjin" placeholder="링크 URL">
+            <select class="ant-input" style="max-width:160px;"><option>YouTube</option></select>
+            <input class="ant-input" value="https://youtube.com/@wonjin" placeholder="링크 URL">
             <button class="row-remove">×</button>
           </div>
           <button class="add-row-btn">+ 채널 추가</button>
@@ -1696,14 +1653,14 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
       <div class="section-title">⑦ FAQ <span class="auto-note changed">신규</span></div>
 
       <div class="faq-item">
-        <div class="faq-item-head"><span class="faq-item-num">FAQ 01</span><button class="btn-danger-link">삭제</button></div>
-        <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">질문</div><input class="form-input" value="외국인도 예약하고 시술받을 수 있나요?"></div>
-        <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">답변</div><textarea class="form-textarea">네, 외국인 고객도 동일하게 예약 및 시술 가능합니다. KBS 앱을 통해 예약하거나 채팅으로 문의해 주세요.</textarea></div>
+        <div class="faq-item-head"><span class="faq-item-num">FAQ 01</span><button class="ant-btn ant-btn-link ant-btn-dangerous ant-btn-sm">삭제</button></div>
+        <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">질문</div><input class="ant-input" value="외국인도 예약하고 시술받을 수 있나요?"></div>
+        <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">답변</div><textarea class="ant-input">네, 외국인 고객도 동일하게 예약 및 시술 가능합니다. KBS 앱을 통해 예약하거나 채팅으로 문의해 주세요.</textarea></div>
       </div>
       <div class="faq-item">
-        <div class="faq-item-head"><span class="faq-item-num">FAQ 02</span><button class="btn-danger-link">삭제</button></div>
-        <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">질문</div><input class="form-input" value="시술 당일 방문 시 준비물이 있나요?"></div>
-        <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">답변</div><textarea class="form-textarea">메이크업을 지우고 방문해 주세요. 예약 확인서를 지참하시면 됩니다.</textarea></div>
+        <div class="faq-item-head"><span class="faq-item-num">FAQ 02</span><button class="ant-btn ant-btn-link ant-btn-dangerous ant-btn-sm">삭제</button></div>
+        <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">질문</div><input class="ant-input" value="시술 당일 방문 시 준비물이 있나요?"></div>
+        <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">답변</div><textarea class="ant-input">메이크업을 지우고 방문해 주세요. 예약 확인서를 지참하시면 됩니다.</textarea></div>
       </div>
       <button class="add-row-btn">+ FAQ 추가</button>
       <div class="trans-bar" style="margin-top:12px;">
@@ -1745,8 +1702,8 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
 
     </div>
     <div class="drawer-footer">
-      <button class="btn" onclick="closeDrawer()">Cancel</button>
-      <button class="btn btn-primary">OK</button>
+      <button class="ant-btn" onclick="closeDrawer()">Cancel</button>
+      <button class="ant-btn ant-btn-primary">OK</button>
     </div>
 </aside>
 
@@ -1773,27 +1730,27 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
       <div class="section-title">식별 정보 <span class="auto-note">변경 없음</span></div>
       <div class="form-row">
         <div class="form-label"><span class="req">*</span>상점코드</div>
-        <input class="form-input" value="wonjin">
+        <input class="ant-input" value="wonjin">
       </div>
       <div class="form-row">
         <div class="form-label">카테고리</div>
-        <select class="form-select"><option>성형외과</option></select>
+        <select class="ant-input"><option>성형외과</option></select>
       </div>
       <div class="form-row">
         <div class="form-label">지역</div>
-        <select class="form-select"><option>서울 서초구</option></select>
+        <select class="ant-input"><option>서울 서초구</option></select>
       </div>
       <div class="form-row">
         <div class="form-label"><span class="req">*</span>대표번호</div>
-        <input class="form-input" value="02-1234-5678">
+        <input class="ant-input" value="02-1234-5678">
       </div>
       <div class="form-row">
         <div class="form-label"><span class="req">*</span>사업자번호</div>
-        <input class="form-input" value="123-45-67890">
+        <input class="ant-input" value="123-45-67890">
       </div>
       <div class="form-row">
         <div class="form-label"><span class="req">*</span>이메일</div>
-        <input class="form-input" value="contact@wonjin.kr">
+        <input class="ant-input" value="contact@wonjin.kr">
       </div>
 
       <!-- 계정 상태 (신규) -->
@@ -1811,11 +1768,11 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
       <div class="section-title">주소 / 좌표 <span class="auto-note">변경 없음</span></div>
       <div class="form-row">
         <div class="form-label"><span class="req">*</span>우편번호</div>
-        <input class="form-input" value="06158">
+        <input class="ant-input" value="06158">
       </div>
       <div class="form-row">
         <div class="form-label">주소</div>
-        <input class="form-input" value="서울 서초구 강남대로 419 (서초동, 파고다타워)">
+        <input class="ant-input" value="서울 서초구 강남대로 419 (서초동, 파고다타워)">
       </div>
       <div class="form-row">
         <div class="form-label">지도</div>
@@ -1823,11 +1780,11 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
       </div>
       <div class="form-row">
         <div class="form-label"><span class="req">*</span>위도</div>
-        <input class="form-input" value="37.4979">
+        <input class="ant-input" value="37.4979">
       </div>
       <div class="form-row">
         <div class="form-label"><span class="req">*</span>경도</div>
-        <input class="form-input" value="127.0276">
+        <input class="ant-input" value="127.0276">
       </div>
 
       <!-- 담당자 -->
@@ -1836,17 +1793,17 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
         <div class="form-label"><span class="req">*</span>담당자<br><span style="font-weight:400;font-size:11px;color:#8c8c8c;">(최소 1명, 최대 3명)</span></div>
         <div class="form-control">
           <div class="multi-row">
-            <input class="form-input" value="김원장" placeholder="성함" style="max-width:120px;">
-            <input class="form-input" value="02-1234-5678" placeholder="연락처">
+            <input class="ant-input" value="김원장" placeholder="성함" style="max-width:120px;">
+            <input class="ant-input" value="02-1234-5678" placeholder="연락처">
             <button class="row-remove" disabled style="opacity:0.3;cursor:not-allowed;">×</button>
           </div>
-          <input class="form-input" value="director@wonjin.kr" placeholder="이메일 (선택)" style="margin-bottom:8px;">
+          <input class="ant-input" value="director@wonjin.kr" placeholder="이메일 (선택)" style="margin-bottom:8px;">
           <div class="multi-row">
-            <input class="form-input" value="박실장" placeholder="성함" style="max-width:120px;">
-            <input class="form-input" value="010-2345-6789" placeholder="연락처">
+            <input class="ant-input" value="박실장" placeholder="성함" style="max-width:120px;">
+            <input class="ant-input" value="010-2345-6789" placeholder="연락처">
             <button class="row-remove">×</button>
           </div>
-          <input class="form-input" value="" placeholder="이메일 (선택)" style="margin-bottom:8px;">
+          <input class="ant-input" value="" placeholder="이메일 (선택)" style="margin-bottom:8px;">
           <button class="add-row-btn">+ 담당자 추가 (최대 3명)</button>
           <div class="form-help">고객 화면에는 노출되지 않습니다. 내부 운영·KBS 측 문의 연락처로 활용됩니다.</div>
         </div>
@@ -1857,14 +1814,14 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
       <div class="form-row" style="align-items:flex-start;">
         <div class="form-label">요일별 운영시간</div>
         <div class="form-control" style="display:flex;flex-direction:column;gap:6px;">
-          <div style="display:flex;gap:6px;align-items:center;"><span style="width:48px;font-size:12px;font-weight:600;">월</span><input class="form-input" type="time" value="09:00" style="width:90px;"><span>~</span><input class="form-input" type="time" value="18:00" style="width:90px;"><label style="font-size:11px;display:flex;gap:3px;align-items:center;"><input type="checkbox"> 휴무</label></div>
-          <div style="display:flex;gap:6px;align-items:center;"><span style="width:48px;font-size:12px;font-weight:600;">화</span><input class="form-input" type="time" value="09:00" style="width:90px;"><span>~</span><input class="form-input" type="time" value="18:00" style="width:90px;"><label style="font-size:11px;display:flex;gap:3px;align-items:center;"><input type="checkbox"> 휴무</label></div>
-          <div style="display:flex;gap:6px;align-items:center;"><span style="width:48px;font-size:12px;font-weight:600;">수</span><input class="form-input" type="time" value="09:00" style="width:90px;"><span>~</span><input class="form-input" type="time" value="18:00" style="width:90px;"><label style="font-size:11px;display:flex;gap:3px;align-items:center;"><input type="checkbox"> 휴무</label></div>
-          <div style="display:flex;gap:6px;align-items:center;"><span style="width:48px;font-size:12px;font-weight:600;">목</span><input class="form-input" type="time" value="09:00" style="width:90px;"><span>~</span><input class="form-input" type="time" value="18:00" style="width:90px;"><label style="font-size:11px;display:flex;gap:3px;align-items:center;"><input type="checkbox"> 휴무</label></div>
-          <div style="display:flex;gap:6px;align-items:center;"><span style="width:48px;font-size:12px;font-weight:600;">금</span><input class="form-input" type="time" value="09:00" style="width:90px;"><span>~</span><input class="form-input" type="time" value="18:00" style="width:90px;"><label style="font-size:11px;display:flex;gap:3px;align-items:center;"><input type="checkbox"> 휴무</label></div>
-          <div style="display:flex;gap:6px;align-items:center;"><span style="width:48px;font-size:12px;font-weight:600;">토</span><input class="form-input" type="time" value="10:00" style="width:90px;"><span>~</span><input class="form-input" type="time" value="15:00" style="width:90px;"><label style="font-size:11px;display:flex;gap:3px;align-items:center;"><input type="checkbox"> 휴무</label></div>
-          <div style="display:flex;gap:6px;align-items:center;"><span style="width:48px;font-size:12px;font-weight:600;">일</span><input class="form-input" type="time" style="width:90px;" disabled><span>~</span><input class="form-input" type="time" style="width:90px;" disabled><label style="font-size:11px;display:flex;gap:3px;align-items:center;"><input type="checkbox" checked> 휴무</label></div>
-          <div style="display:flex;gap:6px;align-items:center;"><span style="width:48px;font-size:12px;font-weight:600;">공휴일</span><input class="form-input" type="time" style="width:90px;" disabled><span>~</span><input class="form-input" type="time" style="width:90px;" disabled><label style="font-size:11px;display:flex;gap:3px;align-items:center;"><input type="checkbox" checked> 휴무</label></div>
+          <div style="display:flex;gap:6px;align-items:center;"><span style="width:48px;font-size:12px;font-weight:600;">월</span><input class="ant-input" type="time" value="09:00" style="width:90px;"><span>~</span><input class="ant-input" type="time" value="18:00" style="width:90px;"><label style="font-size:11px;display:flex;gap:3px;align-items:center;"><input type="checkbox"> 휴무</label></div>
+          <div style="display:flex;gap:6px;align-items:center;"><span style="width:48px;font-size:12px;font-weight:600;">화</span><input class="ant-input" type="time" value="09:00" style="width:90px;"><span>~</span><input class="ant-input" type="time" value="18:00" style="width:90px;"><label style="font-size:11px;display:flex;gap:3px;align-items:center;"><input type="checkbox"> 휴무</label></div>
+          <div style="display:flex;gap:6px;align-items:center;"><span style="width:48px;font-size:12px;font-weight:600;">수</span><input class="ant-input" type="time" value="09:00" style="width:90px;"><span>~</span><input class="ant-input" type="time" value="18:00" style="width:90px;"><label style="font-size:11px;display:flex;gap:3px;align-items:center;"><input type="checkbox"> 휴무</label></div>
+          <div style="display:flex;gap:6px;align-items:center;"><span style="width:48px;font-size:12px;font-weight:600;">목</span><input class="ant-input" type="time" value="09:00" style="width:90px;"><span>~</span><input class="ant-input" type="time" value="18:00" style="width:90px;"><label style="font-size:11px;display:flex;gap:3px;align-items:center;"><input type="checkbox"> 휴무</label></div>
+          <div style="display:flex;gap:6px;align-items:center;"><span style="width:48px;font-size:12px;font-weight:600;">금</span><input class="ant-input" type="time" value="09:00" style="width:90px;"><span>~</span><input class="ant-input" type="time" value="18:00" style="width:90px;"><label style="font-size:11px;display:flex;gap:3px;align-items:center;"><input type="checkbox"> 휴무</label></div>
+          <div style="display:flex;gap:6px;align-items:center;"><span style="width:48px;font-size:12px;font-weight:600;">토</span><input class="ant-input" type="time" value="10:00" style="width:90px;"><span>~</span><input class="ant-input" type="time" value="15:00" style="width:90px;"><label style="font-size:11px;display:flex;gap:3px;align-items:center;"><input type="checkbox"> 휴무</label></div>
+          <div style="display:flex;gap:6px;align-items:center;"><span style="width:48px;font-size:12px;font-weight:600;">일</span><input class="ant-input" type="time" style="width:90px;" disabled><span>~</span><input class="ant-input" type="time" style="width:90px;" disabled><label style="font-size:11px;display:flex;gap:3px;align-items:center;"><input type="checkbox" checked> 휴무</label></div>
+          <div style="display:flex;gap:6px;align-items:center;"><span style="width:48px;font-size:12px;font-weight:600;">공휴일</span><input class="ant-input" type="time" style="width:90px;" disabled><span>~</span><input class="ant-input" type="time" style="width:90px;" disabled><label style="font-size:11px;display:flex;gap:3px;align-items:center;"><input type="checkbox" checked> 휴무</label></div>
         </div>
       </div>
 
@@ -1873,7 +1830,7 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
       <div class="form-row" style="align-items:flex-start;">
         <div class="form-label">가까운 지하철역</div>
         <div class="form-control">
-          <select class="form-select"><option>지하철 노선 선택</option></select>
+          <select class="ant-input"><option>지하철 노선 선택</option></select>
           <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
             <span class="active-tag" style="font-size:12px;padding:4px 6px 4px 12px;">명동역 4호선 <button>×</button></span>
             <span class="active-tag" style="font-size:12px;padding:4px 6px 4px 12px;">을지로입구역 2호선 <button>×</button></span>
@@ -1901,7 +1858,7 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
             <span class="active-tag" style="font-size:12px;padding:4px 6px 4px 12px;">전문의 <button>×</button></span>
             <span class="active-tag" style="font-size:12px;padding:4px 6px 4px 12px;">여의사 <button>×</button></span>
             <span class="active-tag" style="font-size:12px;padding:4px 6px 4px 12px;">픽업서비스 <button>×</button></span>
-            <button class="btn btn-sm">+ 특징 추가</button>
+            <button class="ant-btn ant-btn-sm">+ 특징 추가</button>
           </div>
         </div>
       </div>
@@ -1910,13 +1867,13 @@ body { font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; back
       <div class="section-title">어드민 메모 <span class="auto-note changed">신규</span></div>
       <div class="form-row">
         <div class="form-label">내부 메모</div>
-        <textarea class="form-textarea" rows="3" placeholder="운영팀 내부 메모 (호스트에 노출 안 됨)"></textarea>
+        <textarea class="ant-input" rows="3" placeholder="운영팀 내부 메모 (호스트에 노출 안 됨)"></textarea>
       </div>
 
     </div>
     <div class="drawer-footer">
-      <button class="btn" onclick="closeBasicDrawer()">Cancel</button>
-      <button class="btn btn-primary">저장</button>
+      <button class="ant-btn" onclick="closeBasicDrawer()">Cancel</button>
+      <button class="ant-btn ant-btn-primary">저장</button>
     </div>
 </aside>
 
