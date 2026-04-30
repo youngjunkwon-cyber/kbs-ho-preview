@@ -212,6 +212,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 .f2-mode { width:100%; height:28px; font-size:11px; padding:3px 8px; }
 .f2-mode-empty { width:100px; }
 .f2-channel-block .ch-split { display:grid; grid-template-columns:1fr 320px; gap:16px; align-items:start; }
+.stat-cond { display:flex; align-items:center; gap:6px; }
+.stat-cond .ant-input { height:32px; }
+.stat-cond > select.ant-input:first-child { width:200px; }
 .ch-split-left { display:flex; flex-direction:column; gap:8px; }
 .ch-split-right { padding:10px 12px; background:#fff; border:1px solid #f0f0f0; border-radius:2px; display:flex; flex-direction:column; gap:8px; }
 .chip-row.chip-row-stack { flex-direction:column; align-items:flex-start; gap:6px; }
@@ -680,6 +683,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
               <div class="f2-cell"><div class="f2-label">상점 검색</div><input class="ant-input" placeholder="상점명 또는 코드"></div>
               <div class="f2-cell"><div class="f2-label">활성</div><select class="ant-input"><option>전체</option><option>활성만</option><option>비활성만</option></select></div>
               <div class="f2-cell"><div class="f2-label">번역 상태</div><select class="ant-input"><option>전체</option><option>번역 완료</option><option>일부 미번역</option><option>전체 미번역</option></select></div>
+              <div class="f2-cell"><div class="f2-label">운영 형태 <span class="f2-new">NEW</span></div><select class="ant-input"><option>전체</option><option>퍼블릭</option><option>프라이빗</option><option>미선택</option></select></div>
               <div class="f2-cell"><div class="f2-label">정렬</div><select class="ant-input"><option>최근 수정 순</option><option>등록일 순</option><option>상점명 가나다 순</option><option>번역 미완료 우선</option></select></div>
             </div>
           </div>
@@ -744,9 +748,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
                       </div>
                       <label class="ch-tgl"><input type="checkbox"> 환영 메시지 ON</label>
                     </div>
+                    <!-- 3축 정밀 매칭 토글 (NEW) -->
+                    <div style="border-top:1px dashed #f0f0f0;padding-top:8px;margin-top:4px;">
+                      <label class="ch-tgl" style="font-size:12px;color:rgba(0,0,0,0.85);font-weight:500;">
+                        <input type="checkbox"> 선택 언어 chip의 슬롯에 한해 매칭
+                        <span class="f2-new">NEW</span>
+                      </label>
+                      <div style="font-size:11px;color:#8c8c8c;margin-left:22px;margin-top:2px;">ON: 위 언어 chip이 활성화된 (언어 × SNS) 슬롯에만 채널 소유자·SNS 매칭 적용</div>
+                    </div>
                   </div>
                   <div class="ch-split-right">
-                    <div class="f2-section-title">⚠ 채널 검증</div>
+                    <div class="f2-section-title" style="display:flex;align-items:center;justify-content:space-between;">
+                      <span>⚠ 채널 검증</span>
+                      <select class="ant-input f2-mode" style="width:80px;"><option>OR</option><option>AND</option></select>
+                    </div>
                     <div class="chip-row chip-row-stack">
                       <span class="verify-chip">SNS 채팅 미설정</span>
                       <span class="verify-chip">콘텐츠 채널 미설정</span>
@@ -757,22 +772,104 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
                 </div>
               </div>
 
-              <!-- 보유 콘텐츠 -->
+              <!-- 🏷 스토어 특징 (NEW — BO 마스터 다중 선택) -->
+              <div class="f2-section">
+                <div class="f2-section-title">🏷 스토어 특징 <span class="f2-new">NEW</span> <span class="f2-section-help">— 옵션관리 &gt; 특징 관리 마스터 기준</span></div>
+                <div class="f2-row f2-channel">
+                  <div class="f2-label">매칭</div>
+                  <select class="ant-input f2-mode"><option>AND</option><option selected>OR</option><option>제외</option></select>
+                  <div class="chip-row">
+                    <span class="filter-chip">전문의</span>
+                    <span class="filter-chip">여의사</span>
+                    <span class="filter-chip">야간진료</span>
+                    <span class="filter-chip">휴일진료</span>
+                    <span class="filter-chip">픽업서비스</span>
+                    <span class="filter-chip">수술실CCTV</span>
+                    <span class="filter-chip">시술전문병원</span>
+                    <span class="filter-chip">외국어상담</span>
+                    <span class="filter-chip">통역사 동행</span>
+                    <span class="filter-chip">당일예약</span>
+                    <span class="filter-chip">무통증시술</span>
+                    <span class="filter-chip">비급여전문</span>
+                    <span class="filter-chip">진단/회복실</span>
+                    <span class="filter-chip">공항픽업</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 📊 통계 조건 (NEW — 다중 조건 + 연산자) -->
+              <div class="f2-section">
+                <div class="f2-section-title">📊 통계 조건 <span class="f2-new">NEW</span> <span class="f2-section-help">— 조회 기간 합산 기준 · AND 결합</span></div>
+                <div class="stat-cond">
+                  <select class="ant-input">
+                    <optgroup label="유입 funnel">
+                      <option>노출수</option>
+                      <option>내부진입수</option>
+                      <option>직접유입수</option>
+                    </optgroup>
+                    <optgroup label="전환">
+                      <option>채팅수</option>
+                      <option>상담수</option>
+                      <option>버튼 클릭수</option>
+                      <option>상담접수</option>
+                    </optgroup>
+                    <optgroup label="채널별 클릭">
+                      <option>인앱채팅</option>
+                      <option>외부링크</option>
+                      <option>위챗</option>
+                      <option>샤오홍슈</option>
+                      <option>왓츠앱</option>
+                      <option>라인</option>
+                      <option>카카오톡</option>
+                      <option>페이스북</option>
+                    </optgroup>
+                  </select>
+                  <select class="ant-input" style="width:80px;"><option>≥</option><option>≤</option><option>=</option><option>≠</option><option>사이</option></select>
+                  <input class="ant-input" type="number" placeholder="값" style="width:120px;">
+                  <button class="ant-btn ant-btn-sm ant-btn-link ant-btn-dangerous" style="padding:0 8px;">×</button>
+                </div>
+                <div class="stat-cond">
+                  <select class="ant-input"><option>채팅수</option></select>
+                  <select class="ant-input" style="width:80px;"><option>≥</option></select>
+                  <input class="ant-input" type="number" value="100" style="width:120px;">
+                  <button class="ant-btn ant-btn-sm ant-btn-link ant-btn-dangerous" style="padding:0 8px;">×</button>
+                </div>
+                <div class="stat-cond">
+                  <select class="ant-input"><option>상담수</option></select>
+                  <select class="ant-input" style="width:80px;"><option>=</option></select>
+                  <input class="ant-input" type="number" value="0" style="width:120px;">
+                  <button class="ant-btn ant-btn-sm ant-btn-link ant-btn-dangerous" style="padding:0 8px;">×</button>
+                </div>
+                <button class="ant-btn ant-btn-sm" style="width:fit-content;">+ 조건 추가</button>
+              </div>
+
+              <!-- 보유 콘텐츠 + 어드민 활동 -->
               <div class="f2-row f2-row-inputs">
                 <div class="f2-cell"><div class="f2-label">FAQ 개수</div><select class="ant-input"><option>전체</option><option>0개</option><option>1~4개</option><option>5개</option><option>5개 초과</option></select></div>
                 <div class="f2-cell"><div class="f2-label">관리자 설정</div><select class="ant-input"><option>전체</option><option>관리자 일괄적용 ON</option><option>상품에 일괄적용 ON</option><option>외부링크 ON</option></select></div>
+                <div class="f2-cell"><div class="f2-label">어드민 활동 <span class="f2-new">NEW</span></div><select class="ant-input"><option>전체</option><option>최근 7일 내 어드민 수정</option><option>최근 30일 내 어드민 수정</option><option>어드민 미수정 (호스트 입력만)</option></select></div>
+                <div class="f2-cell"><div class="f2-label">담당 어드민</div><select class="ant-input"><option>전체</option><option>운영팀 김</option><option>운영팀 이</option><option>운영팀 박</option></select></div>
               </div>
 
-              <!-- ⚠ 콘텐츠·번역 검증 (채널 검증은 위 채널 설정 섹션 우측으로 이동) -->
+              <!-- ⚠ 콘텐츠·번역 검증 (매칭 모드 + cross-condition chips 확장) -->
               <div class="f2-section">
-                <div class="f2-section-title">⚠ 콘텐츠·번역 검증 <span class="f2-new">NEW</span> <span class="f2-section-help">— 의심·점검 필요한 상태</span></div>
+                <div class="f2-section-title" style="display:flex;align-items:center;justify-content:space-between;">
+                  <span>⚠ 콘텐츠·번역 검증 <span class="f2-new">NEW</span> <span class="f2-section-help">— 의심·점검 필요한 상태</span></span>
+                  <select class="ant-input f2-mode" style="width:80px;"><option>OR</option><option>AND</option></select>
+                </div>
                 <div class="chip-row">
                   <span class="verify-chip">활성인데 대표 이미지 없음</span>
                   <span class="verify-chip">활성인데 로고 없음</span>
+                  <span class="verify-chip">활성인데 운영시간 미입력</span>
                   <span class="verify-chip">스토어 소개글 없음</span>
+                  <span class="verify-chip">소개글 있는데 인트로 이미지 없음</span>
+                  <span class="verify-chip">AI 소개 카드 있는데 소개글 없음</span>
                   <span class="verify-chip">FAQ 0개</span>
+                  <span class="verify-chip">FAQ 있는데 번역 미완료</span>
                   <span class="verify-chip">30일 이상 미수정</span>
                   <span class="verify-chip">언어 1개 이상 미번역</span>
+                  <span class="verify-chip">이번달 노출수 0건</span>
+                  <span class="verify-chip">사업자번호 형식 오류</span>
                 </div>
               </div>
             </div>
@@ -784,6 +881,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
               <span class="active-tag">카테고리: 피부과/성형외과 <button>×</button></span>
               <span class="active-tag">번역상태: 일부 미번역 <button>×</button></span>
             </div>
+            <label class="ch-tgl" style="margin-right:auto;margin-left:12px;font-size:12px;"><input type="checkbox"> 집계 행 표시 <span class="f2-new">NEW</span></label>
             <button class="ant-btn ant-btn-primary">검색 (예상 23건)</button>
           </div>
         </div>
@@ -830,13 +928,30 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
                 <label class="tbl-col-item"><input type="checkbox"> SNS 콘텐츠 채널 수</label>
                 <label class="tbl-col-item"><input type="checkbox"> 인앱 채팅 모드</label>
                 <label class="tbl-col-item"><input type="checkbox"> 환영 메시지</label>
-                <div class="tbl-col-group-title">통계 (조회 기간 합산)</div>
+                <div class="tbl-col-group-title">통계 — 유입·전환</div>
                 <label class="tbl-col-item"><input type="checkbox" checked> 노출수</label>
                 <label class="tbl-col-item"><input type="checkbox" checked> 내부진입수</label>
                 <label class="tbl-col-item"><input type="checkbox" checked> 직접유입수</label>
                 <label class="tbl-col-item"><input type="checkbox" checked> 버튼 클릭수</label>
+                <label class="tbl-col-item"><input type="checkbox"> 채팅수</label>
+                <label class="tbl-col-item"><input type="checkbox"> 상담수</label>
+                <label class="tbl-col-item"><input type="checkbox"> 상담접수</label>
+                <div class="tbl-col-group-title">통계 — 채널별 클릭</div>
+                <label class="tbl-col-item"><input type="checkbox"> 인앱채팅</label>
+                <label class="tbl-col-item"><input type="checkbox"> 외부링크</label>
+                <label class="tbl-col-item"><input type="checkbox"> 위챗</label>
+                <label class="tbl-col-item"><input type="checkbox"> 샤오홍슈</label>
+                <label class="tbl-col-item"><input type="checkbox"> 왓츠앱</label>
+                <label class="tbl-col-item"><input type="checkbox"> 라인</label>
+                <label class="tbl-col-item"><input type="checkbox"> 카카오톡</label>
+                <label class="tbl-col-item"><input type="checkbox"> 페이스북</label>
+                <div class="tbl-col-group-title">어드민 활동 <span style="color:rgba(0,0,0,0.45);font-size:9px;border:1px solid #d9d9d9;padding:0 4px;border-radius:2px;margin-left:3px;">NEW</span></div>
+                <label class="tbl-col-item"><input type="checkbox"> 마지막 어드민 수정일</label>
+                <label class="tbl-col-item"><input type="checkbox"> 마지막 어드민 ID</label>
                 <div class="tbl-col-group-title">기타</div>
                 <label class="tbl-col-item"><input type="checkbox"> 메모</label>
+                <label class="tbl-col-item"><input type="checkbox"> 운영 형태(P/P)</label>
+                <label class="tbl-col-item"><input type="checkbox"> 특징 chip 수</label>
               </div>
             </div>
             <button class="tbl-bulk-btn" style="background:#262626;color:#fff;border-color:#262626;">⬇ Excel 다운로드 (조회 결과 전체)</button>
