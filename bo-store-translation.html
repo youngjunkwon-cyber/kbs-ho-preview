@@ -219,6 +219,28 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 @media (max-width:1280px) { .f2-channel-block .ch-split { grid-template-columns:1fr; } }
 .f2-new { display:inline-block; font-size:9px; color:rgba(0,0,0,0.45); border:1px solid #d9d9d9; padding:0 4px; border-radius:2px; margin-left:4px; font-weight:500; vertical-align:middle; }
 
+/* ── KBS 공식 채널 마스터 — 셀당 다중 슬롯 ── */
+.kbs-master-tbl th, .kbs-master-tbl td { vertical-align:top; padding:10px 8px; }
+.ms-cell { display:flex; flex-direction:column; gap:6px; min-width:180px; }
+.ms-slot { display:flex; gap:4px; align-items:center; }
+.ms-slot .ant-input { font-size:11px; height:28px; padding:3px 8px; flex:1; min-width:0; }
+.ms-slot .ms-label { max-width:90px; flex-shrink:0; }
+.ms-rm { background:transparent; border:none; color:#bfbfbf; cursor:pointer; padding:0 4px; font-size:14px; line-height:1; }
+.ms-rm:hover { color:#ff4d4f; }
+.ms-add { background:transparent; border:1px dashed #d9d9d9; color:#8c8c8c; padding:4px; font-size:11px; cursor:pointer; border-radius:2px; }
+.ms-add:hover { color:#1890ff; border-color:#1890ff; }
+
+/* ── FAQ / 예약 가이드 — 언어 탭 ── */
+.lang-tabs { display:flex; gap:0; border-bottom:1px solid #f0f0f0; margin-bottom:12px; }
+.lang-tab-btn { padding:6px 14px; font-size:12px; color:rgba(0,0,0,0.65); background:transparent; border:none; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; display:flex; align-items:center; gap:5px; }
+.lang-tab-btn:hover { color:#1890ff; }
+.lang-tab-btn.active { color:#1890ff; border-bottom-color:#1890ff; font-weight:500; }
+.lang-tab-btn .lt-dot { width:6px; height:6px; border-radius:50%; background:#52c41a; display:inline-block; }
+.lang-tab-btn .lt-dot.pending { background:#d9d9d9; }
+.lang-tab-panel { display:none; }
+.lang-tab-panel.active { display:block; }
+.lang-edit-note { font-size:11px; color:#8c8c8c; padding:6px 10px; background:#fafafa; border-radius:3px; margin-bottom:8px; border:1px dashed #d9d9d9; }
+
 /* ── Result table action bar ── */
 .tbl-actbar { background:#fafafa; border:1px solid #f0f0f0; border-bottom:none; border-radius:4px 4px 0 0; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
 .tbl-actbar-left { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
@@ -1117,80 +1139,128 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 
             <div class="section-title">
               <span>피부과 — 기본 FAQ</span>
-              <span class="auto-note">현재 5개 등록 / 권장 5개</span>
+              <span class="auto-note">현재 5개 등록 / 권장 5개 · 저장 시 자동 번역 → 어드민 검수·수정 후 호스트 배포</span>
             </div>
 
-            <!-- FAQ 1 -->
+            <!-- FAQ 1 — 언어 탭 풀 데모 -->
             <div class="faq-item">
               <div class="faq-item-head">
                 <span class="faq-item-num">FAQ 01</span>
                 <button class="ant-btn ant-btn-link ant-btn-dangerous ant-btn-sm">삭제</button>
               </div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;">
-                <div class="form-label">질문 (한국어)</div>
-                <input class="ant-input" value="시술 후 바로 일상생활이 가능한가요?">
+              <div class="lang-tabs">
+                <button class="lang-tab-btn active" onclick="switchLangTab(this,'faq01')">원본</button>
+                <button class="lang-tab-btn" onclick="switchLangTab(this,'faq01-en')"><span class="lt-dot"></span>EN</button>
+                <button class="lang-tab-btn" onclick="switchLangTab(this,'faq01-zh')"><span class="lt-dot"></span>简体</button>
+                <button class="lang-tab-btn" onclick="switchLangTab(this,'faq01-tw')"><span class="lt-dot"></span>繁體</button>
+                <button class="lang-tab-btn" onclick="switchLangTab(this,'faq01-jp')"><span class="lt-dot"></span>日本語</button>
+                <button class="lang-tab-btn" onclick="switchLangTab(this,'faq01-id')"><span class="lt-dot"></span>Indonesia</button>
               </div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;">
-                <div class="form-label">답변 (한국어)</div>
-                <textarea class="ant-input">시술 종류에 따라 다르지만 대부분 당일 일상생활이 가능합니다. 강도 높은 운동·사우나는 1주일 정도 피해 주세요.</textarea>
-              </div>
-              <div class="trans-bar" style="margin-top:10px;">
-                <button class="trans-bar-btn">저장 및 번역 실행</button>
-                <div class="trans-prog">
-                  <span class="trans-prog-item"><span class="trans-prog-dot"></span>EN</span>
-                  <span class="trans-prog-item"><span class="trans-prog-dot"></span>简</span>
-                  <span class="trans-prog-item"><span class="trans-prog-dot"></span>繁</span>
-                  <span class="trans-prog-item"><span class="trans-prog-dot"></span>JP</span>
-                  <span class="trans-prog-item"><span class="trans-prog-dot"></span>ID</span>
+              <div id="faq01" class="lang-tab-panel active">
+                <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">질문</div><input class="ant-input" value="시술 후 바로 일상생활이 가능한가요?"></div>
+                <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">답변</div><textarea class="ant-input">시술 종류에 따라 다르지만 대부분 당일 일상생활이 가능합니다. 강도 높은 운동·사우나는 1주일 정도 피해 주세요.</textarea></div>
+                <div class="trans-bar" style="margin-top:10px;">
+                  <button class="trans-bar-btn">저장 및 번역 실행</button>
+                  <span style="font-size:11px;color:#8c8c8c;">한국어 원본 저장 시 5개 언어 자동 번역 → 언어 탭에서 검수·수정</span>
                 </div>
-                <span class="trans-prog-label">번역 완료 · 2026-04-29 14:21</span>
+              </div>
+              <div id="faq01-en" class="lang-tab-panel">
+                <div class="lang-edit-note">✦ 자동 번역됨 · 어드민이 수정 가능 · 수정 시 호스트에는 검수된 버전 배포</div>
+                <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">Question</div><input class="ant-input" value="Can I return to daily activities right after treatment?"></div>
+                <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">Answer</div><textarea class="ant-input">Most treatments allow you to resume daily activities the same day. However, please avoid strenuous exercise and sauna for about one week.</textarea></div>
+                <div style="margin-top:10px;display:flex;justify-content:flex-end;gap:6px;"><button class="ant-btn ant-btn-sm">재번역</button><button class="ant-btn ant-btn-primary ant-btn-sm">검수 저장</button></div>
+              </div>
+              <div id="faq01-zh" class="lang-tab-panel">
+                <div class="lang-edit-note">✦ 자동 번역됨 · 어드민이 수정 가능</div>
+                <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">问题</div><input class="ant-input" value="治疗后可以立即恢复日常生活吗？"></div>
+                <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">回答</div><textarea class="ant-input">大多数治疗后当天即可恢复日常生活。但请避免剧烈运动和桑拿约一周时间。</textarea></div>
+                <div style="margin-top:10px;display:flex;justify-content:flex-end;gap:6px;"><button class="ant-btn ant-btn-sm">재번역</button><button class="ant-btn ant-btn-primary ant-btn-sm">검수 저장</button></div>
+              </div>
+              <div id="faq01-tw" class="lang-tab-panel">
+                <div class="lang-edit-note">✦ 자동 번역됨 · 어드민이 수정 가능</div>
+                <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">問題</div><input class="ant-input" value="治療後可以立即恢復日常生活嗎？"></div>
+                <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">回答</div><textarea class="ant-input">大多數治療後當天即可恢復日常生活。但請避免劇烈運動和桑拿約一週時間。</textarea></div>
+                <div style="margin-top:10px;display:flex;justify-content:flex-end;gap:6px;"><button class="ant-btn ant-btn-sm">재번역</button><button class="ant-btn ant-btn-primary ant-btn-sm">검수 저장</button></div>
+              </div>
+              <div id="faq01-jp" class="lang-tab-panel">
+                <div class="lang-edit-note">✦ 자동 번역됨 · 어드민이 수정 가능</div>
+                <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">質問</div><input class="ant-input" value="施術後すぐに日常生活に戻れますか？"></div>
+                <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">回答</div><textarea class="ant-input">施術の種類によりますが、大部分は当日から日常生活に戻れます。激しい運動・サウナは1週間程度お控えください。</textarea></div>
+                <div style="margin-top:10px;display:flex;justify-content:flex-end;gap:6px;"><button class="ant-btn ant-btn-sm">재번역</button><button class="ant-btn ant-btn-primary ant-btn-sm">검수 저장</button></div>
+              </div>
+              <div id="faq01-id" class="lang-tab-panel">
+                <div class="lang-edit-note">✦ 자동 번역됨 · 어드민이 수정 가능</div>
+                <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">Pertanyaan</div><input class="ant-input" value="Apakah saya bisa kembali ke aktivitas harian setelah perawatan?"></div>
+                <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">Jawaban</div><textarea class="ant-input">Sebagian besar perawatan memungkinkan Anda kembali ke aktivitas harian pada hari yang sama. Namun, hindari olahraga berat dan sauna selama sekitar satu minggu.</textarea></div>
+                <div style="margin-top:10px;display:flex;justify-content:flex-end;gap:6px;"><button class="ant-btn ant-btn-sm">재번역</button><button class="ant-btn ant-btn-primary ant-btn-sm">검수 저장</button></div>
               </div>
             </div>
 
+            <!-- FAQ 02~05 — 원본 탭만 노출 (구조 동일) -->
             <div class="faq-item">
               <div class="faq-item-head"><span class="faq-item-num">FAQ 02</span><button class="ant-btn ant-btn-link ant-btn-dangerous ant-btn-sm">삭제</button></div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">질문 (한국어)</div><input class="ant-input" value="외국인도 진료를 받을 수 있나요?"></div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">답변 (한국어)</div><textarea class="ant-input">네, 외국인 고객도 동일하게 진료받으실 수 있습니다. KBS 앱 채팅으로 사전 문의 가능합니다.</textarea></div>
-              <div class="trans-bar" style="margin-top:10px;">
-                <button class="trans-bar-btn">저장 및 번역 실행</button>
-                <div class="trans-prog">
-                  <span class="trans-prog-item"><span class="trans-prog-dot"></span>EN</span>
-                  <span class="trans-prog-item"><span class="trans-prog-dot"></span>简</span>
-                  <span class="trans-prog-item"><span class="trans-prog-dot"></span>繁</span>
-                  <span class="trans-prog-item"><span class="trans-prog-dot"></span>JP</span>
-                  <span class="trans-prog-item"><span class="trans-prog-dot"></span>ID</span>
-                </div>
-                <span class="trans-prog-label">번역 완료</span>
+              <div class="lang-tabs">
+                <button class="lang-tab-btn active">원본</button>
+                <button class="lang-tab-btn"><span class="lt-dot"></span>EN</button>
+                <button class="lang-tab-btn"><span class="lt-dot"></span>简体</button>
+                <button class="lang-tab-btn"><span class="lt-dot"></span>繁體</button>
+                <button class="lang-tab-btn"><span class="lt-dot"></span>日本語</button>
+                <button class="lang-tab-btn"><span class="lt-dot"></span>Indonesia</button>
+              </div>
+              <div class="lang-tab-panel active">
+                <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">질문</div><input class="ant-input" value="외국인도 진료를 받을 수 있나요?"></div>
+                <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">답변</div><textarea class="ant-input">네, 외국인 고객도 동일하게 진료받으실 수 있습니다. KBS 앱 채팅으로 사전 문의 가능합니다.</textarea></div>
+                <div class="trans-bar" style="margin-top:10px;"><button class="trans-bar-btn">저장 및 번역 실행</button><span style="font-size:11px;color:#8c8c8c;">번역 완료 — 검수됨</span></div>
               </div>
             </div>
 
             <div class="faq-item">
               <div class="faq-item-head"><span class="faq-item-num">FAQ 03</span><button class="ant-btn ant-btn-link ant-btn-dangerous ant-btn-sm">삭제</button></div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">질문 (한국어)</div><input class="ant-input" value="시술 시간은 얼마나 걸리나요?"></div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">답변 (한국어)</div><textarea class="ant-input">시술 종류에 따라 30분~2시간까지 다양합니다. 상담 시 정확한 소요시간을 안내드립니다.</textarea></div>
-              <div class="trans-bar" style="margin-top:10px;">
-                <button class="trans-bar-btn">저장 및 번역 실행</button>
-                <div class="trans-prog">
-                  <span class="trans-prog-item"><span class="trans-prog-dot pending"></span>EN</span>
-                  <span class="trans-prog-item"><span class="trans-prog-dot pending"></span>简</span>
-                  <span class="trans-prog-item"><span class="trans-prog-dot pending"></span>繁</span>
-                  <span class="trans-prog-item"><span class="trans-prog-dot pending"></span>JP</span>
-                  <span class="trans-prog-item"><span class="trans-prog-dot pending"></span>ID</span>
-                </div>
-                <span class="trans-prog-label" style="color:#fa8c16;">미번역 — 저장 후 실행 필요</span>
+              <div class="lang-tabs">
+                <button class="lang-tab-btn active">원본</button>
+                <button class="lang-tab-btn"><span class="lt-dot pending"></span>EN</button>
+                <button class="lang-tab-btn"><span class="lt-dot pending"></span>简体</button>
+                <button class="lang-tab-btn"><span class="lt-dot pending"></span>繁體</button>
+                <button class="lang-tab-btn"><span class="lt-dot pending"></span>日本語</button>
+                <button class="lang-tab-btn"><span class="lt-dot pending"></span>Indonesia</button>
+              </div>
+              <div class="lang-tab-panel active">
+                <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">질문</div><input class="ant-input" value="시술 시간은 얼마나 걸리나요?"></div>
+                <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">답변</div><textarea class="ant-input">시술 종류에 따라 30분~2시간까지 다양합니다. 상담 시 정확한 소요시간을 안내드립니다.</textarea></div>
+                <div class="trans-bar" style="margin-top:10px;"><button class="trans-bar-btn">저장 및 번역 실행</button><span style="font-size:11px;color:rgba(0,0,0,0.65);">미번역 — 저장 시 5개 언어 일괄 번역</span></div>
               </div>
             </div>
 
             <div class="faq-item">
               <div class="faq-item-head"><span class="faq-item-num">FAQ 04</span><button class="ant-btn ant-btn-link ant-btn-dangerous ant-btn-sm">삭제</button></div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">질문 (한국어)</div><input class="ant-input" value="시술 비용은 어떻게 결제하나요?"></div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">답변 (한국어)</div><textarea class="ant-input">현장 결제(카드·현금)와 KBS 앱 내 사전 결제 모두 가능합니다.</textarea></div>
+              <div class="lang-tabs">
+                <button class="lang-tab-btn active">원본</button>
+                <button class="lang-tab-btn"><span class="lt-dot"></span>EN</button>
+                <button class="lang-tab-btn"><span class="lt-dot"></span>简体</button>
+                <button class="lang-tab-btn"><span class="lt-dot"></span>繁體</button>
+                <button class="lang-tab-btn"><span class="lt-dot"></span>日本語</button>
+                <button class="lang-tab-btn"><span class="lt-dot"></span>Indonesia</button>
+              </div>
+              <div class="lang-tab-panel active">
+                <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">질문</div><input class="ant-input" value="시술 비용은 어떻게 결제하나요?"></div>
+                <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">답변</div><textarea class="ant-input">현장 결제(카드·현금)와 KBS 앱 내 사전 결제 모두 가능합니다.</textarea></div>
+              </div>
             </div>
 
             <div class="faq-item">
               <div class="faq-item-head"><span class="faq-item-num">FAQ 05</span><button class="ant-btn ant-btn-link ant-btn-dangerous ant-btn-sm">삭제</button></div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">질문 (한국어)</div><input class="ant-input" value="당일 예약도 가능한가요?"></div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">답변 (한국어)</div><textarea class="ant-input">예약 상황에 따라 당일 진료도 가능합니다. KBS 앱 채팅으로 실시간 문의해 주세요.</textarea></div>
+              <div class="lang-tabs">
+                <button class="lang-tab-btn active">원본</button>
+                <button class="lang-tab-btn"><span class="lt-dot"></span>EN</button>
+                <button class="lang-tab-btn"><span class="lt-dot"></span>简体</button>
+                <button class="lang-tab-btn"><span class="lt-dot"></span>繁體</button>
+                <button class="lang-tab-btn"><span class="lt-dot"></span>日本語</button>
+                <button class="lang-tab-btn"><span class="lt-dot"></span>Indonesia</button>
+              </div>
+              <div class="lang-tab-panel active">
+                <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">질문</div><input class="ant-input" value="당일 예약도 가능한가요?"></div>
+                <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">답변</div><textarea class="ant-input">예약 상황에 따라 당일 진료도 가능합니다. KBS 앱 채팅으로 실시간 문의해 주세요.</textarea></div>
+              </div>
             </div>
 
             <button class="add-row-btn">+ FAQ 추가</button>
@@ -1213,19 +1283,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
           <strong>KBS가 운영하는 공식 채팅·콘텐츠 채널 마스터.</strong><br>
           • 신규 스토어 등록 시 모든 슬롯이 자동으로 ⓐ KBS 공식으로 채워짐<br>
           • 어드민이 마스터 링크 변경 시 ⓐ 모드 사용 중인 모든 스토어에 즉시 반영<br>
-          • 호스트가 자체 채널 운영 중이면 ⓑ 자체로 변경 후 직접 입력
+          • 호스트가 자체 채널 운영 중이면 ⓑ 자체로 변경 후 직접 입력<br>
+          • <strong>같은 (채널 × 언어) 조합에 N개 슬롯 가능</strong> — 예: LINE × 日本語에 도쿄용/오사카용 별도 운영 / LINE × 繁體에 대만용
         </div>
 
         <div class="card">
           <div class="card-header">
-            <span>SNS 채팅 채널 마스터 (언어 × 채널)</span>
-            <button class="ant-btn ant-btn-primary ant-btn-sm">+ 채널 추가</button>
+            <span>SNS 채팅 채널 마스터 (언어 × 채널, 셀당 다중 슬롯 지원)</span>
+            <button class="ant-btn ant-btn-primary ant-btn-sm">+ 채널 종류 추가</button>
           </div>
           <div class="card-body" style="padding:0;overflow-x:auto;">
-            <table class="tbl-rich" style="font-size:12px;">
+            <table class="tbl-rich kbs-master-tbl">
               <thead>
                 <tr>
-                  <th style="width:120px;">채널</th>
+                  <th style="width:110px;">채널</th>
                   <th>EN</th>
                   <th>简体</th>
                   <th>繁體</th>
@@ -1236,43 +1307,43 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
               <tbody>
                 <tr>
                   <td><strong>💬 WhatsApp</strong></td>
-                  <td><input class="ant-input" value="wa.me/+821044001234" style="width:100%;font-size:11px;"></td>
-                  <td><input class="ant-input" value="wa.me/+821044001234" style="width:100%;font-size:11px;"></td>
-                  <td><input class="ant-input" placeholder="미설정" style="width:100%;font-size:11px;"></td>
-                  <td><input class="ant-input" value="wa.me/+8170123456" style="width:100%;font-size:11px;"></td>
-                  <td><input class="ant-input" value="wa.me/+62812345678" style="width:100%;font-size:11px;"></td>
+                  <td><div class="ms-cell"><div class="ms-slot"><input class="ant-input" value="wa.me/+821044001234"><input class="ant-input ms-label" placeholder="별칭 (선택)" value="글로벌"><button class="ms-rm">×</button></div><button class="ms-add">+ 슬롯 추가</button></div></td>
+                  <td><div class="ms-cell"><div class="ms-slot"><input class="ant-input" value="wa.me/+821044001234"><input class="ant-input ms-label" placeholder="별칭" value="글로벌"><button class="ms-rm">×</button></div><button class="ms-add">+ 슬롯 추가</button></div></td>
+                  <td><div class="ms-cell"><button class="ms-add">+ 슬롯 추가</button></div></td>
+                  <td><div class="ms-cell"><div class="ms-slot"><input class="ant-input" value="wa.me/+8170123456"><input class="ant-input ms-label" placeholder="별칭" value="도쿄"><button class="ms-rm">×</button></div><div class="ms-slot"><input class="ant-input" value="wa.me/+8170987654"><input class="ant-input ms-label" placeholder="별칭" value="오사카"><button class="ms-rm">×</button></div><button class="ms-add">+ 슬롯 추가</button></div></td>
+                  <td><div class="ms-cell"><div class="ms-slot"><input class="ant-input" value="wa.me/+62812345678"><input class="ant-input ms-label" placeholder="별칭" value="자카르타"><button class="ms-rm">×</button></div><button class="ms-add">+ 슬롯 추가</button></div></td>
                 </tr>
                 <tr>
                   <td><strong>💚 LINE</strong></td>
-                  <td><input class="ant-input" value="line.me/R/ti/p/@kbs_en" style="width:100%;font-size:11px;"></td>
-                  <td><input class="ant-input" placeholder="미설정" style="width:100%;font-size:11px;"></td>
-                  <td><input class="ant-input" placeholder="미설정" style="width:100%;font-size:11px;"></td>
-                  <td><input class="ant-input" value="line.me/R/ti/p/@kbs_jp" style="width:100%;font-size:11px;"></td>
-                  <td><input class="ant-input" placeholder="미설정" style="width:100%;font-size:11px;"></td>
+                  <td><div class="ms-cell"><div class="ms-slot"><input class="ant-input" value="line.me/R/ti/p/@kbs_en"><input class="ant-input ms-label" placeholder="별칭" value="EN"><button class="ms-rm">×</button></div><button class="ms-add">+ 슬롯 추가</button></div></td>
+                  <td><div class="ms-cell"><button class="ms-add">+ 슬롯 추가</button></div></td>
+                  <td><div class="ms-cell"><div class="ms-slot"><input class="ant-input" value="line.me/R/ti/p/@kbs_tw"><input class="ant-input ms-label" placeholder="별칭" value="대만 본점"><button class="ms-rm">×</button></div><div class="ms-slot"><input class="ant-input" value="line.me/R/ti/p/@kbs_taipei"><input class="ant-input ms-label" placeholder="별칭" value="타이베이"><button class="ms-rm">×</button></div><button class="ms-add">+ 슬롯 추가</button></div></td>
+                  <td><div class="ms-cell"><div class="ms-slot"><input class="ant-input" value="line.me/R/ti/p/@kbs_tokyo"><input class="ant-input ms-label" placeholder="별칭" value="도쿄용"><button class="ms-rm">×</button></div><div class="ms-slot"><input class="ant-input" value="line.me/R/ti/p/@kbs_osaka"><input class="ant-input ms-label" placeholder="별칭" value="오사카용"><button class="ms-rm">×</button></div><button class="ms-add">+ 슬롯 추가</button></div></td>
+                  <td><div class="ms-cell"><button class="ms-add">+ 슬롯 추가</button></div></td>
                 </tr>
                 <tr>
                   <td><strong>🐉 WeChat</strong></td>
-                  <td><input class="ant-input" placeholder="미설정" style="width:100%;font-size:11px;"></td>
-                  <td><input class="ant-input" value="kbs_official_zh" style="width:100%;font-size:11px;"></td>
-                  <td><input class="ant-input" value="kbs_official_zh" style="width:100%;font-size:11px;"></td>
-                  <td><input class="ant-input" placeholder="미설정" style="width:100%;font-size:11px;"></td>
-                  <td><input class="ant-input" placeholder="미설정" style="width:100%;font-size:11px;"></td>
+                  <td><div class="ms-cell"><button class="ms-add">+ 슬롯 추가</button></div></td>
+                  <td><div class="ms-cell"><div class="ms-slot"><input class="ant-input" value="kbs_official_zh"><input class="ant-input ms-label" placeholder="별칭" value="중국 본토"><button class="ms-rm">×</button></div><button class="ms-add">+ 슬롯 추가</button></div></td>
+                  <td><div class="ms-cell"><div class="ms-slot"><input class="ant-input" value="kbs_official_zh"><input class="ant-input ms-label" placeholder="별칭"><button class="ms-rm">×</button></div><button class="ms-add">+ 슬롯 추가</button></div></td>
+                  <td><div class="ms-cell"><button class="ms-add">+ 슬롯 추가</button></div></td>
+                  <td><div class="ms-cell"><button class="ms-add">+ 슬롯 추가</button></div></td>
                 </tr>
                 <tr>
                   <td><strong>🍓 샤오홍슈</strong></td>
-                  <td><input class="ant-input" placeholder="미설정" style="width:100%;font-size:11px;"></td>
-                  <td><input class="ant-input" value="xhs.com/user/kbs" style="width:100%;font-size:11px;"></td>
-                  <td><input class="ant-input" value="xhs.com/user/kbs" style="width:100%;font-size:11px;"></td>
-                  <td><input class="ant-input" placeholder="미설정" style="width:100%;font-size:11px;"></td>
-                  <td><input class="ant-input" placeholder="미설정" style="width:100%;font-size:11px;"></td>
+                  <td><div class="ms-cell"><button class="ms-add">+ 슬롯 추가</button></div></td>
+                  <td><div class="ms-cell"><div class="ms-slot"><input class="ant-input" value="xhs.com/user/kbs"><input class="ant-input ms-label" placeholder="별칭"><button class="ms-rm">×</button></div><button class="ms-add">+ 슬롯 추가</button></div></td>
+                  <td><div class="ms-cell"><div class="ms-slot"><input class="ant-input" value="xhs.com/user/kbs"><input class="ant-input ms-label" placeholder="별칭"><button class="ms-rm">×</button></div><button class="ms-add">+ 슬롯 추가</button></div></td>
+                  <td><div class="ms-cell"><button class="ms-add">+ 슬롯 추가</button></div></td>
+                  <td><div class="ms-cell"><button class="ms-add">+ 슬롯 추가</button></div></td>
                 </tr>
                 <tr>
                   <td><strong>💛 KakaoTalk</strong></td>
-                  <td><input class="ant-input" value="pf.kakao.com/_kbsofficial" style="width:100%;font-size:11px;"></td>
-                  <td><input class="ant-input" value="pf.kakao.com/_kbsofficial" style="width:100%;font-size:11px;"></td>
-                  <td><input class="ant-input" value="pf.kakao.com/_kbsofficial" style="width:100%;font-size:11px;"></td>
-                  <td><input class="ant-input" value="pf.kakao.com/_kbsofficial" style="width:100%;font-size:11px;"></td>
-                  <td><input class="ant-input" value="pf.kakao.com/_kbsofficial" style="width:100%;font-size:11px;"></td>
+                  <td><div class="ms-cell"><div class="ms-slot"><input class="ant-input" value="pf.kakao.com/_kbsofficial"><input class="ant-input ms-label" placeholder="별칭"><button class="ms-rm">×</button></div><button class="ms-add">+ 슬롯 추가</button></div></td>
+                  <td><div class="ms-cell"><div class="ms-slot"><input class="ant-input" value="pf.kakao.com/_kbsofficial"><input class="ant-input ms-label" placeholder="별칭"><button class="ms-rm">×</button></div><button class="ms-add">+ 슬롯 추가</button></div></td>
+                  <td><div class="ms-cell"><div class="ms-slot"><input class="ant-input" value="pf.kakao.com/_kbsofficial"><input class="ant-input ms-label" placeholder="별칭"><button class="ms-rm">×</button></div><button class="ms-add">+ 슬롯 추가</button></div></td>
+                  <td><div class="ms-cell"><div class="ms-slot"><input class="ant-input" value="pf.kakao.com/_kbsofficial"><input class="ant-input ms-label" placeholder="별칭"><button class="ms-rm">×</button></div><button class="ms-add">+ 슬롯 추가</button></div></td>
+                  <td><div class="ms-cell"><div class="ms-slot"><input class="ant-input" value="pf.kakao.com/_kbsofficial"><input class="ant-input ms-label" placeholder="별칭"><button class="ms-rm">×</button></div><button class="ms-add">+ 슬롯 추가</button></div></td>
                 </tr>
               </tbody>
             </table>
@@ -1302,8 +1373,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
         <div style="margin-bottom:16px;padding:12px 16px;background:#fafafa;border:1px solid #f0f0f0;border-radius:4px;font-size:12px;color:#595959;line-height:1.7;">
           <strong>카테고리별 예약 가이드 마스터.</strong><br>
           • FO 스토어 상세 "예약 방법" 섹션에 자동 노출<br>
-          • 카테고리(8개) × 단계 가변 × 다국어 6개<br>
-          • 단계 추가·삭제·정렬 가능
+          • 카테고리(8개) × <strong>단일 (제목 + 본문)</strong> · 단계 구분 없음, 호스트가 자유 작성<br>
+          • 저장 시 5개 언어 자동 번역 → 어드민 검수·수정 후 호스트 배포 (FAQ와 동일 정책)
         </div>
 
         <div class="card">
@@ -1323,50 +1394,63 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
             </div>
 
             <div class="section-title">
-              <span>피부과 — 예약 4단계</span>
-              <button class="ant-btn ant-btn-sm">+ 단계 추가</button>
+              <span>피부과 — 예약 가이드</span>
+              <span class="auto-note">최종 수정 2026-04-29 14:21</span>
             </div>
 
+            <!-- 단일 (제목 + 본문) + 언어 탭 -->
             <div class="faq-item">
-              <div class="faq-item-head"><span class="faq-item-num">단계 1</span><button class="ant-btn ant-btn-link ant-btn-dangerous ant-btn-sm">삭제</button></div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">제목 (한국어)</div><input class="ant-input" value="원하는 시술 선택"></div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">설명 (한국어)</div><textarea class="ant-input">상품 목록에서 원하는 시술을 선택하고 상세 정보를 확인하세요.</textarea></div>
-              <div class="trans-bar" style="margin-top:10px;">
-                <button class="trans-bar-btn">저장 및 번역 실행</button>
-                <div class="trans-prog">
-                  <span class="trans-prog-item"><span class="trans-prog-dot"></span>EN</span>
-                  <span class="trans-prog-item"><span class="trans-prog-dot"></span>简</span>
-                  <span class="trans-prog-item"><span class="trans-prog-dot"></span>繁</span>
-                  <span class="trans-prog-item"><span class="trans-prog-dot"></span>JP</span>
-                  <span class="trans-prog-item"><span class="trans-prog-dot"></span>ID</span>
+              <div class="lang-tabs">
+                <button class="lang-tab-btn active" onclick="switchLangTab(this,'guide-derm-ko')">원본</button>
+                <button class="lang-tab-btn" onclick="switchLangTab(this,'guide-derm-en')"><span class="lt-dot"></span>EN</button>
+                <button class="lang-tab-btn" onclick="switchLangTab(this,'guide-derm-zh')"><span class="lt-dot"></span>简体</button>
+                <button class="lang-tab-btn" onclick="switchLangTab(this,'guide-derm-tw')"><span class="lt-dot"></span>繁體</button>
+                <button class="lang-tab-btn" onclick="switchLangTab(this,'guide-derm-jp')"><span class="lt-dot"></span>日本語</button>
+                <button class="lang-tab-btn" onclick="switchLangTab(this,'guide-derm-id')"><span class="lt-dot"></span>Indonesia</button>
+              </div>
+              <div id="guide-derm-ko" class="lang-tab-panel active">
+                <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">제목</div><input class="ant-input" value="간편한 예약 절차"></div>
+                <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">본문</div><textarea class="ant-input" rows="6">KBS 앱에서 원하는 시술을 선택하고, 가능한 날짜·시간을 골라 예약하세요. 이름·연락처·특이사항(알레르기 등)만 입력하면 끝납니다. 예약 확정 시 LINE 또는 이메일로 확인 메시지가 발송되며, 당일 변경·취소도 앱에서 바로 가능합니다.</textarea></div>
+                <div class="trans-bar" style="margin-top:10px;">
+                  <button class="trans-bar-btn">저장 및 번역 실행</button>
+                  <span style="font-size:11px;color:#8c8c8c;">한국어 원본 저장 시 5개 언어 자동 번역 → 언어 탭에서 검수·수정</span>
                 </div>
-                <span class="trans-prog-label">번역 완료</span>
+              </div>
+              <div id="guide-derm-en" class="lang-tab-panel">
+                <div class="lang-edit-note">✦ 자동 번역됨 · 어드민이 수정 가능 · 검수된 버전이 호스트에 배포</div>
+                <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">Title</div><input class="ant-input" value="Easy Booking Process"></div>
+                <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">Body</div><textarea class="ant-input" rows="6">Select the treatment you want in the KBS app, then choose an available date and time. Just enter your name, contact, and any special notes (e.g., allergies). When confirmed, you'll receive a notification via LINE or email. Same-day changes and cancellations are also available right in the app.</textarea></div>
+                <div style="margin-top:10px;display:flex;justify-content:flex-end;gap:6px;"><button class="ant-btn ant-btn-sm">재번역</button><button class="ant-btn ant-btn-primary ant-btn-sm">검수 저장</button></div>
+              </div>
+              <div id="guide-derm-zh" class="lang-tab-panel">
+                <div class="lang-edit-note">✦ 자동 번역됨 · 어드민이 수정 가능</div>
+                <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">标题</div><input class="ant-input" value="便捷的预约流程"></div>
+                <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">正文</div><textarea class="ant-input" rows="6">在KBS应用中选择您想要的治疗项目，然后选择可用的日期和时间进行预约。只需输入姓名、联系方式和特殊事项（如过敏）即可。预约确认后，将通过LINE或电子邮件发送通知。当天的变更和取消也可在应用中直接进行。</textarea></div>
+                <div style="margin-top:10px;display:flex;justify-content:flex-end;gap:6px;"><button class="ant-btn ant-btn-sm">재번역</button><button class="ant-btn ant-btn-primary ant-btn-sm">검수 저장</button></div>
+              </div>
+              <div id="guide-derm-tw" class="lang-tab-panel">
+                <div class="lang-edit-note">✦ 자동 번역됨 · 어드민이 수정 가능</div>
+                <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">標題</div><input class="ant-input" value="簡便的預約流程"></div>
+                <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">內文</div><textarea class="ant-input" rows="6">在KBS應用中選擇您想要的治療項目，然後選擇可用的日期和時間進行預約。只需輸入姓名、聯絡方式和特殊事項（如過敏）即可。預約確認後，將透過LINE或電子郵件發送通知。當天的變更和取消也可在應用中直接進行。</textarea></div>
+                <div style="margin-top:10px;display:flex;justify-content:flex-end;gap:6px;"><button class="ant-btn ant-btn-sm">재번역</button><button class="ant-btn ant-btn-primary ant-btn-sm">검수 저장</button></div>
+              </div>
+              <div id="guide-derm-jp" class="lang-tab-panel">
+                <div class="lang-edit-note">✦ 자동 번역됨 · 어드민이 수정 가능</div>
+                <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">タイトル</div><input class="ant-input" value="簡単な予約手順"></div>
+                <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">本文</div><textarea class="ant-input" rows="6">KBSアプリで希望の施術を選び、空いている日時を選択して予約してください。お名前・連絡先・特記事項（アレルギー等）を入力するだけで完了です。予約確定時にLINEまたはメールで確認メッセージが届き、当日の変更・キャンセルもアプリから可能です。</textarea></div>
+                <div style="margin-top:10px;display:flex;justify-content:flex-end;gap:6px;"><button class="ant-btn ant-btn-sm">재번역</button><button class="ant-btn ant-btn-primary ant-btn-sm">검수 저장</button></div>
+              </div>
+              <div id="guide-derm-id" class="lang-tab-panel">
+                <div class="lang-edit-note">✦ 자동 번역됨 · 어드민이 수정 가능</div>
+                <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">Judul</div><input class="ant-input" value="Proses Pemesanan Mudah"></div>
+                <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">Isi</div><textarea class="ant-input" rows="6">Pilih perawatan yang Anda inginkan di aplikasi KBS, lalu pilih tanggal dan waktu yang tersedia untuk memesan. Cukup masukkan nama, kontak, dan catatan khusus (mis. alergi). Setelah dikonfirmasi, Anda akan menerima pemberitahuan melalui LINE atau email. Perubahan dan pembatalan pada hari yang sama juga tersedia langsung di aplikasi.</textarea></div>
+                <div style="margin-top:10px;display:flex;justify-content:flex-end;gap:6px;"><button class="ant-btn ant-btn-sm">재번역</button><button class="ant-btn ant-btn-primary ant-btn-sm">검수 저장</button></div>
               </div>
             </div>
 
-            <div class="faq-item">
-              <div class="faq-item-head"><span class="faq-item-num">단계 2</span><button class="ant-btn ant-btn-link ant-btn-dangerous ant-btn-sm">삭제</button></div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">제목 (한국어)</div><input class="ant-input" value="날짜 & 시간 선택"></div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">설명 (한국어)</div><textarea class="ant-input">원하는 날짜와 시간을 선택하세요. 실시간으로 가능한 슬롯을 확인할 수 있습니다.</textarea></div>
-            </div>
-
-            <div class="faq-item">
-              <div class="faq-item-head"><span class="faq-item-num">단계 3</span><button class="ant-btn ant-btn-link ant-btn-dangerous ant-btn-sm">삭제</button></div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">제목 (한국어)</div><input class="ant-input" value="예약 정보 입력"></div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">설명 (한국어)</div><textarea class="ant-input">이름·연락처·특이사항(알레르기 등)을 입력해 주세요.</textarea></div>
-            </div>
-
-            <div class="faq-item">
-              <div class="faq-item-head"><span class="faq-item-num">단계 4</span><button class="ant-btn ant-btn-link ant-btn-dangerous ant-btn-sm">삭제</button></div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:8px;"><div class="form-label">제목 (한국어)</div><input class="ant-input" value="예약 확정"></div>
-              <div class="form-row" style="grid-template-columns:80px 1fr;margin-bottom:0;"><div class="form-label">설명 (한국어)</div><textarea class="ant-input">예약이 확정되면 LINE 또는 이메일로 확인 메시지가 발송됩니다.</textarea></div>
-            </div>
-
-            <button class="add-row-btn">+ 단계 추가</button>
-
             <div style="margin-top:24px;display:flex;justify-content:flex-end;gap:8px;">
               <button class="ant-btn">취소</button>
-              <button class="ant-btn ant-btn-primary">전체 저장 및 번역 실행</button>
+              <button class="ant-btn ant-btn-primary">저장 및 번역 실행</button>
             </div>
           </div>
         </div>
@@ -1506,17 +1590,17 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
       </div>
 
       <div class="form-row" style="align-items:flex-start;">
-        <div class="form-label">SNS 채팅 채널<br><span style="font-weight:400;font-size:11px;color:#fa8c16;">(KBS/자체/미사용 mode 도입)</span></div>
+        <div class="form-label">SNS 채팅 채널<br><span style="font-weight:400;font-size:11px;color:rgba(0,0,0,0.45);">(KBS/자체/미사용 + 슬롯 N개)</span></div>
         <div class="form-control">
           <div style="background:#fafbfc;border:1px solid #e8e8e8;border-radius:4px;padding:10px 14px;margin-bottom:8px;">
             <div style="display:flex;gap:6px;margin-bottom:10px;align-items:center;flex-wrap:wrap;">
-              <span style="font-size:11px;color:#595959;font-weight:500;">언어별 슬롯:</span>
+              <span style="font-size:11px;color:#595959;font-weight:500;">언어 슬롯:</span>
               <span class="filter-chip on" style="font-size:11px;">EN</span>
               <span class="filter-chip" style="font-size:11px;">简体</span>
               <span class="filter-chip" style="font-size:11px;">繁體</span>
               <span class="filter-chip" style="font-size:11px;">日本語</span>
               <span class="filter-chip" style="font-size:11px;">Indonesia</span>
-              <span style="font-size:10px;color:#8c8c8c;margin-left:auto;">— 슬롯 mode: ⓐ KBS 공식 / ⓑ 자체 / ⓒ 미사용</span>
+              <span style="font-size:10px;color:#8c8c8c;margin-left:auto;">— mode: ⓐ KBS 공식 / ⓑ 자체 / ⓒ 미사용 · 같은 채널에 슬롯 N개 가능</span>
             </div>
             <div class="ch-slot">
               <div class="ch-slot-head">
@@ -1527,7 +1611,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
                   <label><input type="radio" name="ch-wa"> ⓒ 미사용</label>
                 </div>
               </div>
-              <div style="font-size:11px;color:#1890ff;margin-left:12px;">→ KBS 마스터: <code style="background:#f5faff;padding:1px 6px;border-radius:3px;">wa.me/+821044001234</code></div>
+              <div style="font-size:11px;color:#595959;margin-left:12px;">→ KBS 마스터 (1개): <code style="background:#fafafa;padding:1px 6px;border-radius:3px;">wa.me/+821044001234 · 글로벌</code></div>
             </div>
             <div class="ch-slot">
               <div class="ch-slot-head">
@@ -1538,7 +1622,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
                   <label><input type="radio" name="ch-line"> ⓒ 미사용</label>
                 </div>
               </div>
-              <input class="form-input ch-slot-link" value="https://line.me/R/ti/p/@220upddy" placeholder="자체 채널 URL">
+              <div style="margin-left:12px;display:flex;flex-direction:column;gap:4px;">
+                <div class="ms-slot"><input class="ant-input" value="https://line.me/R/ti/p/@en_main"><input class="ant-input ms-label" value="본점" placeholder="별칭"><button class="ms-rm">×</button></div>
+                <div class="ms-slot"><input class="ant-input" value="https://line.me/R/ti/p/@en_branch"><input class="ant-input ms-label" value="강남점" placeholder="별칭"><button class="ms-rm">×</button></div>
+                <button class="ms-add" style="align-self:flex-start;">+ 자체 LINE 슬롯 추가</button>
+              </div>
             </div>
             <div class="ch-slot">
               <div class="ch-slot-head">
@@ -1938,6 +2026,17 @@ document.addEventListener('keydown', (e) => {
     closeBasicDrawer();
   }
 });
+
+/* ── 언어 탭 전환 (FAQ / 예약 가이드) ── */
+function switchLangTab(btn, panelId) {
+  const wrapper = btn.closest('.faq-item');
+  if (!wrapper) return;
+  wrapper.querySelectorAll('.lang-tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  wrapper.querySelectorAll('.lang-tab-panel').forEach(p => p.classList.remove('active'));
+  const panel = document.getElementById(panelId);
+  if (panel) panel.classList.add('active');
+}
 </script>
 </body>
 </html>
