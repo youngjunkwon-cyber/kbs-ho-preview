@@ -193,6 +193,26 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 .auto-note { font-size:11px; color:#8c8c8c; padding:6px 10px; background:#fafafa; border-radius:3px; display:inline-block; }
 .auto-note.changed { color:#595959; background:#fafafa; border:1px dashed #d9d9d9; }
 
+/* ── Filter v2 (번역정보관리 — 깔끔 버전) ── */
+.f2 { padding:14px 18px; display:flex; flex-direction:column; gap:10px; }
+.f2-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.f2-label { font-size:12px; color:rgba(0,0,0,0.65); font-weight:500; min-width:90px; flex-shrink:0; }
+.f2-cell { display:flex; align-items:center; gap:8px; flex:1; min-width:200px; }
+.f2-cell .f2-label { min-width:64px; }
+.f2-cell .ant-input { flex:1; height:32px; }
+.f2-row-inputs { gap:14px; }
+.f2-daterange { display:flex; align-items:center; gap:4px; flex:1; }
+.f2-daterange .ant-input { width:130px; height:32px; }
+.f2-daterange span { color:#bfbfbf; }
+.f2-section { padding:10px 12px; background:#fafafa; border:1px solid #f0f0f0; border-radius:2px; display:flex; flex-direction:column; gap:8px; }
+.f2-section-title { font-size:12px; font-weight:600; color:rgba(0,0,0,0.85); }
+.f2-section-help { font-size:11px; color:#8c8c8c; font-weight:400; margin-left:6px; }
+.f2-channel { display:grid !important; grid-template-columns:90px 100px 1fr auto; align-items:center; gap:8px; }
+.f2-channel .f2-label { min-width:0; }
+.f2-mode { width:100%; height:28px; font-size:11px; padding:3px 8px; }
+.f2-mode-empty { width:100px; }
+.f2-new { display:inline-block; font-size:9px; color:rgba(0,0,0,0.45); border:1px solid #d9d9d9; padding:0 4px; border-radius:2px; margin-left:4px; font-weight:500; vertical-align:middle; }
+
 /* ── Result table action bar ── */
 .tbl-actbar { background:#fafafa; border:1px solid #f0f0f0; border-bottom:none; border-radius:4px 4px 0 0; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
 .tbl-actbar-left { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
@@ -602,22 +622,21 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
             </div>
           </div>
 
-          <!-- 1행: 기본 검색 ── -->
-          <div class="filter-grid">
-            <div class="filter-cell">
-              <label class="filter-label">언어 (다중)</label>
-              <div class="chip-row" id="lang-chips">
-                <span class="filter-chip on" data-v="ko">한국어</span>
-                <span class="filter-chip on" data-v="en">영어</span>
-                <span class="filter-chip on" data-v="zh">중국어</span>
-                <span class="filter-chip" data-v="tw">중국어(번체)</span>
-                <span class="filter-chip" data-v="jp">일본어</span>
-                <span class="filter-chip" data-v="id">인도네시아어</span>
+          <!-- 기본 필터 (한 row 안에 라벨 + 칩 인라인) -->
+          <div class="f2">
+            <div class="f2-row">
+              <div class="f2-label">언어</div>
+              <div class="chip-row">
+                <span class="filter-chip on">한국어</span>
+                <span class="filter-chip on">영어</span>
+                <span class="filter-chip on">중국어</span>
+                <span class="filter-chip">중국어(번체)</span>
+                <span class="filter-chip">일본어</span>
+                <span class="filter-chip">인도네시아어</span>
               </div>
             </div>
-
-            <div class="filter-cell">
-              <label class="filter-label">카테고리 (다중)</label>
+            <div class="f2-row">
+              <div class="f2-label">카테고리</div>
               <div class="chip-row">
                 <span class="filter-chip on">피부과</span>
                 <span class="filter-chip on">성형외과</span>
@@ -629,173 +648,95 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
                 <span class="filter-chip">메디컬체크</span>
               </div>
             </div>
-          </div>
-
-          <div class="filter-grid filter-grid-4">
-            <div class="filter-cell">
-              <label class="filter-label">상점 검색</label>
-              <input class="ant-input" placeholder="상점명 또는 코드로 검색">
-            </div>
-            <div class="filter-cell">
-              <label class="filter-label">활성 여부</label>
-              <select class="ant-input"><option>전체</option><option>활성만</option><option>비활성만</option></select>
-            </div>
-            <div class="filter-cell">
-              <label class="filter-label">번역 상태</label>
-              <select class="ant-input"><option>전체</option><option>번역 완료</option><option>일부 미번역</option><option>전체 미번역</option></select>
-            </div>
-            <div class="filter-cell">
-              <label class="filter-label">정렬</label>
-              <select class="ant-input"><option>최근 수정 순</option><option>등록일 순</option><option>상점명 가나다 순</option><option>번역 미완료 우선</option></select>
+            <div class="f2-row f2-row-inputs">
+              <div class="f2-cell"><div class="f2-label">상점 검색</div><input class="ant-input" placeholder="상점명 또는 코드"></div>
+              <div class="f2-cell"><div class="f2-label">활성</div><select class="ant-input"><option>전체</option><option>활성만</option><option>비활성만</option></select></div>
+              <div class="f2-cell"><div class="f2-label">번역 상태</div><select class="ant-input"><option>전체</option><option>번역 완료</option><option>일부 미번역</option><option>전체 미번역</option></select></div>
+              <div class="f2-cell"><div class="f2-label">정렬</div><select class="ant-input"><option>최근 수정 순</option><option>등록일 순</option><option>상점명 가나다 순</option><option>번역 미완료 우선</option></select></div>
             </div>
           </div>
 
-          <!-- 고급 필터 ── -->
+          <!-- 고급 필터 -->
           <div id="filter-advanced" class="filter-advanced">
-            <div class="filter-grid filter-grid-4">
-              <div class="filter-cell">
-                <label class="filter-label">등록일</label>
-                <div style="display:flex;gap:4px;align-items:center;">
-                  <input class="ant-input" type="date" value="2026-01-01">
-                  <span style="color:#bfbfbf;">~</span>
-                  <input class="ant-input" type="date" value="2026-04-29">
-                </div>
-              </div>
-              <div class="filter-cell">
-                <label class="filter-label">최종 수정일</label>
-                <div style="display:flex;gap:4px;align-items:center;">
-                  <input class="ant-input" type="date">
-                  <span style="color:#bfbfbf;">~</span>
-                  <input class="ant-input" type="date">
-                </div>
-              </div>
-              <div class="filter-cell">
-                <label class="filter-label">최종 번역일</label>
-                <select class="ant-input"><option>전체</option><option>오늘</option><option>최근 7일</option><option>최근 30일</option><option>30일 이상 미번역</option></select>
-              </div>
-              <div class="filter-cell">
-                <label class="filter-label">지역</label>
-                <select class="ant-input"><option>전체</option><option>강남구</option><option>서초구</option><option>마포구</option><option>중구</option></select>
-              </div>
-            </div>
-
-            <!-- 채널 설정 (유기적 검색) — 2-column 그리드 -->
-            <div class="ch-block">
-              <div class="ch-block-head">
-                <span class="ch-block-title">📡 채널 설정으로 검색</span>
-                <span class="ch-block-help">선택한 채널이 실제로 등록된 스토어만 노출. 매칭 모드로 조합 가능합니다.</span>
+            <div class="f2">
+              <!-- 날짜·지역 -->
+              <div class="f2-row f2-row-inputs">
+                <div class="f2-cell"><div class="f2-label">등록일</div><div class="f2-daterange"><input class="ant-input" type="date" value="2026-01-01"><span>~</span><input class="ant-input" type="date" value="2026-04-29"></div></div>
+                <div class="f2-cell"><div class="f2-label">최종 수정일</div><div class="f2-daterange"><input class="ant-input" type="date"><span>~</span><input class="ant-input" type="date"></div></div>
+                <div class="f2-cell"><div class="f2-label">최종 번역일</div><select class="ant-input"><option>전체</option><option>오늘</option><option>최근 7일</option><option>최근 30일</option><option>30일 이상 미번역</option></select></div>
+                <div class="f2-cell"><div class="f2-label">지역</div><select class="ant-input"><option>전체</option><option>강남구</option><option>서초구</option><option>마포구</option><option>중구</option></select></div>
               </div>
 
-              <div class="ch-grid">
-                <!-- 좌측 컬럼: SNS 채팅 채널 + 채널 소유자 -->
-                <div class="ch-col">
-                  <div class="ch-line">
-                    <div class="ch-line-label">
-                      <span class="ch-line-title">SNS 채팅 채널</span>
-                      <select class="ch-mode ant-input">
-                        <option>모두 포함 (AND)</option>
-                        <option selected>하나 이상 포함 (OR)</option>
-                        <option>정확히 일치</option>
-                        <option>제외</option>
-                      </select>
-                    </div>
-                    <div class="chip-row">
-                      <span class="filter-chip on">WhatsApp</span>
-                      <span class="filter-chip on">LINE</span>
-                      <span class="filter-chip">WeChat</span>
-                      <span class="filter-chip">샤오홍슈</span>
-                      <span class="filter-chip">KakaoTalk</span>
-                      <span class="filter-chip">기타</span>
-                    </div>
-                    <div class="ch-meta">
-                      <select class="ant-input" style="width:130px;"><option>채널 수: 전체</option><option>없음</option><option>1개</option><option>2~3개</option><option>3개 초과</option></select>
-                      <label class="ch-tgl"><input type="checkbox"> 미설정만</label>
-                    </div>
-                  </div>
-
-                  <div class="ch-line">
-                    <div class="ch-line-label">
-                      <span class="ch-line-title">채널 소유자 <span style="font-size:9px;color:rgba(0,0,0,0.45);border:1px solid #d9d9d9;padding:0 4px;border-radius:2px;margin-left:3px;">NEW</span></span>
-                    </div>
-                    <div class="chip-row">
-                      <span class="owner-chip on">KBS 공식</span>
-                      <span class="owner-chip">입점사 자체</span>
-                      <span class="owner-chip">미설정 슬롯</span>
-                    </div>
+              <!-- 📡 채널 설정 (단일 컬럼, 칩만 + 매칭 모드만) -->
+              <div class="f2-section">
+                <div class="f2-section-title">📡 채널 설정</div>
+                <div class="f2-row f2-channel">
+                  <div class="f2-label">SNS 채팅</div>
+                  <select class="ant-input f2-mode"><option>AND</option><option selected>OR</option><option>정확히 일치</option><option>제외</option></select>
+                  <div class="chip-row">
+                    <span class="filter-chip on">WhatsApp</span>
+                    <span class="filter-chip on">LINE</span>
+                    <span class="filter-chip">WeChat</span>
+                    <span class="filter-chip">샤오홍슈</span>
+                    <span class="filter-chip">KakaoTalk</span>
+                    <span class="filter-chip">기타</span>
                   </div>
                 </div>
-
-                <!-- 우측 컬럼: 콘텐츠 채널 + 인앱 채팅 -->
-                <div class="ch-col">
-                  <div class="ch-line">
-                    <div class="ch-line-label">
-                      <span class="ch-line-title">콘텐츠 채널</span>
-                      <select class="ch-mode ant-input">
-                        <option>모두 포함 (AND)</option>
-                        <option selected>하나 이상 포함 (OR)</option>
-                        <option>정확히 일치</option>
-                        <option>제외</option>
-                      </select>
-                    </div>
-                    <div class="chip-row">
-                      <span class="filter-chip on">Instagram</span>
-                      <span class="filter-chip">YouTube</span>
-                      <span class="filter-chip">TikTok</span>
-                      <span class="filter-chip">Facebook</span>
-                      <span class="filter-chip">샤오홍슈</span>
-                      <span class="filter-chip">매거진(자체)</span>
-                    </div>
-                    <div class="ch-meta">
-                      <select class="ant-input" style="width:130px;"><option>채널 수: 전체</option><option>없음</option><option>1개</option><option>2~3개</option><option>3개 초과</option></select>
-                      <label class="ch-tgl"><input type="checkbox"> 미설정만</label>
-                    </div>
+                <div class="f2-row f2-channel">
+                  <div class="f2-label">채널 소유자 <span class="f2-new">NEW</span></div>
+                  <span></span>
+                  <div class="chip-row">
+                    <span class="owner-chip on">KBS 공식</span>
+                    <span class="owner-chip">입점사 자체</span>
+                    <span class="owner-chip">미설정 슬롯</span>
                   </div>
-
-                  <div class="ch-line">
-                    <div class="ch-line-label">
-                      <span class="ch-line-title">인앱 채팅</span>
-                    </div>
-                    <div class="chip-row">
-                      <span class="filter-chip on">스토어 채팅</span>
-                      <span class="filter-chip">상품별 채팅</span>
-                      <span class="filter-chip">비활성</span>
-                    </div>
-                    <div class="ch-meta">
-                      <label class="ch-tgl"><input type="checkbox"> 환영 메시지 ON</label>
-                    </div>
+                  <span></span>
+                </div>
+                <div class="f2-row f2-channel">
+                  <div class="f2-label">콘텐츠</div>
+                  <select class="ant-input f2-mode"><option>AND</option><option selected>OR</option><option>정확히 일치</option><option>제외</option></select>
+                  <div class="chip-row">
+                    <span class="filter-chip on">Instagram</span>
+                    <span class="filter-chip">YouTube</span>
+                    <span class="filter-chip">TikTok</span>
+                    <span class="filter-chip">Facebook</span>
+                    <span class="filter-chip">샤오홍슈</span>
+                    <span class="filter-chip">매거진(자체)</span>
                   </div>
                 </div>
+                <div class="f2-row f2-channel">
+                  <div class="f2-label">인앱 채팅</div>
+                  <span></span>
+                  <div class="chip-row">
+                    <span class="filter-chip on">스토어 채팅</span>
+                    <span class="filter-chip">상품별 채팅</span>
+                    <span class="filter-chip">비활성</span>
+                  </div>
+                  <label class="ch-tgl"><input type="checkbox"> 환영 메시지 ON</label>
+                </div>
               </div>
-            </div>
 
-            <!-- 컨텐츠 보유 -->
-            <div class="filter-grid filter-grid-3" style="margin-top:14px;">
-              <div class="filter-cell">
-                <label class="filter-label">FAQ 개수</label>
-                <select class="ant-input"><option>전체</option><option>0개</option><option>1~4개</option><option>5개</option><option>5개 초과</option></select>
+              <!-- 보유 콘텐츠 -->
+              <div class="f2-row f2-row-inputs">
+                <div class="f2-cell"><div class="f2-label">FAQ 개수</div><select class="ant-input"><option>전체</option><option>0개</option><option>1~4개</option><option>5개</option><option>5개 초과</option></select></div>
+                <div class="f2-cell"><div class="f2-label">관리자 설정</div><select class="ant-input"><option>전체</option><option>관리자 일괄적용 ON</option><option>상품에 일괄적용 ON</option><option>외부링크 ON</option></select></div>
               </div>
-              <div class="filter-cell">
-                <label class="filter-label">담당자 수 <span style="color:#bfbfbf;font-size:10px;">(기본정보관리로 이동)</span></label>
-                <select class="ant-input"><option>전체</option><option>1명</option><option>2명</option><option>3명</option></select>
-              </div>
-              <div class="filter-cell">
-                <label class="filter-label">관리자 설정</label>
-                <select class="ant-input"><option>전체</option><option>관리자 일괄적용 ON</option><option>상품에 일괄적용 ON</option><option>외부링크 ON</option></select>
-              </div>
-            </div>
 
-            <!-- 검증 케이스 (신규) -->
-            <div class="verify-row">
-              <div class="verify-row-title">⚠ 검증 케이스 <span style="font-size:10px;color:#fa8c16;font-weight:500;margin-left:4px;">NEW</span> <span style="font-size:11px;color:#8c8c8c;font-weight:400;margin-left:4px;">— 의심·점검 필요한 상태</span></div>
-              <div class="verify-chips">
-                <span class="verify-chip">KBS 공식인데 마스터 링크 없음</span>
-                <span class="verify-chip">입점사 자체인데 링크 비어있음</span>
-                <span class="verify-chip">활성인데 대표 이미지 없음</span>
-                <span class="verify-chip">활성인데 로고 없음</span>
-                <span class="verify-chip">스토어 소개글 없음</span>
-                <span class="verify-chip">FAQ 0개</span>
-                <span class="verify-chip">30일 이상 미수정</span>
-                <span class="verify-chip">언어 1개 이상 미번역</span>
+              <!-- ⚠ 검증 케이스 -->
+              <div class="f2-section">
+                <div class="f2-section-title">⚠ 검증 케이스 <span class="f2-new">NEW</span> <span class="f2-section-help">— 의심·점검 필요한 상태</span></div>
+                <div class="chip-row">
+                  <span class="verify-chip">SNS 채팅 미설정</span>
+                  <span class="verify-chip">콘텐츠 채널 미설정</span>
+                  <span class="verify-chip">KBS 공식인데 마스터 링크 없음</span>
+                  <span class="verify-chip">입점사 자체인데 링크 비어있음</span>
+                  <span class="verify-chip">활성인데 대표 이미지 없음</span>
+                  <span class="verify-chip">활성인데 로고 없음</span>
+                  <span class="verify-chip">스토어 소개글 없음</span>
+                  <span class="verify-chip">FAQ 0개</span>
+                  <span class="verify-chip">30일 이상 미수정</span>
+                  <span class="verify-chip">언어 1개 이상 미번역</span>
+                </div>
               </div>
             </div>
           </div>
