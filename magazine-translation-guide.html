@@ -258,27 +258,27 @@ body {
 .step-header-title { font-size: 15px; font-weight: 800; color: var(--navy); }
 .step-header-sub { font-size: 11.5px; color: var(--text-sub); margin-left: auto; }
 
-.step-body-wrap { display: flex; min-height: 300px; }
+.step-body-wrap { display: flex; flex-direction: column; }
 .step-img-col {
-  width: 58%;
-  flex-shrink: 0;
+  width: 100%;
   background: #f4f4f8;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   overflow: hidden;
-  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 0;
 }
 .step-img-col img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: top left;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
   display: block;
 }
 .img-ph {
-  width: 100%; height: 100%;
-  min-height: 300px;
+  width: 100%;
+  min-height: 240px;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   gap: 12px;
@@ -295,11 +295,10 @@ body {
 }
 
 .step-text-col {
-  flex: 1;
-  padding: 24px 28px;
+  width: 100%;
+  padding: 24px 28px 28px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
 }
 .step-desc-body {
   font-size: 13px;
@@ -384,15 +383,16 @@ body {
 }
 .modal-card-img {
   background: #f4f4f8;
-  height: 180px;
+  min-height: 180px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   border-bottom: 1px solid var(--border);
+  padding: 8px;
 }
-.modal-card-img img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
-.modal-card-img .img-ph { min-height: 180px; }
+.modal-card-img img { width: 100%; height: auto; max-width: 100%; object-fit: contain; display: block; }
+.modal-card-img .img-ph { min-height: 164px; }
 .modal-card-body { padding: 14px 16px; }
 .modal-card-title {
   font-size: 13px; font-weight: 800;
@@ -424,8 +424,6 @@ body {
 @media (max-width: 760px) {
   .layout { flex-direction: column; }
   .sidebar { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--border); padding: 16px 0; }
-  .step-body-wrap { flex-direction: column; }
-  .step-img-col { width: 100%; min-height: 220px; border-right: none; border-bottom: 1px solid var(--border); }
   .modal-grid { grid-template-columns: 1fr; }
   .hero { padding: 28px 24px; }
 }
