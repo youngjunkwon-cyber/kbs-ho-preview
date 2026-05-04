@@ -145,29 +145,32 @@ body {
 
 /* ── Hero ── */
 .hero {
-  background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 60%, #0d3060 100%);
+  background: var(--white);
   border-radius: 16px;
   padding: 40px 44px;
   margin-bottom: 36px;
-  color: white;
+  color: var(--navy);
   position: relative;
   overflow: hidden;
+  border: 1px solid var(--border);
 }
 .hero::before {
   content: '';
   position: absolute;
-  top: -40px; right: -40px;
-  width: 220px; height: 220px;
+  top: -50px; right: -50px;
+  width: 240px; height: 240px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,107,138,0.18) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(255,107,138,0.12) 0%, transparent 70%);
+  pointer-events: none;
 }
-.hero-eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 3px; color: var(--pink); margin-bottom: 12px; }
-.hero-title { font-size: 28px; font-weight: 900; line-height: 1.3; margin-bottom: 12px; }
-.hero-desc { font-size: 13.5px; color: rgba(255,255,255,0.55); margin-bottom: 24px; line-height: 1.7; }
-.hero-parts { display: flex; gap: 12px; flex-wrap: wrap; }
+.hero-eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 3px; color: var(--pink); margin-bottom: 12px; position: relative; }
+.hero-title { font-size: 28px; font-weight: 900; line-height: 1.3; margin-bottom: 12px; color: var(--navy); position: relative; }
+.hero-desc { font-size: 13.5px; color: var(--text-sub); margin-bottom: 24px; line-height: 1.7; position: relative; }
+.hero-desc b { color: var(--navy); }
+.hero-parts { display: flex; gap: 12px; flex-wrap: wrap; position: relative; }
 .hero-part {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.12);
+  background: var(--bg);
+  border: 1px solid var(--border);
   border-radius: 10px;
   padding: 14px 18px;
   flex: 1;
@@ -180,8 +183,8 @@ body {
   color: var(--pink);
   margin-bottom: 4px;
 }
-.hero-part-title { font-size: 14px; font-weight: 800; color: white; margin-bottom: 4px; }
-.hero-part-desc { font-size: 11.5px; color: rgba(255,255,255,0.5); line-height: 1.6; }
+.hero-part-title { font-size: 14px; font-weight: 800; color: var(--navy); margin-bottom: 4px; }
+.hero-part-desc { font-size: 11.5px; color: var(--text-sub); line-height: 1.6; }
 
 /* ── Part Header ── */
 .part-header {
@@ -480,7 +483,7 @@ body {
       <div class="hero-eyebrow">ADMIN GUIDE</div>
       <div class="hero-title">매거진 운영 가이드</div>
       <div class="hero-desc">
-        매거진 콘텐츠를 새로 <b style="color:white">작성</b>하거나 기존 글을 <b style="color:white">복제</b>하여 다국어로 발행하는 전체 플로우를 안내합니다.
+        매거진 콘텐츠를 새로 <b>작성</b>하거나 기존 글을 <b>복제</b>하여 다국어로 발행하는 전체 플로우를 안내합니다.
       </div>
       <div class="hero-parts">
         <div class="hero-part">
