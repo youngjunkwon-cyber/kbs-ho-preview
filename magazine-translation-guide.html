@@ -529,15 +529,16 @@ body {
           </div>
         </div>
         <div class="step-text-col">
-          <div class="step-desc-body">매거진 목록 화면에서 글을 조회하고, 신규 작성·복제·삭제 등의 작업을 수행할 수 있습니다.</div>
+          <div class="step-desc-body">매거진 목록 화면에서 글을 조회하고, 신규 작성·복제·삭제·상태 변경을 수행합니다. 행별로 노출 통계를 한눈에 확인할 수 있습니다.</div>
           <ul class="step-checklist">
-            <li><span class="step-check-icon">●</span><span><b>조회</b>: 검색어 / 게시 상태 / 언어 / 작성일 등 필터로 조회</span></li>
-            <li><span class="step-check-icon">●</span><span><b>[신규 작성]</b>: 새 매거진 글 작성 화면으로 이동</span></li>
-            <li><span class="step-check-icon">●</span><span><b>[복제]</b>: 행별 버튼 — 해당 글을 복제 (PART 2 참고)</span></li>
-            <li><span class="step-check-icon">●</span><span><b>[수정]</b>: 행 클릭 — 작성 화면으로 진입하여 수정</span></li>
+            <li><span class="step-check-icon">●</span><span><b>필터</b>: 상태 / 언어 / 작성일 + 검색어로 조회 후 <b>[검색]</b> 클릭</span></li>
+            <li><span class="step-check-icon">●</span><span><b>[매거진 작성]</b> (우측 상단): 새 매거진 작성 화면 진입</span></li>
+            <li><span class="step-check-icon">●</span><span><b>행 컬럼</b>: 내부 관리용 제목 / 언어 / 상태 / 태그 / 작성일</span></li>
+            <li><span class="step-check-icon">●</span><span><b>통계 컬럼</b>: 노출수 / 내부진입수 / 직접유입 / 대표블록수 / 상품 갯수 / 스토어 갯수</span></li>
+            <li><span class="step-check-icon">●</span><span><b>관리 컬럼</b>: 행별 <b>[복제]</b> · <b>[삭제]</b> 버튼</span></li>
             <li><span class="step-check-icon">●</span><span><b>상태 드롭다운</b>: 행별로 게시 / 비게시 / 검토필요 변경</span></li>
           </ul>
-          <div class="callout tip">💡 목록은 언어별로 필터링이 가능합니다. 다국어 글의 경우 각 언어별로 별도 행이 표시됩니다.</div>
+          <div class="callout tip">💡 다국어 글은 언어별로 별도 행으로 표시됩니다. 같은 콘텐츠라도 언어마다 별도로 게시 상태를 관리할 수 있습니다.</div>
         </div>
       </div>
     </section>
@@ -564,27 +565,39 @@ body {
           </div>
         </div>
         <div class="step-text-col">
-          <div class="step-desc-body">매거진 작성 화면 상단의 필드 영역입니다. 각 필드의 입력 규칙은 아래와 같습니다.</div>
+          <div class="step-desc-body">매거진 작성 화면은 상단 <b>기본 정보</b> 영역과 하단 <b>본문 작성 및 미리보기</b> 영역으로 구성됩니다. 기본 정보 필드의 입력 규칙은 아래와 같습니다.</div>
           <ul class="field-list">
             <li class="field-list-item">
               <span class="field-list-label">내부 관리용 제목</span>
-              <div class="field-list-desc">관리자만 보는 식별용 제목. <b>FO 노출 안 됨.</b> 운영팀이 글을 구분하기 위한 라벨로만 사용됩니다.</div>
+              <div class="field-list-desc">관리자만 보는 식별용 제목. <b>FO 노출 안 됨.</b> 운영팀이 글을 구분하기 위한 라벨로 사용됩니다.</div>
             </li>
             <li class="field-list-item">
               <span class="field-list-label">게시 언어</span>
-              <div class="field-list-desc">현재 작성 중인 언어 탭. <b>EN · JA · ZH · ZH-TW · ID</b> 중 선택.</div>
+              <div class="field-list-desc">현재 작성 중인 언어 탭. <b>영어 · 일본어 · 중국어 · 중국어(번체) · 인도네시아</b> 중 선택. 탭 전환 시 본문도 해당 언어 탭으로 전환됩니다.</div>
             </li>
             <li class="field-list-item">
               <span class="field-list-label">노출 제목</span>
-              <div class="field-list-desc">FO에 실제로 보이는 제목. 언어 탭별로 별도 입력. 자동번역 시 자동으로 채워집니다.</div>
+              <div class="field-list-desc">FO에 실제로 보이는 제목. 언어 탭별로 별도 입력. 자동번역 시 함께 번역되어 채워집니다.</div>
             </li>
             <li class="field-list-item">
-              <span class="field-list-label">slug 중복검사</span>
-              <div class="field-list-desc">URL 경로용 키워드. <b>[중복검사]</b> 버튼 클릭 시 사용 가능 여부 확인. 중복되면 저장 불가.</div>
+              <span class="field-list-label">Slug</span>
+              <div class="field-list-desc">URL 경로용 키워드. <b>노출 제목 키워드로부터 자동 생성</b>되며 직접 수정 가능. <b>[중복검사]</b> 버튼으로 사용 가능 여부 확인. 중복 시 저장 불가.</div>
+            </li>
+            <li class="field-list-item">
+              <span class="field-list-label">대표 태그</span>
+              <div class="field-list-desc"><b>[대표 태그 선택]</b> 클릭 → 모달에서 1개 선택. 글의 메인 카테고리로 사용.</div>
+            </li>
+            <li class="field-list-item">
+              <span class="field-list-label">기타 태그</span>
+              <div class="field-list-desc"><b>[기타 태그 추가]</b> 클릭 → 모달에서 다중 선택. 보조 분류·검색 정확도 향상에 사용.</div>
             </li>
             <li class="field-list-item">
               <span class="field-list-label">미리보기</span>
-              <div class="field-list-desc">우측 패널에서 실시간 FO 노출 형태 확인. 에디터 내용 입력 시 자동 갱신.</div>
+              <div class="field-list-desc">우측 패널에서 실시간 FO 노출 형태 확인. <b>375px / 480px</b> 토글로 디바이스 폭 전환. 에디터 입력 시 자동 갱신.</div>
+            </li>
+            <li class="field-list-item">
+              <span class="field-list-label">대표 이미지</span>
+              <div class="field-list-desc">우측 영역의 <b>[이미지 업로드]</b>. 미리보기 카드 썸네일·소셜 공유 시 사용되는 메인 이미지.</div>
             </li>
           </ul>
         </div>
@@ -612,8 +625,8 @@ body {
               </div>
             </div>
             <div class="modal-card-body">
-              <div class="modal-card-title">태그 선택 <span class="modal-card-tag">TAG</span></div>
-              <div class="modal-card-desc">사전에 등록된 태그 풀에서 다중 선택. 글 분류·검색 정확도 향상에 사용.</div>
+              <div class="modal-card-title">대표 태그 / 기타 태그 <span class="modal-card-tag">TAG</span></div>
+              <div class="modal-card-desc">사전 등록된 태그 풀에서 선택. 5개 언어 매핑이 사전에 잡혀있어 언어 탭 전환 시 자동 반영. <b>대표</b>는 1개, <b>기타</b>는 다중.</div>
             </div>
           </div>
           <div class="modal-card">
