@@ -242,6 +242,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 .lang-tab-btn .lt-dot.pending { background:#d9d9d9; }
 .lang-tab-panel { display:none; }
 .lang-tab-panel.active { display:block; }
+.basic-tab-panel { display:none; }
+.basic-tab-panel.active { display:block; }
 .lang-edit-note { font-size:11px; color:#8c8c8c; padding:6px 10px; background:#fafafa; border-radius:3px; margin-bottom:8px; border:1px dashed #d9d9d9; }
 
 /* ── Result table action bar ── */
@@ -542,7 +544,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
                 <th rowspan="2">카테고리</th>
                 <th rowspan="2">지원 언어</th>
                 <th rowspan="2" class="grp-new">계정 상태 <span class="grp-new-tag">NEW</span></th>
-                <th colspan="3" class="grp-head">계약 정보</th>
+                <th colspan="9" class="grp-head">계약 정보 <span class="grp-new-tag">NEW 확장</span></th>
                 <th colspan="6" class="grp-head">위치정보</th>
                 <th colspan="8" class="grp-head">운영시간</th>
                 <th colspan="2" class="grp-head">특징</th>
@@ -551,6 +553,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
               </tr>
               <tr>
                 <th>대표번호</th><th>사업자등록번호</th><th>이메일</th>
+                <th>계약 형태</th><th>자동<br>갱신</th><th>계약<br>시작일</th><th>계약<br>종료일</th><th>정산일</th><th>정산 계좌</th>
                 <th>우편번호</th><th>지역</th><th>주소</th><th>위도</th><th>경도</th><th>지하철 정보</th>
                 <th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th><th>일</th><th>공휴일</th>
                 <th>프라이빗</th><th>특징</th>
@@ -566,6 +569,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
                 <td><span class="ant-tag">중국어</span> <span class="ant-tag">영어</span> <span class="ant-tag">일본어</span></td>
                 <td><span class="ant-tag ant-tag-green">활성</span></td>
                 <td>02-1234-5678</td><td>123-45-67890</td><td>contact@wonjin.kr</td>
+                <td><span class="ant-tag">월 고정비</span></td><td>ON</td><td>2025-03-12</td><td>2026-03-11</td><td>매월 25일</td><td>신한 110-***-1234</td>
                 <td>06158</td><td>서초구</td><td>서울 서초구 강남대로 419</td><td>37.49790</td><td>127.02760</td><td><span class="ant-tag ant-tag-blue">강남역</span></td>
                 <td>09:00<br>~18:00</td><td>09:00<br>~18:00</td><td>09:00<br>~18:00</td><td>09:00<br>~18:00</td><td>09:00<br>~18:00</td><td>10:00<br>~15:00</td><td>휴무</td><td>휴무</td>
                 <td><span class="ant-tag ant-tag-green">퍼블릭</span></td>
@@ -581,6 +585,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
                 <td><span class="ant-tag">영어</span> <span class="ant-tag">중국어</span> <span class="ant-tag">중국어(번체)</span> <span class="ant-tag">일본어</span> <span class="ant-tag">인도네시아</span></td>
                 <td><span class="ant-tag ant-tag-green">활성</span></td>
                 <td>02-2345-6789</td><td>234-56-78901</td><td>info@beautynyoung.kr</td>
+                <td><span class="ant-tag">수수료</span></td><td>ON</td><td>2025-08-22</td><td>2026-08-21</td><td>매월 10일</td><td>국민 305-***-5678</td>
                 <td>06253</td><td>강남구</td><td>서울 강남구 강남대로 302</td><td>37.49032</td><td>127.03168</td><td><span class="ant-tag ant-tag-blue">역삼역</span></td>
                 <td>10:00<br>~19:00</td><td>10:00<br>~19:00</td><td>10:00<br>~19:00</td><td>10:00<br>~19:00</td><td>10:00<br>~19:00</td><td>10:00<br>~15:00</td><td>휴무</td><td>휴무</td>
                 <td><span class="ant-tag ant-tag-green">퍼블릭</span></td>
@@ -596,6 +601,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
                 <td><span class="ant-tag">중국어</span> <span class="ant-tag">영어</span> <span class="ant-tag">중국어(번체)</span></td>
                 <td><span class="ant-tag ant-tag-green">활성</span></td>
                 <td>02-3456-7890</td><td>345-67-89012</td><td>jiyu@jiyu.kr</td>
+                <td><span class="ant-tag">혼합</span></td><td>ON</td><td>2025-11-04</td><td>2026-11-03</td><td>매월 5일</td><td>우리 1002-***-9012</td>
                 <td>03949</td><td>마포구</td><td>서울 마포구 양화로 45</td><td>37.55656</td><td>126.91456</td><td><span class="memo-empty">—</span></td>
                 <td>11:00<br>~20:00</td><td>11:00<br>~20:00</td><td>11:00<br>~20:00</td><td>11:00<br>~20:00</td><td>11:00<br>~20:00</td><td>11:00<br>~16:00</td><td>휴무</td><td>휴무</td>
                 <td><span class="ant-tag">미선택</span></td>
@@ -611,6 +617,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
                 <td><span class="ant-tag">영어</span> <span class="ant-tag">일본어</span></td>
                 <td><span class="ant-tag">비활성</span></td>
                 <td>02-4567-8901</td><td>456-78-90123</td><td>—</td>
+                <td><span class="ant-tag">무료</span></td><td>OFF</td><td>2025-09-09</td><td>2026-09-08</td><td>—</td><td>—</td>
                 <td>04533</td><td>중구</td><td>서울 중구 남대문로 81</td><td>37.56477</td><td>126.98180</td><td><span class="ant-tag ant-tag-blue">명동역</span> <span class="ant-tag ant-tag-blue">을지로입구역</span></td>
                 <td>10:00<br>~19:00</td><td>10:00<br>~19:00</td><td>10:00<br>~19:00</td><td>10:00<br>~19:00</td><td>10:00<br>~19:00</td><td>휴무</td><td>휴무</td><td>휴무</td>
                 <td><span class="ant-tag ant-tag-green">퍼블릭</span></td>
@@ -627,6 +634,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
                 <td><span class="ant-tag ant-tag-red">탈퇴</span></td>
                 <td>—</td><td>—</td><td>—</td>
                 <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>
+                <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>
                 <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>
                 <td>—</td><td>—</td>
                 <td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>
@@ -640,6 +648,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
                 <td><span class="ant-tag">중국어</span> <span class="ant-tag">영어</span> <span class="ant-tag">일본어</span></td>
                 <td><span class="ant-tag ant-tag-green">활성</span></td>
                 <td>02-5678-9012</td><td>567-89-01234</td><td>tu@tudental.kr</td>
+                <td><span class="ant-tag">월 고정비</span></td><td>ON</td><td>2025-09-09</td><td>2026-09-08</td><td>매월 25일</td><td>KEB하나 999-***-3456</td>
                 <td>06254</td><td>강남구</td><td>서울 강남구 도곡로3길 20-9</td><td>37.49177</td><td>127.03342</td><td><span class="ant-tag ant-tag-blue">강남역</span></td>
                 <td>10:00<br>~20:00</td><td>10:00<br>~20:00</td><td>10:00<br>~20:00</td><td>10:00<br>~20:00</td><td>10:00<br>~20:00</td><td>휴무</td><td>10:00<br>~20:00</td><td>10:00<br>~20:00</td>
                 <td><span class="ant-tag ant-tag-green">퍼블릭</span></td>
@@ -1913,9 +1922,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
     <div class="drawer-body">
 
       <div class="tabs">
-        <div class="tab active">스토어정보</div>
-        <div class="tab">관리자설정</div>
+        <div class="tab active" onclick="switchBasicTab(this,'tab-store')">스토어정보</div>
+        <div class="tab" onclick="switchBasicTab(this,'tab-contract')">계약 정보 <span class="f2-new">NEW</span></div>
+        <div class="tab" onclick="switchBasicTab(this,'tab-admin')">관리자설정</div>
       </div>
+
+      <div id="tab-store" class="basic-tab-panel active">
 
       <!-- 식별/메타 -->
       <div class="section-title">식별 정보 <span class="auto-note">변경 없음</span></div>
@@ -2054,59 +2066,77 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
         </div>
       </div>
 
-      <!-- 계약 정보 (신규) -->
-      <div class="section-title">계약 정보 <span class="auto-note changed">신규 — 어드민 전용 (호스트 미노출)</span></div>
-      <div class="form-row two-col">
-        <div class="form-label">계약 형태</div>
-        <select class="ant-input"><option>월 고정비</option><option>수수료</option><option>혼합</option><option>무료</option></select>
-        <div class="form-label">자동 갱신</div>
-        <div class="radio-group"><label><input type="radio" name="renew" checked> ON</label><label><input type="radio" name="renew"> OFF</label></div>
-      </div>
-      <div class="form-row two-col">
-        <div class="form-label">월 고정비</div>
-        <input class="ant-input" value="500,000" placeholder="원">
-        <div class="form-label">수수료율</div>
-        <input class="ant-input" value="" placeholder="% (수수료/혼합 시)">
-      </div>
-      <div class="form-row two-col">
-        <div class="form-label">계약 시작일</div>
-        <input class="ant-input" type="date" value="2025-03-12">
-        <div class="form-label">계약 종료일</div>
-        <input class="ant-input" type="date" value="2026-03-11">
-      </div>
-      <div class="form-row two-col">
-        <div class="form-label">정산일</div>
-        <select class="ant-input"><option>매월 5일</option><option>매월 10일</option><option>매월 15일</option><option>매월 25일</option><option>매월 말일</option></select>
-        <div class="form-label">정산 계좌</div>
-        <input class="ant-input" placeholder="은행 / 계좌번호 / 예금주">
-      </div>
-      <div class="form-row">
-        <div class="form-label">계약서 첨부</div>
-        <div style="display:flex;gap:6px;align-items:center;">
-          <button class="ant-btn ant-btn-sm">파일 선택</button>
-          <span style="font-size:11px;color:#8c8c8c;">계약서_원진성형외과_2025.pdf · 2.4MB</span>
-          <button class="ant-btn ant-btn-link ant-btn-dangerous ant-btn-sm">삭제</button>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-label">계약 메모</div>
-        <textarea class="ant-input" rows="2" placeholder="계약 특이사항 (자동 갱신 조건·할인·기타)"></textarea>
-      </div>
-      <div class="form-row">
-        <div class="form-label">변경 이력</div>
-        <div style="font-size:11px;color:#595959;background:#fafafa;border:1px solid #f0f0f0;border-radius:2px;padding:8px 10px;">
-          <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed #f0f0f0;"><span>월 고정비: 450,000 → 500,000</span><span style="color:#8c8c8c;">어드민 A · 2026-03-15 11:20</span></div>
-          <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed #f0f0f0;"><span>자동 갱신: OFF → ON</span><span style="color:#8c8c8c;">어드민 B · 2026-02-20 14:05</span></div>
-          <div style="display:flex;justify-content:space-between;padding:4px 0;"><span>계약 형태: 수수료 → 월 고정비</span><span style="color:#8c8c8c;">어드민 A · 2026-01-10 09:30</span></div>
-        </div>
-      </div>
-
-      <!-- 메모 -->
+      <!-- 메모 (스토어정보 탭 안 마지막 섹션) -->
       <div class="section-title">어드민 메모 <span class="auto-note changed">신규</span></div>
       <div class="form-row">
         <div class="form-label">내부 메모</div>
         <textarea class="ant-input" rows="3" placeholder="운영팀 내부 메모 (호스트에 노출 안 됨)"></textarea>
       </div>
+
+      </div><!-- /tab-store -->
+
+      <div id="tab-contract" class="basic-tab-panel">
+        <div style="margin-bottom:14px;padding:10px 14px;background:#fafafa;border:1px solid #f0f0f0;border-radius:2px;font-size:12px;color:#595959;">
+          <strong>계약 정보 — 어드민 전용 (호스트 미노출)</strong> · 모든 필드 선택 입력
+        </div>
+
+        <div class="section-title">계약 형태·금액</div>
+        <div class="form-row two-col">
+          <div class="form-label">계약 형태</div>
+          <select class="ant-input"><option>월 고정비</option><option>수수료</option><option>혼합</option><option>무료</option></select>
+          <div class="form-label">자동 갱신</div>
+          <div class="radio-group"><label><input type="radio" name="renew" checked> ON</label><label><input type="radio" name="renew"> OFF</label></div>
+        </div>
+        <div class="form-row two-col">
+          <div class="form-label">월 고정비</div>
+          <input class="ant-input" value="500,000" placeholder="원">
+          <div class="form-label">수수료율</div>
+          <input class="ant-input" placeholder="% (수수료/혼합 시)">
+        </div>
+
+        <div class="section-title">계약 기간·정산</div>
+        <div class="form-row two-col">
+          <div class="form-label">계약 시작일</div>
+          <input class="ant-input" type="date" value="2025-03-12">
+          <div class="form-label">계약 종료일</div>
+          <input class="ant-input" type="date" value="2026-03-11">
+        </div>
+        <div class="form-row two-col">
+          <div class="form-label">정산일</div>
+          <select class="ant-input"><option>매월 5일</option><option>매월 10일</option><option>매월 15일</option><option>매월 25일</option><option>매월 말일</option></select>
+          <div class="form-label">정산 계좌</div>
+          <input class="ant-input" placeholder="은행 / 계좌번호 / 예금주">
+        </div>
+
+        <div class="section-title">첨부·메모</div>
+        <div class="form-row">
+          <div class="form-label">계약서 첨부</div>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <button class="ant-btn ant-btn-sm">파일 선택</button>
+            <span style="font-size:11px;color:#8c8c8c;">계약서_원진성형외과_2025.pdf · 2.4MB</span>
+            <button class="ant-btn ant-btn-link ant-btn-dangerous ant-btn-sm">삭제</button>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">계약 메모</div>
+          <textarea class="ant-input" rows="2" placeholder="계약 특이사항 (자동 갱신 조건·할인·기타)"></textarea>
+        </div>
+
+        <div class="section-title">변경 이력 <span class="auto-note">자동 기록</span></div>
+        <div class="form-row">
+          <div class="form-label">이력</div>
+          <div style="font-size:11px;color:#595959;background:#fafafa;border:1px solid #f0f0f0;border-radius:2px;padding:10px 12px;">
+            <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed #f0f0f0;"><span>월 고정비: 450,000 → 500,000</span><span style="color:#8c8c8c;">어드민 A · 2026-03-15 11:20</span></div>
+            <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed #f0f0f0;"><span>자동 갱신: OFF → ON</span><span style="color:#8c8c8c;">어드민 B · 2026-02-20 14:05</span></div>
+            <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed #f0f0f0;"><span>계약 형태: 수수료 → 월 고정비</span><span style="color:#8c8c8c;">어드민 A · 2026-01-10 09:30</span></div>
+            <div style="display:flex;justify-content:space-between;padding:5px 0;"><span>정산 계좌: (미설정) → 신한 110-***-***-1234</span><span style="color:#8c8c8c;">어드민 A · 2025-04-01 09:30</span></div>
+          </div>
+        </div>
+      </div><!-- /tab-contract -->
+
+      <div id="tab-admin" class="basic-tab-panel">
+        <div style="font-size:12px;color:#8c8c8c;padding:30px 0;text-align:center;">관리자설정 영역 (라이브 BO 그대로 — 권한·롤 등)</div>
+      </div><!-- /tab-admin -->
 
     </div>
     <div class="drawer-footer">
@@ -2223,6 +2253,17 @@ function switchLangTab(btn, panelId) {
   wrapper.querySelectorAll('.lang-tab-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   wrapper.querySelectorAll('.lang-tab-panel').forEach(p => p.classList.remove('active'));
+  const panel = document.getElementById(panelId);
+  if (panel) panel.classList.add('active');
+}
+
+/* ── 기본정보 드로어 탭 전환 ── */
+function switchBasicTab(tabEl, panelId) {
+  const drawer = document.getElementById('drawer-basic');
+  if (!drawer) return;
+  drawer.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+  tabEl.classList.add('active');
+  drawer.querySelectorAll('.basic-tab-panel').forEach(p => p.classList.remove('active'));
   const panel = document.getElementById(panelId);
   if (panel) panel.classList.add('active');
 }
