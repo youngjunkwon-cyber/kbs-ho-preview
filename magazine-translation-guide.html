@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>매거진 자동번역 운영 가이드 | K-Beauty Station Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ── Reset & Base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --pink: #FF6B8A;
+  --pink-light: #fff0f3;
+  --pink-mid: #ffd6df;
+  --navy: #0f1023;
+  --navy2: #1a1a3e;
+  --text: #2c2c3e;
+  --text-sub: #6b7280;
+  --border: #e8e8f0;
+  --bg: #f7f7fb;
+  --white: #ffffff;
+  --tip-bg: #EEF6FF;
+  --tip-border: #4A90D9;
+  --tip-text: #2d5fa0;
+  --warn-bg: #FFF7ED;
+  --warn-border: #F59E0B;
+  --warn-text: #7a5000;
+  --sidebar-w: 240px;
+  --header-h: 56px;
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+/* ── Top Header ── */
+.top-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--header-h);
+  background: var(--navy);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 12px;
+  z-index: 100;
+  border-bottom: 2px solid rgba(255,107,138,0.5);
+}
+.header-logo {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--white);
+  letter-spacing: 0.5px;
+}
+.header-logo span { color: var(--pink); }
+.header-sep { width: 1px; height: 18px; background: rgba(255,255,255,0.15); }
+.header-title {
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.3px;
+}
+.header-badge {
+  margin-left: auto;
+  background: rgba(255,107,138,0.15);
+  border: 1px solid rgba(255,107,138,0.3);
+  color: var(--pink);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+}
+
+/* ── Layout ── */
+.layout {
+  display: flex;
+  padding-top: var(--header-h);
+  min-height: 100vh;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  position: sticky;
+  top: var(--header-h);
+  height: calc(100vh - var(--header-h));
+  overflow-y: auto;
+  background: var(--white);
+  border-right: 1px solid var(--border);
+  padding: 28px 0 40px;
+}
+.sidebar-section-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  color: var(--text-sub);
+  padding: 0 20px 10px;
+  text-transform: uppercase;
+}
+.nav-list { list-style: none; }
+.nav-item a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 20px;
+  font-size: 12.5px;
+  color: var(--text-sub);
+  text-decoration: none;
+  transition: all 0.15s;
+  border-left: 3px solid transparent;
+  line-height: 1.4;
+}
+.nav-item a:hover {
+  color: var(--pink);
+  background: var(--pink-light);
+  border-left-color: var(--pink-mid);
+}
+.nav-item.active a {
+  color: var(--pink);
+  background: var(--pink-light);
+  border-left-color: var(--pink);
+  font-weight: 700;
+}
+.nav-step-num {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--border);
+  color: var(--text-sub);
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.nav-item.active .nav-step-num {
+  background: var(--pink);
+  color: white;
+}
+.nav-divider {
+  margin: 16px 20px;
+  border: none;
+  border-top: 1px solid var(--border);
+}
+.sidebar-footer {
+  padding: 0 20px;
+  font-size: 11px;
+  color: var(--text-sub);
+  line-height: 1.8;
+  margin-top: 8px;
+}
+
+/* ── Main Content ── */
+.main {
+  flex: 1;
+  min-width: 0;
+  padding: 40px 48px 80px 40px;
+}
+
+/* ── Hero ── */
+.hero {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 60%, #0d3060 100%);
+  border-radius: 16px;
+  padding: 44px 48px;
+  margin-bottom: 40px;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,107,138,0.15) 0%, transparent 70%);
+}
+.hero-eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--pink);
+  margin-bottom: 12px;
+}
+.hero-title {
+  font-size: 28px;
+  font-weight: 900;
+  line-height: 1.3;
+  margin-bottom: 12px;
+}
+.hero-desc {
+  font-size: 13.5px;
+  color: rgba(255,255,255,0.55);
+  margin-bottom: 24px;
+  line-height: 1.7;
+}
+.hero-flow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.hero-flow-step {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 11.5px;
+  color: rgba(255,255,255,0.7);
+}
+.hero-flow-arrow {
+  color: rgba(255,255,255,0.25);
+  font-size: 12px;
+}
+
+/* ── Step Section ── */
+.step-section {
+  background: var(--white);
+  border-radius: 16px;
+  margin-bottom: 24px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  scroll-margin-top: calc(var(--header-h) + 24px);
+}
+
+.step-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 28px;
+  border-bottom: 1px solid var(--border);
+  background: var(--white);
+}
+.step-num-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--pink);
+  color: white;
+  font-size: 12px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.step-header-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--navy);
+}
+.step-header-sub {
+  font-size: 12px;
+  color: var(--text-sub);
+  margin-left: auto;
+}
+
+.step-body-wrap {
+  display: flex;
+  min-height: 360px;
+}
+
+/* Image column */
+.step-img-col {
+  width: 58%;
+  flex-shrink: 0;
+  background: #f4f4f8;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow: hidden;
+  border-right: 1px solid var(--border);
+  padding: 0;
+}
+.step-img-col img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top left;
+  display: block;
+}
+.img-ph {
+  width: 100%;
+  height: 100%;
+  min-height: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #c8c8d0;
+  font-size: 11.5px;
+  letter-spacing: 1px;
+}
+.img-ph svg { opacity: 0.45; }
+.img-ph-label {
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  font-weight: 600;
+  color: #d0d0da;
+}
+
+/* Text column */
+.step-text-col {
+  flex: 1;
+  padding: 32px 32px 32px 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.step-desc-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 10px;
+}
+.step-desc-body {
+  font-size: 13px;
+  color: #4a4a60;
+  line-height: 1.9;
+  margin-bottom: 16px;
+}
+.step-checklist {
+  list-style: none;
+  margin-bottom: 0;
+}
+.step-checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.7;
+  padding: 4px 0;
+  border-bottom: 1px solid #f0f0f4;
+}
+.step-checklist li:last-child { border-bottom: none; }
+.step-check-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--pink-light);
+  color: var(--pink);
+  font-size: 9px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+.step-checklist b { color: var(--navy); font-weight: 700; }
+
+/* Callout */
+.callout {
+  margin-top: 18px;
+  padding: 12px 14px;
+  border-radius: 0 8px 8px 0;
+  font-size: 12px;
+  line-height: 1.75;
+}
+.callout.tip {
+  background: var(--tip-bg);
+  border-left: 3px solid var(--tip-border);
+  color: var(--tip-text);
+}
+.callout.warn {
+  background: var(--warn-bg);
+  border-left: 3px solid var(--warn-border);
+  color: var(--warn-text);
+}
+
+/* ── Multi-language table ── */
+.multi-lang-section {
+  background: var(--white);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  padding: 28px 32px 32px;
+  margin-top: 24px;
+  scroll-margin-top: calc(var(--header-h) + 24px);
+}
+.section-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--navy);
+  margin-bottom: 6px;
+}
+.section-sub {
+  font-size: 12.5px;
+  color: var(--text-sub);
+  margin-bottom: 20px;
+  line-height: 1.7;
+}
+.lang-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.lang-table th {
+  background: var(--navy);
+  color: rgba(255,255,255,0.7);
+  padding: 10px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 11.5px;
+  letter-spacing: 0.3px;
+}
+.lang-table th:first-child { border-radius: 8px 0 0 0; }
+.lang-table th:last-child { border-radius: 0 8px 0 0; }
+.lang-table td {
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+  line-height: 1.6;
+}
+.lang-table tr:last-child td { border-bottom: none; }
+.lang-table tr:hover td { background: var(--pink-light); }
+.lang-badge {
+  display: inline-block;
+  background: var(--navy);
+  color: rgba(255,255,255,0.85);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+.lang-badge.en { background: #2563eb; }
+.lang-badge.ja { background: #c0392b; }
+.lang-badge.zh { background: #e67e22; }
+.lang-badge.tw { background: #8e44ad; }
+.lang-badge.id { background: #16a085; }
+.tag-auto {
+  background: var(--pink-light);
+  color: var(--pink);
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+.tag-manual {
+  background: #f0f4ff;
+  color: #3b5bdb;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+/* ── Scrollbar ── */
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  :root { --sidebar-w: 200px; }
+  .main { padding: 24px 20px 60px; }
+}
+@media (max-width: 700px) {
+  .layout { flex-direction: column; }
+  .sidebar { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--border); padding: 16px 0; }
+  .step-body-wrap { flex-direction: column; }
+  .step-img-col { width: 100%; min-height: 240px; border-right: none; border-bottom: 1px solid var(--border); }
+  .hero { padding: 28px 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header class="top-header">
+  <div class="header-logo">K-Beauty<span>Station</span></div>
+  <div class="header-sep"></div>
+  <div class="header-title">ADMIN 운영 가이드</div>
+  <div class="header-badge">INTERNAL</div>
+</header>
+
+<!-- ── Layout ── -->
+<div class="layout">
+
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-section-label">목차</div>
+    <ul class="nav-list">
+      <li class="nav-item" id="nav-step1">
+        <a href="#step1"><span class="nav-step-num">1</span>매거진 복제</a>
+      </li>
+      <li class="nav-item" id="nav-step2">
+        <a href="#step2"><span class="nav-step-num">2</span>복제 글 진입</a>
+      </li>
+      <li class="nav-item" id="nav-step3">
+        <a href="#step3"><span class="nav-step-num">3</span>언어 탭 선택</a>
+      </li>
+      <li class="nav-item" id="nav-step4">
+        <a href="#step4"><span class="nav-step-num">4</span>자동번역 실행</a>
+      </li>
+      <li class="nav-item" id="nav-step5">
+        <a href="#step5"><span class="nav-step-num">5</span>번역 결과 확인</a>
+      </li>
+      <li class="nav-item" id="nav-step6">
+        <a href="#step6"><span class="nav-step-num">6</span>저장</a>
+      </li>
+      <li class="nav-item" id="nav-step7">
+        <a href="#step7"><span class="nav-step-num">7</span>게시 상태 변경</a>
+      </li>
+    </ul>
+    <hr class="nav-divider">
+    <div class="sidebar-section-label">다중 언어</div>
+    <ul class="nav-list">
+      <li class="nav-item" id="nav-multilang">
+        <a href="#multilang"><span class="nav-step-num" style="font-size:9px">표</span>반복 절차</a>
+      </li>
+    </ul>
+    <hr class="nav-divider">
+    <div class="sidebar-footer">
+      K-Beauty Station<br>
+      ADMIN · 2026.05<br>
+      내부 배포용
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="hero-eyebrow">ADMIN GUIDE</div>
+      <div class="hero-title">매거진 자동번역 운영 가이드</div>
+      <div class="hero-desc">
+        매거진 게시글을 복제한 뒤 각 언어 탭에서 자동번역을 실행하고, 검수 후 저장·게시하는 전체 플로우를 안내합니다.
+      </div>
+      <div class="hero-flow">
+        <span class="hero-flow-step">복제</span>
+        <span class="hero-flow-arrow">›</span>
+        <span class="hero-flow-step">언어 탭 선택</span>
+        <span class="hero-flow-arrow">›</span>
+        <span class="hero-flow-step">자동번역 실행</span>
+        <span class="hero-flow-arrow">›</span>
+        <span class="hero-flow-step">번역 결과 확인</span>
+        <span class="hero-flow-arrow">›</span>
+        <span class="hero-flow-step">저장</span>
+        <span class="hero-flow-arrow">›</span>
+        <span class="hero-flow-step">게시 상태 변경</span>
+      </div>
+    </div>
+
+    <!-- STEP 01 -->
+    <section class="step-section" id="step1">
+      <div class="step-header">
+        <div class="step-num-badge">01</div>
+        <div class="step-header-title">매거진 복제</div>
+        <div class="step-header-sub">매거진 목록 → 복제 버튼</div>
+      </div>
+      <div class="step-body-wrap">
+        <div class="step-img-col">
+          <img src="img/magazine-guide/step01.png" alt="매거진 복제 화면"
+            onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="img-ph" style="display:none">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c8c8d0" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            <div class="img-ph-label">SCREENSHOT 01</div>
+          </div>
+        </div>
+        <div class="step-text-col">
+          <div class="step-desc-body">매거진 목록에서 번역할 원본 게시글을 찾아 복제합니다.</div>
+          <ul class="step-checklist">
+            <li><span class="step-check-icon">✓</span><span>BO 매거진 목록 화면 접속</span></li>
+            <li><span class="step-check-icon">✓</span><span>복제할 게시글 행의 <b>[복제]</b> 버튼 클릭</span></li>
+            <li><span class="step-check-icon">✓</span><span>목록 상단에 복사본이 생성됨 확인</span></li>
+          </ul>
+          <div class="callout tip">💡 복제된 글은 원본 내용을 그대로 복사합니다. 언어별로 따로 복제할 필요 없이, 한 번만 복제한 뒤 언어 탭을 전환하며 번역합니다.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 02 -->
+    <section class="step-section" id="step2">
+      <div class="step-header">
+        <div class="step-num-badge">02</div>
+        <div class="step-header-title">복제 글 진입</div>
+        <div class="step-header-sub">복제된 글 클릭 → 에디터 열기</div>
+      </div>
+      <div class="step-body-wrap">
+        <div class="step-img-col">
+          <img src="img/magazine-guide/step02.png" alt="복제 글 에디터 진입"
+            onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="img-ph" style="display:none">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c8c8d0" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            <div class="img-ph-label">SCREENSHOT 02</div>
+          </div>
+        </div>
+        <div class="step-text-col">
+          <div class="step-desc-body">복제된 글을 클릭하여 에디터 화면으로 진입합니다.</div>
+          <ul class="step-checklist">
+            <li><span class="step-check-icon">✓</span><span>목록에서 복제된 글의 제목 클릭</span></li>
+            <li><span class="step-check-icon">✓</span><span>에디터 상단 <b>언어 탭</b> 위치 확인</span></li>
+            <li><span class="step-check-icon">✓</span><span>기본 탭 <b>영어(EN)</b> 선택 상태로 열림</span></li>
+          </ul>
+          <div class="callout tip">💡 복제 직후에는 모든 언어 탭의 본문이 원본과 동일합니다. 자동번역 전에 내용을 수정하지 마세요.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 03 -->
+    <section class="step-section" id="step3">
+      <div class="step-header">
+        <div class="step-num-badge">03</div>
+        <div class="step-header-title">언어 탭 선택</div>
+        <div class="step-header-sub">에디터 상단 → 번역 대상 언어 탭 클릭</div>
+      </div>
+      <div class="step-body-wrap">
+        <div class="step-img-col">
+          <img src="img/magazine-guide/step03.png" alt="언어 탭 선택"
+            onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="img-ph" style="display:none">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c8c8d0" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            <div class="img-ph-label">SCREENSHOT 03</div>
+          </div>
+        </div>
+        <div class="step-text-col">
+          <div class="step-desc-body">에디터 상단 언어 탭에서 번역할 언어를 클릭합니다.</div>
+          <ul class="step-checklist">
+            <li><span class="step-check-icon">✓</span><span>지원 언어: <b>EN · JA · ZH · ZH-TW · ID</b></span></li>
+            <li><span class="step-check-icon">✓</span><span>번역 대상 언어 탭 클릭 → 탭 활성화 확인</span></li>
+            <li><span class="step-check-icon">✓</span><span>탭 전환 후 에디터 본문이 해당 탭으로 전환됨</span></li>
+          </ul>
+          <div class="callout tip">💡 EN(영어)은 원본 언어로 자동번역 없이 직접 작성하거나 원본을 그대로 사용합니다. JA / ZH / ZH-TW / ID 탭에서 자동번역을 실행합니다.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 04 -->
+    <section class="step-section" id="step4">
+      <div class="step-header">
+        <div class="step-num-badge">04</div>
+        <div class="step-header-title">자동번역 실행</div>
+        <div class="step-header-sub">에디터 툴바 → [자동번역] 버튼</div>
+      </div>
+      <div class="step-body-wrap">
+        <div class="step-img-col">
+          <img src="img/magazine-guide/step04.png" alt="자동번역 실행"
+            onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="img-ph" style="display:none">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c8c8d0" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            <div class="img-ph-label">SCREENSHOT 04</div>
+          </div>
+        </div>
+        <div class="step-text-col">
+          <div class="step-desc-body">에디터 툴바의 <b>[자동번역]</b> 버튼을 클릭하여 번역을 시작합니다.</div>
+          <ul class="step-checklist">
+            <li><span class="step-check-icon">✓</span><span>에디터 툴바 → <b>[자동번역]</b> 클릭</span></li>
+            <li><span class="step-check-icon">✓</span><span>확인 팝업 표시됨 → 내용 확인</span></li>
+            <li><span class="step-check-icon">✓</span><span>팝업의 <b>[자동번역]</b> 버튼 클릭</span></li>
+          </ul>
+          <div class="callout warn">⚠️ 번역 중에는 페이지를 이탈하거나 다른 탭을 클릭하지 마세요. 번역이 중단될 수 있습니다.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 05 -->
+    <section class="step-section" id="step5">
+      <div class="step-header">
+        <div class="step-num-badge">05</div>
+        <div class="step-header-title">번역 결과 확인</div>
+        <div class="step-header-sub">노출 제목 · 에디터 본문 · 브랜드명 검수</div>
+      </div>
+      <div class="step-body-wrap">
+        <div class="step-img-col">
+          <img src="img/magazine-guide/step05.png" alt="번역 결과 확인"
+            onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="img-ph" style="display:none">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c8c8d0" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            <div class="img-ph-label">SCREENSHOT 05</div>
+          </div>
+        </div>
+        <div class="step-text-col">
+          <div class="step-desc-body">번역 완료 후 에디터 본문과 노출 제목을 검수합니다.</div>
+          <ul class="step-checklist">
+            <li><span class="step-check-icon">✓</span><span><b>노출 제목</b>: 번역 언어로 자동 전환 — 어색하면 직접 수정 가능</span></li>
+            <li><span class="step-check-icon">✓</span><span><b>에디터 본문</b>: 우측 미리보기 패널에서 확인</span></li>
+            <li><span class="step-check-icon">✓</span><span>브랜드명 · 수치 · 화폐 단위 올바르게 번역됐는지 확인</span></li>
+          </ul>
+          <div class="callout tip">💡 상품/스토어 위젯 영역은 번역 대상에 포함되지 않습니다. 에디터 본문만 번역됩니다.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 06 -->
+    <section class="step-section" id="step6">
+      <div class="step-header">
+        <div class="step-num-badge">06</div>
+        <div class="step-header-title">저장</div>
+        <div class="step-header-sub">우측 상단 → [저장] 버튼 클릭</div>
+      </div>
+      <div class="step-body-wrap">
+        <div class="step-img-col">
+          <img src="img/magazine-guide/step06.png" alt="저장 버튼"
+            onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="img-ph" style="display:none">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c8c8d0" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            <div class="img-ph-label">SCREENSHOT 06</div>
+          </div>
+        </div>
+        <div class="step-text-col">
+          <div class="step-desc-body">번역 검수 후 우측 상단 <b>[저장]</b> 버튼을 클릭합니다.</div>
+          <ul class="step-checklist">
+            <li><span class="step-check-icon">✓</span><span>화면 우측 상단 <b>[저장]</b> 버튼 클릭</span></li>
+            <li><span class="step-check-icon">✓</span><span>목록으로 돌아가려면 <b>[목록으로]</b> 클릭</span></li>
+          </ul>
+          <div class="callout tip">💡 다른 언어도 함께 번역할 경우, 각 언어 탭을 순서대로 자동번역한 뒤 한 번에 <b>[저장]</b>하면 됩니다. 언어별로 따로 저장하지 않아도 됩니다.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 07 -->
+    <section class="step-section" id="step7">
+      <div class="step-header">
+        <div class="step-num-badge">07</div>
+        <div class="step-header-title">게시 상태 변경</div>
+        <div class="step-header-sub">매거진 목록 → 상태 드롭다운</div>
+      </div>
+      <div class="step-body-wrap">
+        <div class="step-img-col">
+          <img src="img/magazine-guide/step07.png" alt="게시 상태 변경"
+            onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="img-ph" style="display:none">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c8c8d0" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            <div class="img-ph-label">SCREENSHOT 07</div>
+          </div>
+        </div>
+        <div class="step-text-col">
+          <div class="step-desc-body">매거진 목록에서 해당 언어 행의 <b>상태 드롭다운</b>으로 게시 상태를 변경합니다.</div>
+          <ul class="step-checklist">
+            <li><span class="step-check-icon">✓</span><span>목록에서 번역한 글 확인 (언어 컬럼으로 구분)</span></li>
+            <li><span class="step-check-icon">✓</span><span>상태 컬럼의 드롭다운 클릭</span></li>
+            <li><span class="step-check-icon">✓</span><span>상태 선택: <b>게시 / 비게시 / 검토필요</b></span></li>
+          </ul>
+          <div class="callout tip">💡 <b>게시</b> — FO 즉시 노출 &nbsp;&nbsp; <b>비게시</b> — 저장만, FO 미노출 &nbsp;&nbsp; <b>검토필요</b> — 담당자 검토 후 게시 예정</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Multi-language table -->
+    <div class="multi-lang-section" id="multilang">
+      <div class="section-title">다중 언어 번역 시 반복 절차</div>
+      <div class="section-sub">5개 언어 전체 번역 시 STEP 3~5를 언어별로 반복합니다. 한 번의 복제 작성 화면에서 모든 언어 탭을 순서대로 번역한 뒤 저장하면 됩니다.</div>
+      <table class="lang-table">
+        <thead>
+          <tr>
+            <th style="width:60px">탭 순서</th>
+            <th style="width:80px">언어 코드</th>
+            <th>언어명</th>
+            <th>번역 방식</th>
+            <th>비고</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td><span class="lang-badge en">EN</span></td>
+            <td>영어</td>
+            <td><span class="tag-manual">직접 입력 / 원본 유지</span></td>
+            <td>원본 언어 — 자동번역 불필요</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td><span class="lang-badge ja">JA</span></td>
+            <td>일본어</td>
+            <td><span class="tag-auto">자동번역 실행</span></td>
+            <td>STEP 3~5 반복</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td><span class="lang-badge zh">ZH</span></td>
+            <td>중국어 간체</td>
+            <td><span class="tag-auto">자동번역 실행</span></td>
+            <td>STEP 3~5 반복</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td><span class="lang-badge tw">ZH-TW</span></td>
+            <td>중국어 번체</td>
+            <td><span class="tag-auto">자동번역 실행</span></td>
+            <td>STEP 3~5 반복</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td><span class="lang-badge id">ID</span></td>
+            <td>인도네시아어</td>
+            <td><span class="tag-auto">자동번역 실행</span></td>
+            <td>STEP 3~5 반복</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// Active nav on scroll
+const sections = ['step1','step2','step3','step4','step5','step6','step7','multilang'];
+const headerH = 56;
+
+function updateActiveNav() {
+  const scrollY = window.scrollY + headerH + 60;
+  let current = sections[0];
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.offsetTop <= scrollY) current = id;
+  });
+  sections.forEach(id => {
+    const navId = id === 'multilang' ? 'nav-multilang' : 'nav-' + id;
+    const navEl = document.getElementById(navId);
+    if (navEl) navEl.classList.toggle('active', id === current);
+  });
+}
+window.addEventListener('scroll', updateActiveNav, { passive: true });
+updateActiveNav();
+</script>
+</body>
+</html>
