@@ -175,6 +175,27 @@ body {
 /* ── 2안 section anchors ── */
 .v2-section { scroll-margin-top: 8px; }
 
+/* ── KBS / 자체 채널 슬롯 (v3 확정안) ── */
+.ch-slot-group-label { font-size: 12px; font-weight: 600; color: var(--text2,#3d3d3d); margin-bottom: 6px; }
+.channel-row-new.kbs-row { background: #fafafa; border: 1px solid #f0f0f0; border-radius: 4px; padding: 8px 12px; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+.channel-row-new .ch-mode-tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 3px; flex-shrink: 0; }
+.channel-row-new .ch-mode-tag.kbs { background: #fff0f4; color: #e85d75; border: 1px solid #ffd1dc; }
+.channel-row-new .ch-mode-tag.merchant { background: #fafafa; color: #595959; border: 1px solid #d9d9d9; }
+.channel-row-new .ch-mode-channel { font-size: 12px; font-weight: 600; color: var(--text1,#1a1a1a); min-width: 80px; }
+.channel-row-new .ch-mode-link { font-size: 12px; color: var(--text2,#3d3d3d); flex: 1; }
+.channel-row-new .ch-mode-remove { background: transparent; border: 1px solid #d9d9d9; color: #8c8c8c; width: 24px; height: 24px; border-radius: 3px; cursor: pointer; font-size: 14px; line-height: 1; padding: 0; }
+.channel-row-new .ch-mode-remove:hover { color: #ff4d4f; border-color: #ff4d4f; }
+.ch-slot-empty { padding: 12px 0; text-align: center; color: var(--text3,#8c8c8c); font-size: 12px; background: #fafafa; border: 1px dashed #e8e8e8; border-radius: 4px; margin-bottom: 8px; }
+
+/* ── FAQ 항목 컨트롤 (수정 / 삭제 / 사용·미사용 토글) ── */
+.faq-item-ctl .faq-item-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 6px; }
+.faq-item-ctl .faq-item-head .faq-q { flex: 1; }
+.faq-item-ctl .faq-item-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.faq-use-toggle { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text2,#3d3d3d); cursor: pointer; padding: 4px 8px; border: 1px solid #d9d9d9; border-radius: 3px; background: #fff; }
+.faq-use-toggle input { margin: 0; }
+.faq-item-ctl.faq-disabled { opacity: 0.45; }
+.faq-item-ctl.faq-disabled .faq-q::after { content: " (미사용)"; color: var(--text3,#8c8c8c); font-weight: 400; }
+
 /* ── Card-level lang tabs (2안 inline) ── */
 .card-lang-bar {
   display: flex; border-bottom: 1px solid var(--border);
@@ -1578,8 +1599,8 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
               <div class="banner banner-info" style="margin-bottom:14px;">
                 <span class="banner-icon">ℹ️</span>
                 <div class="banner-body">
-                  <div class="banner-title">언어별로 각각 N개 채널을 등록할 수 있습니다.</div>
-                  <div class="banner-desc">해당 언어 고객에게 표시되는 채팅 버튼이 언어별로 달라집니다. 노출 중인 언어에만 표시됩니다.</div>
+                  <div class="banner-title">KBS 통합 고객센터 채널이 디폴트로 노출됩니다.</div>
+                  <div class="banner-desc">자체 채널 운영 시 ×로 KBS 슬롯을 제거하거나 + 채널 추가로 자체 채널을 등록하세요. 같은 언어에 같은 채널 종류는 1개만 등록 가능합니다.</div>
                 </div>
               </div>
               <div class="channel-lang-tabs">
@@ -1589,36 +1610,60 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
                 <button class="channel-lang-tab" onclick="switchChannelLang(this,'ch-jp-v2')">JP</button>
                 <button class="channel-lang-tab" onclick="switchChannelLang(this,'ch-id-v2')">ID</button>
               </div>
+
+              <!-- EN -->
               <div id="ch-en-v2" class="channel-lang-panel active">
-                <div class="channel-row-new"><select class="select" style="width:120px;"><option>WhatsApp</option><option>LINE</option><option>WeChat</option><option>KakaoTalk</option><option>Telegram</option></select><input class="input" style="flex:1;" value="+82-10-1234-5678" /><button class="btn btn-secondary btn-sm" style="color:#EF4444;flex-shrink:0;">삭제</button></div>
+                <div class="ch-slot-group-label">기본 채널 (KBS 운영)</div>
+                <div class="channel-row-new kbs-row"><span class="ch-mode-tag kbs">KBS</span><span class="ch-mode-channel">WhatsApp</span><span class="ch-mode-link">+82-2-1234-0000</span><button class="ch-mode-remove" title="제거">×</button></div>
+                <div class="ch-slot-group-label" style="margin-top:14px;">자체 채널</div>
+                <div class="ch-slot-empty">자체 채널이 없습니다. 필요시 아래에서 추가하세요.</div>
                 <button class="btn btn-secondary btn-sm" style="margin-bottom:12px;" onclick="addChannelRow(this)">+ 채널 추가</button>
                 <div class="card-inner-divider"></div>
-                <div style="display:flex;align-items:center;gap:8px;margin-top:10px;"><span style="font-size:12px;font-weight:600;color:var(--text2);white-space:nowrap;">플로팅 CTA</span><select class="select" style="flex:1;"><option selected>WhatsApp · +82-10-1234-5678</option><option value="">설정 안함</option></select></div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:10px;"><span style="font-size:12px;font-weight:600;color:var(--text2);white-space:nowrap;">플로팅 CTA</span><select class="select" style="flex:1;"><option selected>KBS · WhatsApp · +82-2-1234-0000</option><option value="">설정 안함</option></select></div>
               </div>
+
+              <!-- 简体 -->
               <div id="ch-zh-v2" class="channel-lang-panel">
-                <div class="channel-row-new"><select class="select" style="width:120px;"><option>WeChat</option><option>WhatsApp</option><option>LINE</option><option>KakaoTalk</option><option>Telegram</option></select><input class="input" style="flex:1;" value="hanmiyeok_cn" /><button class="btn btn-secondary btn-sm" style="color:#EF4444;flex-shrink:0;">삭제</button></div>
-                <div class="channel-row-new"><select class="select" style="width:120px;"><option>WhatsApp</option><option>WeChat</option><option>LINE</option><option>KakaoTalk</option><option>Telegram</option></select><input class="input" style="flex:1;" value="+82-10-1234-5678" /><button class="btn btn-secondary btn-sm" style="color:#EF4444;flex-shrink:0;">삭제</button></div>
+                <div class="ch-slot-group-label">기본 채널 (KBS 운영)</div>
+                <div class="channel-row-new kbs-row"><span class="ch-mode-tag kbs">KBS</span><span class="ch-mode-channel">WeChat</span><span class="ch-mode-link">kbs_official_cn</span><button class="ch-mode-remove" title="제거">×</button></div>
+                <div class="ch-slot-group-label" style="margin-top:14px;">자체 채널</div>
+                <div class="channel-row-new"><span class="ch-mode-tag merchant">자체</span><select class="select" style="width:120px;"><option>WhatsApp</option><option disabled>WeChat (이미 KBS 등록)</option><option>LINE</option><option>샤오홍슈</option><option>KakaoTalk</option></select><input class="input" style="flex:1;" value="+82-10-1234-5678" /><button class="btn btn-secondary btn-sm" style="color:#EF4444;flex-shrink:0;">삭제</button></div>
                 <button class="btn btn-secondary btn-sm" style="margin-bottom:12px;" onclick="addChannelRow(this)">+ 채널 추가</button>
                 <div class="card-inner-divider"></div>
-                <div style="display:flex;align-items:center;gap:8px;margin-top:10px;"><span style="font-size:12px;font-weight:600;color:var(--text2);white-space:nowrap;">플로팅 CTA</span><select class="select" style="flex:1;"><option selected>WeChat · hanmiyeok_cn</option><option>WhatsApp · +82-10-1234-5678</option><option value="">설정 안함</option></select></div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:10px;"><span style="font-size:12px;font-weight:600;color:var(--text2);white-space:nowrap;">플로팅 CTA</span><select class="select" style="flex:1;"><option selected>KBS · WeChat · kbs_official_cn</option><option>자체 · WhatsApp · +82-10-1234-5678</option><option value="">설정 안함</option></select></div>
               </div>
+
+              <!-- 繁體 -->
               <div id="ch-tw-v2" class="channel-lang-panel">
-                <div class="channel-row-new"><select class="select" style="width:120px;"><option>LINE</option><option>WhatsApp</option><option>WeChat</option><option>KakaoTalk</option><option>Telegram</option></select><input class="input" style="flex:1;" value="@hanmiyeok_tw" /><button class="btn btn-secondary btn-sm" style="color:#EF4444;flex-shrink:0;">삭제</button></div>
+                <div class="ch-slot-group-label">기본 채널 (KBS 운영)</div>
+                <div class="channel-row-new kbs-row"><span class="ch-mode-tag kbs">KBS</span><span class="ch-mode-channel">LINE</span><span class="ch-mode-link">@kbs_official_tw</span><button class="ch-mode-remove" title="제거">×</button></div>
+                <div class="ch-slot-group-label" style="margin-top:14px;">자체 채널</div>
+                <div class="ch-slot-empty">자체 채널이 없습니다.</div>
                 <button class="btn btn-secondary btn-sm" style="margin-bottom:12px;" onclick="addChannelRow(this)">+ 채널 추가</button>
                 <div class="card-inner-divider"></div>
-                <div style="display:flex;align-items:center;gap:8px;margin-top:10px;"><span style="font-size:12px;font-weight:600;color:var(--text2);white-space:nowrap;">플로팅 CTA</span><select class="select" style="flex:1;"><option selected>LINE · @hanmiyeok_tw</option><option value="">설정 안함</option></select></div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:10px;"><span style="font-size:12px;font-weight:600;color:var(--text2);white-space:nowrap;">플로팅 CTA</span><select class="select" style="flex:1;"><option selected>KBS · LINE · @kbs_official_tw</option><option value="">설정 안함</option></select></div>
               </div>
+
+              <!-- JP -->
               <div id="ch-jp-v2" class="channel-lang-panel">
-                <div style="padding:20px 0;text-align:center;color:var(--text3);font-size:12px;">등록된 채널이 없습니다</div>
-                <button class="btn btn-secondary btn-sm" style="margin-bottom:12px;width:100%;" onclick="addChannelRow(this)">+ 채널 추가</button>
-                <div class="card-inner-divider"></div>
-                <div style="display:flex;align-items:center;gap:8px;margin-top:10px;"><span style="font-size:12px;font-weight:600;color:var(--text2);white-space:nowrap;">플로팅 CTA</span><select class="select" style="flex:1;"><option selected value="">설정 안함</option></select></div>
-              </div>
-              <div id="ch-id-v2" class="channel-lang-panel">
-                <div class="channel-row-new"><select class="select" style="width:120px;"><option>WhatsApp</option><option>LINE</option><option>WeChat</option><option>KakaoTalk</option><option>Telegram</option></select><input class="input" style="flex:1;" value="+62-812-3456-7890" /><button class="btn btn-secondary btn-sm" style="color:#EF4444;flex-shrink:0;">삭제</button></div>
+                <div class="ch-slot-group-label">기본 채널 (KBS 운영)</div>
+                <div class="channel-row-new kbs-row"><span class="ch-mode-tag kbs">KBS</span><span class="ch-mode-channel">LINE</span><span class="ch-mode-link">@kbs_official_jp</span><button class="ch-mode-remove" title="제거">×</button></div>
+                <div class="ch-slot-group-label" style="margin-top:14px;">자체 채널</div>
+                <div class="ch-slot-empty">자체 채널이 없습니다.</div>
                 <button class="btn btn-secondary btn-sm" style="margin-bottom:12px;" onclick="addChannelRow(this)">+ 채널 추가</button>
                 <div class="card-inner-divider"></div>
-                <div style="display:flex;align-items:center;gap:8px;margin-top:10px;"><span style="font-size:12px;font-weight:600;color:var(--text2);white-space:nowrap;">플로팅 CTA</span><select class="select" style="flex:1;"><option selected>WhatsApp · +62-812-3456-7890</option><option value="">설정 안함</option></select></div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:10px;"><span style="font-size:12px;font-weight:600;color:var(--text2);white-space:nowrap;">플로팅 CTA</span><select class="select" style="flex:1;"><option selected>KBS · LINE · @kbs_official_jp</option><option value="">설정 안함</option></select></div>
+              </div>
+
+              <!-- ID -->
+              <div id="ch-id-v2" class="channel-lang-panel">
+                <div class="ch-slot-group-label">기본 채널 (KBS 운영)</div>
+                <div class="channel-row-new kbs-row"><span class="ch-mode-tag kbs">KBS</span><span class="ch-mode-channel">WhatsApp</span><span class="ch-mode-link">+62-21-0000-0000</span><button class="ch-mode-remove" title="제거">×</button></div>
+                <div class="ch-slot-group-label" style="margin-top:14px;">자체 채널</div>
+                <div class="ch-slot-empty">자체 채널이 없습니다.</div>
+                <button class="btn btn-secondary btn-sm" style="margin-bottom:12px;" onclick="addChannelRow(this)">+ 채널 추가</button>
+                <div class="card-inner-divider"></div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:10px;"><span style="font-size:12px;font-weight:600;color:var(--text2);white-space:nowrap;">플로팅 CTA</span><select class="select" style="flex:1;"><option selected>KBS · WhatsApp · +62-21-0000-0000</option><option value="">설정 안함</option></select></div>
               </div>
             </div>
           </div>
@@ -1755,8 +1800,14 @@ input[type="radio"] { accent-color: var(--text1); cursor: pointer; }
             </div>
             <div class="card-body">
               <div id="faq2-ko" class="card-lang-panel active">
-                <div class="faq-item" style="margin-bottom:8px;"><div class="faq-q" style="font-weight:600;font-size:12px;">Q. 외국인도 예약하고 시술받을 수 있나요?</div><div class="faq-a"><textarea class="textarea" style="min-height:48px;">네, 외국인 고객도 동일하게 예약 및 시술 가능합니다. KBS 앱을 통해 예약하거나 채팅으로 문의해 주세요.</textarea></div></div>
-                <div class="faq-item" style="margin-bottom:8px;"><div class="faq-q" style="font-weight:600;font-size:12px;">Q. 시술 당일 방문 시 준비물이 있나요?</div><div class="faq-a"><textarea class="textarea" style="min-height:48px;">메이크업을 지우고 방문해 주세요. 예약 확인서를 지참하시면 됩니다.</textarea></div></div>
+                <div class="faq-item faq-item-ctl" style="margin-bottom:8px;">
+                  <div class="faq-item-head"><div class="faq-q" style="font-weight:600;font-size:12px;">Q. 외국인도 예약하고 시술받을 수 있나요?</div><div class="faq-item-actions"><label class="faq-use-toggle"><input type="checkbox" checked> 사용</label><button class="btn btn-secondary btn-sm">수정</button><button class="btn btn-secondary btn-sm" style="color:#EF4444;">삭제</button></div></div>
+                  <div class="faq-a"><textarea class="textarea" style="min-height:48px;">네, 외국인 고객도 동일하게 예약 및 시술 가능합니다. KBS 앱을 통해 예약하거나 채팅으로 문의해 주세요.</textarea></div>
+                </div>
+                <div class="faq-item faq-item-ctl" style="margin-bottom:8px;">
+                  <div class="faq-item-head"><div class="faq-q" style="font-weight:600;font-size:12px;">Q. 시술 당일 방문 시 준비물이 있나요?</div><div class="faq-item-actions"><label class="faq-use-toggle"><input type="checkbox" checked> 사용</label><button class="btn btn-secondary btn-sm">수정</button><button class="btn btn-secondary btn-sm" style="color:#EF4444;">삭제</button></div></div>
+                  <div class="faq-a"><textarea class="textarea" style="min-height:48px;">메이크업을 지우고 방문해 주세요. 예약 확인서를 지참하시면 됩니다.</textarea></div>
+                </div>
                 <div class="trans-save-bar">
                   <button class="trans-save-btn" onclick="runSectionTranslation(this,'faq2')">저장 및 번역 실행</button>
                   <div class="trans-prog-row">
