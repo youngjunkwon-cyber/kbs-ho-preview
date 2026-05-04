@@ -244,6 +244,46 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 .lang-tab-panel.active { display:block; }
 .basic-tab-panel { display:none; }
 .basic-tab-panel.active { display:block; }
+
+/* ── Memo popover (셀 클릭 시 인라인 편집) ── */
+.memo-cell-wrap { position:relative; cursor:pointer; }
+.memo-cell-wrap:hover .memo-tag { border-color:#1890ff; color:#262626; }
+.memo-popover { display:none; position:absolute; top:calc(100% + 4px); left:0; z-index:100; background:#fff; border:1px solid #d9d9d9; border-radius:2px; box-shadow:0 4px 12px rgba(0,0,0,0.08); width:280px; padding:10px; }
+.memo-popover.open { display:block; }
+.memo-popover textarea { width:100%; min-height:80px; padding:6px 8px; font-size:12px; border:1px solid #d9d9d9; border-radius:2px; font-family:inherit; resize:vertical; }
+.memo-popover-meta { font-size:10px; color:#8c8c8c; margin-top:6px; }
+.memo-popover-actions { display:flex; justify-content:flex-end; gap:6px; margin-top:8px; }
+
+/* ── Page size selector ── */
+.page-size-bar { padding:14px 0; display:flex; justify-content:space-between; align-items:center; }
+.page-size-left { display:flex; align-items:center; gap:8px; font-size:12px; color:rgba(0,0,0,0.65); }
+.page-size-toggle { display:inline-flex; border:1px solid #d9d9d9; border-radius:2px; overflow:hidden; }
+.page-size-toggle button { background:transparent; border:none; padding:4px 12px; font-size:12px; color:rgba(0,0,0,0.65); cursor:pointer; border-right:1px solid #d9d9d9; }
+.page-size-toggle button:last-child { border-right:none; }
+.page-size-toggle button.active { background:#262626; color:#fff; }
+.page-size-toggle button:hover:not(.active) { color:#1890ff; }
+
+/* ── Sortable column headers ── */
+.tbl-rich th.sortable { cursor:pointer; user-select:none; }
+.tbl-rich th.sortable::after { content:"⇅"; margin-left:4px; color:#bfbfbf; font-size:10px; }
+.tbl-rich th.sortable.asc::after { content:"▲"; color:#1890ff; }
+.tbl-rich th.sortable.desc::after { content:"▼"; color:#1890ff; }
+.tbl-rich th.sortable:hover { background:#f0f0f0; }
+
+/* ── 통계 리포트 ── */
+.report-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.report-card { background:#fff; border:1px solid #f0f0f0; border-radius:2px; padding:18px 20px; }
+.report-card-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid #f0f0f0; }
+.report-card-title { font-size:14px; font-weight:600; color:rgba(0,0,0,0.85); }
+.report-card-period { font-size:11px; color:rgba(0,0,0,0.45); }
+.report-stat-row { display:flex; justify-content:space-between; align-items:baseline; padding:8px 0; border-bottom:1px dashed #f0f0f0; font-size:12px; }
+.report-stat-row:last-child { border-bottom:none; }
+.report-stat-label { color:rgba(0,0,0,0.65); }
+.report-stat-num { font-weight:600; color:rgba(0,0,0,0.85); font-variant-numeric:tabular-nums; }
+.report-stat-num.warn { color:#fa8c16; }
+.report-stat-num.alert { color:#ff4d4f; }
+.report-bar { height:8px; background:#f5f5f5; border-radius:4px; overflow:hidden; margin-top:4px; }
+.report-bar-fill { height:100%; background:#262626; }
 .lang-edit-note { font-size:11px; color:#8c8c8c; padding:6px 10px; background:#fafafa; border-radius:3px; margin-bottom:8px; border:1px dashed #d9d9d9; }
 
 /* ── Result table action bar ── */
@@ -399,9 +439,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
       <div class="menu-sub">지하철 관리</div>
       <div class="menu-sub">특징 관리</div>
       <div class="menu-sub">지역 관리</div>
-      <div class="menu-sub" id="nav-faq" onclick="showView('faq')">기본 FAQ 관리 <span style="font-size:9px;color:#8c8c8c;border:1px solid #d9d9d9;padding:0 4px;border-radius:3px;margin-left:4px;font-weight:500;">NEW</span></div>
-      <div class="menu-sub" id="nav-channels" onclick="showView('channels')">KBS 공식 채널 <span style="font-size:9px;color:#8c8c8c;border:1px solid #d9d9d9;padding:0 4px;border-radius:3px;margin-left:4px;font-weight:500;">NEW</span></div>
-      <div class="menu-sub" id="nav-guide" onclick="showView('guide')">예약 가이드 <span style="font-size:9px;color:#8c8c8c;border:1px solid #d9d9d9;padding:0 4px;border-radius:3px;margin-left:4px;font-weight:500;">NEW</span></div>
+      <div class="menu-sub" id="nav-faq" onclick="showView('faq')">기본 FAQ 관리</div>
+      <div class="menu-sub" id="nav-channels" onclick="showView('channels')">KBS 공식 채널</div>
+      <div class="menu-sub" id="nav-guide" onclick="showView('guide')">예약 가이드</div>
     </div>
     <div class="menu-item has-sub">상품</div>
     <div class="menu-item has-sub">매거진</div>
@@ -413,7 +453,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
     <div class="menu-item has-sub">쿠폰</div>
     <div class="menu-item has-sub">기획전</div>
     <div class="menu-item has-sub">인플루언서</div>
-    <div class="menu-item has-sub">통계</div>
+    <div class="menu-item has-sub open" onclick="toggleSub('stats-sub')">통계</div>
+    <div id="stats-sub" class="sub-group open">
+      <div class="menu-sub" id="nav-stats" onclick="showView('stats')">스토어 운영 리포트</div>
+    </div>
   </aside>
 
   <!-- ═══════════ Main ═══════════ -->
@@ -456,14 +499,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
         <!-- 신규 추가: 계정 상태 + 계약 정보 + 검증 케이스 -->
         <div style="background:#fff;border:1px solid #f0f0f0;border-radius:2px;padding:10px 16px;margin-bottom:14px;display:flex;flex-direction:column;gap:8px;">
           <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;">
-            <span style="font-size:12px;color:#595959;font-weight:600;min-width:60px;">계정 상태 <span style="font-size:10px;color:#bfbfbf;">NEW</span></span>
+            <span style="font-size:12px;color:#595959;font-weight:600;min-width:60px;">계정 상태</span>
             <div class="chip-row">
               <span class="filter-chip on">활성</span>
               <span class="filter-chip on">비활성</span>
               <span class="filter-chip">탈퇴</span>
             </div>
             <span style="border-left:1px solid #f0f0f0;height:18px;"></span>
-            <span style="font-size:12px;color:#595959;font-weight:600;">계약 형태 <span style="font-size:10px;color:#bfbfbf;">NEW</span></span>
+            <span style="font-size:12px;color:#595959;font-weight:600;">계약 형태</span>
             <div class="chip-row">
               <span class="filter-chip">월 고정비</span>
               <span class="filter-chip">수수료</span>
@@ -543,13 +586,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
                 <th rowspan="2">스토어명</th>
                 <th rowspan="2">카테고리</th>
                 <th rowspan="2">지원 언어</th>
-                <th rowspan="2" class="grp-new">계정 상태 <span class="grp-new-tag">NEW</span></th>
-                <th colspan="9" class="grp-head">계약 정보 <span class="grp-new-tag">NEW 확장</span></th>
+                <th rowspan="2">계정 상태</th>
+                <th colspan="9" class="grp-head">계약 정보</th>
                 <th colspan="6" class="grp-head">위치정보</th>
                 <th colspan="8" class="grp-head">운영시간</th>
                 <th colspan="2" class="grp-head">특징</th>
                 <th colspan="15" class="grp-head">통계 (조회 기간 합산)</th>
-                <th rowspan="2" class="grp-new">메모 <span class="grp-new-tag">NEW</span></th>
+                <th rowspan="2">메모</th>
               </tr>
               <tr>
                 <th>대표번호</th><th>사업자등록번호</th><th>이메일</th>
@@ -660,8 +703,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
           </table>
         </div>
 
-        <!-- 페이지네이션 (라이브 매칭) -->
-        <div style="display:flex;justify-content:flex-end;padding:14px 0;">
+        <!-- 페이지네이션 + 페이지 사이즈 토글 -->
+        <div class="page-size-bar">
+          <div class="page-size-left">
+            <span>페이지당</span>
+            <div class="page-size-toggle">
+              <button>10</button>
+              <button class="active">20</button>
+              <button>50</button>
+              <button>100</button>
+            </div>
+            <span>건 표시 (전체 28건)</span>
+          </div>
           <ul class="ant-pagination" style="display:flex;gap:6px;list-style:none;">
             <li class="ant-pagination-prev"><button class="ant-pagination-item-link">‹</button></li>
             <li class="ant-pagination-item ant-pagination-item-active"><a>1</a></li>
@@ -722,8 +775,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
               <div class="f2-cell"><div class="f2-label">상점 검색</div><input class="ant-input" placeholder="상점명 또는 코드"></div>
               <div class="f2-cell"><div class="f2-label">활성</div><select class="ant-input"><option>전체</option><option>활성만</option><option>비활성만</option></select></div>
               <div class="f2-cell"><div class="f2-label">번역 상태</div><select class="ant-input"><option>전체</option><option>번역 완료</option><option>일부 미번역</option><option>전체 미번역</option></select></div>
-              <div class="f2-cell"><div class="f2-label">운영 형태 <span class="f2-new">NEW</span></div><select class="ant-input"><option>전체</option><option>퍼블릭</option><option>프라이빗</option><option>미선택</option></select></div>
-              <div class="f2-cell"><div class="f2-label">정렬</div><select class="ant-input"><option>최근 수정 순</option><option>등록일 순</option><option>상점명 가나다 순</option><option>번역 미완료 우선</option></select></div>
+              <div class="f2-cell"><div class="f2-label">운영 형태 </div><select class="ant-input"><option>전체</option><option>퍼블릭</option><option>프라이빗</option><option>미선택</option></select></div>
+              <div class="f2-cell"><div class="f2-label">정렬</div><select class="ant-input"><option>등록일 내림차순</option><option>등록일 오름차순</option><option>최근 수정 순</option><option>상점명 가나다 순</option><option>번역 미완료 우선</option></select></div>
             </div>
           </div>
 
@@ -756,7 +809,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
                       </div>
                     </div>
                     <div class="f2-row f2-channel">
-                      <div class="f2-label">채널 소유자 <span class="f2-new">NEW</span></div>
+                      <div class="f2-label">채널 소유자 </div>
                       <span></span>
                       <div class="chip-row" style="align-items:center;gap:10px;">
                         <span class="owner-chip on">KBS 공식</span>
@@ -792,8 +845,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
                     <div style="border-top:1px dashed #f0f0f0;padding-top:8px;margin-top:4px;">
                       <label class="ch-tgl" style="font-size:12px;color:rgba(0,0,0,0.85);font-weight:500;">
                         <input type="checkbox"> 선택 언어 chip의 슬롯에 한해 매칭
-                        <span class="f2-new">NEW</span>
-                      </label>
+                                             </label>
                       <div style="font-size:11px;color:#8c8c8c;margin-left:22px;margin-top:2px;">ON: 위 언어 chip이 활성화된 (언어 × SNS) 슬롯에만 채널 소유자·SNS 매칭 적용</div>
                     </div>
                   </div>
@@ -814,7 +866,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 
               <!-- 🏷 스토어 특징 (NEW — BO 마스터 다중 선택) -->
               <div class="f2-section">
-                <div class="f2-section-title">🏷 스토어 특징 <span class="f2-new">NEW</span> <span class="f2-section-help">— 옵션관리 &gt; 특징 관리 마스터 기준</span></div>
+                <div class="f2-section-title">🏷 스토어 특징  <span class="f2-section-help">— 옵션관리 &gt; 특징 관리 마스터 기준</span></div>
                 <div class="f2-row f2-channel">
                   <div class="f2-label">매칭</div>
                   <select class="ant-input f2-mode"><option>AND</option><option selected>OR</option><option>제외</option></select>
@@ -839,7 +891,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 
               <!-- 📊 통계 조건 (NEW — 다중 조건 + 연산자) -->
               <div class="f2-section">
-                <div class="f2-section-title">📊 통계 조건 <span class="f2-new">NEW</span> <span class="f2-section-help">— 조회 기간 합산 기준 · AND 결합</span></div>
+                <div class="f2-section-title">📊 통계 조건  <span class="f2-section-help">— 조회 기간 합산 기준 · AND 결합</span></div>
                 <div class="stat-cond">
                   <select class="ant-input">
                     <optgroup label="유입 funnel">
@@ -887,14 +939,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
               <div class="f2-row f2-row-inputs">
                 <div class="f2-cell"><div class="f2-label">FAQ 개수</div><select class="ant-input"><option>전체</option><option>0개</option><option>1~4개</option><option>5개</option><option>5개 초과</option></select></div>
                 <div class="f2-cell"><div class="f2-label">관리자 설정</div><select class="ant-input"><option>전체</option><option>관리자 일괄적용 ON</option><option>상품에 일괄적용 ON</option><option>외부링크 ON</option></select></div>
-                <div class="f2-cell"><div class="f2-label">어드민 활동 <span class="f2-new">NEW</span></div><select class="ant-input"><option>전체</option><option>최근 7일 내 어드민 수정</option><option>최근 30일 내 어드민 수정</option><option>어드민 미수정 (호스트 입력만)</option></select></div>
+                <div class="f2-cell"><div class="f2-label">어드민 활동 </div><select class="ant-input"><option>전체</option><option>최근 7일 내 어드민 수정</option><option>최근 30일 내 어드민 수정</option><option>어드민 미수정 (호스트 입력만)</option></select></div>
                 <div class="f2-cell"><div class="f2-label">담당 어드민</div><select class="ant-input"><option>전체</option><option>운영팀 김</option><option>운영팀 이</option><option>운영팀 박</option></select></div>
               </div>
 
               <!-- ⚠ 콘텐츠·번역 검증 (매칭 모드 + cross-condition chips 확장) -->
               <div class="f2-section">
                 <div class="f2-section-title" style="display:flex;align-items:center;justify-content:space-between;">
-                  <span>⚠ 콘텐츠·번역 검증 <span class="f2-new">NEW</span> <span class="f2-section-help">— 의심·점검 필요한 상태</span></span>
+                  <span>⚠ 콘텐츠·번역 검증  <span class="f2-section-help">— 의심·점검 필요한 상태</span></span>
                   <select class="ant-input f2-mode" style="width:80px;"><option>OR</option><option>AND</option></select>
                 </div>
                 <div class="chip-row">
@@ -921,7 +973,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
               <span class="active-tag">카테고리: 피부과/성형외과 <button>×</button></span>
               <span class="active-tag">번역상태: 일부 미번역 <button>×</button></span>
             </div>
-            <label class="ch-tgl" style="margin-right:auto;margin-left:12px;font-size:12px;"><input type="checkbox"> 집계 행 표시 <span class="f2-new">NEW</span></label>
+            <label class="ch-tgl" style="margin-right:auto;margin-left:12px;font-size:12px;"><input type="checkbox"> 집계 행 표시 </label>
             <button class="ant-btn ant-btn-primary">검색 (예상 23건)</button>
           </div>
         </div>
@@ -985,7 +1037,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
                 <label class="tbl-col-item"><input type="checkbox"> 라인</label>
                 <label class="tbl-col-item"><input type="checkbox"> 카카오톡</label>
                 <label class="tbl-col-item"><input type="checkbox"> 페이스북</label>
-                <div class="tbl-col-group-title">어드민 활동 <span style="color:rgba(0,0,0,0.45);font-size:9px;border:1px solid #d9d9d9;padding:0 4px;border-radius:2px;margin-left:3px;">NEW</span></div>
+                <div class="tbl-col-group-title">어드민 활동</div>
                 <label class="tbl-col-item"><input type="checkbox"> 마지막 어드민 수정일</label>
                 <label class="tbl-col-item"><input type="checkbox"> 마지막 어드민 ID</label>
                 <div class="tbl-col-group-title">기타</div>
@@ -1255,12 +1307,24 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
           </table>
         </div>
 
-        <div style="margin-top:20px;padding:14px 18px;background:#fafafa;border:1px solid #f0f0f0;border-radius:4px;font-size:12px;color:#595959;line-height:1.7;">
-          <strong>📌 시안 안내 (중간점검 v2)</strong><br>
-          • 행 클릭 시 우측 사이드 드로어로 9개 섹션 편집 진입 (모달 → 드로어 변경)<br>
-          • 결과 테이블: 디폴트 12개 컬럼, 우측 <strong>컬럼 ▼</strong>로 토글 풀에서 +/-<br>
-          • 일괄 작업: 행 체크 시 활성화 (자동 번역 / 채널 슬롯 KBS 디폴트)<br>
-          • 신규 메뉴: <strong style="color:#fa8c16;">기본 FAQ 관리 / KBS 공식 채널 / 예약 가이드</strong>
+        <!-- 페이지네이션 + 페이지 사이즈 토글 -->
+        <div class="page-size-bar">
+          <div class="page-size-left">
+            <span>페이지당</span>
+            <div class="page-size-toggle">
+              <button>10</button>
+              <button class="active">20</button>
+              <button>50</button>
+              <button>100</button>
+            </div>
+            <span>건 표시 (전체 23건)</span>
+          </div>
+          <ul class="ant-pagination" style="display:flex;gap:6px;list-style:none;">
+            <li class="ant-pagination-prev"><button class="ant-pagination-item-link">‹</button></li>
+            <li class="ant-pagination-item ant-pagination-item-active"><a>1</a></li>
+            <li class="ant-pagination-item"><a>2</a></li>
+            <li class="ant-pagination-next"><button class="ant-pagination-item-link">›</button></li>
+          </ul>
         </div>
 
       </div>
@@ -1269,16 +1333,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
            VIEW 2 — 기본 FAQ 관리 (신규 메뉴)
       ════════════════════════════════ -->
       <div id="view-faq" class="view">
-        <div class="page-title">옵션 관리 &gt; 기본 FAQ 관리 <span style="font-size:11px;background:#fa8c16;color:#fff;padding:2px 8px;border-radius:8px;margin-left:8px;font-weight:500;">NEW</span></div>
-
-        <div style="margin-bottom:16px;padding:12px 16px;background:#fafafa;border:1px solid #f0f0f0;border-radius:4px;font-size:12px;color:#595959;line-height:1.7;">
-          호스트가 스토어 설정에서 FAQ 작성 시, 매칭되는 카테고리의 기본 FAQ 5개가 자동 채워집니다. 호스트는 이를 그대로 사용하거나 수정·삭제·추가할 수 있습니다.
-        </div>
+        <div class="page-title">옵션 관리 &gt; 기본 FAQ 관리</div>
 
         <div class="card">
           <div class="card-header">
             <span>카테고리 선택</span>
-            <span style="font-size:11px;color:#8c8c8c;">카테고리는 별도 메뉴에서 관리 · 자동 동기화</span>
           </div>
           <div class="card-body">
             <div class="cat-tabs">
@@ -1432,19 +1491,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
            VIEW 3 — KBS 공식 채널 (신규)
       ════════════════════════════════ -->
       <div id="view-channels" class="view">
-        <div class="page-title">옵션 관리 &gt; KBS 공식 채널 <span style="font-size:11px;background:#fa8c16;color:#fff;padding:2px 8px;border-radius:8px;margin-left:8px;font-weight:500;">NEW</span></div>
-
-        <div style="margin-bottom:16px;padding:12px 16px;background:#fafafa;border:1px solid #f0f0f0;border-radius:4px;font-size:12px;color:#595959;line-height:1.7;">
-          <strong>KBS가 운영하는 공식 채팅·콘텐츠 채널 마스터.</strong><br>
-          • 신규 스토어 등록 시 모든 슬롯이 자동으로 ⓐ KBS 공식으로 채워짐<br>
-          • 어드민이 마스터 링크 변경 시 ⓐ 모드 사용 중인 모든 스토어에 즉시 반영<br>
-          • 호스트가 자체 채널 운영 중이면 ⓑ 자체로 변경 후 직접 입력<br>
-          • (채널 × 언어) 조합당 1개 link · 채널 종류는 BO에서 추가/제거 가능
-        </div>
+        <div class="page-title">옵션 관리 &gt; KBS 공식 채널</div>
 
         <div class="card">
           <div class="card-header">
-            <span>SNS 채팅 채널 마스터 (언어 × 채널)</span>
+            <span>SNS 채팅 채널 마스터</span>
             <button class="ant-btn ant-btn-primary ant-btn-sm">+ 채널 종류 추가</button>
           </div>
           <div class="card-body" style="padding:0;overflow-x:auto;">
@@ -1503,9 +1554,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
               </tbody>
             </table>
           </div>
-          <div style="padding:12px 16px;background:#fafafa;border-top:1px solid #f0f0f0;font-size:11px;color:#8c8c8c;">
-            ⚠ 변경 시 ⓐ KBS 공식 모드 사용 중인 스토어 전체(N개)에 즉시 반영됩니다. 신중히 수정해 주세요.
-          </div>
         </div>
 
         <div class="card" style="margin-top:14px;">
@@ -1523,14 +1571,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
            VIEW 4 — 예약 가이드 (신규)
       ════════════════════════════════ -->
       <div id="view-guide" class="view">
-        <div class="page-title">옵션 관리 &gt; 예약 가이드 <span style="font-size:11px;background:#fa8c16;color:#fff;padding:2px 8px;border-radius:8px;margin-left:8px;font-weight:500;">NEW</span></div>
-
-        <div style="margin-bottom:16px;padding:12px 16px;background:#fafafa;border:1px solid #f0f0f0;border-radius:4px;font-size:12px;color:#595959;line-height:1.7;">
-          <strong>카테고리별 예약 가이드 마스터.</strong><br>
-          • FO 스토어 상세 "예약 방법" 섹션에 자동 노출<br>
-          • 카테고리(8개) × <strong>단일 (제목 + 본문)</strong> · 단계 구분 없음, 호스트가 자유 작성<br>
-          • 저장 시 5개 언어 자동 번역 → 어드민 검수·수정 후 호스트 배포 (FAQ와 동일 정책)
-        </div>
+        <div class="page-title">옵션 관리 &gt; 예약 가이드</div>
 
         <div class="card">
           <div class="card-header">
@@ -1611,6 +1652,125 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
         </div>
       </div>
 
+      <!-- ════════════════════════════════
+           VIEW 5 — 통계 > 스토어 운영 리포트
+      ════════════════════════════════ -->
+      <div id="view-stats" class="view">
+        <div class="page-title">통계 &gt; 스토어 운영 리포트</div>
+
+        <div style="background:#fff;border:1px solid #f0f0f0;border-radius:2px;padding:14px 16px;margin-bottom:14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <span style="font-size:12px;font-weight:600;color:rgba(0,0,0,0.85);">조회 기간</span>
+          <button class="ant-btn ant-btn-sm">오늘</button>
+          <button class="ant-btn ant-btn-sm">어제</button>
+          <button class="ant-btn ant-btn-sm">이번주</button>
+          <button class="ant-btn ant-btn-sm ant-btn-primary">이번달</button>
+          <input class="ant-input" type="date" value="2026-04-01" style="width:140px;height:32px;">
+          <span style="color:#bfbfbf;">~</span>
+          <input class="ant-input" type="date" value="2026-04-29" style="width:140px;height:32px;">
+          <button class="ant-btn ant-btn-primary">조회</button>
+          <button class="ant-btn" style="margin-left:auto;background:#262626;color:#fff;border-color:#262626;">⬇ Excel 다운로드</button>
+        </div>
+
+        <div class="report-grid">
+          <!-- 1. 채널 설정 현황 -->
+          <div class="report-card">
+            <div class="report-card-head">
+              <span class="report-card-title">스토어별 채널 설정 현황</span>
+              <span class="report-card-period">전체 28건 기준</span>
+            </div>
+            <div class="report-stat-row"><span class="report-stat-label">KBS 공식 모드 사용 슬롯</span><span class="report-stat-num">186 / 240 (77.5%)</span></div>
+            <div class="report-bar"><div class="report-bar-fill" style="width:77.5%;"></div></div>
+            <div class="report-stat-row"><span class="report-stat-label">입점사 자체 모드 슬롯</span><span class="report-stat-num">38 / 240 (15.8%)</span></div>
+            <div class="report-bar"><div class="report-bar-fill" style="width:15.8%;background:#fa8c16;"></div></div>
+            <div class="report-stat-row"><span class="report-stat-label">미설정 슬롯</span><span class="report-stat-num">16 / 240 (6.7%)</span></div>
+            <div class="report-bar"><div class="report-bar-fill" style="width:6.7%;background:#bfbfbf;"></div></div>
+            <div class="report-stat-row" style="margin-top:8px;"><span class="report-stat-label">카테고리별 — 피부과</span><span class="report-stat-num">KBS 82% / 자체 12% / 빈 6%</span></div>
+            <div class="report-stat-row"><span class="report-stat-label">카테고리별 — 성형외과</span><span class="report-stat-num">KBS 68% / 자체 24% / 빈 8%</span></div>
+            <div class="report-stat-row"><span class="report-stat-label">카테고리별 — 치과</span><span class="report-stat-num">KBS 75% / 자체 19% / 빈 6%</span></div>
+          </div>
+
+          <!-- 2. FAQ 활용도 -->
+          <div class="report-card">
+            <div class="report-card-head">
+              <span class="report-card-title">FAQ 활용도</span>
+              <span class="report-card-period">기본 FAQ 마스터 기준</span>
+            </div>
+            <div class="report-stat-row"><span class="report-stat-label">기본 FAQ 채택률 (피부과)</span><span class="report-stat-num">68%</span></div>
+            <div class="report-bar"><div class="report-bar-fill" style="width:68%;"></div></div>
+            <div class="report-stat-row"><span class="report-stat-label">기본 FAQ 채택률 (성형외과)</span><span class="report-stat-num">52%</span></div>
+            <div class="report-bar"><div class="report-bar-fill" style="width:52%;"></div></div>
+            <div class="report-stat-row"><span class="report-stat-label">호스트 수정 빈도 (이번달)</span><span class="report-stat-num">42회</span></div>
+            <div class="report-stat-row"><span class="report-stat-label">호스트 삭제 빈도 (이번달)</span><span class="report-stat-num">8회</span></div>
+            <div class="report-stat-row"><span class="report-stat-label">미사용 토글 OFF 비율</span><span class="report-stat-num">18%</span></div>
+            <div class="report-stat-row"><span class="report-stat-label">FAQ 0개 스토어</span><span class="report-stat-num warn">3건</span></div>
+          </div>
+
+          <!-- 3. AI 사용량 -->
+          <div class="report-card">
+            <div class="report-card-head">
+              <span class="report-card-title">AI 사용량</span>
+              <span class="report-card-period">2026-04 기준</span>
+            </div>
+            <div class="report-stat-row"><span class="report-stat-label">AI 소개 카드 일평균 생성</span><span class="report-stat-num">14회</span></div>
+            <div class="report-stat-row"><span class="report-stat-label">한도 도달 (1일 3회) 빈도</span><span class="report-stat-num">2회</span></div>
+            <div class="report-stat-row"><span class="report-stat-label">자동 번역 실행 (이번달)</span><span class="report-stat-num">521회</span></div>
+            <div class="report-stat-row"><span class="report-stat-label">자동 번역 — EN</span><span class="report-stat-num">142회</span></div>
+            <div class="report-stat-row"><span class="report-stat-label">자동 번역 — 简体</span><span class="report-stat-num">118회</span></div>
+            <div class="report-stat-row"><span class="report-stat-label">자동 번역 — 繁體</span><span class="report-stat-num">94회</span></div>
+            <div class="report-stat-row"><span class="report-stat-label">자동 번역 — 日本語</span><span class="report-stat-num">132회</span></div>
+            <div class="report-stat-row"><span class="report-stat-label">자동 번역 — Indonesia</span><span class="report-stat-num">35회</span></div>
+          </div>
+
+          <!-- 4. 계약 관리 -->
+          <div class="report-card">
+            <div class="report-card-head">
+              <span class="report-card-title">계약 관리</span>
+              <span class="report-card-period">전체 28건 기준</span>
+            </div>
+            <div class="report-stat-row"><span class="report-stat-label">계약 형태 — 월 고정비</span><span class="report-stat-num">12건 (43%)</span></div>
+            <div class="report-stat-row"><span class="report-stat-label">계약 형태 — 수수료</span><span class="report-stat-num">8건 (29%)</span></div>
+            <div class="report-stat-row"><span class="report-stat-label">계약 형태 — 혼합</span><span class="report-stat-num">5건 (18%)</span></div>
+            <div class="report-stat-row"><span class="report-stat-label">계약 형태 — 무료</span><span class="report-stat-num">3건 (10%)</span></div>
+            <div class="report-stat-row" style="margin-top:8px;"><span class="report-stat-label">자동 갱신 OFF 비율</span><span class="report-stat-num warn">10건 (36%)</span></div>
+            <div class="report-stat-row"><span class="report-stat-label">계약 만료 30일 이내</span><span class="report-stat-num alert">4건</span></div>
+            <div class="report-stat-row"><span class="report-stat-label">자동 갱신 OFF + 만료 임박</span><span class="report-stat-num alert">2건</span></div>
+            <div class="report-stat-row"><span class="report-stat-label">계약서 미첨부</span><span class="report-stat-num warn">5건</span></div>
+          </div>
+
+          <!-- 5. 번역 검수 현황 -->
+          <div class="report-card">
+            <div class="report-card-head">
+              <span class="report-card-title">번역 검수 현황</span>
+              <span class="report-card-period">이번달 기준</span>
+            </div>
+            <div class="report-stat-row"><span class="report-stat-label">어드민 수정 건수</span><span class="report-stat-num">87회</span></div>
+            <div class="report-stat-row"><span class="report-stat-label">어드민 검수 완료 비율</span><span class="report-stat-num">62%</span></div>
+            <div class="report-bar"><div class="report-bar-fill" style="width:62%;"></div></div>
+            <div class="report-stat-row"><span class="report-stat-label">미검수 (자동 번역만) 건수</span><span class="report-stat-num warn">38건</span></div>
+            <div class="report-stat-row"><span class="report-stat-label">덮어쓰기 컨펌 발생</span><span class="report-stat-num">14회</span></div>
+            <div class="report-stat-row"><span class="report-stat-label">언어 1개 이상 미번역 스토어</span><span class="report-stat-num warn">7건</span></div>
+            <div class="report-stat-row"><span class="report-stat-label">30일 이상 미수정 스토어</span><span class="report-stat-num">11건</span></div>
+          </div>
+
+          <!-- 6. 신규·탈퇴 호스트 추이 -->
+          <div class="report-card">
+            <div class="report-card-head">
+              <span class="report-card-title">신규·탈퇴 호스트 추이</span>
+              <span class="report-card-period">최근 6개월</span>
+            </div>
+            <div class="report-stat-row"><span class="report-stat-label">2025-11 신규</span><span class="report-stat-num">5건</span></div>
+            <div class="report-stat-row"><span class="report-stat-label">2025-12 신규</span><span class="report-stat-num">3건</span></div>
+            <div class="report-stat-row"><span class="report-stat-label">2026-01 신규</span><span class="report-stat-num">7건</span></div>
+            <div class="report-stat-row"><span class="report-stat-label">2026-02 신규</span><span class="report-stat-num">2건</span></div>
+            <div class="report-stat-row"><span class="report-stat-label">2026-03 신규</span><span class="report-stat-num">4건</span></div>
+            <div class="report-stat-row"><span class="report-stat-label">2026-04 신규</span><span class="report-stat-num">6건</span></div>
+            <div class="report-stat-row" style="margin-top:8px;"><span class="report-stat-label">최근 6개월 탈퇴 합계</span><span class="report-stat-num alert">3건</span></div>
+            <div class="report-stat-row"><span class="report-stat-label">활성 → 비활성 전환 (이번달)</span><span class="report-stat-num warn">2건</span></div>
+            <div class="report-stat-row"><span class="report-stat-label">탈퇴 90일 경과 (정리 대기)</span><span class="report-stat-num">1건</span></div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </main>
 </div>
@@ -1635,7 +1795,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
       </div>
 
       <!-- ── 1. 대표 이미지 ── -->
-      <div class="section-title">① 대표 이미지 <span class="auto-note changed">신규 — 호스트 업로드 동기화</span></div>
+      <div class="section-title">① 대표 이미지</div>
       <div class="form-row">
         <div class="form-label"><span class="req">*</span>대표 이미지</div>
         <div class="form-control">
@@ -1650,7 +1810,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
       </div>
 
       <!-- ── 2. 스토어 로고 ── -->
-      <div class="section-title">② 스토어 로고 <span class="auto-note changed">신규</span></div>
+      <div class="section-title">② 스토어 로고</div>
       <div class="form-row">
         <div class="form-label">스토어 로고</div>
         <div class="form-control">
@@ -1686,7 +1846,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
       </div>
 
       <!-- ── 4. AI 소개 카드 ── -->
-      <div class="section-title">④ AI 소개 카드 <span class="auto-note changed">신규</span></div>
+      <div class="section-title">④ AI 소개 카드</div>
       <div class="form-row">
         <div class="form-label">AI 소개</div>
         <div class="form-control">
@@ -1707,7 +1867,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
       </div>
 
       <!-- ── 5. 스토어 소개글 + 인트로 이미지 ── -->
-      <div class="section-title">⑤ 스토어 소개글 <span class="auto-note changed">신규</span></div>
+      <div class="section-title">⑤ 스토어 소개글</div>
       <div class="form-row">
         <div class="form-label">인트로 이미지</div>
         <div class="form-control">
@@ -1733,7 +1893,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
       </div>
 
       <!-- ── 6. 채팅 채널 ── -->
-      <div class="section-title">⑥ 채팅 채널 <span class="auto-note changed">구조 확장</span></div>
+      <div class="section-title">⑥ 채팅 채널</div>
 
       <div class="form-row">
         <div class="form-label">인앱 채팅</div>
@@ -1850,7 +2010,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
       </div>
 
       <!-- ── 7. FAQ ── -->
-      <div class="section-title">⑦ FAQ <span class="auto-note changed">신규</span></div>
+      <div class="section-title">⑦ FAQ</div>
 
       <div class="faq-item">
         <div class="faq-item-head"><span class="faq-item-num">FAQ 01</span><button class="ant-btn ant-btn-link ant-btn-dangerous ant-btn-sm">삭제</button></div>
@@ -1876,7 +2036,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
       </div>
 
       <!-- ── 8. 운영 상태 ── -->
-      <div class="section-title">⑧ 운영 상태 <span class="auto-note changed">담당자는 기본정보관리로 이동</span></div>
+      <div class="section-title">⑧ 운영 상태</div>
 
       <div class="form-row">
         <div class="form-label"><span class="req">*</span>활성/비활성화</div>
@@ -1923,14 +2083,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 
       <div class="tabs">
         <div class="tab active" onclick="switchBasicTab(this,'tab-store')">스토어정보</div>
-        <div class="tab" onclick="switchBasicTab(this,'tab-contract')">계약 정보 <span class="f2-new">NEW</span></div>
+        <div class="tab" onclick="switchBasicTab(this,'tab-contract')">계약 정보 </div>
         <div class="tab" onclick="switchBasicTab(this,'tab-admin')">관리자설정</div>
       </div>
 
       <div id="tab-store" class="basic-tab-panel active">
 
       <!-- 식별/메타 -->
-      <div class="section-title">식별 정보 <span class="auto-note">변경 없음</span></div>
+      <div class="section-title">식별 정보</div>
       <div class="form-row">
         <div class="form-label"><span class="req">*</span>상점코드</div>
         <input class="ant-input" value="wonjin">
@@ -1957,7 +2117,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
       </div>
 
       <!-- 계정 상태 (신규) -->
-      <div class="section-title">계정 상태 <span class="auto-note changed">신규 — 활성·비활성·탈퇴 3-state</span></div>
+      <div class="section-title">계정 상태</div>
       <div class="form-row">
         <div class="form-label"><span class="req">*</span>상태</div>
         <div class="radio-group">
@@ -1968,7 +2128,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
       </div>
 
       <!-- 주소/좌표 -->
-      <div class="section-title">주소 / 좌표 <span class="auto-note">변경 없음</span></div>
+      <div class="section-title">주소 / 좌표</div>
       <div class="form-row">
         <div class="form-label"><span class="req">*</span>우편번호</div>
         <input class="ant-input" value="06158">
@@ -1991,7 +2151,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
       </div>
 
       <!-- 담당자 -->
-      <div class="section-title">담당자 <span class="auto-note changed">번역정보관리 → 기본정보관리로 이동 · 1~3명 동적</span></div>
+      <div class="section-title">담당자</div>
       <div class="form-row" style="align-items:flex-start;">
         <div class="form-label"><span class="req">*</span>담당자<br><span style="font-weight:400;font-size:11px;color:#8c8c8c;">(최소 1명, 최대 3명)</span></div>
         <div class="form-control">
@@ -2013,7 +2173,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
       </div>
 
       <!-- 운영시간 -->
-      <div class="section-title">운영시간 <span class="auto-note">변경 없음</span></div>
+      <div class="section-title">운영시간</div>
       <div class="form-row" style="align-items:flex-start;">
         <div class="form-label">요일별 운영시간</div>
         <div class="form-control" style="display:flex;flex-direction:column;gap:6px;">
@@ -2029,7 +2189,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
       </div>
 
       <!-- 위치 정보: 지하철역 다중 -->
-      <div class="section-title">위치 정보 <span class="auto-note changed">지하철역 단일 → 다중 (최대 3개)</span></div>
+      <div class="section-title">위치 정보</div>
       <div class="form-row" style="align-items:flex-start;">
         <div class="form-label">가까운 지하철역</div>
         <div class="form-control">
@@ -2042,7 +2202,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
       </div>
 
       <!-- 운영 형태 -->
-      <div class="section-title">운영 형태 <span class="auto-note">변경 없음</span></div>
+      <div class="section-title">운영 형태</div>
       <div class="form-row">
         <div class="form-label">프라이빗/퍼블릭</div>
         <div class="radio-group">
@@ -2067,7 +2227,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
       </div>
 
       <!-- 메모 (스토어정보 탭 안 마지막 섹션) -->
-      <div class="section-title">어드민 메모 <span class="auto-note changed">신규</span></div>
+      <div class="section-title">어드민 메모</div>
       <div class="form-row">
         <div class="form-label">내부 메모</div>
         <textarea class="ant-input" rows="3" placeholder="운영팀 내부 메모 (호스트에 노출 안 됨)"></textarea>
@@ -2076,9 +2236,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
       </div><!-- /tab-store -->
 
       <div id="tab-contract" class="basic-tab-panel">
-        <div style="margin-bottom:14px;padding:10px 14px;background:#fafafa;border:1px solid #f0f0f0;border-radius:2px;font-size:12px;color:#595959;">
-          <strong>계약 정보 — 어드민 전용 (호스트 미노출)</strong> · 모든 필드 선택 입력
-        </div>
 
         <div class="section-title">계약 형태·금액</div>
         <div class="form-row two-col">
@@ -2267,6 +2424,75 @@ function switchBasicTab(tabEl, panelId) {
   const panel = document.getElementById(panelId);
   if (panel) panel.classList.add('active');
 }
+
+/* ── 페이지 사이즈 토글 ── */
+document.querySelectorAll('.page-size-toggle button').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+/* ── 메모 popover (셀 클릭 시 inline 편집) ── */
+function openMemoPopover(e, currentText) {
+  e.stopPropagation();
+  closeAllMemoPopovers();
+  const wrap = e.currentTarget;
+  let pop = wrap.querySelector('.memo-popover');
+  if (!pop) {
+    pop = document.createElement('div');
+    pop.className = 'memo-popover';
+    pop.innerHTML = `
+      <textarea>${currentText || ''}</textarea>
+      <div class="memo-popover-meta">마지막 수정: 어드민 A · 2026-04-29 14:21</div>
+      <div class="memo-popover-actions">
+        <button class="ant-btn ant-btn-sm" onclick="closeMemoPopover(event,this)">취소</button>
+        <button class="ant-btn ant-btn-primary ant-btn-sm" onclick="closeMemoPopover(event,this,true)">저장</button>
+      </div>
+    `;
+    wrap.appendChild(pop);
+  }
+  pop.classList.add('open');
+  pop.querySelector('textarea').focus();
+}
+function closeMemoPopover(e, btn, save) {
+  if (e) e.stopPropagation();
+  const pop = btn.closest('.memo-popover');
+  if (save) {
+    const text = pop.querySelector('textarea').value;
+    const wrap = pop.closest('.memo-cell-wrap');
+    const display = wrap.querySelector('.memo-tag, .memo-empty');
+    if (display) {
+      if (text.trim()) {
+        display.className = 'memo-tag';
+        display.textContent = text;
+      } else {
+        display.className = 'memo-empty';
+        display.textContent = '—';
+      }
+    }
+  }
+  pop.classList.remove('open');
+}
+function closeAllMemoPopovers() {
+  document.querySelectorAll('.memo-popover.open').forEach(p => p.classList.remove('open'));
+}
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.memo-cell-wrap')) closeAllMemoPopovers();
+});
+
+/* ── 기본정보관리 결과 테이블 메모 셀에 click handler 자동 부여 ── */
+document.querySelectorAll('#view-basic table.tbl-rich tbody tr').forEach(tr => {
+  const lastTd = tr.querySelector('td:last-child');
+  if (!lastTd) return;
+  lastTd.classList.add('memo-cell-wrap');
+  lastTd.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const cur = lastTd.querySelector('.memo-tag');
+    openMemoPopover({currentTarget: lastTd, stopPropagation: () => {}}, cur ? cur.textContent : '');
+  });
+});
 </script>
 </body>
 </html>
