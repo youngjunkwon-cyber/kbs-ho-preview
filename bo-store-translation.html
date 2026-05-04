@@ -451,25 +451,55 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
           <button class="ant-btn">신규 상점등록</button>
         </div>
 
-        <!-- 신규 추가: 계정 상태 + 검증 케이스 -->
-        <div style="background:#fff;border:1px solid #f0f0f0;border-radius:2px;padding:10px 16px;margin-bottom:14px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;">
-          <span style="font-size:12px;color:#595959;font-weight:600;">계정 상태 <span style="font-size:10px;color:#bfbfbf;">NEW</span>:</span>
-          <div class="chip-row">
-            <span class="filter-chip on">활성</span>
-            <span class="filter-chip on">비활성</span>
-            <span class="filter-chip">탈퇴</span>
+        <!-- 신규 추가: 계정 상태 + 계약 정보 + 검증 케이스 -->
+        <div style="background:#fff;border:1px solid #f0f0f0;border-radius:2px;padding:10px 16px;margin-bottom:14px;display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;">
+            <span style="font-size:12px;color:#595959;font-weight:600;min-width:60px;">계정 상태 <span style="font-size:10px;color:#bfbfbf;">NEW</span></span>
+            <div class="chip-row">
+              <span class="filter-chip on">활성</span>
+              <span class="filter-chip on">비활성</span>
+              <span class="filter-chip">탈퇴</span>
+            </div>
+            <span style="border-left:1px solid #f0f0f0;height:18px;"></span>
+            <span style="font-size:12px;color:#595959;font-weight:600;">계약 형태 <span style="font-size:10px;color:#bfbfbf;">NEW</span></span>
+            <div class="chip-row">
+              <span class="filter-chip">월 고정비</span>
+              <span class="filter-chip">수수료</span>
+              <span class="filter-chip">혼합</span>
+              <span class="filter-chip">무료</span>
+            </div>
+            <span style="border-left:1px solid #f0f0f0;height:18px;"></span>
+            <span style="font-size:12px;color:#595959;">자동 갱신</span>
+            <div class="chip-row">
+              <span class="filter-chip">ON</span>
+              <span class="filter-chip">OFF</span>
+            </div>
           </div>
-          <span style="border-left:1px solid #f0f0f0;height:18px;"></span>
-          <span style="font-size:12px;color:#595959;font-weight:600;">⚠ 검증:</span>
-          <div class="chip-row">
-            <span class="verify-chip">운영시간 미입력</span>
-            <span class="verify-chip">담당자 0명</span>
-            <span class="verify-chip">지하철 0개</span>
-            <span class="verify-chip">사업자번호 오류</span>
-            <span class="verify-chip">위경도 미설정</span>
-            <span class="verify-chip">탈퇴 90일 경과</span>
+          <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;">
+            <span style="font-size:12px;color:#595959;font-weight:600;min-width:60px;">계약 시작</span>
+            <input class="ant-input" type="date" style="width:130px;height:28px;font-size:11px;">
+            <span style="color:#bfbfbf;">~</span>
+            <input class="ant-input" type="date" style="width:130px;height:28px;font-size:11px;">
+            <span style="border-left:1px solid #f0f0f0;height:18px;"></span>
+            <span style="font-size:12px;color:#595959;font-weight:600;">정산일</span>
+            <select class="ant-input" style="width:140px;height:28px;font-size:11px;"><option>전체</option><option>이번주 정산</option><option>이번달 정산</option><option>매월 5일</option><option>매월 10일</option><option>매월 25일</option><option>매월 말일</option></select>
           </div>
-          <span style="margin-left:auto;font-size:12px;color:#8c8c8c;">예상 결과 <strong style="color:#262626;">28건</strong></span>
+          <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;">
+            <span style="font-size:12px;color:#595959;font-weight:600;min-width:60px;">⚠ 검증</span>
+            <div class="chip-row">
+              <span class="verify-chip">운영시간 미입력</span>
+              <span class="verify-chip">담당자 0명</span>
+              <span class="verify-chip">지하철 0개</span>
+              <span class="verify-chip">사업자번호 오류</span>
+              <span class="verify-chip">위경도 미설정</span>
+              <span class="verify-chip">탈퇴 90일 경과</span>
+              <span class="verify-chip">계약 만료 30일 이내</span>
+              <span class="verify-chip">자동 갱신 OFF + 만료 임박</span>
+              <span class="verify-chip">정산 계좌 미입력</span>
+              <span class="verify-chip">계약서 미첨부</span>
+            </div>
+            <span style="margin-left:auto;font-size:12px;color:#8c8c8c;">예상 결과 <strong style="color:#262626;">28건</strong></span>
+          </div>
         </div>
 
         <!-- 액션 바 -->
@@ -719,10 +749,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
                     <div class="f2-row f2-channel">
                       <div class="f2-label">채널 소유자 <span class="f2-new">NEW</span></div>
                       <span></span>
-                      <div class="chip-row">
+                      <div class="chip-row" style="align-items:center;gap:10px;">
                         <span class="owner-chip on">KBS 공식</span>
                         <span class="owner-chip">입점사 자체</span>
                         <span class="owner-chip">미설정 슬롯</span>
+                        <label class="ch-tgl" style="margin-left:6px;border-left:1px solid #f0f0f0;padding-left:10px;"><input type="checkbox"> 선택 언어 슬롯에 한정</label>
                       </div>
                       <span></span>
                     </div>
@@ -1238,7 +1269,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
         <div class="card">
           <div class="card-header">
             <span>카테고리 선택</span>
-            <button class="ant-btn ant-btn-primary ant-btn-sm">+ 카테고리 추가</button>
+            <span style="font-size:11px;color:#8c8c8c;">카테고리는 별도 메뉴에서 관리 · 자동 동기화</span>
           </div>
           <div class="card-body">
             <div class="cat-tabs">
@@ -1399,19 +1430,19 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
           • 신규 스토어 등록 시 모든 슬롯이 자동으로 ⓐ KBS 공식으로 채워짐<br>
           • 어드민이 마스터 링크 변경 시 ⓐ 모드 사용 중인 모든 스토어에 즉시 반영<br>
           • 호스트가 자체 채널 운영 중이면 ⓑ 자체로 변경 후 직접 입력<br>
-          • <strong>같은 (채널 × 언어) 조합에 N개 슬롯 가능</strong> — 예: LINE × 日本語에 도쿄용/오사카용 별도 운영 / LINE × 繁體에 대만용
+          • (채널 × 언어) 조합당 1개 link · 채널 종류는 BO에서 추가/제거 가능
         </div>
 
         <div class="card">
           <div class="card-header">
-            <span>SNS 채팅 채널 마스터 (언어 × 채널, 셀당 다중 슬롯 지원)</span>
+            <span>SNS 채팅 채널 마스터 (언어 × 채널)</span>
             <button class="ant-btn ant-btn-primary ant-btn-sm">+ 채널 종류 추가</button>
           </div>
           <div class="card-body" style="padding:0;overflow-x:auto;">
             <table class="tbl-rich kbs-master-tbl">
               <thead>
                 <tr>
-                  <th style="width:110px;">채널</th>
+                  <th style="width:120px;">채널</th>
                   <th>EN</th>
                   <th>简体</th>
                   <th>繁體</th>
@@ -1422,43 +1453,43 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
               <tbody>
                 <tr>
                   <td><strong>💬 WhatsApp</strong></td>
-                  <td><div class="ms-cell"><div class="ms-slot"><input class="ant-input" value="wa.me/+821044001234"><input class="ant-input ms-label" placeholder="별칭 (선택)" value="글로벌"><button class="ms-rm">×</button></div><button class="ms-add">+ 슬롯 추가</button></div></td>
-                  <td><div class="ms-cell"><div class="ms-slot"><input class="ant-input" value="wa.me/+821044001234"><input class="ant-input ms-label" placeholder="별칭" value="글로벌"><button class="ms-rm">×</button></div><button class="ms-add">+ 슬롯 추가</button></div></td>
-                  <td><div class="ms-cell"><button class="ms-add">+ 슬롯 추가</button></div></td>
-                  <td><div class="ms-cell"><div class="ms-slot"><input class="ant-input" value="wa.me/+8170123456"><input class="ant-input ms-label" placeholder="별칭" value="도쿄"><button class="ms-rm">×</button></div><div class="ms-slot"><input class="ant-input" value="wa.me/+8170987654"><input class="ant-input ms-label" placeholder="별칭" value="오사카"><button class="ms-rm">×</button></div><button class="ms-add">+ 슬롯 추가</button></div></td>
-                  <td><div class="ms-cell"><div class="ms-slot"><input class="ant-input" value="wa.me/+62812345678"><input class="ant-input ms-label" placeholder="별칭" value="자카르타"><button class="ms-rm">×</button></div><button class="ms-add">+ 슬롯 추가</button></div></td>
+                  <td><input class="ant-input" value="wa.me/+821044001234" style="font-size:11px;height:28px;"></td>
+                  <td><input class="ant-input" value="wa.me/+821044001234" style="font-size:11px;height:28px;"></td>
+                  <td><input class="ant-input" placeholder="미설정" style="font-size:11px;height:28px;"></td>
+                  <td><input class="ant-input" value="wa.me/+8170123456" style="font-size:11px;height:28px;"></td>
+                  <td><input class="ant-input" value="wa.me/+62812345678" style="font-size:11px;height:28px;"></td>
                 </tr>
                 <tr>
                   <td><strong>💚 LINE</strong></td>
-                  <td><div class="ms-cell"><div class="ms-slot"><input class="ant-input" value="line.me/R/ti/p/@kbs_en"><input class="ant-input ms-label" placeholder="별칭" value="EN"><button class="ms-rm">×</button></div><button class="ms-add">+ 슬롯 추가</button></div></td>
-                  <td><div class="ms-cell"><button class="ms-add">+ 슬롯 추가</button></div></td>
-                  <td><div class="ms-cell"><div class="ms-slot"><input class="ant-input" value="line.me/R/ti/p/@kbs_tw"><input class="ant-input ms-label" placeholder="별칭" value="대만 본점"><button class="ms-rm">×</button></div><div class="ms-slot"><input class="ant-input" value="line.me/R/ti/p/@kbs_taipei"><input class="ant-input ms-label" placeholder="별칭" value="타이베이"><button class="ms-rm">×</button></div><button class="ms-add">+ 슬롯 추가</button></div></td>
-                  <td><div class="ms-cell"><div class="ms-slot"><input class="ant-input" value="line.me/R/ti/p/@kbs_tokyo"><input class="ant-input ms-label" placeholder="별칭" value="도쿄용"><button class="ms-rm">×</button></div><div class="ms-slot"><input class="ant-input" value="line.me/R/ti/p/@kbs_osaka"><input class="ant-input ms-label" placeholder="별칭" value="오사카용"><button class="ms-rm">×</button></div><button class="ms-add">+ 슬롯 추가</button></div></td>
-                  <td><div class="ms-cell"><button class="ms-add">+ 슬롯 추가</button></div></td>
+                  <td><input class="ant-input" value="line.me/R/ti/p/@kbs_en" style="font-size:11px;height:28px;"></td>
+                  <td><input class="ant-input" placeholder="미설정" style="font-size:11px;height:28px;"></td>
+                  <td><input class="ant-input" value="line.me/R/ti/p/@kbs_tw" style="font-size:11px;height:28px;"></td>
+                  <td><input class="ant-input" value="line.me/R/ti/p/@kbs_jp" style="font-size:11px;height:28px;"></td>
+                  <td><input class="ant-input" placeholder="미설정" style="font-size:11px;height:28px;"></td>
                 </tr>
                 <tr>
                   <td><strong>🐉 WeChat</strong></td>
-                  <td><div class="ms-cell"><button class="ms-add">+ 슬롯 추가</button></div></td>
-                  <td><div class="ms-cell"><div class="ms-slot"><input class="ant-input" value="kbs_official_zh"><input class="ant-input ms-label" placeholder="별칭" value="중국 본토"><button class="ms-rm">×</button></div><button class="ms-add">+ 슬롯 추가</button></div></td>
-                  <td><div class="ms-cell"><div class="ms-slot"><input class="ant-input" value="kbs_official_zh"><input class="ant-input ms-label" placeholder="별칭"><button class="ms-rm">×</button></div><button class="ms-add">+ 슬롯 추가</button></div></td>
-                  <td><div class="ms-cell"><button class="ms-add">+ 슬롯 추가</button></div></td>
-                  <td><div class="ms-cell"><button class="ms-add">+ 슬롯 추가</button></div></td>
+                  <td><input class="ant-input" placeholder="미설정" style="font-size:11px;height:28px;"></td>
+                  <td><input class="ant-input" value="kbs_official_zh" style="font-size:11px;height:28px;"></td>
+                  <td><input class="ant-input" value="kbs_official_zh" style="font-size:11px;height:28px;"></td>
+                  <td><input class="ant-input" placeholder="미설정" style="font-size:11px;height:28px;"></td>
+                  <td><input class="ant-input" placeholder="미설정" style="font-size:11px;height:28px;"></td>
                 </tr>
                 <tr>
                   <td><strong>🍓 샤오홍슈</strong></td>
-                  <td><div class="ms-cell"><button class="ms-add">+ 슬롯 추가</button></div></td>
-                  <td><div class="ms-cell"><div class="ms-slot"><input class="ant-input" value="xhs.com/user/kbs"><input class="ant-input ms-label" placeholder="별칭"><button class="ms-rm">×</button></div><button class="ms-add">+ 슬롯 추가</button></div></td>
-                  <td><div class="ms-cell"><div class="ms-slot"><input class="ant-input" value="xhs.com/user/kbs"><input class="ant-input ms-label" placeholder="별칭"><button class="ms-rm">×</button></div><button class="ms-add">+ 슬롯 추가</button></div></td>
-                  <td><div class="ms-cell"><button class="ms-add">+ 슬롯 추가</button></div></td>
-                  <td><div class="ms-cell"><button class="ms-add">+ 슬롯 추가</button></div></td>
+                  <td><input class="ant-input" placeholder="미설정" style="font-size:11px;height:28px;"></td>
+                  <td><input class="ant-input" value="xhs.com/user/kbs" style="font-size:11px;height:28px;"></td>
+                  <td><input class="ant-input" value="xhs.com/user/kbs" style="font-size:11px;height:28px;"></td>
+                  <td><input class="ant-input" placeholder="미설정" style="font-size:11px;height:28px;"></td>
+                  <td><input class="ant-input" placeholder="미설정" style="font-size:11px;height:28px;"></td>
                 </tr>
                 <tr>
                   <td><strong>💛 KakaoTalk</strong></td>
-                  <td><div class="ms-cell"><div class="ms-slot"><input class="ant-input" value="pf.kakao.com/_kbsofficial"><input class="ant-input ms-label" placeholder="별칭"><button class="ms-rm">×</button></div><button class="ms-add">+ 슬롯 추가</button></div></td>
-                  <td><div class="ms-cell"><div class="ms-slot"><input class="ant-input" value="pf.kakao.com/_kbsofficial"><input class="ant-input ms-label" placeholder="별칭"><button class="ms-rm">×</button></div><button class="ms-add">+ 슬롯 추가</button></div></td>
-                  <td><div class="ms-cell"><div class="ms-slot"><input class="ant-input" value="pf.kakao.com/_kbsofficial"><input class="ant-input ms-label" placeholder="별칭"><button class="ms-rm">×</button></div><button class="ms-add">+ 슬롯 추가</button></div></td>
-                  <td><div class="ms-cell"><div class="ms-slot"><input class="ant-input" value="pf.kakao.com/_kbsofficial"><input class="ant-input ms-label" placeholder="별칭"><button class="ms-rm">×</button></div><button class="ms-add">+ 슬롯 추가</button></div></td>
-                  <td><div class="ms-cell"><div class="ms-slot"><input class="ant-input" value="pf.kakao.com/_kbsofficial"><input class="ant-input ms-label" placeholder="별칭"><button class="ms-rm">×</button></div><button class="ms-add">+ 슬롯 추가</button></div></td>
+                  <td><input class="ant-input" value="pf.kakao.com/_kbsofficial" style="font-size:11px;height:28px;"></td>
+                  <td><input class="ant-input" value="pf.kakao.com/_kbsofficial" style="font-size:11px;height:28px;"></td>
+                  <td><input class="ant-input" value="pf.kakao.com/_kbsofficial" style="font-size:11px;height:28px;"></td>
+                  <td><input class="ant-input" value="pf.kakao.com/_kbsofficial" style="font-size:11px;height:28px;"></td>
+                  <td><input class="ant-input" value="pf.kakao.com/_kbsofficial" style="font-size:11px;height:28px;"></td>
                 </tr>
               </tbody>
             </table>
@@ -1737,11 +1768,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
                   <label><input type="radio" name="ch-line"> ⓒ 미사용</label>
                 </div>
               </div>
-              <div style="margin-left:12px;display:flex;flex-direction:column;gap:4px;">
-                <div class="ms-slot"><input class="ant-input" value="https://line.me/R/ti/p/@en_main"><input class="ant-input ms-label" value="본점" placeholder="별칭"><button class="ms-rm">×</button></div>
-                <div class="ms-slot"><input class="ant-input" value="https://line.me/R/ti/p/@en_branch"><input class="ant-input ms-label" value="강남점" placeholder="별칭"><button class="ms-rm">×</button></div>
-                <button class="ms-add" style="align-self:flex-start;">+ 자체 LINE 슬롯 추가</button>
-              </div>
+              <input class="ant-input ch-slot-link" value="https://line.me/R/ti/p/@220upddy" placeholder="자체 채널 URL" style="margin-left:12px;width:calc(100% - 12px);">
             </div>
             <div class="ch-slot">
               <div class="ch-slot-head">
@@ -2024,6 +2051,53 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
             <span class="active-tag" style="font-size:12px;padding:4px 6px 4px 12px;">픽업서비스 <button>×</button></span>
             <button class="ant-btn ant-btn-sm">+ 특징 추가</button>
           </div>
+        </div>
+      </div>
+
+      <!-- 계약 정보 (신규) -->
+      <div class="section-title">계약 정보 <span class="auto-note changed">신규 — 어드민 전용 (호스트 미노출)</span></div>
+      <div class="form-row two-col">
+        <div class="form-label">계약 형태</div>
+        <select class="ant-input"><option>월 고정비</option><option>수수료</option><option>혼합</option><option>무료</option></select>
+        <div class="form-label">자동 갱신</div>
+        <div class="radio-group"><label><input type="radio" name="renew" checked> ON</label><label><input type="radio" name="renew"> OFF</label></div>
+      </div>
+      <div class="form-row two-col">
+        <div class="form-label">월 고정비</div>
+        <input class="ant-input" value="500,000" placeholder="원">
+        <div class="form-label">수수료율</div>
+        <input class="ant-input" value="" placeholder="% (수수료/혼합 시)">
+      </div>
+      <div class="form-row two-col">
+        <div class="form-label">계약 시작일</div>
+        <input class="ant-input" type="date" value="2025-03-12">
+        <div class="form-label">계약 종료일</div>
+        <input class="ant-input" type="date" value="2026-03-11">
+      </div>
+      <div class="form-row two-col">
+        <div class="form-label">정산일</div>
+        <select class="ant-input"><option>매월 5일</option><option>매월 10일</option><option>매월 15일</option><option>매월 25일</option><option>매월 말일</option></select>
+        <div class="form-label">정산 계좌</div>
+        <input class="ant-input" placeholder="은행 / 계좌번호 / 예금주">
+      </div>
+      <div class="form-row">
+        <div class="form-label">계약서 첨부</div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <button class="ant-btn ant-btn-sm">파일 선택</button>
+          <span style="font-size:11px;color:#8c8c8c;">계약서_원진성형외과_2025.pdf · 2.4MB</span>
+          <button class="ant-btn ant-btn-link ant-btn-dangerous ant-btn-sm">삭제</button>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-label">계약 메모</div>
+        <textarea class="ant-input" rows="2" placeholder="계약 특이사항 (자동 갱신 조건·할인·기타)"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-label">변경 이력</div>
+        <div style="font-size:11px;color:#595959;background:#fafafa;border:1px solid #f0f0f0;border-radius:2px;padding:8px 10px;">
+          <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed #f0f0f0;"><span>월 고정비: 450,000 → 500,000</span><span style="color:#8c8c8c;">어드민 A · 2026-03-15 11:20</span></div>
+          <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed #f0f0f0;"><span>자동 갱신: OFF → ON</span><span style="color:#8c8c8c;">어드민 B · 2026-02-20 14:05</span></div>
+          <div style="display:flex;justify-content:space-between;padding:4px 0;"><span>계약 형태: 수수료 → 월 고정비</span><span style="color:#8c8c8c;">어드민 A · 2026-01-10 09:30</span></div>
         </div>
       </div>
 
