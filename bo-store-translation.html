@@ -314,6 +314,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 .tbl-rich th { text-align:left; padding:10px 12px; background:#fafafa; font-weight:600; color:#262626; border-bottom:1px solid #f0f0f0; font-size:11px; white-space:nowrap; cursor:pointer; user-select:none; position:sticky; top:0; }
 .tbl-rich th .sort-arrow { color:#bfbfbf; font-size:9px; margin-left:2px; }
 .tbl-rich th.active .sort-arrow { color:#1890ff; }
+.tbl-rich th[data-sort] { cursor:pointer; user-select:none; white-space:nowrap; }
+.tbl-rich th[data-sort]:hover { background:#fafafa; }
 .tbl-rich td { padding:11px 12px; border-bottom:1px solid #f5f5f5; color:#595959; vertical-align:middle; }
 .tbl-rich tr:hover td { background:#fafafa; cursor:pointer; }
 .tbl-rich tr.checked td { background:#f5f5f5; }
@@ -793,9 +795,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
             <div class="f2-row f2-row-inputs">
               <div class="f2-cell"><div class="f2-label">상점 검색</div><input class="ant-input" placeholder="상점명 또는 코드"></div>
               <div class="f2-cell"><div class="f2-label">활성</div><select class="ant-input"><option>전체</option><option>활성만</option><option>비활성만</option></select></div>
-              <div class="f2-cell"><div class="f2-label">번역 상태</div><select class="ant-input"><option>전체</option><option>번역 완료</option><option>일부 미번역</option><option>전체 미번역</option></select></div>
               <div class="f2-cell"><div class="f2-label">운영 형태 </div><select class="ant-input"><option>전체</option><option>퍼블릭</option><option>프라이빗</option><option>미선택</option></select></div>
-              <div class="f2-cell"><div class="f2-label">정렬</div><select class="ant-input"><option>등록일 내림차순</option><option>등록일 오름차순</option><option>최근 수정 순</option><option>상점명 가나다 순</option><option>번역 미완료 우선</option></select></div>
             </div>
           </div>
 
@@ -806,73 +806,55 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
               <div class="f2-row f2-row-inputs">
                 <div class="f2-cell"><div class="f2-label">등록일</div><div class="f2-daterange"><input class="ant-input" type="date" value="2026-01-01"><span>~</span><input class="ant-input" type="date" value="2026-04-29"></div></div>
                 <div class="f2-cell"><div class="f2-label">최종 수정일</div><div class="f2-daterange"><input class="ant-input" type="date"><span>~</span><input class="ant-input" type="date"></div></div>
-                <div class="f2-cell"><div class="f2-label">최종 번역일</div><select class="ant-input"><option>전체</option><option>오늘</option><option>최근 7일</option><option>최근 30일</option><option>30일 이상 미번역</option></select></div>
                 <div class="f2-cell"><div class="f2-label">지역</div><select class="ant-input"><option>전체</option><option>강남구</option><option>서초구</option><option>마포구</option><option>중구</option></select></div>
               </div>
 
-              <!-- 📡 채널 설정 + 채널 관련 검증 (2-col split, 좌측 설정 / 우측 채널 검증) -->
+              <!-- 📡 채널 설정 -->
               <div class="f2-section f2-channel-block">
-                <div class="ch-split">
-                  <div class="ch-split-left">
-                    <div class="f2-section-title">📡 채널 설정</div>
-                    <div class="f2-row f2-channel">
-                      <div class="f2-label">SNS 채팅</div>
-                      <select class="ant-input f2-mode"><option>AND</option><option selected>OR</option><option>정확히 일치</option><option>제외</option></select>
-                      <div class="chip-row">
-                        <span class="filter-chip on">WhatsApp</span>
-                        <span class="filter-chip on">LINE</span>
-                        <span class="filter-chip">WeChat</span>
-                        <span class="filter-chip">샤오홍슈</span>
-                        <span class="filter-chip">KakaoTalk</span>
-                        <span class="filter-chip">기타</span>
-                      </div>
-                    </div>
-                    <div class="f2-row f2-channel">
-                      <div class="f2-label">채널 소유자 </div>
-                      <span></span>
-                      <div class="chip-row" style="align-items:center;gap:10px;">
-                        <span class="owner-chip on">KBS 공식</span>
-                        <span class="owner-chip">입점사 자체</span>
-                        <span class="owner-chip">미설정 슬롯</span>
-                        <label class="ch-tgl" style="margin-left:6px;border-left:1px solid #f0f0f0;padding-left:10px;"><input type="checkbox"> 선택 언어 슬롯에 한정</label>
-                      </div>
-                      <span></span>
-                    </div>
-                    <div class="f2-row f2-channel">
-                      <div class="f2-label">콘텐츠</div>
-                      <select class="ant-input f2-mode"><option>AND</option><option selected>OR</option><option>정확히 일치</option><option>제외</option></select>
-                      <div class="chip-row">
-                        <span class="filter-chip on">Instagram</span>
-                        <span class="filter-chip">YouTube</span>
-                        <span class="filter-chip">TikTok</span>
-                        <span class="filter-chip">Facebook</span>
-                        <span class="filter-chip">샤오홍슈</span>
-                        <span class="filter-chip">매거진(자체)</span>
-                      </div>
-                    </div>
-                    <div class="f2-row f2-channel">
-                      <div class="f2-label">인앱 채팅</div>
-                      <span></span>
-                      <div class="chip-row">
-                        <span class="filter-chip on">스토어 채팅</span>
-                        <span class="filter-chip">상품별 채팅</span>
-                        <span class="filter-chip">비활성</span>
-                      </div>
-                      <label class="ch-tgl"><input type="checkbox"> 환영 메시지 ON</label>
-                    </div>
+                <div class="f2-section-title">📡 채널 설정</div>
+                <div class="f2-row f2-channel">
+                  <div class="f2-label">SNS 채팅</div>
+                  <select class="ant-input f2-mode"><option>AND</option><option selected>OR</option><option>정확히 일치</option><option>제외</option></select>
+                  <div class="chip-row">
+                    <span class="filter-chip on">WhatsApp</span>
+                    <span class="filter-chip on">LINE</span>
+                    <span class="filter-chip">WeChat</span>
+                    <span class="filter-chip">샤오홍슈</span>
+                    <span class="filter-chip">KakaoTalk</span>
+                    <span class="filter-chip">기타</span>
                   </div>
-                  <div class="ch-split-right">
-                    <div class="f2-section-title" style="display:flex;align-items:center;justify-content:space-between;">
-                      <span>⚠ 채널 검증</span>
-                      <select class="ant-input f2-mode" style="width:80px;"><option>OR</option><option>AND</option></select>
-                    </div>
-                    <div class="chip-row chip-row-stack">
-                      <span class="verify-chip">SNS 채팅 미설정</span>
-                      <span class="verify-chip">콘텐츠 채널 미설정</span>
-                      <span class="verify-chip">KBS 공식인데 마스터 링크 없음</span>
-                      <span class="verify-chip">입점사 자체인데 링크 비어있음</span>
-                    </div>
+                </div>
+                <div class="f2-row f2-channel">
+                  <div class="f2-label">채널 소유자 </div>
+                  <span></span>
+                  <div class="chip-row" style="align-items:center;gap:10px;">
+                    <span class="owner-chip on">KBS 공식</span>
+                    <span class="owner-chip">입점사 자체</span>
+                    <span class="owner-chip">미설정 슬롯</span>
                   </div>
+                  <span></span>
+                </div>
+                <div class="f2-row f2-channel">
+                  <div class="f2-label">콘텐츠</div>
+                  <select class="ant-input f2-mode"><option>AND</option><option selected>OR</option><option>정확히 일치</option><option>제외</option></select>
+                  <div class="chip-row">
+                    <span class="filter-chip on">Instagram</span>
+                    <span class="filter-chip">YouTube</span>
+                    <span class="filter-chip">TikTok</span>
+                    <span class="filter-chip">Facebook</span>
+                    <span class="filter-chip">샤오홍슈</span>
+                    <span class="filter-chip">매거진(자체)</span>
+                  </div>
+                </div>
+                <div class="f2-row f2-channel">
+                  <div class="f2-label">인앱 채팅</div>
+                  <span></span>
+                  <div class="chip-row">
+                    <span class="filter-chip on">스토어 채팅</span>
+                    <span class="filter-chip">상품별 채팅</span>
+                    <span class="filter-chip">비활성</span>
+                  </div>
+                  <label class="ch-tgl"><input type="checkbox"> 환영 메시지 ON</label>
                 </div>
               </div>
 
@@ -956,7 +938,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
               <span class="active-tag">카테고리: 피부과/성형외과 <button>×</button></span>
               <span class="active-tag">번역상태: 일부 미번역 <button>×</button></span>
             </div>
-            <label class="ch-tgl" style="margin-right:auto;margin-left:12px;font-size:12px;"><input type="checkbox"> 집계 행 표시 </label>
             <button class="ant-btn ant-btn-primary">검색 (예상 23건)</button>
           </div>
         </div>
@@ -1039,18 +1020,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
             <thead>
               <tr>
                 <th class="ck-cell"></th>
-                <th>상점명</th>
-                <th>카테고리</th>
-                <th>지역</th>
-                <th>상태</th>
-                <th class="active">등록일 <span class="sort-arrow">▼</span></th>
-                <th>번역 상태</th>
+                <th data-sort onclick="sortCol(this)">상점명 <span class="sort-arrow">↕</span></th>
+                <th data-sort onclick="sortCol(this)">카테고리 <span class="sort-arrow">↕</span></th>
+                <th data-sort onclick="sortCol(this)">지역 <span class="sort-arrow">↕</span></th>
+                <th data-sort onclick="sortCol(this)">상태 <span class="sort-arrow">↕</span></th>
+                <th data-sort onclick="sortCol(this)" class="active">등록일 <span class="sort-arrow">▼</span></th>
+                <th data-sort onclick="sortCol(this)">번역 상태 <span class="sort-arrow">↕</span></th>
                 <th>이미지</th>
                 <th>채널 설정</th>
-                <th style="text-align:right;">노출수</th>
-                <th style="text-align:right;">내부<br>진입수</th>
-                <th style="text-align:right;">직접<br>유입수</th>
-                <th style="text-align:right;">버튼<br>클릭수</th>
+                <th data-sort onclick="sortCol(this)" style="text-align:right;">노출수 <span class="sort-arrow">↕</span></th>
+                <th data-sort onclick="sortCol(this)" style="text-align:right;">내부<br>진입수 <span class="sort-arrow">↕</span></th>
+                <th data-sort onclick="sortCol(this)" style="text-align:right;">직접<br>유입수 <span class="sort-arrow">↕</span></th>
+                <th data-sort onclick="sortCol(this)" style="text-align:right;">버튼<br>클릭수 <span class="sort-arrow">↕</span></th>
               </tr>
             </thead>
             <tbody id="tbl-body">
@@ -2359,6 +2340,23 @@ function updateSelCountBasic() {
   document.querySelectorAll('.row-ck-basic').forEach(ck => {
     ck.closest('tr').classList.toggle('checked', ck.checked);
   });
+}
+
+function sortCol(th) {
+  const table = th.closest('table');
+  const allTh = table.querySelectorAll('th[data-sort]');
+  const wasActive = th.classList.contains('active');
+  const arrow = th.querySelector('.sort-arrow');
+  const wasDesc = arrow && arrow.textContent === '▼';
+
+  allTh.forEach(h => {
+    h.classList.remove('active');
+    const a = h.querySelector('.sort-arrow');
+    if (a) a.textContent = '↕';
+  });
+
+  th.classList.add('active');
+  if (arrow) arrow.textContent = (wasActive && wasDesc) ? '▲' : '▼';
 }
 
 function toggleAllRows(master, selector) {
