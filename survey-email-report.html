@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>K-Beauty Station 설문 이메일 발송 분석 리포트</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',-apple-system,sans-serif; background:#F4F5F7; color:#2A2A33; line-height:1.5; padding:32px 16px; }
+  .wrap { max-width:1080px; margin:0 auto; }
+  .header { background:linear-gradient(135deg,#72243E,#D4537E); color:#fff; border-radius:16px; padding:32px 36px; margin-bottom:28px; }
+  .header h1 { font-size:24px; font-weight:700; margin-bottom:8px; }
+  .header .meta { font-size:13px; opacity:.9; line-height:1.8; }
+  .header .meta b { font-weight:600; }
+  .badge-live { display:inline-block; background:rgba(255,255,255,.2); border:1px solid rgba(255,255,255,.4); border-radius:20px; padding:3px 12px; font-size:11px; font-weight:600; margin-top:10px; }
+  .section-title { font-size:17px; font-weight:700; margin:32px 0 14px; color:#2A2A33; }
+  .summary { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+  .card { background:#fff; border-radius:14px; padding:22px 24px; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+  .card .label { font-size:13px; color:#888; margin-bottom:4px; }
+  .card .count { font-size:13px; color:#aaa; font-weight:500; }
+  .card .pct { font-size:34px; font-weight:700; margin-top:6px; }
+  .card.success .pct { color:#2A2A3C; }
+  .card.open .pct { color:#F5A623; }
+  .card.click .pct { color:#3B82F6; }
+  .card.unsub .pct { color:#9AA0A6; }
+  .compare { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  .camp { background:#fff; border-radius:14px; padding:24px; box-shadow:0 1px 3px rgba(0,0,0,.06); border-top:4px solid; }
+  .camp.en { border-color:#3B82F6; }
+  .camp.cn { border-color:#D4537E; }
+  .camp .flag { font-size:12px; font-weight:700; letter-spacing:.04em; margin-bottom:4px; }
+  .camp.en .flag { color:#3B82F6; }
+  .camp.cn .flag { color:#D4537E; }
+  .camp .subj { font-size:15px; font-weight:600; margin-bottom:16px; word-break:break-all; }
+  .camp .rowstat { display:flex; justify-content:space-between; font-size:13px; padding:7px 0; border-bottom:1px solid #F0F0F2; }
+  .camp .rowstat:last-child { border-bottom:none; }
+  .camp .rowstat .k { color:#777; }
+  .camp .rowstat .v { font-weight:600; }
+  .camp .rowstat .v small { color:#aaa; font-weight:500; }
+  .bars { background:#fff; border-radius:14px; padding:24px; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+  .barblock { margin-bottom:20px; }
+  .barblock:last-child { margin-bottom:0; }
+  .barblock .bt { font-size:13px; font-weight:600; margin-bottom:10px; color:#555; }
+  .barrow { display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+  .barrow .name { width:90px; font-size:12px; color:#777; flex-shrink:0; }
+  .bartrack { flex:1; background:#F0F0F2; border-radius:6px; height:22px; position:relative; overflow:hidden; }
+  .barfill { height:100%; border-radius:6px; display:flex; align-items:center; justify-content:flex-end; padding-right:8px; color:#fff; font-size:11px; font-weight:600; min-width:34px; }
+  .barfill.en { background:#3B82F6; }
+  .barfill.cn { background:#D4537E; }
+  table { width:100%; border-collapse:collapse; background:#fff; border-radius:14px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,.06); font-size:13px; }
+  th, td { padding:12px 16px; text-align:left; border-bottom:1px solid #F0F0F2; }
+  th { background:#FAFAFB; font-weight:600; color:#666; font-size:12px; }
+  td.r, th.r { text-align:right; }
+  tr:last-child td { border-bottom:none; }
+  .tag { display:inline-block; font-size:11px; padding:2px 8px; border-radius:6px; font-weight:600; }
+  .tag.soft { background:#FFF3E0; color:#E68A00; }
+  .tag.hard { background:#FDE8E8; color:#D64545; }
+  .mono { font-family:'SF Mono',Consolas,monospace; font-size:12px; color:#555; }
+  .insight { background:#fff; border-radius:14px; padding:8px 24px; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+  .ins { padding:16px 0; border-bottom:1px solid #F0F0F2; display:flex; gap:14px; }
+  .ins:last-child { border-bottom:none; }
+  .ins .ic { font-size:20px; flex-shrink:0; }
+  .ins .tx h4 { font-size:14px; font-weight:700; margin-bottom:3px; }
+  .ins .tx p { font-size:13px; color:#666; }
+  .ins .tx b { color:#D4537E; }
+  .note { font-size:12px; color:#999; margin-top:24px; text-align:center; line-height:1.7; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <h1>📊 설문 초대 이메일 발송 분석 리포트</h1>
+    <div class="meta">
+      <b>캠페인</b> · K-Beauty Station 서비스 만족도 조사 (영어본 + 중국어본)<br>
+      <b>발송</b> 2026-06-04 12:00~12:30 &nbsp;|&nbsp; <b>데이터 추출</b> 2026-06-05 10:13 (발송 후 약 22시간)
+    </div>
+    <span class="badge-live">⏱ 설문 진행 중 · 중간 스냅샷 (오픈·클릭 계속 증가)</span>
+  </div>
+
+  <div class="section-title">전체 요약 (영어 + 중국어 합산)</div>
+  <div class="summary">
+    <div class="card success"><div class="label">발송 성공 <span class="count">443 / 451</span></div><div class="pct">98.2%</div></div>
+    <div class="card open"><div class="label">오픈 <span class="count">128명</span></div><div class="pct">28.9%</div></div>
+    <div class="card click"><div class="label">클릭 <span class="count">12명</span></div><div class="pct">2.7%</div></div>
+    <div class="card unsub"><div class="label">수신거부 <span class="count">0명</span></div><div class="pct">0%</div></div>
+  </div>
+
+  <div class="section-title">캠페인별 비교</div>
+  <div class="compare">
+    <div class="camp en">
+      <div class="flag">🌐 영어본 (비중국 그룹)</div>
+      <div class="subj">5–7 min · 100 win a ₩15,000 gift card 🎁</div>
+      <div class="rowstat"><span class="k">발송 대상</span><span class="v">174명</span></div>
+      <div class="rowstat"><span class="k">발송 성공</span><span class="v">166명 <small>95.4%</small></span></div>
+      <div class="rowstat"><span class="k">발송 실패</span><span class="v">8명 <small>소프트5·하드3</small></span></div>
+      <div class="rowstat"><span class="k">오픈</span><span class="v" style="color:#F5A623;">43명 <small>25.9%</small></span></div>
+      <div class="rowstat"><span class="k">클릭</span><span class="v" style="color:#3B82F6;">8명 <small>4.8%</small></span></div>
+      <div class="rowstat"><span class="k">오픈→클릭 전환</span><span class="v">18.6%</span></div>
+      <div class="rowstat"><span class="k">수신거부</span><span class="v">0명</span></div>
+    </div>
+    <div class="camp cn">
+      <div class="flag">🇨🇳 중국어본 (중국 그룹)</div>
+      <div class="subj">想听听您的心声 🌸</div>
+      <div class="rowstat"><span class="k">발송 대상</span><span class="v">277명</span></div>
+      <div class="rowstat"><span class="k">발송 성공</span><span class="v">277명 <small>100%</small></span></div>
+      <div class="rowstat"><span class="k">발송 실패</span><span class="v">0명</span></div>
+      <div class="rowstat"><span class="k">오픈</span><span class="v" style="color:#F5A623;">85명 <small>30.7%</small></span></div>
+      <div class="rowstat"><span class="k">클릭</span><span class="v" style="color:#3B82F6;">4명 <small>1.4%</small></span></div>
+      <div class="rowstat"><span class="k">오픈→클릭 전환</span><span class="v">4.7%</span></div>
+      <div class="rowstat"><span class="k">수신거부</span><span class="v">0명</span></div>
+    </div>
+  </div>
+
+  <div class="section-title">지표별 비교</div>
+  <div class="bars">
+    <div class="barblock">
+      <div class="bt">오픈율 (발송 성공 대비)</div>
+      <div class="barrow"><span class="name">🌐 영어</span><div class="bartrack"><div class="barfill en" style="width:43%;">25.9%</div></div></div>
+      <div class="barrow"><span class="name">🇨🇳 중국</span><div class="bartrack"><div class="barfill cn" style="width:51%;">30.7%</div></div></div>
+    </div>
+    <div class="barblock">
+      <div class="bt">클릭율 (발송 성공 대비)</div>
+      <div class="barrow"><span class="name">🌐 영어</span><div class="bartrack"><div class="barfill en" style="width:24%;">4.8%</div></div></div>
+      <div class="barrow"><span class="name">🇨🇳 중국</span><div class="bartrack"><div class="barfill cn" style="width:7%;">1.4%</div></div></div>
+    </div>
+    <div class="barblock">
+      <div class="bt">오픈→클릭 전환율 (열어본 사람 중 클릭) — 설문 참여 의향 지표</div>
+      <div class="barrow"><span class="name">🌐 영어</span><div class="bartrack"><div class="barfill en" style="width:93%;">18.6%</div></div></div>
+      <div class="barrow"><span class="name">🇨🇳 중국</span><div class="bartrack"><div class="barfill cn" style="width:24%;">4.7%</div></div></div>
+    </div>
+  </div>
+
+  <div class="section-title">링크별 클릭</div>
+  <table>
+    <thead><tr><th>캠페인</th><th>링크</th><th class="r">클릭(고유)</th></tr></thead>
+    <tbody>
+      <tr><td>🌐 영어</td><td>설문 폼 (forms.gle)</td><td class="r">6</td></tr>
+      <tr><td>🌐 영어</td><td>서비스 방문 (k-beautystation.com)</td><td class="r">2</td></tr>
+      <tr><td>🇨🇳 중국</td><td>설문 폼 (报名工具)</td><td class="r">3</td></tr>
+      <tr><td>🇨🇳 중국</td><td>서비스 방문 (k-beautystation.com)</td><td class="r">1</td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">발송 실패 상세 (영어본 8건 · 중국어본 0건)</div>
+  <table>
+    <thead><tr><th>이메일 (개인정보 보호 위해 일부 마스킹)</th><th>유형</th><th>비고</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">ss***@gmail.com</td><td><span class="tag soft">소프트바운스</span></td><td>일시적 (재시도 대상)</td></tr>
+      <tr><td class="mono">sh***@icloud.com</td><td><span class="tag soft">소프트바운스</span></td><td>일시적 (알 수 없음)</td></tr>
+      <tr><td class="mono">ev***@bmw.com</td><td><span class="tag soft">소프트바운스</span></td><td>일시적</td></tr>
+      <tr><td class="mono">23***@qq.con</td><td><span class="tag soft">소프트바운스</span></td><td>⚠️ 오타 (qq.<b>con</b> → qq.com)</td></tr>
+      <tr><td class="mono">47***@qq.con</td><td><span class="tag soft">소프트바운스</span></td><td>⚠️ 오타 (qq.<b>con</b> → qq.com)</td></tr>
+      <tr><td class="mono">ha***@gmail.com</td><td><span class="tag hard">하드바운스</span></td><td>영구 실패 (자동삭제)</td></tr>
+      <tr><td class="mono">su***@kfp.re.kr</td><td><span class="tag hard">하드바운스</span></td><td>영구 실패 (자동삭제)</td></tr>
+      <tr><td class="mono">yu***@glofix.co.kr</td><td><span class="tag hard">하드바운스</span></td><td>영구 실패 (내부 주소·자동삭제)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">핵심 인사이트 & 제안</div>
+  <div class="insight">
+    <div class="ins"><div class="ic">🎯</div><div class="tx"><h4>중국 발송이 의외로 강세</h4><p>걱정과 달리 <b>발송 성공 100%(실패 0건)</b>, 오픈율 <b>30.7%</b>로 오히려 영어본(25.9%)보다 높았습니다. 중국 현지 설문 도구(报名工具) 링크 + 중국 ISP 도달이 예상보다 양호했어요.</p></div></div>
+    <div class="ins"><div class="ic">🔍</div><div class="tx"><h4>단, "열어본 뒤 참여"는 영어가 압도</h4><p>오픈→클릭 전환이 <b>영어 18.6% vs 중국 4.7%</b>. 중국 유저는 메일은 많이 열어봤지만 설문 참여(클릭)로는 덜 이어졌습니다. <b>설문 진입 단계</b>를 줄이면 참여가 크게 늘 잠재력이 있어요.</p></div></div>
+    <div class="ins"><div class="ic">✅</div><div class="tx"><h4>수신거부 0건</h4><p>양쪽 모두 수신거부 0 — 마케팅 동의 회원 대상이라 거부감 없이 잘 받았습니다.</p></div></div>
+    <div class="ins"><div class="ic">⏱</div><div class="tx"><h4>아직 집계 중 (발송 22시간)</h4><p>설문 기간이 진행 중이라 오픈·클릭은 며칠에 걸쳐 더 쌓입니다. 지금은 중간 스냅샷이에요. (오픈은 이미지 차단 시 실제보다 낮게 잡혀 실제 수치는 더 높을 수 있음)</p></div></div>
+    <div class="ins"><div class="ic">💡</div><div class="tx"><h4>다음 액션</h4><p>① <b>영어본</b>: SPF/DKIM 인증으로 스팸함行 줄이면 오픈율↑ &nbsp; ② <b>중국본</b>: 설문 참여 전환 개선 (CTA 강조·폼 간소화) &nbsp; ③ <code class="mono">qq.con</code> 오타 2건 명단에서 <code class="mono">.com</code>으로 정정</p></div></div>
+  </div>
+
+  <div class="note">
+    데이터 출처: 스티비 전체 통계 CSV (2026-06-05 10:13 추출) · 발송 후 약 22시간 시점 · 비율은 발송 성공 기준<br>
+    실패자 이메일은 개인정보 보호를 위해 일부 마스킹 처리했습니다. · © 2026 K-Beauty Station 韩美站 · 내부 분석용
+  </div>
+
+</div>
+</body>
+</html>
