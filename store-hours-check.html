@@ -130,7 +130,12 @@ function buildTable(store){
   return html;
 }
 
-function message(name){
+function hasBlankCells(store){
+  const rows = store.rows.filter(r => r.src===KBS || r.days.some(d=>norm(d)!==""));
+  return rows.some(r => r.days.some(d=> norm(d)==="" ));
+}
+
+function message(name, blank){
   return [
     "안녕하세요, K-Beauty Station입니다.",
     "",
@@ -139,13 +144,13 @@ function message(name){
     "첨부 이미지를 확인 부탁드립니다.",
     "- 맨 윗줄 : K-Beauty Station 노출 중인 운영시간",
     "- 노란색 칸: K-Beauty Station과 다른 운영시간",
-    "- 빈 칸: 해당 채널에 정보 없음",
+    (blank ? "- 빈 칸: 해당 채널에 정보 없음" : null),
     "",
     "운영시간이 다르면 고객이 영업 여부를 오인할 수 있어 안내드립니다.",
     "번거로우시겠지만 정확한 운영시간을 확인하신 뒤, 각 채널의 정보를 동일하게 맞춰주시면 감사하겠습니다.",
     "",
     "감사합니다."
-  ].join("\n");
+  ].filter(function(l){ return l!==null; }).join("\n");
 }
 
 let toastT;
@@ -171,6 +176,8 @@ function render(){
   STORES.forEach((store, i)=>{
     const id = i+1;
     const fileBase = pad2(id)+'_'+safeName(store.name);
+    const blank = hasBlankCells(store);
+    const note = '<b>K-Beauty Station</b> = 저희 서비스 등록값 · 노란 칸 = 등록값과 다른 채널 정보' + (blank ? ' · 빈 칸 = 해당 채널 정보 없음' : '');
     const card = document.createElement('div');
     card.className = 'store' + (done.includes(i)?' done':'');
     card.id = 'store-'+i;
@@ -183,14 +190,14 @@ function render(){
       '<div class="cap" id="cap-'+i+'">'+
         '<div class="cap-title">'+store.name+' 운영시간 등록 현황</div>'+
         buildTable(store)+
-        '<div class="cap-note"><b>K-Beauty Station</b> = 저희 서비스 등록값 · 노란 칸 = 등록값과 다른 채널 정보 · 빈 칸 = 해당 채널 정보 없음</div>'+
+        '<div class="cap-note">'+note+'</div>'+
       '</div>'+
       '<div class="acts">'+
         '<button class="b-text" data-act="text" data-i="'+i+'">① 문구 복사</button>'+
         '<button class="b-img" data-act="img" data-i="'+i+'">② 이미지 복사</button>'+
         '<button class="b-save" data-act="save" data-i="'+i+'" data-file="'+fileBase+'">이미지 저장(PNG)</button>'+
       '</div>'+
-      '<textarea class="msg" id="msg-'+i+'">'+message(store.name)+'</textarea>';
+      '<textarea class="msg" id="msg-'+i+'">'+message(store.name, blank)+'</textarea>';
     list.appendChild(card);
   });
   updateProg();
