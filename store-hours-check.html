@@ -20,10 +20,13 @@
   .store{ background:#fff; border:1px solid var(--line); border-radius:12px; padding:18px;
           margin-bottom:18px; }
   .store.done{ opacity:.5; }
+  .store.self{ background:#EFF6FF; border-color:#93C5FD; }
   .store .top{ display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
   .store .idx{ font-weight:700; color:var(--pink); font-size:16px; }
   .store .nm{ font-weight:700; font-size:17px; }
-  .store .chk{ margin-left:auto; font-size:13px; color:#555; display:flex; align-items:center; gap:6px; }
+  .store .status{ margin-left:auto; display:flex; gap:14px; align-items:center; }
+  .store .chk{ font-size:13px; color:#555; display:flex; align-items:center; gap:6px; cursor:pointer; }
+  .store .chk.self{ color:#2563EB; }
   .store .chk input{ width:18px; height:18px; }
 
   /* capture target */
@@ -59,14 +62,15 @@
   <h1>운영시간 확인요청 발송용</h1>
   <span class="prog" id="prog">0 / 0 발송완료</span>
   <button id="btnAll">전체 이미지 저장(PNG)</button>
-  <button id="btnReset">발송체크 초기화</button>
+  <button id="btnReset">체크 초기화</button>
 </header>
 <div class="hint">
   위에서부터 한 곳씩 처리하세요 →
   <b>① 문구 복사</b> 눌러 카톡에 붙여넣기 ·
   <b>② 이미지 복사</b> 눌러 카톡에 붙여넣기(Ctrl+V) ·
   전송 후 우측 <b>발송완료 체크</b>.
-  이미지 복사가 안 되면 <b>이미지 저장</b>으로 PNG를 받아 드래그하세요. (발송체크는 이 브라우저에 자동 저장됩니다.)
+  이미지 복사가 안 되면 <b>이미지 저장</b>으로 PNG를 받아 드래그하세요.<br>
+  <b style="color:#2563EB">자체수정</b> = 연락 방법이 없거나 우리가 임의등록한 곳 등, 발송하지 않고 우리가 직접 수정할 곳에 체크하세요. (모든 체크는 이 브라우저에 자동 저장됩니다.)
 </div>
 <div class="wrap" id="list"></div>
 <div class="toast" id="toast"></div>
@@ -163,29 +167,38 @@ function toast(msg){
 function updateProg(){
   const total = STORES.length;
   const done = document.querySelectorAll('.store.done').length;
-  document.getElementById('prog').textContent = done+' / '+total+' 발송완료';
+  const self = document.querySelectorAll('.store.self').length;
+  document.getElementById('prog').textContent = done+' / '+total+' 발송완료 · '+self+' 자체수정';
 }
 
 const DONE_KEY = 'kbs_hours_sent_v1';
 function loadDone(){ try{ return JSON.parse(localStorage.getItem(DONE_KEY)||'[]'); }catch(e){ return []; } }
 function saveDone(arr){ localStorage.setItem(DONE_KEY, JSON.stringify(arr)); }
 
+const SELF_KEY = 'kbs_hours_selffix_v1';
+function loadSelf(){ try{ return JSON.parse(localStorage.getItem(SELF_KEY)||'[]'); }catch(e){ return []; } }
+function saveSelf(arr){ localStorage.setItem(SELF_KEY, JSON.stringify(arr)); }
+
 function render(){
   const list = document.getElementById('list');
   const done = loadDone();
+  const self = loadSelf();
   STORES.forEach((store, i)=>{
     const id = i+1;
     const fileBase = pad2(id)+'_'+safeName(store.name);
     const blank = hasBlankCells(store);
     const note = '<b>K-Beauty Station</b> = 저희 서비스 등록값 · 노란 칸 = 등록값과 다른 채널 정보' + (blank ? ' · 빈 칸 = 해당 채널 정보 없음' : '');
     const card = document.createElement('div');
-    card.className = 'store' + (done.includes(i)?' done':'');
+    card.className = 'store' + (done.includes(i)?' done':'') + (self.includes(i)?' self':'');
     card.id = 'store-'+i;
     card.innerHTML =
       '<div class="top">'+
         '<span class="idx">'+pad2(id)+'</span>'+
         '<span class="nm">'+store.name+'</span>'+
-        '<label class="chk"><input type="checkbox" data-i="'+i+'" '+(done.includes(i)?'checked':'')+'> 발송완료</label>'+
+        '<span class="status">'+
+          '<label class="chk"><input type="checkbox" data-i="'+i+'" data-kind="sent" '+(done.includes(i)?'checked':'')+'> 발송완료</label>'+
+          '<label class="chk self"><input type="checkbox" data-i="'+i+'" data-kind="self" '+(self.includes(i)?'checked':'')+'> 자체수정</label>'+
+        '</span>'+
       '</div>'+
       '<div class="cap" id="cap-'+i+'">'+
         '<div class="cap-title">'+store.name+' 운영시간 등록 현황</div>'+
@@ -255,14 +268,23 @@ document.addEventListener('click', async (e)=>{
 });
 
 document.addEventListener('change', (e)=>{
-  const cb = e.target.closest('input[type=checkbox][data-i]');
+  const cb = e.target.closest('input[type=checkbox][data-kind]');
   if(!cb) return;
   const i = +cb.dataset.i;
+  const kind = cb.dataset.kind;
   const card = document.getElementById('store-'+i);
-  const done = loadDone();
-  if(cb.checked){ card.classList.add('done'); if(!done.includes(i)) done.push(i); }
-  else { card.classList.remove('done'); const k=done.indexOf(i); if(k>=0) done.splice(k,1); }
-  saveDone(done); updateProg();
+  if(kind==='sent'){
+    const done = loadDone();
+    if(cb.checked){ card.classList.add('done'); if(!done.includes(i)) done.push(i); }
+    else { card.classList.remove('done'); const k=done.indexOf(i); if(k>=0) done.splice(k,1); }
+    saveDone(done);
+  } else {
+    const self = loadSelf();
+    if(cb.checked){ card.classList.add('self'); if(!self.includes(i)) self.push(i); }
+    else { card.classList.remove('self'); const k=self.indexOf(i); if(k>=0) self.splice(k,1); }
+    saveSelf(self);
+  }
+  updateProg();
 });
 
 document.getElementById('btnAll').addEventListener('click', async (e)=>{
@@ -277,10 +299,11 @@ document.getElementById('btnAll').addEventListener('click', async (e)=>{
 });
 
 document.getElementById('btnReset').addEventListener('click', ()=>{
-  saveDone([]);
-  document.querySelectorAll('.store').forEach(c=>c.classList.remove('done'));
-  document.querySelectorAll('input[type=checkbox][data-i]').forEach(cb=>cb.checked=false);
-  updateProg(); toast('발송체크 초기화됨');
+  if(!confirm('발송완료·자체수정 체크를 모두 초기화할까요?')) return;
+  saveDone([]); saveSelf([]);
+  document.querySelectorAll('.store').forEach(c=>{ c.classList.remove('done'); c.classList.remove('self'); });
+  document.querySelectorAll('input[type=checkbox][data-kind]').forEach(cb=>cb.checked=false);
+  updateProg(); toast('체크 초기화됨');
 });
 
 render();
