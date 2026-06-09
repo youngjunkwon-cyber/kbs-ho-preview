@@ -142,18 +142,17 @@ function hasBlankCells(store){
 function message(name, blank){
   return [
     "안녕하세요, K-Beauty Station입니다.",
+    "현재 각 사이트별로 귀사의 운영시간이 다르게 등록되어 있어 안내드립니다.",
+    "첨부 이미지를 참고하시어 확인 부탁드립니다.",
     "",
-    name+"의 운영시간이 채널마다 다르게 등록되어 있어 안내드립니다.",
+    "맨 윗줄: K-Beauty Station에 노출 중인 운영시간",
+    "노란색 칸: K-Beauty Station과 다른 운영시간",
+    (blank ? "빈 칸: 해당 사이트에 정보 없음" : null),
     "",
-    "첨부 이미지를 확인 부탁드립니다.",
-    "- 맨 윗줄 : K-Beauty Station 노출 중인 운영시간",
-    "- 노란색 칸: K-Beauty Station과 다른 운영시간",
-    (blank ? "- 빈 칸: 해당 채널에 정보 없음" : null),
+    "운영시간이 다르면 고객이 실 운영시간에 대해 오인 할 수 있어 번거로우시겠지만 각 사이트별 운영시간을 맞춰주시면 감사하겠습니다.",
+    "* 먼저 정확한 운영시간을 회신해 주시면 K-Beauty Station 노출 정보는 저희가 수정해드리겠습니다.",
     "",
-    "운영시간이 다르면 고객이 영업 여부를 오인할 수 있어 안내드립니다.",
-    "번거로우시겠지만 정확한 운영시간을 확인하신 뒤, 각 채널의 정보를 동일하게 맞춰주시면 감사하겠습니다.",
-    "",
-    "감사합니다."
+    "감사합니다 :)"
   ].filter(function(l){ return l!==null; }).join("\n");
 }
 
@@ -187,7 +186,7 @@ function render(){
     const id = i+1;
     const fileBase = pad2(id)+'_'+safeName(store.name);
     const blank = hasBlankCells(store);
-    const note = '<b>K-Beauty Station</b> = 저희 서비스 등록값 · 노란 칸 = 등록값과 다른 채널 정보' + (blank ? ' · 빈 칸 = 해당 채널 정보 없음' : '');
+    const note = '<b>K-Beauty Station</b> = 노출 중인 운영시간 · 노란 칸 = K-Beauty Station과 다른 운영시간' + (blank ? ' · 빈 칸 = 해당 사이트 정보 없음' : '');
     const card = document.createElement('div');
     card.className = 'store' + (done.includes(i)?' done':'') + (self.includes(i)?' self':'');
     card.id = 'store-'+i;
