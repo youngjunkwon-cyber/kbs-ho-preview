@@ -41,9 +41,9 @@
   #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 18px;border-radius:8px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:50}
   #toast.show{opacity:1}
   .empty{color:#9ca3af;text-align:center;padding:40px}
-  .stbl{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:13px}
+  .stbl{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:10px;font-size:13px}
   .stbl th,.stbl td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
-  .stbl th{background:#f9fafb;font-weight:600;color:#374151;position:sticky;top:0}
+  .stbl th{background:#f9fafb;font-weight:600;color:#374151;position:sticky;top:var(--hdr-h,0);z-index:5;box-shadow:inset 0 -1px 0 var(--line)}
   .stbl tr:hover{background:#fafafa}
   .stx{font-size:11px;padding:2px 8px;border-radius:99px;white-space:nowrap}
   .st-done{background:#dcfce7;color:#16a34a}
@@ -136,7 +136,10 @@ function renderStatus(){
       '<td class="issue">'+esc(x.issue||'-')+'</td>'+
       '<td><input class="noteinp" value="'+escAttr(NOTES[x.pid]||'')+'" placeholder="비고 입력" onchange="saveNote(\''+x.pid+'\',this.value)"></td></tr>').join('')+
     '</tbody></table>' : '<div class="empty">결과 없음</div>';
+  syncHdr();
 }
+function syncHdr(){ const h=document.querySelector('header'); if(h) document.documentElement.style.setProperty('--hdr-h', h.offsetHeight+'px'); }
+window.addEventListener('resize', syncHdr);
 function render(){
   if(tab==='stat'){ renderStatus(); return; }
   const doneN = P.filter(x=>DONE[x.pid]).length;
