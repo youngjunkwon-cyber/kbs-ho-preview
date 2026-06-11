@@ -54,6 +54,10 @@
   .noteinp{width:100%;min-width:140px;padding:5px 8px;border:1px solid var(--line);border-radius:6px;font-size:12px;font-family:inherit}
   .issue{font-size:12px;color:#4b5563;line-height:1.45}
   .stbl td:nth-child(4),.stbl td:nth-child(5){white-space:nowrap}
+  .rvw{text-align:center}
+  .rvchk{width:18px;height:18px;cursor:pointer;accent-color:#16a34a}
+  .stbl tr.reviewed{background:#f0fdf4}
+  .stbl tr.reviewed:hover{background:#e9f9ee}
   .noteinp:focus{outline:none;border-color:var(--pink)}
 </style>
 </head>
@@ -82,9 +86,11 @@
 const P = window.PRODUCTS || [], DES = window.DESIGNER || [], TOTAL = window.TOTAL_NORMAL || P.length, MS = window.MNSTATUS || [];
 const DONE = Object.assign({}, JSON.parse(localStorage.getItem('kbs_mn_done') || '{}'), (window.REGISTERED || {}));
 const NOTES = JSON.parse(localStorage.getItem('kbs_mn_notes') || '{}');
+const REVIEW = JSON.parse(localStorage.getItem('kbs_mn_review') || '{}');
 let tab = 'gen';
 function saveDone(){ localStorage.setItem('kbs_mn_done', JSON.stringify(DONE)); }
 function saveNote(pid,v){ if(v) NOTES[pid]=v; else delete NOTES[pid]; localStorage.setItem('kbs_mn_notes', JSON.stringify(NOTES)); }
+function saveReview(pid,c){ if(c) REVIEW[pid]=1; else delete REVIEW[pid]; localStorage.setItem('kbs_mn_review', JSON.stringify(REVIEW)); }
 function escAttr(s){ return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
 function setTab(t){ tab=t;
   document.getElementById('tabGen').classList.toggle('active',t==='gen');
@@ -124,8 +130,9 @@ function renderStatus(){
     return true;
   });
   const list=document.getElementById('list');
-  list.innerHTML = items.length ? '<table class="stbl"><colgroup><col style="width:9%"><col style="width:17%"><col style="width:18%"><col style="width:5%"><col style="width:8%"><col style="width:27%"><col style="width:16%"></colgroup><thead><tr><th>스토어</th><th>상품명(영어)</th><th>몽골어명(적용)</th><th>pid</th><th>상태</th><th>이슈 / 해소방법</th><th>비고</th></tr></thead><tbody>'+
-    items.map(x=>'<tr><td>'+esc(x.store)+'</td><td>'+esc(x.eng)+'</td><td>'+esc(x.mn||'-')+'</td><td>'+x.pid+'</td><td><span class="stx '+statClass(x.status)+'">'+esc(x.status)+'</span></td>'+
+  list.innerHTML = items.length ? '<table class="stbl"><colgroup><col style="width:9%"><col style="width:16%"><col style="width:17%"><col style="width:5%"><col style="width:8%"><col style="width:6%"><col style="width:25%"><col style="width:14%"></colgroup><thead><tr><th>스토어</th><th>상품명(영어)</th><th>몽골어명(적용)</th><th>pid</th><th>상태</th><th>검수</th><th>이슈 / 해소방법</th><th>비고</th></tr></thead><tbody>'+
+    items.map(x=>'<tr class="'+(REVIEW[x.pid]?'reviewed':'')+'"><td>'+esc(x.store)+'</td><td>'+esc(x.eng)+'</td><td>'+esc(x.mn||'-')+'</td><td>'+x.pid+'</td><td><span class="stx '+statClass(x.status)+'">'+esc(x.status)+'</span></td>'+
+      '<td class="rvw"><input type="checkbox" class="rvchk" '+(REVIEW[x.pid]?'checked':'')+' onchange="saveReview(\''+x.pid+'\',this.checked);this.closest(\'tr\').classList.toggle(\'reviewed\',this.checked)"></td>'+
       '<td class="issue">'+esc(x.issue||'-')+'</td>'+
       '<td><input class="noteinp" value="'+escAttr(NOTES[x.pid]||'')+'" placeholder="비고 입력" onchange="saveNote(\''+x.pid+'\',this.value)"></td></tr>').join('')+
     '</tbody></table>' : '<div class="empty">결과 없음</div>';
