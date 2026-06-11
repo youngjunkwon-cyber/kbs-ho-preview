@@ -50,6 +50,8 @@
   .st-amb{background:#fef3c7;color:#d97706}
   .st-thumb{background:#f3e8ff;color:#7c3aed}
   .st-none{background:#fee2e2;color:#dc2626}
+  .noteinp{width:100%;min-width:140px;padding:5px 8px;border:1px solid var(--line);border-radius:6px;font-size:12px;font-family:inherit}
+  .noteinp:focus{outline:none;border-color:var(--pink)}
 </style>
 </head>
 <body>
@@ -76,8 +78,11 @@
 <script>
 const P = window.PRODUCTS || [], DES = window.DESIGNER || [], TOTAL = window.TOTAL_NORMAL || P.length, MS = window.MNSTATUS || [];
 const DONE = Object.assign({}, JSON.parse(localStorage.getItem('kbs_mn_done') || '{}'), (window.REGISTERED || {}));
+const NOTES = JSON.parse(localStorage.getItem('kbs_mn_notes') || '{}');
 let tab = 'gen';
 function saveDone(){ localStorage.setItem('kbs_mn_done', JSON.stringify(DONE)); }
+function saveNote(pid,v){ if(v) NOTES[pid]=v; else delete NOTES[pid]; localStorage.setItem('kbs_mn_notes', JSON.stringify(NOTES)); }
+function escAttr(s){ return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
 function setTab(t){ tab=t;
   document.getElementById('tabGen').classList.toggle('active',t==='gen');
   document.getElementById('tabStat').classList.toggle('active',t==='stat');
@@ -115,8 +120,9 @@ function renderStatus(){
     return true;
   });
   const list=document.getElementById('list');
-  list.innerHTML = items.length ? '<table class="stbl"><thead><tr><th>스토어</th><th>상품명(영어)</th><th>몽골어명(적용)</th><th>pid</th><th>상태</th></tr></thead><tbody>'+
-    items.map(x=>'<tr><td>'+esc(x.store)+'</td><td>'+esc(x.eng)+'</td><td>'+esc(x.mn||'-')+'</td><td>'+x.pid+'</td><td><span class="stx '+statClass(x.status)+'">'+esc(x.status)+'</span></td></tr>').join('')+
+  list.innerHTML = items.length ? '<table class="stbl"><thead><tr><th>스토어</th><th>상품명(영어)</th><th>몽골어명(적용)</th><th>pid</th><th>상태</th><th>비고</th></tr></thead><tbody>'+
+    items.map(x=>'<tr><td>'+esc(x.store)+'</td><td>'+esc(x.eng)+'</td><td>'+esc(x.mn||'-')+'</td><td>'+x.pid+'</td><td><span class="stx '+statClass(x.status)+'">'+esc(x.status)+'</span></td>'+
+      '<td><input class="noteinp" value="'+escAttr(NOTES[x.pid]||'')+'" placeholder="비고 입력" onchange="saveNote(\''+x.pid+'\',this.value)"></td></tr>').join('')+
     '</tbody></table>' : '<div class="empty">결과 없음</div>';
 }
 function render(){
