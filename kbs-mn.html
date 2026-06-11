@@ -19,7 +19,8 @@
   .tabs{display:flex;gap:6px;margin-top:10px}
   .tabs button{padding:6px 12px;border:1px solid var(--line);background:#fff;border-radius:8px;cursor:pointer;font-size:13px}
   .tabs button.active{background:var(--pink);color:#fff;border-color:var(--pink)}
-  main{padding:16px 20px;max-width:1000px;margin:0 auto}
+  main{padding:16px 20px;max-width:1100px;margin:0 auto}
+  main.wide{max-width:1600px}
   .card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px}
   .card.done{opacity:.5}
   .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
@@ -51,7 +52,8 @@
   .st-thumb{background:#f3e8ff;color:#7c3aed}
   .st-none{background:#fee2e2;color:#dc2626}
   .noteinp{width:100%;min-width:140px;padding:5px 8px;border:1px solid var(--line);border-radius:6px;font-size:12px;font-family:inherit}
-  .issue{font-size:12px;color:#4b5563;line-height:1.45;max-width:340px}
+  .issue{font-size:12px;color:#4b5563;line-height:1.45}
+  .stbl td:nth-child(4),.stbl td:nth-child(5){white-space:nowrap}
   .noteinp:focus{outline:none;border-color:var(--pink)}
 </style>
 </head>
@@ -92,6 +94,7 @@ function setTab(t){ tab=t;
   document.getElementById('fstatus').style.display=t==='gen'?'':'none';
   document.getElementById('fdone').style.display=t==='gen'?'':'none';
   document.getElementById('fmnstat').style.display=t==='stat'?'':'none';
+  document.getElementById('list').classList.toggle('wide',t==='stat');
   render();
 }
 function toast(m){ const e=document.getElementById('toast'); e.textContent=m; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1800); }
@@ -121,7 +124,7 @@ function renderStatus(){
     return true;
   });
   const list=document.getElementById('list');
-  list.innerHTML = items.length ? '<table class="stbl"><thead><tr><th>스토어</th><th>상품명(영어)</th><th>몽골어명(적용)</th><th>pid</th><th>상태</th><th>이슈 / 해소방법</th><th>비고</th></tr></thead><tbody>'+
+  list.innerHTML = items.length ? '<table class="stbl"><colgroup><col style="width:9%"><col style="width:17%"><col style="width:18%"><col style="width:5%"><col style="width:8%"><col style="width:27%"><col style="width:16%"></colgroup><thead><tr><th>스토어</th><th>상품명(영어)</th><th>몽골어명(적용)</th><th>pid</th><th>상태</th><th>이슈 / 해소방법</th><th>비고</th></tr></thead><tbody>'+
     items.map(x=>'<tr><td>'+esc(x.store)+'</td><td>'+esc(x.eng)+'</td><td>'+esc(x.mn||'-')+'</td><td>'+x.pid+'</td><td><span class="stx '+statClass(x.status)+'">'+esc(x.status)+'</span></td>'+
       '<td class="issue">'+esc(x.issue||'-')+'</td>'+
       '<td><input class="noteinp" value="'+escAttr(NOTES[x.pid]||'')+'" placeholder="비고 입력" onchange="saveNote(\''+x.pid+'\',this.value)"></td></tr>').join('')+
