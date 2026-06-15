@@ -158,7 +158,8 @@ async function init(){
     setStatus('공유 연결 확인 중…');
     try{
       REMOTE = await apiGet();
-      if(Object.keys(REMOTE).length===0){ setStatus('초기 동기화 중…'); await seedFromLocal(); REMOTE = await apiGet(); }
+      const anyReal = STORES.some(s=>REMOTE[s.name]);
+      if(!anyReal){ setStatus('초기 동기화 중…'); await seedFromLocal(); REMOTE = await apiGet(); }
       setStatus('공유 연결됨 ✓','ok');
     }catch(err){ REMOTE=null; setStatus('공유 연결 실패 — 로컬 모드','err'); }
   } else {
