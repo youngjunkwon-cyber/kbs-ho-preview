@@ -55,6 +55,18 @@
   .toast{ position:fixed; left:50%; bottom:28px; transform:translateX(-50%); background:#222; color:#fff;
           padding:10px 18px; border-radius:20px; font-size:13px; opacity:0; transition:opacity .2s; z-index:50; }
   .toast.show{ opacity:1; }
+
+  .store.applied{ border-left:4px solid #22C55E; }
+  .store .chk.applied{ color:#16A34A; }
+  .note-wrap{ margin-top:12px; }
+  .note-wrap summary{ cursor:pointer; font-size:13px; color:#444; user-select:none; list-style:none; }
+  .note-wrap summary::-webkit-details-marker{ display:none; }
+  .note-wrap summary:before{ content:'▸ '; }
+  .note-wrap[open] summary:before{ content:'▾ '; }
+  .note-box{ margin-top:8px; min-height:84px; border:1px solid var(--line); border-radius:8px; padding:10px;
+             font-size:13px; line-height:1.6; background:#fff; overflow:auto; }
+  .note-box:empty:before{ content:attr(data-ph); color:#aaa; }
+  .note-box img{ max-width:100%; border-radius:6px; display:block; margin:6px 0; }
 </style>
 </head>
 <body>
@@ -70,7 +82,8 @@
   <b>② 이미지 복사</b> 눌러 카톡에 붙여넣기(Ctrl+V) ·
   전송 후 우측 <b>발송완료 체크</b>.
   이미지 복사가 안 되면 <b>이미지 저장</b>으로 PNG를 받아 드래그하세요.<br>
-  <b style="color:#2563EB">자체수정</b> = 연락 방법이 없거나 우리가 임의등록한 곳 등, 발송하지 않고 우리가 직접 수정할 곳에 체크하세요. (모든 체크는 이 브라우저에 자동 저장됩니다.)
+  <b style="color:#2563EB">자체수정</b> = 연락 방법이 없거나 우리가 임의등록한 곳 등, 발송하지 않고 우리가 직접 수정할 곳에 체크하세요.<br>
+  회신이 오면 각 카드 하단 <b>회신 내용·메모</b>에 붙여넣기(텍스트·이미지 모두 Ctrl+V) 후, 반영을 마치면 <b style="color:#16A34A">수정적용 완료</b>에 체크하세요. (모든 체크·메모는 이 브라우저에 자동 저장됩니다.)
 </div>
 <div class="wrap" id="list"></div>
 <div class="toast" id="toast"></div>
@@ -167,7 +180,9 @@ function updateProg(){
   const total = STORES.length;
   const done = document.querySelectorAll('.store.done').length;
   const self = document.querySelectorAll('.store.self').length;
-  document.getElementById('prog').textContent = done+' / '+total+' 발송완료 · '+self+' 자체수정';
+  const applied = document.querySelectorAll('.store.applied').length;
+  document.getElementById('prog').textContent =
+    '발송 '+done+' · 자체수정 '+self+' · 적용완료 '+applied+' / '+total;
 }
 
 const DONE_KEY = 'kbs_hours_sent_v1';
@@ -178,17 +193,43 @@ const SELF_KEY = 'kbs_hours_selffix_v1';
 function loadSelf(){ try{ return JSON.parse(localStorage.getItem(SELF_KEY)||'[]'); }catch(e){ return []; } }
 function saveSelf(arr){ localStorage.setItem(SELF_KEY, JSON.stringify(arr)); }
 
+const APPLIED_KEY = 'kbs_hours_applied_v1';
+function loadApplied(){ try{ return JSON.parse(localStorage.getItem(APPLIED_KEY)||'[]'); }catch(e){ return []; } }
+function saveApplied(arr){ localStorage.setItem(APPLIED_KEY, JSON.stringify(arr)); }
+
+/* 회신 메모(텍스트·이미지)는 용량이 커질 수 있어 IndexedDB에 저장 */
+let _db;
+function db(){ return new Promise((res,rej)=>{ if(_db) return res(_db);
+  const r=indexedDB.open('kbs_hours',1);
+  r.onupgradeneeded=()=>{ r.result.createObjectStore('notes'); };
+  r.onsuccess=()=>{ _db=r.result; res(_db); };
+  r.onerror=()=>rej(r.error); }); }
+async function noteGet(i){ const d=await db(); return new Promise((res)=>{
+  const t=d.transaction('notes','readonly').objectStore('notes').get(i);
+  t.onsuccess=()=>res(t.result||''); t.onerror=()=>res(''); }); }
+async function noteSet(i,html){ const d=await db(); return new Promise((res)=>{
+  const t=d.transaction('notes','readwrite').objectStore('notes').put(html,i);
+  t.onsuccess=()=>res(true); t.onerror=()=>res(false); }); }
+
+function updateNoteFlag(i){
+  const el=document.getElementById('note-'+i); const sum=document.getElementById('sum-'+i);
+  if(!el||!sum) return;
+  const has = el.textContent.trim().length>0 || !!el.querySelector('img');
+  sum.textContent = '회신 내용·메모' + (has ? ' (작성됨)' : '');
+}
+
 function render(){
   const list = document.getElementById('list');
   const done = loadDone();
   const self = loadSelf();
+  const applied = loadApplied();
   STORES.forEach((store, i)=>{
     const id = i+1;
     const fileBase = pad2(id)+'_'+safeName(store.name);
     const blank = hasBlankCells(store);
     const note = '<b>K-Beauty Station</b> = 노출 중인 운영시간 · 노란 칸 = K-Beauty Station과 다른 운영시간' + (blank ? ' · 빈 칸 = 해당 사이트 정보 없음' : '');
     const card = document.createElement('div');
-    card.className = 'store' + (done.includes(i)?' done':'') + (self.includes(i)?' self':'');
+    card.className = 'store' + (done.includes(i)?' done':'') + (self.includes(i)?' self':'') + (applied.includes(i)?' applied':'');
     card.id = 'store-'+i;
     card.innerHTML =
       '<div class="top">'+
@@ -197,6 +238,7 @@ function render(){
         '<span class="status">'+
           '<label class="chk"><input type="checkbox" data-i="'+i+'" data-kind="sent" '+(done.includes(i)?'checked':'')+'> 발송완료</label>'+
           '<label class="chk self"><input type="checkbox" data-i="'+i+'" data-kind="self" '+(self.includes(i)?'checked':'')+'> 자체수정</label>'+
+          '<label class="chk applied"><input type="checkbox" data-i="'+i+'" data-kind="applied" '+(applied.includes(i)?'checked':'')+'> 수정적용 완료</label>'+
         '</span>'+
       '</div>'+
       '<div class="cap" id="cap-'+i+'">'+
@@ -209,10 +251,16 @@ function render(){
         '<button class="b-img" data-act="img" data-i="'+i+'">② 이미지 복사</button>'+
         '<button class="b-save" data-act="save" data-i="'+i+'" data-file="'+fileBase+'">이미지 저장(PNG)</button>'+
       '</div>'+
-      '<textarea class="msg" id="msg-'+i+'">'+message(store.name, blank)+'</textarea>';
+      '<textarea class="msg" id="msg-'+i+'">'+message(store.name, blank)+'</textarea>'+
+      '<details class="note-wrap">'+
+        '<summary id="sum-'+i+'">회신 내용·메모</summary>'+
+        '<div class="note-box" id="note-'+i+'" data-i="'+i+'" contenteditable="true" data-ph="회신 내용을 여기에 붙여넣기 하세요 (텍스트·이미지 모두 Ctrl+V 가능)"></div>'+
+      '</details>';
     list.appendChild(card);
   });
   updateProg();
+  // 저장된 회신 메모 비동기 로드
+  STORES.forEach((s,i)=>{ noteGet(i).then(html=>{ const el=document.getElementById('note-'+i); if(el && html){ el.innerHTML=html; updateNoteFlag(i); } }); });
 }
 
 async function nodeToBlob(node){
@@ -277,13 +325,47 @@ document.addEventListener('change', (e)=>{
     if(cb.checked){ card.classList.add('done'); if(!done.includes(i)) done.push(i); }
     else { card.classList.remove('done'); const k=done.indexOf(i); if(k>=0) done.splice(k,1); }
     saveDone(done);
-  } else {
+  } else if(kind==='self'){
     const self = loadSelf();
     if(cb.checked){ card.classList.add('self'); if(!self.includes(i)) self.push(i); }
     else { card.classList.remove('self'); const k=self.indexOf(i); if(k>=0) self.splice(k,1); }
     saveSelf(self);
+  } else if(kind==='applied'){
+    const applied = loadApplied();
+    if(cb.checked){ card.classList.add('applied'); if(!applied.includes(i)) applied.push(i); }
+    else { card.classList.remove('applied'); const k=applied.indexOf(i); if(k>=0) applied.splice(k,1); }
+    saveApplied(applied);
   }
   updateProg();
+});
+
+/* 회신 메모: 텍스트·이미지 붙여넣기 + 자동 저장 */
+const _saveTimers = {};
+document.addEventListener('paste', (e)=>{
+  const box = e.target.closest && e.target.closest('.note-box');
+  if(!box) return;
+  const cd = e.clipboardData || window.clipboardData;
+  if(!cd) return;
+  const imgs = [];
+  for(const it of cd.items){ if(it.type && it.type.indexOf('image')===0){ const f=it.getAsFile(); if(f) imgs.push(f); } }
+  if(imgs.length){
+    e.preventDefault();
+    imgs.forEach(f=>{ const rd=new FileReader(); rd.onload=()=>{
+      document.execCommand('insertHTML', false, '<img src="'+rd.result+'">');
+      const i=+box.dataset.i; noteSet(i, box.innerHTML); updateNoteFlag(i);
+    }; rd.readAsDataURL(f); });
+  } else {
+    e.preventDefault();
+    const txt = cd.getData('text/plain');
+    document.execCommand('insertText', false, txt);
+  }
+});
+document.addEventListener('input', (e)=>{
+  const box = e.target.closest && e.target.closest('.note-box');
+  if(!box) return;
+  const i=+box.dataset.i;
+  clearTimeout(_saveTimers[i]);
+  _saveTimers[i]=setTimeout(()=>{ noteSet(i, box.innerHTML); updateNoteFlag(i); }, 500);
 });
 
 document.getElementById('btnAll').addEventListener('click', async (e)=>{
@@ -298,11 +380,11 @@ document.getElementById('btnAll').addEventListener('click', async (e)=>{
 });
 
 document.getElementById('btnReset').addEventListener('click', ()=>{
-  if(!confirm('발송완료·자체수정 체크를 모두 초기화할까요?')) return;
-  saveDone([]); saveSelf([]);
-  document.querySelectorAll('.store').forEach(c=>{ c.classList.remove('done'); c.classList.remove('self'); });
+  if(!confirm('발송완료·자체수정·수정적용 완료 체크를 모두 초기화할까요?\n(회신 내용·메모는 그대로 유지됩니다.)')) return;
+  saveDone([]); saveSelf([]); saveApplied([]);
+  document.querySelectorAll('.store').forEach(c=>{ c.classList.remove('done'); c.classList.remove('self'); c.classList.remove('applied'); });
   document.querySelectorAll('input[type=checkbox][data-kind]').forEach(cb=>cb.checked=false);
-  updateProg(); toast('체크 초기화됨');
+  updateProg(); toast('체크 초기화됨 (메모는 유지)');
 });
 
 render();
