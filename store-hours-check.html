@@ -78,6 +78,7 @@
   <span class="prog" id="prog">0 / 0 발송완료</span>
   <span class="sync" id="sync"></span>
   <button id="btnAll">전체 이미지 저장(PNG)</button>
+  <button id="btnImport">내 체크 공용에 올리기</button>
   <button id="btnReset">체크 초기화</button>
 </header>
 <div class="hint">
@@ -450,6 +451,24 @@ document.getElementById('btnAll').addEventListener('click', async (e)=>{
     try{ const blob = await nodeToBlob(node); download(blob, file); await new Promise(r=>setTimeout(r,350)); }catch(err){}
   }
   btn.textContent=orig; btn.disabled=false; toast('전체 PNG 저장 완료 — 다운로드 폴더 확인');
+});
+
+document.getElementById('btnImport').addEventListener('click', async ()=>{
+  if(!REMOTE){ alert('공유 연결 상태에서만 사용할 수 있습니다.'); return; }
+  if(!confirm('이 브라우저에 저장된 발송/자체수정/적용 체크와 메모를 공용 데이터로 올립니다.\n(초기 이관용 — 49곳을 이 브라우저 상태로 채웁니다.)\n계속할까요?')) return;
+  const btn=document.getElementById('btnImport'); btn.disabled=true;
+  const d=loadDone(), s=loadSelf(), a=loadApplied();
+  let n=0;
+  for(let i=0;i<STORES.length;i++){
+    btn.textContent='올리는 중… '+(i+1)+'/'+STORES.length;
+    const html = await noteGet(i);
+    const rec = {store:STORES[i].name, sent:d.includes(i), self:s.includes(i), applied:a.includes(i), note:html||''};
+    try{ await apiSave(rec); if(rec.sent||rec.self||rec.applied||rec.note) n++; }catch(err){}
+  }
+  REMOTE = await apiGet();
+  render();
+  btn.disabled=false; btn.textContent='내 체크 공용에 올리기';
+  toast('완료 — '+n+'개 항목을 공용으로 올렸습니다');
 });
 
 document.getElementById('btnReset').addEventListener('click', ()=>{
