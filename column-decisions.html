@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8"><title>칼럼 기능 — 의사결정 요청</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#f4f5f7;font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;color:#1f2329;line-height:1.6}
+  .wrap{max-width:860px;margin:0 auto;padding:36px 22px 60px}
+  .title{font-size:26px;font-weight:800;margin:0 0 6px}
+  .lead{color:#5a6270;font-size:15px;margin:0 0 4px}
+  .note{color:#8a909a;font-size:13px;margin:10px 0 30px}
+  .group{margin:0 0 30px}
+  .ghead{display:flex;align-items:center;gap:8px;font-size:18px;font-weight:800;margin:0 0 14px}
+  .gtag{font-size:12px;font-weight:700;color:#fff;border-radius:20px;padding:3px 11px}
+  .card{background:#fff;border-radius:12px;padding:18px 20px;margin:0 0 12px;box-shadow:0 1px 3px rgba(0,0,0,.08);border-left:5px solid #ccc}
+  .q{font-size:16px;font-weight:700;margin:0 0 7px}
+  .d{font-size:14px;color:#5a6270;margin:0}
+  .rec{display:inline-block;font-size:12px;font-weight:700;color:#0a7d3c;background:#e6f6ec;border-radius:6px;padding:3px 9px;margin-top:9px}
+  /* group colors */
+  .law .ghead{color:#c62828}    .law .card{border-left-color:#e53935}
+  .law .gtag{background:#e53935}
+  .biz .ghead{color:#1565c0}    .biz .card{border-left-color:#1e88e5}
+  .biz .gtag{background:#1e88e5}
+  .svc .ghead{color:#c2185b}    .svc .card{border-left-color:#E8467D}
+  .svc .gtag{background:#E8467D}
+  .etc .ghead{color:#555}       .etc .card{border-left-color:#9aa0a6}
+</style></head>
+<body><div class="wrap">
+
+  <div class="title">칼럼(원장 칼럼) 기능 — 결정 요청</div>
+  <p class="lead">입점사(원장)가 자기 매장 페이지에 직접 글(시술·진료 정보 / 원장·디자이너 소개 / 매장 이야기)을 써서 올리는 기능입니다.</p>
+  <p class="lead">아래 항목을 <b>결정해 회신</b> 부탁드립니다.</p>
+  <p class="note">※ 모두 기획 담당 제안이며 확정 전입니다. 특히 <b>법무 항목이 전제</b> — 결과에 따라 운영 방식이 바뀔 수 있습니다.</p>
+
+  <div class="group law">
+    <div class="ghead">⚖️ 법무 <span class="gtag">최우선 · 전제</span></div>
+    <div class="card">
+      <p class="q">칼럼을 법적으로 ‘광고’로 보는가? 입점사가 광고성 글을 올렸을 때 책임은 어디까지 지는가?</p>
+      <p class="d">‘광고’로 판정되면 사전심의 의무가 생겨 ‘즉시 게시’가 위법이 됩니다. 또 시스템이 못 막는 맥락성 광고(예: “지금 예약 시 특별가”)를 입점사가 올리면 책임이 플랫폼에 올 수 있습니다. 나머지 모든 결정의 전제입니다.</p>
+    </div>
+  </div>
+
+  <div class="group biz">
+    <div class="ghead">💼 경영 <span class="gtag">정책 · 리스크 · 비용</span></div>
+    <div class="card">
+      <p class="q">사람이 미리 검사하지 않고 바로 게시해도 되는가?</p>
+      <p class="d">검수 인력을 두지 않는 대신, 위반 글이 내려지기 전까지 일시 노출될 위험을 회사가 감수하게 됩니다.</p>
+    </div>
+    <div class="card">
+      <p class="q">작성 권한을 ‘어드민이 매장별로 켜고 끄는’ 방식으로 할까?</p>
+      <p class="d">등급제가 아니라, 허용한 매장만 칼럼을 쓸 수 있게 하는 방식입니다. 이걸로 충분한지 확인이 필요합니다.</p>
+    </div>
+    <div class="card">
+      <p class="q">권한을 거둘 때 기존 글을 ‘삭제’가 아니라 ‘숨김’으로 처리할까?</p>
+      <p class="d">삭제하면 검색 노출·데이터가 영구 손실되고 되돌릴 수 없습니다. 숨김은 고객에게 안 보이게 하되 데이터는 남깁니다.</p>
+      <span class="rec">기획 권고 — 숨김</span>
+    </div>
+    <div class="card">
+      <p class="q">외국어 6개 금지표현 사전 구축(비용·일정)을 승인하는가?</p>
+      <p class="d">한국어만 막으면 번역된 외국어 글의 위반은 못 거릅니다. 언어별 사전이 있어야 전 언어를 걸러낼 수 있으며, 구축에 비용·시간이 듭니다.</p>
+    </div>
+  </div>
+
+  <div class="group svc">
+    <div class="ghead">🎨 서비스 방향 <span class="gtag">기획 · 디자인</span></div>
+    <div class="card">
+      <p class="q">회사 매거진과 칼럼을 따로 노출할까?</p>
+      <p class="d">같이 노출하면 입점사 글의 품질 편차가 회사 브랜드·검색 평판에까지 번질 수 있습니다.</p>
+      <span class="rec">기획 권고 — 분리</span>
+    </div>
+    <div class="card">
+      <p class="q">고객이 칼럼을 어디로 들어와 보게 할까?</p>
+      <p class="d">예) 마이페이지에 ‘칼럼’ 메뉴 추가 / 메인 화면에 칼럼 영역 추가 / 칼럼만 모아 보여주는 페이지 추가 중에서 선택.</p>
+    </div>
+    <div class="card">
+      <p class="q">칼럼 분류의 세부 카테고리를 무엇으로 할까?</p>
+      <p class="d">큰 틀(시술·진료 정보 / 원장·전문가 소개 / 매장 이야기)은 정했고, 그 아래 세부 항목을 확정해야 합니다.</p>
+    </div>
+  </div>
+
+  <div class="group etc">
+    <div class="ghead">🔎 별도 확인</div>
+    <div class="card">
+      <p class="q">매거진과 인플루언서 기획전의 노출 관계가 현행 화면 구성과 맞는가?</p>
+      <p class="d">과거 작업 메모를 근거로 잡은 부분이라, 지금 화면 기준으로 다시 확인이 필요합니다.</p>
+    </div>
+  </div>
+
+</div></body></html>
