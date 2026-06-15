@@ -13,6 +13,9 @@
           padding:14px 20px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
   header h1{ font-size:18px; margin:0; }
   header .prog{ font-size:14px; color:#555; }
+  header .sync{ font-size:12px; color:#888; padding:3px 8px; border-radius:6px; background:#F1F3F5; }
+  header .sync.ok{ color:#15803D; background:#DCFCE7; }
+  header .sync.err{ color:#B91C1C; background:#FEE2E2; }
   header button{ font-size:13px; padding:7px 12px; border:1px solid var(--line); background:#fff;
                  border-radius:8px; cursor:pointer; }
   header button:hover{ background:#f2f2f2; }
@@ -73,6 +76,7 @@
 <header>
   <h1>운영시간 확인요청 발송용</h1>
   <span class="prog" id="prog">0 / 0 발송완료</span>
+  <span class="sync" id="sync"></span>
   <button id="btnAll">전체 이미지 저장(PNG)</button>
   <button id="btnReset">체크 초기화</button>
 </header>
@@ -88,10 +92,80 @@
 <div class="wrap" id="list"></div>
 <div class="toast" id="toast"></div>
 
+<script src="store-hours-config.js"></script>
 <script src="store-hours-data.js"></script>
 <script>
 const DAYS = ["월","화","수","목","금","토","일","공휴일"];
 const KBS = "K-Beauty Station";
+
+/* ===== 공유 백엔드(Apps Script) 연동 ===== */
+const API = (window.API_URL||'').trim();
+let REMOTE = null; // 연결되면 {스토어명: {sent,self,applied,note}}
+
+function setStatus(txt, kind){
+  const el=document.getElementById('sync'); if(!el) return;
+  el.textContent=txt; el.className='sync'+(kind?(' '+kind):'');
+}
+async function apiGet(){
+  const res = await fetch(API, {method:'GET'});
+  const j = await res.json(); return j.data||{};
+}
+async function apiSave(rec){
+  await fetch(API, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify({action:'save', rec})});
+}
+async function apiUpload(base64, mime){
+  const res = await fetch(API, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify({action:'upload', base64:base64, mime:mime})});
+  const j = await res.json(); if(!j.ok) throw new Error(j.error||'upload fail'); return j.url;
+}
+function readAsDataURL(f){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(f); }); }
+
+function stById(i){
+  const name=STORES[i].name;
+  if(REMOTE){ const r=REMOTE[name]||{}; return {sent:!!r.sent, self:!!r.self, applied:!!r.applied}; }
+  const d=loadDone(), s=loadSelf(), a=loadApplied();
+  return {sent:d.includes(i), self:s.includes(i), applied:a.includes(i)};
+}
+async function setFlag(i, kind, val){
+  const name=STORES[i].name;
+  const field = kind==='sent'?'sent':kind;
+  if(REMOTE){
+    REMOTE[name]=REMOTE[name]||{}; REMOTE[name][field]=val;
+    const rec={store:name}; rec[field]=val; await apiSave(rec);
+  } else {
+    const key = kind==='sent'?DONE_KEY:(kind==='self'?SELF_KEY:APPLIED_KEY);
+    let arr=JSON.parse(localStorage.getItem(key)||'[]');
+    if(val){ if(!arr.includes(i)) arr.push(i); } else { const k=arr.indexOf(i); if(k>=0) arr.splice(k,1); }
+    localStorage.setItem(key, JSON.stringify(arr));
+  }
+}
+async function setNote(i, html){
+  const name=STORES[i].name;
+  if(REMOTE){ REMOTE[name]=REMOTE[name]||{}; REMOTE[name].note=html; await apiSave({store:name, note:html}); }
+  else { await noteSet(i, html); }
+}
+async function seedFromLocal(){
+  const d=loadDone(), s=loadSelf(), a=loadApplied();
+  for(let i=0;i<STORES.length;i++){
+    const html = await noteGet(i);
+    const rec = {store:STORES[i].name, sent:d.includes(i), self:s.includes(i), applied:a.includes(i), note:html||''};
+    if(rec.sent||rec.self||rec.applied||rec.note) await apiSave(rec);
+  }
+}
+async function init(){
+  if(API){
+    setStatus('공유 연결 확인 중…');
+    try{
+      REMOTE = await apiGet();
+      if(Object.keys(REMOTE).length===0){ setStatus('초기 동기화 중…'); await seedFromLocal(); REMOTE = await apiGet(); }
+      setStatus('공유 연결됨 ✓','ok');
+    }catch(err){ REMOTE=null; setStatus('공유 연결 실패 — 로컬 모드','err'); }
+  } else {
+    setStatus('공유 미연결 — 로컬 저장 모드');
+  }
+  render();
+}
 
 function norm(v){
   let s = String(v==null?"":v).trim();
@@ -220,25 +294,24 @@ function updateNoteFlag(i){
 
 function render(){
   const list = document.getElementById('list');
-  const done = loadDone();
-  const self = loadSelf();
-  const applied = loadApplied();
+  list.innerHTML = '';
   STORES.forEach((store, i)=>{
     const id = i+1;
     const fileBase = pad2(id)+'_'+safeName(store.name);
     const blank = hasBlankCells(store);
+    const st = stById(i);
     const note = '<b>K-Beauty Station</b> = 노출 중인 운영시간 · 노란 칸 = K-Beauty Station과 다른 운영시간' + (blank ? ' · 빈 칸 = 해당 사이트 정보 없음' : '');
     const card = document.createElement('div');
-    card.className = 'store' + (done.includes(i)?' done':'') + (self.includes(i)?' self':'') + (applied.includes(i)?' applied':'');
+    card.className = 'store' + (st.sent?' done':'') + (st.self?' self':'') + (st.applied?' applied':'');
     card.id = 'store-'+i;
     card.innerHTML =
       '<div class="top">'+
         '<span class="idx">'+pad2(id)+'</span>'+
         '<span class="nm">'+store.name+'</span>'+
         '<span class="status">'+
-          '<label class="chk"><input type="checkbox" data-i="'+i+'" data-kind="sent" '+(done.includes(i)?'checked':'')+'> 발송완료</label>'+
-          '<label class="chk self"><input type="checkbox" data-i="'+i+'" data-kind="self" '+(self.includes(i)?'checked':'')+'> 자체수정</label>'+
-          '<label class="chk applied"><input type="checkbox" data-i="'+i+'" data-kind="applied" '+(applied.includes(i)?'checked':'')+'> 수정적용 완료</label>'+
+          '<label class="chk"><input type="checkbox" data-i="'+i+'" data-kind="sent" '+(st.sent?'checked':'')+'> 발송완료</label>'+
+          '<label class="chk self"><input type="checkbox" data-i="'+i+'" data-kind="self" '+(st.self?'checked':'')+'> 자체수정</label>'+
+          '<label class="chk applied"><input type="checkbox" data-i="'+i+'" data-kind="applied" '+(st.applied?'checked':'')+'> 수정적용 완료</label>'+
         '</span>'+
       '</div>'+
       '<div class="cap" id="cap-'+i+'">'+
@@ -259,8 +332,12 @@ function render(){
     list.appendChild(card);
   });
   updateProg();
-  // 저장된 회신 메모 비동기 로드
-  STORES.forEach((s,i)=>{ noteGet(i).then(html=>{ const el=document.getElementById('note-'+i); if(el && html){ el.innerHTML=html; updateNoteFlag(i); } }); });
+  // 저장된 회신 메모 로드 (공유 모드는 REMOTE, 로컬 모드는 IndexedDB)
+  if(REMOTE){
+    STORES.forEach((s,i)=>{ const html=(REMOTE[s.name]||{}).note||''; const el=document.getElementById('note-'+i); if(el && html){ el.innerHTML=html; updateNoteFlag(i); } });
+  } else {
+    STORES.forEach((s,i)=>{ noteGet(i).then(html=>{ const el=document.getElementById('note-'+i); if(el && html){ el.innerHTML=html; updateNoteFlag(i); } }); });
+  }
 }
 
 async function nodeToBlob(node){
@@ -314,34 +391,22 @@ document.addEventListener('click', async (e)=>{
   }
 });
 
-document.addEventListener('change', (e)=>{
+document.addEventListener('change', async (e)=>{
   const cb = e.target.closest('input[type=checkbox][data-kind]');
   if(!cb) return;
   const i = +cb.dataset.i;
   const kind = cb.dataset.kind;
   const card = document.getElementById('store-'+i);
-  if(kind==='sent'){
-    const done = loadDone();
-    if(cb.checked){ card.classList.add('done'); if(!done.includes(i)) done.push(i); }
-    else { card.classList.remove('done'); const k=done.indexOf(i); if(k>=0) done.splice(k,1); }
-    saveDone(done);
-  } else if(kind==='self'){
-    const self = loadSelf();
-    if(cb.checked){ card.classList.add('self'); if(!self.includes(i)) self.push(i); }
-    else { card.classList.remove('self'); const k=self.indexOf(i); if(k>=0) self.splice(k,1); }
-    saveSelf(self);
-  } else if(kind==='applied'){
-    const applied = loadApplied();
-    if(cb.checked){ card.classList.add('applied'); if(!applied.includes(i)) applied.push(i); }
-    else { card.classList.remove('applied'); const k=applied.indexOf(i); if(k>=0) applied.splice(k,1); }
-    saveApplied(applied);
-  }
+  const cls = kind==='sent'?'done':kind;
+  card.classList.toggle(cls, cb.checked);
   updateProg();
+  try{ await setFlag(i, kind, cb.checked); }
+  catch(err){ toast('저장 실패: '+err.message); }
 });
 
 /* 회신 메모: 텍스트·이미지 붙여넣기 + 자동 저장 */
 const _saveTimers = {};
-document.addEventListener('paste', (e)=>{
+document.addEventListener('paste', async (e)=>{
   const box = e.target.closest && e.target.closest('.note-box');
   if(!box) return;
   const cd = e.clipboardData || window.clipboardData;
@@ -350,10 +415,17 @@ document.addEventListener('paste', (e)=>{
   for(const it of cd.items){ if(it.type && it.type.indexOf('image')===0){ const f=it.getAsFile(); if(f) imgs.push(f); } }
   if(imgs.length){
     e.preventDefault();
-    imgs.forEach(f=>{ const rd=new FileReader(); rd.onload=()=>{
-      document.execCommand('insertHTML', false, '<img src="'+rd.result+'">');
-      const i=+box.dataset.i; noteSet(i, box.innerHTML); updateNoteFlag(i);
-    }; rd.readAsDataURL(f); });
+    const i=+box.dataset.i;
+    for(const f of imgs){
+      try{
+        let src;
+        if(REMOTE){ toast('이미지 업로드 중…'); const du=await readAsDataURL(f); src=await apiUpload(du.split(',')[1], f.type||'image/png'); }
+        else { src=await readAsDataURL(f); }
+        box.focus();
+        document.execCommand('insertHTML', false, '<img src="'+src+'">');
+      }catch(err){ toast('이미지 처리 실패: '+err.message); }
+    }
+    await setNote(i, box.innerHTML); updateNoteFlag(i);
   } else {
     e.preventDefault();
     const txt = cd.getData('text/plain');
@@ -365,7 +437,7 @@ document.addEventListener('input', (e)=>{
   if(!box) return;
   const i=+box.dataset.i;
   clearTimeout(_saveTimers[i]);
-  _saveTimers[i]=setTimeout(()=>{ noteSet(i, box.innerHTML); updateNoteFlag(i); }, 500);
+  _saveTimers[i]=setTimeout(()=>{ setNote(i, box.innerHTML); updateNoteFlag(i); }, 600);
 });
 
 document.getElementById('btnAll').addEventListener('click', async (e)=>{
@@ -380,6 +452,7 @@ document.getElementById('btnAll').addEventListener('click', async (e)=>{
 });
 
 document.getElementById('btnReset').addEventListener('click', ()=>{
+  if(REMOTE){ alert('공유 모드에서는 전체 초기화가 비활성화되어 있습니다.\n(실수로 팀 전체 데이터가 지워지는 것을 방지)'); return; }
   if(!confirm('발송완료·자체수정·수정적용 완료 체크를 모두 초기화할까요?\n(회신 내용·메모는 그대로 유지됩니다.)')) return;
   saveDone([]); saveSelf([]); saveApplied([]);
   document.querySelectorAll('.store').forEach(c=>{ c.classList.remove('done'); c.classList.remove('self'); c.classList.remove('applied'); });
@@ -387,7 +460,7 @@ document.getElementById('btnReset').addEventListener('click', ()=>{
   updateProg(); toast('체크 초기화됨 (메모는 유지)');
 });
 
-render();
+init();
 </script>
 </body>
 </html>
