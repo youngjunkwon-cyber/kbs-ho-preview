@@ -83,7 +83,7 @@ STG: admin(`k-beautystation-admin.vercel.app`) / host(`k-beautystation-host.verc
   - **메인** — 전문가 가이드 전용 섹션 신설(디자인 시안 별도)
   - **스토어 페이지**: 해당 스토어의 전문가 가이드 노출. 매장 페이지 내 위치는 **상품 섹션 위**
   - **마이페이지 > 전문가 가이드** — Explore 영역에 매거진과 나란히
-- **정렬** — 메인·모아보기는 매거진처럼 **최신순 / 인기순(=조회수)** 일괄 노출. 스토어 페이지는 해당 스토어 글. (**조회수 = 글 상세 화면 진입 수**)
+- **정렬** — 메인·모아보기는 **최신순 / 인기순(=조회수)** 토글. **스토어 페이지는 해당 스토어 글을 최신순 고정**(활동성·신선도 우선, 콜드스타트 회피). (**조회수 = 글 상세 화면 진입 수**)
 - **매거진과 분리** — 속성이 달라 개념적으로 분리(회사 큐레이션 매거진 vs 입점사 작성 가이드). 단 **UI는 매거진 레이아웃 차용·디벨롭**.
 
 ### 3.4 의료법 대비
@@ -225,7 +225,7 @@ STG: admin(`k-beautystation-admin.vercel.app`) / host(`k-beautystation-host.verc
 | ID | 기능명 | 요구사항 |
 |---|---|---|
 | COL-FO-01 | 메인 섹션 | 전문가 가이드 전용 섹션(최신순/조회수순) |
-| COL-FO-02 | 스토어 페이지 노출 | 스토어 상세에 해당 스토어 가이드 |
+| COL-FO-02 | 스토어 페이지 노출 | 스토어 상세에 해당 스토어 가이드(**최신순**) |
 | COL-FO-03 | 마이페이지 진입 | 마이페이지 > 전문가 가이드(모아보기) |
 | COL-FO-04 | 칼럼 상세 | 본문(카드 포함) + 분류·태그 |
 | COL-FO-05 | 다국어 URL/SEO | `/guides/{lang}/{slug}` + canonical/OG/Article/SSR |
@@ -250,6 +250,8 @@ STG: admin(`k-beautystation-admin.vercel.app`) / host(`k-beautystation-host.verc
 | 메인/모아보기 화면 | 디자인 시안(매거진 UI 차용) |
 | 화면 디테일 | 에디터 허용 요소, 빈 상태, slug·메타 세부 |
 | 작성 권한 off 운영 기준 | off 발동 세부 운영 기준(위반 반복 판정 등) — 내부 운영정책 |
+| 노출 예외·URL 처리 | 블라인드·삭제 글의 URL 응답(404/410)·canonical, 삽입 카드 대상(상품/스토어) 삭제·비노출 시 본문 카드 처리 |
+| 게시글 상태 전이 규칙 | 숨김↔블라인드 중첩, 블라인드 해제 시 복귀 상태 등 |
 
 </script>
 <script>document.getElementById('content').innerHTML=marked.parse(document.getElementById('md').textContent);</script>
