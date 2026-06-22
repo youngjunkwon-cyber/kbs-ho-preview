@@ -354,9 +354,9 @@ STG: admin(`k-beautystation-admin.vercel.app`) / host(`k-beautystation-host.verc
 | 금지어 초기 키워드 | 언어별 초기 등록 키워드 세트(기획 정리 → 어드민 등록) |
 | 칼럼 통계 | **지표 정의 확정** — 노출수=서비스 내 노출 횟수 / 내부진입수=서비스 내 이동해 상세 진입 / 직접유입수=외부 링크로 바로 상세 진입. 조회수(인기순 기준)=상세 진입 수(내부+직접). 추가 지표·집계 주기는 상세 기획 |
 | 메인/모아보기 화면 | 디자인 시안(매거진 UI 차용) |
-| 화면 디테일 | 에디터 허용 요소, 빈 상태, slug·메타 세부 |
+| 화면 디테일 | 에디터 세부 허용 요소(리치 텍스트 범위). (slug·메타·URL은 §3.7, 빈 상태·모달은 시안 확정) |
 | 작성 권한 OFF 운영 기준 | OFF 발동 세부 운영 기준(위반 반복 판정 등) — 내부 운영정책 |
-| 노출 예외·URL 처리 | 블라인드·삭제 글의 URL 응답(404/410)·canonical |
+| 노출 예외·URL 처리 | **§3.7 확정** — 비노출(숨김·블라인드·재심사·삭제·번역없음)=404, canonical=self, hreflang=게시중 언어 |
 | 게시글 상태 전이 규칙 | **§6.2 확정** — 블라인드 처리=직전 상태 보존, 해제=직전 상태로 복원. 숨김↔블라인드 중첩 등 잔여 엣지만 상세 기획 |
 </script>
 <script>document.getElementById('content').innerHTML=marked.parse(document.getElementById('md').textContent);</script>
