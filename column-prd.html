@@ -193,7 +193,7 @@ STG: admin(`k-beautystation-admin.vercel.app`) / host(`k-beautystation-host.verc
 - **코드 주의: 간체 = `zh-Hans`, 번체 = `zh-Hant`**(글자체 기준이 국가코드 zh-CN/zh-TW보다 정확). URL path는 zh-CN/zh-TW 유지하되 hreflang 속성은 Hans/Hant로. 그 외 en·ja·id·mn.
 
 **③ 메타 · OG · 구조화 데이터**
-- `<title>` = 노출 제목 + 스토어명 + K-Beauty Station. `meta description` = 본문 앞부분 자동 발췌(약 155자, 수동 입력 없음).
+- `<title>` = 노출 제목 + 스토어명 + K-Beauty Station. `meta description` = 본문 **첫 의미 있는 문장 기준 자동 발췌**(머리말·이미지 캡션 스킵, 문장 경계로 자름, 약 150~160자, 수동 입력 없음). 발췌 불가 시에만 템플릿 폴백.
 - OG/Twitter : `og:type=article` · `og:title/description` · `og:image`(등록 썸네일 그대로 = 375×200, OG 이미지 재생성 안 함 — 매거진과 동일) · `og:locale`(언어별) · `og:url`(canonical) · `twitter:card=summary_large_image`.
 - schema.org/**Article** : headline · image · datePublished(등록일) · dateModified(수정일) · author(스토어) · publisher(K-Beauty Station + 로고) · inLanguage · mainEntityOfPage.
 - schema.org/**BreadcrumbList** : Home › Expert Guides › {스토어} › {글} (검색결과 빵부스러기 노출).
