@@ -189,12 +189,14 @@ STG: admin(`k-beautystation-admin.vercel.app`) / host(`k-beautystation-host.verc
 
 **② canonical · hreflang (다국어 핵심)**
 - canonical = 각 언어 URL **자기 자신**(번역본은 독립 콘텐츠로 각각 인덱싱, 중복 아님).
-- hreflang = 한 글의 **게시중 노출 언어 전부를 상호 alternate**로 연결 + `x-default`(영어). 원본 한국어·비노출·블라인드 언어는 hreflang에서 제외.
+- hreflang = 한 글의 **게시중 노출 언어 전부를 상호 alternate**로 연결 + `x-default`(영어). 원본 한국어·비노출·블라인드 언어는 제외.
+- **코드 주의: 간체 = `zh-Hans`, 번체 = `zh-Hant`**(글자체 기준이 국가코드 zh-CN/zh-TW보다 정확). URL path는 zh-CN/zh-TW 유지하되 hreflang 속성은 Hans/Hant로. 그 외 en·ja·id·mn.
 
 **③ 메타 · OG · 구조화 데이터**
 - `<title>` = 노출 제목 + 스토어명 + K-Beauty Station. `meta description` = 본문 앞부분 자동 발췌(약 155자, 수동 입력 없음).
 - OG/Twitter : `og:type=article` · `og:title/description` · `og:image`(등록 썸네일 그대로 = 375×200, OG 이미지 재생성 안 함 — 매거진과 동일) · `og:locale`(언어별) · `og:url`(canonical) · `twitter:card=summary_large_image`.
 - schema.org/**Article** : headline · image · datePublished(등록일) · dateModified(수정일) · author(스토어) · publisher(K-Beauty Station + 로고) · inLanguage · mainEntityOfPage.
+- schema.org/**BreadcrumbList** : Home › Expert Guides › {스토어} › {글} (검색결과 빵부스러기 노출).
 
 **④ sitemap · 인덱싱 (게시글 상태 연동)**
 - `sitemap-guides.xml`(다국어) : **게시중 + 노출 언어 URL만** 포함. `lastmod` = 수정일, hreflang alternates 포함.
@@ -206,7 +208,7 @@ STG: admin(`k-beautystation-admin.vercel.app`) / host(`k-beautystation-host.verc
 
 **⑤ 렌더 · 기타**
 - **SSR**로 본문·메타·구조화 데이터 서버 렌더(크롤러 대응, 매거진 SSR 재활용).
-- robots.txt `Allow: /guides`. 썸네일 `alt`(노출 제목). 스토어 페이지 ↔ 칼럼 상호 내부링크로 크롤 경로 확보.
+- 페이지별 `<html lang>` = 노출 언어 명시(다국어 정합·접근성). robots.txt `Allow: /guides`. 썸네일 `alt`(노출 제목). 스토어 페이지 ↔ 칼럼 + **같은 스토어·태그 관련 칼럼** 상호 내부링크로 크롤 경로·연관도 확보.
 
 ### 3.8 명칭 (언어별)
 | 언어 | 명칭 | 비고 |
