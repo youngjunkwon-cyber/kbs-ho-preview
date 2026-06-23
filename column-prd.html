@@ -146,7 +146,7 @@ STG: admin(`k-beautystation-admin.vercel.app`) / host(`k-beautystation-host.verc
 ### 3.2 다국어 — 한 화면 언어별 번역 입력 (스토어 노출정보 패턴 차용)
 - 매거진의 "복제 후 별도 글" 방식 ❌ → **스토어 노출정보와 동일한 한 화면 다국어 구조**(언어 탭 + 필드별/본문 "번역" 버튼, 원본+번역 한 엔티티).
 - **언어 탭 노출**: 스토어가 활성화한 언어 설정에 맞춰 해당 언어 탭만 노출된다.
-- **번역**: 번역 버튼을 누르면 활성 언어들에 대해서만 **일괄 자동번역**되고, 각 언어 탭에서 **개별 수정** 가능하다. 자동번역은 **스토어당 일 20회 한도**(MT 비용·악용 방지) — 초과 시 안내, 탭별 수동 수정은 계속 가능(수치는 운영 데이터로 보정).
+- **번역**: 번역 버튼을 누르면 활성 언어들에 대해서만 **일괄 자동번역**되고, 각 언어 탭에서 **개별 수정** 가능하다. 자동번역 버튼은 **원본 탭에서만 노출**(원본→활성 언어 일괄), **스토어당 일 20회 한도**(MT 비용·악용 방지)이며 **버튼 옆에 잔여 횟수 표시**(예: 오늘 N회 남음) — 초과 시 비활성·안내, 탭별 수동 수정은 계속 가능(수치는 운영 데이터로 보정).
 - 지원 언어: 중국어 간체 / 영어 / 중국어 번체 / 일본어 / 인도네시아어 / 몽골어(MN).
 - **원본(기준) 언어 = 한국어** — 호스트가 한국어로 작성 후 위 6개 언어로 번역. 한국어 원본은 **내부 기준이며 FO 비노출**(노출은 번역본만). 입력 언어가 한국어인지 시스템이 판별·강제하지 않음.
 
@@ -185,7 +185,7 @@ STG: admin(`k-beautystation-admin.vercel.app`) / host(`k-beautystation-host.verc
 
 **① URL · slug**
 - `{lang}` = 노출 언어 코드 `en` · `ja` · `zh-CN`(간체) · `zh-TW`(번체) · `id` · `mn`. **원본 한국어는 FO 비노출이라 공개 URL 없음**.
-- `{slug}` = 노출 제목 기준 **언어별 자동 생성**(해당 언어 그대로, 공백→하이픈, 비ASCII 그대로 — 매거진 `/blog/{lang}/{slug}`와 동일 방식, 예 `/guides/zh-CN/首尔毛孔护理指南`). 수정 불가, 중복 시 `-2` suffix, 게시 시 중복검사.
+- `{slug}` = 제목 기준 **언어별 자동 생성**(해당 언어 그대로, 공백→하이픈, 비ASCII 그대로 — 매거진 `/blog/{lang}/{slug}`와 동일 방식, 예 `/guides/zh-CN/首尔毛孔护理指南`). 수정 불가, 중복 시 `-2` suffix, 게시 시 중복검사.
 
 **② canonical · hreflang (다국어 핵심)**
 - canonical = 각 언어 URL **자기 자신**(번역본은 독립 콘텐츠로 각각 인덱싱, 중복 아님).
@@ -193,7 +193,7 @@ STG: admin(`k-beautystation-admin.vercel.app`) / host(`k-beautystation-host.verc
 - **코드 주의: 간체 = `zh-Hans`, 번체 = `zh-Hant`**(글자체 기준이 국가코드 zh-CN/zh-TW보다 정확). URL path는 zh-CN/zh-TW 유지하되 hreflang 속성은 Hans/Hant로. 그 외 en·ja·id·mn.
 
 **③ 메타 · OG · 구조화 데이터**
-- `<title>` = 노출 제목 + 스토어명 + K-Beauty Station. `meta description` = 본문 **첫 의미 있는 문장 기준 자동 발췌**(머리말·이미지 캡션 스킵, 문장 경계로 자름, 약 150~160자, 수동 입력 없음). 발췌 불가 시에만 템플릿 폴백.
+- `<title>` = 제목 + 스토어명 + K-Beauty Station. `meta description` = 본문 **첫 의미 있는 문장 기준 자동 발췌**(머리말·이미지 캡션 스킵, 문장 경계로 자름, 약 150~160자, 수동 입력 없음). 발췌 불가 시에만 템플릿 폴백.
 - OG/Twitter : `og:type=article` · `og:title/description` · `og:image`(등록 썸네일 그대로 = 375×200, OG 이미지 재생성 안 함 — 매거진과 동일) · `og:locale`(언어별) · `og:url`(canonical) · `twitter:card=summary_large_image`.
 - schema.org/**Article** : headline · image · datePublished(등록일) · dateModified(수정일) · author(스토어) · publisher(K-Beauty Station + 로고) · inLanguage · mainEntityOfPage.
 - schema.org/**BreadcrumbList** : Home › Expert Guides › {스토어} › {글} (검색결과 빵부스러기 노출).
@@ -208,7 +208,7 @@ STG: admin(`k-beautystation-admin.vercel.app`) / host(`k-beautystation-host.verc
 
 **⑤ 렌더 · 기타**
 - **SSR**로 본문·메타·구조화 데이터 서버 렌더(크롤러 대응, 매거진 SSR 재활용).
-- 페이지별 `<html lang>` = 노출 언어 명시(다국어 정합·접근성). robots.txt `Allow: /guides`. 썸네일 `alt`(노출 제목). 스토어 페이지 ↔ 칼럼 + **같은 스토어·태그 관련 칼럼** 상호 내부링크로 크롤 경로·연관도 확보.
+- 페이지별 `<html lang>` = 노출 언어 명시(다국어 정합·접근성). robots.txt `Allow: /guides`. 썸네일 `alt`(제목). 스토어 페이지 ↔ 칼럼 + **같은 스토어·태그 관련 칼럼** 상호 내부링크로 크롤 경로·연관도 확보.
 
 ### 3.8 명칭 (언어별)
 | 언어 | 명칭 | 비고 |
@@ -246,7 +246,7 @@ STG: admin(`k-beautystation-admin.vercel.app`) / host(`k-beautystation-host.verc
    - **숨김·삭제**(노출 줄이는 방향) → **권한과 무관, OFF 중에도 가능**. 삭제는 **복구불가 확인 모달** 후 영구 삭제, 숨김은 복구 가능.
 3. 기준 언어(한국어)로 본문 작성·수정.
 4. 한 화면에서 언어별 번역 입력(자동번역 보조), 노출 언어 선택(체크박스).
-5. 태그(BO 풀에서 선택)·썸네일·노출 제목 입력 → slug 자동생성.
+5. 태그(BO 풀에서 선택)·썸네일·제목 입력 → slug 자동생성.
 6. 게시 클릭(확정 모달) → **① 유의사항 안내·본인 책임 확인 모달**(동의) → **② 금지어 검출**(검출 시 **차단 + 검출 금지어 안내 모달** → 본문 수정으로 복귀 후 재시도) → 즉시 게시.
 7. **수정 후 게시도 동일 게이트(①동의 → ②금지어) 재확인**. 단 **숨김 해제(단순 재노출)는 게이트 없이 즉시** — 게이트는 신규 작성·내용 수정 후 게시에만 적용.
 8. **블라인드 글 수정** — 수정 화면 진입 가능(저장해도 노출 X). [게시] 대신 **[재심사 요청]**(금지어 검출 후 BO 재심사 큐로). 노출 복원은 BO 승인으로만.
