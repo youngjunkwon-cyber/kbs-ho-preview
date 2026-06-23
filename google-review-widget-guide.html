@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>구글리뷰 위젯 생성 및 삽입 가이드 | K-Beauty Station Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --pink: #FF6B8A;
+  --pink-light: #fff0f3;
+  --pink-mid: #ffd6df;
+  --navy: #0f1023;
+  --navy2: #1a1a3e;
+  --text: #2c2c3e;
+  --text-sub: #6b7280;
+  --text-light: #9ca3af;
+  --border: #e8e8f0;
+  --border-light: #f0f0f4;
+  --bg: #f7f7fb;
+  --white: #ffffff;
+  --tip-bg: #EEF6FF;
+  --tip-border: #4A90D9;
+  --tip-text: #2d5fa0;
+  --warn-bg: #FFF7ED;
+  --warn-border: #F59E0B;
+  --warn-text: #7a5000;
+  --info-bg: #F3F0FF;
+  --info-border: #8b5cf6;
+  --info-text: #5b21b6;
+  --code-bg: #1a1a2e;
+  --code-text: #e8e8f0;
+  --sidebar-w: 260px;
+  --header-h: 56px;
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+/* ── Header ── */
+.top-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--header-h);
+  background: var(--navy);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 12px;
+  z-index: 100;
+  border-bottom: 2px solid rgba(255,107,138,0.5);
+}
+.header-logo { font-size: 14px; font-weight: 800; color: var(--white); letter-spacing: 0.5px; }
+.header-logo span { color: var(--pink); }
+.header-sep { width: 1px; height: 18px; background: rgba(255,255,255,0.15); }
+.header-title { font-size: 13px; color: rgba(255,255,255,0.55); letter-spacing: 0.3px; }
+.header-badge {
+  margin-left: auto;
+  background: rgba(255,107,138,0.15);
+  border: 1px solid rgba(255,107,138,0.3);
+  color: var(--pink);
+  font-size: 11px; font-weight: 700;
+  padding: 3px 10px; border-radius: 20px; letter-spacing: 0.5px;
+}
+
+/* ── Layout ── */
+.layout { display: flex; padding-top: var(--header-h); min-height: 100vh; }
+
+/* ── Sidebar ── */
+.sidebar {
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  position: sticky;
+  top: var(--header-h);
+  height: calc(100vh - var(--header-h));
+  overflow-y: auto;
+  background: var(--white);
+  border-right: 1px solid var(--border);
+  padding: 24px 0 40px;
+}
+.sidebar-part-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2.5px;
+  color: var(--pink);
+  padding: 0 20px 8px;
+  text-transform: uppercase;
+}
+.sidebar-part-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--navy);
+  padding: 0 20px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.part-num-circle {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: white;
+  font-size: 12px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+}
+.nav-list { list-style: none; }
+.nav-item a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 20px 9px 32px;
+  font-size: 13.5px;
+  color: var(--text-sub);
+  text-decoration: none;
+  transition: all 0.15s;
+  border-left: 3px solid transparent;
+  line-height: 1.4;
+}
+.nav-item.sub a { padding-left: 48px; font-size: 13px; color: var(--text-light); }
+.nav-item a:hover {
+  color: var(--pink);
+  background: var(--pink-light);
+  border-left-color: var(--pink-mid);
+}
+.nav-item.active a {
+  color: var(--pink);
+  background: var(--pink-light);
+  border-left-color: var(--pink);
+  font-weight: 700;
+}
+.nav-divider { margin: 18px 20px; border: none; border-top: 1px solid var(--border); }
+.sidebar-footer {
+  padding: 0 20px;
+  font-size: 12px;
+  color: var(--text-sub);
+  line-height: 1.8;
+  margin-top: 8px;
+}
+
+/* ── Main ── */
+.main { flex: 1; min-width: 0; padding: 36px 48px 80px 40px; }
+
+/* ── Hero ── */
+.hero {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 40px 44px;
+  margin-bottom: 36px;
+  color: var(--navy);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50px; right: -50px;
+  width: 240px; height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,107,138,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 3px; color: var(--pink); margin-bottom: 14px; position: relative; }
+.hero-title { font-size: 32px; font-weight: 900; line-height: 1.3; margin-bottom: 14px; color: var(--navy); position: relative; }
+.hero-desc { font-size: 15px; color: var(--text-sub); margin-bottom: 26px; line-height: 1.7; position: relative; }
+.hero-desc b { color: var(--navy); }
+.hero-parts { display: flex; gap: 14px; flex-wrap: wrap; position: relative; }
+.hero-part {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  flex: 1;
+  min-width: 240px;
+}
+.hero-part-num {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: var(--pink);
+  margin-bottom: 5px;
+}
+.hero-part-title { font-size: 16px; font-weight: 800; color: var(--navy); margin-bottom: 5px; }
+.hero-part-desc { font-size: 13px; color: var(--text-sub); line-height: 1.6; }
+
+/* ── Part Header ── */
+.part-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 48px 0 20px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--navy);
+  scroll-margin-top: calc(var(--header-h) + 16px);
+}
+.part-header:first-of-type { margin-top: 8px; }
+.part-header-num {
+  width: 46px; height: 46px;
+  border-radius: 11px;
+  background: var(--navy);
+  color: white;
+  font-size: 18px; font-weight: 900;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.part-header-text { flex: 1; }
+.part-header-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: var(--pink); margin-bottom: 3px; }
+.part-header-title { font-size: 26px; font-weight: 900; color: var(--navy); }
+.part-header-sub { font-size: 15px; color: var(--text-sub); margin-top: 4px; line-height: 1.6; }
+
+/* ── Sub-section header ── */
+.sub-section-header {
+  margin: 28px 0 14px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  scroll-margin-top: calc(var(--header-h) + 16px);
+}
+.sub-section-num {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--pink);
+  letter-spacing: 1px;
+}
+.sub-section-title { font-size: 19px; font-weight: 800; color: var(--navy); }
+
+/* ── Step Section ── */
+.step-section {
+  background: var(--white);
+  border-radius: 14px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  scroll-margin-top: calc(var(--header-h) + 16px);
+}
+.step-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--white);
+}
+.step-num-badge {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 16px;
+  background: var(--pink);
+  color: white;
+  font-size: 13px;
+  font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  letter-spacing: 0.3px;
+}
+.step-header-title { font-size: 18px; font-weight: 800; color: var(--navy); }
+.step-header-sub { font-size: 13.5px; color: var(--text-sub); margin-left: auto; }
+
+.step-body-wrap { display: flex; flex-direction: column; }
+.step-img-col {
+  width: 100%;
+  background: #f4f4f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+  padding: 0;
+}
+.step-img-col img {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
+  display: block;
+}
+.img-ph {
+  width: 100%;
+  min-height: 240px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 12px;
+  color: #c8c8d0;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+.img-ph svg { opacity: 0.45; }
+.img-ph-label {
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  font-weight: 600;
+  color: #d0d0da;
+}
+
+.step-text-col {
+  width: 100%;
+  padding: 24px 28px 28px;
+  display: flex;
+  flex-direction: column;
+}
+.step-desc-body {
+  font-size: 15px;
+  color: #4a4a60;
+  line-height: 1.8;
+  margin-bottom: 16px;
+}
+.step-desc-body b { color: var(--navy); font-weight: 700; }
+
+.step-checklist { list-style: none; }
+.step-checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 16px;
+  color: var(--text);
+  line-height: 1.7;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-light);
+}
+.step-checklist li:last-child { border-bottom: none; }
+.step-check-icon {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--pink-light);
+  color: var(--pink);
+  font-size: 10px;
+  font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+.step-checklist b { color: var(--navy); font-weight: 700; }
+
+/* Field-list */
+.field-list { list-style: none; }
+.field-list-item {
+  padding: 12px 0;
+  border-bottom: 1px dashed var(--border);
+}
+.field-list-item:last-child { border-bottom: none; }
+.field-list-label {
+  display: inline-block;
+  background: var(--navy);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 4px;
+  margin-right: 8px;
+  letter-spacing: 0.3px;
+}
+.field-list-desc { font-size: 16px; color: #4a4a60; margin-top: 8px; line-height: 1.7; }
+.field-list-desc b { color: var(--navy); }
+
+/* Code block */
+.code-block {
+  margin-top: 16px;
+  background: var(--code-bg);
+  border-radius: 8px;
+  padding: 16px 18px;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--code-text);
+  overflow-x: auto;
+  white-space: pre;
+}
+.code-block .cmt { color: #7a7a9a; }
+.code-block .tag { color: #FF8FA8; }
+
+/* Callout */
+.callout {
+  margin-top: 16px;
+  padding: 13px 16px;
+  border-radius: 0 8px 8px 0;
+  font-size: 15px;
+  line-height: 1.7;
+}
+.callout.tip { background: var(--tip-bg); border-left: 3px solid var(--tip-border); color: var(--tip-text); }
+.callout.warn { background: var(--warn-bg); border-left: 3px solid var(--warn-border); color: var(--warn-text); }
+.callout.info { background: var(--info-bg); border-left: 3px solid var(--info-border); color: var(--info-text); }
+
+/* Sidebar scrollbar */
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* Responsive */
+@media (max-width: 1000px) {
+  :root { --sidebar-w: 220px; }
+  .main { padding: 24px 24px 60px; }
+}
+@media (max-width: 760px) {
+  .layout { flex-direction: column; }
+  .sidebar { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--border); padding: 16px 0; }
+  .hero { padding: 28px 24px; }
+}
+</style>
+</head>
+<body>
+
+<header class="top-header">
+  <div class="header-logo">K-Beauty<span>Station</span></div>
+  <div class="header-sep"></div>
+  <div class="header-title">ADMIN · 구글리뷰 위젯 가이드</div>
+  <div class="header-badge">INTERNAL</div>
+</header>
+
+<div class="layout">
+
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-part-label">PART 1</div>
+    <div class="sidebar-part-title"><span class="part-num-circle">1</span>위젯 생성 (Elfsight)</div>
+    <ul class="nav-list">
+      <li class="nav-item" id="nav-p1-1"><a href="#p1-1">1-1. Elfsight 진입 및 위젯 만들기</a></li>
+      <li class="nav-item" id="nav-p1-2"><a href="#p1-2">1-2. 구글 비즈니스 연결</a></li>
+      <li class="nav-item" id="nav-p1-3"><a href="#p1-3">1-3. 레이아웃 / 표시 설정</a></li>
+      <li class="nav-item" id="nav-p1-4"><a href="#p1-4">1-4. 게시 및 임베드 코드 복사</a></li>
+    </ul>
+
+    <hr class="nav-divider">
+
+    <div class="sidebar-part-label">PART 2</div>
+    <div class="sidebar-part-title"><span class="part-num-circle">2</span>스토어 페이지에 삽입</div>
+    <ul class="nav-list">
+      <li class="nav-item" id="nav-p2-1"><a href="#p2-1">2-1. 스토어 관리 진입</a></li>
+      <li class="nav-item" id="nav-p2-2"><a href="#p2-2">2-2. 구글리뷰 필드에 붙여넣기</a></li>
+      <li class="nav-item" id="nav-p2-3"><a href="#p2-3">2-3. 저장 및 노출 확인</a></li>
+    </ul>
+
+    <hr class="nav-divider">
+
+    <div class="sidebar-footer">
+      K-Beauty Station<br>
+      ADMIN · 2026.06.23<br>
+      내부 배포용
+    </div>
+  </nav>
+
+  <main class="main">
+
+    <!-- HERO -->
+    <div class="hero">
+      <div class="hero-eyebrow">ADMIN GUIDE</div>
+      <div class="hero-title">구글리뷰 위젯 생성 및 삽입 가이드</div>
+      <div class="hero-desc">
+        외부 위젯 빌더 <b>Elfsight</b>에서 매장의 구글 리뷰 위젯을 만들고, 발급된 <b>임베드 코드</b>를
+        어드민 스토어 페이지의 <b>구글리뷰 입력 필드</b>에 삽입하여 스토어 상세에 노출하는 전체 절차를 안내합니다.
+      </div>
+      <div class="hero-parts">
+        <div class="hero-part">
+          <div class="hero-part-num">PART 01</div>
+          <div class="hero-part-title">위젯 생성 (Elfsight)</div>
+          <div class="hero-part-desc">위젯 만들기 → 구글 연결 → 설정 → 코드 복사</div>
+        </div>
+        <div class="hero-part">
+          <div class="hero-part-num">PART 02</div>
+          <div class="hero-part-title">스토어 페이지에 삽입</div>
+          <div class="hero-part-desc">스토어 관리 → 필드 붙여넣기 → 저장 / 확인</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ PART 1. 위젯 생성 ═══════════════════ -->
+    <div class="part-header" id="part1">
+      <div class="part-header-num">01</div>
+      <div class="part-header-text">
+        <div class="part-header-eyebrow">PART 01</div>
+        <div class="part-header-title">위젯 생성 (Elfsight)</div>
+        <div class="part-header-sub">Elfsight에서 구글 리뷰 위젯을 만들고 임베드 코드를 발급받습니다.</div>
+      </div>
+    </div>
+
+    <!-- 1-1 -->
+    <section class="step-section" id="p1-1">
+      <div class="step-header">
+        <div class="step-num-badge">1-1</div>
+        <div class="step-header-title">Elfsight 진입 및 위젯 만들기</div>
+        <div class="step-header-sub">elfsight.com 로그인 → Google Reviews 선택</div>
+      </div>
+      <div class="step-body-wrap">
+        <div class="step-img-col">
+          <img src="img/google-review-guide/01-elfsight-create.png" alt="Elfsight 위젯 생성 시작" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="img-ph" style="display:none">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c8c8d0" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            <div class="img-ph-label">SCREENSHOT · Elfsight 위젯 생성 화면</div>
+          </div>
+        </div>
+        <div class="step-text-col">
+          <div class="step-desc-body">운영팀 공용 Elfsight 계정으로 로그인한 뒤, 새 위젯을 <b>Google Reviews</b> 템플릿으로 생성합니다.</div>
+          <ul class="step-checklist">
+            <li><span class="step-check-icon">1</span><span><b>elfsight.com</b> 접속 → 운영팀 공용 계정으로 로그인</span></li>
+            <li><span class="step-check-icon">2</span><span>대시보드에서 <b>[Create Widget]</b> 클릭</span></li>
+            <li><span class="step-check-icon">3</span><span>위젯 목록에서 <b>Google Reviews</b> 선택</span></li>
+            <li><span class="step-check-icon">4</span><span>제공되는 템플릿 중 하나로 시작 (이후 자유롭게 변경 가능)</span></li>
+          </ul>
+          <div class="callout tip">💡 매장마다 위젯을 <b>각각</b> 생성합니다. 위젯 이름은 매장 식별이 쉽도록 <b>스토어명</b>으로 지정해 두면 이후 관리가 편합니다.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1-2 -->
+    <section class="step-section" id="p1-2">
+      <div class="step-header">
+        <div class="step-num-badge">1-2</div>
+        <div class="step-header-title">구글 비즈니스 연결</div>
+        <div class="step-header-sub">매장의 구글 비즈니스 프로필 검색 → 연결</div>
+      </div>
+      <div class="step-body-wrap">
+        <div class="step-img-col">
+          <img src="img/google-review-guide/02-connect-google.png" alt="구글 비즈니스 연결" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="img-ph" style="display:none">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c8c8d0" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            <div class="img-ph-label">SCREENSHOT · 구글 비즈니스 연결</div>
+          </div>
+        </div>
+        <div class="step-text-col">
+          <div class="step-desc-body">위젯에 표시할 리뷰의 출처인 <b>구글 비즈니스 프로필</b>을 연결합니다. 매장명 또는 구글 지도 URL로 검색합니다.</div>
+          <ul class="step-checklist">
+            <li><span class="step-check-icon">1</span><span>설정 패널의 <b>[Sources]</b> / <b>[Add source]</b> 클릭</span></li>
+            <li><span class="step-check-icon">2</span><span>매장의 <b>구글 비즈니스명</b> 또는 <b>구글 지도 링크</b>를 입력해 검색</span></li>
+            <li><span class="step-check-icon">3</span><span>검색 결과에서 정확한 매장을 선택해 연결</span></li>
+            <li><span class="step-check-icon">4</span><span>실제 리뷰가 위젯 미리보기에 불러와지는지 확인</span></li>
+          </ul>
+          <div class="callout warn">⚠️ 동명이인·지점이 여러 곳일 수 있으니, <b>주소·평점·리뷰 수</b>를 대조해 정확히 해당 매장이 맞는지 반드시 확인하세요.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1-3 -->
+    <section class="step-section" id="p1-3">
+      <div class="step-header">
+        <div class="step-num-badge">1-3</div>
+        <div class="step-header-title">레이아웃 / 표시 설정</div>
+        <div class="step-header-sub">레이아웃 · 필터 · 디자인 통일</div>
+      </div>
+      <div class="step-body-wrap">
+        <div class="step-img-col">
+          <img src="img/google-review-guide/03-layout-settings.png" alt="레이아웃 및 표시 설정" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="img-ph" style="display:none">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c8c8d0" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            <div class="img-ph-label">SCREENSHOT · 레이아웃 / 표시 설정</div>
+          </div>
+        </div>
+        <div class="step-text-col">
+          <div class="step-desc-body">위젯의 노출 형태를 설정합니다. 매장마다 모양이 제각각이지 않도록 <b>운영 표준값</b>으로 통일합니다.</div>
+          <ul class="field-list">
+            <li class="field-list-item">
+              <span class="field-list-label">Layout</span>
+              <div class="field-list-desc">리뷰 노출 형태. 스토어 상세에는 <b>슬라이더(Carousel)</b> 또는 <b>그리드</b>를 권장. 매장 간 동일하게 통일합니다.</div>
+            </li>
+            <li class="field-list-item">
+              <span class="field-list-label">Filter / Rating</span>
+              <div class="field-list-desc">표시할 리뷰의 <b>최소 평점</b>을 설정 (예: 4점 이상). 빈 내용·저평점 리뷰가 그대로 노출되지 않도록 합니다.</div>
+            </li>
+            <li class="field-list-item">
+              <span class="field-list-label">Header / Summary</span>
+              <div class="field-list-desc">상단의 <b>평균 평점·총 리뷰 수·구글 로고</b> 요약 영역 표시 여부. 신뢰도를 위해 표시 권장.</div>
+            </li>
+            <li class="field-list-item">
+              <span class="field-list-label">Language</span>
+              <div class="field-list-desc">위젯 UI 텍스트 언어. 다국어 스토어 특성상 별도 지정이 없으면 <b>영어(English)</b>로 통일합니다.</div>
+            </li>
+            <li class="field-list-item">
+              <span class="field-list-label">Style / Color</span>
+              <div class="field-list-desc">배경·폰트 등 디자인. 스토어 페이지와 이질감이 없도록 <b>밝은 배경 기본형</b>을 유지합니다.</div>
+            </li>
+          </ul>
+          <div class="callout info">📌 설정 표준값은 운영팀 내부 기준을 따릅니다. 매장별로 임의 변경하지 말고, 기준이 바뀌면 가이드를 먼저 업데이트하세요.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1-4 -->
+    <section class="step-section" id="p1-4">
+      <div class="step-header">
+        <div class="step-num-badge">1-4</div>
+        <div class="step-header-title">게시 및 임베드 코드 복사</div>
+        <div class="step-header-sub">[Add to website] → 코드 복사</div>
+      </div>
+      <div class="step-body-wrap">
+        <div class="step-img-col">
+          <img src="img/google-review-guide/04-embed-code.png" alt="임베드 코드 복사" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="img-ph" style="display:none">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c8c8d0" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            <div class="img-ph-label">SCREENSHOT · 임베드 코드 복사</div>
+          </div>
+        </div>
+        <div class="step-text-col">
+          <div class="step-desc-body">설정이 끝나면 위젯을 게시하고 <b>임베드 코드</b>를 복사합니다. 이 코드를 스토어 페이지에 그대로 붙여넣게 됩니다.</div>
+          <ul class="step-checklist">
+            <li><span class="step-check-icon">1</span><span>우측 상단 <b>[Save]</b>로 설정 저장</span></li>
+            <li><span class="step-check-icon">2</span><span><b>[Add to website]</b> 클릭 → 임베드 코드 패널 열림</span></li>
+            <li><span class="step-check-icon">3</span><span>표시된 코드를 <b>[Copy]</b> 버튼으로 전체 복사</span></li>
+          </ul>
+          <div class="code-block"><span class="cmt">&lt;!-- Elfsight Google Reviews 위젯 (예시 형태) --&gt;</span>
+<span class="tag">&lt;script src="https://static.elfsight.com/platform/platform.js" async&gt;&lt;/script&gt;</span>
+<span class="tag">&lt;div class="elfsight-app-xxxxxxxx-xxxx-xxxx" data-elfsight-app-lazy&gt;&lt;/div&gt;</span></div>
+          <div class="callout warn">⚠️ <b>코드는 한 글자도 수정하지 마세요.</b> 따옴표·공백·앱 ID가 바뀌면 위젯이 표시되지 않습니다. 반드시 [Copy] 버튼으로 전체를 그대로 복사합니다.</div>
+          <div class="callout tip">💡 무료 플랜은 노출 리뷰 수·월 조회수에 제한이 있고 Elfsight 브랜딩이 표시될 수 있습니다. 제한 도달 시 운영팀에 플랜을 확인하세요.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ PART 2. 삽입 ═══════════════════ -->
+    <div class="part-header" id="part2">
+      <div class="part-header-num">02</div>
+      <div class="part-header-text">
+        <div class="part-header-eyebrow">PART 02</div>
+        <div class="part-header-title">스토어 페이지에 삽입</div>
+        <div class="part-header-sub">복사한 임베드 코드를 어드민 스토어 페이지의 구글리뷰 필드에 붙여넣습니다.</div>
+      </div>
+    </div>
+
+    <!-- 2-1 -->
+    <section class="step-section" id="p2-1">
+      <div class="step-header">
+        <div class="step-num-badge">2-1</div>
+        <div class="step-header-title">스토어 관리 진입</div>
+        <div class="step-header-sub">어드민 → 스토어 관리 → 해당 매장 편집</div>
+      </div>
+      <div class="step-body-wrap">
+        <div class="step-img-col">
+          <img src="img/google-review-guide/05-store-admin.png" alt="스토어 관리 진입" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="img-ph" style="display:none">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c8c8d0" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            <div class="img-ph-label">SCREENSHOT · 스토어 관리 화면</div>
+          </div>
+        </div>
+        <div class="step-text-col">
+          <div class="step-desc-body">어드민에서 위젯을 적용할 매장을 찾아 편집 화면으로 진입합니다.</div>
+          <ul class="step-checklist">
+            <li><span class="step-check-icon">1</span><span>어드민 <b>스토어 관리</b> 메뉴 진입</span></li>
+            <li><span class="step-check-icon">2</span><span>적용할 <b>매장 검색</b> 후 행 선택 → 편집 화면 진입</span></li>
+            <li><span class="step-check-icon">3</span><span>1단계에서 위젯을 만든 <b>매장과 동일한지</b> 매장명으로 재확인</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2-2 -->
+    <section class="step-section" id="p2-2">
+      <div class="step-header">
+        <div class="step-num-badge">2-2</div>
+        <div class="step-header-title">구글리뷰 필드에 붙여넣기</div>
+        <div class="step-header-sub">[구글리뷰] 전용 입력 필드</div>
+      </div>
+      <div class="step-body-wrap">
+        <div class="step-img-col">
+          <img src="img/google-review-guide/06-paste-field.png" alt="구글리뷰 입력 필드" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="img-ph" style="display:none">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c8c8d0" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            <div class="img-ph-label">SCREENSHOT · 구글리뷰 입력 필드</div>
+          </div>
+        </div>
+        <div class="step-text-col">
+          <div class="step-desc-body">스토어 편집 화면의 <b>구글리뷰</b> 전용 입력 필드에 복사한 임베드 코드를 붙여넣습니다. 본문 에디터가 아닌 <b>별도 필드</b>입니다.</div>
+          <ul class="step-checklist">
+            <li><span class="step-check-icon">1</span><span><b>구글리뷰</b> 입력 필드를 찾는다</span></li>
+            <li><span class="step-check-icon">2</span><span>필드를 비우고 1-4에서 복사한 <b>임베드 코드 전체</b>를 붙여넣기</span></li>
+            <li><span class="step-check-icon">3</span><span><b>script</b>와 <b>div</b> 두 줄이 모두 들어갔는지 확인</span></li>
+          </ul>
+          <div class="callout warn">⚠️ 코드 <b>일부만</b> 붙여넣으면 위젯이 뜨지 않습니다. <code>&lt;script&gt;</code> 줄과 <code>&lt;div&gt;</code> 줄이 모두 포함됐는지 확인하세요.</div>
+          <div class="callout info">📌 이미 위젯이 들어간 매장을 <b>교체</b>할 때는, 기존 코드를 모두 지운 뒤 새 코드를 붙여넣습니다. 두 코드가 섞이면 위젯이 중복 표시됩니다.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2-3 -->
+    <section class="step-section" id="p2-3">
+      <div class="step-header">
+        <div class="step-num-badge">2-3</div>
+        <div class="step-header-title">저장 및 노출 확인</div>
+        <div class="step-header-sub">[저장] → FO 스토어 상세에서 확인</div>
+      </div>
+      <div class="step-body-wrap">
+        <div class="step-img-col">
+          <img src="img/google-review-guide/07-fo-verify.png" alt="FO 노출 확인" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="img-ph" style="display:none">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c8c8d0" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            <div class="img-ph-label">SCREENSHOT · FO 스토어 상세 노출</div>
+          </div>
+        </div>
+        <div class="step-text-col">
+          <div class="step-desc-body">저장 후 실제 스토어 상세 페이지에서 위젯이 정상적으로 노출되는지 확인합니다.</div>
+          <ul class="step-checklist">
+            <li><span class="step-check-icon">1</span><span>편집 화면 <b>[저장]</b> 클릭</span></li>
+            <li><span class="step-check-icon">2</span><span>FO 해당 <b>스토어 상세 페이지</b>를 새로고침</span></li>
+            <li><span class="step-check-icon">3</span><span>구글 리뷰 위젯이 <b>정상 평점·리뷰 내용</b>과 함께 표시되는지 확인</span></li>
+            <li><span class="step-check-icon">4</span><span><b>모바일</b> 화면에서도 깨짐 없이 노출되는지 확인</span></li>
+          </ul>
+          <div class="callout tip">💡 위젯이 안 보이면 ① 코드가 일부만 들어갔는지 ② 다른 매장 코드와 바뀌지 않았는지 ③ Elfsight에서 위젯이 게시(Save) 상태인지 순서로 점검하세요.</div>
+          <div class="callout warn">⚠️ 위젯 첫 로딩은 몇 초 지연될 수 있습니다. 즉시 안 떠도 새로고침 후 잠시 기다려 확인하세요.</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+const sections = ['p1-1','p1-2','p1-3','p1-4','p2-1','p2-2','p2-3'];
+const headerH = 56;
+
+function updateActiveNav() {
+  const scrollY = window.scrollY + headerH + 80;
+  let current = sections[0];
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.offsetTop <= scrollY) current = id;
+  });
+  sections.forEach(id => {
+    const navEl = document.getElementById('nav-' + id);
+    if (navEl) navEl.classList.toggle('active', id === current);
+  });
+}
+window.addEventListener('scroll', updateActiveNav, { passive: true });
+updateActiveNav();
+</script>
+</body>
+</html>
