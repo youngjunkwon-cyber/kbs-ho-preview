@@ -420,9 +420,7 @@ body {
     <div class="sidebar-part-label">PART 2</div>
     <div class="sidebar-part-title"><span class="part-num-circle">2</span>스토어 페이지에 삽입</div>
     <ul class="nav-list">
-      <li class="nav-item" id="nav-p2-1"><a href="#p2-1">8. 스토어 정보 · 리뷰 설정 ON</a></li>
-      <li class="nav-item" id="nav-p2-2"><a href="#p2-2">9. 코드 붙여넣기 · 수/평점</a></li>
-      <li class="nav-item" id="nav-p2-3"><a href="#p2-3">10. 저장 및 노출 확인</a></li>
+      <li class="nav-item" id="nav-p2-1"><a href="#p2-1">8. 스토어 정보 · 리뷰 설정 입력</a></li>
     </ul>
 
     <hr class="nav-divider">
@@ -451,9 +449,9 @@ body {
           <div class="hero-part-desc">생성 → 템플릿 → 소스 → AI → 레이아웃 → 스타일 → 코드</div>
         </div>
         <div class="hero-part">
-          <div class="hero-part-num">PART 02 · STEP 8–10</div>
+          <div class="hero-part-num">PART 02 · STEP 8</div>
           <div class="hero-part-title">스토어 페이지에 삽입</div>
-          <div class="hero-part-desc">리뷰 설정 ON → 코드 붙여넣기 + 수/평점 → 저장</div>
+          <div class="hero-part-desc">연동 → 위젯 코드 → 리뷰 수/평점 → 저장</div>
         </div>
       </div>
     </div>
@@ -656,8 +654,8 @@ body {
     <section class="step-section" id="p1-7">
       <div class="step-header">
         <div class="step-num-badge">STEP 7</div>
-        <div class="step-header-title">Publish · 임베드 코드 복사</div>
-        <div class="step-header-sub">Publish → 목록 → Install → 코드 복사</div>
+        <div class="step-header-title">Publish · 위젯 코드 발췌</div>
+        <div class="step-header-sub">Publish → Install → 위젯 코드(앱 ID) 발췌</div>
       </div>
       <div class="step-body-wrap">
         <div class="step-img-col">
@@ -668,17 +666,14 @@ body {
           </div>
         </div>
         <div class="step-text-col">
-          <div class="step-desc-body">설정이 끝나면 위젯을 게시하고, 위젯 목록에서 <b>Install</b>을 눌러 모달에 표시되는 <b>임베드 코드</b>를 복사합니다.</div>
+          <div class="step-desc-body">설정이 끝나면 위젯을 게시한 뒤, Install 모달의 임베드 코드에서 <b>위젯 코드(앱 ID)</b> 부분만 발췌합니다. 8단계 BO <b>리뷰 설정</b>의 <b>위젯 코드</b> 칸에 넣을 값입니다.</div>
           <ul class="step-checklist">
             <li><span class="step-check-icon">1</span><span>우측 상단 <b>[Publish]</b> 클릭</span></li>
             <li><span class="step-check-icon">2</span><span>위젯 <b>목록</b>(My Apps)으로 이동</span></li>
             <li><span class="step-check-icon">3</span><span>해당 위젯의 <b>[Install]</b> 클릭 → 임베드 코드 모달 열림</span></li>
-            <li><span class="step-check-icon">4</span><span>모달의 <b>코드 전체</b> 복사 (script + div 두 줄)</span></li>
+            <li><span class="step-check-icon">4</span><span>코드 중 <b>위젯 코드(앱 ID)</b>만 발췌 — <code>elfsight-app-</code> 뒤의 ID 값</span></li>
           </ul>
-          <div class="code-block"><span class="cmt">&lt;!-- Google Reviews | 강남다움의원 --&gt;</span>
-<span class="tag">&lt;script src="https://elfsightcdn.com/platform.js" async&gt;&lt;/script&gt;</span>
-<span class="tag">&lt;div class="elfsight-app-<span class="hl">f2f77e63-7a80-4392-ac36-031716e34204</span>" data-elfsight-app-lazy&gt;&lt;/div&gt;</span></div>
-          <div class="callout warn">⚠️ <b>코드는 한 글자도 수정하지 마세요.</b> 강조된 앱 ID·따옴표·공백이 바뀌면 위젯이 표시되지 않습니다. 반드시 모달의 코드를 <b>전체</b> 복사합니다.</div>
+          <div class="callout warn">⚠️ 앱 ID는 <b>공백·문자 변경 없이 그대로</b> 발췌하세요. 한 글자라도 다르면 위젯이 표시되지 않습니다.</div>
         </div>
       </div>
     </section>
@@ -689,90 +684,51 @@ body {
       <div class="part-header-text">
         <div class="part-header-eyebrow">PART 02</div>
         <div class="part-header-title">스토어 페이지에 삽입</div>
-        <div class="part-header-sub">복사한 임베드 코드를 어드민 스토어 정보의 리뷰 설정에 붙여넣습니다.</div>
+        <div class="part-header-sub">발췌한 위젯 코드(앱 ID)를 어드민 스토어 정보의 리뷰 설정에 입력합니다.</div>
       </div>
     </div>
 
-    <!-- 8 -->
+    <!-- 8 BO 리뷰 설정 -->
     <section class="step-section" id="p2-1">
       <div class="step-header">
         <div class="step-num-badge">STEP 8</div>
-        <div class="step-header-title">스토어 정보 · 리뷰 설정 ON</div>
-        <div class="step-header-sub">어드민 → 스토어 정보 → 리뷰 설정</div>
+        <div class="step-header-title">스토어 정보 · 리뷰 설정 입력</div>
+        <div class="step-header-sub">연동 · 위젯 코드 · 리뷰 수 / 평점</div>
       </div>
       <div class="step-body-wrap">
         <div class="step-img-col">
-          <img src="img/google-review-guide/8.png" alt="리뷰 설정 ON" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <img src="img/google-review-guide/8.png" alt="어드민 리뷰 설정" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="img-ph" style="display:none">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c8c8d0" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-            <div class="img-ph-label">SCREENSHOT 8 · 스토어 정보 · 리뷰 설정</div>
+            <div class="img-ph-label">SCREENSHOT 8 · 어드민 리뷰 설정</div>
           </div>
         </div>
         <div class="step-text-col">
-          <div class="step-desc-body">어드민에서 위젯을 적용할 매장의 스토어 정보로 진입해 <b>리뷰 설정</b>을 켭니다.</div>
-          <ul class="step-checklist">
-            <li><span class="step-check-icon">1</span><span>어드민 <b>스토어 정보</b> 진입</span></li>
-            <li><span class="step-check-icon">2</span><span><b>리뷰 설정</b> <span class="toggle-on">ON</span></span></li>
-            <li><span class="step-check-icon">3</span><span>위젯을 만든 <b>매장과 동일한지</b> 매장명으로 재확인</span></li>
+          <div class="step-desc-body">어드민 <b>스토어 정보 · 리뷰 설정</b> 탭에서 위젯을 연동하고, 7단계에서 발췌한 <b>위젯 코드</b>와 <b>리뷰 수 · 평점</b>을 입력합니다.</div>
+          <ul class="field-list">
+            <li class="field-list-item">
+              <span class="field-list-label">리뷰 위젯</span>
+              <div class="field-list-desc"><b>연동</b> 선택 (미연동 → 연동)</div>
+            </li>
+            <li class="field-list-item">
+              <span class="field-list-label">위젯 코드</span>
+              <div class="field-list-desc">7단계에서 발췌한 <b>앱 ID</b>를 입력</div>
+            </li>
+            <li class="field-list-item">
+              <span class="field-list-label">리뷰 수 추가</span>
+              <div class="field-list-desc">구글 실제 <b>리뷰 수</b> 입력 (예: 233)</div>
+            </li>
+            <li class="field-list-item">
+              <span class="field-list-label">리뷰 평점 추가</span>
+              <div class="field-list-desc">구글 실제 <b>평점</b> 입력 (예: 4.9)</div>
+            </li>
           </ul>
-          <div class="callout info">📌 PART 2(스토어 측)는 실제 화면 캡처가 준비되면 단계 내용을 확정합니다.</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 9 -->
-    <section class="step-section" id="p2-2">
-      <div class="step-header">
-        <div class="step-num-badge">STEP 9</div>
-        <div class="step-header-title">코드 붙여넣기 · 수/평점 입력</div>
-        <div class="step-header-sub">임베드 코드 + 리뷰 수 + 리뷰 평점</div>
-      </div>
-      <div class="step-body-wrap">
-        <div class="step-img-col">
-          <img src="img/google-review-guide/9.png" alt="코드 붙여넣기 및 수/평점 입력" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-          <div class="img-ph" style="display:none">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c8c8d0" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-            <div class="img-ph-label">SCREENSHOT 9 · 코드 붙여넣기 / 수 / 평점</div>
-          </div>
-        </div>
-        <div class="step-text-col">
-          <div class="step-desc-body">리뷰 설정 영역에 복사한 임베드 코드를 붙여넣고, <b>리뷰 수</b>와 <b>리뷰 평점</b>을 입력합니다.</div>
           <ul class="step-checklist">
-            <li><span class="step-check-icon">1</span><span>복사한 <b>임베드 코드 전체</b>를 붙여넣기 (script + div 두 줄 모두)</span></li>
-            <li><span class="step-check-icon">2</span><span><b>리뷰 수</b> 입력</span></li>
-            <li><span class="step-check-icon">3</span><span><b>리뷰 평점</b> 입력</span></li>
+            <li><span class="step-check-icon">1</span><span>위 값 입력 후 <b>[저장]</b> 클릭</span></li>
+            <li><span class="step-check-icon">2</span><span>FO 스토어 상세에서 위젯 · 평점 · 리뷰 수 노출 확인 (모바일 포함)</span></li>
           </ul>
-          <div class="callout info">📌 <b>리뷰 수 · 리뷰 평점</b>은 위젯과 별개로 직접 입력하는 값입니다. 연결한 매장의 <b>구글 실제 수치와 동일하게</b> 맞춰 입력하세요.</div>
-          <div class="callout warn">⚠️ 코드 <b>일부만</b> 붙여넣으면 위젯이 뜨지 않습니다. <code>&lt;script&gt;</code> 줄과 <code>&lt;div&gt;</code> 줄이 모두 들어갔는지 확인하세요. 매장 교체 시에는 기존 코드를 모두 지운 뒤 새 코드를 넣습니다.</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 10 -->
-    <section class="step-section" id="p2-3">
-      <div class="step-header">
-        <div class="step-num-badge">STEP 10</div>
-        <div class="step-header-title">저장 및 노출 확인</div>
-        <div class="step-header-sub">[저장] → FO 스토어 상세 확인</div>
-      </div>
-      <div class="step-body-wrap">
-        <div class="step-img-col">
-          <img src="img/google-review-guide/10.png" alt="FO 노출 확인" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-          <div class="img-ph" style="display:none">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c8c8d0" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-            <div class="img-ph-label">SCREENSHOT 10 · FO 스토어 상세 노출</div>
-          </div>
-        </div>
-        <div class="step-text-col">
-          <div class="step-desc-body">저장 후 실제 스토어 상세 페이지에서 위젯이 정상적으로 노출되는지 확인합니다.</div>
-          <ul class="step-checklist">
-            <li><span class="step-check-icon">1</span><span>스토어 정보 <b>[저장]</b> 클릭</span></li>
-            <li><span class="step-check-icon">2</span><span>FO 해당 <b>스토어 상세 페이지</b> 새로고침</span></li>
-            <li><span class="step-check-icon">3</span><span>구글 리뷰 위젯이 <b>평점 · 리뷰 수 · 리뷰 내용</b>과 함께 표시되는지 확인</span></li>
-            <li><span class="step-check-icon">4</span><span><b>모바일</b> 화면에서도 깨짐 없이 노출되는지 확인</span></li>
-          </ul>
-          <div class="callout tip">💡 위젯이 안 보이면 ① 코드가 일부만 들어갔는지 ② 다른 매장 코드와 바뀌지 않았는지 ③ Elfsight에서 위젯이 Publish 됐는지 순서로 점검하세요.</div>
-          <div class="callout warn">⚠️ 위젯 첫 로딩은 몇 초 지연될 수 있습니다. 즉시 안 떠도 새로고침 후 잠시 기다려 확인하세요.</div>
+          <div class="callout info">📌 <b>리뷰 수 추가 · 리뷰 평점 추가</b>는 위젯과 별개로 직접 입력하는 값입니다. 연결한 매장의 <b>구글 실제 수치와 동일하게</b> 맞춰 입력하세요.</div>
+          <div class="callout tip">💡 위젯이 안 보이면 ① 리뷰 위젯이 <b>[연동]</b>인지 ② 위젯 코드(앱 ID)가 정확한지 ③ Elfsight에서 <b>Publish</b> 됐는지 순서로 점검하세요. 첫 로딩은 몇 초 지연될 수 있습니다.</div>
         </div>
       </div>
     </section>
@@ -781,7 +737,7 @@ body {
 </div>
 
 <script>
-const sections = ['p1-1','p1-2','p1-3','p1-4','p1-5','p1-6','p1-7','p2-1','p2-2','p2-3'];
+const sections = ['p1-1','p1-2','p1-3','p1-4','p1-5','p1-6','p1-7','p2-1'];
 const headerH = 56;
 
 function updateActiveNav() {
