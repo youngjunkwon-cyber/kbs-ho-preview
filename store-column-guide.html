@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>스토어 칼럼 작성 가이드 | K-Beauty Station Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --pink: #FF6B8A;
+  --pink-light: #fff0f3;
+  --pink-mid: #ffd6df;
+  --navy: #0f1023;
+  --navy2: #1a1a3e;
+  --text: #2c2c3e;
+  --text-sub: #6b7280;
+  --text-light: #9ca3af;
+  --border: #e8e8f0;
+  --border-light: #f0f0f4;
+  --bg: #f7f7fb;
+  --white: #ffffff;
+  --tip-bg: #EEF6FF;
+  --tip-border: #4A90D9;
+  --tip-text: #2d5fa0;
+  --warn-bg: #FFF7ED;
+  --warn-border: #F59E0B;
+  --warn-text: #7a5000;
+  --info-bg: #F3F0FF;
+  --info-border: #8b5cf6;
+  --info-text: #5b21b6;
+  --sidebar-w: 260px;
+  --header-h: 56px;
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+/* ── Header ── */
+.top-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--header-h);
+  background: var(--navy);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 12px;
+  z-index: 100;
+  border-bottom: 2px solid rgba(255,107,138,0.5);
+}
+.header-logo { font-size: 14px; font-weight: 800; color: var(--white); letter-spacing: 0.5px; }
+.header-logo span { color: var(--pink); }
+.header-sep { width: 1px; height: 18px; background: rgba(255,255,255,0.15); }
+.header-title { font-size: 13px; color: rgba(255,255,255,0.55); letter-spacing: 0.3px; }
+.header-badge {
+  margin-left: auto;
+  background: rgba(255,107,138,0.15);
+  border: 1px solid rgba(255,107,138,0.3);
+  color: var(--pink);
+  font-size: 11px; font-weight: 700;
+  padding: 3px 10px; border-radius: 20px; letter-spacing: 0.5px;
+}
+
+/* ── Layout ── */
+.layout { display: flex; padding-top: var(--header-h); min-height: 100vh; }
+
+/* ── Sidebar ── */
+.sidebar {
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  position: sticky;
+  top: var(--header-h);
+  height: calc(100vh - var(--header-h));
+  overflow-y: auto;
+  background: var(--white);
+  border-right: 1px solid var(--border);
+  padding: 24px 0 40px;
+}
+.sidebar-part-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2.5px;
+  color: var(--pink);
+  padding: 0 20px 8px;
+  text-transform: uppercase;
+}
+.sidebar-part-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--navy);
+  padding: 0 20px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.part-num-circle {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: white;
+  font-size: 12px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+}
+.nav-list { list-style: none; }
+.nav-item a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 20px 9px 32px;
+  font-size: 13.5px;
+  color: var(--text-sub);
+  text-decoration: none;
+  transition: all 0.15s;
+  border-left: 3px solid transparent;
+  line-height: 1.4;
+}
+.nav-item.sub a { padding-left: 48px; font-size: 13px; color: var(--text-light); }
+.nav-item a:hover {
+  color: var(--pink);
+  background: var(--pink-light);
+  border-left-color: var(--pink-mid);
+}
+.nav-item.active a {
+  color: var(--pink);
+  background: var(--pink-light);
+  border-left-color: var(--pink);
+  font-weight: 700;
+}
+.nav-divider { margin: 18px 20px; border: none; border-top: 1px solid var(--border); }
+.sidebar-footer {
+  padding: 0 20px;
+  font-size: 12px;
+  color: var(--text-sub);
+  line-height: 1.8;
+  margin-top: 8px;
+}
+
+/* ── Main ── */
+.main { flex: 1; min-width: 0; padding: 36px 48px 80px 40px; }
+
+/* ── Hero ── */
+.hero {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 40px 44px;
+  margin-bottom: 36px;
+  color: var(--navy);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50px; right: -50px;
+  width: 240px; height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,107,138,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 3px; color: var(--pink); margin-bottom: 14px; position: relative; }
+.hero-title { font-size: 32px; font-weight: 900; line-height: 1.3; margin-bottom: 14px; color: var(--navy); position: relative; }
+.hero-desc { font-size: 15px; color: var(--text-sub); margin-bottom: 26px; line-height: 1.7; position: relative; }
+.hero-desc b { color: var(--navy); }
+.hero-parts { display: flex; gap: 14px; flex-wrap: wrap; position: relative; }
+.hero-part {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  flex: 1;
+  min-width: 200px;
+}
+.hero-part-num {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: var(--pink);
+  margin-bottom: 5px;
+}
+.hero-part-title { font-size: 16px; font-weight: 800; color: var(--navy); margin-bottom: 5px; }
+.hero-part-desc { font-size: 13px; color: var(--text-sub); line-height: 1.6; }
+
+/* ── Part Header ── */
+.part-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 48px 0 20px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--navy);
+  scroll-margin-top: calc(var(--header-h) + 16px);
+}
+.part-header:first-of-type { margin-top: 8px; }
+.part-header-num {
+  width: 46px; height: 46px;
+  border-radius: 11px;
+  background: var(--navy);
+  color: white;
+  font-size: 18px; font-weight: 900;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.part-header-text { flex: 1; }
+.part-header-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: var(--pink); margin-bottom: 3px; }
+.part-header-title { font-size: 26px; font-weight: 900; color: var(--navy); }
+.part-header-sub { font-size: 15px; color: var(--text-sub); margin-top: 4px; line-height: 1.6; }
+
+/* ── Sub-section header ── */
+.sub-section-header {
+  margin: 28px 0 14px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  scroll-margin-top: calc(var(--header-h) + 16px);
+}
+.sub-section-num {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--pink);
+  letter-spacing: 1px;
+}
+.sub-section-title { font-size: 19px; font-weight: 800; color: var(--navy); }
+
+/* ── Step Section ── */
+.step-section {
+  background: var(--white);
+  border-radius: 14px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  scroll-margin-top: calc(var(--header-h) + 16px);
+}
+.step-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--white);
+}
+.step-num-badge {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 16px;
+  background: var(--pink);
+  color: white;
+  font-size: 13px;
+  font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  letter-spacing: 0.3px;
+}
+.step-header-title { font-size: 18px; font-weight: 800; color: var(--navy); }
+.step-header-sub { font-size: 13.5px; color: var(--text-sub); margin-left: auto; }
+
+.step-body-wrap { display: flex; flex-direction: column; }
+.step-img-col {
+  width: 100%;
+  background: #f4f4f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+  padding: 0;
+}
+.step-img-col img {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
+  display: block;
+}
+.img-ph {
+  width: 100%;
+  min-height: 240px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 12px;
+  color: #c8c8d0;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+.img-ph svg { opacity: 0.45; }
+.img-ph-label {
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  font-weight: 600;
+  color: #d0d0da;
+}
+
+.step-text-col {
+  width: 100%;
+  padding: 24px 28px 28px;
+  display: flex;
+  flex-direction: column;
+}
+.step-desc-body {
+  font-size: 15px;
+  color: #4a4a60;
+  line-height: 1.8;
+  margin-bottom: 16px;
+}
+.step-desc-body b { color: var(--navy); font-weight: 700; }
+
+.step-checklist { list-style: none; }
+.step-checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 16px;
+  color: var(--text);
+  line-height: 1.7;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-light);
+}
+.step-checklist li:last-child { border-bottom: none; }
+.step-check-icon {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--pink-light);
+  color: var(--pink);
+  font-size: 10px;
+  font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+.step-checklist b { color: var(--navy); font-weight: 700; }
+
+/* Field-list */
+.field-list { list-style: none; }
+.field-list-item {
+  padding: 12px 0;
+  border-bottom: 1px dashed var(--border);
+}
+.field-list-item:last-child { border-bottom: none; }
+.field-list-label {
+  display: inline-block;
+  background: var(--navy);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 4px;
+  margin-right: 8px;
+  letter-spacing: 0.3px;
+}
+.field-list-desc { font-size: 16px; color: #4a4a60; margin-top: 8px; line-height: 1.7; }
+.field-list-desc b { color: var(--navy); }
+
+/* Callout */
+.callout {
+  margin-top: 16px;
+  padding: 13px 16px;
+  border-radius: 0 8px 8px 0;
+  font-size: 15px;
+  line-height: 1.7;
+}
+.callout.tip { background: var(--tip-bg); border-left: 3px solid var(--tip-border); color: var(--tip-text); }
+.callout.warn { background: var(--warn-bg); border-left: 3px solid var(--warn-border); color: var(--warn-text); }
+.callout.info { background: var(--info-bg); border-left: 3px solid var(--info-border); color: var(--info-text); }
+
+/* 모달 그리드 */
+.modal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.modal-card {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.modal-card-img {
+  background: #f4f4f8;
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+  padding: 8px;
+}
+.modal-card-img img { width: 100%; height: auto; max-width: 100%; object-fit: contain; display: block; }
+.modal-card-img .img-ph { min-height: 164px; }
+.modal-card-body { padding: 14px 16px; }
+.modal-card-title {
+  font-size: 16px; font-weight: 800;
+  color: var(--navy);
+  margin-bottom: 6px;
+  display: flex; align-items: center; gap: 6px;
+}
+.modal-card-tag {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--pink);
+  background: var(--pink-light);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+.modal-card-desc { font-size: 14px; color: var(--text-sub); line-height: 1.7; }
+
+/* Sidebar scrollbar */
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* Responsive */
+@media (max-width: 1000px) {
+  :root { --sidebar-w: 220px; }
+  .main { padding: 24px 24px 60px; }
+}
+@media (max-width: 760px) {
+  .layout { flex-direction: column; }
+  .sidebar { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--border); padding: 16px 0; }
+  .modal-grid { grid-template-columns: 1fr; }
+  .hero { padding: 28px 24px; }
+}
+</style>
+</head>
+<body>
+
+<header class="top-header">
+  <div class="header-logo">K-Beauty<span>Station</span></div>
+  <div class="header-sep"></div>
+  <div class="header-title">스토어 칼럼 작성 가이드</div>
+  <div class="header-badge">입점사용</div>
+</header>
+
+<div class="layout">
+
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-part-label">PART 1</div>
+    <div class="sidebar-part-title"><span class="part-num-circle">1</span>칼럼 작성하기</div>
+    <ul class="nav-list">
+      <li class="nav-item" id="nav-p1-1"><a href="#p1-1">1-1. 작성 시작하기</a></li>
+      <li class="nav-item" id="nav-p1-2"><a href="#p1-2">1-2. 기본 정보 입력</a></li>
+      <li class="nav-item" id="nav-p1-3"><a href="#p1-3">1-3. 본문 작성 · 번역</a></li>
+      <li class="nav-item" id="nav-p1-4"><a href="#p1-4">1-4. 게시하기</a></li>
+    </ul>
+
+    <hr class="nav-divider">
+
+    <div class="sidebar-part-label">PART 2</div>
+    <div class="sidebar-part-title"><span class="part-num-circle">2</span>칼럼 관리하기</div>
+    <ul class="nav-list">
+      <li class="nav-item" id="nav-p2-1"><a href="#p2-1">2-1. 목록 화면 보기</a></li>
+      <li class="nav-item" id="nav-p2-2"><a href="#p2-2">2-2. 숨기기 · 다시 게시</a></li>
+      <li class="nav-item" id="nav-p2-3"><a href="#p2-3">2-3. 삭제하기</a></li>
+      <li class="nav-item" id="nav-p2-4"><a href="#p2-4">2-4. 블라인드 · 재심사 요청</a></li>
+      <li class="nav-item" id="nav-p2-5"><a href="#p2-5">2-5. 정책 위반 안내 확인</a></li>
+    </ul>
+
+    <hr class="nav-divider">
+
+    <div class="sidebar-part-label">PART 3</div>
+    <div class="sidebar-part-title"><span class="part-num-circle">3</span>노출 언어 관리</div>
+    <ul class="nav-list">
+      <li class="nav-item" id="nav-p3-1"><a href="#p3-1">3-1. 언어를 뺄 때 주의</a></li>
+    </ul>
+
+    <hr class="nav-divider">
+
+    <div class="sidebar-footer">
+      K-Beauty Station<br>
+      스토어 칼럼 · 입점사용<br>
+      공유용 가이드
+    </div>
+  </nav>
+
+  <main class="main">
+
+    <!-- HERO -->
+    <div class="hero">
+      <div class="hero-eyebrow">STORE COLUMN GUIDE</div>
+      <div class="hero-title">스토어 칼럼 작성 가이드</div>
+      <div class="hero-desc">
+        우리 스토어의 전문가 가이드(스토어 칼럼)를 <b>작성</b>하고 여러 언어로 <b>게시</b>한 뒤, 목록에서 <b>관리</b>하는 방법을 순서대로 안내합니다. 백오피스가 처음이어도 이 순서만 따라오시면 됩니다.
+      </div>
+      <div class="hero-parts">
+        <div class="hero-part">
+          <div class="hero-part-num">PART 01</div>
+          <div class="hero-part-title">칼럼 작성하기</div>
+          <div class="hero-part-desc">작성 시작 → 기본 정보 → 본문·번역 → 게시</div>
+        </div>
+        <div class="hero-part">
+          <div class="hero-part-num">PART 02</div>
+          <div class="hero-part-title">칼럼 관리하기</div>
+          <div class="hero-part-desc">목록 보기 · 숨기기 · 삭제 · 재심사 · 안내 확인</div>
+        </div>
+        <div class="hero-part">
+          <div class="hero-part-num">PART 03</div>
+          <div class="hero-part-title">노출 언어 관리</div>
+          <div class="hero-part-desc">지원 언어를 뺄 때 주의할 점</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ PART 1 ═══════════════ -->
+    <div class="part-header" id="part1">
+      <div class="part-header-num">01</div>
+      <div class="part-header-text">
+        <div class="part-header-eyebrow">PART 01</div>
+        <div class="part-header-title">칼럼 작성하기</div>
+        <div class="part-header-sub">새 스토어 칼럼을 작성해서 여러 언어로 게시하는 방법</div>
+      </div>
+    </div>
+
+    <!-- 1-1 -->
+    <div class="sub-section-header" id="p1-1">
+      <span class="sub-section-num">1-1</span>
+      <span class="sub-section-title">작성 시작하기</span>
+    </div>
+    <section class="step-section" id="p1-1-1">
+      <div class="step-header">
+        <div class="step-num-badge">1-1</div>
+        <div class="step-header-title">[신규 작성] 버튼 누르기</div>
+        <div class="step-header-sub">스토어 칼럼 관리 화면</div>
+      </div>
+      <div class="step-body-wrap">
+        <div class="step-img-col">
+          <img src="img/column-guide/list.png" alt="스토어 칼럼 관리 목록 화면" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="img-ph" style="display:none"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c8c8d0" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><div class="img-ph-label">스토어 칼럼 관리 화면</div></div>
+        </div>
+        <div class="step-text-col">
+          <div class="step-desc-body">왼쪽 메뉴에서 <b>칼럼 관리 &gt; 스토어 칼럼 관리</b>로 들어간 뒤, 오른쪽 위 <b>[신규 작성]</b> 버튼을 누르면 작성 화면이 열립니다.</div>
+          <ul class="step-checklist">
+            <li><span class="step-check-icon">●</span><span>메뉴 위치: <b>칼럼 관리 &gt; 스토어 칼럼 관리</b></span></li>
+            <li><span class="step-check-icon">●</span><span>화면 오른쪽 위 <b>[신규 작성]</b> 버튼 클릭</span></li>
+          </ul>
+          <div class="callout tip">💡 스토어 칼럼은 우리 스토어를 찾은 고객에게 전문가 가이드로 보여지는 글입니다. 시술·관리 정보처럼 고객이 궁금해할 내용을 담으면 좋습니다.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1-2 -->
+    <div class="sub-section-header" id="p1-2">
+      <span class="sub-section-num">1-2</span>
+      <span class="sub-section-title">기본 정보 입력</span>
+    </div>
+    <section class="step-section" id="p1-2-1">
+      <div class="step-header">
+        <div class="step-num-badge">1-2</div>
+        <div class="step-header-title">제목 · 노출 언어 · 태그 정하기</div>
+        <div class="step-header-sub">작성 화면 상단</div>
+      </div>
+      <div class="step-body-wrap">
+        <div class="step-img-col">
+          <img src="img/column-guide/write.png" alt="스토어 칼럼 작성 화면" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="img-ph" style="display:none"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c8c8d0" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><div class="img-ph-label">스토어 칼럼 작성 화면</div></div>
+        </div>
+        <div class="step-text-col">
+          <div class="step-desc-body">작성 화면 위쪽 <b>기본 정보</b>에서 글의 뼈대를 정합니다. 여기서 정한 <b>노출 언어</b>만큼 아래에 본문 탭이 생깁니다.</div>
+          <ul class="field-list">
+            <li class="field-list-item"><span class="field-list-label">내부 관리용 제목</span><div class="field-list-desc">우리끼리 글을 구분하려고 붙이는 제목입니다. <b>고객에게는 보이지 않습니다</b>.</div></li>
+            <li class="field-list-item"><span class="field-list-label">노출 언어</span><div class="field-list-desc">이 글을 어떤 언어로 보여줄지 체크합니다. 체크한 언어마다 아래에 본문 <b>작성 탭</b>이 생깁니다. (한국어 원본은 번역용이라 고객에게 노출되지 않습니다.)</div></li>
+            <li class="field-list-item"><span class="field-list-label">언어별 게시 관리</span><div class="field-list-desc">언어마다 <b>게시중 / 숨김</b>을 켜고 끕니다. 특정 언어만 잠시 내리고 싶을 때 씁니다.</div></li>
+            <li class="field-list-item"><span class="field-list-label">대표 태그 · 기타 태그</span><div class="field-list-desc">글 주제를 나타내는 태그를 <b>목록에서 선택</b>합니다. 대표 태그는 카드에 먼저 보이는 한 개입니다. (태그는 직접 새로 만들 수 없고 제공되는 목록에서 고릅니다.)</div></li>
+          </ul>
+          <div class="callout warn">⚠️ <b>대표 이미지·노출 언어·대표 태그·내부 제목</b>은 필수입니다. 비워두면 게시할 수 없습니다.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1-3 -->
+    <div class="sub-section-header" id="p1-3">
+      <span class="sub-section-num">1-3</span>
+      <span class="sub-section-title">본문 작성 · 번역</span>
+    </div>
+    <section class="step-section" id="p1-3-1">
+      <div class="step-header">
+        <div class="step-num-badge">1-3</div>
+        <div class="step-header-title">한국어로 쓰고 자동번역하기</div>
+        <div class="step-header-sub">본문 작성 · 미리보기</div>
+      </div>
+      <div class="step-body-wrap">
+        <div class="step-img-col">
+          <img src="img/column-guide/write.png" alt="본문 작성 · 자동번역" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="img-ph" style="display:none"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c8c8d0" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><div class="img-ph-label">본문 작성 화면</div></div>
+        </div>
+        <div class="step-text-col">
+          <div class="step-desc-body">먼저 <b>원본(한국어)</b> 탭에서 제목과 본문을 씁니다. 그런 다음 <b>[자동번역]</b>을 누르면 체크한 언어들로 한 번에 번역됩니다. 번역 결과는 각 언어 탭에서 <b>직접 다듬을</b> 수 있습니다.</div>
+          <ul class="step-checklist">
+            <li><span class="step-check-icon">1</span><span><b>원본</b> 탭에서 제목·본문 작성 (텍스트와 이미지 사용 가능)</span></li>
+            <li><span class="step-check-icon">2</span><span><b>[자동번역]</b> 클릭 → 체크한 언어로 일괄 번역</span></li>
+            <li><span class="step-check-icon">3</span><span>언어 탭을 눌러 번역 결과 확인 후 어색한 부분 직접 수정</span></li>
+            <li><span class="step-check-icon">4</span><span>오른쪽 <b>대표 이미지</b> 업로드 (권장 크기 375 × 200)</span></li>
+            <li><span class="step-check-icon">5</span><span>오른쪽 <b>미리보기</b>로 고객 화면 확인</span></li>
+          </ul>
+          <div class="callout info">📌 자동번역은 <b>하루 20회</b>까지 쓸 수 있고, 버튼 옆에 남은 횟수가 표시됩니다. 다 쓰면 다음 날 다시 채워지며, 그 사이에도 각 언어 탭에서 손으로 고치는 건 계속 됩니다.</div>
+          <div class="callout tip">💡 번역이 도는 동안에는 페이지를 벗어나지 마세요. 작성 중 실수로 나가더라도 쓰던 내용은 자동으로 임시 보관됩니다.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1-4 -->
+    <div class="sub-section-header" id="p1-4">
+      <span class="sub-section-num">1-4</span>
+      <span class="sub-section-title">게시하기</span>
+    </div>
+    <section class="step-section" id="p1-4-1">
+      <div class="step-header">
+        <div class="step-num-badge">1-4</div>
+        <div class="step-header-title">[게시] → 동의 → 완료</div>
+        <div class="step-header-sub">게시 2단계 확인</div>
+      </div>
+      <div class="step-body-wrap">
+        <div class="step-text-col" style="border-bottom:1px solid var(--border)">
+          <div class="step-desc-body">오른쪽 위 <b>[게시]</b>를 누르면 <b>두 단계 확인</b>을 거친 뒤 바로 고객에게 노출됩니다. 아래 두 창을 순서대로 만나게 됩니다.</div>
+        </div>
+      </div>
+      <div style="padding:0 28px 24px">
+        <div class="modal-grid">
+          <div class="modal-card">
+            <div class="modal-card-img"><img src="img/column-guide/publish-confirm.png" alt="게시 확인" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="img-ph" style="display:none"><div class="img-ph-label">게시 확인</div></div></div>
+            <div class="modal-card-body">
+              <div class="modal-card-title">① 게시 확인 <span class="modal-card-tag">동의</span></div>
+              <div class="modal-card-desc">유의사항을 안내하고, "이 글의 책임은 작성자 본인에게 있다"는 항목에 동의해야 다음으로 넘어갑니다. 전 항목 체크 후 게시됩니다.</div>
+            </div>
+          </div>
+          <div class="modal-card">
+            <div class="modal-card-img"><img src="img/column-guide/publish-block.png" alt="게시 차단" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="img-ph" style="display:none"><div class="img-ph-label">게시 차단</div></div></div>
+            <div class="modal-card-body">
+              <div class="modal-card-title">② 게시 차단 <span class="modal-card-tag">금지어 검사</span></div>
+              <div class="modal-card-desc">본문에 사용할 수 없는 단어가 있으면 게시가 막히고, 어떤 단어가 걸렸는지 알려줍니다. <b>[수정하기]</b>로 돌아가 고친 뒤 다시 게시하면 됩니다.</div>
+            </div>
+          </div>
+        </div>
+        <div class="callout tip">💡 문제가 없으면 두 번째 창 없이 바로 게시됩니다. 게시된 글은 목록에서 언제든 다시 수정할 수 있습니다.</div>
+      </div>
+    </section>
+
+    <!-- ═══════════════ PART 2 ═══════════════ -->
+    <div class="part-header" id="part2">
+      <div class="part-header-num">02</div>
+      <div class="part-header-text">
+        <div class="part-header-eyebrow">PART 02</div>
+        <div class="part-header-title">칼럼 관리하기</div>
+        <div class="part-header-sub">올린 글을 확인하고 숨기거나 삭제·수정하는 방법</div>
+      </div>
+    </div>
+
+    <!-- 2-1 -->
+    <div class="sub-section-header" id="p2-1">
+      <span class="sub-section-num">2-1</span>
+      <span class="sub-section-title">목록 화면 보기</span>
+    </div>
+    <section class="step-section" id="p2-1-1">
+      <div class="step-header">
+        <div class="step-num-badge">2-1</div>
+        <div class="step-header-title">글 상태와 성과 한눈에 보기</div>
+        <div class="step-header-sub">스토어 칼럼 관리 화면</div>
+      </div>
+      <div class="step-body-wrap">
+        <div class="step-img-col">
+          <img src="img/column-guide/list.png" alt="스토어 칼럼 관리 목록" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="img-ph" style="display:none"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c8c8d0" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><div class="img-ph-label">스토어 칼럼 관리 화면</div></div>
+        </div>
+        <div class="step-text-col">
+          <div class="step-desc-body">작성한 글이 목록으로 보입니다. 글 왼쪽 <b>▸ 화살표</b>를 누르면 언어별로 펼쳐져, 언어마다 상태와 성과를 따로 볼 수 있습니다.</div>
+          <ul class="step-checklist">
+            <li><span class="step-check-icon">●</span><span><b>필터</b>: 상태 / 언어 / 태그 / 기간 + 제목 검색 후 <b>[검색]</b></span></li>
+            <li><span class="step-check-icon">●</span><span><b>상태</b>: 게시중 · 숨김 · 블라인드 · 재심사 (한 글에 언어별로 다를 수 있어 개수로 표시)</span></li>
+            <li><span class="step-check-icon">●</span><span><b>노출수 · 조회수</b>: 글이 얼마나 보여지고 읽혔는지 성과 확인</span></li>
+            <li><span class="step-check-icon">●</span><span><b>관리</b>: 행마다 [수정] · [삭제] 등</span></li>
+          </ul>
+          <div class="callout info">📌 <b>▸</b>로 펼치면 언어별 행이 나옵니다. 게시·숨김은 <b>언어 단위</b>로, 삭제는 <b>글 전체 단위</b>로 동작합니다.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2-2 -->
+    <div class="sub-section-header" id="p2-2">
+      <span class="sub-section-num">2-2</span>
+      <span class="sub-section-title">숨기기 · 다시 게시</span>
+    </div>
+    <section class="step-section" id="p2-2-1">
+      <div class="step-header">
+        <div class="step-num-badge">2-2</div>
+        <div class="step-header-title">잠깐 내리기 · 다시 올리기</div>
+        <div class="step-header-sub">일괄 게시 · 일괄 숨김</div>
+      </div>
+      <div class="step-body-wrap">
+        <div class="step-img-col">
+          <img src="img/column-guide/bulk-publish.png" alt="일괄 게시" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="img-ph" style="display:none"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c8c8d0" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><div class="img-ph-label">일괄 게시 화면</div></div>
+        </div>
+        <div class="step-text-col">
+          <div class="step-desc-body"><b>숨김</b>은 글을 지우지 않고 고객 화면에서만 잠시 내리는 기능입니다. 언제든 다시 게시할 수 있고, 내용은 그대로 남습니다.</div>
+          <ul class="step-checklist">
+            <li><span class="step-check-icon">●</span><span>목록에서 원하는 글(또는 언어)을 <b>체크</b></span></li>
+            <li><span class="step-check-icon">●</span><span>위쪽 <b>[일괄 숨김]</b> 또는 <b>[일괄 게시]</b> 클릭</span></li>
+            <li><span class="step-check-icon">●</span><span>펼쳐서 <b>언어 하나만</b> 골라 내리거나 올릴 수도 있음</span></li>
+          </ul>
+          <div class="callout tip">💡 다시 게시할 때는 별도 확인 없이 바로 올라갑니다. 숨김은 사장님이 직접 되돌릴 수 있는, 되돌리기 쉬운 기능입니다.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2-3 -->
+    <div class="sub-section-header" id="p2-3">
+      <span class="sub-section-num">2-3</span>
+      <span class="sub-section-title">삭제하기</span>
+    </div>
+    <section class="step-section" id="p2-3-1">
+      <div class="step-header">
+        <div class="step-num-badge">2-3</div>
+        <div class="step-header-title">글 영구 삭제</div>
+        <div class="step-header-sub">되돌릴 수 없음</div>
+      </div>
+      <div class="step-body-wrap">
+        <div class="step-img-col">
+          <img src="img/column-guide/delete-single.png" alt="칼럼 삭제 확인" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="img-ph" style="display:none"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c8c8d0" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><div class="img-ph-label">삭제 확인 창</div></div>
+        </div>
+        <div class="step-text-col">
+          <div class="step-desc-body">더 이상 필요 없는 글은 <b>[삭제]</b>로 지웁니다. 삭제하면 <b>모든 언어 버전이 함께 영구 삭제</b>되고 되돌릴 수 없으니, 잠깐 내릴 거면 삭제 대신 <b>숨김</b>을 쓰세요.</div>
+          <ul class="step-checklist">
+            <li><span class="step-check-icon">●</span><span>행의 <b>[삭제]</b> 클릭 → 확인 창에서 한 번 더 확인</span></li>
+            <li><span class="step-check-icon">●</span><span>여러 글을 체크해 <b>[일괄 삭제]</b>도 가능</span></li>
+          </ul>
+          <div class="callout warn">⚠️ 삭제는 <b>되돌릴 수 없습니다.</b> 원본과 번역본 전부 사라집니다. 다시 쓸 가능성이 있으면 숨김을 권합니다.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2-4 -->
+    <div class="sub-section-header" id="p2-4">
+      <span class="sub-section-num">2-4</span>
+      <span class="sub-section-title">블라인드 · 재심사 요청</span>
+    </div>
+    <section class="step-section" id="p2-4-1">
+      <div class="step-header">
+        <div class="step-num-badge">2-4</div>
+        <div class="step-header-title">블라인드된 글 다시 올리기</div>
+        <div class="step-header-sub">수정 → 재심사 요청</div>
+      </div>
+      <div class="step-body-wrap">
+        <div class="step-img-col">
+          <img src="img/column-guide/blind-edit.png" alt="블라인드 글 수정 화면" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="img-ph" style="display:none"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c8c8d0" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><div class="img-ph-label">블라인드 글 수정 화면</div></div>
+        </div>
+        <div class="step-text-col">
+          <div class="step-desc-body"><b>블라인드</b>는 정책 문제로 운영팀이 글을 내린 상태입니다. 이건 사장님이 직접 다시 못 올리고, <b>내용을 고쳐서 재심사를 요청</b>해야 합니다. 수정 화면 위에 <b>내려간 이유</b>가 안내됩니다.</div>
+          <ul class="step-checklist">
+            <li><span class="step-check-icon">1</span><span>블라인드된 글의 <b>[수정]</b> 진입 → 상단 안내에서 사유 확인</span></li>
+            <li><span class="step-check-icon">2</span><span>지적된 부분을 고침</span></li>
+            <li><span class="step-check-icon">3</span><span><b>[재심사 요청]</b> 클릭 → 운영팀 검토 요청</span></li>
+          </ul>
+          <div class="callout info">📌 재심사 요청 후 <b>승인되면 다시 노출</b>되고, <b>반려되면 사유가 안내</b>됩니다. 승인 전까지는 고객에게 보이지 않습니다.</div>
+        </div>
+      </div>
+    </section>
+    <div style="padding:0">
+      <div class="modal-grid" style="margin-top:0">
+        <div class="modal-card">
+          <div class="modal-card-img"><img src="img/column-guide/rereview.png" alt="재심사 요청 창" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="img-ph" style="display:none"><div class="img-ph-label">재심사 요청</div></div></div>
+          <div class="modal-card-body">
+            <div class="modal-card-title">재심사 요청 <span class="modal-card-tag">제출</span></div>
+            <div class="modal-card-desc">고친 내용을 운영팀에 검토 요청으로 제출합니다. 제출 시 금지어 검사가 다시 돌아갑니다.</div>
+          </div>
+        </div>
+        <div class="modal-card">
+          <div class="modal-card-img"><img src="img/column-guide/history.png" alt="제재·재심사 이력" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="img-ph" style="display:none"><div class="img-ph-label">이력 보기</div></div></div>
+          <div class="modal-card-body">
+            <div class="modal-card-title">이력 보기 <span class="modal-card-tag">기록</span></div>
+            <div class="modal-card-desc">언제·왜 내려갔고 어떻게 처리됐는지 최신순으로 확인합니다. 수정 화면 안내의 <b>[이력 보기]</b>로 엽니다.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2-5 -->
+    <div class="sub-section-header" id="p2-5">
+      <span class="sub-section-num">2-5</span>
+      <span class="sub-section-title">정책 위반 안내 확인</span>
+    </div>
+    <section class="step-section" id="p2-5-1">
+      <div class="step-header">
+        <div class="step-num-badge">2-5</div>
+        <div class="step-header-title">안내가 오면 내용 확인하기</div>
+        <div class="step-header-sub">진입 시 1회 안내</div>
+      </div>
+      <div class="step-body-wrap">
+        <div class="step-img-col">
+          <img src="img/column-guide/warning.png" alt="정책 위반 안내 창" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="img-ph" style="display:none"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c8c8d0" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><div class="img-ph-label">정책 위반 안내 창</div></div>
+        </div>
+        <div class="step-text-col">
+          <div class="step-desc-body">운영팀이 정책 관련 안내를 남기면, 칼럼 관리 화면에 <b>노란 배너</b>가 뜨고 처음 들어갈 때 <b>안내 창이 한 번</b> 나타납니다. 어떤 내용인지 확인해 주세요.</div>
+          <ul class="step-checklist">
+            <li><span class="step-check-icon">●</span><span>노란 배너의 <b>[확인하기]</b>로 안내 다시 열기</span></li>
+            <li><span class="step-check-icon">●</span><span>안내에는 <b>사유 · 관련 글 · 일시</b>가 담겨 있음</span></li>
+          </ul>
+          <div class="callout tip">💡 궁금한 점이 있으면 담당 매니저에게 카카오톡으로 문의하시면 됩니다.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════ PART 3 ═══════════════ -->
+    <div class="part-header" id="part3">
+      <div class="part-header-num">03</div>
+      <div class="part-header-text">
+        <div class="part-header-eyebrow">PART 03</div>
+        <div class="part-header-title">노출 언어 관리</div>
+        <div class="part-header-sub">스토어 지원 언어를 바꿀 때 칼럼에 생기는 일</div>
+      </div>
+    </div>
+
+    <!-- 3-1 -->
+    <div class="sub-section-header" id="p3-1">
+      <span class="sub-section-num">3-1</span>
+      <span class="sub-section-title">언어를 뺄 때 주의</span>
+    </div>
+    <section class="step-section" id="p3-1-1">
+      <div class="step-header">
+        <div class="step-num-badge">3-1</div>
+        <div class="step-header-title">지원 언어에서 언어를 빼면</div>
+        <div class="step-header-sub">마이페이지 기본정보 · 지원 언어</div>
+      </div>
+      <div class="step-body-wrap">
+        <div class="step-img-col">
+          <img src="img/column-guide/lang-setting.png" alt="마이페이지 지원 언어 설정" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="img-ph" style="display:none"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c8c8d0" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><div class="img-ph-label">지원 언어 설정</div></div>
+        </div>
+        <div class="step-text-col">
+          <div class="step-desc-body">마이페이지 기본정보의 <b>지원 언어</b>에서 어떤 언어의 체크를 <b>해제</b>하면, 그 언어로 쓴 칼럼은 고객에게 보이지 않게 됩니다(비활성). 이미 그 언어로 쓴 칼럼이 있으면 <b>안내 창</b>이 먼저 뜹니다.</div>
+          <ul class="step-checklist">
+            <li><span class="step-check-icon">●</span><span>안내 창에 <b>영향받는 칼럼 개수와 목록</b>이 표시됨</span></li>
+            <li><span class="step-check-icon">●</span><span><b>[비활성]</b> 선택 시 그 언어 칼럼이 숨겨지고, 내용은 <b>그대로 보관</b>됨</span></li>
+            <li><span class="step-check-icon">●</span><span>나중에 <b>그 언어를 다시 추가</b>하면 자동으로 다시 보여짐</span></li>
+          </ul>
+          <div class="callout info">📌 내용이 삭제되는 게 아니라 <b>잠시 감춰지는</b> 것입니다. 언어를 다시 켜면 원래대로 돌아옵니다.</div>
+        </div>
+      </div>
+    </section>
+    <div class="modal-grid" style="grid-template-columns:1fr; max-width:520px">
+      <div class="modal-card">
+        <div class="modal-card-img"><img src="img/column-guide/lang-deactivate.png" alt="언어 비활성 안내 창" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="img-ph" style="display:none"><div class="img-ph-label">언어 비활성 안내</div></div></div>
+        <div class="modal-card-body">
+          <div class="modal-card-title">언어 비활성 안내 <span class="modal-card-tag">확인</span></div>
+          <div class="modal-card-desc">체크를 해제할 때 뜨는 안내 창입니다. 영향받는 칼럼을 보여주고, <b>[비활성]</b> / <b>[취소]</b> 중 선택합니다.</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const sections = ['p1-1','p1-2','p1-3','p1-4','p2-1','p2-2','p2-3','p2-4','p2-5','p3-1'];
+const headerH = 56;
+function updateActiveNav() {
+  const scrollY = window.scrollY + headerH + 80;
+  let current = sections[0];
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.offsetTop <= scrollY) current = id;
+  });
+  sections.forEach(id => {
+    const navEl = document.getElementById('nav-' + id);
+    if (navEl) navEl.classList.toggle('active', id === current);
+  });
+}
+window.addEventListener('scroll', updateActiveNav, { passive: true });
+updateActiveNav();
+</script>
+</body>
+</html>
