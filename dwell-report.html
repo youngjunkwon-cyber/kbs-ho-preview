@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>체류 구간 분석 · K-Beauty Station</title>
+<style>
+  :root{
+    --ground:#FBFAFC;
+    --card:#FFFFFF;
+    --ink:#1B1A1F;
+    --muted:#6E6873;
+    --line:#EBE6EC;
+    --accent:#D6336C;
+    --track:#F0EAEE;
+    --good:#2B8A5B;
+    --warn:#B9770A;
+    --bad:#C92A2A;
+    --good-bg:#E7F3EC;
+    --warn-bg:#FBF1DF;
+    --bad-bg:#FBE9E9;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--ground)}
+  .wrap{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Malgun Gothic","Apple SD Gothic Neo",sans-serif;
+    color:var(--ink);
+    background:var(--ground);
+    max-width:820px;
+    margin:0 auto;
+    padding:44px 40px 52px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .eyebrow{
+    font-size:11.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    font-weight:700;
+    margin:0 0 8px;
+  }
+  h1{
+    font-size:27px;
+    line-height:1.2;
+    letter-spacing:-.01em;
+    margin:0 0 6px;
+    text-wrap:balance;
+    font-weight:750;
+  }
+  .meta{
+    font-size:12.5px;
+    color:var(--muted);
+    margin:0 0 30px;
+    padding-bottom:22px;
+    border-bottom:1px solid var(--line);
+  }
+  h2{
+    font-size:13px;
+    letter-spacing:.02em;
+    text-transform:uppercase;
+    color:var(--muted);
+    font-weight:700;
+    margin:34px 0 14px;
+  }
+  h2 .n{color:var(--accent);margin-right:7px}
+  .lead{
+    font-size:16px;
+    line-height:1.55;
+    margin:0;
+  }
+  .lead b{font-weight:750}
+  .rank{display:flex;flex-direction:column;gap:9px;margin-top:4px}
+  .row{display:grid;grid-template-columns:96px 1fr 66px;align-items:center;gap:14px}
+  .row .name{font-size:13.5px;font-weight:600;text-align:right;white-space:nowrap}
+  .bartrack{background:var(--track);border-radius:5px;height:22px;overflow:hidden}
+  .bar{height:100%;border-radius:5px;background:linear-gradient(90deg,#E85A8A,#D6336C)}
+  .bar.dim{background:#CFC7CE}
+  .val{font-size:13px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink)}
+  .depth{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:4px;
+  }
+  .stat{
+    background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:15px 16px;
+  }
+  .stat .num{font-size:24px;font-weight:760;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat .lbl{font-size:13px;color:var(--muted);margin-top:2px;font-weight:600}
+  .findings{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:13px}
+  .findings li{
+    display:grid;grid-template-columns:20px 1fr;gap:12px;font-size:14.5px;line-height:1.5;
+  }
+  .findings .mk{color:var(--accent);font-weight:800;font-variant-numeric:tabular-nums}
+  .findings b{font-weight:730}
+  .callout{
+    margin-top:16px;background:var(--warn-bg);border:1px solid #F0DDB6;
+    border-radius:10px;padding:15px 17px;font-size:14px;line-height:1.55;
+  }
+  .callout .tag{
+    display:inline-block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    font-weight:800;color:var(--warn);margin-right:8px;
+  }
+  .tail{font-size:12.5px;color:var(--muted);margin-top:34px;padding-top:18px;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">사용자 체류 구간 분석</p>
+  <h1>사람들이 가장 오래 머무는 곳</h1>
+  <p class="meta">K-Beauty Station · GA4 · 최근 28일</p>
+
+  <p class="lead">시간이 가장 많이 쌓이는 곳은 <b>스토어 상세, 상품 상세, 홈</b>입니다.
+  한 번 들어가서 오래 붙잡는 곳은 <b>상품 목록과 검색</b>이고요.</p>
+
+  <h2><span class="n">1</span>시간이 가장 많이 쌓이는 구간 <span style="text-transform:none;letter-spacing:0;font-weight:500">· 총 체류시간</span></h2>
+  <div class="rank">
+    <div class="row"><div class="name">스토어 상세</div><div class="bartrack"><div class="bar" style="width:100%"></div></div><div class="val">32.0h</div></div>
+    <div class="row"><div class="name">상품 상세</div><div class="bartrack"><div class="bar" style="width:90%"></div></div><div class="val">28.9h</div></div>
+    <div class="row"><div class="name">홈</div><div class="bartrack"><div class="bar" style="width:81%"></div></div><div class="val">26.0h</div></div>
+    <div class="row"><div class="name">상품 목록</div><div class="bartrack"><div class="bar" style="width:57%"></div></div><div class="val">18.3h</div></div>
+    <div class="row"><div class="name">스토어 목록</div><div class="bartrack"><div class="bar dim" style="width:18%"></div></div><div class="val">5.9h</div></div>
+    <div class="row"><div class="name">검색</div><div class="bartrack"><div class="bar dim" style="width:14%"></div></div><div class="val">4.5h</div></div>
+    <div class="row"><div class="name">매거진</div><div class="bartrack"><div class="bar dim" style="width:10%"></div></div><div class="val">3.3h</div></div>
+    <div class="row"><div class="name">인플루언서</div><div class="bartrack"><div class="bar dim" style="width:4%"></div></div><div class="val">1.2h</div></div>
+  </div>
+
+  <h2><span class="n">2</span>한 번 들어가면 오래 붙잡는 구간 <span style="text-transform:none;letter-spacing:0;font-weight:500">· 방문당 체류</span></h2>
+  <div class="depth">
+    <div class="stat"><div class="num">56<span style="font-size:14px">초</span></div><div class="lbl">상품 목록</div></div>
+    <div class="stat"><div class="num">39<span style="font-size:14px">초</span></div><div class="lbl">스토어 목록</div></div>
+    <div class="stat"><div class="num">31<span style="font-size:14px">초</span></div><div class="lbl">검색</div></div>
+  </div>
+
+  <h2><span class="n">3</span>핵심 시사점</h2>
+  <ul class="findings">
+    <li><span class="mk">·</span><span><b>목록과 검색의 체류가 길다는 건 좋은 신호가 아닙니다.</b> 원하는 걸 빨리 못 찾아 헤맨다는 뜻에 가까워요. 상품 찾기 화면 개선 여지가 큽니다.</span></li>
+    <li><span class="mk">·</span><span><b>체류의 무게중심은 상세페이지와 홈</b>입니다. 서비스가 실제로 소비되는 지점이 여기예요.</span></li>
+    <li><span class="mk">·</span><span><b>인플루언서 페이지는 유입 대비 체류가 가장 짧습니다.</b> 들어와도 다음 행동으로 이어지지 못하고 이탈합니다.</span></li>
+  </ul>
+
+  <div class="callout">
+    <span class="tag">주의</span>조회수는 신뢰 지표가 아닙니다. 상품 상세는 조회 18만으로 1위지만, 그 중 <b>84%가 광고·봇·링크 미리보기 트래픽(뷰당 0.1초)</b>입니다. 판단은 조회수가 아니라 <b>실제 체류 시간</b> 기준으로 봐야 합니다.
+  </div>
+
+  <p class="tail">지표 정의 · 총 체류시간 = 사용자 참여도 합계 · 방문당 체류 = 세션당 평균 참여 시간 · 데이터 출처 GA4 탐색 리포트</p>
+</div>
+</body>
+</html>
