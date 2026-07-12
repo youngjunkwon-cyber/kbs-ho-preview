@@ -149,15 +149,24 @@ body.asis .board { filter: none; }
 
 /* merge log */
 .mlog { display: flex; flex-direction: column; gap: 8px; max-height: 50vh; overflow-y: auto; }
-.mlog-row { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 12.5px; }
-.mlog-row .arrow { color: var(--merge); font-weight: 700; }
-.mlog-row .into { font-weight: 700; }
-.mlog-row .cat { font-size: 11px; color: var(--muted); }
-.mlog-row .undo { margin-left: auto; }
+.mlog-row { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; line-height: 1.5; }
+.mlog-row .from { flex: 1; min-width: 0; }
+.mlog-row .arrow { color: var(--merge); font-weight: 700; flex: 0 0 auto; }
+.mlog-row .into { font-weight: 700; flex: 0 0 auto; }
+.mlog-row .cat { font-size: 11.5px; color: var(--muted); flex: 0 0 auto; white-space: nowrap; }
+.mlog-row .undo { margin-left: auto; flex: 0 0 auto; }
+
+/* plan (안) selector */
+.planbar { display: flex; align-items: center; gap: 5px; }
+.planbar label { font-size: 10.5px; color: var(--muted); font-weight: 700; letter-spacing: .03em; }
+.planbar select { border: 1px solid var(--border); background: var(--surface); color: var(--accent); border-radius: 8px; padding: 6px 8px; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.planbar select:focus { outline: 2px solid var(--accent); }
+.planbar .btn { padding: 5px 8px; }
 
 /* modal */
 .modal-bg { position: fixed; inset: 0; background: rgba(20,10,15,.45); display: grid; place-items: center; z-index: 50; }
-.modal { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; width: min(420px, 92vw); box-shadow: var(--shadow); }
+.modal { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 22px 24px; width: min(560px, 92vw); box-shadow: var(--shadow); }
+.modal.wide { width: min(820px, 94vw); }
 .modal h3 { font-size: 15px; margin-bottom: 12px; }
 .modal label { font-size: 12px; color: var(--muted); display: block; margin: 10px 0 4px; }
 .modal input, .modal select { width: 100%; border: 1px solid var(--border); background: var(--bg); color: var(--text); border-radius: 8px; padding: 8px 10px; font-size: 13px; font-family: inherit; }
@@ -173,6 +182,13 @@ body.asis .board { filter: none; }
     <div class="brand">
       <h1>옵션 체계 편집</h1>
       <span class="sub">회의용 · 조합하며 확정</span>
+    </div>
+    <div class="planbar">
+      <label>안</label>
+      <select id="plan-select" title="안 전환"></select>
+      <button class="btn small" id="plan-new" title="현재 안을 복제해 새 안 만들기">+ 새 안</button>
+      <button class="btn small ghost" id="plan-rename" title="안 이름 변경">✎</button>
+      <button class="btn small ghost" id="plan-del" title="안 삭제">✕</button>
     </div>
     <div class="tabs" role="tablist">
       <button class="tab" role="tab" data-tab="sub" aria-selected="true">세부분류</button>
@@ -231,7 +247,7 @@ window.KBS = {"cats":["뷰티 클리닉","헤어살롱","뷰티케어","건강�
     '온라인 제품': '온라인형 스토어·상품 축 (제나벨, 도로시와 등)'
   };
   var STYPES = ['', '시술', '수술', '치과', '공통'];
-  var LS_KEY = 'kbs-opt-tool-v3';
+  var LS_KEY = 'kbs-opt-tool-v4';
   var uidc = 0;
   function uid() { return 'u' + (++uidc); }
   // 카테고리는 편집 가능한 상태 (세 탭 공유). name 목록·정의 헬퍼
@@ -249,9 +265,8 @@ window.KBS = {"cats":["뷰티 클리닉","헤어살롱","뷰티케어","건강�
     return ta;
   }
 
-  /* ---------- state ---------- */
-  var state = load();
-  function freshState() {
+  /* ---------- state (안 단위) ---------- */
+  function freshState(name) {
     var cats = RAW.cats.map(function (n) { return { name: n, def: CAT_DEF_INIT[n] || '' }; });
     var sub = RAW.sub.map(function (s) {
       return { uid: uid(), ko: s.ko, cat: s.cat, origCat: s.cat, stype: s.stype || '', tr: s.tr.slice(),
@@ -261,15 +276,23 @@ window.KBS = {"cats":["뷰티 클리닉","헤어살롱","뷰티케어","건강�
       return { uid: uid(), ko: k.ko, group: k.group, cat: k.cat, origGroup: k.group, origCat: k.cat, tr: k.tr.slice(),
         active: k.active, origTag: k.tag, note: k.note, deleted: k.tag === '삭제', isNew: k.tag === '신규' };
     });
-    return { cats: cats, sub: sub, kw: kw, mergeLog: [] };
+    return { name: name || '1안', cats: cats, sub: sub, kw: kw, mergeLog: [] };
+  }
+  function normPlan(d, nm) {
+    if (!d.cats) d.cats = RAW.cats.map(function (n) { return { name: n, def: CAT_DEF_INIT[n] || '' }; });
+    if (!d.mergeLog) d.mergeLog = [];
+    if (!d.name) d.name = nm || '1안';
+    return d;
   }
   function load() {
-    try {
-      var raw = localStorage.getItem(LS_KEY);
-      if (raw) { var d = JSON.parse(raw); if (d && d.sub && d.kw) { d.sub.forEach(function(x){uidc++;}); if (!d.cats) d.cats = RAW.cats.map(function (n) { return { name: n, def: CAT_DEF_INIT[n] || '' }; }); if (!d.mergeLog) d.mergeLog = []; return d; } }
-    } catch (e) {}
-    return freshState();
+    // v4: {plans:[...], active}
+    try { var raw = localStorage.getItem(LS_KEY); if (raw) { var d = JSON.parse(raw); if (d && d.plans && d.plans.length) { d.plans.forEach(function (p, i) { normPlan(p, (i + 1) + '안'); }); if (d.active == null || d.active >= d.plans.length) d.active = 0; return d; } } } catch (e) {}
+    // v3 단일 상태 마이그레이션 → 1안
+    try { var old = localStorage.getItem('kbs-opt-tool-v3'); if (old) { var od = JSON.parse(old); if (od && od.sub && od.kw) { normPlan(od, '1안'); return { plans: [od], active: 0 }; } } } catch (e) {}
+    return { plans: [freshState('1안')], active: 0 };
   }
+  var store = load();
+  var state = store.plans[store.active];
   var asisMode = false;
   var selected = {}; // uid -> true (선택된 병합 후보)
   function selCount() { return Object.keys(selected).length; }
@@ -277,7 +300,20 @@ window.KBS = {"cats":["뷰티 클리닉","헤어살롱","뷰티케어","건강�
   function clearSel() { selected = {}; }
   var saveTimer = null, dirty = false;
   function markDirty() { dirty = true; setSave(false); clearTimeout(saveTimer); saveTimer = setTimeout(save, 400); }
-  function save() { try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch (e) {} dirty = false; setSave(true); }
+  function save() { try { localStorage.setItem(LS_KEY, JSON.stringify(store)); } catch (e) {} dirty = false; setSave(true); }
+  function renderPlanBar() {
+    var sel = document.getElementById('plan-select'); if (!sel) return; sel.innerHTML = '';
+    store.plans.forEach(function (p, i) { var o = el('option', null, p.name); o.value = String(i); if (i === store.active) o.selected = true; sel.appendChild(o); });
+    document.getElementById('plan-del').disabled = store.plans.length <= 1;
+  }
+  function switchPlan(i) { if (i < 0 || i >= store.plans.length) return; store.active = i; state = store.plans[i]; clearSel(); asisMode = false; document.body.classList.remove('asis'); var ab = document.getElementById('btn-asis'); ab.classList.remove('active'); ab.textContent = 'AS-IS 보기'; markDirty(); renderPlanBar(); rerender(); }
+  function newPlan() {
+    var copy = JSON.parse(JSON.stringify(state));
+    copy.name = (store.plans.length + 1) + '안';
+    store.plans.push(copy); switchPlan(store.plans.length - 1);
+  }
+  function renamePlan() { var nm = prompt('안 이름', state.name); if (nm && nm.trim()) { state.name = nm.trim(); markDirty(); renderPlanBar(); } }
+  function delPlan() { if (store.plans.length <= 1) { alert('최소 1개 안은 있어야 합니다.'); return; } if (!confirm('"' + state.name + '"을(를) 삭제할까요?')) return; store.plans.splice(store.active, 1); store.active = 0; state = store.plans[0]; clearSel(); markDirty(); renderPlanBar(); rerender(); }
   function setSave(saved) {
     var p = document.getElementById('savepill'), t = document.getElementById('savetxt');
     if (saved) { p.classList.remove('dirty'); t.textContent = '저장됨'; }
@@ -533,10 +569,10 @@ window.KBS = {"cats":["뷰티 클리닉","헤어살롱","뷰티케어","건강�
   function byUid(arr, id) { for (var i = 0; i < arr.length; i++) if (arr[i].uid === id) return arr[i]; return null; }
 
   /* ---------- modals ---------- */
-  function modal(title, bodyBuild, onOk) {
+  function modal(title, bodyBuild, onOk, opts) {
     var root = document.getElementById('modal-root');
     var bg = el('div', 'modal-bg');
-    var m = el('div', 'modal');
+    var m = el('div', 'modal' + (opts && opts.wide ? ' wide' : ''));
     m.appendChild(el('h3', null, title));
     var form = el('div'); bodyBuild(form); m.appendChild(form);
     var acts = el('div', 'actions');
@@ -730,21 +766,21 @@ window.KBS = {"cats":["뷰티 클리닉","헤어살롱","뷰티케어","건강�
     state.mergeLog.splice(idx, 1); markDirty(); rerender();
   }
   function openMergeLog() {
-    modal('병합 기록 (' + state.mergeLog.length + '건)', function (form) {
+    modal(state.name + ' · 병합 기록 (' + state.mergeLog.length + '건)', function (form) {
       if (!state.mergeLog.length) { form.appendChild(el('div', 'empty', '아직 병합 기록이 없습니다.')); return; }
       var wrap = el('div', 'mlog');
       state.mergeLog.forEach(function (log, i) {
         var row = el('div', 'mlog-row');
-        row.appendChild(el('span', null, log.from.join(' + ')));
+        row.appendChild(el('span', 'from', log.from.join(' + ')));
         row.appendChild(el('span', 'arrow', '→'));
         row.appendChild(el('span', 'into', log.into));
-        row.appendChild(el('span', 'cat', '(' + log.cat + ' · ' + (log.kind === 'sub' ? '세부분류' : '키워드') + ')'));
+        row.appendChild(el('span', 'cat', '· ' + log.cat + ' · ' + (log.kind === 'sub' ? '세부분류' : '키워드')));
         var u = el('button', 'btn small undo', '되돌리기'); u.onclick = function () { undoMerge(i); document.getElementById('modal-root').innerHTML = ''; openMergeLog(); };
         row.appendChild(u);
         wrap.appendChild(row);
       });
       form.appendChild(wrap);
-    }, function () { return true; });
+    }, function () { return true; }, { wide: true });
   }
 
   /* ---------- AS-IS (원본) 읽기전용 뷰 ---------- */
@@ -812,8 +848,8 @@ window.KBS = {"cats":["뷰티 클리닉","헤어살롱","뷰티케어","건강�
     document.getElementById('summary').textContent = s;
   }
   function exportJSON() {
-    var out = { generated: new Date().toISOString(), cats: state.cats, sub: state.sub, kw: state.kw, mergeLog: state.mergeLog };
-    download('옵션체계_편집결과.json', JSON.stringify(out, null, 2), 'application/json');
+    var out = { generated: new Date().toISOString(), plan: state.name, cats: state.cats, sub: state.sub, kw: state.kw, mergeLog: state.mergeLog };
+    download('옵션체계_' + state.name + '.json', JSON.stringify(out, null, 2), 'application/json');
   }
   function csvCell(v) { v = (v == null ? '' : String(v)); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
   function exportCSV() {
@@ -868,7 +904,11 @@ window.KBS = {"cats":["뷰티 클리닉","헤어살롱","뷰티케어","건강�
   document.getElementById('btn-mergelog').onclick = openMergeLog;
   document.getElementById('search').addEventListener('input', rerender);
   document.getElementById('chk-tr').addEventListener('change', function (e) { showTr = e.target.checked; rerender(); });
-  document.getElementById('btn-reset').onclick = function () { if (confirm('편집 내용을 모두 버리고 원본 TO-BE로 초기화할까요?')) { localStorage.removeItem(LS_KEY); state = freshState(); save(); rerender(); } };
+  document.getElementById('btn-reset').onclick = function () { if (confirm('현재 안(' + state.name + ')의 편집 내용을 버리고 원본 TO-BE로 초기화할까요?\n(다른 안은 그대로 유지됩니다)')) { var nm = state.name; store.plans[store.active] = freshState(nm); state = store.plans[store.active]; clearSel(); markDirty(); rerender(); } };
+  document.getElementById('plan-select').onchange = function (e) { switchPlan(parseInt(e.target.value, 10)); };
+  document.getElementById('plan-new').onclick = newPlan;
+  document.getElementById('plan-rename').onclick = renamePlan;
+  document.getElementById('plan-del').onclick = delPlan;
   document.getElementById('btn-export').onclick = function () {
     modal('내보내기', function (form) {
       form.appendChild(el('label', null, '형식을 선택하세요'));
@@ -887,6 +927,7 @@ window.KBS = {"cats":["뷰티 클리닉","헤어살롱","뷰티케어","건강�
     document.documentElement.setAttribute('data-theme', next); localStorage.setItem('kbs-theme', next);
   };
   setSave(true);
+  renderPlanBar();
   showTab('sub');
 })();
 
