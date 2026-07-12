@@ -83,6 +83,10 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .col.dragover { outline: 2px solid var(--accent); outline-offset: -2px; }
 .col-body { padding: 10px; display: flex; flex-direction: column; gap: 7px; overflow-y: auto; }
 .col-def { font-size: 11px; color: var(--muted); padding: 0 14px 10px; line-height: 1.4; border-bottom: 1px solid var(--border); margin-bottom: 2px; }
+.col-def-edit { width: 100%; border: 1px solid transparent; background: transparent; color: var(--text); font-family: inherit; font-size: 13px; line-height: 1.5; padding: 8px 13px 10px; resize: none; overflow: hidden; display: block; border-bottom: 1px solid var(--border); margin-bottom: 2px; transition: background .12s; }
+.col-def-edit::placeholder { color: var(--muted); }
+.col-def-edit:hover { background: var(--surface-2); }
+.col-def-edit:focus { outline: none; background: var(--surface-2); border: 1px solid var(--accent); border-radius: 8px; }
 
 /* Card */
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: 9px; padding: 8px 10px; cursor: grab; transition: .12s; position: relative; }
@@ -202,6 +206,15 @@ window.KBS = {"cats":["뷰티 클리닉","헤어살롱","뷰티케어","건강�
   // 카테고리는 편집 가능한 상태 (세 탭 공유). name 목록·정의 헬퍼
   function catNames() { return state.cats.map(function (c) { return c.name; }); }
   function catDef(name) { for (var i = 0; i < state.cats.length; i++) if (state.cats[i].name === name) return state.cats[i].def; return ''; }
+  function autoGrow(ta) { ta.style.height = 'auto'; ta.style.height = (ta.scrollHeight) + 'px'; }
+  function catDefBox(cat) {
+    var ta = document.createElement('textarea');
+    ta.className = 'col-def-edit'; ta.value = catDef(cat); ta.placeholder = '축 정의를 입력…'; ta.rows = 1;
+    ta.addEventListener('input', function () { var c = state.cats.filter(function (x) { return x.name === cat; })[0]; if (c) { c.def = ta.value; markDirty(); } autoGrow(ta); });
+    ta.addEventListener('click', function (e) { e.stopPropagation(); });
+    setTimeout(function () { autoGrow(ta); }, 0);
+    return ta;
+  }
 
   /* ---------- state ---------- */
   var state = load();
@@ -294,7 +307,7 @@ window.KBS = {"cats":["뷰티 클리닉","헤어살롱","뷰티케어","건강�
     add.onclick = function () { openSubModal(null, cat); };
     head.appendChild(add);
     col.appendChild(head);
-    if (def) col.appendChild(el('div', 'col-def', def));
+    col.appendChild(catDefBox(cat));
     var body = el('div', 'col-body');
     if (!items.length) body.appendChild(el('div', 'empty', '비어 있음'));
     items.forEach(function (s) { body.appendChild(subCard(s)); });
@@ -361,7 +374,7 @@ window.KBS = {"cats":["뷰티 클리닉","헤어살롱","뷰티케어","건강�
     add.onclick = function () { openGroupModal(null, cat); };
     head.appendChild(add);
     col.appendChild(head);
-    if (def) col.appendChild(el('div', 'col-def', def));
+    col.appendChild(catDefBox(cat));
     var body = el('div', 'col-body');
     if (!groups.length) body.appendChild(el('div', 'empty', '그룹 없음'));
     groups.forEach(function (g) { body.appendChild(grpCard(g)); });
@@ -413,6 +426,7 @@ window.KBS = {"cats":["뷰티 클리닉","헤어살롱","뷰티케어","건강�
     add.onclick = function () { openKwModal(null, cat); };
     head.appendChild(add);
     col.appendChild(head);
+    col.appendChild(catDefBox(cat));
     var body = el('div', 'col-body');
     if (!items.length) body.appendChild(el('div', 'empty', '비어 있음'));
     // group within column
