@@ -184,9 +184,8 @@ window.KBS = {"cats":["뷰티 클리닉","헤어살롱","뷰티케어","건강�
 (function () {
   'use strict';
   var RAW = window.KBS;
-  var CATS = RAW.cats.slice();
   var LANGS = RAW.langs;
-  var CAT_DEF = {
+  var CAT_DEF_INIT = {
     '뷰티 클리닉': '피부시술·성형수술·치과형 미용의료를 한 축으로 (시술구분 속성으로 시술/수술/치과 구분)',
     '헤어살롱': '헤어 중심 + 메이크업 포함 운영 축',
     '뷰티케어': '반영구·네일·속눈썹·왁싱·퍼스널컬러 같은 비의료 뷰티 서비스 축',
@@ -197,13 +196,17 @@ window.KBS = {"cats":["뷰티 클리닉","헤어살롱","뷰티케어","건강�
     '온라인 제품': '온라인형 스토어·상품 축 (제나벨, 도로시와 등)'
   };
   var STYPES = ['', '시술', '수술', '치과', '공통'];
-  var LS_KEY = 'kbs-opt-tool-v2';
+  var LS_KEY = 'kbs-opt-tool-v3';
   var uidc = 0;
   function uid() { return 'u' + (++uidc); }
+  // 카테고리는 편집 가능한 상태 (세 탭 공유). name 목록·정의 헬퍼
+  function catNames() { return state.cats.map(function (c) { return c.name; }); }
+  function catDef(name) { for (var i = 0; i < state.cats.length; i++) if (state.cats[i].name === name) return state.cats[i].def; return ''; }
 
   /* ---------- state ---------- */
   var state = load();
   function freshState() {
+    var cats = RAW.cats.map(function (n) { return { name: n, def: CAT_DEF_INIT[n] || '' }; });
     var sub = RAW.sub.map(function (s) {
       return { uid: uid(), ko: s.ko, cat: s.cat, origCat: s.cat, stype: s.stype || '', tr: s.tr.slice(),
         active: s.active, origTag: s.tag, note: s.note, deleted: s.tag === '삭제', isNew: s.tag === '신규' };
@@ -212,12 +215,12 @@ window.KBS = {"cats":["뷰티 클리닉","헤어살롱","뷰티케어","건강�
       return { uid: uid(), ko: k.ko, group: k.group, cat: k.cat, origGroup: k.group, origCat: k.cat, tr: k.tr.slice(),
         active: k.active, origTag: k.tag, note: k.note, deleted: k.tag === '삭제', isNew: k.tag === '신규' };
     });
-    return { sub: sub, kw: kw };
+    return { cats: cats, sub: sub, kw: kw };
   }
   function load() {
     try {
       var raw = localStorage.getItem(LS_KEY);
-      if (raw) { var d = JSON.parse(raw); if (d && d.sub && d.kw) { d.sub.forEach(function(x){uidc++;}); return d; } }
+      if (raw) { var d = JSON.parse(raw); if (d && d.sub && d.kw) { d.sub.forEach(function(x){uidc++;}); if (!d.cats) d.cats = RAW.cats.map(function (n) { return { name: n, def: CAT_DEF_INIT[n] || '' }; }); return d; } }
     } catch (e) {}
     return freshState();
   }
@@ -271,20 +274,21 @@ window.KBS = {"cats":["뷰티 클리닉","헤어살롱","뷰티케어","건강�
   /* ================= SUB tab ================= */
   function renderSub() {
     var root = document.getElementById('view-sub'); root.innerHTML = '';
-    CATS.forEach(function (cat) {
+    catNames().forEach(function (cat) {
       var items = state.sub.filter(function (s) { return !s.deleted && s.cat === cat && matchSearch(s); });
-      root.appendChild(subColumn(cat, items, CAT_DEF[cat]));
+      root.appendChild(subColumn(cat, items, catDef(cat)));
     });
     // trash
     var del = state.sub.filter(function (s) { return s.deleted && matchSearch(s); });
     root.appendChild(trashColumn('sub', del.length, function (col) {
       del.forEach(function (s) { col.appendChild(subCard(s)); });
     }));
+    root.appendChild(addCatColumn());
   }
   function subColumn(cat, items, def) {
     var col = el('div', 'col');
     var head = el('div', 'col-head');
-    head.appendChild(el('h3', null, cat));
+    var h3c = el('h3', null, cat); h3c.style.cursor = 'pointer'; h3c.title = '카테고리 이름·정의 편집'; h3c.onclick = function () { openCatModal(cat); }; head.appendChild(h3c);
     head.appendChild(el('span', 'count', String(items.length)));
     var add = el('button', 'btn small add', '＋'); add.title = '세부분류 추가';
     add.onclick = function () { openSubModal(null, cat); };
@@ -339,18 +343,19 @@ window.KBS = {"cats":["뷰티 클리닉","헤어살롱","뷰티케어","건강�
   function renderGrp() {
     var root = document.getElementById('view-grp'); root.innerHTML = '';
     var map = groupsOf();
-    var byCat = {}; CATS.forEach(function (c) { byCat[c] = []; });
+    var byCat = {}; catNames().forEach(function (c) { byCat[c] = []; });
     Object.keys(map).forEach(function (key) { var g = map[key]; if (byCat[g.cat]) byCat[g.cat].push(g); });
-    CATS.forEach(function (cat) {
+    catNames().forEach(function (cat) {
       var groups = byCat[cat].filter(function (g) { return !document.getElementById('search').value || g.group.toLowerCase().indexOf(document.getElementById('search').value.toLowerCase()) >= 0; });
       groups.sort(function (a, b) { return b.items.length - a.items.length; });
-      root.appendChild(grpColumn(cat, groups, CAT_DEF[cat]));
+      root.appendChild(grpColumn(cat, groups, catDef(cat)));
     });
+    root.appendChild(addCatColumn());
   }
   function grpColumn(cat, groups, def) {
     var col = el('div', 'col');
     var head = el('div', 'col-head');
-    head.appendChild(el('h3', null, cat));
+    var h3c = el('h3', null, cat); h3c.style.cursor = 'pointer'; h3c.title = '카테고리 이름·정의 편집'; h3c.onclick = function () { openCatModal(cat); }; head.appendChild(h3c);
     head.appendChild(el('span', 'count', String(groups.length)));
     var add = el('button', 'btn small add', '＋'); add.title = '그룹 추가';
     add.onclick = function () { openGroupModal(null, cat); };
@@ -391,17 +396,18 @@ window.KBS = {"cats":["뷰티 클리닉","헤어살롱","뷰티케어","건강�
   /* ================= KEYWORD tab ================= */
   function renderKw() {
     var root = document.getElementById('view-kw'); root.innerHTML = '';
-    CATS.forEach(function (cat) {
+    catNames().forEach(function (cat) {
       var items = state.kw.filter(function (k) { return !k.deleted && k.cat === cat && matchSearch(k); });
       root.appendChild(kwColumn(cat, items));
     });
     var del = state.kw.filter(function (k) { return k.deleted && matchSearch(k); });
     root.appendChild(trashColumn('kw', del.length, function (col) { del.forEach(function (k) { col.appendChild(kwCard(k)); }); }));
+    root.appendChild(addCatColumn());
   }
   function kwColumn(cat, items) {
     var col = el('div', 'col');
     var head = el('div', 'col-head');
-    head.appendChild(el('h3', null, cat));
+    var h3c = el('h3', null, cat); h3c.style.cursor = 'pointer'; h3c.title = '카테고리 이름·정의 편집'; h3c.onclick = function () { openCatModal(cat); }; head.appendChild(h3c);
     head.appendChild(el('span', 'count', String(items.length)));
     var add = el('button', 'btn small add', '＋'); add.title = '키워드 추가';
     add.onclick = function () { openKwModal(null, cat); };
@@ -504,7 +510,7 @@ window.KBS = {"cats":["뷰티 클리닉","헤어살롱","뷰티케어","건강�
       form.appendChild(el('label', null, '이름 (한국어)'));
       var nm = el('input'); nm.value = s ? s.ko : ''; form.appendChild(nm); form.nm = nm;
       form.appendChild(el('label', null, '카테고리'));
-      var cs = el('select'); CATS.forEach(function (c) { var o = el('option', null, c); o.value = c; if ((s ? s.cat : cat) === c) o.selected = true; cs.appendChild(o); }); form.appendChild(cs); form.cs = cs;
+      var cs = el('select'); catNames().forEach(function (c) { var o = el('option', null, c); o.value = c; if ((s ? s.cat : cat) === c) o.selected = true; cs.appendChild(o); }); form.appendChild(cs); form.cs = cs;
       form.appendChild(el('label', null, '시술구분 (뷰티 클리닉만 사용)'));
       var ss = el('select'); ['', '시술', '수술', '치과', '공통'].forEach(function (v) { var o = el('option', null, v || '(없음)'); o.value = v; if ((s ? s.stype : '') === v) o.selected = true; ss.appendChild(o); }); form.appendChild(ss); form.ss = ss;
       form.tr = trInputs(form, s ? s.tr : null);
@@ -524,7 +530,7 @@ window.KBS = {"cats":["뷰티 클리닉","헤어살롱","뷰티케어","건강�
     modal(isNew ? '키워드그룹 추가 (' + cat + ')' : '그룹명 변경', function (form) {
       form.appendChild(el('label', null, '그룹명'));
       var nm = el('input'); nm.value = g ? g.group : ''; form.appendChild(nm);
-      if (isNew) { form.appendChild(el('label', null, '카테고리')); var cs = el('select'); CATS.forEach(function (c) { var o = el('option', null, c); o.value = c; if (cat === c) o.selected = true; cs.appendChild(o); }); form.appendChild(cs); }
+      if (isNew) { form.appendChild(el('label', null, '카테고리')); var cs = el('select'); catNames().forEach(function (c) { var o = el('option', null, c); o.value = c; if (cat === c) o.selected = true; cs.appendChild(o); }); form.appendChild(cs); }
     }, function () {
       var f = document.querySelector('.modal');
       var nm = f.querySelector('input').value.trim(); if (!nm) return false;
@@ -539,7 +545,7 @@ window.KBS = {"cats":["뷰티 클리닉","헤어살롱","뷰티케어","건강�
       form.appendChild(el('label', null, '이름 (한국어)'));
       var nm = el('input'); nm.value = k ? k.ko : ''; form.appendChild(nm);
       form.appendChild(el('label', null, '카테고리'));
-      var cs = el('select'); CATS.forEach(function (c) { var o = el('option', null, c); o.value = c; if ((k ? k.cat : cat) === c) o.selected = true; cs.appendChild(o); }); form.appendChild(cs);
+      var cs = el('select'); catNames().forEach(function (c) { var o = el('option', null, c); o.value = c; if ((k ? k.cat : cat) === c) o.selected = true; cs.appendChild(o); }); form.appendChild(cs);
       form.appendChild(el('label', null, '그룹'));
       var gi = el('input'); gi.value = k ? k.group : ''; gi.setAttribute('list', 'grouplist'); form.appendChild(gi);
       var dl = el('datalist'); dl.id = 'grouplist'; var seen = {}; state.kw.forEach(function (x) { if (!seen[x.group]) { seen[x.group] = 1; var o = el('option'); o.value = x.group; dl.appendChild(o); } }); form.appendChild(dl);
@@ -555,6 +561,59 @@ window.KBS = {"cats":["뷰티 클리닉","헤어살롱","뷰티케어","건강�
       else { k.ko = nm; k.cat = cs; k.group = gi; k.tr = trs; }
       markDirty(); rerender();
     });
+  }
+
+  /* ---------- category editing (세 탭 공유) ---------- */
+  function renameCat(oldName, newName, newDef) {
+    if (newName && newName !== oldName) {
+      if (catNames().indexOf(newName) >= 0) { alert('이미 있는 카테고리명입니다.'); return false; }
+      state.sub.forEach(function (s) { if (s.cat === oldName) s.cat = newName; if (s.origCat === oldName) s.origCat = newName; });
+      state.kw.forEach(function (k) { if (k.cat === oldName) k.cat = newName; if (k.origCat === oldName) k.origCat = newName; });
+    }
+    var c = state.cats.filter(function (x) { return x.name === oldName; })[0];
+    if (c) { c.name = newName || oldName; c.def = newDef; }
+    markDirty(); rerender(); return true;
+  }
+  function addCat(name, def) {
+    if (!name) return false;
+    if (catNames().indexOf(name) >= 0) { alert('이미 있는 카테고리명입니다.'); return false; }
+    state.cats.push({ name: name, def: def || '' }); markDirty(); rerender(); return true;
+  }
+  function deleteCat(name) {
+    var nSub = state.sub.filter(function (s) { return !s.deleted && s.cat === name; }).length;
+    var nKw = state.kw.filter(function (k) { return !k.deleted && k.cat === name; }).length;
+    if (nSub || nKw) {
+      if (!confirm('"' + name + '" 카테고리에 세부분류 ' + nSub + '개·키워드 ' + nKw + '개가 있습니다.\n지우면 소속 항목이 모두 삭제 대상으로 이동합니다. 진행할까요?')) return;
+      state.sub.forEach(function (s) { if (s.cat === name) s.deleted = true; });
+      state.kw.forEach(function (k) { if (k.cat === name) k.deleted = true; });
+    }
+    state.cats = state.cats.filter(function (c) { return c.name !== name; });
+    markDirty(); rerender();
+  }
+  function openCatModal(name) {
+    var isNew = !name;
+    modal(isNew ? '카테고리 추가' : '카테고리 편집', function (form) {
+      form.appendChild(el('label', null, '카테고리 이름'));
+      var nm = el('input'); nm.value = name || ''; form.appendChild(nm);
+      form.appendChild(el('label', null, '축 정의 (설명)'));
+      var df = el('input'); df.value = name ? catDef(name) : ''; form.appendChild(df);
+      if (!isNew) {
+        var delb = el('button', 'btn', '이 카테고리 삭제'); delb.style.marginTop = '14px'; delb.style.color = 'var(--del)'; delb.style.borderColor = 'var(--del)';
+        delb.onclick = function () { document.getElementById('modal-root').innerHTML = ''; deleteCat(name); };
+        form.appendChild(delb);
+      }
+    }, function () {
+      var f = document.querySelector('.modal'); var inps = f.querySelectorAll('input');
+      var nm = inps[0].value.trim(); var df = inps[1].value.trim();
+      if (!nm) return false;
+      if (isNew) return addCat(nm, df); else return renameCat(name, nm, df);
+    });
+  }
+  function addCatColumn() {
+    var col = el('div', 'col'); col.style.border = '1px dashed var(--border)'; col.style.background = 'transparent'; col.style.flex = '0 0 170px';
+    var b = el('button', 'btn', '＋ 카테고리'); b.style.margin = '14px'; b.title = '새 카테고리 추가';
+    b.onclick = function () { openCatModal(null); };
+    col.appendChild(b); return col;
   }
 
   /* ---------- summary / export ---------- */
@@ -573,7 +632,7 @@ window.KBS = {"cats":["뷰티 클리닉","헤어살롱","뷰티케어","건강�
     document.getElementById('summary').textContent = s;
   }
   function exportJSON() {
-    var out = { generated: new Date().toISOString(), sub: state.sub, kw: state.kw };
+    var out = { generated: new Date().toISOString(), cats: state.cats, sub: state.sub, kw: state.kw };
     download('옵션체계_편집결과.json', JSON.stringify(out, null, 2), 'application/json');
   }
   function csvCell(v) { v = (v == null ? '' : String(v)); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
