@@ -81,6 +81,11 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .col-head .count { font-size: 11px; color: var(--muted); background: var(--surface-2); padding: 1px 7px; border-radius: 20px; font-variant-numeric: tabular-nums; }
 .col-head .add { margin-left: auto; }
 .col.dragover { outline: 2px solid var(--accent); outline-offset: -2px; }
+.col.col-dragover { outline: 2px dashed var(--accent); outline-offset: -2px; }
+.col-head.drag-handle { cursor: grab; }
+.col-head.drag-handle:active { cursor: grabbing; }
+.col-head.drag-handle::before { content: "⠿"; color: var(--muted); font-size: 13px; margin-right: 2px; opacity: .5; letter-spacing: -2px; }
+.col-head.drag-handle:hover::before { opacity: 1; color: var(--accent); }
 .col-body { padding: 10px; display: flex; flex-direction: column; gap: 7px; overflow-y: auto; }
 .col-def { font-size: 11px; color: var(--muted); padding: 0 14px 10px; line-height: 1.4; border-bottom: 1px solid var(--border); margin-bottom: 2px; }
 .col-def-edit { width: 100%; box-sizing: border-box; flex: 0 0 auto; border: 1px solid transparent; background: transparent; color: var(--text); font-family: inherit; font-size: 13px; line-height: 1.55; padding: 8px 13px 10px; resize: none; overflow: hidden; display: block; min-height: 40px; white-space: pre-wrap; overflow-wrap: break-word; border-bottom: 1px solid var(--border); margin-bottom: 2px; transition: background .12s; }
@@ -365,11 +370,33 @@ window.KBS = {"cats":["뷰티 클리닉","헤어살롱","뷰티케어","건강�
   /* ---------- drag ---------- */
   var dragUid = null, dragKind = null;
   function onDragStart(e, id, kind) { dragUid = id; dragKind = kind; e.dataTransfer.effectAllowed = 'move'; try { e.dataTransfer.setData('text/plain', id); } catch (x) {} e.target.classList.add('dragging'); }
-  function onDragEnd(e) { e.target.classList.remove('dragging'); dragUid = null; }
-  function colDnd(col, kind, onDrop) {
-    col.addEventListener('dragover', function (e) { if (dragKind === kind) { e.preventDefault(); col.classList.add('dragover'); } });
-    col.addEventListener('dragleave', function () { col.classList.remove('dragover'); });
-    col.addEventListener('drop', function (e) { e.preventDefault(); col.classList.remove('dragover'); if (dragKind === kind && dragUid) onDrop(dragUid); });
+  function onDragEnd(e) { if (e && e.target && e.target.classList) e.target.classList.remove('dragging'); dragUid = null; dragKind = null; }
+  function startColDrag(e, catName) { dragKind = 'col'; dragUid = catName; e.dataTransfer.effectAllowed = 'move'; try { e.dataTransfer.setData('text/plain', catName); } catch (x) {} }
+  function moveCat(fromName, toName) {
+    var from = -1, to = -1;
+    state.cats.forEach(function (c, i) { if (c.name === fromName) from = i; if (c.name === toName) to = i; });
+    if (from < 0 || to < 0 || from === to) return;
+    var c = state.cats.splice(from, 1)[0];
+    state.cats.splice(to, 0, c);
+    markDirty(); rerender();
+  }
+  function colDnd(col, kind, onDrop, catName) {
+    col.addEventListener('dragover', function (e) {
+      if (dragKind === kind) { e.preventDefault(); col.classList.add('dragover'); }
+      else if (dragKind === 'col' && catName && dragUid !== catName) { e.preventDefault(); col.classList.add('col-dragover'); }
+    });
+    col.addEventListener('dragleave', function () { col.classList.remove('dragover'); col.classList.remove('col-dragover'); });
+    col.addEventListener('drop', function (e) {
+      e.preventDefault(); col.classList.remove('dragover'); col.classList.remove('col-dragover');
+      if (dragKind === kind && dragUid) onDrop(dragUid);
+      else if (dragKind === 'col' && dragUid && catName) moveCat(dragUid, catName);
+    });
+  }
+  // 컬럼 헤더를 드래그 핸들로 (카테고리 좌우 재배치)
+  function makeColDraggable(head, catName) {
+    head.draggable = true; head.classList.add('drag-handle');
+    head.addEventListener('dragstart', function (e) { startColDrag(e, catName); });
+    head.addEventListener('dragend', onDragEnd);
   }
 
   /* ================= SUB tab ================= */
@@ -400,7 +427,8 @@ window.KBS = {"cats":["뷰티 클리닉","헤어살롱","뷰티케어","건강�
     if (!items.length) body.appendChild(el('div', 'empty', '비어 있음'));
     items.forEach(function (s) { body.appendChild(subCard(s)); });
     col.appendChild(body);
-    colDnd(col, 'sub', function (id) { var s = byUid(state.sub, id); if (s && (s.cat !== cat || s.deleted)) { s.cat = cat; s.deleted = false; markDirty(); rerender(); } });
+    colDnd(col, 'sub', function (id) { var s = byUid(state.sub, id); if (s && (s.cat !== cat || s.deleted)) { s.cat = cat; s.deleted = false; markDirty(); rerender(); } }, cat);
+    makeColDraggable(head, cat);
     return col;
   }
   function subCard(s) {
@@ -475,7 +503,8 @@ window.KBS = {"cats":["뷰티 클리닉","헤어살롱","뷰티케어","건강�
       if (oc === cat) return;
       state.kw.forEach(function (k) { if (!k.deleted && k.cat === oc && k.group === gn) k.cat = cat; });
       markDirty(); rerender();
-    });
+    }, cat);
+    makeColDraggable(head, cat);
     return col;
   }
   function grpCard(g) {
@@ -530,7 +559,8 @@ window.KBS = {"cats":["뷰티 클리닉","헤어살롱","뷰티케어","건강�
       groups[gn].forEach(function (k) { body.appendChild(kwCard(k)); });
     });
     col.appendChild(body);
-    colDnd(col, 'kw', function (id) { var k = byUid(state.kw, id); if (k && (k.cat !== cat || k.deleted)) { k.cat = cat; k.deleted = false; markDirty(); rerender(); } });
+    colDnd(col, 'kw', function (id) { var k = byUid(state.kw, id); if (k && (k.cat !== cat || k.deleted)) { k.cat = cat; k.deleted = false; markDirty(); rerender(); } }, cat);
+    makeColDraggable(head, cat);
     return col;
   }
   function kwCard(k) {
