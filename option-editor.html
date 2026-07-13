@@ -186,6 +186,7 @@ body.asis .board { filter: none; }
 .planbar select { border: 1px solid var(--border); background: var(--surface); color: var(--accent); border-radius: 8px; padding: 6px 8px; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
 .planbar select:focus { outline: 2px solid var(--accent); }
 .planbar .btn { padding: 5px 8px; }
+#plan-del:hover { color: var(--del); border-color: var(--del); }
 
 /* modal */
 .modal-bg { position: fixed; inset: 0; background: rgba(20,10,15,.45); display: grid; place-items: center; z-index: 50; }
@@ -214,7 +215,7 @@ body.asis .board { filter: none; }
       <button class="btn small" id="plan-import" title="엑셀(.xlsx)/JSON 파일을 새 안으로 가져오기">가져오기</button>
       <input type="file" id="import-file" accept=".xlsx,.json" style="display:none">
       <button class="btn small ghost" id="plan-rename" title="안 이름 변경">✎</button>
-      <button class="btn small ghost" id="plan-del" title="안 삭제">✕</button>
+      <button class="btn small ghost" id="plan-del" title="안 삭제">🗑</button>
     </div>
     <div class="tabs" role="tablist">
       <button class="tab" role="tab" data-tab="tree" aria-selected="true">트리(통합)</button>
