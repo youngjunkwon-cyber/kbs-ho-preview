@@ -211,6 +211,8 @@ body.asis .board { filter: none; }
       <label>안</label>
       <select id="plan-select" title="안 전환"></select>
       <button class="btn small" id="plan-new" title="현재 안을 복제해 새 안 만들기">+ 새 안</button>
+      <button class="btn small" id="plan-import" title="엑셀(.xlsx)/JSON 파일을 새 안으로 가져오기">가져오기</button>
+      <input type="file" id="import-file" accept=".xlsx,.json" style="display:none">
       <button class="btn small ghost" id="plan-rename" title="안 이름 변경">✎</button>
       <button class="btn small ghost" id="plan-del" title="안 삭제">✕</button>
     </div>
@@ -803,6 +805,81 @@ window.KBS = {"cats":["뷰티 클리닉","헤어살롱","뷰티케어","건강�
     });
   }
 
+  /* ---------- 가져오기 (엑셀/JSON → 새 안) ---------- */
+  function decodeXml(s) { return s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&#x([0-9a-fA-F]+);/g, function (_, h) { return String.fromCodePoint(parseInt(h, 16)); }).replace(/&#(\d+);/g, function (_, d) { return String.fromCodePoint(+d); }).replace(/&amp;/g, '&'); }
+  function parseShared(xml) { var arr = [], re = /<si>([\s\S]*?)<\/si>/g, m; while (m = re.exec(xml)) { var t = '', tre = /<t(?:\s[^>]*)?>([\s\S]*?)<\/t>|<t(?:\s[^>]*)?\/>/g, x; while (x = tre.exec(m[1])) t += x[1] ? decodeXml(x[1]) : ''; arr.push(t); } return arr; }
+  function colIdx(c) { var n = 0; for (var i = 0; i < c.length; i++) n = n * 26 + (c.charCodeAt(i) - 64); return n - 1; }
+  function parseSheet(xml, shared) { var rows = [], rre = /<row[^>]*r="(\d+)"[^>]*>([\s\S]*?)<\/row>/g, r; while (r = rre.exec(xml)) { var rn = +r[1], cells = [], cre = /<c\s+r="([A-Z]+)\d+"([^>]*?)(?:\/>|>([\s\S]*?)<\/c>)/g, c; while (c = cre.exec(r[2])) { var idx = colIdx(c[1]), attrs = c[2] || '', inner = c[3] || '', val = ''; var vm = inner.match(/<v>([\s\S]*?)<\/v>/); var ism = inner.match(/<is>([\s\S]*?)<\/is>/); if (/t="s"/.test(attrs) && vm) val = shared[+vm[1]] || ''; else if (ism) { var tm = ism[1].match(/<t(?:\s[^>]*)?>([\s\S]*?)<\/t>/); val = tm ? decodeXml(tm[1]) : ''; } else if (vm) val = decodeXml(vm[1]); cells[idx] = val; } rows[rn - 1] = cells; } return rows; }
+  async function inflateRaw(u8) { var ds = new DecompressionStream('deflate-raw'); var ab = await new Response(new Blob([u8]).stream().pipeThrough(ds)).arrayBuffer(); return new TextDecoder().decode(ab); }
+  async function unzipXlsx(buf) {
+    var u8 = new Uint8Array(buf), dv = new DataView(buf), eocd = -1;
+    for (var i = u8.length - 22; i >= 0; i--) { if (u8[i] === 0x50 && u8[i + 1] === 0x4b && u8[i + 2] === 0x05 && u8[i + 3] === 0x06) { eocd = i; break; } }
+    if (eocd < 0) throw new Error('올바른 xlsx(zip) 파일이 아닙니다.');
+    var cdOff = dv.getUint32(eocd + 16, true), cdCnt = dv.getUint16(eocd + 10, true), p = cdOff, entries = {};
+    for (var n = 0; n < cdCnt; n++) {
+      var method = dv.getUint16(p + 10, true), compSize = dv.getUint32(p + 20, true), nameLen = dv.getUint16(p + 28, true), extraLen = dv.getUint16(p + 30, true), commentLen = dv.getUint16(p + 32, true), localOff = dv.getUint32(p + 42, true);
+      var name = new TextDecoder().decode(u8.subarray(p + 46, p + 46 + nameLen));
+      var lNameLen = dv.getUint16(localOff + 26, true), lExtraLen = dv.getUint16(localOff + 28, true), dataStart = localOff + 30 + lNameLen + lExtraLen;
+      entries[name] = { method: method, data: u8.subarray(dataStart, dataStart + compSize) };
+      p += 46 + nameLen + extraLen + commentLen;
+    }
+    var want = ['xl/sharedStrings.xml', 'xl/worksheets/sheet1.xml', 'xl/worksheets/sheet2.xml', 'xl/worksheets/sheet3.xml'], out = {};
+    for (var w = 0; w < want.length; w++) { var e = entries[want[w]]; if (e) out[want[w]] = e.method === 0 ? new TextDecoder().decode(e.data) : await inflateRaw(e.data); }
+    return out;
+  }
+  function colOf(header, names) { for (var i = 0; i < header.length; i++) { var hv = (header[i] || ''); for (var j = 0; j < names.length; j++) if (hv.indexOf(names[j]) >= 0) return i; } return -1; }
+  function rowsToPlan(sheets) {
+    var subRows = null, kwRows = null;
+    sheets.forEach(function (rows) {
+      if (!rows || !rows.length) return;
+      var h = (rows[0] || []).join('|');
+      if ((h.indexOf('명칭') >= 0 && h.indexOf('그룹') >= 0)) kwRows = rows;
+      else if (h.indexOf('세부분류') >= 0 || h.indexOf('원본') >= 0 || h.indexOf('카테고리') >= 0) { if (!subRows) subRows = rows; }
+    });
+    var sub = [], kw = [];
+    if (subRows) {
+      var h = subRows[0], ci = { cat: colOf(h, ['카테고리']), ko: colOf(h, ['원본', '세부분류명', '명칭']), zh: colOf(h, ['간체', '중국어']), en: colOf(h, ['영어']), tw: colOf(h, ['번체']), ja: colOf(h, ['일본']), id: colOf(h, ['인니', '인도네']), mn: colOf(h, ['몽골']), act: colOf(h, ['활성']) };
+      for (var r = 1; r < subRows.length; r++) { var row = subRows[r]; if (!row) continue; var ko = row[ci.ko]; if (!ko) continue; sub.push({ uid: uid(), ko: ko, cat: row[ci.cat] || '(미지정)', origCat: row[ci.cat] || '(미지정)', stype: '', tr: [row[ci.zh] || '', row[ci.en] || '', row[ci.tw] || '', row[ci.ja] || '', row[ci.id] || '', row[ci.mn] || ''], active: row[ci.act] || '활성', origTag: '유지', note: '', deleted: false, isNew: false }); }
+    }
+    if (kwRows) {
+      var hk = kwRows[0], ck = { ko: colOf(hk, ['명칭']), group: colOf(hk, ['그룹']), cat: colOf(hk, ['카테고리']), zh: colOf(hk, ['간체', '중국어']), en: colOf(hk, ['영어']), tw: colOf(hk, ['번체']), ja: colOf(hk, ['일본']), id: colOf(hk, ['인니', '인도네']), mn: colOf(hk, ['몽골']), act: colOf(hk, ['활성']) };
+      for (var rk = 1; rk < kwRows.length; rk++) { var rw = kwRows[rk]; if (!rw) continue; var kko = rw[ck.ko]; if (!kko) continue; kw.push({ uid: uid(), ko: kko, group: rw[ck.group] || '(미지정)', sub: '', cat: rw[ck.cat] || '(미지정)', origGroup: rw[ck.group] || '(미지정)', origCat: rw[ck.cat] || '(미지정)', tr: [rw[ck.zh] || '', rw[ck.en] || '', rw[ck.tw] || '', rw[ck.ja] || '', rw[ck.id] || '', rw[ck.mn] || ''], active: rw[ck.act] || '활성', origTag: '유지', note: '', deleted: false, isNew: false }); }
+    }
+    return { sub: sub, kw: kw };
+  }
+  async function parseXlsxToPlan(buf) {
+    var files = await unzipXlsx(buf);
+    var shared = parseShared(files['xl/sharedStrings.xml'] || '');
+    var sheets = ['xl/worksheets/sheet1.xml', 'xl/worksheets/sheet2.xml', 'xl/worksheets/sheet3.xml'].map(function (s) { return files[s] ? parseSheet(files[s], shared) : null; });
+    return rowsToPlan(sheets);
+  }
+  function catsFrom(sub, kw) { var seen = {}, cs = []; sub.concat(kw).forEach(function (x) { if (x.cat && !seen[x.cat]) { seen[x.cat] = 1; cs.push({ name: x.cat, def: '' }); } }); return cs; }
+  function addImportedPlan(name, cats, sub, kw) {
+    if ((!sub || !sub.length) && (!kw || !kw.length)) { alert('가져올 데이터를 찾지 못했습니다. 세부분류/키워드 시트와 헤더(카테고리·원본/명칭·그룹)를 확인해 주세요.'); return; }
+    sub = sub || []; kw = kw || [];
+    sub.forEach(function (s) { s.uid = uid(); s.origCat = s.origCat || s.cat; if (s.isNew == null) s.isNew = false; if (!s.origTag) s.origTag = '유지'; if (s.stype == null) s.stype = ''; if (s.deleted == null) s.deleted = false; if (!s.tr) s.tr = ['', '', '', '', '', '']; });
+    kw.forEach(function (k) { k.uid = uid(); k.origCat = k.origCat || k.cat; k.origGroup = k.origGroup || k.group; if (k.isNew == null) k.isNew = false; if (!k.origTag) k.origTag = '유지'; if (k.sub == null) k.sub = ''; if (k.deleted == null) k.deleted = false; if (!k.tr) k.tr = ['', '', '', '', '', '']; });
+    if (!cats || !cats.length) cats = catsFrom(sub, kw);
+    var nm = name || ((store.plans.length + 1) + '안'), base = nm, i = 2;
+    while (store.plans.some(function (p) { return p.name === nm; })) { nm = base + '(' + i + ')'; i++; }
+    store.plans.push({ name: nm, cats: cats, sub: sub, kw: kw, mergeLog: [] });
+    switchPlan(store.plans.length - 1);
+    alert('"' + nm + '" 안으로 가져왔습니다.\n세부분류 ' + sub.length + '개, 키워드 ' + kw.length + '개.');
+  }
+  async function importFile(file) {
+    try {
+      var base = file.name.replace(/\.(xlsx|json)$/i, '');
+      if (/\.json$/i.test(file.name)) {
+        var d = JSON.parse(await file.text());
+        addImportedPlan(d.plan || base, d.cats, d.sub, d.kw);
+      } else if (/\.xlsx$/i.test(file.name)) {
+        var buf = await file.arrayBuffer();
+        var r = await parseXlsxToPlan(buf);
+        addImportedPlan(base, null, r.sub, r.kw);
+      } else { alert('.xlsx 또는 .json 파일만 가져올 수 있습니다.'); }
+    } catch (err) { alert('가져오기 실패: ' + (err && err.message ? err.message : err)); }
+  }
+
   /* ---------- category editing (세 탭 공유) ---------- */
   function renameCat(oldName, newName, newDef) {
     if (newName && newName !== oldName) {
@@ -1060,6 +1137,8 @@ window.KBS = {"cats":["뷰티 클리닉","헤어살롱","뷰티케어","건강�
   document.getElementById('plan-new').onclick = newPlan;
   document.getElementById('plan-rename').onclick = renamePlan;
   document.getElementById('plan-del').onclick = delPlan;
+  document.getElementById('plan-import').onclick = function () { document.getElementById('import-file').click(); };
+  document.getElementById('import-file').onchange = function (e) { var f = e.target.files[0]; if (f) importFile(f); e.target.value = ''; };
   document.getElementById('btn-export').onclick = function () {
     modal('내보내기', function (form) {
       form.appendChild(el('label', null, '형식을 선택하세요'));
