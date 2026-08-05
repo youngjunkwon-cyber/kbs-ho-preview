@@ -14,7 +14,7 @@
     --tab-hea:#f7f7f5;
     --code-bac:rgba(135,131,120,.15);
     --yel-bac:#fdecc8;
-    --fill-bac:#fbfbfa;
+    --fill-bac:#fafaf9;
   }
   *{box-sizing:border-box;}
   html{-webkit-text-size-adjust:100%;}
@@ -102,8 +102,9 @@
     background:transparent;color:inherit;font:inherit;
     padding:7px 9px;margin:0;min-height:34px;line-height:20px;
   }
-  td.fillcell textarea.fill{font-size:14px;line-height:20px;}
+  td.fillcell textarea.fill{font-size:14px;line-height:20px;cursor:text;}
   textarea.fill::placeholder{color:var(--tex-ter);}
+  td.fillcell textarea.fill:hover{background:rgba(55,53,47,.045);}
   textarea.fill:focus{background:rgba(35,131,226,.06);box-shadow:inset 0 0 0 1.5px rgba(35,131,226,.45);}
   .fill-line textarea.fill{
     padding:3px 6px;min-height:30px;font-size:16px;line-height:24px;
@@ -462,11 +463,32 @@
       if (el.type === 'checkbox') el.checked = !!d[k];
       else { el.value = d[k] || ''; grow(el); }
     });
+    syncCells();
   }
   function grow(t){
     if (!t || t.tagName !== 'TEXTAREA') return;
     t.style.height = 'auto';
     t.style.height = t.scrollHeight + 'px';
+  }
+  /* 표 안 입력칸은 셀 높이를 꽉 채워, 셀 어디를 눌러도 입력되게 한다.
+     단 좁은 컬럼에 긴 글이 들어와 행이 과도하게 늘어나지 않도록 상한을 두고,
+     상한을 넘으면 칸 안에서 스크롤한다. */
+  var CELL_MAX = 240;
+  var cellFields = [].slice.call(document.querySelectorAll('td.fillcell > textarea.fill'));
+  function syncCells(){
+    var i, ta, content;
+    for (i = 0; i < cellFields.length; i++){          // 1단계: 내용 높이(상한 적용)로 되돌림
+      ta = cellFields[i];
+      ta.style.height = 'auto';
+      content = ta.scrollHeight;
+      ta.style.overflowY = (content > CELL_MAX) ? 'auto' : 'hidden';
+      ta.style.height = Math.min(content, CELL_MAX) + 'px';
+    }
+    for (i = 0; i < cellFields.length; i++){          // 2단계: 확정된 셀 높이까지 늘림
+      ta = cellFields[i];
+      var need = ta.parentElement.clientHeight;
+      if (need > ta.offsetHeight) ta.style.height = need + 'px';
+    }
   }
 
   /* ---------- 탭 렌더 ---------- */
@@ -589,7 +611,11 @@
   /* ---------- 입력 감지 ---------- */
   fields.forEach(function(el){
     if (el.tagName === 'TEXTAREA'){
-      el.addEventListener('input', function(){ grow(el); scheduleSave(); });
+      var inCell = !!(el.parentElement && el.parentElement.classList.contains('fillcell'));
+      el.addEventListener('input', function(){
+        if (inCell) syncCells(); else grow(el);
+        scheduleSave();
+      });
     } else {
       el.addEventListener('change', scheduleSave);
     }
@@ -636,7 +662,12 @@
     }, function(){});
   });
 
-  window.addEventListener('resize', function(){ fields.forEach(grow); });
+  window.addEventListener('resize', function(){ fields.forEach(grow); syncCells(); });
+
+  /* 최초 렌더 직후에는 표 레이아웃이 아직 확정되지 않을 수 있어 한 번 더 맞춘다 */
+  requestAnimationFrame(function(){ requestAnimationFrame(syncCells); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncCells);
+  window.addEventListener('load', syncCells);
 })();
 </script>
 </body>
