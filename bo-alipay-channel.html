@@ -286,7 +286,7 @@ function effBtns(p) {
   const st = S(p.store); const out = {}; let chatAuto = false;
   if (p.mode === '기본 설정') {
     ROWS_PRODUCT.forEach(r => { out[r.k] = { web: !!st.btns[r.k].web, ali: !!st.btns[r.k].ali }; });
-    if (!ROWS_PRODUCT.some(r => out[r.k].ali)) { out.chat.ali = true; chatAuto = true; }
+    if (ctaList(out, ROWS_PRODUCT, 'ali').length === 0) { out.chat.ali = true; chatAuto = true; }
   } else {
     ROWS_PRODUCT.forEach(r => { out[r.k] = { web: !!p.btns[r.k].web, ali: !!p.btns[r.k].ali }; });
   }
@@ -304,18 +304,29 @@ function effStoreBtns(st) {
   if (!st.bookingEnabled) { out.booking.web = false; out.booking.ali = false; }
   return { btns: out };
 }
-const onCount = (b, rows, ch) => rows.filter(r => b[r.k] && b[r.k][ch]).length;
+// FO 하단 CTA 로 렌더되는 자리 수. 상담접수와 문의하기 통합은 한 자리를 쓴다.
+function ctaList(b, rows, ch) {
+  const out = [];
+  if (b.inquiry && b.inquiry[ch]) out.push('문의하기');
+  else if (b.consult && b.consult[ch]) out.push('상담접수');
+  ['chat', 'extlink', 'messenger', 'booking'].forEach(k => {
+    if (rows.some(r => r.k === k) && b[k] && b[k][ch]) out.push(rows.filter(r => r.k === k)[0].label.replace(' 설정', ''));
+  });
+  return out;
+}
+const onCount = (b, rows, ch) => ctaList(b, rows, ch).length;
 
 /* ------------------------------- 판정 ------------------------------- */
 function judgeProduct(p) {
   if (ALI_LANGS.indexOf(p.lang) === -1) return { na: true, visible: false, reason: '', conds: [{ s: 'sk', t: '언어 = ' + p.lang + '. 알리페이 채널 대상 언어가 아니라 판정하지 않는다.' }] };
   const st = S(p.store), e = effBtns(p);
   const c1 = p.aliVisible === '노출', c3 = st.aliVisible === '노출';
-  const c2 = ROWS_PRODUCT.some(r => e.btns[r.k].ali);
+  const c2 = onCount(e.btns, ROWS_PRODUCT, 'ali') > 0;
   const conds = [
     { s: c1 ? 'ok' : 'no', t: '① 알리페이 노출 설정 = ' + p.aliVisible },
     { s: c3 ? 'ok' : 'no', t: '③ 소속 스토어(' + st.name + ') 알리페이 노출 설정 = ' + st.aliVisible },
-    { s: c2 ? 'ok' : 'no', t: '② 알리페이에서 열 수 있는 버튼 ' + onCount(e.btns, ROWS_PRODUCT, 'ali') + '개' + (e.chatAuto ? ' (기본 설정 · 채팅 자동 ON)' : '') }
+    { s: c2 ? 'ok' : 'no', t: '② 알리페이에서 열 수 있는 버튼 ' + onCount(e.btns, ROWS_PRODUCT, 'ali') + '개' + (e.chatAuto ? ' (기본 설정 · 채팅 자동 ON)' : '') },
+    { s: 'sk', t: 'FO 하단 CTA : ' + (ctaList(e.btns, ROWS_PRODUCT, 'ali').join(' / ') || '없음') }
   ];
   let reason = '';
   if (!c1) reason = '직접 끔';
@@ -328,10 +339,11 @@ function judgeProduct(p) {
 function judgeStore(st) {
   const e = effStoreBtns(st);
   const c1 = st.aliVisible === '노출';
-  const c2 = ROWS_STORE.some(r => e.btns[r.k].ali);
+  const c2 = onCount(e.btns, ROWS_STORE, 'ali') > 0;
   const conds = [
     { s: c1 ? 'ok' : 'no', t: '① 알리페이 노출 설정 = ' + st.aliVisible },
-    { s: c2 ? 'ok' : 'no', t: '② 알리페이에서 열 수 있는 버튼 ' + onCount(e.btns, ROWS_STORE, 'ali') + '개' }
+    { s: c2 ? 'ok' : 'no', t: '② 알리페이에서 열 수 있는 버튼 ' + onCount(e.btns, ROWS_STORE, 'ali') + '개' },
+    { s: 'sk', t: 'FO 하단 CTA : ' + (ctaList(e.btns, ROWS_STORE, 'ali').join(' / ') || '없음') }
   ];
   let reason = '';
   if (!c1) reason = '직접 끔';
@@ -502,7 +514,10 @@ function btnTable(kind, obj) {
   });
   html += '</tbody></table></div>';
   const webCnt = onCount(eff.btns, rows, 'web'), aliCnt = onCount(eff.btns, rows, 'ali');
-  html += '<div class="hint">' + MSG.cap + ' 현재 웹 ' + webCnt + '개 / 알리페이 ' + aliCnt + '개.</div>';
+  const webCta = ctaList(eff.btns, rows, 'web'), aliCta = ctaList(eff.btns, rows, 'ali');
+  html += '<div class="hint">' + MSG.cap + '<br>지금 웹 ' + webCnt + '개' + (webCta.length ? ' (' + webCta.join(' / ') + ')' : '') +
+    ' · 알리페이 ' + aliCnt + '개' + (aliCta.length ? ' (' + aliCta.join(' / ') + ')' : '') +
+    '<br>문의하기 통합은 상담접수를 포함하므로 둘이 한 자리를 씁니다. 통합이 ON이면 그 자리가 문의하기로 나갑니다.</div>';
   if (webCnt > CAP || aliCnt > CAP) html += '<div class="notice red">마이그레이션 이전에 저장된 건이라 ' + (webCnt > CAP ? '웹' : '알리페이') + ' 열에 ' + Math.max(webCnt, aliCnt) + '개가 켜져 있습니다. 저장하려면 두 개로 줄여 주세요.</div>';
   if (locked) html += '<div class="notice grey">스토어 설정 적용이 기본 설정이라 스토어 값을 그대로 보여주고 편집은 잠깁니다. 스토어에만 있는 예약 행은 무시합니다.</div>';
   if (selfHidden) html += '<div class="notice grey">알리페이 노출이 미노출이라 알리페이 열을 잠갔습니다. 값은 그대로 보관합니다.</div>';
@@ -517,9 +532,12 @@ window.setBtn = function (kind, k, ch, on) {
   const rows = kind === 'store' ? ROWS_STORE : ROWS_PRODUCT;
   const label = rows.filter(r => r.k === k)[0].label;
   if (on) {
-    const e0 = kind === 'store' ? effStoreBtns(obj) : effBtns(obj);
-    const cur = onCount(e0.btns, rows, ch);
-    if (!e0.btns[k][ch] && cur >= CAP) { alertBox('켤 수 없습니다', MSG.cap + ' 지금 ' + (ch === 'web' ? '웹' : '알리페이') + ' 열에 ' + cur + '개가 켜져 있습니다.'); render(); return; }
+    const keep = obj.btns[k][ch];
+    obj.btns[k][ch] = true;
+    const e1 = kind === 'store' ? effStoreBtns(obj) : effBtns(obj);
+    const after = onCount(e1.btns, rows, ch);
+    obj.btns[k][ch] = keep;
+    if (after > CAP) { alertBox('켤 수 없습니다', MSG.cap + ' 켜면 ' + (ch === 'web' ? '웹' : '알리페이') + ' 열이 ' + after + '개가 됩니다. 지금 켜져 있는 것은 ' + ctaList(e1.btns, rows, ch).slice(0, CAP).join(' / ') + ' 입니다.'); render(); return; }
   }
   const before = obj.btns[k][ch] ? 'ON' : 'OFF';
   obj.btns[k][ch] = !!on;
@@ -527,7 +545,7 @@ window.setBtn = function (kind, k, ch, on) {
   logChange(obj, '버튼 설정 · ' + label + ' · ' + (ch === 'web' ? '웹' : '알리페이'), before, on ? 'ON' : 'OFF', kind === 'store' ? '소속 상품 ' + obj.prodCount + '건' : '');
   if (ch === 'ali' && k === 'consult' && !on) {
     const e = kind === 'store' ? effStoreBtns(obj) : effBtns(obj);
-    if (!rows.some(r => e.btns[r.k].ali)) confirmBox('저장 확인', kind === 'store' ? MSG.saveStore : MSG.saveProd, function () {}, function () { obj.btns[k][ch] = true; obj.history.shift(); render(); });
+    if (onCount(e.btns, rows, 'ali') === 0) confirmBox('저장 확인', kind === 'store' ? MSG.saveStore : MSG.saveProd, function () {}, function () { obj.btns[k][ch] = true; obj.history.shift(); render(); });
   }
   render();
 };
@@ -906,7 +924,7 @@ window.save = function (kind) {
   const rows = kind === 'store' ? ROWS_STORE : ROWS_PRODUCT;
   const eff = kind === 'store' ? effStoreBtns(obj) : effBtns(obj);
   const webCnt = onCount(eff.btns, rows, 'web'), aliCnt = onCount(eff.btns, rows, 'ali');
-  if (webCnt > CAP || aliCnt > CAP) { alertBox('저장할 수 없습니다', MSG.cap + ' 지금 웹 ' + webCnt + '개, 알리페이 ' + aliCnt + '개가 켜져 있습니다. 두 개로 줄인 뒤 저장해 주세요.'); return; }
+  if (webCnt > CAP || aliCnt > CAP) { alertBox('저장할 수 없습니다', MSG.cap + ' 지금 웹 ' + webCnt + '개(' + ctaList(eff.btns, rows, 'web').join(' / ') + '), 알리페이 ' + aliCnt + '개(' + ctaList(eff.btns, rows, 'ali').join(' / ') + ')가 나갑니다. 두 개로 줄인 뒤 저장해 주세요.'); return; }
   const langOk = kind === 'store' ? true : ALI_LANGS.indexOf(obj.lang) !== -1;
   if (langOk && obj.aliVisible === '노출' && aliCnt === 0) {
     confirmBox('저장 확인', kind === 'store' ? MSG.saveStore : MSG.saveProd,
@@ -1009,8 +1027,10 @@ function scenarios() {
       run: function () { const c = C('E2'); c.stores = []; VIEW.lang = c.lang; go('c-list'); openColl('E2'); } },
     { id: 'HOST-CH-01', t: '호스트 화면 안내', d: '버튼 구성이 빈 상품은 상단에 쉬운 말 안내만 보이고 고칠 항목이 없습니다.',
       run: function () { const p = P('P8'); p.mode = '개별 설정'; ROWS_PRODUCT.forEach(r => p.btns[r.k].ali = false); go('h-edit'); } },
-    { id: '공통', t: 'ON 개수 상한 2개', d: '알리페이 열에 3개째를 켜려 하면 막힙니다. 채팅을 ON으로 눌러 보세요.',
+    { id: '공통', t: '문의하기 통합은 상담접수와 한 자리', d: '상담접수와 통합이 모두 ON이어도 FO에는 문의하기 하나만 나갑니다. 카운트도 1입니다.',
       run: function () { const p = P('P2'); p.mode = '개별 설정'; p.btns.consult.ali = true; p.btns.inquiry.ali = true; p.btns.chat.ali = false; VIEW.lang = p.lang; go('p-list'); openProduct('P2'); } },
+    { id: '공통', t: 'CTA 자리 상한 2개', d: '문의하기와 채팅으로 두 자리가 차 있습니다. 세 번째를 켜려 하면 막힙니다.',
+      run: function () { const p = P('P2'); p.mode = '개별 설정'; p.btns.consult.ali = true; p.btns.inquiry.ali = true; p.btns.chat.ali = true; p.btns.consult.web = true; p.btns.inquiry.web = true; p.btns.chat.web = true; VIEW.lang = p.lang; go('p-list'); openProduct('P2'); } },
     { id: 'SYS-CH-03', t: '마이그레이션 위반 건 (웹 3개)', d: '배치가 값을 건드리지 않고 넘긴 건입니다. OK를 누르면 상한 검증에 걸립니다.',
       run: function () { const p = P('P10'); p.btns.consult.web = true; p.btns.chat.web = true; p.btns.messenger.web = true; VIEW.lang = p.lang; go('p-list'); openProduct('P10'); } },
     { id: 'SYS-CH-03', t: '메신저만 켜져 있던 상품', d: '알리페이에서는 메신저를 켤 수 없어, 배치가 채팅을 켜 노출되게 만듭니다.',
