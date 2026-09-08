@@ -232,8 +232,7 @@ const DB = {
       linkType: '외부링크', targetUrl: 'https://blog.naver.com/...', aliVisible: '노출', btns: [] },
     { id: 'B3', title: '스킨케어 기획전 안내', biz: '뷰티랩', pos: '홈 하단', lang: '영어',
       linkType: '내부이미지랜딩페이지', aliVisible: '노출',
-      btns: [ { label: '지금 예약하기', kind: '내부', target: { type: '상품', id: 'P3' }, web: true, ali: true },
-              { label: '카카오 채널', kind: '외부', url: 'http://pf.kakao.com/...', web: true, ali: false } ] },
+      btns: [ { label: '지금 예약하기', kind: '내부', target: { type: '상품', id: 'P3' }, web: true, ali: true } ] },
     { id: 'B4', title: '성형 상담 배너', biz: '모모클리닉', pos: '홈 중단', lang: '중국어(간체)',
       linkType: '내부이미지랜딩페이지', aliVisible: '노출',
       btns: [ { label: '상담 신청', kind: '외부', url: 'https://form.gle/...', web: true, ali: false } ] },
@@ -369,19 +368,30 @@ function judgeExhibition(x) {
 }
 
 /* ============================== 화면 ============================== */
-let VIEW = { name: 'p-list', id: null, tab: 0, langFilter: '중국어(간체)', aliFilter: '전체', rsnFilter: '전체' };
+let VIEW = { name: 'p-list', id: null, tab: 0, langFilter: '중국어(간체)' };
+// 목록 필터는 화면마다 따로 둔다. 사유 값이 화면마다 다르므로 공유하면 다른 화면이 빈 목록이 된다.
+const FILTERS = { 'p-list': { ali: '전체', rsn: '전체' }, 's-list': { ali: '전체', rsn: '전체' }, 'b-list': { ali: '전체', rsn: '전체' }, 'e-list': { ali: '전체', rsn: '전체' } };
+const F = () => FILTERS[VIEW.name] || { ali: '전체', rsn: '전체' };
 const el = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const TITLES = { 'p-list': '상품 목록', 'p-edit': '상품 정보 수정', 's-list': '스토어 목록', 's-edit': '스토어 정보 수정',
   'b-list': '배너 목록', 'b-edit': '배너 등록·수정', 'e-list': '기획전 목록', 'e-edit': '기획전 등록·수정', 'h-list': '호스트 상품 목록' };
 
-function go(name, id) { VIEW.name = name; if (id !== undefined) VIEW.id = id; VIEW.tab = 0; render(); window.scrollTo(0, 0); }
+function go(name, id) { VIEW.name = name; if (id !== undefined) VIEW.id = id; VIEW.tab = name === 's-edit' ? 1 : name === 'p-edit' ? 1 : 0; render(); window.scrollTo(0, 0); }
 
 function visCell(j) {
   if (j.na) return '<span class="tag na">-</span>';
   return j.visible ? '<span class="tag on">노출</span>' : '<span class="tag off">미노출</span>';
 }
 function rsnCell(j) { return j.na ? '<span class="tblnote">-</span>' : (j.reason ? `<span class="tag rsn">${j.reason}</span>` : '') ; }
+// 호스트에게는 어드민 사유 값을 그대로 보이지 않는다. 상태와 쉬운 안내만 준다.
+function hostNote(j) {
+  if (j.na) return '이 언어는 알리페이에 나가지 않습니다.';
+  if (!j.reason) return '알리페이에서 볼 수 있습니다.';
+  if (j.reason === '알리페이 버튼 없음') return '문의나 예약 버튼이 없어 알리페이에서는 보이지 않습니다. 버튼은 본사에서 설정합니다.';
+  if (j.reason === '판정 오류') return '상태를 확인하는 중입니다.';
+  return '본사 설정으로 알리페이에서는 보이지 않습니다.';
+}
 
 /* ---------- 라디오 / 토글 렌더 ---------- */
 function radio(nameAttr, val, cur, onChange, dis) {
@@ -473,22 +483,23 @@ window.setMode = function (v) {
   }
   p.mode = v; render();
 };
-window.setLang = function (v) { const p = P(VIEW.id); p.lang = v; render(); };
+window.setLang = function (v) { const p = P(VIEW.id); p.lang = v; VIEW.langFilter = v; render(); };
 window.setErr = function (id, on) { if (on) DB.errors[id] = true; else delete DB.errors[id]; render(); };
 
 /* --------------------------- 목록 화면 --------------------------- */
 function listFilters(extra) {
   return `<div class="filters">
     <div class="f"><span>언어</span><select onchange="VIEW.langFilter=this.value;render()">${ALL_LANGS.map(l => `<option ${l === VIEW.langFilter ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
-    <div class="f"><span>알리페이 노출</span><select onchange="VIEW.aliFilter=this.value;render()">${['전체', '노출', '미노출'].map(l => `<option ${l === VIEW.aliFilter ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
-    <div class="f"><span>사유</span><select onchange="VIEW.rsnFilter=this.value;render()">${extra.map(l => `<option ${l === VIEW.rsnFilter ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
+    <div class="f"><span>알리페이 노출</span><select onchange="F().ali=this.value;render()">${['전체', '노출', '미노출'].map(l => `<option ${l === F().ali ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
+    <div class="f"><span>사유</span><select onchange="F().rsn=this.value;render()">${extra.map(l => `<option ${l === F().rsn ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
     <div class="f"><span>검색</span><input type="text" placeholder="이름"></div>
     <div class="f"><span>&nbsp;</span><button class="btn pri">검색</button></div>
   </div>`;
 }
 function passFilter(j) {
-  if (VIEW.aliFilter !== '전체') { if (j.na) return false; if ((VIEW.aliFilter === '노출') !== j.visible) return false; }
-  if (VIEW.rsnFilter !== '전체') { if (j.na || j.reason !== VIEW.rsnFilter) return false; }
+  const f = F();
+  if (f.ali !== '전체') { if (j.na) return false; if ((f.ali === '노출') !== j.visible) return false; }
+  if (f.rsn !== '전체') { if (j.na || j.reason !== f.rsn) return false; }
   return true;
 }
 
@@ -508,12 +519,12 @@ function screen_pList() {
 function screen_hList() {
   const rows = DB.products.filter(p => p.store === 'S1');
   const body = rows.map(p => { const j = judgeProduct(p);
-    return `<tr><td>${esc(p.name)}</td><td>${esc(p.lang)}</td><td class="c">${visCell(j)}</td><td>${rsnCell(j)}</td></tr>`; }).join('');
+    return `<tr><td>${esc(p.name)}</td><td>${esc(p.lang)}</td><td class="c">${visCell(j)}</td><td class="tblnote">${hostNote(j)}</td></tr>`; }).join('');
   return `<h2 class="page">호스트 상품 목록 <span class="sub">HOST-CH-01</span></h2>
     <div class="crumb">호스트 &gt; 내 상품</div>
     <div class="card"><div class="hd">준오헤어 명동점</div><div class="bd">
-      <table><thead><tr><th>상품명</th><th style="width:130px">언어</th><th class="c" style="width:110px">알리페이 노출</th><th style="width:160px">사유</th></tr></thead><tbody>${body}</tbody></table>
-      <div class="notice grey">호스트 화면은 결과만 보여줍니다. 노출 설정과 버튼 설정은 없습니다. 새로 등록한 상품은 알리페이 노출이 자동으로 노출로 저장되고, 스토어 설정 적용은 기본 설정으로 시작합니다.</div>
+      <table><thead><tr><th>상품명</th><th style="width:130px">언어</th><th class="c" style="width:110px">알리페이 노출</th><th>안내</th></tr></thead><tbody>${body}</tbody></table>
+      <div class="notice grey">호스트 화면은 결과만 보여줍니다. 노출 설정과 버튼 설정은 없고, 어드민에서 쓰는 사유 값도 보이지 않습니다. 새로 등록한 상품은 알리페이 노출이 자동으로 노출로 저장되고, 스토어 설정 적용은 기본 설정으로 시작합니다.</div>
     </div></div>`;
 }
 function screen_sList() {
@@ -524,8 +535,8 @@ function screen_sList() {
     <div class="crumb">스토어 관리 &gt; 스토어 목록</div>
     <div class="card">
       <div class="filters">
-        <div class="f"><span>알리페이 노출</span><select onchange="VIEW.aliFilter=this.value;render()">${['전체', '노출', '미노출'].map(l => `<option ${l === VIEW.aliFilter ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
-        <div class="f"><span>사유</span><select onchange="VIEW.rsnFilter=this.value;render()">${['전체', '직접 끔', '알리페이 버튼 없음', '판정 오류'].map(l => `<option ${l === VIEW.rsnFilter ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
+        <div class="f"><span>알리페이 노출</span><select onchange="F().ali=this.value;render()">${['전체', '노출', '미노출'].map(l => `<option ${l === F().ali ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
+        <div class="f"><span>사유</span><select onchange="F().rsn=this.value;render()">${['전체', '직접 끔', '알리페이 버튼 없음', '판정 오류'].map(l => `<option ${l === F().rsn ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
         <div class="f"><span>검색</span><input type="text" placeholder="스토어명"></div>
         <div class="f"><span>&nbsp;</span><button class="btn pri">검색</button></div>
       </div>
@@ -536,12 +547,16 @@ function screen_sList() {
 function screen_pEdit() {
   const p = P(VIEW.id); const st = S(p.store); const aliLangOk = ALI_LANGS.includes(p.lang);
   const tabs = ['상품 정보', '관리자설정', '상세 설명'];
+  const tabBar = '<div style="display:flex;gap:24px;padding:0 20px;border-bottom:1px solid #f0f0f0">' +
+    tabs.map((t, i) => '<div onclick="VIEW.tab=' + i + ';render()" style="padding:14px 0;cursor:pointer;' +
+      (i === VIEW.tab ? 'color:#e8537a;font-weight:500;box-shadow:inset 0 -2px 0 #e8537a' : 'color:#595959') + '">' + t + '</div>').join('') + '</div>';
+  if (VIEW.tab !== 1) return `<h2 class="page">상품 정보 수정 <span class="sub">BO-CH-01</span></h2>
+    <div class="crumb">상품 관리 &gt; 상품 목록 &gt; ${esc(p.name)}</div>
+    <div class="card">${tabBar}<div class="bd"><div class="tblnote">이번 작업 범위가 아닌 탭입니다. 관리자설정 탭을 확인해 주세요.</div></div></div>`;
   return `<h2 class="page">상품 정보 수정 <span class="sub">BO-CH-01</span></h2>
     <div class="crumb">상품 관리 &gt; 상품 목록 &gt; ${esc(p.name)}</div>
     <div class="card">
-      <div style="display:flex;gap:24px;padding:0 20px;border-bottom:1px solid #f0f0f0">
-        ${tabs.map((t, i) => `<div style="padding:14px 0;cursor:pointer;${i === 1 ? 'color:#e8537a;font-weight:500;box-shadow:inset 0 -2px 0 #e8537a' : 'color:#595959'}">${t}</div>`).join('')}
-      </div>
+      ${tabBar}
       <div class="bd">
         <div class="row"><div class="lbl">상품명</div><div class="val">${esc(p.name)} <span class="mono">${p.id}</span></div></div>
         <div class="row"><div class="lbl">언어</div><div class="val"><select onchange="setLang(this.value)">${ALL_LANGS.map(l => `<option ${l === p.lang ? 'selected' : ''}>${l}</option>`).join('')}</select>
@@ -577,7 +592,6 @@ window.save = function (kind) {
   const webCnt = rows.filter(r => eff.btns[r.k].web).length;
   const aliCnt = aliOnCount(eff.btns, rows);
   if (webCnt > CAP || aliCnt > CAP) { alertBox('저장할 수 없습니다', `${MSG.cap} 지금 웹 ${webCnt}개, 알리페이 ${aliCnt}개가 켜져 있습니다. 두 개로 줄인 뒤 저장해 주세요.`); return; }
-  if (kind === 'store' && obj.aliVisible === '미노출' && obj.prodCount >= 10) { setVis('store', '미노출'); return; }
   if (obj.aliVisible === '노출' && aliCnt === 0 && ALI_LANGS.includes(obj.lang || '중국어(간체)')) {
     confirmBox('저장 확인', kind === 'store' ? MSG.saveStore : MSG.saveProd, () => alertBox('저장했습니다', '판정 결과와 사유를 다시 계산해 저장 컬럼에 넣었습니다.'), () => {}); return; }
   alertBox('저장했습니다', '판정 결과와 사유를 다시 계산해 저장 컬럼에 넣었습니다. 목록과 프런트에는 바로 반영됩니다.');
@@ -585,7 +599,7 @@ window.save = function (kind) {
 function screen_sEdit() {
   const st = S(VIEW.id);
   const tabs = ['기본정보', '노출정보', '버튼 및 메신저 설정', '소개'];
-  const t = VIEW.tab || 1;
+  const t = VIEW.tab;
   const eff = effStoreBtns(st);
   const aliCnt = aliOnCount(eff.btns, ROWS_STORE);
   return `<h2 class="page">스토어 정보 수정 <span class="sub">BO-CH-03</span></h2>
@@ -634,7 +648,7 @@ function screen_bEdit() {
       <div class="row"><div class="lbl"><span class="req">*</span>광고제목</div><div class="val">${esc(b.title)}</div></div>
       <div class="row"><div class="lbl"><span class="req">*</span>배너위치</div><div class="val">${esc(b.pos)}</div></div>
       <div class="row"><div class="lbl"><span class="req">*</span>링크종류</div><div class="val">
-        <span class="rg">${['외부링크', '내부링크', '내부이미지랜딩페이지'].map(v => radio('blt', v, b.linkType, `DB.banners.find(x=>x.id==='${b.id}').linkType='${v}';render()`)).join('')}</span>
+        <span class="rg">${['외부링크', '내부링크', '내부이미지랜딩페이지'].map(v => radio('blt', v, b.linkType, `setLinkType('${b.id}','${v}')`)).join('')}</span>
       </div></div>
       ${isExt ? `<div class="row"><div class="lbl"><span class="req">*</span>외부 URL</div><div class="val"><input type="text" style="width:420px" value="${esc(b.targetUrl || '')}"></div></div>` : ''}
       ${b.linkType === '내부링크' ? `<div class="row"><div class="lbl"><span class="req">*</span>내부 페이지 :</div><div class="val">
@@ -653,7 +667,7 @@ function screen_bEdit() {
       </div></div>
     </div></div>
 
-    ${isLanding ? `<div class="card"><div class="hd">하단 버튼 <span class="sub">랜딩페이지 배너에만 있습니다</span></div><div class="bd">
+    ${isLanding ? `<div class="card"><div class="hd">하단 버튼 <span class="sub">내부이미지랜딩페이지에만 하나 있습니다</span></div><div class="bd">
       <table><thead><tr><th style="width:180px">버튼 텍스트</th><th style="width:120px">내부 / 외부</th><th>연결 대상</th><th class="c" style="width:130px">웹</th><th class="c" style="width:130px">알리페이</th><th>안내</th></tr></thead><tbody>
       ${b.btns.map((x, i) => {
         const extBtn = x.kind === '외부';
@@ -673,6 +687,14 @@ function screen_bEdit() {
     </div></div>` : ''}`;
 }
 window.setBannerBtn = function (bid, i, ch, v) { const b = DB.banners.find(x => x.id === bid); b.btns[i][ch] = v; render(); };
+// 링크종류를 바꾸면 그 종류가 쓰는 값을 채운다. 비면 판정이 미노출로 고정돼 되돌릴 방법이 없다.
+window.setLinkType = function (bid, v) {
+  const b = DB.banners.find(x => x.id === bid);
+  b.linkType = v;
+  if (v === '내부링크' && !b.target) b.target = { type: '상품', id: 'P1' };
+  if (v === '내부이미지랜딩페이지' && b.btns.length === 0) b.btns = [{ label: '자세히 보기', kind: '내부', target: { type: '상품', id: 'P1' }, web: true, ali: true }];
+  render();
+};
 
 function screen_eList() {
   const rows = DB.exhibitions.filter(x => x.lang === VIEW.langFilter);
@@ -718,7 +740,7 @@ function railFor() {
   else if (n === 'b-edit') { obj = DB.banners.find(x => x.id === VIEW.id); j = judgeBanner(obj); title = obj.title; }
   else if (n === 'e-edit') { obj = DB.exhibitions.find(x => x.id === VIEW.id); j = judgeExhibition(obj); title = obj.name; }
 
-  let html = '';
+  let html = '<div class="rail" style="border-left:3px solid #e8537a"><div class="bd" style="padding:12px 16px;font-size:12px;color:#595959;line-height:1.7">아래 세 패널은 화면이 아니라 로직을 확인하기 위한 도구입니다. 개발 대상이 아닙니다. 왼쪽 화면만 구현 대상입니다.</div></div>';
   if (j) {
     const cls = j.na ? 'q' : j.visible ? 'y' : 'n';
     const lab = j.na ? '판정 대상 아님' : j.visible ? '알리페이에 노출' : '알리페이에 미노출';
@@ -791,8 +813,9 @@ function applyBase() {
   ['products', 'stores', 'banners', 'exhibitions'].forEach(k => { DB[k].length = 0; b[k].forEach(x => DB[k].push(x)); });
   Object.keys(DB.errors).forEach(k => delete DB.errors[k]);
 }
-window.resetDB = () => { applyBase(); VIEW.langFilter = '중국어(간체)'; VIEW.aliFilter = '전체'; VIEW.rsnFilter = '전체'; go('p-list'); };
-window.runScn = i => { applyBase(); VIEW.aliFilter = '전체'; VIEW.rsnFilter = '전체'; scenarios()[i].run(); };
+function clearFilters() { Object.keys(FILTERS).forEach(k => { FILTERS[k].ali = '전체'; FILTERS[k].rsn = '전체'; }); }
+window.resetDB = () => { applyBase(); VIEW.langFilter = '중국어(간체)'; clearFilters(); go('p-list'); };
+window.runScn = i => { applyBase(); clearFilters(); scenarios()[i].run(); };
 
 /* ------------------------------ 모달 ------------------------------ */
 function alertBox(title, body) {
