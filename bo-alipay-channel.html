@@ -620,7 +620,7 @@ function screen_pList() {
     return '<tr><td>' + p.status + ' ⌄</td><td>' + swch(p.active) + '</td><td>' + swch(p.hidden) + '</td>' +
       '<td class="new c">' + visCell(j) + '</td><td class="new">' + rsnCell(j) + '</td>' +
       '<td>' + p.lang + '</td><td>' + esc(st.code) + '</td><td>' + esc(p.name) + '</td><td>' + p.cat + '</td><td>' + p.sub + '</td><td>' + p.price + '</td><td>' + p.vat + '</td>' +
-      '<td class="tblnote">-</td><td>0</td><td>' + p.mode + '</td>' + stat.map(v => '<td>' + v + '</td>').join('') +
+      '<td class="tblnote">-</td><td>0</td><td>' + (S(p.store).messenger.length ? S(p.store).messenger[0].base : '미사용') + '</td>' + stat.map(v => '<td>' + v + '</td>').join('') +
       '<td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>' +
       '<td class="tblnote">-</td><td class="tblnote">-</td><td class="tblnote">-</td><td>2026-09-01</td><td>2026-09-05</td><td class="tblnote">-</td>' +
       '<td><button class="btn sm">미리보기</button> <button class="btn sm" onclick="openProduct(\'' + p.id + '\')">수정</button> <button class="btn sm red">삭제</button></td></tr>'; }).join('');
