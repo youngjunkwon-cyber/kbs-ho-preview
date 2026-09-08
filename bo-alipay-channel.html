@@ -305,6 +305,18 @@ function judgeStore(st) {
   if (DB.errors[st.id]) conds.push({ s: 'no', t: '대상 조회 오류로 판정 실패. 재판정 큐가 처리한다.' });
   return { na: false, visible: !reason, reason, conds };
 }
+// 스토어를 숨겼을 때 함께 숨겨지는 배너·기획전 건수. 모달의 M·K.
+function impactOfHiding(st) {
+  const keep = st.aliVisible;
+  st.aliVisible = '노출';
+  const bnOn = DB.banners.filter(b => { const j = judgeBanner(b); return !j.na && j.visible; }).map(b => b.id);
+  const exOn = DB.exhibitions.filter(x => { const j = judgeExhibition(x); return !j.na && j.visible; }).map(x => x.id);
+  st.aliVisible = '미노출';
+  const bnAfter = DB.banners.filter(b => { const j = judgeBanner(b); return !j.na && j.visible; }).map(b => b.id);
+  const exAfter = DB.exhibitions.filter(x => { const j = judgeExhibition(x); return !j.na && j.visible; }).map(x => x.id);
+  st.aliVisible = keep;
+  return { M: bnOn.filter(id => bnAfter.indexOf(id) === -1).length, K: exOn.filter(id => exAfter.indexOf(id) === -1).length };
+}
 function targetVisible(t) {
   if (!t) return { ok: false, label: '대상 없음' };
   if (t.type === '상품') { const p = P(t.id); if (!p) return { ok: false, label: '대상 없음' }; const j = judgeProduct(p); return { ok: !j.na && j.visible, label: '상품 · ' + p.name, j }; }
@@ -369,8 +381,14 @@ function scanEditor(text) {
   const emb = String(text).match(/<\s*(iframe|script|object|embed)\b/gi) || [];
   return { ext, emb };
 }
+function toRelative(u) {
+  try { const x = new URL(u); if (INTERNAL_HOSTS.indexOf(x.hostname.toLowerCase()) !== -1) return x.pathname + x.search + x.hash; } catch (e) {}
+  return u;
+}
 function stripEditor(text) {
   let t = String(text).replace(/<\s*(iframe|script|object|embed)\b[\s\S]*?(<\/\s*\1\s*>|>)/gi, '');
+  // 내부 절대 URL은 상대 경로로 바꿔 저장한다
+  t = t.replace(/https?:\/\/[^\s"'<>)]+/gi, m => isExternalUrl(m) ? m : toRelative(m));
   t = t.replace(/<a\b[^>]*href\s*=\s*["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi, (m, href, inner) => isExternalUrl(href) ? inner : m);
   t = t.replace(/(?:https?:)?\/\/[^\s"'<>)]+|javascript:[^\s"'<>)]*|data:[^\s"'<>)]*/gi, m => isExternalUrl(m) ? '' : m);
   return t.replace(/[ \t]{2,}/g, ' ').trim();
@@ -450,7 +468,7 @@ function btnTable(kind, obj) {
   const rows = isStore ? ROWS_STORE : ROWS_PRODUCT;
   const eff = isStore ? effStoreBtns(obj) : effBtns(obj);
   const langOk = isStore ? true : ALI_LANGS.indexOf(obj.lang) !== -1;
-  const selfHidden = !isStore && obj.aliVisible === '미노출';
+  const selfHidden = obj.aliVisible === '미노출';
   const storeHidden = !isStore && S(obj.store).aliVisible === '미노출';
   const locked = !isStore && obj.mode === '기본 설정';
   const aliOffAll = !langOk || selfHidden || storeHidden || locked;
@@ -507,11 +525,11 @@ window.setVis = function (kind, v) {
   const obj = kind === 'store' ? S(VIEW.id) : kind === 'product' ? P(VIEW.id) : kind === 'banner' ? B(VIEW.id) : E(VIEW.id);
   const before = obj.aliVisible;
   if (kind === 'store' && v === '미노출' && obj.prodCount >= 10) {
-    confirmBox('알리페이 미노출 저장 확인',
-      '<p><b>' + esc(obj.name) + '</b>의 알리페이 노출을 <b>미노출</b>로 바꿉니다.</p><p>' + MSG.storeHide(obj.prodCount) + '</p>' +
-      '<table style="margin-top:12px"><thead><tr><th>구분</th><th>값</th></tr></thead><tbody>' +
-      '<tr><td>함께 숨겨지는 소속 상품</td><td>' + obj.prodCount + '건</td></tr><tr><td>적용 언어</td><td>모든 언어</td></tr></tbody></table>' +
-      '<p class="hint">스토어를 다시 노출로 되돌리면 소속 상품은 원래 값대로 돌아옵니다. 상품별 알리페이 노출 값은 그대로 보관합니다.</p>',
+    const im = impactOfHiding(obj);
+    confirmBox('알리페이 미노출로 저장',
+      '<p><b>' + esc(obj.name) + '</b></p>' +
+      '<p>스토어를 알리페이에서 숨기면 소속 상품 ' + obj.prodCount + '건이 함께 숨겨지고, 이 스토어나 소속 상품을 가리키는 배너 ' + im.M + '건과 노출 가능 항목이 0건이 되는 기획전 ' + im.K + '건도 알리페이에 노출되지 않습니다.</p>' +
+      '<p class="hint">웹 노출은 그대로 유지됩니다.</p>',
       function () { obj.aliVisible = v; logChange(obj, '알리페이 노출', before, v, '소속 상품 ' + obj.prodCount + '건'); render(); },
       function () { render(); }, '미노출로 저장');
     return;
@@ -638,7 +656,7 @@ function screen_pEdit() {
     '<div class="row"><div class="lbl">활성화</div><div class="val"><span class="tag on">활성화</span> <span class="tblnote">기존 항목</span></div></div>' +
     '<div class="row"><div class="lbl">히든</div><div class="val"><span class="tag na">미사용</span> <span class="tblnote">기존 항목</span></div></div>' +
     '<div class="row"><div class="lbl"><span class="req">*</span>알리페이 노출</div><div class="val"><span class="rg">' +
-    radio('pv', '노출', p.aliVisible, "setVis('product','노출')", !langOk) + radio('pv', '미노출', p.aliVisible, "setVis('product','미노출')", !langOk) + '</span>' +
+    radio('pv', '노출', langOk ? p.aliVisible : '노출', "setVis('product','노출')", !langOk) + radio('pv', '미노출', langOk ? p.aliVisible : '노출', "setVis('product','미노출')", !langOk) + '</span>' +
     (langOk ? '' : '<div class="notice grey">' + MSG.langOnly + '</div>') +
     (langOk && st.aliVisible === '미노출' ? '<div class="notice grey">소속 스토어가 알리페이 미노출이라 이 값과 무관하게 상품은 알리페이에 노출되지 않습니다.</div>' : '') +
     '</div></div>' +
@@ -736,7 +754,7 @@ function screen_bEdit() {
   const j = judgeBanner(b);
   h += '<div class="card"><div class="hd">노출 설정</div><div class="bd">' +
     '<div class="row"><div class="lbl"><span class="req">*</span>알리페이 노출</div><div class="val"><span class="rg">' +
-    radio('bv', '노출', b.aliVisible, "setVis('banner','노출')", !langOk) + radio('bv', '미노출', b.aliVisible, "setVis('banner','미노출')", !langOk) + '</span>' +
+    radio('bv', '노출', langOk ? b.aliVisible : '노출', "setVis('banner','노출')", !langOk) + radio('bv', '미노출', langOk ? b.aliVisible : '노출', "setVis('banner','미노출')", !langOk) + '</span>' +
     (langOk ? '' : '<div class="notice grey">' + MSG.langOnly + '</div>') + '</div></div>';
   if (langOk && b.aliVisible === '노출') {
     if (j.reason === '외부 연결') h += '<div class="notice">' + MSG.bnExt + '</div>';
@@ -747,6 +765,7 @@ function screen_bEdit() {
 
   if (isLanding && b.btn) {
     const extBtn = b.btn.linkKind === '외부링크';
+    const bnHidden = b.aliVisible === '미노출';
     h += '<div class="card"><div class="hd">하단 버튼 <span class="tblnote">내부이미지랜딩페이지에만 하나 있습니다</span></div><div class="bd">' +
       '<div class="row"><div class="lbl"><span class="req">*</span>버튼 텍스트</div><div class="val"><input type="text" value="' + esc(b.btn.label) + '" style="width:260px"></div></div>' +
       '<div class="row"><div class="lbl"><span class="req">*</span>버튼 링크 종류</div><div class="val">' +
@@ -756,8 +775,9 @@ function screen_bEdit() {
     h += '<div class="row"><div class="lbl"><span class="req">*</span>버튼 표시여부</div><div class="val">' +
       '<table style="max-width:740px"><thead><tr><th style="width:220px">웹</th><th style="width:220px">알리페이</th><th></th></tr></thead><tbody><tr>' +
       '<td>' + onoff('bshw', b.btn.web, "setBannerBtnShow('" + b.id + "','web',%V%)", false, ['활성화', '비활성화']) + '</td>' +
-      '<td class="' + (extBtn ? 'lock' : '') + '">' + onoff('bsha', b.btn.ali, "setBannerBtnShow('" + b.id + "','ali',%V%)", extBtn || !langOk, ['활성화', '비활성화']) + '</td>' +
-      '<td class="tblnote">' + (extBtn ? '버튼 링크 종류가 외부링크라 알리페이 열이 잠깁니다.' : '') + '</td></tr></tbody></table></div></div>' +
+      '<td class="' + (extBtn || bnHidden ? 'lock' : '') + '">' + onoff('bsha', b.btn.ali, "setBannerBtnShow('" + b.id + "','ali',%V%)", extBtn || bnHidden || !langOk, ['활성화', '비활성화']) + '</td>' +
+      '<td class="tblnote">' + (extBtn ? '버튼 링크 종류가 외부링크라 알리페이 열이 잠깁니다.' : bnHidden ? '알리페이 노출이 미노출이라 알리페이 열이 잠깁니다.' : '') + '</td></tr></tbody></table></div></div>' +
+      (bnHidden ? '<div class="notice grey">알리페이 노출이 미노출이라 알리페이 열을 잠갔습니다. 값은 그대로 보관합니다.</div>' : '') +
       '</div></div>';
   }
   return h + historyCard(b);
@@ -773,7 +793,7 @@ function screen_eEdit() {
     '<div class="row"><div class="lbl"><span class="req">*</span>진행 기간</div><div class="val">' + esc(x.period) + '</div></div>' +
     '<div class="row"><div class="lbl"><span class="req">*</span>노출 여부</div><div class="val"><span class="tag on">' + x.visible + '</span> <span class="tblnote">기존 항목</span></div></div>' +
     '<div class="row"><div class="lbl"><span class="req">*</span>알리페이 노출</div><div class="val"><span class="rg">' +
-    radio('ev', '노출', x.aliVisible, "setVis('exh','노출')", !langOk) + radio('ev', '미노출', x.aliVisible, "setVis('exh','미노출')", !langOk) + '</span>' +
+    radio('ev', '노출', langOk ? x.aliVisible : '노출', "setVis('exh','노출')", !langOk) + radio('ev', '미노출', langOk ? x.aliVisible : '노출', "setVis('exh','미노출')", !langOk) + '</span>' +
     (langOk ? '' : '<div class="notice grey">' + MSG.langOnly + '</div>') +
     (langOk && x.aliVisible === '노출' && j.liveCount === 0 ? '<div class="notice">' + MSG.exhEmpty + '</div>' : '') + '</div></div>' +
     '</div></div>';
@@ -792,7 +812,6 @@ function screen_hEdit() {
     '<div class="card"><div class="hd">상품 정보</div><div class="bd">' +
     '<div class="row"><div class="lbl">상품명</div><div class="val">' + esc(p.name) + '</div></div>' +
     '<div class="row"><div class="lbl">언어</div><div class="val">' + esc(p.lang) + '</div></div>' +
-    '<div class="row"><div class="lbl">알리페이 노출</div><div class="val"><span class="tblnote">' + hostNote(j) + '</span></div></div>' +
     '</div></div>' +
     editorCard('상품 설명', 'product', p.id, 'detail', true);
 }
