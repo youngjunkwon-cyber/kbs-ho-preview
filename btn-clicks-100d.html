@@ -47,7 +47,7 @@ h2{font-family:"Gowun Batang",serif;font-size:21px;font-weight:700;margin:0 0 4p
 .h2note{color:var(--muted);font-size:13px;margin:0 0 16px}
 section{scroll-margin-top:calc(var(--tbh) + 12px)}
 
-/* 필터 바 — 높이 고정. 표 헤더 스티키 오프셋이 이 값에 물려 있으므로 줄바꿈 없이 가로 스크롤만 한다 */
+/* 필터 바. 높이 고정. 표 헤더 스티키 오프셋이 이 값에 물려 있으므로 줄바꿈 없이 가로 스크롤만 한다 */
 .bar{
   position:sticky;top:0;z-index:20;
   height:var(--tbh);
@@ -95,11 +95,10 @@ tbody td{border-bottom:1px solid var(--line)}
 .month-tbl tbody tr:hover td{background:var(--surface-2)}
 .month-tbl tbody tr[aria-selected="true"] td{background:var(--rose-soft)}
 .month-tbl .tot{font-weight:600;font-size:16px}
+.month-tbl tfoot td{border-top:1px solid var(--line-2);font-weight:600;padding:13px 10px}
+.month-tbl tfoot .shr{font-weight:400;font-size:12px;color:var(--muted);display:block;margin-top:2px}
 .delta{font-weight:500}
 .delta.up{color:var(--up)} .delta.down{color:var(--down)} .delta.flat{color:var(--muted)}
-.trackcell{width:30%;min-width:120px}
-.track{height:9px;background:var(--surface-2);border-radius:2px;overflow:hidden}
-.track span{display:block;height:100%;background:var(--rose);border-radius:2px}
 
 /* 차트 */
 .chartbox{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:20px 18px 12px}
@@ -125,7 +124,10 @@ svg{display:block;width:100%;height:auto}
 .legend i{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:6px;vertical-align:-1px}
 .legend i.ln{height:2px;border-radius:0;width:16px;vertical-align:3px}
 
-/* 일자별 표 */
+/* 일자별 표.
+   overflow 를 걸지 않는다. overflow 조상이 있으면 thead 의 sticky 기준이 뷰포트가 아니라
+   그 스크롤 박스가 되어 헤더가 표 안쪽으로 내려가 고정된다. 가로 스크롤은 좁은 화면에서만 켜고
+   그때는 헤더 고정을 끈다. */
 .daily-wrap{border:1px solid var(--line);border-top:0;border-radius:0 0 6px 6px;background:var(--surface)}
 .daily-wrap thead th{position:sticky;top:var(--tbh);background:var(--surface);z-index:3;box-shadow:0 1px 0 var(--line-2);border-bottom:0}
 .daily-wrap thead th:first-child{border-top-left-radius:6px}
@@ -137,17 +139,38 @@ svg{display:block;width:100%;height:auto}
 .dow{color:var(--muted);font-size:12px;margin-left:6px}
 .sat{color:var(--l-jp)} .sun{color:var(--rose)}
 .tot-c{font-weight:600}
-.zero{color:var(--muted);opacity:.45}
+.zero{color:var(--muted)}
 .dim{opacity:.4}
 .peak{color:var(--rose);font-weight:600}
-.rank{display:inline-block;min-width:17px;font-size:10.5px;color:var(--rose);font-weight:600;margin-right:5px;text-align:right}
+.rank{display:inline-block;margin-left:8px;padding:1px 6px;border-radius:9px;background:var(--rose-soft);color:var(--rose);font-size:10.5px;font-weight:600;letter-spacing:.02em;vertical-align:1px}
 .miniwrap{display:flex;align-items:center;gap:9px;justify-content:flex-end}
 .mini{width:56px;height:6px;background:var(--surface-2);border-radius:1px;overflow:hidden;flex:none}
 .mini span{display:block;height:100%;background:var(--bar-hi);opacity:.55}
 .empty{padding:28px 12px;text-align:center;color:var(--muted);font-size:13.5px}
 
+/* 특이구간 */
+.finds{display:flex;flex-direction:column;gap:0}
+.find{display:grid;grid-template-columns:34px 1fr;gap:0 12px;padding:20px 0;border-top:1px solid var(--line)}
+.find:first-child{border-top:1px solid var(--line-2)}
+.find:last-child{border-bottom:1px solid var(--line-2)}
+.fnum{font-size:20px;font-weight:600;line-height:1.2;color:var(--fc)}
+.find h3{grid-column:2;margin:0 0 2px;font-family:"Gowun Batang",serif;font-size:16.5px;font-weight:700;line-height:1.35}
+.find .fwhen{grid-column:2;margin:0 0 10px;font-size:12px;color:var(--muted);letter-spacing:.03em;font-variant-numeric:tabular-nums}
+.find ul{grid-column:2;margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px;font-size:13.5px;color:var(--ink-2);max-width:70ch}
+.find ul li{padding-left:11px;position:relative;font-variant-numeric:tabular-nums}
+.find ul li::before{content:'';position:absolute;left:0;top:9px;width:3px;height:3px;border-radius:50%;background:var(--line-2)}
+.find ul ul{margin-top:4px;gap:3px;font-size:12.5px;color:var(--muted)}
+.find b{color:var(--ink);font-weight:600}
+.find .quote{grid-column:2;margin:12px 0 0;padding:12px 14px;background:var(--surface-2);border-left:2px solid var(--fc);font-size:13px;line-height:1.75;color:var(--ink-2);max-width:70ch}
+.find .src{grid-column:2;margin:9px 0 0;font-size:11.5px;color:var(--muted);letter-spacing:.02em}
+@media (max-width:640px){
+  .find{grid-template-columns:24px 1fr;gap:0 9px;padding:16px 0}
+  .fnum{font-size:16px}
+}
+
 .foot{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padding-top:16px;line-height:1.8}
 .foot b{color:var(--ink-2);font-weight:500}
+.foot .warn{display:block;margin-top:10px}
 @media (max-width:640px){
   .wrap{padding:28px 14px 60px;gap:32px}
   .bar{margin:0 -14px;padding:0 14px}
@@ -155,6 +178,8 @@ svg{display:block;width:100%;height:auto}
   .summary div:first-child{border-top:0}
   th,td{padding:8px 7px}
   .mini{width:34px}
+  .daily-wrap{overflow-x:auto}
+  .daily-wrap thead th{position:static}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -201,9 +226,61 @@ svg{display:block;width:100%;height:auto}
   </section>
 
   <section>
+    <h2>특이구간</h2>
+    <p class="h2note">위 그래프의 ①②③ 표식과 같은 번호입니다.</p>
+    <div class="finds">
+
+      <article class="find" style="--fc:var(--l-en)">
+        <span class="fnum">①</span>
+        <h3>영어 클릭 급증</h3>
+        <p class="fwhen">2026. 06. 09 ~ 06. 16 · 8일</p>
+        <ul>
+          <li>구간 일평균 <b>152.5건</b>. 직전·직후 각 8일(6/1~6/8, 6/17~6/24) 일평균 63.1건의 <b>2.4배</b>.</li>
+          <li>구간 영어 클릭 <b>1,023건</b>. 구간 총 1,220건의 <b>84%</b>.</li>
+          <li>영어 외 언어는 구간 일평균 24.6건, 직전·직후 26.5건으로 <b>변화 없음</b>. 급증분은 영어에만 나타납니다.</li>
+          <li>GA 기준 필리핀 유입 1,620명 → 19,192명(12배), 전부 fb/paid.
+            <ul>
+              <li>유입 페이지: /en/products/2575-woori-breast-augmentation 등 영어 상품 상세</li>
+              <li>상관계수: 필리핀 유입 ↔ 영어 클릭 0.909 / 영어 외 클릭 0.146</li>
+            </ul>
+          </li>
+        </ul>
+        <p class="quote">이 기간 유입은 페이스북 유료(fb/paid) 필리핀 트래픽으로 확인되나, 당사 Meta 광고 계정 5개 어디에도 필리핀 집행 기록이 없다(6/9~6/16 노출 국가: 일본·한국·캐나다·영국·미국). 집행 주체는 미확인.</p>
+        <p class="src">유입·상관계수·광고 계정 항목은 GA 및 Meta 광고 계정 기준. 클릭 수치는 어드민 버튼 클릭 현황 기준.</p>
+      </article>
+
+      <article class="find" style="--fc:var(--l-tw)">
+        <span class="fnum">②</span>
+        <h3>번체 클릭 스파이크 3일</h3>
+        <p class="fwhen">2026. 07. 25 · 08. 09 · 08. 16</p>
+        <ul>
+          <li>7/25 <b>44건</b> · 8/9 <b>47건</b> · 8/16 <b>37건</b>. 이 3일을 뺀 97일 번체 일평균은 <b>4.0건</b>입니다.</li>
+          <li>8/9는 GA 기준 대만 유입 327명(평시 73~130명의 2.5~4배). <b>실제 유입 증가</b>로 설명됩니다.</li>
+          <li>8/16은 대만 유입 77명인데 번체 클릭 37건. 클릭률 <b>48%</b>로 비정상입니다.</li>
+          <li>3일 모두 랜딩 1위가 볼뉴머(Volnewmer) 리프팅 번체 페이지.</li>
+          <li>대만 역시 당사 Meta 광고 계정에 집행 기록이 없습니다.</li>
+        </ul>
+        <p class="src">유입·랜딩·광고 계정 항목은 GA 및 Meta 광고 계정 기준.</p>
+      </article>
+
+      <article class="find" style="--fc:var(--l-jp)">
+        <span class="fnum">③</span>
+        <h3>9월 반등은 6월과 성격이 다릅니다</h3>
+        <p class="fwhen">2026. 09. 01 ~ 09. 08 · 8일</p>
+        <ul>
+          <li>6월 급증은 <b>영어 주도</b>. 총 2,621건 중 영어 1,860건으로 <b>71%</b>.</li>
+          <li>9월 반등은 <b>일어 주도</b>. 총 658건 중 일어 312건으로 <b>47%</b>.</li>
+          <li>일평균은 82.3건으로 6월(87.4건)에 근접하지만 구성 언어가 다릅니다. 두 구간을 같은 급증으로 묶어 설명할 수 없습니다.</li>
+        </ul>
+      </article>
+
+    </div>
+  </section>
+
+  <section>
     <h2>일자별 상세</h2>
     <p class="h2note" id="dailyNote"></p>
-    <div class="scroll daily-wrap"><table id="dailyTbl"></table></div>
+    <div class="daily-wrap"><table id="dailyTbl"></table></div>
   </section>
 
   <p class="foot" id="foot"></p>
@@ -221,6 +298,18 @@ const LANGS = [
   {k:'몽골', full:'몽골어',      i:7, c:'var(--l-mn)'},
 ];
 const DOW = ['일','월','화','수','목','금','토'];
+
+/* 차트에 음영으로 표시할 특이구간 */
+const BANDS = [
+  {id:'①', from:'2026-06-09', to:'2026-06-16', c:'var(--l-en)', t:'영어 급증'},
+  {id:'③', from:'2026-09-01', to:'2026-09-08', c:'var(--l-jp)', t:'일어 주도 반등'},
+];
+/* 차트에 표식으로 표시할 특이일 */
+const MARKS = [
+  {id:'②', d:'2026-07-25', c:'var(--l-tw)'},
+  {id:'②', d:'2026-08-09', c:'var(--l-tw)'},
+  {id:'②', d:'2026-08-16', c:'var(--l-tw)'},
+];
 const nf = n => n.toLocaleString('ko-KR');
 const md = s => s.slice(5).replace('-','/');
 const mLabel = k => k.slice(5).replace(/^0/,'') + '월';
@@ -255,7 +344,7 @@ function seg(el, items, get, set){
 }
 function buildBar(){
   seg(document.getElementById('segMonth'),
-    [{v:'all',t:'전체 100일'}, ...mKeys.map(k=>({v:k,t:mLabel(k)}))],
+    [{v:'all',t:`전체 ${ROWS.length}일`}, ...mKeys.map(k=>({v:k,t:mLabel(k)}))],
     ()=>S.month, v=>S.month=v);
   seg(document.getElementById('segLang'),
     [{v:'all',t:'전체'}, ...LANGS.map((l,j)=>({v:j,t:l.k,c:l.c}))],
@@ -277,8 +366,9 @@ function render(){
   const topSet = new Map([...base].sort((a,b)=>b[ci]-a[ci]).slice(0,10).map((r,n)=>[r[0],n+1]));
 
   /* 필터 바 요약 */
+  const filtered = S.month!=='all' || S.lang!=='all';
   document.getElementById('barnote').innerHTML =
-    `<b>${base.length}</b>일 · <b>${nf(sum)}</b>건 (전체의 ${(sum/grandAll*100).toFixed(1)}%)`;
+    `<b>${nf(sum)}</b>건 · ${base.length}일` + (filtered ? ` · 전체의 ${(sum/grandAll*100).toFixed(1)}%` : '');
 
   /* 요약 스트립 */
   document.getElementById('summary').innerHTML = [
@@ -294,8 +384,7 @@ function render(){
 }
 
 function renderMonths(){
-  const mAvgMax = Math.max(...mKeys.map(k=>months[k].tot/months[k].days));
-  let h = `<thead><tr><th>월</th><th>일수</th><th>합계</th><th>일평균</th><th>전월 대비</th><th class="trackcell">일평균 비교</th><th>최다 언어</th></tr></thead><tbody>`;
+  let h = `<thead><tr><th>월</th><th>일수</th><th>합계</th><th>일평균</th><th>전월 대비</th>${LANGS.map(l=>`<th style="color:${l.c}">${l.k}</th>`).join('')}</tr></thead><tbody>`;
   mKeys.forEach((k,idx)=>{
     const m = months[k], a = m.tot/m.days;
     let d = '<span class="delta flat">기준</span>';
@@ -306,15 +395,18 @@ function renderMonths(){
       const sign = pct>0 ? '▲' : pct<0 ? '▼' : '';
       d = `<span class="delta ${cls}">${sign} ${Math.abs(pct).toFixed(0)}%</span>`;
     }
-    const bi = m.langs.indexOf(Math.max(...m.langs));
-    const share = (m.langs[bi]/m.tot*100).toFixed(0);
     const label = mLabel(k) + (k==='2026-09' ? ' <small style="color:var(--muted)">1~8일</small>' : '');
     h += `<tr data-m="${k}" aria-selected="${S.month===k}"><td>${label}</td><td>${m.days}</td><td class="tot">${nf(m.tot)}</td><td class="tot">${a.toFixed(1)}</td><td>${d}</td>
-      <td class="trackcell"><div class="track"><span style="width:${(a/mAvgMax*100).toFixed(1)}%"></span></div></td>
-      <td style="color:${LANGS[bi].c};font-weight:600">${LANGS[bi].k} ${share}%</td></tr>`;
+      ${m.langs.map(v=>`<td class="${v===0?'zero':''}">${nf(v)}</td>`).join('')}</tr>`;
   });
+  h += `</tbody><tfoot><tr><td>합계</td><td>${ROWS.length}</td><td>${nf(grandAll)}</td><td>${(grandAll/ROWS.length).toFixed(1)}</td><td></td>` +
+    LANGS.map(l=>{
+      const v = ROWS.reduce((a,r)=>a+r[l.i],0);
+      const pct = v/grandAll*100;
+      return `<td style="color:${l.c}">${nf(v)}<span class="shr">${pct<1?pct.toFixed(1):pct.toFixed(0)}%</span></td>`;
+    }).join('') + `</tr></tfoot>`;
   const t = document.getElementById('monthTbl');
-  t.innerHTML = h + '</tbody>';
+  t.innerHTML = h;
   t.tBodies[0].onclick = e => {
     const tr = e.target.closest('tr[data-m]');
     if(!tr) return;
@@ -339,6 +431,24 @@ function renderChart(rows, ci, peakDate){
     s += `<line x1="${L}" y1="${y(v)}" x2="${W-R}" y2="${y(v)}" stroke="var(--grid)" stroke-width="1"/>`;
     s += `<text x="${L-9}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="var(--muted)">${v}</text>`;
   }
+  /* 특이구간 음영 (막대보다 먼저 그려 뒤에 깔린다) */
+  const slot = iw / rows.length;
+  BANDS.forEach(b=>{
+    const i0 = rows.findIndex(r => r[0] >= b.from);
+    if(i0 < 0 || rows[i0][0] > b.to) return;
+    let i1 = i0;
+    for(let k = rows.length-1; k >= i0; k--){ if(rows[k][0] <= b.to){ i1 = k; break; } }
+    const x0 = x(i0) - slot/2, x1 = x(i1) + slot/2;
+    s += `<rect x="${x0.toFixed(1)}" y="${T}" width="${(x1-x0).toFixed(1)}" height="${ih}" fill="${b.c}" opacity=".08"/>`;
+    s += `<line x1="${x0.toFixed(1)}" y1="${T}" x2="${x0.toFixed(1)}" y2="${T+ih}" stroke="${b.c}" stroke-width="1" opacity=".4"/>`;
+    s += `<line x1="${x1.toFixed(1)}" y1="${T}" x2="${x1.toFixed(1)}" y2="${T+ih}" stroke="${b.c}" stroke-width="1" opacity=".4"/>`;
+    /* 오른쪽 끝 구간은 라벨을 안쪽(왼쪽)으로 뻗게 해 차트 경계를 넘지 않도록 한다 */
+    const toRight = x1 > L + iw*0.78;
+    s += toRight
+      ? `<text x="${(x1-5).toFixed(1)}" y="${T+12}" font-size="10.5" font-weight="600" fill="${b.c}" text-anchor="end">${b.id} ${b.t}</text>`
+      : `<text x="${(x0+5).toFixed(1)}" y="${T+12}" font-size="10.5" font-weight="600" fill="${b.c}">${b.id} ${b.t}</text>`;
+  });
+
   const barFill = S.lang==='all' ? 'var(--bar)' : accent;
   const barOp = S.lang==='all' ? '0.9' : '0.3';
   rows.forEach((r,i)=>{
@@ -374,6 +484,15 @@ function renderChart(rows, ci, peakDate){
       }
     });
   }
+  /* 특이일 표식 */
+  MARKS.forEach(m=>{
+    const i = rows.findIndex(r=>r[0]===m.d);
+    if(i<0) return;
+    const v = rows[i][ci];
+    const ty = Math.max(T+11, y(v)-8);
+    s += `<text x="${x(i).toFixed(1)}" y="${ty.toFixed(1)}" font-size="10.5" font-weight="600" fill="${m.c}" text-anchor="middle">${m.id}</text>`;
+  });
+
   /* hover 레이어 (가장 위에 그린다) */
   s += `<g id="hoverG" style="display:none">
     <line id="hoverLine" y1="${T}" y2="${T+ih}" stroke="var(--ink-2)" stroke-width="1" opacity=".3"/>
@@ -388,7 +507,8 @@ function renderChart(rows, ci, peakDate){
   document.getElementById('chartTitle').textContent =
     (S.lang==='all' ? '일별 클릭 추이' : `일별 ${LANGS[S.lang].full} 클릭 추이`);
   document.getElementById('chartNote').textContent =
-    `막대는 일별 ${metricName()}, 선은 7일 이동평균.` + (S.month==='all' ? ' 점선은 월 경계.' : '') + ' 막대에 마우스를 올리면 날짜와 건수가 나옵니다.';
+    `막대는 일별 ${metricName()}, 선은 7일 이동평균.` + (S.month==='all' ? ' 점선은 월 경계.' : '') +
+    ' 마우스를 올리면 날짜와 건수가 나옵니다. 음영과 ①②③ 표식은 아래 특이구간과 같은 번호입니다.';
   document.getElementById('legend').innerHTML =
     `<span><i style="background:${barFill};opacity:${barOp}"></i>일별 ${metricName()}</span>
      <span><i class="ln" style="background:${accent}"></i>7일 이동평균</span>
@@ -488,7 +608,7 @@ function renderDaily(rows, ci, maxV, topSet){
     const w = new Date(r[0]+'T00:00:00').getDay();
     const cls = w===0?'sun':w===6?'sat':'';
     const rk = topSet.get(r[0]);
-    h += `<tr><td>${rk?`<span class="rank">${rk}</span>`:'<span class="rank"></span>'}${md(r[0])}<span class="dow ${cls}">${DOW[w]}</span></td>
+    h += `<tr><td>${md(r[0])}<span class="dow ${cls}">${DOW[w]}</span>${rk?`<span class="rank">${rk}위</span>`:''}</td>
       <td><div class="miniwrap"><div class="mini"><span style="width:${(r[ci]/maxV*100).toFixed(0)}%"></span></div><span class="tot-c ${rk?'peak':''}">${nf(r[ci])}</span></div></td>
       ${LANGS.map((l,j)=>`<td class="${r[l.i]===0?'zero':''} ${S.lang!=='all'&&S.lang!==j?'dim':''}">${r[l.i]}</td>`).join('')}</tr>`;
   });
@@ -500,12 +620,13 @@ function renderDaily(rows, ci, maxV, topSet){
 
 /* 푸터 (전체 100일 고정) */
 document.getElementById('foot').innerHTML =
-  `언어 비중 (100일 누계)<br>` +
-  LANGS.map(l=>({k:l.k, v:ROWS.reduce((a,r)=>a+r[l.i],0), c:l.c}))
-    .sort((a,b)=>b.v-a.v)
-    .map(o=>`<b style="color:${o.c}">${o.k} ${(o.v/grandAll*100).toFixed(0)}%</b>`).join(' · ') +
-  `<br>출처: K-Beauty Station 어드민 대시보드 › 버튼 클릭 현황 (스토어 + 상품 합계). 일자별로 조회해 수집.<br>` +
-  `검증: 100일 전건 <b>총 건수 = 언어별 합계 = 버튼 유형별 합계</b> 일치 확인.`;
+  `<b>출처</b><br>` +
+  `K-Beauty Station 어드민 대시보드 › 버튼 클릭 현황. 스토어와 상품을 합산한 수치이며, 스토어 단독 카드나 상품 단독 카드와는 다릅니다. 일자별로 조회해 수집했습니다.<br>` +
+  `통계 API(스토어별 문의) 수치와도 다릅니다(예: 9/9 대시보드 16건, API 11건). 이 페이지는 <b>대시보드 기준</b>으로 통일했습니다.<br>` +
+  `<b class="warn">검산</b><br>` +
+  `100일 전건에서 총 건수 = 언어별 합계 = 버튼 유형별 합계가 성립합니다.<br>` +
+  `<b class="warn">GA 소스 라벨 주의</b><br>` +
+  `GA 소스 표기가 fb/paid 에서 meta/paid_social 로 7/27 시작, 7/30 완료로 전환됐습니다. 소스별로 기간을 비교하면 트래픽이 준 것처럼 보이지만 라벨만 바뀐 것입니다(전체 활성 사용자는 7월 69,777명에서 8월 73,261명으로 증가). 소스 기준 비교가 필요하면 두 소스를 합산해서 보십시오.`;
 
 buildBar();
 render();
