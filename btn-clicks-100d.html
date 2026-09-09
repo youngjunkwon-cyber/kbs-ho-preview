@@ -11,7 +11,7 @@
   --up:#1F7A5C; --down:#B03A48;
   --grid:#EFE9E8; --bar:#E3C4D1; --bar-hi:#D6336C;
   --bar-shadow:rgba(28,23,25,.06);
-  --tbh:56px;
+  --tbh:48px;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
@@ -47,28 +47,30 @@ h2{font-family:"Gowun Batang",serif;font-size:21px;font-weight:700;margin:0 0 4p
 .h2note{color:var(--muted);font-size:13px;margin:0 0 16px}
 section{scroll-margin-top:calc(var(--tbh) + 12px)}
 
-/* 필터 바 */
+/* 필터 바 — 높이 고정. 표 헤더 스티키 오프셋이 이 값에 물려 있으므로 줄바꿈 없이 가로 스크롤만 한다 */
 .bar{
   position:sticky;top:0;z-index:20;
-  background:color-mix(in srgb, var(--bg) 88%, transparent);
-  backdrop-filter:blur(10px) saturate(1.4);
+  height:var(--tbh);
+  background:var(--bg);
   border-bottom:1px solid var(--line-2);
-  margin:0 -24px;padding:10px 24px;
-  display:flex;flex-wrap:wrap;align-items:center;gap:10px 22px;
+  margin:0 -24px;padding:0 24px;
+  display:flex;flex-wrap:nowrap;align-items:center;gap:0 20px;
+  overflow-x:auto;overflow-y:hidden;white-space:nowrap;
+  scrollbar-width:thin;
 }
-.grp{display:flex;align-items:center;gap:8px;min-width:0}
+.grp{display:flex;flex-wrap:nowrap;align-items:center;gap:8px;flex:none}
 .grp>b{font-size:11px;letter-spacing:.1em;color:var(--muted);font-weight:500;text-transform:uppercase;flex:none}
-.seg{display:flex;background:var(--surface-2);border:1px solid var(--line);border-radius:5px;padding:2px;gap:2px;flex-wrap:wrap}
+.seg{display:flex;flex-wrap:nowrap;background:var(--surface-2);border:1px solid var(--line);border-radius:5px;padding:2px;gap:2px;flex:none}
 .seg button{
-  font:inherit;font-size:13px;line-height:1;color:var(--ink-2);
-  background:none;border:0;border-radius:3px;padding:6px 11px;cursor:pointer;white-space:nowrap;
+  font:inherit;font-size:12.5px;line-height:1;color:var(--ink-2);
+  background:none;border:0;border-radius:3px;padding:6px 10px;cursor:pointer;white-space:nowrap;
 }
 .seg button:hover{color:var(--ink);background:var(--surface-3)}
 .seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);font-weight:600;box-shadow:0 1px 2px var(--bar-shadow)}
 .seg button:focus-visible{outline:2px solid var(--rose);outline-offset:1px}
 .seg.lang button[aria-pressed="true"]{color:var(--c,var(--ink))}
 .seg.lang button i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--c);margin-right:6px;vertical-align:1px;opacity:.85}
-.barnote{margin-left:auto;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.barnote{margin-left:auto;padding-left:8px;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;flex:none}
 .barnote b{color:var(--ink-2);font-weight:500}
 
 /* 요약 스트립 */
@@ -114,8 +116,7 @@ svg{display:block;width:100%;height:auto}
 .daily-wrap td{border-bottom:1px solid var(--line)}
 .daily-wrap tbody tr:last-child td{border-bottom:0}
 .daily-wrap tbody tr:hover td{background:var(--surface-2)}
-.mbreak td{background:var(--surface-2);font-family:"Gowun Batang",serif;font-weight:700;font-size:13px;color:var(--ink-2);letter-spacing:.06em;text-align:left;padding:8px 10px;border-bottom:1px solid var(--line-2)}
-.mbreak td{position:sticky;top:calc(var(--tbh) + 34px);z-index:2}
+.mbreak td{background:var(--surface-2);font-family:"Gowun Batang",serif;font-weight:700;font-size:13px;color:var(--ink-2);letter-spacing:.06em;text-align:left;padding:8px 10px;border-bottom:1px solid var(--line-2);border-top:1px solid var(--line-2)}
 .dow{color:var(--muted);font-size:12px;margin-left:6px}
 .sat{color:var(--l-jp)} .sun{color:var(--rose)}
 .tot-c{font-weight:600}
@@ -132,8 +133,7 @@ svg{display:block;width:100%;height:auto}
 .foot b{color:var(--ink-2);font-weight:500}
 @media (max-width:640px){
   .wrap{padding:28px 14px 60px;gap:32px}
-  .bar{margin:0 -14px;padding:9px 14px}
-  .barnote{margin-left:0;width:100%}
+  .bar{margin:0 -14px;padding:0 14px}
   .summary div{padding:14px;border-left:0;border-top:1px solid var(--line)}
   .summary div:first-child{border-top:0}
   th,td{padding:8px 7px}
@@ -406,13 +406,6 @@ document.getElementById('foot').innerHTML =
   `<br>출처: K-Beauty Station 어드민 대시보드 › 버튼 클릭 현황 (스토어 + 상품 합계). 일자별로 조회해 수집.<br>` +
   `검증: 100일 전건 <b>총 건수 = 언어별 합계 = 버튼 유형별 합계</b> 일치 확인.`;
 
-/* 스티키 헤더 오프셋 */
-const barEl = document.querySelector('.bar');
-const syncBar = () => document.documentElement.style.setProperty('--tbh', barEl.offsetHeight + 'px');
-window.addEventListener('resize', syncBar);
-if(document.fonts && document.fonts.ready) document.fonts.ready.then(syncBar);
-
 buildBar();
 render();
-syncBar();
 </script>
