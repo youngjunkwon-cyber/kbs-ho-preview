@@ -505,7 +505,6 @@ function btnTable(kind, obj) {
     if (r.needConsult && !eff.btns.consult.web) webDis = true;
     if (r.needConsult && !eff.btns.consult.ali) { aliDis = true; note = MSG.needConsult; }
     if (r.needBooking && !obj.bookingEnabled) { webDis = true; aliDis = true; note = MSG.needBooking; }
-    if (!langOk) note = note || MSG.langOnly;
     if (r.k === 'chat' && !isStore && eff.chatAuto) note = '스토어의 알리페이 열이 비어 채팅이 자동으로 켜집니다.';
     html += '<tr><td><span class="req">*</span>' + r.label + (r.isNew ? '<span class="newbadge">신규</span>' : '') + '</td>' +
       '<td>' + onoff('w_' + kind + '_' + r.k, e.web, "setBtn('" + kind + "','" + r.k + "','web',%V%)", webDis) + '</td>' +
@@ -515,14 +514,13 @@ function btnTable(kind, obj) {
   html += '</tbody></table></div>';
   const webCnt = onCount(eff.btns, rows, 'web'), aliCnt = onCount(eff.btns, rows, 'ali');
   const webCta = ctaList(eff.btns, rows, 'web'), aliCta = ctaList(eff.btns, rows, 'ali');
-  html += '<div class="hint">' + MSG.cap + '<br>지금 웹 ' + webCnt + '개' + (webCta.length ? ' (' + webCta.join(' / ') + ')' : '') +
-    ' · 알리페이 ' + aliCnt + '개' + (aliCta.length ? ' (' + aliCta.join(' / ') + ')' : '') +
-    '<br>문의하기 통합은 상담접수를 포함하므로 둘이 한 자리를 씁니다. 통합이 ON이면 그 자리가 문의하기로 나갑니다.</div>';
+  html += '<div class="hint">웹과 알리페이 각각 버튼 자리 2개까지 켤 수 있습니다. 상담접수와 문의하기 통합은 프런트 하단에서 한 자리를 쓰고, 통합이 ON이면 그 자리가 문의하기로 나갑니다.' +
+    '<br>지금 웹 ' + webCnt + '개' + (webCta.length ? ' (' + webCta.join(' / ') + ')' : '') +
+    ' · 알리페이 ' + aliCnt + '개' + (aliCta.length ? ' (' + aliCta.join(' / ') + ')' : '') + '</div>';
   if (webCnt > CAP || aliCnt > CAP) html += '<div class="notice red">마이그레이션 이전에 저장된 건이라 ' + (webCnt > CAP ? '웹' : '알리페이') + ' 열에 ' + Math.max(webCnt, aliCnt) + '개가 켜져 있습니다. 저장하려면 두 개로 줄여 주세요.</div>';
   if (locked) html += '<div class="notice grey">스토어 설정 적용이 기본 설정이라 스토어 값을 그대로 보여주고 편집은 잠깁니다. 스토어에만 있는 예약 행은 무시합니다.</div>';
   if (selfHidden) html += '<div class="notice grey">알리페이 노출이 미노출이라 알리페이 열을 잠갔습니다. 값은 그대로 보관합니다.</div>';
   if (storeHidden) html += '<div class="notice grey">소속 스토어가 알리페이 미노출이라 알리페이 열을 잠갔습니다.</div>';
-  if (!langOk) html += '<div class="notice grey">' + MSG.langOnly + '</div>';
   if (langOk && !selfHidden && !storeHidden && aliCnt === 0) html += '<div class="notice">' + MSG.noAliBtn + '</div>';
   return html;
 }
@@ -733,9 +731,10 @@ function screen_sEdit() {
   } else {
     bd = '<div class="bd"><div class="tblnote">이번 작업 범위가 아닌 섹션입니다. 노출정보 · 예약설정 · 버튼 및 메신저 설정을 확인해 주세요.</div></div>';
   }
-  return '<div class="phd"><div><h2 class="page">스토어 정보 수정</h2><div class="pdesc">스토어 기본 정보와 운영 설정을 수정합니다. · ' + esc(st.name) + '</div></div>' +
-    '<div style="display:flex;gap:8px"><button class="btn" onclick="go(\'s-list\')">취소</button><button class="btn pri" onclick="save(\'store\')">저장</button></div></div>' +
-    '<div class="anchors">' + SECTS.map((s, k) => '<div class="anchor ' + (k === i ? 'on' : SECT_IN_SCOPE.indexOf(k) === -1 ? 'dim' : '') + '" onclick="VIEW.sect=' + k + ';render()">' + s + '</div>').join('') + '</div>' +
+  return '<div class="phd"><div><h2 class="page">스토어 정보 수정</h2><div class="pdesc">스토어 기본 정보와 운영 설정을 수정합니다. · ' + esc(st.name) + '</div></div></div>' +
+    '<div class="anchors" style="justify-content:space-between;align-items:center">' +
+    '<div style="display:flex;flex-wrap:wrap;gap:6px;flex:1">' + SECTS.map((s, k) => '<div class="anchor ' + (k === i ? 'on' : SECT_IN_SCOPE.indexOf(k) === -1 ? 'dim' : '') + '" onclick="VIEW.sect=' + k + ';render()">' + s + '</div>').join('') + '</div>' +
+    '<div style="display:flex;gap:8px;margin-left:12px"><button class="btn" onclick="go(\'s-list\')">취소</button><button class="btn" style="background:#1F1F1F;border-color:#1F1F1F;color:#fff" onclick="save(\'store\')">저장</button></div></div>' +
     '<div class="card"><div class="hd">' + SECTS[i] + (SECT_IN_SCOPE.indexOf(i) >= 0 ? '' : '') + '<button class="btn" onclick="save(\'store\')">저장</button></div>' + bd + '</div>' +
     historyCard(st);
 }
@@ -812,6 +811,7 @@ function modal_ad() {
   if (b.linkType === '내부링크') h += '<div class="row"><div class="lbl"><span class="req">*</span>내부링크</div><div class="val">' +
     innerPicker('setAdInnerKind(this.value)', 'setAdInnerId(this.value)', b.inner) +
     '<div class="hint">앞은 내부링크 종류, 뒤는 대상입니다. 병원과 기획전만 알리페이 노출을 판정합니다. 인플루언서와 직접입력은 판정하지 않습니다.</div></div></div>';
+  h += '<div class="row"><div class="lbl"><span class="req">*</span>대표 이미지</div><div class="val"><span class="tblnote">banner_' + b.id + '.jpg (기존)</span></div></div>';
   if (isLanding) h += '<div class="row"><div class="lbl"><span class="req">*</span>상세 이미지</div><div class="val"><span class="tblnote">landing_' + b.id + '.jpg (기존)</span></div></div>';
   if (langOk && b.aliVisible === '노출') {
     if (j.reason === '외부 연결') h += '<div class="notice">' + MSG.bnExt + '</div>';
@@ -845,7 +845,7 @@ function screen_cList() {
   const body = rows.map(c => { const j = judgeCollection(c); if (!passFilter(j)) return '';
     return '<tr><td>' + c.active + '</td><td>' + c.lang + '</td><td>' + c.from + ' ~ ' + c.to + '</td><td>' + c.type + '</td><td>' + esc(c.name) + '</td>' +
       '<td class="new c">' + visCell(j) + '</td><td class="new">' + rsnCell(j) + '</td>' +
-      '<td>' + c.products.length + '</td><td class="new">' + c.stores.length + '<span class="newbadge">신규</span></td>' +
+      '<td>' + c.products.length + '</td><td>' + c.stores.length + '</td>' +
       '<td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>' +
       '<td>2026-08-25</td><td>2026-09-08</td>' +
       '<td><button class="btn sm" onclick="openColl(\'' + c.id + '\')">수정</button></td></tr>'; }).join('');
@@ -857,7 +857,7 @@ function screen_cList() {
     '</div><div class="tblwrap"><table><thead><tr>' +
     '<th>기획전 상태</th><th>언어</th><th>노출 기간</th><th>유형</th><th>기획전명</th>' +
     '<th class="new">알리페이 노출<span class="newbadge">신규</span></th><th class="new">사유<span class="newbadge">신규</span></th>' +
-    '<th>상품</th><th class="new">스토어</th><th>대상 클릭수</th><th>채팅수</th><th>상담수</th>' +
+    '<th>상품</th><th>스토어</th><th>대상 클릭수</th><th>채팅수</th><th>상담수</th>' +
     '<th>상담접수</th><th>인앱채팅</th><th>외부링크</th><th>위챗</th><th>샤오홍슈</th><th>왓츠앱</th><th>라인</th><th>카카오톡</th><th>페이스북</th>' +
     '<th>등록일</th><th>수정일</th><th>관리</th></tr></thead><tbody>' + (body || empty(24)) + '</tbody></table></div></div>';
 }
