@@ -208,7 +208,7 @@ svg{display:block;width:100%;height:auto}
 
   <section>
     <h2>월별 추이</h2>
-    <p class="h2note">일평균 기준. 행을 누르면 그 달만 볼 수 있습니다.</p>
+    <p class="h2note">하루 평균 기준입니다. 행을 누르면 그 달만 볼 수 있습니다.</p>
     <div class="scroll"><table class="month-tbl" id="monthTbl"></table></div>
   </section>
 
@@ -379,7 +379,7 @@ function render(){
 }
 
 function renderMonths(){
-  let h = `<thead><tr><th>월</th><th>일수</th><th>합계</th><th>일평균</th><th>전월 대비</th>${LANGS.map(l=>`<th style="color:${l.c}">${l.k}</th>`).join('')}</tr></thead><tbody>`;
+  let h = `<thead><tr><th>월</th><th>일수</th><th>합계</th><th>하루 평균</th><th>전월 대비</th>${LANGS.map(l=>`<th style="color:${l.c}">${l.k}</th>`).join('')}</tr></thead><tbody>`;
   mKeys.forEach((k,idx)=>{
     const m = months[k], a = m.tot/m.days;
     let d = '<span class="delta flat">기준</span>';
@@ -597,7 +597,7 @@ function renderDaily(rows, ci, maxV, topSet){
       if(m!==cur){
         cur=m;
         const mm = months[m];
-        h += `<tr class="mbreak"><td colspan="${2+LANGS.length}">${mLabel(m)} · ${mm.days}일 · 합계 ${nf(mm.tot)} · 일평균 ${(mm.tot/mm.days).toFixed(1)}</td></tr>`;
+        h += `<tr class="mbreak"><td colspan="${2+LANGS.length}">${mLabel(m)} · ${mm.days}일 · 합계 ${nf(mm.tot)} · 하루 평균 ${(mm.tot/mm.days).toFixed(1)}</td></tr>`;
       }
     }
     const w = new Date(r[0]+'T00:00:00').getDay();
