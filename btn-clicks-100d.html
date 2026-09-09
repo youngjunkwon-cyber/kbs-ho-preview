@@ -1,0 +1,418 @@
+<title>버튼 클릭 100일</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap">
+<style>
+:root{
+  --bg:#FBF9F8; --surface:#FFFFFF; --surface-2:#F6F2F1; --surface-3:#EFE9E8;
+  --ink:#1C1719; --ink-2:#4A4145; --muted:#867B7E; --line:#EAE3E2; --line-2:#DCD3D2;
+  --rose:#D6336C; --rose-soft:#F7E3EA;
+  --l-cn:#DE7A28; --l-en:#D6336C; --l-tw:#2E8C74; --l-jp:#2F6FB5; --l-id:#7A5BC0; --l-mn:#8C8487;
+  --up:#1F7A5C; --down:#B03A48;
+  --grid:#EFE9E8; --bar:#E3C4D1; --bar-hi:#D6336C;
+  --bar-shadow:rgba(28,23,25,.06);
+  --tbh:56px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#141013; --surface:#1D181B; --surface-2:#241E22; --surface-3:#2C2429;
+    --ink:#F3EDEF; --ink-2:#CFC5C9; --muted:#9A8E92; --line:#302930; --line-2:#3D3439;
+    --rose:#F0679B; --rose-soft:#3A1F2B;
+    --l-cn:#F0A05A; --l-en:#F0679B; --l-tw:#4FB89B; --l-jp:#6BA3E0; --l-id:#A88AE0; --l-mn:#A79DA1;
+    --up:#4FBE94; --down:#E8737F;
+    --grid:#2A2329; --bar:#4A2C39; --bar-hi:#F0679B;
+    --bar-shadow:rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#141013; --surface:#1D181B; --surface-2:#241E22; --surface-3:#2C2429;
+  --ink:#F3EDEF; --ink-2:#CFC5C9; --muted:#9A8E92; --line:#302930; --line-2:#3D3439;
+  --rose:#F0679B; --rose-soft:#3A1F2B;
+  --l-cn:#F0A05A; --l-en:#F0679B; --l-tw:#4FB89B; --l-jp:#6BA3E0; --l-id:#A88AE0; --l-mn:#A79DA1;
+  --up:#4FBE94; --down:#E8737F;
+  --grid:#2A2329; --bar:#4A2C39; --bar-hi:#F0679B;
+  --bar-shadow:rgba(0,0,0,.4);
+}
+*{box-sizing:border-box}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:"IBM Plex Sans KR","Malgun Gothic",system-ui,sans-serif;
+  font-weight:400; line-height:1.6; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1120px;margin:0 auto;padding:44px 24px 80px;display:flex;flex-direction:column;gap:40px}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--rose);font-weight:600;margin:0}
+h1{font-family:"Gowun Batang",serif;font-weight:700;font-size:clamp(30px,5vw,44px);line-height:1.15;margin:10px 0 6px;text-wrap:balance;letter-spacing:-.01em}
+.sub{color:var(--muted);font-size:14px;margin:0}
+h2{font-family:"Gowun Batang",serif;font-size:21px;font-weight:700;margin:0 0 4px}
+.h2note{color:var(--muted);font-size:13px;margin:0 0 16px}
+section{scroll-margin-top:calc(var(--tbh) + 12px)}
+
+/* 필터 바 */
+.bar{
+  position:sticky;top:0;z-index:20;
+  background:color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter:blur(10px) saturate(1.4);
+  border-bottom:1px solid var(--line-2);
+  margin:0 -24px;padding:10px 24px;
+  display:flex;flex-wrap:wrap;align-items:center;gap:10px 22px;
+}
+.grp{display:flex;align-items:center;gap:8px;min-width:0}
+.grp>b{font-size:11px;letter-spacing:.1em;color:var(--muted);font-weight:500;text-transform:uppercase;flex:none}
+.seg{display:flex;background:var(--surface-2);border:1px solid var(--line);border-radius:5px;padding:2px;gap:2px;flex-wrap:wrap}
+.seg button{
+  font:inherit;font-size:13px;line-height:1;color:var(--ink-2);
+  background:none;border:0;border-radius:3px;padding:6px 11px;cursor:pointer;white-space:nowrap;
+}
+.seg button:hover{color:var(--ink);background:var(--surface-3)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);font-weight:600;box-shadow:0 1px 2px var(--bar-shadow)}
+.seg button:focus-visible{outline:2px solid var(--rose);outline-offset:1px}
+.seg.lang button[aria-pressed="true"]{color:var(--c,var(--ink))}
+.seg.lang button i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--c);margin-right:6px;vertical-align:1px;opacity:.85}
+.barnote{margin-left:auto;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.barnote b{color:var(--ink-2);font-weight:500}
+
+/* 요약 스트립 */
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0;border-top:1px solid var(--line-2);border-bottom:1px solid var(--line-2)}
+.summary div{padding:18px 20px;border-left:1px solid var(--line)}
+.summary div:first-child{border-left:0;padding-left:0}
+.summary dt{font-size:12px;color:var(--muted);letter-spacing:.04em;margin:0 0 6px}
+.summary dd{margin:0;font-size:27px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.1}
+.summary dd small{font-size:13px;font-weight:400;color:var(--muted);margin-left:5px}
+
+/* 표 공통 */
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:14px}
+th,td{text-align:right;padding:9px 10px;white-space:nowrap}
+th{font-weight:500;font-size:12px;color:var(--muted);letter-spacing:.03em;border-bottom:1px solid var(--line-2)}
+th:first-child,td:first-child{text-align:left}
+tbody td{border-bottom:1px solid var(--line)}
+.scroll{overflow-x:auto}
+
+/* 월별 추이 */
+.month-tbl td{padding:13px 10px}
+.month-tbl tbody tr{cursor:pointer}
+.month-tbl tbody tr:hover td{background:var(--surface-2)}
+.month-tbl tbody tr[aria-selected="true"] td{background:var(--rose-soft)}
+.month-tbl .tot{font-weight:600;font-size:16px}
+.delta{font-weight:500}
+.delta.up{color:var(--up)} .delta.down{color:var(--down)} .delta.flat{color:var(--muted)}
+.trackcell{width:30%;min-width:120px}
+.track{height:9px;background:var(--surface-2);border-radius:2px;overflow:hidden}
+.track span{display:block;height:100%;background:var(--rose);border-radius:2px}
+
+/* 차트 */
+.chartbox{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:20px 18px 12px}
+svg{display:block;width:100%;height:auto}
+.legend{display:flex;flex-wrap:wrap;gap:18px;margin-top:12px;font-size:12px;color:var(--ink-2)}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.legend i.ln{height:2px;border-radius:0;width:16px;vertical-align:3px}
+
+/* 일자별 표 */
+.daily-wrap{border:1px solid var(--line);border-top:0;border-radius:0 0 6px 6px;background:var(--surface)}
+.daily-wrap thead th{position:sticky;top:var(--tbh);background:var(--surface);z-index:3;box-shadow:0 1px 0 var(--line-2);border-bottom:0}
+.daily-wrap thead th:first-child{border-top-left-radius:6px}
+.daily-wrap thead th:last-child{border-top-right-radius:6px}
+.daily-wrap td{border-bottom:1px solid var(--line)}
+.daily-wrap tbody tr:last-child td{border-bottom:0}
+.daily-wrap tbody tr:hover td{background:var(--surface-2)}
+.mbreak td{background:var(--surface-2);font-family:"Gowun Batang",serif;font-weight:700;font-size:13px;color:var(--ink-2);letter-spacing:.06em;text-align:left;padding:8px 10px;border-bottom:1px solid var(--line-2)}
+.mbreak td{position:sticky;top:calc(var(--tbh) + 34px);z-index:2}
+.dow{color:var(--muted);font-size:12px;margin-left:6px}
+.sat{color:var(--l-jp)} .sun{color:var(--rose)}
+.tot-c{font-weight:600}
+.zero{color:var(--muted);opacity:.45}
+.dim{opacity:.4}
+.peak{color:var(--rose);font-weight:600}
+.rank{display:inline-block;min-width:17px;font-size:10.5px;color:var(--rose);font-weight:600;margin-right:5px;text-align:right}
+.miniwrap{display:flex;align-items:center;gap:9px;justify-content:flex-end}
+.mini{width:56px;height:6px;background:var(--surface-2);border-radius:1px;overflow:hidden;flex:none}
+.mini span{display:block;height:100%;background:var(--bar-hi);opacity:.55}
+.empty{padding:28px 12px;text-align:center;color:var(--muted);font-size:13.5px}
+
+.foot{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padding-top:16px;line-height:1.8}
+.foot b{color:var(--ink-2);font-weight:500}
+@media (max-width:640px){
+  .wrap{padding:28px 14px 60px;gap:32px}
+  .bar{margin:0 -14px;padding:9px 14px}
+  .barnote{margin-left:0;width:100%}
+  .summary div{padding:14px;border-left:0;border-top:1px solid var(--line)}
+  .summary div:first-child{border-top:0}
+  th,td{padding:8px 7px}
+  .mini{width:34px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">K-Beauty Station · 어드민 대시보드</p>
+    <h1>버튼 클릭 100일</h1>
+    <p class="sub">2026년 6월 1일 ~ 9월 8일 · 언어별 일간 집계 · 총 100일</p>
+  </header>
+
+  <div class="bar">
+    <div class="grp">
+      <b>기간</b>
+      <div class="seg" id="segMonth"></div>
+    </div>
+    <div class="grp">
+      <b>언어</b>
+      <div class="seg lang" id="segLang"></div>
+    </div>
+    <div class="grp">
+      <b>정렬</b>
+      <div class="seg" id="segSort"></div>
+    </div>
+    <p class="barnote" id="barnote"></p>
+  </div>
+
+  <dl class="summary" id="summary"></dl>
+
+  <section>
+    <h2>월별 추이</h2>
+    <p class="h2note">일평균 기준. 행을 누르면 그 달만 볼 수 있습니다.</p>
+    <div class="scroll"><table class="month-tbl" id="monthTbl"></table></div>
+  </section>
+
+  <section>
+    <h2 id="chartTitle">일별 클릭 추이</h2>
+    <p class="h2note" id="chartNote">막대는 일별 클릭, 선은 7일 이동평균.</p>
+    <div class="chartbox">
+      <svg id="chart" viewBox="0 0 1000 320" role="img" aria-label="일별 버튼 클릭 추이 차트"></svg>
+      <div class="legend" id="legend"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>일자별 상세</h2>
+    <p class="h2note" id="dailyNote"></p>
+    <div class="scroll daily-wrap"><table id="dailyTbl"></table></div>
+  </section>
+
+  <p class="foot" id="foot"></p>
+</div>
+
+<script>
+const ROWS = [["2026-06-01",31,5,15,1,8,2,0],["2026-06-02",36,7,18,3,5,3,0],["2026-06-03",43,4,23,4,12,0,0],["2026-06-04",90,9,72,0,8,1,0],["2026-06-05",55,9,22,3,20,1,0],["2026-06-06",36,6,26,1,3,0,0],["2026-06-07",38,3,23,0,10,2,0],["2026-06-08",81,4,46,1,26,4,0],["2026-06-09",109,2,94,7,4,2,0],["2026-06-10",204,0,180,8,11,5,0],["2026-06-11",208,3,166,5,29,5,0],["2026-06-12",139,18,110,2,5,4,0],["2026-06-13",108,1,91,4,7,5,0],["2026-06-14",182,2,169,3,5,3,0],["2026-06-15",164,13,128,5,14,4,0],["2026-06-16",106,3,85,6,9,3,0],["2026-06-17",60,12,36,2,8,2,0],["2026-06-18",57,8,34,5,6,4,0],["2026-06-19",74,5,43,3,15,8,0],["2026-06-20",74,10,46,0,8,10,0],["2026-06-21",75,8,49,2,5,9,2],["2026-06-22",113,21,60,3,20,8,1],["2026-06-23",72,11,35,3,14,9,0],["2026-06-24",75,14,38,6,7,9,1],["2026-06-25",74,19,36,0,19,0,0],["2026-06-26",78,7,62,2,7,0,0],["2026-06-27",66,12,44,2,8,0,0],["2026-06-28",55,1,37,6,11,0,0],["2026-06-29",80,10,50,4,16,0,0],["2026-06-30",38,3,22,1,12,0,0],["2026-07-01",33,1,26,0,6,0,0],["2026-07-02",49,7,26,4,12,0,0],["2026-07-03",44,7,21,1,15,0,0],["2026-07-04",46,9,12,8,14,2,1],["2026-07-05",51,1,22,3,24,0,1],["2026-07-06",33,1,20,2,10,0,0],["2026-07-07",46,15,15,2,14,0,0],["2026-07-08",37,5,20,3,8,1,0],["2026-07-09",51,1,26,7,16,1,0],["2026-07-10",49,5,19,11,13,1,0],["2026-07-11",40,1,18,4,16,1,0],["2026-07-12",47,4,16,10,14,3,0],["2026-07-13",31,6,13,2,10,0,0],["2026-07-14",18,0,10,0,8,0,0],["2026-07-15",35,7,18,3,7,0,0],["2026-07-16",33,8,15,3,7,0,0],["2026-07-17",15,3,5,1,6,0,0],["2026-07-18",34,3,11,4,15,1,0],["2026-07-19",82,5,16,5,56,0,0],["2026-07-20",33,2,20,1,10,0,0],["2026-07-21",55,13,17,9,16,0,0],["2026-07-22",56,6,32,6,12,0,0],["2026-07-23",34,1,20,2,11,0,0],["2026-07-24",52,7,21,8,15,1,0],["2026-07-25",93,3,24,44,22,0,0],["2026-07-26",57,0,29,9,19,0,0],["2026-07-27",58,3,23,13,19,0,0],["2026-07-28",73,6,39,8,20,0,0],["2026-07-29",46,5,27,3,11,0,0],["2026-07-30",30,3,20,3,3,1,0],["2026-07-31",26,4,7,3,12,0,0],["2026-08-01",45,4,23,7,11,0,0],["2026-08-02",36,1,20,7,8,0,0],["2026-08-03",67,7,47,0,13,0,0],["2026-08-04",50,10,26,4,8,1,1],["2026-08-05",49,1,37,3,8,0,0],["2026-08-06",48,2,20,4,22,0,0],["2026-08-07",28,1,15,4,8,0,0],["2026-08-08",28,0,18,7,3,0,0],["2026-08-09",69,1,14,47,7,0,0],["2026-08-10",35,5,20,6,3,0,1],["2026-08-11",55,0,32,3,20,0,0],["2026-08-12",40,1,13,19,6,1,0],["2026-08-13",60,10,39,4,6,1,0],["2026-08-14",29,2,15,6,6,0,0],["2026-08-15",37,5,23,0,9,0,0],["2026-08-16",57,5,4,37,11,0,0],["2026-08-17",38,14,9,1,14,0,0],["2026-08-18",56,7,32,9,8,0,0],["2026-08-19",33,5,9,2,14,2,1],["2026-08-20",51,4,32,7,8,0,0],["2026-08-21",50,1,24,4,20,1,0],["2026-08-22",61,3,23,2,32,1,0],["2026-08-23",44,3,19,1,20,1,0],["2026-08-24",61,3,21,5,32,0,0],["2026-08-25",38,6,18,1,13,0,0],["2026-08-26",60,13,28,2,17,0,0],["2026-08-27",40,7,14,5,14,0,0],["2026-08-28",43,4,21,3,15,0,0],["2026-08-29",53,0,12,1,40,0,0],["2026-08-30",49,4,13,1,30,1,0],["2026-08-31",81,21,30,3,27,0,0],["2026-09-01",70,4,23,7,35,1,0],["2026-09-02",88,5,43,4,34,2,0],["2026-09-03",80,13,31,0,34,1,1],["2026-09-04",86,21,17,5,43,0,0],["2026-09-05",72,6,23,3,38,1,1],["2026-09-06",105,3,35,6,60,0,1],["2026-09-07",72,6,31,8,27,0,0],["2026-09-08",85,2,35,6,41,1,0]];
+
+const LANGS = [
+  {k:'간체', full:'중국어(간체)', i:2, c:'var(--l-cn)'},
+  {k:'영어', full:'영어',        i:3, c:'var(--l-en)'},
+  {k:'번체', full:'중국어(번체)', i:4, c:'var(--l-tw)'},
+  {k:'일어', full:'일본어',      i:5, c:'var(--l-jp)'},
+  {k:'인니', full:'인도네시아어', i:6, c:'var(--l-id)'},
+  {k:'몽골', full:'몽골어',      i:7, c:'var(--l-mn)'},
+];
+const DOW = ['일','월','화','수','목','금','토'];
+const nf = n => n.toLocaleString('ko-KR');
+const md = s => s.slice(5).replace('-','/');
+const mLabel = k => k.slice(5).replace(/^0/,'') + '월';
+
+/* 월별 집계 (전체 기준, 필터와 무관하게 고정) */
+const months = {};
+ROWS.forEach(r => {
+  const m = r[0].slice(0,7);
+  months[m] = months[m] || {days:0, tot:0, langs:LANGS.map(()=>0)};
+  months[m].days++; months[m].tot += r[1];
+  LANGS.forEach((l,j)=> months[m].langs[j] += r[l.i]);
+});
+const mKeys = Object.keys(months).sort();
+const grandAll = ROWS.reduce((a,r)=>a+r[1],0);
+
+/* 상태 */
+const S = {month:'all', lang:'all', sort:'date'};
+const colOf = () => S.lang === 'all' ? 1 : LANGS[S.lang].i;
+const metricName = () => S.lang === 'all' ? '총 클릭' : LANGS[S.lang].full;
+
+/* 필터 바 */
+function seg(el, items, get, set){
+  el.innerHTML = items.map(o=>
+    `<button type="button" data-v="${o.v}" ${o.c?`style="--c:${o.c}"`:''} aria-pressed="${String(get())===String(o.v)}">${o.c?'<i></i>':''}${o.t}</button>`
+  ).join('');
+  el.onclick = e => {
+    const b = e.target.closest('button[data-v]');
+    if(!b) return;
+    set(b.dataset.v);
+    render();
+  };
+}
+function buildBar(){
+  seg(document.getElementById('segMonth'),
+    [{v:'all',t:'전체 100일'}, ...mKeys.map(k=>({v:k,t:mLabel(k)}))],
+    ()=>S.month, v=>S.month=v);
+  seg(document.getElementById('segLang'),
+    [{v:'all',t:'전체'}, ...LANGS.map((l,j)=>({v:j,t:l.k,c:l.c}))],
+    ()=>S.lang, v=>S.lang = v==='all' ? 'all' : +v);
+  seg(document.getElementById('segSort'),
+    [{v:'date',t:'날짜순'},{v:'clicks',t:'클릭 많은 순'}],
+    ()=>S.sort, v=>S.sort=v);
+}
+
+/* 렌더 */
+function render(){
+  const base = S.month==='all' ? ROWS : ROWS.filter(r=>r[0].slice(0,7)===S.month);
+  const ci = colOf();
+  const vals = base.map(r=>r[ci]);
+  const sum = vals.reduce((a,b)=>a+b,0);
+  const maxV = Math.max(...vals, 1);
+  const maxRow = base.reduce((a,r)=> r[ci]>a[ci] ? r : a);
+  const minRow = base.reduce((a,r)=> r[ci]<a[ci] ? r : a);
+  const topSet = new Map([...base].sort((a,b)=>b[ci]-a[ci]).slice(0,10).map((r,n)=>[r[0],n+1]));
+
+  /* 필터 바 요약 */
+  document.getElementById('barnote').innerHTML =
+    `<b>${base.length}</b>일 · <b>${nf(sum)}</b>건 (전체의 ${(sum/grandAll*100).toFixed(1)}%)`;
+
+  /* 요약 스트립 */
+  document.getElementById('summary').innerHTML = [
+    [metricName()+' 합계', nf(sum), '건'],
+    ['일평균', (sum/base.length).toFixed(1), '건'],
+    ['최고일', nf(maxRow[ci]), md(maxRow[0])],
+    ['최저일', nf(minRow[ci]), md(minRow[0])],
+  ].map(([t,v,s])=>`<div><dt>${t}</dt><dd>${v}<small>${s}</small></dd></div>`).join('');
+
+  renderMonths();
+  renderChart(base, ci, maxRow[0]);
+  renderDaily(base, ci, maxV, topSet);
+}
+
+function renderMonths(){
+  const mAvgMax = Math.max(...mKeys.map(k=>months[k].tot/months[k].days));
+  let h = `<thead><tr><th>월</th><th>일수</th><th>합계</th><th>일평균</th><th>전월 대비</th><th class="trackcell">일평균 비교</th><th>최다 언어</th></tr></thead><tbody>`;
+  mKeys.forEach((k,idx)=>{
+    const m = months[k], a = m.tot/m.days;
+    let d = '<span class="delta flat">기준</span>';
+    if (idx>0){
+      const p = months[mKeys[idx-1]].tot/months[mKeys[idx-1]].days;
+      const pct = (a-p)/p*100;
+      const cls = pct>1 ? 'up' : pct<-1 ? 'down' : 'flat';
+      const sign = pct>0 ? '▲' : pct<0 ? '▼' : '';
+      d = `<span class="delta ${cls}">${sign} ${Math.abs(pct).toFixed(0)}%</span>`;
+    }
+    const bi = m.langs.indexOf(Math.max(...m.langs));
+    const share = (m.langs[bi]/m.tot*100).toFixed(0);
+    const label = mLabel(k) + (k==='2026-09' ? ' <small style="color:var(--muted)">1~8일</small>' : '');
+    h += `<tr data-m="${k}" aria-selected="${S.month===k}"><td>${label}</td><td>${m.days}</td><td class="tot">${nf(m.tot)}</td><td class="tot">${a.toFixed(1)}</td><td>${d}</td>
+      <td class="trackcell"><div class="track"><span style="width:${(a/mAvgMax*100).toFixed(1)}%"></span></div></td>
+      <td style="color:${LANGS[bi].c};font-weight:600">${LANGS[bi].k} ${share}%</td></tr>`;
+  });
+  const t = document.getElementById('monthTbl');
+  t.innerHTML = h + '</tbody>';
+  t.tBodies[0].onclick = e => {
+    const tr = e.target.closest('tr[data-m]');
+    if(!tr) return;
+    S.month = (S.month===tr.dataset.m) ? 'all' : tr.dataset.m;
+    render();
+  };
+}
+
+function renderChart(rows, ci, peakDate){
+  const W=1000,H=320, L=46,R=12,T=16,B=30;
+  const iw=W-L-R, ih=H-T-B;
+  const totals = rows.map(r=>r[ci]);
+  const rawMax = Math.max(...totals, 1);
+  const step = rawMax>150 ? 50 : rawMax>60 ? 20 : rawMax>24 ? 10 : 5;
+  const yMax = Math.max(step, Math.ceil(rawMax/step)*step);
+  const x = i => L + (i+0.5)*(iw/rows.length);
+  const y = v => T + ih - (v/yMax)*ih;
+  const bw = Math.min(26, Math.max(2, iw/rows.length - 2.2));
+  const accent = S.lang==='all' ? 'var(--rose)' : LANGS[S.lang].c;
+  let s = '';
+  for(let v=0; v<=yMax; v+=step){
+    s += `<line x1="${L}" y1="${y(v)}" x2="${W-R}" y2="${y(v)}" stroke="var(--grid)" stroke-width="1"/>`;
+    s += `<text x="${L-9}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="var(--muted)">${v}</text>`;
+  }
+  rows.forEach((r,i)=>{
+    const h = Math.max(1, ih - (y(r[ci])-T));
+    const hi = r[0]===peakDate;
+    s += `<rect x="${(x(i)-bw/2).toFixed(1)}" y="${y(r[ci]).toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" fill="${hi?accent:'var(--bar)'}" ${hi?'':'opacity="0.9"'}><title>${r[0]} · ${r[ci]}건</title></rect>`;
+  });
+  if(S.month==='all'){
+    rows.forEach((r,i)=>{
+      if(i>0 && r[0].slice(0,7)!==rows[i-1][0].slice(0,7)){
+        const px = x(i)-bw/2-1.1;
+        s += `<line x1="${px.toFixed(1)}" y1="${T}" x2="${px.toFixed(1)}" y2="${T+ih}" stroke="var(--line-2)" stroke-width="1" stroke-dasharray="3 3"/>`;
+      }
+    });
+  }
+  const ma = totals.map((_,i)=>{
+    const sl = totals.slice(Math.max(0,i-6), i+1);
+    return sl.reduce((a,b)=>a+b,0)/sl.length;
+  });
+  s += `<path d="${ma.map((v,i)=>`${i?'L':'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ')}" fill="none" stroke="${accent}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>`;
+  s += `<circle cx="${x(rows.length-1).toFixed(1)}" cy="${y(ma[ma.length-1]).toFixed(1)}" r="3.6" fill="${accent}"/>`;
+  if(S.month==='all'){
+    const seen={};
+    rows.forEach((r,i)=>{ const m=r[0].slice(0,7); if(!(m in seen)) seen[m]=i; });
+    Object.entries(seen).forEach(([m,i])=>{
+      s += `<text x="${x(i)}" y="${H-9}" font-size="11.5" fill="var(--muted)" text-anchor="start">${mLabel(m)}</text>`;
+    });
+  } else {
+    rows.forEach((r,i)=>{
+      const day = +r[0].slice(8);
+      if(day===1 || day%5===0){
+        s += `<text x="${x(i)}" y="${H-9}" font-size="11.5" fill="var(--muted)" text-anchor="middle">${day}</text>`;
+      }
+    });
+  }
+  document.getElementById('chart').innerHTML = s;
+
+  document.getElementById('chartTitle').textContent =
+    (S.lang==='all' ? '일별 클릭 추이' : `일별 ${LANGS[S.lang].full} 클릭 추이`);
+  document.getElementById('chartNote').textContent =
+    `막대는 일별 ${metricName()}, 선은 7일 이동평균.` + (S.month==='all' ? ' 점선은 월 경계.' : '');
+  document.getElementById('legend').innerHTML =
+    `<span><i style="background:var(--bar)"></i>일별 ${metricName()}</span>
+     <span><i class="ln" style="background:${accent}"></i>7일 이동평균</span>
+     <span><i style="background:${accent};opacity:.85"></i>최고일</span>`;
+}
+
+function renderDaily(rows, ci, maxV, topSet){
+  const sorted = S.sort==='clicks'
+    ? [...rows].sort((a,b)=> b[ci]-a[ci] || (a[0]<b[0]?-1:1))
+    : rows;
+  const showBreaks = S.sort==='date' && S.month==='all';
+  const metricTh = S.lang==='all' ? '총 클릭' : LANGS[S.lang].k + ' 클릭';
+
+  let h = `<thead><tr><th>날짜</th><th>${metricTh}</th>${LANGS.map((l,j)=>`<th style="color:${l.c}" class="${S.lang!=='all'&&S.lang!==j?'dim':''}">${l.k}</th>`).join('')}</tr></thead><tbody>`;
+  let cur='';
+  sorted.forEach(r=>{
+    if(showBreaks){
+      const m = r[0].slice(0,7);
+      if(m!==cur){
+        cur=m;
+        const mm = months[m];
+        h += `<tr class="mbreak"><td colspan="${2+LANGS.length}">${mLabel(m)} · ${mm.days}일 · 합계 ${nf(mm.tot)} · 일평균 ${(mm.tot/mm.days).toFixed(1)}</td></tr>`;
+      }
+    }
+    const w = new Date(r[0]+'T00:00:00').getDay();
+    const cls = w===0?'sun':w===6?'sat':'';
+    const rk = topSet.get(r[0]);
+    h += `<tr><td>${rk?`<span class="rank">${rk}</span>`:'<span class="rank"></span>'}${md(r[0])}<span class="dow ${cls}">${DOW[w]}</span></td>
+      <td><div class="miniwrap"><div class="mini"><span style="width:${(r[ci]/maxV*100).toFixed(0)}%"></span></div><span class="tot-c ${rk?'peak':''}">${nf(r[ci])}</span></div></td>
+      ${LANGS.map((l,j)=>`<td class="${r[l.i]===0?'zero':''} ${S.lang!=='all'&&S.lang!==j?'dim':''}">${r[l.i]}</td>`).join('')}</tr>`;
+  });
+  document.getElementById('dailyTbl').innerHTML = h + '</tbody>';
+  document.getElementById('dailyNote').textContent =
+    `${S.month==='all' ? '100일 전체' : mLabel(S.month)+' '+rows.length+'일'} · ` +
+    `${S.sort==='clicks' ? '클릭 많은 순' : '날짜순'} · ${metricName()} 상위 10일은 순위와 함께 강조.`;
+}
+
+/* 푸터 (전체 100일 고정) */
+document.getElementById('foot').innerHTML =
+  `언어 비중 (100일 누계)<br>` +
+  LANGS.map(l=>({k:l.k, v:ROWS.reduce((a,r)=>a+r[l.i],0), c:l.c}))
+    .sort((a,b)=>b.v-a.v)
+    .map(o=>`<b style="color:${o.c}">${o.k} ${(o.v/grandAll*100).toFixed(0)}%</b>`).join(' · ') +
+  `<br>출처: K-Beauty Station 어드민 대시보드 › 버튼 클릭 현황 (스토어 + 상품 합계). 일자별로 조회해 수집.<br>` +
+  `검증: 100일 전건 <b>총 건수 = 언어별 합계 = 버튼 유형별 합계</b> 일치 확인.`;
+
+/* 스티키 헤더 오프셋 */
+const barEl = document.querySelector('.bar');
+const syncBar = () => document.documentElement.style.setProperty('--tbh', barEl.offsetHeight + 'px');
+window.addEventListener('resize', syncBar);
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(syncBar);
+
+buildBar();
+render();
+syncBar();
+</script>
