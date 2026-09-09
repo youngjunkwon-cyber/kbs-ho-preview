@@ -75,6 +75,7 @@ button{font-family:inherit;font-size:13px}
 .filters{padding:16px 20px;border-bottom:1px solid #f0f0f0;display:flex;flex-direction:column;gap:8px}
 .frow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 select,input[type=text]{height:32px;padding:0 8px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;font-family:inherit;font-size:13px;color:#262626}
+textarea{width:100%;min-height:220px;padding:10px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;font-family:inherit;font-size:13px;line-height:1.8;color:#262626;resize:vertical}
 select:disabled,input:disabled{background:#f5f5f5;color:#bfbfbf;cursor:not-allowed}
 select.dim{color:#8c8c8c}
 .fl{display:inline-flex;flex-direction:column;gap:3px}
@@ -173,7 +174,9 @@ const MSG = {
   bnTarget:    '연결된 콘텐츠가 알리페이에 노출되지 않아 이 배너도 노출되지 않습니다.',
   hostHidden:  '이 상품은 알리페이에는 노출되지 않아요.',
   storeDefault:'기본 설정 선택 시 스토어에 설정된 버튼 구성을 동일하게 적용합니다.',
-  msgLang:     '메신저 설정이 ON일 때만 언어별로 메신저를 하나씩 설정할 수 있습니다.'
+  msgLang:     '메신저 설정이 ON일 때만 언어별로 메신저를 하나씩 설정할 수 있습니다.',
+  edBlock:     '외부 사이트 주소는 넣을 수 없습니다. K-Beauty Station 안의 주소만 넣을 수 있습니다.',
+  edStrip:     n => '외부 링크 ' + n + '개가 제거되었습니다.'
 };
 
 /* ------------------------------- 데이터 ------------------------------- */
@@ -274,12 +277,37 @@ const DB = {
       products: ['P3'], stores: [], history: [] }
   ],
   influencers: [{ id: 'IF1', name: '지우 (@jiwoo)' }],
+  magazines: [{ id: 'M1', title: '가을 두피 관리 가이드', lang: '중국어(간체)', status: '게시', reg: '2026-09-02 11:20',
+    body: '가을에는 두피가 건조해집니다. 자세한 코스는 <a href="https://k-beautystation.com/products/P1">상품 페이지</a>에서 확인하세요. 후기 영상은 https://www.instagram.com/p/abc/ 에서 볼 수 있습니다. <iframe src="https://www.youtube.com/embed/xyz"></iframe>' }],
   errors: {}
 };
+/* 에디터 링크 판정 (BO-CH-07). 본문 에디터는 매거진과 스토어 칼럼에만 있다. */
+const INTERNAL_HOSTS = ['k-beautystation.com', 'www.k-beautystation.com', 'host.kbstations.com', 'admin.k-beautystation.com'];
+function isExternalUrl(u) {
+  const v = String(u).trim();
+  if (!v) return false;
+  if (/^(javascript|data|vbscript):/i.test(v)) return true;
+  if (/^\/\//.test(v)) return true;
+  if (/^\//.test(v)) return false;
+  try { return INTERNAL_HOSTS.indexOf(new URL(v).hostname.toLowerCase()) === -1; } catch (e) { return true; }
+}
+function toRelative(u) { try { const x = new URL(u); if (INTERNAL_HOSTS.indexOf(x.hostname.toLowerCase()) !== -1) return x.pathname + x.search + x.hash; } catch (e) {} return u; }
+function scanBody(text) {
+  const urls = String(text).match(/(?:https?:)?\/\/[^\s"'<>)]+|javascript:[^\s"'<>)]*|data:[^\s"'<>)]*/gi) || [];
+  return { ext: urls.filter(isExternalUrl), emb: String(text).match(/<\s*(iframe|script|object|embed)\b/gi) || [] };
+}
+function stripBody(text) {
+  let t = String(text).replace(/<\s*(iframe|script|object|embed)\b[\s\S]*?(<\/\s*\1\s*>|>)/gi, '');
+  t = t.replace(/<a\b[^>]*href\s*=\s*["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi, (m, href, inner) => isExternalUrl(href) ? inner : m);
+  t = t.replace(/https?:\/\/[^\s"'<>)]+/gi, m => isExternalUrl(m) ? '' : toRelative(m));
+  t = t.replace(/(?:\/\/|javascript:|data:)[^\s"'<>)]+/gi, m => isExternalUrl(m) ? '' : m);
+  return t.replace(/[ \t]{2,}/g, ' ').trim();
+}
 const S = id => DB.stores.filter(x => x.id === id)[0];
 const P = id => DB.products.filter(x => x.id === id)[0];
 const A = id => DB.ads.filter(x => x.id === id)[0];
 const C = id => DB.collections.filter(x => x.id === id)[0];
+const M = id => DB.magazines.filter(x => x.id === id)[0];
 
 /* ---------------------------- 유효 버튼 ---------------------------- */
 function effBtns(p) {
@@ -415,8 +443,8 @@ const F = () => FILTERS[VIEW.name] || { ali: '전체', rsn: '전체' };
 const el = s => document.querySelector(s);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const TITLES = { 'p-list': '입점사 스토어별 상품 정보 관리', 's-list': '스토어 정보 관리', 's-edit': '스토어 정보 수정',
-  'a-list': '광고 관리', 'c-list': '기획전 관리', 'h-edit': '상품 수정 (호스트)' };
-const SCREEN_ID = { 'p-list': 'BO-CH-02 / BO-CH-01', 's-list': 'BO-CH-04', 's-edit': 'BO-CH-03', 'a-list': 'BO-CH-06 / BO-CH-05', 'c-list': 'BO-CH-09 / BO-CH-08', 'h-edit': 'HOST-CH-01' };
+  'a-list': '광고 관리', 'c-list': '기획전 관리', 'm-edit': '매거진 등록·수정', 'btn-spec': '버튼 설정 공통 구조', 'h-edit': '상품 수정 (호스트)' };
+const SCREEN_ID = { 'p-list': 'BO-CH-02 / BO-CH-01', 's-list': 'BO-CH-04', 's-edit': 'BO-CH-03', 'a-list': 'BO-CH-06 / BO-CH-05', 'c-list': 'BO-CH-09 / BO-CH-08', 'm-edit': 'BO-CH-07', 'btn-spec': 'BO-CH-10', 'h-edit': 'HOST-CH-01' };
 
 function go(name, id) { VIEW.name = name; if (id !== undefined) VIEW.id = id; if (name === 's-edit') VIEW.sect = 2; render(); window.scrollTo(0, 0); }
 window.go = go;
@@ -443,10 +471,11 @@ const MENU = [
   ['처음으로'], ['공지사항'], ['예약'], ['고객지원'], ['회원'],
   ['스토어', ['정보관리', 's-list'], ['채팅조회'], ['상담조회'], ['리뷰관리'], ['이미지 관리']],
   ['상품', ['상품정보관리', 'p-list'], ['상품채팅조회'], ['상품상담조회'], ['상품리뷰관리']],
-  ['옵션 관리'], ['매거진'], ['스토어 칼럼'], ['SEO'], ['AI 관리'], ['채팅'], ['상담'], ['리뷰'], ['계정'],
+  ['옵션 관리'], ['매거진', null, 'm-edit'], ['스토어 칼럼'], ['SEO'], ['AI 관리'], ['채팅'], ['상담'], ['리뷰'], ['계정'],
   ['광고정보관리', null, 'a-list'], ['쿠폰'],
   ['기획전', ['기획전 관리', 'c-list'], ['유형 관리']],
-  ['인플루언서'], ['통계'], ['호스트 상품 수정 (시안용)', null, 'h-edit']
+  ['인플루언서'], ['통계'],
+  ['버튼 설정 공통 (시안용)', null, 'btn-spec'], ['호스트 상품 수정 (시안용)', null, 'h-edit']
 ];
 function renderSide() {
   let h = '<div class="logo">ADMIN</div>';
@@ -918,6 +947,99 @@ function screen_hEdit() {
     '</div></div>';
 }
 
+/* --------------------- BO-CH-10 · 버튼 설정 공통 구조 --------------------- */
+const SPEC_ROWS = [
+  ['상담접수', 0, '가능. 자체 기능이다.'],
+  ['문의하기(상담+채팅)로 통합 노출', 0, '가능. 같은 열의 상담접수가 ON일 때만 켤 수 있다. 상담접수와 한 자리를 쓴다.'],
+  ['채팅', 1, '가능. 인앱 채팅이라 웹 열에서도 켤 수 있다.'],
+  ['외부링크 설정', 0, '알리페이 열 비활성 고정. 알리페이 안에서 열리지 않는다.'],
+  ['메신저 설정', 0, '같은 처리. 채널·URL·QR 입력은 기존 언어별 구조 그대로다.'],
+  ['예약', 0, '가능. 예약설정에서 예약을 켠 뒤에만. 스토어에만 있는 행이다.']
+];
+function screen_btnSpec() {
+  const ON = { '상담접수': 1, '문의하기(상담+채팅)로 통합 노출': 1, '예약': 1 };
+  let rows = '';
+  SPEC_ROWS.forEach(r => {
+    const on = !!ON[r[0]];
+    const hard = r[0] === '외부링크 설정' || r[0] === '메신저 설정';
+    rows += '<tr><td><span class="req">*</span>' + r[0] + (r[1] ? '<span class="newbadge">신규</span>' : '') + '</td>' +
+      '<td>' + onoff('sp_w_' + r[0], on, 'void(%V%)', true) + '</td>' +
+      '<td class="new' + (hard ? ' lock' : '') + '">' + onoff('sp_a_' + r[0], on, 'void(%V%)', true) + '</td>' +
+      '<td class="tblnote">' + r[2] + '</td></tr>';
+  });
+  return '<div class="phd"><div><h2 class="page">버튼 설정 공통 구조</h2>' +
+    '<div class="pdesc">상품과 스토어가 같은 구조를 씁니다. 이 화면은 구조를 보여주는 시안용이고, 실제 조작은 상품 수정과 스토어 정보 수정에서 합니다.</div></div></div>' +
+    '<div class="card"><div class="hd">표 구조</div><div class="bd"><div class="tblwrap">' +
+    '<table><thead><tr><th style="min-width:300px">항목</th><th style="width:220px">웹</th>' +
+    '<th class="new" style="width:220px">알리페이<span class="newbadge">신규</span></th><th style="min-width:320px">항목별 규칙</th></tr></thead>' +
+    '<tbody>' + rows + '</tbody></table></div>' +
+    '<div class="hint">폭은 항목 300 · 웹 220 · 알리페이 220 · 나머지 안내입니다. 셀은 ON·OFF 라디오이고 필수 표시는 기존 그대로입니다.</div>' +
+    '</div></div>' +
+    '<div class="card"><div class="hd">자리 계산과 상한</div><div class="bd">' +
+    '<div class="row"><div class="lbl">자리 계산</div><div class="val">문의하기 통합이 ON이면 문의하기 한 자리(상담접수 포함). 통합이 OFF이고 상담접수가 ON이면 상담접수 한 자리. 채팅 · 외부링크 · 메신저 · 예약은 각각 한 자리입니다.</div></div>' +
+    '<div class="row"><div class="lbl">상한</div><div class="val">웹 열 자리 최대 둘, 알리페이 열 자리 최대 둘. 동시에 가능합니다. 셋째 자리를 만들려 하면 막습니다.</div></div>' +
+    '<div class="row"><div class="lbl">지금 예시</div><div class="val">웹 2개(문의하기 / 예약) · 알리페이 2개(문의하기 / 예약). 상한에 딱 맞는 상태입니다.</div></div>' +
+    '</div></div>' +
+    '<div class="card"><div class="hd">알리페이 열에 ON이 없을 때</div><div class="bd">' +
+    '<div class="notice">' + MSG.noAliBtn + '</div>' +
+    '<div class="hint">버튼 설정 블록 하단에 이 안내가 나옵니다. 알리페이 노출 라디오는 손댈 수 있는 상태로 둡니다.</div>' +
+    '</div></div>';
+}
+
+/* --------------------- BO-CH-07 · 매거진 등록·수정 --------------------- */
+window.EDBUF = null;
+window.openLinkModal = function () { MODAL = 'link'; LINKERR = ''; render(); };
+let LINKERR = '';
+window.tryInsertLink = function () {
+  const box = el('#linkurl'); const v = box ? box.value : '';
+  if (!v.trim()) { LINKERR = '주소를 넣어 주세요.'; render(); return; }
+  if (isExternalUrl(v)) { LINKERR = MSG.edBlock; render(); return; }
+  const m = M('M1');
+  const cur = window.EDBUF != null ? window.EDBUF : m.body;
+  m.body = cur + ' <a href="' + v.trim() + '">' + v.trim() + '</a>';
+  window.EDBUF = null; MODAL = null; LINKERR = ''; render();
+};
+window.saveMagazine = function () {
+  const m = M('M1');
+  const cur = window.EDBUF != null ? window.EDBUF : m.body;
+  const sc = scanBody(cur);
+  const n = sc.ext.length + sc.emb.length;
+  m.body = stripBody(cur); window.EDBUF = null;
+  render();
+  alertBox('저장했습니다', n ? MSG.edStrip(n) : '본문을 저장했습니다.');
+};
+function screen_mEdit() {
+  const m = M('M1');
+  const sc = scanBody(m.body);
+  return '<div class="phd"><div><h2 class="page">매거진 등록·수정</h2>' +
+    '<div class="pdesc">매거진 본문 에디터에서 외부 링크와 외부 임베드를 넣을 수 없게 막습니다. 알리페이 노출 설정은 두지 않습니다.</div></div>' +
+    '<div><button class="btn">목록</button></div></div>' +
+    '<div class="card"><div class="hd">기본 정보</div><div class="bd">' +
+    '<div class="row"><div class="lbl">제목</div><div class="val">' + esc(m.title) + '</div></div>' +
+    '<div class="row"><div class="lbl">언어</div><div class="val">' + m.lang + '</div></div>' +
+    '<div class="row"><div class="lbl">상태</div><div class="val"><span class="tag on">' + m.status + '</span> <span class="tblnote">기존 항목</span></div></div>' +
+    '<div class="hint">알리페이 노출 설정 대상이 아니라 관련 항목이 없습니다.</div>' +
+    '</div></div>' +
+    '<div class="card"><div class="hd">본문<span class="newbadge">링크 차단 신규</span></div><div class="bd">' +
+    '<div class="frow" style="margin-bottom:10px"><button class="btn" onclick="openLinkModal()">링크 넣기</button>' +
+    '<span class="tblnote" style="align-self:center">' + MSG.edBlock + '</span></div>' +
+    '<textarea oninput="EDBUF=this.value">' + esc(m.body) + '</textarea>' +
+    (sc.ext.length || sc.emb.length ? '<div class="notice">지금 본문에 외부 링크 ' + sc.ext.length + '개, 외부 임베드 ' + sc.emb.length + '개가 남아 있습니다. 저장하면 제거됩니다.</div>' : '') +
+    '<div class="hint">내부 링크는 저장할 때 상대 경로로 바뀝니다. 판정은 호스트 완전 일치이고 허용 스킴은 http · https · 상대 경로뿐입니다.</div>' +
+    '</div><div class="ft"><button class="btn" onclick="EDBUF=null;render()">취소</button>' +
+    '<button class="btn blue" onclick="saveMagazine()">저장</button></div></div>';
+}
+function modal_link() {
+  return '<div class="mask"><div class="modal" style="max-width:560px"><div class="hd">링크 넣기<button class="x" onclick="closeMD()">✕</button></div>' +
+    '<div class="bd">' +
+    '<div style="font-size:12px;font-weight:500;color:#595959;margin-bottom:6px">주소</div>' +
+    '<input type="text" id="linkurl" style="width:100%" placeholder="https://k-beautystation.com/products/P1 또는 /products/P1">' +
+    (LINKERR ? '<div class="notice">' + LINKERR + '</div>' : '') +
+    '<div class="hint">내부 링크는 저장할 때 상대 경로로 바뀝니다.</div>' +
+    '</div><div class="ft"><button class="btn" onclick="closeMD()">취소</button>' +
+    '<button class="btn blue" onclick="tryInsertLink()">넣기</button></div></div></div>';
+}
+
 /* ------------------------------- 저장 ------------------------------- */
 window.save = function (kind) {
   const obj = kind === 'store' ? S(VIEW.id) : P(VIEW.id);
@@ -952,16 +1074,20 @@ window.alertBox = alertBox;
 
 /* --------------------------- 확인용 패널 --------------------------- */
 function railFor() {
-  let obj = null, j = null, title = '';
+  let obj = null, j = null, title = '', noJudge = '';
   if (MODAL === 'product') { obj = P(VIEW.id); j = judgeProduct(obj); title = obj.name; }
   else if (VIEW.name === 's-edit') { obj = S(VIEW.id); j = judgeStore(obj); title = obj.name; }
   else if (MODAL === 'ad') { obj = A(VIEW.id); j = judgeAd(obj); title = obj.title; }
   else if (MODAL === 'coll') { obj = C(VIEW.id); j = judgeCollection(obj); title = obj.name; }
   else if (VIEW.name === 'h-edit') { obj = P('P8'); j = judgeProduct(obj); title = obj.name; }
+  else if (VIEW.name === 'm-edit' || VIEW.name === 'btn-spec') noJudge = VIEW.name === 'm-edit'
+    ? '매거진은 알리페이 노출 설정 대상이 아닙니다. 판정이 없고 에디터 링크 차단만 적용됩니다.'
+    : '공통 구조를 보여주는 화면이라 판정 대상이 없습니다. 실제 판정은 상품 수정과 스토어 정보 수정에서 확인합니다.';
 
   let html = '<div class="rail toolbar"><div class="bd">아래 패널은 화면이 아니라 로직을 확인하기 위한 도구입니다. 개발 대상이 아닙니다.<br>' +
     '화면 골격은 라이브 어드민 실측 기준이고, 분홍색 <span class="newbadge">신규</span> 표시가 이번에 추가되는 항목입니다.<br>' +
     '지금 화면 <b>' + (SCREEN_ID[VIEW.name] || '-') + '</b></div></div>';
+  if (noJudge) html += '<div class="rail"><div class="hd">판정 결과</div><div class="bd"><div class="result q">판정 대상 아님<small>' + noJudge + '</small></div></div></div>';
   if (j) {
     const cls = j.na ? 'q' : j.visible ? 'y' : 'n';
     const lab = j.na ? '판정 대상 아님' : j.visible ? '알리페이에 노출' : '알리페이에 미노출';
@@ -1033,6 +1159,10 @@ function scenarios() {
       run: function () { const p = P('P2'); p.mode = '개별 설정'; p.btns.consult.ali = true; p.btns.inquiry.ali = true; p.btns.chat.ali = true; p.btns.consult.web = true; p.btns.inquiry.web = true; p.btns.chat.web = true; VIEW.lang = p.lang; go('p-list'); openProduct('P2'); } },
     { id: 'SYS-CH-03', t: '마이그레이션 위반 건 (웹 3개)', d: '배치가 값을 건드리지 않고 넘긴 건입니다. OK를 누르면 상한 검증에 걸립니다.',
       run: function () { const p = P('P10'); p.btns.consult.web = true; p.btns.chat.web = true; p.btns.messenger.web = true; VIEW.lang = p.lang; go('p-list'); openProduct('P10'); } },
+    { id: 'BO-CH-07', t: '매거진 본문 외부 링크 차단', d: '링크 넣기에서 외부 주소를 넣으면 막습니다. 저장하면 본문에 남은 외부 링크와 임베드를 지우고 개수를 알려 줍니다.',
+      run: function () { go('m-edit'); } },
+    { id: 'BO-CH-10', t: '버튼 설정 공통 구조', d: '상품과 스토어가 공유하는 표 구조와 자리 계산, 상한을 한 화면에서 봅니다.',
+      run: function () { go('btn-spec'); } },
     { id: 'SYS-CH-03', t: '메신저만 켜져 있던 상품', d: '알리페이에서는 메신저를 켤 수 없어, 배치가 채팅을 켜 노출되게 만듭니다.',
       run: function () { const p = P('P8'); p.mode = '개별 설정'; ROWS_PRODUCT.forEach(r => { p.btns[r.k].web = false; p.btns[r.k].ali = false; }); p.btns.messenger.web = true; p.btns.chat.ali = true; VIEW.lang = p.lang; go('p-list'); openProduct('P8'); } }
   ];
@@ -1045,10 +1175,11 @@ function newProduct() {
   if (!P('PN')) DB.products.push(p); else Object.assign(P('PN'), p);
   VIEW.lang = p.lang; go('p-list'); openProduct('PN');
 }
-const BASE = JSON.stringify({ products: DB.products, stores: DB.stores, ads: DB.ads, collections: DB.collections });
+const BASE = JSON.stringify({ products: DB.products, stores: DB.stores, ads: DB.ads, collections: DB.collections, magazines: DB.magazines });
 function applyBase() {
   const b = JSON.parse(BASE);
-  ['products', 'stores', 'ads', 'collections'].forEach(k => { DB[k].length = 0; b[k].forEach(x => DB[k].push(x)); });
+  ['products', 'stores', 'ads', 'collections', 'magazines'].forEach(k => { DB[k].length = 0; b[k].forEach(x => DB[k].push(x)); });
+  window.EDBUF = null;
   Object.keys(DB.errors).forEach(k => delete DB.errors[k]);
 }
 function clearFilters() { Object.keys(FILTERS).forEach(k => { FILTERS[k].ali = '전체'; FILTERS[k].rsn = '전체'; }); }
@@ -1057,11 +1188,12 @@ window.runScn = function (i) { applyBase(); MODAL = null; clearFilters(); scenar
 
 /* ------------------------------- 렌더 ------------------------------- */
 function render() {
-  const map = { 'p-list': screen_pList, 's-list': screen_sList, 's-edit': screen_sEdit, 'a-list': screen_aList, 'c-list': screen_cList, 'h-edit': screen_hEdit };
+  const map = { 'p-list': screen_pList, 's-list': screen_sList, 's-edit': screen_sEdit, 'a-list': screen_aList, 'c-list': screen_cList,
+    'm-edit': screen_mEdit, 'btn-spec': screen_btnSpec, 'h-edit': screen_hEdit };
   el('#side').innerHTML = renderSide();
   el('#screen').innerHTML = map[VIEW.name]();
   el('#rail').innerHTML = railFor();
-  const md = { product: modal_product, ad: modal_ad, coll: modal_coll };
+  const md = { product: modal_product, ad: modal_ad, coll: modal_coll, link: modal_link };
   const holder = document.getElementById('mdholder') || (function () { const d = document.createElement('div'); d.id = 'mdholder'; document.body.appendChild(d); return d; })();
   holder.innerHTML = MODAL && md[MODAL] ? md[MODAL]() : '';
 }
