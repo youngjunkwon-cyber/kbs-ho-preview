@@ -170,7 +170,7 @@ const MSG = {
   saveProd:    '알리페이 버튼이 모두 꺼져 이 콘텐츠가 알리페이에서 숨겨집니다. 저장할까요?',
   saveStore:   '알리페이 버튼이 모두 꺼져 스토어 페이지가 알리페이에서 숨겨집니다. 저장할까요?',
   bnExtLock:   '외부링크 배너는 알리페이에 노출되지 않아 이 설정을 바꿀 수 없습니다. 저장된 값은 그대로 보관합니다.',
-  bnBtnExtLock:'버튼 링크 종류가 외부링크라 알리페이 열이 잠기고, 이 배너는 알리페이에 노출되지 않습니다. 값은 그대로 보관합니다.',
+  bnBtnExtLock:'버튼 링크 종류가 외부링크라 알리페이 열이 비활성화로 고정되고, 이 배너는 알리페이에 노출되지 않습니다.',
   lockSelf:    '알리페이 노출이 미노출이라 알리페이 열이 잠깁니다. 값은 그대로 보관합니다.',
   lockStore:   '소속 스토어가 알리페이 미노출이라 이 값과 무관하게 상품은 알리페이에 노출되지 않습니다. 아래 버튼 설정의 알리페이 열도 함께 잠깁니다.',
   bnBtnOff:    '하단 버튼이 알리페이에서 꺼져 있어 이 배너는 알리페이에 노출되지 않습니다.',
@@ -315,15 +315,12 @@ const M = id => DB.magazines.filter(x => x.id === id)[0];
 /* ---------------------------- 유효 버튼 ---------------------------- */
 function effBtns(p) {
   const st = S(p.store); const out = {}; let chatAuto = false;
-  if (p.mode === '기본 설정') {
-    ROWS_PRODUCT.forEach(r => { out[r.k] = { web: !!st.btns[r.k].web, ali: !!st.btns[r.k].ali }; });
-    if (ctaList(out, ROWS_PRODUCT, 'ali').length === 0) { out.chat.ali = true; chatAuto = true; }
-  } else {
-    ROWS_PRODUCT.forEach(r => { out[r.k] = { web: !!p.btns[r.k].web, ali: !!p.btns[r.k].ali }; });
-  }
+  const src = p.mode === '기본 설정' ? st : p;
+  ROWS_PRODUCT.forEach(r => { out[r.k] = { web: !!src.btns[r.k].web, ali: !!src.btns[r.k].ali }; });
   ROWS_PRODUCT.filter(r => r.aliHardOff).forEach(r => { out[r.k].ali = false; });
   if (!out.consult.ali) out.inquiry.ali = false;
   if (!out.consult.web) out.inquiry.web = false;
+  if (p.mode === '기본 설정' && ctaList(out, ROWS_PRODUCT, 'ali').length === 0) { out.chat.ali = true; chatAuto = true; }
   return { btns: out, chatAuto };
 }
 function effStoreBtns(st) {
@@ -570,12 +567,10 @@ window.setBtn = function (kind, k, ch, on) {
   }
   const before = obj.btns[k][ch] ? 'ON' : 'OFF';
   obj.btns[k][ch] = !!on;
+  const cascade = k === 'consult' && !on && obj.btns.inquiry[ch];
   if (k === 'consult' && !on) obj.btns.inquiry[ch] = false;
-  logChange(obj, '버튼 설정 · ' + label + ' · ' + (ch === 'web' ? '웹' : '알리페이'), before, on ? 'ON' : 'OFF', kind === 'store' ? '소속 상품 ' + obj.prodCount + '건' : '');
-  if (ch === 'ali' && k === 'consult' && !on) {
-    const e = kind === 'store' ? effStoreBtns(obj) : effBtns(obj);
-    if (onCount(e.btns, rows, 'ali') === 0) confirmBox('저장 확인', kind === 'store' ? MSG.saveStore : MSG.saveProd, function () {}, function () { obj.btns[k][ch] = true; obj.history.shift(); render(); });
-  }
+  const note = [kind === 'store' ? '소속 상품 ' + obj.prodCount + '건' : '', cascade ? '문의하기 통합도 OFF' : ''].filter(Boolean).join(' · ');
+  logChange(obj, '버튼 설정 · ' + label + ' · ' + (ch === 'web' ? '웹' : '알리페이'), before, on ? 'ON' : 'OFF', note);
   render();
 };
 window.setVis = function (kind, v) {
@@ -606,8 +601,9 @@ function impactOfHiding(st) {
 }
 window.setMode = function (v) {
   const p = P(VIEW.id), st = S(p.store);
-  if (v === '개별 설정' && p.mode === '기본 설정') ROWS_PRODUCT.forEach(r => { p.btns[r.k].web = !!st.btns[r.k].web; p.btns[r.k].ali = false; });
-  logChange(p, '스토어 설정 적용', p.mode, v);
+  const fromDefault = v === '개별 설정' && p.mode === '기본 설정';
+  if (fromDefault) ROWS_PRODUCT.forEach(r => { p.btns[r.k].web = !!st.btns[r.k].web; p.btns[r.k].ali = false; });
+  logChange(p, '스토어 설정 적용', p.mode, v, fromDefault ? '웹 열 스토어 값 복사 · 알리페이 열 비움' : '');
   p.mode = v; render();
 };
 window.setErr = function (id, on) { if (on) DB.errors[id] = true; else delete DB.errors[id]; render(); };
@@ -775,9 +771,10 @@ function screen_aList() {
   const rows = DB.ads.filter(b => b.lang === VIEW.lang);
   const body = rows.map(b => { const j = judgeAd(b); if (!passFilter(j)) return '';
     const link = b.linkType === '외부링크' ? b.url : b.inner ? b.inner.kind + ' · ' + innerTargetOk(b.inner).label.split(' · ')[1] : '랜딩페이지';
-    return '<tr><td>' + b.reg + '</td><td>' + b.from + '</td><td>' + b.to + '</td><td>' + b.lang + '</td><td>' + b.pos + '</td><td>' + b.linkType + '</td>' +
-      '<td class="tblnote" style="max-width:220px;overflow:hidden;text-overflow:ellipsis">' + esc(link) + '</td><td>' + esc(b.biz) + '</td><td>' + esc(b.title) + '</td>' +
+    return '<tr><td>' + b.reg + '</td><td>' + b.from + '</td><td>' + b.to + '</td><td>' + b.lang + '</td><td>' + b.pos + '</td>' +
       '<td class="new c">' + visCell(j) + '</td><td class="new">' + rsnCell(j) + '</td>' +
+      '<td>' + b.linkType + '</td>' +
+      '<td class="tblnote" style="max-width:220px;overflow:hidden;text-overflow:ellipsis">' + esc(link) + '</td><td>' + esc(b.biz) + '</td><td>' + esc(b.title) + '</td>' +
       '<td>0</td><td>0</td><td class="tblnote">-</td>' +
       '<td><button class="btn sm">미리보기</button> <button class="btn sm">활성</button> <button class="btn sm" onclick="openAd(\'' + b.id + '\')">수정</button> <button class="btn sm red">삭제</button></td></tr>'; }).join('');
   return '<div class="phd"><div><h2 class="page">광고 관리</h2><div class="pdesc">광고 노출 기간, 위치, 링크 유형을 조회하고 관리합니다.</div></div>' +
@@ -786,8 +783,9 @@ function screen_aList() {
     '<div class="frow"><button class="btn">오늘</button><button class="btn">이번주</button><button class="btn">이번달</button>' + dimSel('광고일', ['광고일']) + langSelect() + dimSel('노출위치', ['노출위치']) + dimSel('링크종류', ['링크종류']) + '</div>' +
     '<div class="frow">' + aliFilterRow(['전체', '직접 끔', '외부 연결', '알리페이 버튼 없음', '연결 대상 미노출', '판정 오류']) + '<button class="btn blue" style="align-self:flex-end">검색</button></div>' +
     '</div><div class="tblwrap"><table><thead><tr>' +
-    '<th>광고등록일</th><th>광고시작일</th><th>광고종료일</th><th>언어</th><th>노출위치</th><th>링크종류</th><th>링크</th><th>업체명</th><th>광고제목</th>' +
+    '<th>광고등록일</th><th>광고시작일</th><th>광고종료일</th><th>언어</th><th>노출위치</th>' +
     '<th class="new">알리페이 노출<span class="newbadge">신규</span></th><th class="new">사유<span class="newbadge">신규</span></th>' +
+    '<th>링크종류</th><th>링크</th><th>업체명</th><th>광고제목</th>' +
     '<th>노출수</th><th>클릭수</th><th>대표이미지</th><th>관리</th></tr></thead><tbody>' + (body || empty(15)) + '</tbody></table></div></div>';
 }
 
@@ -815,7 +813,7 @@ window.setAdInnerKind = function (k) { const b = A(VIEW.id); const o = innerOpts
 window.setAdInnerId = function (id) { const b = A(VIEW.id); b.inner = { kind: b.inner.kind, id }; render(); };
 window.setBtnLinkKind = function (v) { const b = A(VIEW.id); const before = b.btn.linkKind; b.btn.linkKind = v;
   if (v === '내부링크' && !b.btn.inner) b.btn.inner = { kind: '병원', id: DB.stores[0].id };
-  if (v === '외부링크') { b.btn.url = b.btn.url || 'https://example.com/form'; b.btn.ali = false; }
+  if (v === '외부링크') { b.btn.url = b.btn.url || 'https://example.com/form'; if (b.btn.ali) { logChange(b, '하단 버튼 · 알리페이 표시여부', '활성화', '비활성화', '버튼 링크 종류 외부링크로 고정'); } b.btn.ali = false; }
   logChange(b, '하단 버튼 · 버튼 링크 종류', before, v); render(); };
 window.setBtnInnerKind = function (k) { const b = A(VIEW.id); const o = innerOpts(k)[0]; b.btn.inner = { kind: k, id: o ? o[0] : '' }; render(); };
 window.setBtnInnerId = function (id) { const b = A(VIEW.id); b.btn.inner = { kind: b.btn.inner.kind, id }; render(); };
@@ -930,7 +928,7 @@ function modal_coll() {
     '<button class="btn">선택된 스토어 삭제</button></div>' +
     '<div class="tblwrap"><table><thead><tr><th>No.</th><th>스토어명</th><th>지원언어</th><th>카테고리</th>' +
     '<th class="new">알리페이 노출<span class="newbadge">신규</span></th><th>action</th></tr></thead><tbody>' + (storeRows || '<tr><td colspan="6" class="c tblnote">선택된 스토어 정보가 없습니다</td></tr>') + '</tbody></table></div>' +
-    '<div class="hint">상품 선택 구조는 지금 그대로이고, 같은 방식의 스토어 선택을 더했습니다. 조건 ④는 상품과 스토어를 함께 셉니다.</div>' +
+    '<div class="hint">상품 선택 구조는 지금 그대로이고, 같은 방식의 스토어 선택을 더했습니다. 실제 화면은 상품 추가와 같은 검색 모달이고, 이 시안에서는 셀렉트로 대신합니다. 조건 ④는 상품과 스토어를 함께 셉니다.</div>' +
     '<div class="row" style="margin-top:14px"><div class="lbl"><span class="req">*</span>기획전 노출 기간</div><div class="val">' + c.from + ' ~ ' + c.to + '</div></div>' +
     '<div class="row"><div class="lbl"><span class="req">*</span>기획전 활성화 여부</div><div class="val"><span class="rg">' +
     radio('ca', '활성화', c.active === '활성' ? '활성화' : '비활성화', 'void(0)') + radio('ca', '비활성화', c.active === '활성' ? '활성화' : '비활성화', 'void(0)') + '</span></div></div>' +
@@ -1054,10 +1052,10 @@ window.save = function (kind) {
   const langOk = kind === 'store' ? true : ALI_LANGS.indexOf(obj.lang) !== -1;
   if (langOk && obj.aliVisible === '노출' && aliCnt === 0) {
     confirmBox('저장 확인', kind === 'store' ? MSG.saveStore : MSG.saveProd,
-      function () { alertBox('저장했습니다', '판정 결과와 사유를 다시 계산해 저장 컬럼에 넣었습니다.'); }, function () {});
+      function () { alertBox('저장했습니다', '목록과 프런트에 바로 반영됩니다.'); }, function () {});
     return;
   }
-  alertBox('저장했습니다', '판정 결과와 사유를 다시 계산해 저장 컬럼에 넣었습니다. 목록과 프런트에는 바로 반영됩니다.');
+  alertBox('저장했습니다', '목록과 프런트에 바로 반영됩니다.');
 };
 
 /* ------------------------------- 모달 ------------------------------- */
