@@ -170,6 +170,9 @@ const MSG = {
   saveProd:    '알리페이 버튼이 모두 꺼져 이 콘텐츠가 알리페이에서 숨겨집니다. 저장할까요?',
   saveStore:   '알리페이 버튼이 모두 꺼져 스토어 페이지가 알리페이에서 숨겨집니다. 저장할까요?',
   bnExtLock:   '외부링크 배너는 알리페이에 노출되지 않아 이 설정을 바꿀 수 없습니다. 저장된 값은 그대로 보관합니다.',
+  bnBtnExtLock:'버튼 링크 종류가 외부링크라 알리페이 열이 잠기고, 이 배너는 알리페이에 노출되지 않습니다. 값은 그대로 보관합니다.',
+  lockSelf:    '알리페이 노출이 미노출이라 알리페이 열이 잠깁니다. 값은 그대로 보관합니다.',
+  lockStore:   '소속 스토어가 알리페이 미노출이라 이 값과 무관하게 상품은 알리페이에 노출되지 않습니다. 아래 버튼 설정의 알리페이 열도 함께 잠깁니다.',
   bnBtnOff:    '하단 버튼이 알리페이에서 꺼져 있어 이 배너는 알리페이에 노출되지 않습니다.',
   bnTarget:    '연결된 콘텐츠가 알리페이에 노출되지 않아 이 배너도 노출되지 않습니다.',
   hostHidden:  '이 상품은 알리페이에는 노출되지 않아요.',
@@ -547,9 +550,8 @@ function btnTable(kind, obj) {
     '<br>지금 웹 ' + webCnt + '개' + (webCta.length ? ' (' + webCta.join(' / ') + ')' : '') +
     ' · 알리페이 ' + aliCnt + '개' + (aliCta.length ? ' (' + aliCta.join(' / ') + ')' : '') + '</div>';
   if (webCnt > CAP || aliCnt > CAP) html += '<div class="notice red">마이그레이션 이전에 저장된 건이라 ' + (webCnt > CAP ? '웹' : '알리페이') + ' 열에 ' + Math.max(webCnt, aliCnt) + '개가 켜져 있습니다. 저장하려면 두 개로 줄여 주세요.</div>';
-  if (locked) html += '<div class="notice grey">스토어 설정 적용이 기본 설정이라 스토어 값을 그대로 보여주고 편집은 잠깁니다. 스토어에만 있는 예약 행은 무시합니다.</div>';
-  if (selfHidden) html += '<div class="notice grey">알리페이 노출이 미노출이라 알리페이 열을 잠갔습니다. 값은 그대로 보관합니다.</div>';
-  if (storeHidden) html += '<div class="notice grey">소속 스토어가 알리페이 미노출이라 알리페이 열을 잠갔습니다.</div>';
+  if (locked) html += '<div class="hint">스토어 설정 적용이 기본 설정이라 스토어 값을 그대로 보여주고 편집은 잠깁니다. 스토어에만 있는 예약 행은 무시합니다.</div>';
+  else if (selfHidden) html += '<div class="hint">' + MSG.lockSelf + '</div>';
   if (langOk && !selfHidden && !storeHidden && aliCnt === 0) html += '<div class="notice">' + MSG.noAliBtn + '</div>';
   return html;
 }
@@ -688,13 +690,13 @@ function modal_product() {
       '<div class="row"><div class="lbl">히든 여부</div><div class="val">' + onoff('phid', p.hidden, 'void(%V%)', true) + ' <span class="tblnote">(기존)</span></div></div>' +
       '<div class="row"><div class="lbl"><span class="req">*</span>알리페이 노출<span class="newbadge">신규</span></div><div class="val"><span class="rg">' +
       radio('pv', '노출', langOk ? p.aliVisible : '노출', "setVis('product','노출')", !langOk) + radio('pv', '미노출', langOk ? p.aliVisible : '노출', "setVis('product','미노출')", !langOk) + '</span>' +
-      (langOk ? '' : '<div class="notice grey">' + MSG.langOnly + '</div>') +
-      (langOk && st.aliVisible === '미노출' ? '<div class="notice grey">소속 스토어가 알리페이 미노출이라 이 값과 무관하게 상품은 알리페이에 노출되지 않습니다.</div>' : '') +
+      (langOk ? '' : '<div class="hint">' + MSG.langOnly + '</div>') +
+      (langOk && st.aliVisible === '미노출' ? '<div class="notice">' + MSG.lockStore + '</div>' : '') +
       '</div></div>' +
       '<div class="blk">버튼 설정</div>' +
       '<div class="row"><div class="lbl"><span class="req">*</span>스토어 설정 적용</div><div class="val"><span class="rg">' +
       radio('pm', '개별 설정', p.mode, "setMode('개별 설정')") + radio('pm', '기본 설정', p.mode, "setMode('기본 설정')") + '</span>' +
-      '<div class="hint">' + MSG.storeDefault + '</div></div></div>' +
+      (p.mode === '기본 설정' ? '' : '<div class="hint">' + MSG.storeDefault + '</div>') + '</div></div>' +
       btnTable('product', p) +
       '<div class="row" style="margin-top:14px"><div class="lbl">메신저</div><div class="val"><span class="tblnote">인스타그램 (기존)</span></div></div>' +
       '<div class="row"><div class="lbl">인스타그램 임베디드 노출 여부</div><div class="val">' + onoff('pins', p.insta === 'ON', 'void(%V%)', true) +
@@ -825,6 +827,7 @@ function modal_ad() {
   const isExt = b.linkType === '외부링크', isLanding = b.linkType === '내부이미지랜딩페이지';
   const j = judgeAd(b);
   const visLock = isExt;
+  const extBtn = isLanding && b.btn && b.btn.linkKind === '외부링크';
   let h = '<div class="row"><div class="lbl"><span class="req">*</span>언어</div><div class="val">' + b.lang + '</div></div>' +
     '<div class="row"><div class="lbl"><span class="req">*</span>업체명</div><div class="val"><input type="text" value="' + esc(b.biz) + '" style="width:100%"></div></div>' +
     '<div class="row"><div class="lbl"><span class="req">*</span>광고제목</div><div class="val"><input type="text" value="' + esc(b.title) + '" style="width:100%"></div></div>' +
@@ -834,7 +837,7 @@ function modal_ad() {
     radio('adn', '활성화', b.adNotice, 'void(0)') + radio('adn', '비활성화', b.adNotice, 'void(0)') + '</span></div></div>' +
     '<div class="row"><div class="lbl"><span class="req">*</span>알리페이 노출<span class="newbadge">신규</span></div><div class="val"><span class="rg">' +
     radio('bv', '노출', langOk ? b.aliVisible : '노출', "setVis('ad','노출')", !langOk || visLock) + radio('bv', '미노출', langOk ? b.aliVisible : '노출', "setVis('ad','미노출')", !langOk || visLock) + '</span>' +
-    (langOk ? '' : '<div class="notice grey">' + MSG.langOnly + '</div>') +
+    (langOk ? '' : '<div class="hint">' + MSG.langOnly + '</div>') +
     (langOk && visLock ? '<div class="hint">' + MSG.bnExtLock + '</div>' : '') + '</div></div>' +
     '<div class="row"><div class="lbl"><span class="req">*</span>링크종류</div><div class="val">' +
     '<select onchange="setAdLinkType(this.value)">' + ['외부링크', '내부링크', '내부이미지랜딩페이지'].map(v => '<option' + (v === b.linkType ? ' selected' : '') + '>' + v + '</option>').join('') + '</select></div></div>';
@@ -845,17 +848,17 @@ function modal_ad() {
   h += '<div class="row"><div class="lbl"><span class="req">*</span>대표 이미지</div><div class="val"><span class="tblnote">banner_' + b.id + '.jpg (기존)</span></div></div>';
   if (isLanding) h += '<div class="row"><div class="lbl"><span class="req">*</span>상세 이미지</div><div class="val"><span class="tblnote">landing_' + b.id + '.jpg (기존)</span></div></div>';
   if (langOk && b.aliVisible === '노출') {
-    if (j.reason === '알리페이 버튼 없음') h += '<div class="notice">' + MSG.bnBtnOff + '</div>';
+    if (j.reason === '알리페이 버튼 없음' && !extBtn) h += '<div class="notice">' + MSG.bnBtnOff + '</div>';
     else if (j.reason === '연결 대상 미노출') h += '<div class="notice">' + MSG.bnTarget + '</div>';
   }
   if (isLanding && b.btn) {
-    const extBtn = b.btn.linkKind === '외부링크', bnHidden = b.aliVisible === '미노출';
+    const bnHidden = b.aliVisible === '미노출';
     h += '<div class="blk">하단 버튼</div>' +
       '<div class="row"><div class="lbl"><span class="req">*</span>버튼 표시여부</div><div class="val">' +
       '<div style="display:flex;gap:36px;flex-wrap:wrap;align-items:center">' +
       '<span><span class="tblnote" style="margin-right:8px">웹</span>' + onoff('bshw', b.btn.web, "setAdBtnShow('web',%V%)", false, ['활성화', '비활성화']) + '</span>' +
       '<span class="' + (extBtn || bnHidden ? 'lock' : '') + '"><span class="tblnote" style="margin-right:8px">알리페이<span class="newbadge">신규</span></span>' + onoff('bsha', b.btn.ali, "setAdBtnShow('ali',%V%)", extBtn || bnHidden || !langOk, ['활성화', '비활성화']) + '</span></div>' +
-      (extBtn ? '<div class="hint">버튼 링크 종류가 외부링크라 알리페이 열이 잠깁니다.</div>' : bnHidden ? '<div class="hint">알리페이 노출이 미노출이라 알리페이 열이 잠깁니다. 값은 그대로 보관합니다.</div>' : '') +
+      (extBtn ? '<div class="hint">' + MSG.bnBtnExtLock + '</div>' : bnHidden ? '<div class="hint">' + MSG.lockSelf + '</div>' : '') +
       '</div></div>' +
       '<div class="row"><div class="lbl"><span class="req">*</span>버튼 텍스트</div><div class="val"><input type="text" value="' + esc(b.btn.label) + '" style="width:260px"></div></div>' +
       '<div class="row"><div class="lbl"><span class="req">*</span>버튼 링크 종류</div><div class="val">' +
@@ -915,7 +918,7 @@ function modal_coll() {
     '<div class="row"><div class="lbl"><span class="req">*</span>기획전 유형</div><div class="val">' + c.type + '</div></div>' +
     '<div class="row"><div class="lbl"><span class="req">*</span>알리페이 노출<span class="newbadge">신규</span></div><div class="val"><span class="rg">' +
     radio('cv', '노출', langOk ? c.aliVisible : '노출', "setVis('coll','노출')", !langOk) + radio('cv', '미노출', langOk ? c.aliVisible : '노출', "setVis('coll','미노출')", !langOk) + '</span>' +
-    (langOk ? '' : '<div class="notice grey">' + MSG.langOnly + '</div>') +
+    (langOk ? '' : '<div class="hint">' + MSG.langOnly + '</div>') +
     (langOk && c.aliVisible === '노출' && j.liveCount === 0 ? '<div class="notice">' + MSG.exhEmpty + '</div>' : '') + '</div></div>' +
     '<div class="blk">상품 ' + c.products.length + '개 선택</div>' +
     '<div class="frow" style="margin-bottom:10px"><button class="btn">상품 추가</button><button class="btn">선택된 상품 삭제</button></div>' +
