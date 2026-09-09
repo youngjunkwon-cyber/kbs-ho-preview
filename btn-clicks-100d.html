@@ -102,8 +102,25 @@ tbody td{border-bottom:1px solid var(--line)}
 .track span{display:block;height:100%;background:var(--rose);border-radius:2px}
 
 /* 차트 */
-.chartbox{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:20px 18px 12px}
+.chartbox{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:20px 18px 12px}
 svg{display:block;width:100%;height:auto}
+.tip{
+  position:absolute;left:0;top:0;z-index:5;pointer-events:none;
+  background:var(--surface);border:1px solid var(--line-2);border-radius:5px;
+  padding:8px 11px;box-shadow:0 4px 16px var(--bar-shadow);
+  font-size:13px;line-height:1.5;white-space:nowrap;
+  transform:translate(-50%,calc(-100% - 10px));
+}
+.tip .t-date{display:block;font-size:11.5px;color:var(--muted);letter-spacing:.03em;margin-bottom:2px}
+.tip .t-main{font-variant-numeric:tabular-nums}
+.tip .t-main b{font-size:16px;font-weight:600;margin-right:4px}
+.tip .t-sub{display:block;margin-top:5px;padding-top:5px;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.tip .t-langs{display:block;margin-top:5px;padding-top:5px;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.tip .t-langs span{margin-right:9px}
+.tip .t-langs span:last-child{margin-right:0}
+.tip .t-langs b{font-weight:600}
+.tip .t-langs span.z{opacity:.4}
+.tip .t-langs span.z b{color:var(--muted)!important}
 .legend{display:flex;flex-wrap:wrap;gap:18px;margin-top:12px;font-size:12px;color:var(--ink-2)}
 .legend i{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:6px;vertical-align:-1px}
 .legend i.ln{height:2px;border-radius:0;width:16px;vertical-align:3px}
@@ -178,6 +195,7 @@ svg{display:block;width:100%;height:auto}
     <p class="h2note" id="chartNote">막대는 일별 클릭, 선은 7일 이동평균.</p>
     <div class="chartbox">
       <svg id="chart" viewBox="0 0 1000 320" role="img" aria-label="일별 버튼 클릭 추이 차트"></svg>
+      <div class="tip" id="tip" hidden></div>
       <div class="legend" id="legend"></div>
     </div>
   </section>
@@ -321,10 +339,12 @@ function renderChart(rows, ci, peakDate){
     s += `<line x1="${L}" y1="${y(v)}" x2="${W-R}" y2="${y(v)}" stroke="var(--grid)" stroke-width="1"/>`;
     s += `<text x="${L-9}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="var(--muted)">${v}</text>`;
   }
+  const barFill = S.lang==='all' ? 'var(--bar)' : accent;
+  const barOp = S.lang==='all' ? '0.9' : '0.3';
   rows.forEach((r,i)=>{
     const h = Math.max(1, ih - (y(r[ci])-T));
     const hi = r[0]===peakDate;
-    s += `<rect x="${(x(i)-bw/2).toFixed(1)}" y="${y(r[ci]).toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" fill="${hi?accent:'var(--bar)'}" ${hi?'':'opacity="0.9"'}><title>${r[0]} · ${r[ci]}건</title></rect>`;
+    s += `<rect x="${(x(i)-bw/2).toFixed(1)}" y="${y(r[ci]).toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" fill="${hi?accent:barFill}" opacity="${hi?'1':barOp}"/>`;
   });
   if(S.month==='all'){
     rows.forEach((r,i)=>{
@@ -354,17 +374,98 @@ function renderChart(rows, ci, peakDate){
       }
     });
   }
+  /* hover 레이어 (가장 위에 그린다) */
+  s += `<g id="hoverG" style="display:none">
+    <line id="hoverLine" y1="${T}" y2="${T+ih}" stroke="var(--ink-2)" stroke-width="1" opacity=".3"/>
+    <rect id="hoverBar" fill="${accent}"/>
+    <circle id="hoverDot" r="3.4" fill="${accent}" stroke="var(--surface)" stroke-width="1.5"/>
+  </g>`;
   document.getElementById('chart').innerHTML = s;
+
+  /* hover 계산에 쓸 기하 정보 */
+  G = {rows, ci, n:rows.length, W, H, L, T, ih, iw, bw, x, y, accent};
 
   document.getElementById('chartTitle').textContent =
     (S.lang==='all' ? '일별 클릭 추이' : `일별 ${LANGS[S.lang].full} 클릭 추이`);
   document.getElementById('chartNote').textContent =
-    `막대는 일별 ${metricName()}, 선은 7일 이동평균.` + (S.month==='all' ? ' 점선은 월 경계.' : '');
+    `막대는 일별 ${metricName()}, 선은 7일 이동평균.` + (S.month==='all' ? ' 점선은 월 경계.' : '') + ' 막대에 마우스를 올리면 날짜와 건수가 나옵니다.';
   document.getElementById('legend').innerHTML =
-    `<span><i style="background:var(--bar)"></i>일별 ${metricName()}</span>
+    `<span><i style="background:${barFill};opacity:${barOp}"></i>일별 ${metricName()}</span>
      <span><i class="ln" style="background:${accent}"></i>7일 이동평균</span>
-     <span><i style="background:${accent};opacity:.85"></i>최고일</span>`;
+     <span><i style="background:${accent}"></i>최고일</span>`;
 }
+
+/* 차트 hover 툴팁 */
+let G = null;
+(function(){
+  const svg = document.getElementById('chart');
+  const box = document.querySelector('.chartbox');
+  const tip = document.getElementById('tip');
+
+  function hide(){
+    tip.hidden = true;
+    const g = document.getElementById('hoverG');
+    if(g) g.style.display = 'none';
+  }
+
+  function show(e){
+    if(!G) return;
+    const sr = svg.getBoundingClientRect();
+    if(!sr.width) return;
+    const scale = G.W / sr.width;
+    const vx = (e.clientX - sr.left) * scale;
+    let i = Math.round((vx - G.L) / (G.iw / G.n) - 0.5);
+    if(i < 0 || i > G.n-1){ hide(); return; }
+
+    const r = G.rows[i];
+    const v = r[G.ci];
+    const w = new Date(r[0]+'T00:00:00').getDay();
+    const dowCls = w===0 ? 'sun' : w===6 ? 'sat' : '';
+
+    let html = `<span class="t-date">${r[0].replace(/-/g,'. ')} <span class="${dowCls}">${DOW[w]}</span></span>`;
+    html += `<span class="t-main"><b>${nf(v)}</b>건 · ${metricName()}</span>`;
+    if(S.lang === 'all'){
+      html += `<span class="t-langs">` + LANGS.map(l=>
+        `<span class="${r[l.i]===0?'z':''}">${l.k} <b style="color:${l.c}">${r[l.i]}</b></span>`
+      ).join('') + `</span>`;
+    } else {
+      html += `<span class="t-sub">그날 총 클릭 ${nf(r[1])}건 · 이 언어 비중 ${r[1]?(v/r[1]*100).toFixed(0):0}%</span>`;
+    }
+    tip.innerHTML = html;
+    tip.hidden = false;
+
+    /* 툴팁 위치 (차트 박스 기준) */
+    const br = box.getBoundingClientRect();
+    const px = sr.left - br.left + (G.x(i) / G.W) * sr.width;
+    const py = sr.top - br.top + (G.y(v) / G.H) * sr.height;
+    const half = tip.offsetWidth / 2;
+    const clamped = Math.max(half + 4, Math.min(br.width - half - 4, px));
+    tip.style.left = clamped + 'px';
+    tip.style.top = Math.max(tip.offsetHeight + 10, py) + 'px';
+
+    /* 막대 강조 + 가이드선 */
+    const g = document.getElementById('hoverG');
+    const line = document.getElementById('hoverLine');
+    const bar = document.getElementById('hoverBar');
+    const dot = document.getElementById('hoverDot');
+    if(g){
+      g.style.display = '';
+      line.setAttribute('x1', G.x(i).toFixed(1));
+      line.setAttribute('x2', G.x(i).toFixed(1));
+      bar.setAttribute('x', (G.x(i)-G.bw/2).toFixed(1));
+      bar.setAttribute('y', G.y(v).toFixed(1));
+      bar.setAttribute('width', G.bw.toFixed(1));
+      bar.setAttribute('height', Math.max(1, G.ih - (G.y(v)-G.T)).toFixed(1));
+      dot.setAttribute('cx', G.x(i).toFixed(1));
+      dot.setAttribute('cy', G.y(v).toFixed(1));
+    }
+  }
+
+  svg.addEventListener('pointermove', show);
+  svg.addEventListener('pointerdown', show);
+  svg.addEventListener('pointerleave', hide);
+  window.addEventListener('scroll', hide, {passive:true});
+})();
 
 function renderDaily(rows, ci, maxV, topSet){
   const sorted = S.sort==='clicks'
