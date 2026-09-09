@@ -159,9 +159,7 @@ svg{display:block;width:100%;height:auto}
 .find ul{grid-column:2;margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px;font-size:13.5px;color:var(--ink-2);max-width:70ch}
 .find ul li{padding-left:11px;position:relative;font-variant-numeric:tabular-nums}
 .find ul li::before{content:'';position:absolute;left:0;top:9px;width:3px;height:3px;border-radius:50%;background:var(--line-2)}
-.find ul ul{margin-top:4px;gap:3px;font-size:12.5px;color:var(--muted)}
 .find b{color:var(--ink);font-weight:600}
-.find .src{grid-column:2;margin:9px 0 0;font-size:11.5px;color:var(--muted);letter-spacing:.02em}
 @media (max-width:640px){
   .find{grid-template-columns:24px 1fr;gap:0 9px;padding:16px 0}
   .fnum{font-size:16px}
@@ -225,49 +223,43 @@ svg{display:block;width:100%;height:auto}
   </section>
 
   <section>
-    <h2>특이구간</h2>
+    <h2>특이사항</h2>
     <p class="h2note">위 그래프의 ①②③ 표식과 같은 번호입니다.</p>
     <div class="finds">
 
       <article class="find" style="--fc:var(--l-en)">
         <span class="fnum">①</span>
-        <h3>영어 클릭 급증</h3>
-        <p class="fwhen">2026. 06. 09 ~ 06. 16 · 8일</p>
+        <h3>영어 클릭이 갑자기 늘어난 8일</h3>
+        <p class="fwhen">2026. 06. 09 ~ 06. 16</p>
         <ul>
-          <li>구간 일평균 <b>152.5건</b>. 직전·직후 각 8일(6/1~6/8, 6/17~6/24) 일평균 63.1건의 <b>2.4배</b>.</li>
-          <li>구간 영어 클릭 <b>1,023건</b>. 구간 총 1,220건의 <b>84%</b>.</li>
-          <li>영어 외 언어는 구간 일평균 24.6건, 직전·직후 26.5건으로 <b>변화 없음</b>. 급증분은 영어에만 나타납니다.</li>
-          <li>GA 기준 필리핀 유입 1,620명 → 19,192명(12배), 전부 fb/paid.
-            <ul>
-              <li>유입 페이지: /en/products/2575-woori-breast-augmentation 등 영어 상품 상세</li>
-              <li>상관계수: 필리핀 유입 ↔ 영어 클릭 0.909 / 영어 외 클릭 0.146</li>
-            </ul>
-          </li>
+          <li>이 8일 동안 하루 평균 <b>152.5건</b>이 찍혔습니다. 앞뒤 8일씩은 하루 평균 63.1건이었으니 <b>2.4배</b>입니다.</li>
+          <li>늘어난 것은 영어뿐입니다. 이 기간 영어 클릭이 <b>1,023건</b>으로, 전체 1,220건의 <b>84%</b>를 차지했습니다.</li>
+          <li>영어를 뺀 나머지 언어는 하루 평균 24.6건으로, 앞뒤 기간 26.5건과 <b>차이가 없습니다</b>.</li>
+          <li>GA를 확인해보니 원인은 <b>필리핀에서 들어온 페이스북 유료 광고 트래픽</b>이었습니다. 필리핀 방문자가 1,620명에서 19,192명으로 <b>12배</b> 늘었고, 이들이 들어온 곳은 영어로 된 상품 상세 페이지였습니다.</li>
         </ul>
-        <p class="src">유입 및 상관계수 항목은 GA 기준. 클릭 수치는 어드민 버튼 클릭 현황 기준.</p>
       </article>
 
       <article class="find" style="--fc:var(--l-tw)">
         <span class="fnum">②</span>
-        <h3>번체 클릭 스파이크 3일</h3>
+        <h3>번체 클릭이 튄 3일</h3>
         <p class="fwhen">2026. 07. 25 · 08. 09 · 08. 16</p>
         <ul>
-          <li>7/25 <b>44건</b> · 8/9 <b>47건</b> · 8/16 <b>37건</b>. 이 3일을 뺀 97일 번체 일평균은 <b>4.0건</b>입니다.</li>
-          <li>8/9는 GA 기준 대만 유입 327명(평시 73~130명의 2.5~4배). <b>실제 유입 증가</b>로 설명됩니다.</li>
-          <li>8/16은 대만 유입 77명인데 번체 클릭 37건. 클릭률 <b>48%</b>로 비정상입니다.</li>
-          <li>3일 모두 랜딩 1위가 볼뉴머(Volnewmer) 리프팅 번체 페이지.</li>
+          <li>번체는 평소 하루 <b>4건</b> 정도입니다. 그런데 이 3일은 7/25 <b>44건</b>, 8/9 <b>47건</b>, 8/16 <b>37건</b>이 찍혔습니다.</li>
+          <li>8/9는 GA를 확인해보니 <b>대만 방문자가 실제로 늘어서</b> 생긴 것입니다. 327명이 들어왔고, 평소는 73~130명입니다.</li>
+          <li>8/16은 다릅니다. 대만 방문자가 <b>77명뿐인데 번체 클릭이 37건</b>입니다. 방문자 둘 중 한 명이 버튼을 누른 셈이어서 정상적인 수치로 보기 어렵습니다.</li>
+          <li>3일 모두 방문자가 가장 많이 본 페이지는 <b>볼뉴머 리프팅</b> 번체 페이지였습니다.</li>
         </ul>
-        <p class="src">유입 및 랜딩 항목은 GA 기준.</p>
       </article>
 
       <article class="find" style="--fc:var(--l-jp)">
         <span class="fnum">③</span>
-        <h3>9월 반등은 6월과 성격이 다릅니다</h3>
-        <p class="fwhen">2026. 09. 01 ~ 09. 08 · 8일</p>
+        <h3>9월에 다시 올랐지만 6월과 원인이 다릅니다</h3>
+        <p class="fwhen">2026. 09. 01 ~ 09. 08</p>
         <ul>
-          <li>6월 급증은 <b>영어 주도</b>. 총 2,621건 중 영어 1,860건으로 <b>71%</b>.</li>
-          <li>9월 반등은 <b>일어 주도</b>. 총 658건 중 일어 312건으로 <b>47%</b>.</li>
-          <li>일평균은 82.3건으로 6월(87.4건)에 근접하지만 구성 언어가 다릅니다. 두 구간을 같은 급증으로 묶어 설명할 수 없습니다.</li>
+          <li>9월 1~8일 하루 평균 <b>82.3건</b>으로 6월(87.4건) 수준까지 올라왔습니다.</li>
+          <li>다만 <b>6월은 영어가 끌어올린 것</b>입니다. 2,621건 중 영어가 1,860건으로 71%였습니다.</li>
+          <li><b>9월은 일어가 끌어올린 것</b>입니다. 658건 중 일어가 312건으로 47%입니다.</li>
+          <li>숫자가 비슷하다고 두 시기를 같은 일로 묶어서 설명하면 안 됩니다.</li>
         </ul>
       </article>
 
@@ -505,7 +497,7 @@ function renderChart(rows, ci, peakDate){
     (S.lang==='all' ? '일별 클릭 추이' : `일별 ${LANGS[S.lang].full} 클릭 추이`);
   document.getElementById('chartNote').textContent =
     `막대는 일별 ${metricName()}, 선은 7일 이동평균.` + (S.month==='all' ? ' 점선은 월 경계.' : '') +
-    ' 마우스를 올리면 날짜와 건수가 나옵니다. 음영과 ①②③ 표식은 아래 특이구간과 같은 번호입니다.';
+    ' 마우스를 올리면 날짜와 건수가 나옵니다. 음영과 ①②③ 표식은 아래 특이사항과 같은 번호입니다.';
   document.getElementById('legend').innerHTML =
     `<span><i style="background:${barFill};opacity:${barOp}"></i>일별 ${metricName()}</span>
      <span><i class="ln" style="background:${accent}"></i>7일 이동평균</span>
