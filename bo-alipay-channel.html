@@ -142,7 +142,7 @@ select.dim{color:#8c8c8c}
 /* =========================================================================
    알리페이 채널 분기 · 어드민 동작 시안
    화면 골격은 admin.k-beautystation.com 실측(2026-09-08) 기준
-   규칙은 PRD v0.13 / 기능정의서 v0.9 기준
+   규칙은 알리페이/ 폴더의 PRD·기능정의서 최신본 기준
    ========================================================================= */
 const ALI_LANGS = ['중국어(간체)', '중국어(번체)', '영어'];
 const ALL_LANGS = [...ALI_LANGS, '일본어', '인도네시아어', '몽골어'];
@@ -197,7 +197,7 @@ const DB = {
       btns: { consult: btn({ web: true, ali: true }), inquiry: btn(), chat: btn({ web: true, ali: true }), extlink: btn(), messenger: btn(), booking: btn() },
       messenger: [], history: [] },
     { id: 'S3', no: 224, code: '뷰티랩강남', name: '뷰티랩 강남', biz: '뷰티랩(주)', cat: '스킨케어',
-      langs: '영어, 인도네시아어', tel: '02-222-2222', bizno: '323-45-67890', email: 'c@c.com',
+      langs: '중국어(간체), 영어, 인도네시아어', tel: '02-222-2222', bizno: '323-45-67890', email: 'c@c.com',
       zip: '06120', area: '강남구', reg: '2026-09-01 15:03', aliVisible: '노출', prodCount: 3, bookingEnabled: true,
       btns: { consult: btn(), inquiry: btn(), chat: btn({ web: true }), extlink: btn(), messenger: btn(), booking: btn({ web: true, ali: true }) },
       messenger: [], history: [] },
@@ -733,7 +733,8 @@ function screen_sEdit() {
       '<div class="row"><div class="lbl"><span class="req">*</span>알리페이 노출<span class="newbadge">신규</span></div><div class="val"><span class="rg">' +
       radio('sv', '노출', st.aliVisible, "setVis('store','노출')") + radio('sv', '미노출', st.aliVisible, "setVis('store','미노출')") + '</span>' +
       '<div class="hint">스토어는 언어와 무관한 한 건이라, 알리페이 노출 하나가 모든 언어에 적용됩니다.</div>' +
-      (st.aliVisible === '미노출' ? '<div class="notice">' + MSG.storeHide(st.prodCount) + '</div>' : '') + '</div></div></div>';
+      (st.aliVisible === '미노출' ? '<div class="notice">' + MSG.storeHide(st.prodCount) + '</div>' : '') + '</div></div>' +
+      '<div class="hint">소속 상품 수는 스토어 데이터의 전체 상품 수(' + st.prodCount + '건)입니다. 이 시안의 상품 목록에는 그중 일부만 샘플로 들어 있습니다.</div></div>';
   } else if (i === 8) {
     bd = '<div class="bd"><div class="row"><div class="lbl"><span class="req">*</span>예약 사용</div><div class="val">' +
       onoff('sbk', st.bookingEnabled, 'setBooking(%V%)', false, ['사용', '미사용']) +
@@ -762,7 +763,10 @@ function screen_sEdit() {
 function screen_aList() {
   const rows = DB.ads.filter(b => b.lang === VIEW.lang);
   const body = rows.map(b => { const j = judgeAd(b); if (!passFilter(j)) return '';
-    const link = b.linkType === '외부링크' ? b.url : b.inner ? b.inner.kind + ' · ' + innerTargetOk(b.inner).label.split(' · ')[1] : '랜딩페이지';
+    const link = b.linkType === '외부링크' ? b.url
+      : b.linkType === '내부이미지랜딩페이지' ? '랜딩페이지'
+      : !b.inner || b.inner.kind === '직접입력' ? '직접입력'
+      : b.inner.kind + ' · ' + innerTargetOk(b.inner).label.split(' · ')[1];
     return '<tr><td>' + b.reg + '</td><td>' + b.from + '</td><td>' + b.to + '</td><td>' + b.lang + '</td><td>' + b.pos + '</td>' +
       '<td class="new c">' + visCell(j) + '</td><td class="new">' + rsnCell(j) + '</td>' +
       '<td>' + b.linkType + '</td>' +
