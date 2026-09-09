@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>예약 알림톡 템플릿 등록 · NHN Cloud</title>
+<style>
+  :root{
+    --bg:#f6f6f4; --card:#fff; --line:#e5e4df; --line2:#d3d1c7;
+    --ink:#111; --ink2:#55534e; --ink3:#8a8880;
+    --fill:#f4f3f0; --accent:#0c447c;
+    --warn-bg:#fdf3e3; --warn-ink:#6b3f07; --warn-line:#f0dfbc;
+    --ok-bg:#e6f5ee; --ok-ink:#0b5a45;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+    font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:900px;margin:0 auto;padding:0 20px 100px}
+  header.top{background:#fff;border-bottom:1px solid var(--line);padding:14px 0;margin-bottom:26px;position:sticky;top:0;z-index:5}
+  header.top .in{max-width:900px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:10px}
+  .logo{width:26px;height:26px;border-radius:7px;background:#f2557f;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:15px}
+  .brand{font-weight:600}
+  .brand span{color:var(--ink3);font-weight:400;margin-left:8px;font-size:14px}
+  .prog{margin-left:auto;font-size:14px;color:var(--ink2)}
+  .prog b{color:var(--accent);font-weight:600}
+
+  h1{font-size:28px;margin:0 0 8px;font-weight:700;letter-spacing:-0.01em}
+  .sub{color:var(--ink2);margin:0 0 4px}
+  .meta{color:var(--ink3);font-size:14px;margin:0 0 28px}
+  h2{font-size:20px;font-weight:700;margin:38px 0 12px;letter-spacing:-0.01em}
+
+  .tpl{background:var(--card);border:1px solid var(--line);border-radius:14px;margin:0 0 16px;overflow:hidden}
+  .tpl.done{opacity:.5}
+  .thead{display:flex;align-items:center;gap:10px;padding:15px 20px;border-bottom:1px solid var(--line);background:#fbfbfa}
+  .tno{font-size:13px;font-weight:700;color:var(--ink3);min-width:18px}
+  .tname{font-size:17px;font-weight:600}
+  .tsend{font-size:12px;color:var(--ink3);border:1px solid var(--line2);border-radius:5px;padding:2px 7px}
+  .chk{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ink2);cursor:pointer;user-select:none;white-space:nowrap}
+  .chk input{width:16px;height:16px;cursor:pointer}
+  .tbody{padding:4px 20px 16px}
+
+  .row{display:grid;grid-template-columns:126px 1fr;gap:12px;align-items:start;padding:9px 0;border-bottom:1px solid #f2f1ed}
+  .row:last-child{border-bottom:0}
+  .row.pick{padding:6px 0}
+  .lbl{font-size:13px;color:var(--ink2);padding-top:7px}
+  .row.pick .lbl{padding-top:1px;color:var(--ink3)}
+  .val{display:flex;gap:8px;align-items:flex-start}
+  .fill{flex:1;background:var(--fill);border-radius:8px;padding:8px 11px;font-size:15px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;word-break:break-all;line-height:1.65}
+  .fill.plain{font-family:inherit;word-break:keep-all}
+  .fill.body{font-family:inherit;line-height:1.8}
+  .cp{flex:0 0 auto;background:#fff;border:1px solid var(--line2);color:var(--ink2);
+    font-size:12px;padding:7px 11px;border-radius:7px;cursor:pointer;font-family:inherit}
+  .cp:hover{border-color:var(--ink3)}
+  .cp.ok{background:var(--ok-bg);border-color:#9fd0b6;color:var(--ok-ink)}
+  .fx{font-size:14px;color:var(--ink);padding-top:1px}
+  .fx em{font-style:normal;color:var(--ink3);font-size:12px;margin-left:6px}
+  .fx b{color:var(--warn-ink);background:var(--warn-bg);border:1px solid var(--warn-line);
+    border-radius:5px;padding:1px 6px;font-weight:600;font-size:12px;margin-left:6px}
+  .note{background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:8px;
+    padding:9px 12px;margin:10px 0 0;font-size:14px;color:var(--warn-ink);line-height:1.7}
+  .note code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;background:rgba(0,0,0,.05);padding:1px 5px;border-radius:4px}
+
+  .box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:0 0 14px}
+  #devblock{white-space:pre;overflow-x:auto;word-break:normal;font-size:13px;line-height:1.6}
+  table.v{width:100%;border-collapse:collapse;font-size:14px}
+  table.v th,table.v td{text-align:left;padding:7px 10px;border-bottom:1px solid #f2f1ed;vertical-align:top}
+  table.v th{color:var(--ink2);font-weight:600;background:#fbfbfa}
+  table.v code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;background:rgba(0,0,0,.05);padding:1px 5px;border-radius:4px}
+  .scroll{overflow-x:auto}
+  .foot{margin-top:36px;padding-top:18px;border-top:1px solid var(--line);color:var(--ink3);font-size:13px}
+  @media (max-width:640px){.row{grid-template-columns:1fr;gap:5px}.lbl{padding-top:0}}
+</style>
+</head>
+<body>
+
+<header class="top"><div class="in">
+  <div class="logo">K</div>
+  <div class="brand">예약 알림톡 등록<span>NHN Cloud · STG</span></div>
+  <div class="prog"><b id="pdone">0</b> / 6 완료</div>
+</div></header>
+
+<div class="wrap">
+
+  <h1>예약 알림톡 템플릿 등록</h1>
+  <p class="sub">카드 하나가 등록 화면 하나입니다. 위에서 아래로 그대로 채우면 됩니다.</p>
+  <p class="meta">호스트 수신용 6종 · 회색 칸은 복사해서 붙이고, 아래 옅은 줄은 화면에서 골라주는 값입니다.</p>
+
+  <div class="tpl" data-id="new">
+    <div class="thead"><span class="tno">01</span><span class="tname">신규 예약 접수</span><span class="tsend">고객 예약 접수 완료 시</span>
+      <label class="chk"><input type="checkbox"> 등록함</label></div>
+    <div class="tbody">
+      <div class="row pick"><div class="lbl">발신 프로필</div><div class="fx">일반 / @k-beautystation</div></div>
+      <div class="row"><div class="lbl">템플릿 코드</div><div class="val"><div class="fill">STG_HOST_BKG_NEW</div><button class="cp">복사</button></div></div>
+      <div class="row"><div class="lbl">템플릿 이름</div><div class="val"><div class="fill plain">[호스트] 신규 예약 접수</div><button class="cp">복사</button></div></div>
+      <div class="row pick"><div class="lbl">메시지 유형</div><div class="fx">기본형 <b>기본값 복합형이니 바꾸세요</b></div></div>
+      <div class="row pick"><div class="lbl">강조 유형</div><div class="fx">선택 안 함</div></div>
+      <div class="row"><div class="lbl">템플릿 내용</div><div class="val"><div class="fill body">새 예약이 접수됐어요.
+
+방문: #{visit_date} (#{visit_day}) #{visit_time}
+국적: #{nationality}
+예약번호: #{booking_number}
+
+아래 버튼을 눌러 상세 내용을 확인하세요.</div><button class="cp">복사</button></div></div>
+      <div class="row pick"><div class="lbl">부가 정보</div><div class="fx">입력 안 함 <em>기본형이면 비활성</em></div></div>
+      <div class="row pick"><div class="lbl">채널 추가 안내</div><div class="fx">입력 안 함 <em>기본형이면 비활성</em></div></div>
+      <div class="row pick"><div class="lbl">보안 템플릿</div><div class="fx">미설정</div></div>
+      <div class="row pick"><div class="lbl">카테고리</div><div class="fx">예약 &gt; 예약완료/예약내역(003001)</div></div>
+      <div class="row pick"><div class="lbl">대표 링크</div><div class="fx">추가 안 함</div></div>
+      <div class="row pick"><div class="lbl">버튼 타입</div><div class="fx">웹 링크 <b>기본값 채널 추가이니 바꾸세요</b></div></div>
+      <div class="row"><div class="lbl">버튼 이름</div><div class="val"><div class="fill plain">예약 상세 보기</div><button class="cp">복사</button></div></div>
+      <div class="row"><div class="lbl">버튼 링크<br><em style="font-style:normal;color:var(--ink3);font-size:12px">모바일·PC 동일</em></div><div class="val"><div class="fill">https://k-beautystation-host.vercel.app/bookings/#{booking_number}</div><button class="cp">복사</button></div></div>
+      <div class="row pick"><div class="lbl">바로연결</div><div class="fx">추가 안 함</div></div>
+    </div>
+  </div>
+
+  <div class="tpl" data-id="soon">
+    <div class="thead"><span class="tno">02</span><span class="tname">방문 임박 예약 안내</span><span class="tsend">방문 24시간 전</span>
+      <label class="chk"><input type="checkbox"> 등록함</label></div>
+    <div class="tbody">
+      <div class="row pick"><div class="lbl">발신 프로필</div><div class="fx">일반 / @k-beautystation</div></div>
+      <div class="row"><div class="lbl">템플릿 코드</div><div class="val"><div class="fill">STG_HOST_BKG_SOON</div><button class="cp">복사</button></div></div>
+      <div class="row"><div class="lbl">템플릿 이름</div><div class="val"><div class="fill plain">[호스트] 방문 임박 예약 안내</div><button class="cp">복사</button></div></div>
+      <div class="row pick"><div class="lbl">메시지 유형</div><div class="fx">기본형 <b>기본값 복합형이니 바꾸세요</b></div></div>
+      <div class="row pick"><div class="lbl">강조 유형</div><div class="fx">선택 안 함</div></div>
+      <div class="row"><div class="lbl">템플릿 내용</div><div class="val"><div class="fill body">방문이 임박한 예약이에요.
+
+방문: #{visit_date} (#{visit_day}) #{visit_time}
+국적: #{nationality}
+예약번호: #{booking_number}
+
+아래 버튼을 눌러 상세 내용을 확인하세요.</div><button class="cp">복사</button></div></div>
+      <div class="row pick"><div class="lbl">부가 정보</div><div class="fx">입력 안 함</div></div>
+      <div class="row pick"><div class="lbl">채널 추가 안내</div><div class="fx">입력 안 함</div></div>
+      <div class="row pick"><div class="lbl">보안 템플릿</div><div class="fx">미설정</div></div>
+      <div class="row pick"><div class="lbl">카테고리</div><div class="fx">예약 &gt; 예약알림/리마인드(003004)</div></div>
+      <div class="row pick"><div class="lbl">대표 링크</div><div class="fx">추가 안 함</div></div>
+      <div class="row pick"><div class="lbl">버튼 타입</div><div class="fx">웹 링크 <b>기본값 채널 추가이니 바꾸세요</b></div></div>
+      <div class="row"><div class="lbl">버튼 이름</div><div class="val"><div class="fill plain">예약 상세 보기</div><button class="cp">복사</button></div></div>
+      <div class="row"><div class="lbl">버튼 링크<br><em style="font-style:normal;color:var(--ink3);font-size:12px">모바일·PC 동일</em></div><div class="val"><div class="fill">https://k-beautystation-host.vercel.app/bookings/#{booking_number}</div><button class="cp">복사</button></div></div>
+      <div class="row pick"><div class="lbl">바로연결</div><div class="fx">추가 안 함</div></div>
+    </div>
+  </div>
+
+  <div class="tpl" data-id="unck">
+    <div class="thead"><span class="tno">03</span><span class="tname">미확인 예약 리마인드</span><span class="tsend">접수 후 1시간</span>
+      <label class="chk"><input type="checkbox"> 등록함</label></div>
+    <div class="tbody">
+      <div class="row pick"><div class="lbl">발신 프로필</div><div class="fx">일반 / @k-beautystation</div></div>
+      <div class="row"><div class="lbl">템플릿 코드</div><div class="val"><div class="fill">STG_HOST_BKG_UNCK</div><button class="cp">복사</button></div></div>
+      <div class="row"><div class="lbl">템플릿 이름</div><div class="val"><div class="fill plain">[호스트] 미확인 예약 리마인드</div><button class="cp">복사</button></div></div>
+      <div class="row pick"><div class="lbl">메시지 유형</div><div class="fx">기본형 <b>기본값 복합형이니 바꾸세요</b></div></div>
+      <div class="row pick"><div class="lbl">강조 유형</div><div class="fx">선택 안 함</div></div>
+      <div class="row"><div class="lbl">템플릿 내용</div><div class="val"><div class="fill body">아직 확인하지 않은 예약이 있어요.
+
+방문: #{visit_date} (#{visit_day}) #{visit_time}
+국적: #{nationality}
+예약번호: #{booking_number}
+
+아래 버튼을 눌러 상세 내용을 확인하세요.</div><button class="cp">복사</button></div></div>
+      <div class="row pick"><div class="lbl">부가 정보</div><div class="fx">입력 안 함</div></div>
+      <div class="row pick"><div class="lbl">채널 추가 안내</div><div class="fx">입력 안 함</div></div>
+      <div class="row pick"><div class="lbl">보안 템플릿</div><div class="fx">미설정</div></div>
+      <div class="row pick"><div class="lbl">카테고리</div><div class="fx">예약 &gt; 예약알림/리마인드(003004)</div></div>
+      <div class="row pick"><div class="lbl">대표 링크</div><div class="fx">추가 안 함</div></div>
+      <div class="row pick"><div class="lbl">버튼 타입</div><div class="fx">웹 링크 <b>기본값 채널 추가이니 바꾸세요</b></div></div>
+      <div class="row"><div class="lbl">버튼 이름</div><div class="val"><div class="fill plain">예약 상세 보기</div><button class="cp">복사</button></div></div>
+      <div class="row"><div class="lbl">버튼 링크<br><em style="font-style:normal;color:var(--ink3);font-size:12px">모바일·PC 동일</em></div><div class="val"><div class="fill">https://k-beautystation-host.vercel.app/bookings/#{booking_number}</div><button class="cp">복사</button></div></div>
+      <div class="row pick"><div class="lbl">바로연결</div><div class="fx">추가 안 함</div></div>
+    </div>
+  </div>
+
+  <div class="tpl" data-id="cncl">
+    <div class="thead"><span class="tno">04</span><span class="tname">예약 취소 통보</span><span class="tsend">고객·매장·관리자 취소 시</span>
+      <label class="chk"><input type="checkbox"> 등록함</label></div>
+    <div class="tbody">
+      <div class="note">개발자 테스트본은 <code>HOST_BKG_CNCL_STG</code> 라 코드가 달라 겹치지 않습니다. 그대로 등록되고, 테스트본은 나중에 지우면 됩니다.</div>
+      <div class="row pick" style="margin-top:10px"><div class="lbl">발신 프로필</div><div class="fx">일반 / @k-beautystation</div></div>
+      <div class="row"><div class="lbl">템플릿 코드</div><div class="val"><div class="fill">STG_HOST_BKG_CNCL</div><button class="cp">복사</button></div></div>
+      <div class="row"><div class="lbl">템플릿 이름</div><div class="val"><div class="fill plain">[호스트] 예약 취소 통보</div><button class="cp">복사</button></div></div>
+      <div class="row pick"><div class="lbl">메시지 유형</div><div class="fx">기본형 <b>기본값 복합형이니 바꾸세요</b></div></div>
+      <div class="row pick"><div class="lbl">강조 유형</div><div class="fx">선택 안 함</div></div>
+      <div class="row"><div class="lbl">템플릿 내용</div><div class="val"><div class="fill body">예약이 취소됐어요.
+
+방문: #{visit_date} (#{visit_day}) #{visit_time}
+국적: #{nationality}
+예약번호: #{booking_number}
+취소한 사람: #{cancelled_by}
+
+이 시간은 다시 예약받을 수 있어요.</div><button class="cp">복사</button></div></div>
+      <div class="row pick"><div class="lbl">부가 정보</div><div class="fx">입력 안 함</div></div>
+      <div class="row pick"><div class="lbl">채널 추가 안내</div><div class="fx">입력 안 함</div></div>
+      <div class="row pick"><div class="lbl">보안 템플릿</div><div class="fx">미설정</div></div>
+      <div class="row pick"><div class="lbl">카테고리</div><div class="fx">예약 &gt; 예약취소(003003)</div></div>
+      <div class="row pick"><div class="lbl">대표 링크</div><div class="fx">추가 안 함</div></div>
+      <div class="row pick"><div class="lbl">버튼 타입</div><div class="fx">웹 링크 <b>기본값 채널 추가이니 바꾸세요</b></div></div>
+      <div class="row"><div class="lbl">버튼 이름</div><div class="val"><div class="fill plain">예약 상세 보기</div><button class="cp">복사</button></div></div>
+      <div class="row"><div class="lbl">버튼 링크<br><em style="font-style:normal;color:var(--ink3);font-size:12px">모바일·PC 동일</em></div><div class="val"><div class="fill">https://k-beautystation-host.vercel.app/bookings/#{booking_number}</div><button class="cp">복사</button></div></div>
+      <div class="row pick"><div class="lbl">바로연결</div><div class="fx">추가 안 함</div></div>
+    </div>
+  </div>
+
+  <div class="tpl" data-id="chrq">
+    <div class="thead"><span class="tno">05</span><span class="tname">예약 시간 변경 요청</span><span class="tsend">고객 변경 신청 시</span>
+      <label class="chk"><input type="checkbox"> 등록함</label></div>
+    <div class="tbody">
+      <div class="row pick"><div class="lbl">발신 프로필</div><div class="fx">일반 / @k-beautystation</div></div>
+      <div class="row"><div class="lbl">템플릿 코드</div><div class="val"><div class="fill">STG_HOST_BKG_CHRQ</div><button class="cp">복사</button></div></div>
+      <div class="row"><div class="lbl">템플릿 이름</div><div class="val"><div class="fill plain">[호스트] 예약 시간 변경 요청</div><button class="cp">복사</button></div></div>
+      <div class="row pick"><div class="lbl">메시지 유형</div><div class="fx">기본형 <b>기본값 복합형이니 바꾸세요</b></div></div>
+      <div class="row pick"><div class="lbl">강조 유형</div><div class="fx">선택 안 함</div></div>
+      <div class="row"><div class="lbl">템플릿 내용</div><div class="val"><div class="fill body">예약 시간 변경 요청이 왔어요.
+
+변경: #{new_date} (#{new_day}) #{new_time}
+기존: #{old_date} (#{old_day}) #{old_time}
+고객: #{customer_name}
+예약번호: #{booking_number}
+
+아래 버튼을 눌러 상세 내용을 확인하세요.</div><button class="cp">복사</button></div></div>
+      <div class="row pick"><div class="lbl">부가 정보</div><div class="fx">입력 안 함</div></div>
+      <div class="row pick"><div class="lbl">채널 추가 안내</div><div class="fx">입력 안 함</div></div>
+      <div class="row pick"><div class="lbl">보안 템플릿</div><div class="fx">미설정</div></div>
+      <div class="row pick"><div class="lbl">카테고리</div><div class="fx">예약 &gt; 예약상태(003002)</div></div>
+      <div class="row pick"><div class="lbl">대표 링크</div><div class="fx">추가 안 함</div></div>
+      <div class="row pick"><div class="lbl">버튼 타입</div><div class="fx">웹 링크 <b>기본값 채널 추가이니 바꾸세요</b></div></div>
+      <div class="row"><div class="lbl">버튼 이름</div><div class="val"><div class="fill plain">예약 상세 보기</div><button class="cp">복사</button></div></div>
+      <div class="row"><div class="lbl">버튼 링크<br><em style="font-style:normal;color:var(--ink3);font-size:12px">모바일·PC 동일</em></div><div class="val"><div class="fill">https://k-beautystation-host.vercel.app/bookings/#{booking_number}</div><button class="cp">복사</button></div></div>
+      <div class="row pick"><div class="lbl">바로연결</div><div class="fx">추가 안 함</div></div>
+    </div>
+  </div>
+
+  <div class="tpl" data-id="chok">
+    <div class="thead"><span class="tno">06</span><span class="tname">예약 시간 변경 완료</span><span class="tsend">변경 수락 시</span>
+      <label class="chk"><input type="checkbox"> 등록함</label></div>
+    <div class="tbody">
+      <div class="row pick"><div class="lbl">발신 프로필</div><div class="fx">일반 / @k-beautystation</div></div>
+      <div class="row"><div class="lbl">템플릿 코드</div><div class="val"><div class="fill">STG_HOST_BKG_CHOK</div><button class="cp">복사</button></div></div>
+      <div class="row"><div class="lbl">템플릿 이름</div><div class="val"><div class="fill plain">[호스트] 예약 시간 변경 완료</div><button class="cp">복사</button></div></div>
+      <div class="row pick"><div class="lbl">메시지 유형</div><div class="fx">기본형 <b>기본값 복합형이니 바꾸세요</b></div></div>
+      <div class="row pick"><div class="lbl">강조 유형</div><div class="fx">선택 안 함</div></div>
+      <div class="row"><div class="lbl">템플릿 내용</div><div class="val"><div class="fill body">예약 시간 변경이 완료됐어요.
+
+변경: #{new_date} (#{new_day}) #{new_time}
+기존: #{old_date} (#{old_day}) #{old_time}
+고객: #{customer_name}
+예약번호: #{booking_number}
+
+아래 버튼을 눌러 상세 내용을 확인하세요.</div><button class="cp">복사</button></div></div>
+      <div class="row pick"><div class="lbl">부가 정보</div><div class="fx">입력 안 함</div></div>
+      <div class="row pick"><div class="lbl">채널 추가 안내</div><div class="fx">입력 안 함</div></div>
+      <div class="row pick"><div class="lbl">보안 템플릿</div><div class="fx">미설정</div></div>
+      <div class="row pick"><div class="lbl">카테고리</div><div class="fx">예약 &gt; 예약상태(003002)</div></div>
+      <div class="row pick"><div class="lbl">대표 링크</div><div class="fx">추가 안 함</div></div>
+      <div class="row pick"><div class="lbl">버튼 타입</div><div class="fx">웹 링크 <b>기본값 채널 추가이니 바꾸세요</b></div></div>
+      <div class="row"><div class="lbl">버튼 이름</div><div class="val"><div class="fill plain">예약 상세 보기</div><button class="cp">복사</button></div></div>
+      <div class="row"><div class="lbl">버튼 링크<br><em style="font-style:normal;color:var(--ink3);font-size:12px">모바일·PC 동일</em></div><div class="val"><div class="fill">https://k-beautystation-host.vercel.app/bookings/#{booking_number}</div><button class="cp">복사</button></div></div>
+      <div class="row pick"><div class="lbl">바로연결</div><div class="fx">추가 안 함</div></div>
+    </div>
+  </div>
+
+  <h2>개발자 전달용</h2>
+  <div class="box">
+    <div class="val"><div class="fill" id="devblock">알림톡 템플릿 6종 (STG)
+
+발송 시점                             템플릿 코드
+------------------------------------------------------
+고객 예약 접수 완료                   STG_HOST_BKG_NEW
+방문 24시간 전                        STG_HOST_BKG_SOON
+미확인 예약 리마인드 (접수 후 1시간)   STG_HOST_BKG_UNCK
+예약 취소 (고객·매장·관리자)          STG_HOST_BKG_CNCL
+고객 변경 신청                        STG_HOST_BKG_CHRQ
+변경 수락 완료                        STG_HOST_BKG_CHOK
+
+변수 매핑
+------------------------------------------------------
+visit_date       방문일 YYYY-MM-DD
+visit_day        방문 요일 한 글자 (월~일)
+visit_time       방문 시각 HH:mm (KST)
+
+new_date         변경 후 방문일 YYYY-MM-DD
+new_day          변경 후 요일 한 글자
+new_time         변경 후 시각 HH:mm
+old_date         변경 전 방문일 YYYY-MM-DD
+old_day          변경 전 요일 한 글자
+old_time         변경 전 시각 HH:mm
+
+nationality      국적 한글명 (대한민국, 대만, 일본 …)
+customer_name    여권 영문명, 14자 초과 시 자름
+booking_number   예약번호 13자리
+cancelled_by     '고객' 또는 '매장'
+
+템플릿별 사용 변수
+------------------------------------------------------
+NEW / SOON / UNCK
+  visit_date, visit_day, visit_time, nationality,
+  booking_number
+
+CNCL
+  visit_date, visit_day, visit_time, nationality,
+  booking_number, cancelled_by
+
+CHRQ / CHOK
+  new_date, new_day, new_time,
+  old_date, old_day, old_time,
+  customer_name, booking_number
+
+주의
+------------------------------------------------------
+- 요일은 '월' 한 글자만 넘겨주세요. 괄호는 템플릿에 고정입니다
+- 국적은 영문 원문이 아니라 한글명입니다
+- 버튼 링크가 예약번호를 받습니다. HOST 에서 예약번호로 해당 예약을 열 수 있어야 합니다
+- 버튼 링크 도메인이 환경별로 달라 템플릿도 환경별로 따로 등록합니다
+- 운영은 앞의 STG_ 를 PRD_ 로 바꾸고 링크를 운영 도메인으로 등록합니다</div><button class="cp">복사</button></div>
+  </div>
+
+  <h2>변수 자릿수</h2>
+  <div class="box scroll">
+    <table class="v">
+      <tr><th>변수</th><th>예시 값</th><th>자릿수</th></tr>
+      <tr><td><code>#{visit_date}</code></td><td>2026-07-20</td><td>10</td></tr>
+      <tr><td><code>#{visit_day}</code></td><td>월</td><td>1</td></tr>
+      <tr><td><code>#{visit_time}</code></td><td>14:00</td><td>5</td></tr>
+      <tr><td><code>#{new_date}</code> <code>#{old_date}</code></td><td>2026-07-21</td><td>10</td></tr>
+      <tr><td><code>#{new_day}</code> <code>#{old_day}</code></td><td>화</td><td>1</td></tr>
+      <tr><td><code>#{new_time}</code> <code>#{old_time}</code></td><td>11:30</td><td>5</td></tr>
+      <tr><td><code>#{nationality}</code></td><td>대만</td><td>2</td></tr>
+      <tr><td><code>#{customer_name}</code></td><td>KIM MINJI</td><td>9</td></tr>
+      <tr><td><code>#{booking_number}</code></td><td>260716042EN07</td><td>13</td></tr>
+      <tr><td><code>#{cancelled_by}</code></td><td>고객</td><td>2</td></tr>
+    </table>
+  </div>
+
+  <div class="foot">예약 알림톡 템플릿 6종 · 호스트 수신용 · STG</div>
+</div>
+
+<script>
+(function(){
+  var KEY='kbs_alimtalk_done_v1';
+  function save(){
+    var d={};
+    document.querySelectorAll('.tpl').forEach(function(t){ d[t.dataset.id]=t.querySelector('input').checked; });
+    try{ localStorage.setItem(KEY, JSON.stringify(d)); }catch(e){}
+    document.getElementById('pdone').textContent=document.querySelectorAll('.tpl input:checked').length;
+  }
+  try{
+    var saved=JSON.parse(localStorage.getItem(KEY)||'{}');
+    document.querySelectorAll('.tpl').forEach(function(t){
+      if(saved[t.dataset.id]){ t.querySelector('input').checked=true; t.classList.add('done'); }
+    });
+  }catch(e){}
+  document.querySelectorAll('.tpl input').forEach(function(i){
+    i.addEventListener('change',function(){ i.closest('.tpl').classList.toggle('done', i.checked); save(); });
+  });
+  save();
+
+  function fallback(box,done){
+    var r=document.createRange(); r.selectNodeContents(box);
+    var s=window.getSelection(); s.removeAllRanges(); s.addRange(r);
+    var ok=false; try{ ok=document.execCommand('copy'); }catch(e){}
+    if(ok){ s.removeAllRanges(); done(); }
+  }
+  document.querySelectorAll('.cp').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var box=btn.parentElement.querySelector('.fill');
+      var text=box.innerText;
+      var done=function(){
+        var old=btn.textContent; btn.textContent='복사됨'; btn.classList.add('ok');
+        setTimeout(function(){ btn.textContent=old; btn.classList.remove('ok'); },1200);
+      };
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(done, function(){ fallback(box,done); });
+      } else { fallback(box,done); }
+    });
+  });
+})();
+</script>
+</body>
+</html>

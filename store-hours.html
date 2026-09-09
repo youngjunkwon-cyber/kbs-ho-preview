@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>운영시간 설정 프로토타입</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5f5f5;color:#222;font-size:13px;line-height:1.55}
+button{font-family:inherit;cursor:pointer}
+input,select{font-family:inherit;font-size:13px;color:#333}
+
+.wrap{display:flex;min-height:100vh}
+.sb{width:180px;background:#fff;border-right:2px solid #e8537a;padding:18px 0 24px;flex:none}
+.sb .logo{font-weight:800;color:#e8537a;font-size:14px;padding:0 18px 14px}
+.sb a{display:block;padding:7px 18px;color:#444;font-size:11px;text-decoration:none}
+.sb a.sub{padding-left:30px}
+.sb a.on{background:#fbf0f3;color:#e8537a;font-weight:600}
+.sb .grp{padding:7px 18px;color:#bfbfbf;font-size:11px}
+
+.main{flex:1;padding:16px 32px 60px;min-width:0}
+.acct{display:flex;justify-content:flex-end;align-items:center;gap:8px;padding-bottom:12px;color:#595959;font-size:12px}
+.acct i{width:26px;height:26px;border-radius:13px;background:#e5e5e5;display:block}
+h1{font-size:20px;font-weight:800;line-height:28px}
+.subt{color:#8c8c8c;font-size:12px;margin-top:4px;margin-bottom:18px}
+.tabs{display:flex;align-items:center;border-bottom:1px solid #e5e5e5;flex-wrap:wrap}
+.tabs .t{padding:6px 11px;font-size:11px;color:#595959;border-bottom:2px solid transparent}
+.tabs .t.on{color:#1677ff;font-weight:600;border-bottom-color:#1677ff}
+.tabs .sp{flex:1}
+.tabs .b{margin-left:8px}
+
+.btn{border:1px solid #d9d9d9;background:#fff;color:#444;border-radius:6px;padding:6px 18px;font-size:12px}
+.btn.p{background:#1f1f1f;border-color:#1f1f1f;color:#fff}
+.btn.add{padding:7px 14px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+.body{display:flex;gap:20px;padding-top:20px;align-items:flex-start}
+.cards{flex:1;min-width:0}
+.card{background:#fff;border:1px solid #efefef;border-radius:8px;padding:20px 24px 22px}
+.chd{display:flex;align-items:center;padding-bottom:14px}
+.chd h2{font-size:15px;font-weight:700}
+.chd .sp{flex:1}
+
+.seg{display:inline-flex;border:1px solid #d9d9d9;border-radius:6px;overflow:hidden}
+.seg button{border:0;background:#fff;color:#595959;padding:8px 18px;font-size:12px}
+.seg button.on{background:#1677ff;color:#fff;font-weight:600}
+
+.days{padding-top:14px;display:flex;flex-direction:column;gap:8px}
+.row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.row .lb{width:106px;flex:none;color:#333}
+.row.off .lb{color:#bfbfbf}
+.pick{display:inline-flex;align-items:center;gap:6px;border:1px solid #d9d9d9;border-radius:4px;padding:6px 11px;background:#fff;width:220px;justify-content:space-between}
+.pick.bad{border-color:#ff4d4f}
+.pick input{border:0;outline:0;width:74px;background:transparent}
+.pick input:disabled{color:#bfbfbf}
+.pick .ar{color:#8c8c8c}
+.chk{display:inline-flex;align-items:center;gap:6px;color:#595959}
+.chk input{width:16px;height:16px;accent-color:#1677ff}
+.chk.on{color:#222}
+select{border:1px solid #d9d9d9;border-radius:4px;padding:6px 8px;background:#fff;height:32px}
+.brk{display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap}
+.brkone{display:inline-flex;align-items:center;gap:8px}
+.brkone .x,.exl .x,.chip .x{color:#bfbfbf;cursor:pointer;font-size:11px}
+.next{font-size:11px;color:#8c8c8c}
+.exline{padding-left:120px;font-size:12px;color:#8c8c8c}
+.err{padding-left:120px;font-size:12px;color:#ff4d4f}
+
+.sect{font-size:14px;font-weight:700;padding-top:14px;padding-bottom:2px}
+.slabel{font-size:12px;color:#595959;font-weight:600;padding-top:10px;padding-bottom:4px}
+.empty{color:#bfbfbf;padding:4px 0}
+.opt{display:flex;align-items:center;gap:8px;padding:4px 0}
+.opt input{width:16px;height:16px;accent-color:#1677ff}
+.chip{display:inline-flex;align-items:center;gap:8px;background:#e8f3ff;border:1px solid #1677ff;color:#1677ff;border-radius:14px;padding:5px 11px 5px 13px;font-size:12px;margin-right:8px}
+.chip .x{color:#1677ff}
+.daychips{display:inline-flex;gap:6px}
+.daychips button{border:1px solid #d9d9d9;background:#fff;color:#595959;border-radius:4px;padding:6px 11px;font-size:12px}
+.daychips button.on{background:#1677ff;border-color:#1677ff;color:#fff}
+.rule{display:flex;flex-direction:column;gap:5px;padding:5px 0}
+.warn{color:#d46b08;font-size:12px;padding-bottom:6px}
+.note{color:#8c8c8c;font-size:12px;padding-bottom:2px}
+
+.newrow{background:#fafafa;border:1px solid #e8e8e8;border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:14px;margin-top:6px}
+.newrow .r{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.newrow .hint{color:#8c8c8c;font-size:12px}
+input[type=date],input[type=number]{border:1px solid #d9d9d9;border-radius:4px;padding:6px 11px;background:#fff;height:32px}
+
+.exl{max-height:300px;overflow:auto}
+.mh{font-size:12px;color:#8c8c8c;font-weight:600;padding:10px 0 2px}
+.ex{display:flex;align-items:center;padding:8px 0;border-bottom:1px solid #f5f5f5}
+.ex .d{width:276px;flex:none}
+.ex .v{flex:1}
+
+.pv{width:320px;flex:none;background:#fff;border:1px solid #efefef;border-radius:8px;padding:14px 16px 16px}
+.pv h3{font-size:13px;font-weight:700;margin-bottom:12px}
+.fo{background:#f5f5f5;border:1px solid #e5e5e5;border-radius:8px;padding:16px}
+.fo .k{font-size:11px;color:#7a7a7a;font-weight:600}
+.fo .st{font-size:19px;font-weight:800;line-height:26px;margin-top:6px}
+.fo .hp{font-size:13px;color:#7a7a7a;margin-top:2px}
+.fo .nt{background:#fff7e6;border:1px solid #ffe7b8;color:#d46b08;border-radius:6px;padding:8px 12px;font-size:12px;margin-top:12px}
+.fo .wk{margin-top:14px}
+.fo .wr{display:flex;padding:6px 0;font-size:12px}
+.fo .wr b{width:66px;flex:none;font-weight:400}
+.fo .wr .bk{padding-left:66px;color:#7a7a7a;font-size:11px}
+.fo .rl{margin-top:10px;color:#7a7a7a;font-size:11px}
+.fo .tg{margin-top:12px;font-weight:600;cursor:pointer;font-size:12px}
+.fo .none{color:#bfbfbf;font-size:12px}
+
+.mask{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:9}
+.mask.on{display:flex}
+.dlg{background:#fff;border-radius:8px;width:480px;padding:24px 28px 22px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
+.dlg h3{font-size:17px;font-weight:800;line-height:26px}
+.dlg .sub{color:#8c8c8c;font-size:12px;margin-top:4px}
+.dlg hr{border:0;border-top:1px solid #f0f0f0;margin:16px 0}
+.dlg .b1{font-weight:600}
+.dlg .b2{color:#595959;margin-top:6px}
+.dlg .ft{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+.toast{position:fixed;left:50%;bottom:32px;transform:translateX(-50%);background:#1f1f1f;color:#fff;padding:10px 18px;border-radius:6px;font-size:13px;opacity:0;transition:.25s;z-index:20}
+.toast.on{opacity:1}
+.pill{background:#fff7e6;border:1px solid #ffe7b8;color:#d46b08;border-radius:6px;padding:6px 10px;font-size:12px;margin-right:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="sb">
+    <div class="logo">ADMIN</div>
+    <a href="#">처음으로</a><a href="#">공지사항</a><a href="#">예약</a><a href="#">고객지원</a><a href="#">회원</a>
+    <a href="#">스토어</a>
+    <a href="#" class="sub on">정보관리</a><a href="#" class="sub">채팅조회</a><a href="#" class="sub">상담조회</a><a href="#" class="sub">리뷰관리</a>
+    <div class="grp">이미지 관리</div>
+    <a href="#" class="sub">전/후 사진 관리</a><a href="#" class="sub">갤러리 사진 관리</a>
+    <a href="#">상품</a><a href="#">옵션 관리</a><a href="#">매거진</a><a href="#">스토어 칼럼</a>
+    <a href="#">SEO</a><a href="#">AI 관리</a><a href="#">채팅</a><a href="#">상담</a><a href="#">리뷰</a><a href="#">계정</a>
+    <a href="#" class="sub">관리자 계정 관리</a><a href="#" class="sub">CSM 계정 관리</a><a href="#" class="sub">스토어 계정 관리</a>
+    <a href="#">광고정보관리</a>
+  </nav>
+
+  <main class="main">
+    <div class="acct"><i></i>관리자</div>
+    <h1>스토어 정보 수정</h1>
+    <div class="subt">스토어 기본 정보와 운영 설정을 수정합니다.</div>
+
+    <div class="tabs">
+      <span class="t">기본정보</span><span class="t">이미지 정보</span><span class="t">노출정보</span>
+      <span class="t">담당자 및 연락처</span><span class="t">인스타그램</span><span class="t">채팅 환영 메시지</span>
+      <span class="t">위치정보</span><span class="t on">운영시간</span><span class="t">예약설정</span>
+      <span class="t">스토어 특징</span><span class="t">콘텐츠 채널 정보</span><span class="t">버튼 및 메신저 설정</span>
+      <span class="t">리뷰 설정</span><span class="t">스토어 칼럼 설정</span><span class="t">챗봇 설정</span>
+      <span class="t">AI 소개</span><span class="t">FAQ</span>
+      <span class="sp"></span>
+      <button class="btn b" onclick="revert()">취소</button>
+      <button class="btn p b" onclick="save()">저장</button>
+    </div>
+
+    <div class="body">
+      <div class="cards">
+        <div class="card">
+          <div class="chd"><h2>운영시간</h2><div class="sp"></div><button class="btn p" onclick="save()">저장</button></div>
+
+          <div class="seg" id="modes"></div>
+          <div class="days" id="days"></div>
+
+          <div class="sect">쉬는 날</div>
+          <div id="rulesBlock">
+            <div class="slabel">요일마다 쉬는 날</div>
+            <div id="rules"></div>
+            <div style="padding-top:8px"><button class="btn add" onclick="addRule()">+&nbsp; 규칙 추가</button></div>
+          </div>
+
+          <div class="slabel">공휴일</div>
+          <label class="opt"><input type="radio" name="hol" value="none" onchange="setHol('none')"> 평소 요일대로 엽니다</label>
+          <label class="opt"><input type="radio" name="hol" value="closed" onchange="setHol('closed')"> 쉽니다</label>
+
+          <div class="slabel">매달 같은 날짜</div>
+          <div id="monthly"></div>
+          <div id="monthlyForm"></div>
+          <div style="padding-top:8px"><button class="btn add" onclick="openMonthly()">+&nbsp; 날짜 추가</button></div>
+
+          <div class="sect">특정 날짜</div>
+          <div class="note">하루만 쉬거나 하루만 다르게 여는 날을 넣습니다.</div>
+          <div class="warn" id="warnNoMode" style="display:none">여는 방식을 고르지 않으면 특정 날짜도 고객 화면에 보이지 않습니다.</div>
+          <div class="exl" id="exl"></div>
+          <div id="exForm"></div>
+          <div style="padding-top:10px"><button class="btn add" onclick="openEx()">+&nbsp; 날짜 추가</button></div>
+        </div>
+      </div>
+
+      <aside class="pv">
+        <h3>미리보기</h3>
+        <div class="fo" id="fo"></div>
+        <div style="margin-top:12px;font-size:11px;color:#8c8c8c">지금 시각 기준으로 계산합니다.<br>아래에서 바꿔 볼 수 있습니다.</div>
+        <div style="margin-top:6px"><input type="datetime-local" id="now" onchange="render()" style="width:100%"></div>
+      </aside>
+    </div>
+  </main>
+</div>
+
+<div class="mask" id="mask"><div class="dlg" id="dlg"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------------- 상태 ---------------- */
+const DAYS=['월요일','화요일','수요일','목요일','금요일','토요일','일요일'];
+const SHORT=['월','화','수','목','금','토','일'];
+const MODES=['모든 요일 같아요','평일과 주말이 달라요','요일마다 달라요'];
+
+const S={
+  mode:null,
+  // 모드별 값을 따로 들고 있는다. 되돌리면 그대로 나온다
+  rows:{
+    0:[mk('매일')],
+    1:[mk('평일'),mk('주말')],
+    2:DAYS.map(d=>mk(d))
+  },
+  rules:[],            // {cyc:'매주'|'격주'|'매월', wk:'첫 번째와 세 번째'|..., day:0..6}
+  hol:null,            // 'none' | 'closed'
+  monthly:[],          // [15, 1]
+  ex:[],               // {from,to,closed,a,b}
+  dirty:false, applied:true
+};
+function mk(label){return {label,a:'',b:'',off:false,cyc:'매주',wk:'첫 번째와 세 번째',brk:[],_a:'',_b:''};}
+
+/* ---------------- 달력 ---------------- */
+function nthWeekday(y,m,dow,n){ // n: 1..4, 'last'
+  const out=[];
+  const dim=new Date(y,m,0).getDate();
+  for(let d=1;d<=dim;d++){const t=new Date(y,m-1,d);if(((t.getDay()+6)%7)===dow)out.push(d);}
+  if(n==='last')return out[out.length-1];
+  return out[n-1];
+}
+function biweekly(y,m,dow,which){
+  const a=nthWeekday(y,m,dow,which==='첫 번째와 세 번째'?1:2);
+  const b=nthWeekday(y,m,dow,which==='첫 번째와 세 번째'?3:4);
+  return [a,b].filter(Boolean);
+}
+function ruleText(r){
+  const now=new Date(), y=now.getFullYear(), m=now.getMonth()+1;
+  const ny=m===12?y+1:y, nm=m===12?1:m+1;
+  if(r.cyc==='매주')return `매주 ${DAYS[r.day]}에 쉽니다.`;
+  if(r.cyc==='격주'){
+    const A=biweekly(y,m,r.day,r.wk), B=biweekly(ny,nm,r.day,r.wk);
+    return `${m}월은 ${A.join('일과 ')}일, ${nm}월은 ${B.join('일과 ')}일입니다.`;
+  }
+  const a=nthWeekday(y,m,r.day,r.wk==='마지막'?'last':({'첫 번째':1,'두 번째':2,'세 번째':3,'네 번째':4})[r.wk]);
+  const b=nthWeekday(ny,nm,r.day,r.wk==='마지막'?'last':({'첫 번째':1,'두 번째':2,'세 번째':3,'네 번째':4})[r.wk]);
+  return `${m}월은 ${a}일, ${nm}월은 ${b}일입니다.`;
+}
+function rowRuleText(r,dayIdx){
+  const now=new Date(), y=now.getFullYear(), m=now.getMonth()+1;
+  const ny=m===12?y+1:y, nm=m===12?1:m+1;
+  if(r.cyc==='격주'){
+    const A=biweekly(y,m,dayIdx,r.wk), B=biweekly(ny,nm,dayIdx,r.wk);
+    return `${m}월은 ${A.join('일과 ')}일, ${nm}월은 ${B.join('일과 ')}일입니다.`;
+  }
+  const map={'첫 번째':1,'두 번째':2,'세 번째':3,'네 번째':4};
+  const a=nthWeekday(y,m,dayIdx,r.wk==='마지막'?'last':map[r.wk]);
+  const b=nthWeekday(ny,nm,dayIdx,r.wk==='마지막'?'last':map[r.wk]);
+  return `${m}월은 ${a}일, ${nm}월은 ${b}일입니다.`;
+}
+
+/* ---------------- 유틸 ---------------- */
+const $=s=>document.querySelector(s);
+const mins=t=>{if(!t)return null;const[h,m]=t.split(':').map(Number);return h*60+m;};
+const pad=n=>String(n).padStart(2,'0');
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1800);}
+function dirty(){S.dirty=true;S.applied=false;}
+
+/* ---------------- 여는 방식 ---------------- */
+function renderModes(){
+  $('#modes').innerHTML=MODES.map((m,i)=>
+    `<button class="${S.mode===i?'on':''}" onclick="setMode(${i})">${m}</button>`).join('');
+}
+function setMode(i){
+  if(S.mode===null){ // 첫 선택
+    S.mode=i;
+  }else if(i>S.mode){ // 줄이 늘어남: 빈 줄에 첫 줄 값을 채운다
+    const src=S.rows[S.mode][0];
+    S.rows[i].forEach(r=>{if(!r.a&&!r.b&&!r.off){r.a=src.a;r.b=src.b;r.brk=src.brk.map(x=>({...x}));}});
+    S.mode=i;
+  }else{
+    S.mode=i; // 줄이 줄어듦: 값은 그대로 들고 있으므로 되돌리면 다시 나온다
+  }
+  dirty();render();
+}
+
+/* ---------------- 요일 줄 ---------------- */
+function rows(){return S.mode===null?[]:S.rows[S.mode];}
+function renderDays(){
+  const el=$('#days');
+  if(S.mode===null){el.innerHTML='<div class="empty">먼저 여는 방식을 골라 주세요.</div>';return;}
+  const hasOff=(S.mode===1||S.mode===2);   // 매일 한 줄에는 휴무를 두지 않는다
+  const hasCyc=(S.mode===2);              // 주기는 요일 단위일 때만
+  el.innerHTML=rows().map((r,i)=>{
+    const bad=r._bad||{};
+    const over=(!r.off&&r.a&&r.b&&mins(r.b)<=mins(r.a));
+    let h=`<div class="row ${(r.off&&r.cyc==='매주')?'off':''}">
+      <span class="lb">${r.label}</span>
+      <span class="pick ${bad.time?'bad':''}">
+        <input type="time" step="300" value="${r.a}" ${(r.off&&r.cyc==='매주')?'disabled':''} placeholder="시작 시간" onchange="setT(${i},'a',this.value)">
+        <span class="ar">→</span>
+        <input type="time" step="300" value="${r.b}" ${(r.off&&r.cyc==='매주')?'disabled':''} onchange="setT(${i},'b',this.value)">
+      </span>
+      ${over?'<span class="next">다음날</span>':''}`;
+    if(hasOff){
+      h+=`<label class="chk ${r.off?'on':''}"><input type="checkbox" ${r.off?'checked':''} onchange="setOff(${i},this.checked)">휴무</label>`;
+      if(r.off&&hasCyc){
+        h+=`<select onchange="setCyc(${i},this.value)">${['매주','격주','매월'].map(c=>`<option ${r.cyc===c?'selected':''}>${c}</option>`).join('')}</select>`;
+        if(r.cyc==='격주')h+=`<select onchange="setWk(${i},this.value)">${['첫 번째와 세 번째','두 번째와 네 번째'].map(c=>`<option ${r.wk===c?'selected':''}>${c}</option>`).join('')}</select>`;
+        if(r.cyc==='매월')h+=`<select onchange="setWk(${i},this.value)">${['첫 번째','두 번째','세 번째','네 번째','마지막'].map(c=>`<option ${r.wk===c?'selected':''}>${c}</option>`).join('')}</select>`;
+      }
+    }
+    if(!(r.off&&r.cyc==='매주')){
+      h+='<span class="brk">';
+      r.brk.forEach((b,bi)=>{
+        h+=`<span class="brkone">휴게
+          <span class="pick ${(bad.brk||[]).includes(bi)?'bad':''}">
+            <input type="time" step="300" value="${b.a}" onchange="setB(${i},${bi},'a',this.value)">
+            <span class="ar">→</span>
+            <input type="time" step="300" value="${b.b}" onchange="setB(${i},${bi},'b',this.value)">
+          </span><span class="x" onclick="delB(${i},${bi})">✕</span></span>`;
+      });
+      h+=`<button class="btn add" onclick="addB(${i})">+ 휴게시간 추가</button></span>`;
+    }
+    h+='</div>';
+    if(hasCyc&&r.off&&r.cyc!=='매주')h+=`<div class="exline">${rowRuleText(r,i)}</div>`;
+    if(bad.msg)h+=`<div class="err">${bad.msg}</div>`;
+    return h;
+  }).join('');
+}
+function setT(i,k,v){const r=rows()[i];r[k]=v;r['_'+k]=v;dirty();render();}
+function setOff(i,v){const r=rows()[i];r.off=v;applyCycleTimes(r);dirty();render();}
+function setCyc(i,v){const r=rows()[i];r.cyc=v;r.wk=(v==='격주')?'첫 번째와 세 번째':'마지막';applyCycleTimes(r);dirty();render();}
+function applyCycleTimes(r){
+  if(r.off&&r.cyc==='매주'){            // 매주 쉬면 시간을 넣을 자리가 없다
+    if(r.a||r.b){r._a=r.a;r._b=r.b;}
+    r.a='';r.b='';
+  }else{                                 // 격주·매월은 쉬지 않는 주의 시간을 그 줄에 남긴다
+    if(!r.a&&!r.b){r.a=r._a||'';r.b=r._b||'';}
+  }}
+function setWk(i,v){rows()[i].wk=v;dirty();render();}
+function addB(i){rows()[i].brk.push({a:'',b:''});dirty();render();}
+function delB(i,bi){rows()[i].brk.splice(bi,1);dirty();render();}
+function setB(i,bi,k,v){rows()[i].brk[bi][k]=v;dirty();render();}
+
+/* ---------------- 쉬는 날 규칙 ---------------- */
+function renderRules(){
+  $('#rulesBlock').style.display=(S.mode===2)?'none':'';   // 요일마다 달라요면 요일 줄에서 잡는다
+  const el=$('#rules');
+  if(!S.rules.length){el.innerHTML='<div class="empty">아직 없습니다.</div>';return;}
+  el.innerHTML=S.rules.map((r,i)=>`<div class="rule"><div class="row" style="gap:8px">
+    <select onchange="rCyc(${i},this.value)">${['매주','격주','매월'].map(c=>`<option ${r.cyc===c?'selected':''}>${c}</option>`).join('')}</select>
+    ${r.cyc==='격주'?`<select onchange="rWk(${i},this.value)">${['첫 번째와 세 번째','두 번째와 네 번째'].map(c=>`<option ${r.wk===c?'selected':''}>${c}</option>`).join('')}</select>`:''}
+    ${r.cyc==='매월'?`<select onchange="rWk(${i},this.value)">${['첫 번째','두 번째','세 번째','네 번째','마지막'].map(c=>`<option ${r.wk===c?'selected':''}>${c}</option>`).join('')}</select>`:''}
+    <span class="daychips">${SHORT.map((s,d)=>`<button class="${r.day===d?'on':''}" onclick="rDay(${i},${d})">${s}</button>`).join('')}</span>
+    <span class="x" onclick="rDel(${i})">✕</span>
+  </div><div class="exline" style="padding-left:0">${ruleText(r)}</div></div>`).join('');
+}
+function addRule(){S.rules.push({cyc:'매주',wk:'첫 번째와 세 번째',day:0});dirty();render();}
+function rCyc(i,v){S.rules[i].cyc=v;S.rules[i].wk=(v==='격주')?'첫 번째와 세 번째':'마지막';dirty();render();}
+function rWk(i,v){S.rules[i].wk=v;dirty();render();}
+function rDay(i,d){S.rules[i].day=d;dirty();render();}
+function rDel(i){S.rules.splice(i,1);dirty();render();}
+function setHol(v){S.hol=v;dirty();render();}
+
+/* ---------------- 매달 같은 날짜 ---------------- */
+function renderMonthly(){
+  const el=$('#monthly');
+  el.innerHTML=S.monthly.length
+    ? S.monthly.map((d,i)=>`<span class="chip">매달 ${d}일<span class="x" onclick="mDel(${i})">✕</span></span>`).join('')
+    : '<div class="empty">아직 없습니다.</div>';
+}
+function openMonthly(){
+  $('#monthlyForm').innerHTML=`<div class="newrow">
+    <div class="r">매달 <input type="number" id="mDay" min="1" max="31" value="15" style="width:72px"> 일에 쉽니다</div>
+    <div class="hint">31일처럼 그 달에 없는 날짜는 건너뜁니다.</div>
+    <div class="r"><button class="btn" onclick="closeMonthly()">취소</button><button class="btn p" onclick="mAdd()">추가</button></div>
+  </div>`;
+}
+function closeMonthly(){$('#monthlyForm').innerHTML='';}
+function mAdd(){
+  const v=parseInt($('#mDay').value,10);
+  if(!(v>=1&&v<=31))return toast('1일에서 31일 사이로 넣어 주세요.');
+  if(S.monthly.includes(v))return toast('이미 넣은 날짜입니다.');
+  S.monthly.push(v);S.monthly.sort((a,b)=>a-b);closeMonthly();dirty();render();
+}
+function mDel(i){S.monthly.splice(i,1);dirty();render();}
+
+/* ---------------- 특정 날짜 ---------------- */
+function ymd(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function limits(){
+  const now=new Date();
+  return {min:ymd(now), max:(now.getFullYear()+1)+'-12-31'};
+}
+function exLabel(e){
+  const y=new Date().getFullYear();
+  const f=e.from.split('-'), t=e.to?e.to.split('-'):null;
+  const dow=SHORT[(new Date(e.from).getDay()+6)%7];
+  const head=(+f[0]===y? `${f[0]}-${f[1]}-${f[2]}` : `${f[0]}-${f[1]}-${f[2]}`);
+  if(!e.to||e.to===e.from)return `${head} (${dow})`;
+  return `${head} ~ ${t[1]}-${t[2]}`;
+}
+function renderEx(){
+  const el=$('#exl');
+  const today=ymd(new Date());
+  const list=S.ex.filter(e=>(e.to||e.from)>=today).sort((a,b)=>a.from<b.from?-1:1);
+  if(!list.length){el.innerHTML='<div class="empty">아직 없습니다.</div>';return;}
+  const y=new Date().getFullYear();
+  let last=null,h='';
+  list.forEach(e=>{
+    const key=e.from.slice(0,7);
+    if(key!==last){
+      const yy=+e.from.slice(0,4), mm=+e.from.slice(5,7);
+      h+=`<div class="mh">${yy===y?mm+'월':yy+'년 '+mm+'월'}</div>`;last=key;
+    }
+    const v=e.closed?'쉽니다':`${e.a} → ${e.b}`;
+    h+=`<div class="ex"><span class="d">${exLabel(e)}</span><span class="v">${v}</span><span class="x" onclick="exDel('${e.from}')">✕</span></div>`;
+  });
+  el.innerHTML=h;
+}
+function openEx(){
+  const L=limits();
+  $('#exForm').innerHTML=`<div class="newrow">
+    <div class="r">날짜
+      <input type="date" id="exFrom" min="${L.min}" max="${L.max}">
+      <span id="exToWrap" style="display:none">~ <input type="date" id="exTo" min="${L.min}" max="${L.max}"></span>
+      <label class="chk"><input type="checkbox" id="exMulti" onchange="document.getElementById('exToWrap').style.display=this.checked?'':'none'">여러 날</label>
+    </div>
+    <div class="r">이 날은
+      <label class="chk"><input type="radio" name="exk" value="c" checked onchange="exKind()">쉽니다</label>
+      <label class="chk"><input type="radio" name="exk" value="o" onchange="exKind()">이 시간에 엽니다</label>
+      <span class="pick" id="exTime" style="opacity:.4">
+        <input type="time" step="300" id="exA" disabled><span class="ar">→</span><input type="time" step="300" id="exB" disabled>
+      </span>
+    </div>
+    <div class="hint">여러 날을 켜면 날짜 칸이 시작과 끝 두 개가 됩니다. 오늘부터 ${L.max}까지 넣을 수 있습니다.</div>
+    <div class="r"><button class="btn" onclick="closeEx()">취소</button><button class="btn p" onclick="exAdd()">추가</button></div>
+  </div>`;
+}
+function exKind(){
+  const open=document.querySelector('input[name=exk]:checked').value==='o';
+  $('#exA').disabled=!open;$('#exB').disabled=!open;
+  $('#exTime').style.opacity=open?1:.4;
+}
+function closeEx(){$('#exForm').innerHTML='';}
+function exAdd(){
+  const from=$('#exFrom').value; if(!from)return toast('날짜를 골라 주세요.');
+  const multi=$('#exMulti').checked;
+  const to=multi?$('#exTo').value:from;
+  if(multi&&!to)return toast('끝나는 날짜를 골라 주세요.');
+  if(to<from)return toast('끝나는 날짜가 시작보다 빠릅니다.');
+  if(S.ex.some(e=>e.from===from))return toast('이미 넣은 날짜입니다.');
+  const closed=document.querySelector('input[name=exk]:checked').value==='c';
+  const a=$('#exA').value,b=$('#exB').value;
+  if(!closed&&(!a||!b))return toast('여는 시간을 넣어 주세요.');
+  S.ex.push({from,to,closed,a,b});closeEx();dirty();render();
+}
+function exDel(from){S.ex=S.ex.filter(e=>e.from!==from);dirty();render();}
+
+/* ---------------- 검증 ---------------- */
+function validate(){
+  let ok=true;
+  rows().forEach(r=>{
+    r._bad={};
+    if(r.off&&r.cyc==='매주')return;
+    if((r.a&&!r.b)||(!r.a&&r.b)){r._bad.time=1;r._bad.msg='종료 시간을 넣어 주세요.';ok=false;return;}
+    if(!r.a&&!r.b)return; // 비워 두는 것은 허용
+    const s=mins(r.a),e0=mins(r.b);
+    const e=(e0<=s)?e0+1440:e0;
+    const bads=[];
+    r.brk.forEach((b,i)=>{
+      if(!b.a||!b.b){bads.push(i);r._bad.msg='휴게시간을 끝까지 넣어 주세요.';return;}
+      let bs=mins(b.a),be=mins(b.b);
+      if(be<=bs)be+=1440;
+      if(bs<s)bs+=1440, be+=1440;
+      if(bs<s||be>e){bads.push(i);r._bad.msg='휴게시간은 여는 시간 안에 있어야 합니다.';}
+    });
+    for(let i=0;i<r.brk.length;i++)for(let j=i+1;j<r.brk.length;j++){
+      const A=r.brk[i],B=r.brk[j];if(!A.a||!A.b||!B.a||!B.b)continue;
+      let as=mins(A.a),ae=mins(A.b);if(ae<=as)ae+=1440;
+      let bs=mins(B.a),be=mins(B.b);if(be<=bs)be+=1440;
+      if(Math.min(ae,be)-Math.max(as,bs)>0){bads.push(i,j);r._bad.msg='휴게시간끼리 겹칩니다.';}
+    }
+    if(bads.length){r._bad.brk=[...new Set(bads)];ok=false;}
+  });
+  return ok;
+}
+
+/* ---------------- FO 미리보기 ---------------- */
+function rowFor(dayIdx){
+  if(S.mode===null)return null;
+  if(S.mode===0)return S.rows[0][0];
+  if(S.mode===1)return (dayIdx<=4)?S.rows[1][0]:S.rows[1][1];
+  return S.rows[2][dayIdx];
+}
+function isRestDay(date){
+  const dow=(date.getDay()+6)%7;
+  // 1층 특정 날짜
+  const d=ymd(date);
+  const hit=S.ex.find(e=>d>=e.from&&d<=(e.to||e.from));
+  if(hit)return hit.closed?{rest:true,src:'특정 날짜'}:{rest:false,open:[hit.a,hit.b],src:'특정 날짜'};
+  // 2층 휴무 규칙
+  if(S.monthly.includes(date.getDate()))return {rest:true,src:'매달 같은 날짜'};
+  if(S.mode===2){
+    const r=S.rows[2][dow];
+    if(r.off&&matchCycle(r,date,dow))return {rest:true,src:'요일 휴무'};
+  }else{
+    for(const r of S.rules)if(r.day===dow&&matchCycle(r,date,dow))return {rest:true,src:'요일 휴무'};
+  }
+  if(S.hol==='closed'&&isHoliday(date))return {rest:true,src:'공휴일'};
+  return {rest:false};
+}
+function matchCycle(r,date,dow){
+  if(r.cyc==='매주')return true;
+  const y=date.getFullYear(),m=date.getMonth()+1,d=date.getDate();
+  if(r.cyc==='격주')return biweekly(y,m,dow,r.wk).includes(d);
+  const map={'첫 번째':1,'두 번째':2,'세 번째':3,'네 번째':4};
+  return nthWeekday(y,m,dow,r.wk==='마지막'?'last':map[r.wk])===d;
+}
+const HOLI=['01-01','03-01','05-05','06-06','08-15','10-03','10-09','12-25'];
+function isHoliday(d){return HOLI.includes(pad(d.getMonth()+1)+'-'+pad(d.getDate()));}
+function nextOpen(from){
+  for(let i=1;i<=14;i++){
+    const d=new Date(from);d.setDate(d.getDate()+i);
+    const st=isRestDay(d);const r=rowFor((d.getDay()+6)%7);
+    const a=st.open?st.open[0]:(r&&r.a);
+    if(!st.rest&&a)return {d,a,i};
+  }
+  return null;
+}
+function renderFO(){
+  const el=$('#fo');
+  const hasHours=S.mode!==null&&rows().some(r=>r.a&&r.b);
+  if(!hasHours){el.innerHTML='<div class="none">운영시간이 없어 이 영역이 통째로 보이지 않습니다.</div>';return;}
+  const nowV=$('#now').value;
+  const now=nowV?new Date(nowV):new Date();
+  const dow=(now.getDay()+6)%7;
+  const st=isRestDay(now);
+  const r=rowFor(dow);
+  const a=st.open?st.open[0]:(r?r.a:''), b=st.open?st.open[1]:(r?r.b:'');
+  const cur=now.getHours()*60+now.getMinutes();
+  let state='휴무',help='';
+  if(!st.rest&&a&&b){
+    const s=mins(a);let e=mins(b);if(e<=s)e+=1440;
+    let c=cur;if(c<s&&e>1440)c+=1440;
+    const inBrk=(r?r.brk:[]).find(k=>{if(!k.a||!k.b)return false;let bs=mins(k.a),be=mins(k.b);if(be<=bs)be+=1440;return c>=bs&&c<be;});
+    if(inBrk){state='휴게 중';help=`${inBrk.b}에 다시 엽니다`;}
+    else if(c>=s&&c<e){state='운영 중';help=`${b}에 닫습니다`;}
+    else{state='운영 종료';const n=nextOpen(now);help=n?(n.i===1?`내일 ${n.a}에 엽니다`:`${DAYS[(n.d.getDay()+6)%7]} ${n.a}에 엽니다`):'';}
+  }else{
+    const n=nextOpen(now);help=n?(n.i===1?`내일 ${n.a}에 엽니다`:`${DAYS[(n.d.getDay()+6)%7]} ${n.a}에 엽니다`):'';
+  }
+  // 14일 이내 가장 가까운 특정 날짜 하나
+  let notice='';
+  const t0=ymd(now);
+  const soon=S.ex.filter(e=>e.from>=t0).sort((x,y)=>x.from<y.from?-1:1)[0];
+  if(soon){
+    const diff=(new Date(soon.from)-new Date(t0))/86400000;
+    if(diff<=14){
+      const f=soon.from.split('-'),t=(soon.to||soon.from).split('-');
+      notice=(soon.to&&soon.to!==soon.from)
+        ? `${+f[1]}월 ${+f[2]}일부터 ${+t[1]}월 ${+t[2]}일까지 ${soon.closed?'쉽니다':'다르게 엽니다'}`
+        : `${+f[1]}월 ${+f[2]}일은 ${soon.closed?'쉽니다':'다르게 엽니다'}`;
+    }
+  }
+  const open=el.dataset.open==='1';
+  let wk='';
+  if(open){
+    wk='<div class="wk">';
+    DAYS.forEach((d,i)=>{
+      const rr=rowFor(i);
+      let v='휴무';
+      if(rr&&rr.a&&rr.b){
+        const late=mins(rr.b)<=mins(rr.a);
+        v=`${rr.a} - ${late?'다음날 ':''}${rr.b}`;
+      }else if(S.mode===2&&S.rows[2][i].off&&S.rows[2][i].cyc!=='매주'){v='휴무';}
+      wk+=`<div class="wr"><b>${d}</b><span>${v}</span></div>`;
+      if(rr&&rr.brk.length&&rr.brk[0].a)wk+=`<div class="bk">휴게 ${rr.brk.map(k=>k.a+' - '+k.b).join(', ')}</div>`;
+    });
+    if(S.hol==='closed')wk+='<div class="wr"><b>공휴일</b><span>휴무</span></div>';
+    wk+='</div>';
+    const rl=[];
+    if(S.mode===2)S.rows[2].forEach((rr,i)=>{if(rr.off&&rr.cyc!=='매주')rl.push(`${rr.cyc} ${rr.wk} ${DAYS[i]} 휴무`);});
+    else S.rules.forEach(rr=>{if(rr.cyc!=='매주')rl.push(`${rr.cyc} ${rr.wk} ${DAYS[rr.day]} 휴무`);});
+    S.monthly.forEach(d=>rl.push(`매달 ${d}일 휴무`));
+    if(rl.length)wk+=`<div class="rl">${rl.join('<br>')}</div>`;
+  }
+  el.innerHTML=`<div class="k">운영시간</div><div class="st">${state}</div><div class="hp">${help}</div>
+   ${notice?`<div class="nt">${notice}</div>`:''}
+   ${wk}
+   <div class="tg" onclick="toggleWk()">요일별 시간 ${open?'접기':'보기'} ${open?'⌃':'⌄'}</div>`;
+}
+function toggleWk(){const el=$('#fo');el.dataset.open=el.dataset.open==='1'?'0':'1';renderFO();}
+
+/* ---------------- 저장 ---------------- */
+function save(){
+  if(!validate()){render();toast('저장하지 못했습니다. 빨간 칸을 확인해 주세요.');return;}
+  render();
+  const n=affected();
+  openDlg({
+    title:'예약 받는 시간에도 반영할까요?', sub:'운영시간은 저장했습니다',
+    b1:n?`바뀐 시간 밖에 예약 ${n}건이 있습니다.`:'',
+    b2:'이미 받은 예약은 그대로 유지됩니다. 새 예약만 바뀐 시간에 맞춰 받습니다.',
+    left:'나중에', right:'반영하기',
+    onLeft:()=>{closeDlg();S.dirty=false;S.applied=false;render();toast('운영시간만 저장했습니다.');},
+    onRight:()=>{closeDlg();S.dirty=false;S.applied=true;render();toast('예약 받는 시간까지 반영했습니다.');}
+  });
+}
+function affected(){ // 데모용 건수
+  let n=0;rows().forEach(r=>{if(r.off)n+=2;r.brk.forEach(b=>{if(b.a)n+=1;});});
+  return Math.min(n,9);
+}
+function revert(){
+  if(!confirm('저장 전 값으로 되돌립니다.'))return;
+  location.reload();
+}
+function openDlg(o){
+  $('#dlg').innerHTML=`<h3>${o.title}</h3><div class="sub">${o.sub}</div><hr>
+   ${o.b1?`<div class="b1">${o.b1}</div>`:''}<div class="b2">${o.b2}</div><hr>
+   <div class="ft"><button class="btn" id="dl">${o.left}</button><button class="btn p" id="dr">${o.right}</button></div>`;
+  $('#mask').classList.add('on');
+  $('#dl').onclick=o.onLeft;$('#dr').onclick=o.onRight;
+}
+function closeDlg(){$('#mask').classList.remove('on');}
+
+/* ---------------- 렌더 ---------------- */
+function render(){
+  renderModes();renderDays();renderRules();renderMonthly();renderEx();renderFO();
+  document.querySelectorAll('input[name=hol]').forEach(i=>i.checked=(i.value===S.hol));
+  $('#warnNoMode').style.display=(S.mode===null&&S.ex.length)?'':'none';
+  const bar=$('.tabs');
+  let pill=document.getElementById('pill');
+  if(!S.applied&&!S.dirty){
+    if(!pill){pill=document.createElement('span');pill.id='pill';pill.className='pill';pill.textContent='운영시간이 바뀌었습니다';
+      bar.insertBefore(pill,bar.querySelector('.b'));}
+  }else if(pill)pill.remove();
+}
+(function init(){
+  const n=new Date();n.setSeconds(0,0);
+  $('#now').value=n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate())+'T'+pad(n.getHours())+':'+pad(n.getMinutes());
+  render();
+})();
+</script>
+</body>
+</html>

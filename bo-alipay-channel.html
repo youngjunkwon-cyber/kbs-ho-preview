@@ -170,6 +170,7 @@ const MSG = {
   saveProd:    '알리페이 버튼이 모두 꺼져 이 콘텐츠가 알리페이에서 숨겨집니다. 저장할까요?',
   saveStore:   '알리페이 버튼이 모두 꺼져 스토어 페이지가 알리페이에서 숨겨집니다. 저장할까요?',
   bnExt:       '외부링크 배너는 알리페이에 노출되지 않습니다.',
+  bnExtLock:   '링크종류가 외부링크라 알리페이 노출을 바꿀 수 없습니다. 값은 그대로 보관합니다.',
   bnBtnOff:    '하단 버튼이 알리페이에서 꺼져 있어 이 배너는 알리페이에 노출되지 않습니다.',
   bnTarget:    '연결된 콘텐츠가 알리페이에 노출되지 않아 이 배너도 노출되지 않습니다.',
   hostHidden:  '이 상품은 알리페이에는 노출되지 않아요.',
@@ -824,6 +825,7 @@ function modal_ad() {
   const b = A(VIEW.id), langOk = ALI_LANGS.indexOf(b.lang) !== -1;
   const isExt = b.linkType === '외부링크', isLanding = b.linkType === '내부이미지랜딩페이지';
   const j = judgeAd(b);
+  const visLock = isExt;
   let h = '<div class="row"><div class="lbl"><span class="req">*</span>언어</div><div class="val">' + b.lang + '</div></div>' +
     '<div class="row"><div class="lbl"><span class="req">*</span>업체명</div><div class="val"><input type="text" value="' + esc(b.biz) + '" style="width:100%"></div></div>' +
     '<div class="row"><div class="lbl"><span class="req">*</span>광고제목</div><div class="val"><input type="text" value="' + esc(b.title) + '" style="width:100%"></div></div>' +
@@ -832,8 +834,9 @@ function modal_ad() {
     '<div class="row"><div class="lbl"><span class="req">*</span>광고표기여부</div><div class="val"><span class="rg">' +
     radio('adn', '활성화', b.adNotice, 'void(0)') + radio('adn', '비활성화', b.adNotice, 'void(0)') + '</span></div></div>' +
     '<div class="row"><div class="lbl"><span class="req">*</span>알리페이 노출<span class="newbadge">신규</span></div><div class="val"><span class="rg">' +
-    radio('bv', '노출', langOk ? b.aliVisible : '노출', "setVis('ad','노출')", !langOk) + radio('bv', '미노출', langOk ? b.aliVisible : '노출', "setVis('ad','미노출')", !langOk) + '</span>' +
-    (langOk ? '' : '<div class="notice grey">' + MSG.langOnly + '</div>') + '</div></div>' +
+    radio('bv', '노출', langOk ? b.aliVisible : '노출', "setVis('ad','노출')", !langOk || visLock) + radio('bv', '미노출', langOk ? b.aliVisible : '노출', "setVis('ad','미노출')", !langOk || visLock) + '</span>' +
+    (langOk ? '' : '<div class="notice grey">' + MSG.langOnly + '</div>') +
+    (langOk && visLock ? '<div class="hint">' + MSG.bnExtLock + '</div>' : '') + '</div></div>' +
     '<div class="row"><div class="lbl"><span class="req">*</span>링크종류</div><div class="val">' +
     '<select onchange="setAdLinkType(this.value)">' + ['외부링크', '내부링크', '내부이미지랜딩페이지'].map(v => '<option' + (v === b.linkType ? ' selected' : '') + '>' + v + '</option>').join('') + '</select></div></div>';
   if (isExt) h += '<div class="row"><div class="lbl"><span class="req">*</span>외부링크</div><div class="val"><input type="text" style="width:100%" value="' + esc(b.url) + '"></div></div>';
@@ -1135,7 +1138,7 @@ function scenarios() {
       run: function () { go('s-edit', 'S2'); VIEW.sect = 11; render(); } },
     { id: 'BO-CH-03', t: '예약만 켠 스토어 + 기본 설정 상품', d: '상품에 예약 행이 없어 알리페이 열이 비고, 채팅이 자동으로 켜져 노출됩니다.',
       run: function () { const st = S('S3'); ROWS_STORE.forEach(r => st.btns[r.k].ali = false); st.btns.booking.ali = true; const p = P('P3'); p.mode = '기본 설정'; VIEW.lang = p.lang; go('p-list'); openProduct('P3'); } },
-    { id: 'BO-CH-05-e1', t: '링크종류 = 외부링크', d: '알리페이 노출 값과 무관하게 미노출됩니다. 사유는 외부 연결.',
+    { id: 'BO-CH-05-e1', t: '링크종류 = 외부링크', d: '알리페이 노출 라디오가 잠기고 값은 유지됩니다. 사유는 외부 연결.',
       run: function () { const b = A('B2'); VIEW.lang = b.lang; go('a-list'); openAd('B2'); } },
     { id: 'BO-CH-05-e2', t: '하단 버튼 링크 종류 = 외부링크', d: '알리페이 표시여부가 비활성으로 잠기고 배너가 미노출됩니다.',
       run: function () { const b = A('B4'); VIEW.lang = b.lang; go('a-list'); openAd('B4'); } },
