@@ -169,8 +169,7 @@ const MSG = {
   storeHide:   n => '소속 상품 ' + n + '건이 알리페이에서 함께 숨겨집니다.',
   saveProd:    '알리페이 버튼이 모두 꺼져 이 콘텐츠가 알리페이에서 숨겨집니다. 저장할까요?',
   saveStore:   '알리페이 버튼이 모두 꺼져 스토어 페이지가 알리페이에서 숨겨집니다. 저장할까요?',
-  bnExt:       '외부링크 배너는 알리페이에 노출되지 않습니다.',
-  bnExtLock:   '링크종류가 외부링크라 알리페이 노출을 바꿀 수 없습니다. 값은 그대로 보관합니다.',
+  bnExtLock:   '외부링크 배너는 알리페이에 노출되지 않아 이 설정을 바꿀 수 없습니다. 저장된 값은 그대로 보관합니다.',
   bnBtnOff:    '하단 버튼이 알리페이에서 꺼져 있어 이 배너는 알리페이에 노출되지 않습니다.',
   bnTarget:    '연결된 콘텐츠가 알리페이에 노출되지 않아 이 배너도 노출되지 않습니다.',
   hostHidden:  '이 상품은 알리페이에는 노출되지 않아요.',
@@ -846,8 +845,7 @@ function modal_ad() {
   h += '<div class="row"><div class="lbl"><span class="req">*</span>대표 이미지</div><div class="val"><span class="tblnote">banner_' + b.id + '.jpg (기존)</span></div></div>';
   if (isLanding) h += '<div class="row"><div class="lbl"><span class="req">*</span>상세 이미지</div><div class="val"><span class="tblnote">landing_' + b.id + '.jpg (기존)</span></div></div>';
   if (langOk && b.aliVisible === '노출') {
-    if (j.reason === '외부 연결') h += '<div class="notice">' + MSG.bnExt + '</div>';
-    else if (j.reason === '알리페이 버튼 없음') h += '<div class="notice">' + MSG.bnBtnOff + '</div>';
+    if (j.reason === '알리페이 버튼 없음') h += '<div class="notice">' + MSG.bnBtnOff + '</div>';
     else if (j.reason === '연결 대상 미노출') h += '<div class="notice">' + MSG.bnTarget + '</div>';
   }
   if (isLanding && b.btn) {
