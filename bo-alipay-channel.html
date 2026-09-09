@@ -446,7 +446,7 @@ const TITLES = { 'p-list': '입점사 스토어별 상품 정보 관리', 's-lis
   'a-list': '광고 관리', 'c-list': '기획전 관리', 'm-edit': '매거진 등록·수정', 'btn-spec': '버튼 설정 공통 구조', 'h-edit': '상품 수정 (호스트)' };
 const SCREEN_ID = { 'p-list': 'BO-CH-02 / BO-CH-01', 's-list': 'BO-CH-04', 's-edit': 'BO-CH-03', 'a-list': 'BO-CH-06 / BO-CH-05', 'c-list': 'BO-CH-09 / BO-CH-08', 'm-edit': 'BO-CH-07', 'btn-spec': 'BO-CH-10', 'h-edit': 'HOST-CH-01' };
 
-function go(name, id) { VIEW.name = name; if (id !== undefined) VIEW.id = id; if (name === 's-edit') VIEW.sect = 2; render(); window.scrollTo(0, 0); }
+function go(name, id) { VIEW.name = name; if (id !== undefined) VIEW.id = id; if (name === 's-edit') { VIEW.sect = 2; VIEW.savedVis = S(VIEW.id).aliVisible; } render(); window.scrollTo(0, 0); }
 window.go = go;
 
 const aliLangOk = () => ALI_LANGS.indexOf(VIEW.lang) !== -1;
@@ -576,14 +576,6 @@ window.setBtn = function (kind, k, ch, on) {
 window.setVis = function (kind, v) {
   const obj = kind === 'store' ? S(VIEW.id) : kind === 'product' ? P(VIEW.id) : kind === 'ad' ? A(VIEW.id) : C(VIEW.id);
   const before = obj.aliVisible;
-  if (kind === 'store' && v === '미노출' && obj.prodCount >= 10) {
-    const im = impactOfHiding(obj);
-    confirmBox('알리페이 미노출로 저장',
-      '<p><b>' + esc(obj.name) + '</b></p><p>스토어를 알리페이에서 숨기면 소속 상품 ' + obj.prodCount + '건이 함께 숨겨지고, 이 스토어나 소속 상품을 가리키는 배너 ' + im.M + '건과 노출 가능 항목이 0건이 되는 기획전 ' + im.K + '건도 알리페이에 노출되지 않습니다.</p><p class="hint">웹 노출은 그대로 유지됩니다.</p>',
-      function () { obj.aliVisible = v; logChange(obj, '알리페이 노출', before, v, '소속 상품 ' + obj.prodCount + '건'); render(); },
-      function () { render(); }, '미노출로 저장');
-    return;
-  }
   obj.aliVisible = v;
   logChange(obj, '알리페이 노출', before, v, kind === 'store' ? '소속 상품 ' + obj.prodCount + '건' : '');
   render();
@@ -897,7 +889,7 @@ function screen_cList() {
 window.openColl = function (id) { VIEW.id = id; MODAL = 'coll'; render(); };
 window.addCollStore = function (sid) { const c = C(VIEW.id); if (c.stores.indexOf(sid) === -1) { c.stores.push(sid); logChange(c, '구성 항목 · 스토어 추가', '-', S(sid).name); } render(); };
 window.delCollStore = function (sid) { const c = C(VIEW.id); c.stores = c.stores.filter(x => x !== sid); logChange(c, '구성 항목 · 스토어 삭제', S(sid).name, '-'); render(); };
-window.delCollProduct = function (pid) { const c = C(VIEW.id); c.products = c.products.filter(x => x !== pid); render(); };
+window.delCollProduct = function (pid) { const c = C(VIEW.id); c.products = c.products.filter(x => x !== pid); logChange(c, '구성 항목 · 상품 삭제', P(pid) ? P(pid).name : pid, '-'); render(); };
 function modal_coll() {
   const c = C(VIEW.id), j = judgeCollection(c), langOk = ALI_LANGS.indexOf(c.lang) !== -1;
   const prodRows = c.products.map((id, k) => { const p = P(id); if (!p) return ''; const pj = judgeProduct(p);
@@ -939,7 +931,7 @@ function modal_coll() {
 function screen_hEdit() {
   const p = P('P8'), j = judgeProduct(p);
   return '<div class="phd"><div><h2 class="page">상품 수정</h2><div class="pdesc">내 상품 &gt; ' + esc(p.name) + ' (호스트 화면)</div></div></div>' +
-    (j.visible ? '' : '<div class="card"><div class="bd"><div class="notice">' + MSG.hostHidden + '</div>' +
+    (j.reason !== '알리페이 버튼 없음' ? '' : '<div class="card"><div class="bd"><div class="notice">' + MSG.hostHidden + '</div>' +
       '<div class="hint">여기서 고칠 수 있는 항목은 없어요. 알리페이 노출과 버튼 설정은 본사에서 다뤄요.</div></div></div>') +
     '<div class="card"><div class="hd">상품 정보</div><div class="bd">' +
     '<div class="row"><div class="lbl">상품명</div><div class="val">' + esc(p.name) + '</div></div>' +
@@ -1048,6 +1040,14 @@ window.save = function (kind) {
   const rows = kind === 'store' ? ROWS_STORE : ROWS_PRODUCT;
   const eff = kind === 'store' ? effStoreBtns(obj) : effBtns(obj);
   const webCnt = onCount(eff.btns, rows, 'web'), aliCnt = onCount(eff.btns, rows, 'ali');
+  // 스토어를 이번 편집에서 미노출로 바꿨고 소속 상품이 10건 이상이면 저장 시 영향 범위를 확인한다
+  if (kind === 'store' && obj.aliVisible === '미노출' && VIEW.savedVis === '노출' && obj.prodCount >= 10) {
+    const im = impactOfHiding(obj);
+    confirmBox('알리페이 미노출로 저장',
+      '<p><b>' + esc(obj.name) + '</b></p><p>스토어를 알리페이에서 숨기면 소속 상품 ' + obj.prodCount + '건이 함께 숨겨지고, 이 스토어나 소속 상품을 가리키는 배너 ' + im.M + '건과 노출 가능 항목이 0건이 되는 기획전 ' + im.K + '건도 알리페이에 노출되지 않습니다.</p><p class="hint">웹 노출은 그대로 유지됩니다.</p>',
+      function () { VIEW.savedVis = '미노출'; alertBox('저장했습니다', '목록과 프런트에 바로 반영됩니다.'); }, function () {}, '미노출로 저장');
+    return;
+  }
   if (webCnt > CAP || aliCnt > CAP) { alertBox('저장할 수 없습니다', MSG.cap + ' 지금 웹 ' + webCnt + '개(' + ctaList(eff.btns, rows, 'web').join(' / ') + '), 알리페이 ' + aliCnt + '개(' + ctaList(eff.btns, rows, 'ali').join(' / ') + ')가 나갑니다. 두 개로 줄인 뒤 저장해 주세요.'); return; }
   const langOk = kind === 'store' ? true : ALI_LANGS.indexOf(obj.lang) !== -1;
   if (langOk && obj.aliVisible === '노출' && aliCnt === 0) {
@@ -1125,11 +1125,11 @@ function scenarios() {
       run: function () { newProduct(); } },
     { id: 'BO-CH-01-e5', t: '대상 언어가 아닌 상품 건', d: '일본어 건은 알리페이 노출 라디오가 노출 상태로 고정 비활성이고 알리페이 열 전체가 비활성입니다.',
       run: function () { VIEW.lang = '일본어'; go('p-list'); openProduct('P6'); } },
-    { id: 'BO-CH-01', t: '상담접수 OFF로 열이 빌 때', d: '저장 전에 확인을 띄웁니다. 알리페이 열의 상담접수를 OFF로 눌러 보세요.',
+    { id: 'BO-CH-01', t: '상담접수 OFF로 열이 빌 때', d: '알리페이 열의 상담접수를 OFF로 누르면 안내 박스가 뜨고, OK를 누를 때 저장 확인을 띄웁니다.',
       run: function () { const p = P('P2'); p.mode = '개별 설정'; ROWS_PRODUCT.forEach(r => p.btns[r.k].ali = false); p.btns.consult.ali = true; VIEW.lang = p.lang; go('p-list'); openProduct('P2'); } },
     { id: 'BO-CH-02', t: '소속 스토어가 미노출인 상품', d: '상품 값이 노출이어도 미노출됩니다. 사유는 스토어 설정.',
       run: function () { VIEW.lang = '중국어(번체)'; go('p-list'); openProduct('P4'); } },
-    { id: 'BO-CH-03-e1', t: '스토어를 미노출로', d: '소속 상품이 모든 언어에서 함께 숨습니다. 소속 상품 12건이라 저장 확인 모달이 뜹니다.',
+    { id: 'BO-CH-03-e1', t: '스토어를 미노출로', d: '소속 상품이 모든 언어에서 함께 숨습니다. 미노출을 고르면 소속 상품 수 안내가 뜨고, 소속 상품 12건이라 저장을 누를 때 확인 모달이 뜹니다.',
       run: function () { go('s-edit', 'S1'); VIEW.sect = 2; render(); } },
     { id: 'BO-CH-03-e2', t: '스토어 알리페이 열 ON 없음', d: '스토어 페이지만 숨고 소속 상품은 각자 판정대로 남습니다.',
       run: function () { const st = S('S5'); ROWS_STORE.forEach(r => st.btns[r.k].ali = false); go('s-edit', 'S5'); VIEW.sect = 11; render(); } },
