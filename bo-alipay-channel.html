@@ -897,9 +897,9 @@ window.delCollProduct = function (pid) { const c = C(VIEW.id); c.products = c.pr
 function modal_coll() {
   const c = C(VIEW.id), j = judgeCollection(c), langOk = ALI_LANGS.indexOf(c.lang) !== -1;
   const prodRows = c.products.map((id, k) => { const p = P(id); if (!p) return ''; const pj = judgeProduct(p);
-    return '<tr><td>' + (k + 1) + '</td><td>' + esc(p.name) + '</td><td>' + p.lang + '</td><td>' + esc(S(p.store).name) + '</td><td>' + p.price + '</td>' +
-      '<td>0</td><td>0</td><td>0</td><td>' + swch(S(p.store).aliVisible === '노출') + '</td><td>' + swch(p.active) + '</td><td>' + swch(p.hidden) + '</td>' +
+    return '<tr><td>' + (k + 1) + '</td><td>' + esc(p.name) + '</td><td>' + p.lang + '</td><td>' + esc(S(p.store).name) + '</td>' +
       '<td class="new c">' + visCell(pj) + '</td>' +
+      '<td>' + p.price + '</td><td>0</td><td>0</td><td>0</td><td>' + swch(S(p.store).aliVisible === '노출') + '</td><td>' + swch(p.active) + '</td><td>' + swch(p.hidden) + '</td>' +
       '<td><button class="btn sm red" onclick="delCollProduct(\'' + id + '\')">삭제</button></td></tr>'; }).join('');
   const storeRows = c.stores.map((id, k) => { const st = S(id); if (!st) return ''; const sj = judgeStore(st);
     return '<tr><td>' + (k + 1) + '</td><td>' + esc(st.name) + '</td><td class="tblnote">' + st.langs + '</td><td>' + st.cat + '</td>' +
@@ -916,8 +916,9 @@ function modal_coll() {
     (langOk && c.aliVisible === '노출' && j.liveCount === 0 ? '<div class="notice">' + MSG.exhEmpty + '</div>' : '') + '</div></div>' +
     '<div class="blk">상품 ' + c.products.length + '개 선택</div>' +
     '<div class="frow" style="margin-bottom:10px"><button class="btn">상품 추가</button><button class="btn">선택된 상품 삭제</button></div>' +
-    '<div class="tblwrap"><table><thead><tr><th>No.</th><th>상품명</th><th>언어</th><th>스토어명(언어)</th><th>가격</th><th>노출수</th><th>클릭수</th><th>조회수</th><th>스토어 활성화</th><th>상품 활성화</th><th>히든</th>' +
-    '<th class="new">알리페이 노출<span class="newbadge">신규</span></th><th>action</th></tr></thead><tbody>' + (prodRows || '<tr><td colspan="13" class="c tblnote">선택된 상품 정보가 없습니다</td></tr>') + '</tbody></table></div>' +
+    '<div class="tblwrap"><table><thead><tr><th>No.</th><th>상품명</th><th>언어</th><th>스토어명(언어)</th>' +
+    '<th class="new">알리페이 노출<span class="newbadge">신규</span></th>' +
+    '<th>가격</th><th>노출수</th><th>클릭수</th><th>조회수</th><th>스토어 활성화</th><th>상품 활성화</th><th>히든</th><th>action</th></tr></thead><tbody>' + (prodRows || '<tr><td colspan="13" class="c tblnote">선택된 상품 정보가 없습니다</td></tr>') + '</tbody></table></div>' +
     '<div class="blk">스토어 ' + c.stores.length + '개 선택<span class="newbadge">신규</span></div>' +
     '<div class="frow" style="margin-bottom:10px"><select id="addst">' + addable.map(s => '<option value="' + s.id + '">' + esc(s.name) + '</option>').join('') + '</select>' +
     '<button class="btn" onclick="addCollStore(document.getElementById(\'addst\').value)"' + (addable.length ? '' : ' disabled') + '>스토어 추가</button>' +
