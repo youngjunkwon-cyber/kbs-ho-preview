@@ -181,6 +181,7 @@ const MSG = {
   storeHide:   n => '이 스토어의 상품 ' + n + '건도 알리페이 앱에서 함께 보이지 않게 됩니다.',
   saveProd:    '알리페이 앱에서 켠 버튼이 없습니다. 이대로 저장하면 이 상품은 알리페이 앱에 보이지 않습니다. 저장할까요?',
   saveStore:   '알리페이 앱에서 켠 버튼이 없습니다. 이대로 저장하면 이 스토어는 알리페이 앱에 보이지 않습니다. 저장할까요?',
+  typeSwitch:  (was, n, now) => '유형을 바꾸면 담는 것이 ' + (now === '스토어' ? '스토어로' : '상품으로') + ' 바뀝니다. 지금 담아 둔 ' + was + ' ' + n + '건은 빠집니다. 바꿀까요?',
   saveColl:    s => '담은 ' + s + ' 알리페이 앱에서 모두 보이지 않습니다. 이대로 저장하면 이 기획전은 알리페이 앱에 보이지 않습니다. 저장할까요?',
   saveCollNone:s => '아직 담은 ' + s + ' 없습니다. 이대로 저장하면 이 기획전은 알리페이 앱에 보이지 않습니다. 저장할까요?',
   bnExtLock:   '누르면 외부 사이트로 나가는 배너입니다. 알리페이 앱은 외부로 나가는 것을 막기 때문에 이 배너는 알리페이 앱에 보이지 않고, 이 설정도 바꿀 수 없습니다.',
@@ -193,7 +194,7 @@ const MSG = {
   storeDefault:'기본 설정을 고르면 이 상품의 버튼을 스토어에 설정한 것과 똑같이 맞춥니다.',
   msgLang:     '위에서 메신저 설정을 켜면 언어마다 메신저를 하나씩 넣을 수 있습니다.',
   edBlock:     '외부 사이트 주소는 넣을 수 없습니다. K-Beauty Station 안의 주소만 넣을 수 있습니다.',
-  edStrip:     n => '외부 사이트 주소 ' + n + '개를 지우고 저장했습니다.'
+  edStrip:     (u, e) => [u ? '외부 사이트 주소 ' + u + '개' : '', e ? '외부 영상·SNS 넣기 ' + e + '개' : ''].filter(Boolean).join(', ') + '를 지웠습니다.'
 };
 
 /* ------------------------------- 데이터 ------------------------------- */
@@ -202,27 +203,27 @@ const DB = {
   stores: [
     { id: 'S1', no: 226, code: '준오헤어명동', name: '준오헤어 명동점', biz: '준오헤어(주)', cat: '헤어/메이크업',
       langs: '중국어(간체), 영어, 일본어', tel: '02-000-0000', bizno: '123-45-67890', email: 'a@a.com',
-      zip: '04533', area: '중구', reg: '2026-09-03 18:33', aliVisible: '노출', prodCount: 12, bookingEnabled: true,
+      zip: '04533', area: '중구', reg: '2026-09-03 18:33', aliVisible: '노출', active: true, prodCount: 12, bookingEnabled: true,
       btns: { consult: btn({ web: true, ali: true }), inquiry: btn(), chat: btn(), extlink: btn(), messenger: btn(), booking: btn({ web: true, ali: true }) },
       messenger: [{ lang: '중국어(간체)', type: '🐉 WeChat', url: 'https://weixin.qq.com/r/xxx', base: '사용' }], history: [] },
     { id: 'S2', no: 225, code: '리엔장', name: '리엔장 피부과', biz: '리엔장의원', cat: '피부과',
       langs: '중국어(간체), 중국어(번체)', tel: '02-111-1111', bizno: '223-45-67890', email: 'b@b.com',
-      zip: '06236', area: '강남구', reg: '2026-09-02 17:12', aliVisible: '노출', prodCount: 6, bookingEnabled: false,
+      zip: '06236', area: '강남구', reg: '2026-09-02 17:12', aliVisible: '노출', active: true, prodCount: 6, bookingEnabled: false,
       btns: { consult: btn({ web: true, ali: true }), inquiry: btn(), chat: btn({ web: true, ali: true }), extlink: btn(), messenger: btn(), booking: btn() },
       messenger: [], history: [] },
     { id: 'S3', no: 224, code: '뷰티랩강남', name: '뷰티랩 강남', biz: '뷰티랩(주)', cat: '스킨케어',
       langs: '중국어(간체), 영어, 인도네시아어', tel: '02-222-2222', bizno: '323-45-67890', email: 'c@c.com',
-      zip: '06120', area: '강남구', reg: '2026-09-01 15:03', aliVisible: '노출', prodCount: 3, bookingEnabled: true,
+      zip: '06120', area: '강남구', reg: '2026-09-01 15:03', aliVisible: '노출', active: true, prodCount: 3, bookingEnabled: true,
       btns: { consult: btn(), inquiry: btn(), chat: btn({ web: true }), extlink: btn(), messenger: btn(), booking: btn({ web: true, ali: true }) },
       messenger: [], history: [] },
     { id: 'S4', no: 223, code: '모모클리닉', name: '모모클리닉', biz: '모모의원', cat: '성형외과',
       langs: '중국어(번체), 일본어', tel: '02-333-3333', bizno: '423-45-67890', email: 'd@d.com',
-      zip: '06010', area: '강남구', reg: '2026-08-31 18:16', aliVisible: '미노출', prodCount: 7, bookingEnabled: false,
+      zip: '06010', area: '강남구', reg: '2026-08-31 18:16', aliVisible: '미노출', active: true, prodCount: 7, bookingEnabled: false,
       btns: { consult: btn({ web: true, ali: true }), inquiry: btn(), chat: btn({ web: true, ali: true }), extlink: btn(), messenger: btn(), booking: btn() },
       messenger: [], history: [] },
     { id: 'S5', no: 222, code: '글로우스킨홍대', name: '글로우스킨 홍대', biz: '글로우스킨', cat: '스킨케어',
       langs: '중국어(간체)', tel: '02-444-4444', bizno: '523-45-67890', email: 'e@e.com',
-      zip: '04039', area: '마포구', reg: '2026-08-27 15:58', aliVisible: '노출', prodCount: 2, bookingEnabled: false,
+      zip: '04039', area: '마포구', reg: '2026-08-27 15:58', aliVisible: '노출', active: true, prodCount: 2, bookingEnabled: false,
       btns: { consult: btn({ web: true }), inquiry: btn(), chat: btn(), extlink: btn({ web: true }), messenger: btn(), booking: btn() },
       messenger: [], history: [] }
   ],
@@ -291,7 +292,10 @@ const DB = {
       products: [], stores: ['S4'], history: [] },
     { id: 'E3', name: '영어권 스킨케어전', inner: 'skincare_EN', lang: '영어', type: '추천상품',
       from: '2026-09-05', to: '2026-09-25', active: '활성', aliVisible: '미노출',
-      products: ['P3'], stores: [], history: [] }
+      products: ['P3'], stores: [], history: [] },
+    { id: 'E4', name: '일본 고객 추천전', inner: '추천전_JP', lang: '일본어', type: '추천상품',
+      from: '2026-09-01', to: '2026-09-30', active: '활성', aliVisible: '노출',
+      products: [], stores: [], history: [] }
   ],
   influencers: [{ id: 'IF1', name: '지우 (@jiwoo)' }],
   magazines: [{ id: 'M1', title: '가을 두피 관리 가이드', lang: '중국어(간체)', status: '게시', reg: '2026-09-02 11:20',
@@ -314,7 +318,9 @@ function scanBody(text) {
   return { ext: urls.filter(isExternalUrl), emb: String(text).match(/<\s*(iframe|script|object|embed)\b/gi) || [] };
 }
 function stripBody(text) {
-  let t = String(text).replace(/<\s*(iframe|script|object|embed)\b[\s\S]*?(<\/\s*\1\s*>|>)/gi, '');
+  let t = String(text).replace(/<\s*(iframe|script|object|embed)\b[^>]*>[\s\S]*?<\/\s*\1\s*>/gi, '');
+  t = t.replace(/<\s*(iframe|script|object|embed)\b[^>]*\/?>/gi, '');
+  t = t.replace(/<\/\s*(iframe|script|object|embed)\s*>/gi, '');
   t = t.replace(/<a\b[^>]*href\s*=\s*["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi, (m, href, inner) => isExternalUrl(href) ? inner : m);
   t = t.replace(/https?:\/\/[^\s"'<>)]+/gi, m => isExternalUrl(m) ? '' : toRelative(m));
   t = t.replace(/(?:\/\/|javascript:|data:)[^\s"'<>)]+/gi, m => isExternalUrl(m) ? '' : m);
@@ -366,8 +372,8 @@ function judgeProduct(p) {
   const c2 = onCount(e.btns, ROWS_PRODUCT, 'ali') > 0;
   const conds = [
     { s: c1 ? 'ok' : 'no', t: '① 알리페이 노출 설정 = ' + p.aliVisible },
-    { s: c3 ? 'ok' : 'no', t: '③ 소속 스토어(' + st.name + ') 알리페이 노출 설정 = ' + st.aliVisible },
     { s: c2 ? 'ok' : 'no', t: '② 알리페이 앱에서 누를 수 있는 버튼 ' + onCount(e.btns, ROWS_PRODUCT, 'ali') + '개' + (e.chatAuto ? ' (기본 설정 · 채팅 자동 ON)' : '') },
+    { s: c3 ? 'ok' : 'no', t: '③ 소속 스토어(' + st.name + ') 알리페이 노출 설정 = ' + st.aliVisible },
     { s: 'sk', t: '고객 화면 아래에 나가는 버튼 : ' + (ctaList(e.btns, ROWS_PRODUCT, 'ali').join(' / ') || '없음') }
   ];
   let reason = '';
@@ -412,17 +418,19 @@ function judgeAd(b) {
   if (ext) conds.push({ s: 'no', t: '② 외부링크는 알리페이 앱에서 열리지 않는다' });
   else if (b.linkType === '내부링크') {
     const tv = innerTargetOk(b.inner);
-    conds.push({ s: tv.skip ? 'sk' : tv.ok ? 'ok' : 'no', t: '② 내부링크 대상(' + tv.label + ')' + (tv.skip ? ' 은 판정 대상이 아니라 그대로 노출' : tv.ok ? ' 이 알리페이에 노출' : ' 이 알리페이에 미노출') });
+    conds.push({ s: tv.skip ? 'sk' : tv.ok ? 'ok' : 'no', t: '② 내부링크 대상(' + tv.label + ')' + (tv.skip ? '은 판정 대상이 아니라 그대로 노출한다' : tv.ok ? '이 알리페이에 노출된다' : '이 알리페이에 노출되지 않는다') });
     if (!tv.ok) targetOut = tv.label;
   } else {
     const bt = b.btn;
-    noBtn = !bt || !bt.ali;
-    conds.push({ s: noBtn ? 'no' : 'ok', t: '② 하단 버튼 알리페이 표시여부 = ' + (!bt ? '버튼 없음' : bt.ali ? '활성화' : '비활성화') + (bt && bt.linkKind === '외부링크' ? ' (버튼 링크 종류가 외부링크라 잠김)' : '') });
+    /* 버튼 링크 종류가 외부링크면 저장된 값과 무관하게 알리페이에서 꺼진 것으로 본다 */
+    const btExt = !!bt && bt.linkKind === '외부링크';
+    noBtn = !bt || !bt.ali || btExt;
+    conds.push({ s: noBtn ? 'no' : 'ok', t: '② 하단 버튼 알리페이 표시여부 = ' + (!bt ? '버튼 없음' : btExt ? '비활성화 (버튼 링크 종류가 외부링크라 잠김)' : bt.ali ? '활성화' : '비활성화') });
     if (!noBtn && bt.linkKind === '내부링크') {
       const tv = innerTargetOk(bt.inner);
-      conds.push({ s: tv.skip ? 'sk' : tv.ok ? 'ok' : 'no', t: '버튼 내부링크 대상(' + tv.label + ')' + (tv.skip ? ' 은 판정 대상 아님' : tv.ok ? ' 이 알리페이에 노출' : ' 이 알리페이에 미노출') });
+      conds.push({ s: tv.skip ? 'sk' : tv.ok ? 'ok' : 'no', t: '버튼 내부링크 대상(' + tv.label + ')' + (tv.skip ? '은 판정 대상이 아니다' : tv.ok ? '이 알리페이에 노출된다' : '이 알리페이에 노출되지 않는다') });
       if (!tv.ok) targetOut = tv.label;
-    } else if (!noBtn) conds.push({ s: 'sk', t: '버튼 링크 종류가 링크없음이라 연결 대상을 보지 않는다' });
+    } else if (!noBtn) conds.push({ s: 'sk', t: '버튼 링크 종류가 ' + (bt.linkKind || '링크없음') + '이라 연결 대상을 보지 않는다' });
   }
   let reason = '';
   if (!c1) reason = '직접 끔';
@@ -434,7 +442,12 @@ function judgeAd(b) {
 }
 // 기획전 조건 ④ = 유형에 맞는 구성 항목만 센다. 추천상품은 상품, 병원은 스토어.
 const COLL_TYPES = ['병원', '추천상품', '특가', 'TOP10'];
-const COLL_LANGS = ['중국어(간체)', '영어', '중국어(번체)', '일본어', '인도네시아', '몽골어'];
+/* 라이브 기획전 폼의 라디오 라벨은 인도네시아, 데이터 값은 인도네시아어다. 접두어 비교 대신 값을 명시한다 */
+const COLL_LANGS = [
+  { label: '중국어(간체)', value: '중국어(간체)' }, { label: '영어', value: '영어' },
+  { label: '중국어(번체)', value: '중국어(번체)' }, { label: '일본어', value: '일본어' },
+  { label: '인도네시아', value: '인도네시아어' }, { label: '몽골어', value: '몽골어' }
+];
 const isStoreColl = c => c.type === '병원';
 function judgeCollection(c) {
   if (ALI_LANGS.indexOf(c.lang) === -1) return { na: true, visible: false, reason: '', conds: [{ s: 'sk', t: '언어 = ' + c.lang + '. 대상 언어가 아니라 판정하지 않는다.' }] };
@@ -541,13 +554,14 @@ function btnTable(kind, obj) {
   const locked = !isStore && obj.mode === '기본 설정';
   const aliOffAll = !langOk || selfHidden || storeHidden || locked;
 
-  let html = '<div class="tblwrap"><table><thead><tr><th style="min-width:300px">항목</th><th style="width:180px">웹</th>' +
-    '<th class="new" style="width:180px">알리페이<span class="newbadge">신규</span></th><th style="min-width:160px"></th></tr></thead><tbody>';
+  const cw = isStore ? 220 : 180;
+  let html = '<div class="tblwrap"><table><thead><tr><th style="min-width:300px">항목</th><th style="width:' + cw + 'px">웹</th>' +
+    '<th class="new" style="width:' + cw + 'px">알리페이<span class="newbadge">신규</span></th><th style="min-width:160px"></th></tr></thead><tbody>';
   rows.forEach(r => {
     const e = eff.btns[r.k];
     let webDis = locked, aliDis = aliOffAll || r.aliHardOff, note = '';
     if (r.aliHardOff) note = MSG.hardOff;
-    if (r.needConsult && !eff.btns.consult.web) webDis = true;
+    if (r.needConsult && !eff.btns.consult.web) { webDis = true; note = MSG.needConsult; }
     if (r.needConsult && !eff.btns.consult.ali) { aliDis = true; note = MSG.needConsult; }
     if (r.needBooking && !obj.bookingEnabled) { webDis = true; aliDis = true; note = MSG.needBooking; }
     if (r.k === 'chat' && !isStore && eff.chatAuto) note = '스토어에 켠 알리페이 버튼이 없어 채팅이 자동으로 켜집니다.';
@@ -562,7 +576,10 @@ function btnTable(kind, obj) {
   html += '<div class="hint">고객 화면 아래에는 버튼을 2개까지 보여 줍니다. 웹과 알리페이 앱이 각각 2개입니다. 상담접수와 문의하기 통합은 둘이 합쳐 버튼 하나로 나가고, 통합을 켜면 그 버튼이 문의하기가 됩니다.' +
     '<br>지금 켜 둔 것은 웹 ' + webCnt + '개' + (webCta.length ? ' (' + webCta.join(' / ') + ')' : '') +
     ', 알리페이 앱 ' + aliCnt + '개' + (aliCta.length ? ' (' + aliCta.join(' / ') + ')' : '') + '입니다.</div>';
-  if (webCnt > CAP || aliCnt > CAP) html += '<div class="notice red">예전에 저장된 건이라 ' + (webCnt > CAP ? '웹' : '알리페이 앱') + ' 버튼이 ' + Math.max(webCnt, aliCnt) + '개 켜져 있습니다. 2개로 줄여야 저장할 수 있습니다.</div>';
+  if (webCnt > CAP || aliCnt > CAP) {
+    const over = [webCnt > CAP ? '웹 버튼이 ' + webCnt + '개' : '', aliCnt > CAP ? '알리페이 앱 버튼이 ' + aliCnt + '개' : ''].filter(Boolean).join(', ');
+    html += '<div class="notice red">예전에 저장된 건이라 ' + over + ' 켜져 있습니다. 2개로 줄여야 저장할 수 있습니다.</div>';
+  }
   if (locked) html += '<div class="hint">기본 설정이라 스토어에 설정한 버튼을 그대로 보여 줍니다. 여기서는 바꿀 수 없습니다. 스토어에만 있는 예약은 상품에 쓰지 않습니다.</div>';
   else if (selfHidden) html += '<div class="hint">' + MSG.lockSelf + '</div>';
   if (langOk && !selfHidden && !storeHidden && aliCnt === 0) html += '<div class="notice">' + MSG.noAliBtn(isStore ? '이 스토어는' : '이 상품은') + '</div>';
@@ -575,11 +592,13 @@ window.setBtn = function (kind, k, ch, on) {
   const label = rows.filter(r => r.k === k)[0].label;
   if (on) {
     const keep = obj.btns[k][ch];
+    const e0 = kind === 'store' ? effStoreBtns(obj) : effBtns(obj);
+    const already = ctaList(e0.btns, rows, ch);
     obj.btns[k][ch] = true;
     const e1 = kind === 'store' ? effStoreBtns(obj) : effBtns(obj);
     const after = onCount(e1.btns, rows, ch);
     obj.btns[k][ch] = keep;
-    if (after > CAP) { alertBox('켤 수 없습니다', MSG.cap + ' 이 버튼을 켜면 ' + (ch === 'web' ? '웹' : '알리페이 앱') + ' 버튼이 ' + after + '개가 됩니다. 이미 켜 둔 것은 ' + ctaList(e1.btns, rows, ch).slice(0, CAP).join(' / ') + '입니다.'); render(); return; }
+    if (after > CAP) { alertBox('켤 수 없습니다', MSG.cap + ' 이 버튼을 켜면 ' + (ch === 'web' ? '웹' : '알리페이 앱') + ' 버튼이 ' + after + '개가 됩니다. 이미 켜 둔 것은 ' + already.join(' / ') + '입니다.'); render(); return; }
   }
   const before = obj.btns[k][ch] ? 'ON' : 'OFF';
   obj.btns[k][ch] = !!on;
@@ -703,7 +722,7 @@ function modal_product() {
       btnTable('product', p) +
       '<div class="row" style="margin-top:14px"><div class="lbl">메신저</div><div class="val"><span class="tblnote">인스타그램 (기존)</span></div></div>' +
       '<div class="row"><div class="lbl">인스타그램 임베디드 노출 여부</div><div class="val">' + onoff('pins', p.insta === 'ON', 'void(%V%)', true) +
-      "<div class=\"note\"><b>시안 설명</b>" + '기존 항목입니다. 값은 그대로 두고 알리페이 앱에서만 이 영역을 숨깁니다.</div></div></div>';
+      "<div class=\"note\"><b>시안 설명</b>" + '기존 항목입니다. 값은 그대로 두고 알리페이 앱에서만 이 영역을 숨깁니다.</div></div>' + historyCard(p) + '</div>';
   }
   return '<div class="mask"><div class="modal" style="max-width:900px"><div class="hd">상품정보 수정<button class="x" onclick="closeMD()">✕</button></div>' +
     '<div class="mtabs">' + tabs.map((t, i) => '<div class="mtab ' + (i === VIEW.tab ? 'on' : '') + '" onclick="VIEW.tab=' + i + ';render()">' + t + '</div>').join('') + '</div>' +
@@ -771,7 +790,7 @@ function screen_sEdit() {
     '<div class="anchors" style="justify-content:space-between;align-items:center">' +
     '<div style="display:flex;flex-wrap:wrap;gap:6px;flex:1">' + SECTS.map((s, k) => '<div class="anchor ' + (k === i ? 'on' : SECT_IN_SCOPE.indexOf(k) === -1 ? 'dim' : '') + '" onclick="VIEW.sect=' + k + ';render()">' + s + '</div>').join('') + '</div>' +
     '<div style="display:flex;gap:8px;margin-left:12px"><button class="btn" onclick="go(\'s-list\')">취소</button><button class="btn" style="background:#1F1F1F;border-color:#1F1F1F;color:#fff" onclick="save(\'store\')">저장</button></div></div>' +
-    '<div class="card"><div class="hd">' + SECTS[i] + (SECT_IN_SCOPE.indexOf(i) >= 0 ? '' : '') + '<button class="btn" onclick="save(\'store\')">저장</button></div>' + bd + '</div>' +
+    '<div class="card"><div class="hd">' + SECTS[i] + '<button class="btn" onclick="save(\'store\')">저장</button></div>' + bd + '</div>' +
     historyCard(st);
 }
 
@@ -807,7 +826,7 @@ function innerOpts(kind) {
   if (kind === '병원') return DB.stores.map(s => [s.id, s.name]);
   if (kind === '기획전') return DB.collections.map(c => [c.id, c.name]);
   if (kind === '인플루언서') return DB.influencers.map(f => [f.id, f.name]);
-  return [['', '직접 입력한 내부 주소']];
+  return [];
 }
 function innerPicker(kindH, idH, cur) {
   const kind = (cur && cur.kind) || '직접입력';
@@ -844,7 +863,7 @@ function modal_ad() {
     '<div class="row"><div class="lbl"><span class="req">*</span>배너위치</div><div class="val">' + b.pos + '</div></div>' +
     '<div class="row"><div class="lbl"><span class="req">*</span>광고진행일정</div><div class="val">' + b.from + ' ~ ' + b.to + '</div></div>' +
     '<div class="row"><div class="lbl"><span class="req">*</span>광고표기여부</div><div class="val"><span class="rg">' +
-    radio('adn', '활성화', b.adNotice, 'void(0)') + radio('adn', '비활성화', b.adNotice, 'void(0)') + '</span></div></div>' +
+    radio('adn', '활성화', b.adNotice, 'void(0)', true) + radio('adn', '비활성화', b.adNotice, 'void(0)', true) + '</span></div></div>' +
     '<div class="row"><div class="lbl"><span class="req">*</span>알리페이 노출<span class="newbadge">신규</span></div><div class="val"><span class="rg">' +
     radio('bv', '노출', langOk ? b.aliVisible : '노출', "setVis('ad','노출')", !langOk || visLock) + radio('bv', '미노출', langOk ? b.aliVisible : '노출', "setVis('ad','미노출')", !langOk || visLock) + '</span>' +
     (langOk ? '' : '<div class="hint">' + MSG.langOnly + '</div>') +
@@ -881,7 +900,7 @@ function modal_ad() {
   }
   h += tail;
   return '<div class="mask"><div class="modal" style="max-width:720px"><div class="hd">수정<button class="x" onclick="closeMD()">✕</button></div>' +
-    '<div class="bd">' + h + '</div><div class="ft"><button class="btn" onclick="closeMD()">취소</button><button class="btn blue" onclick="closeMD()">수정</button></div></div></div>';
+    '<div class="bd">' + h + historyCard(b) + '</div><div class="ft"><button class="btn" onclick="closeMD()">취소</button><button class="btn blue" onclick="saveAd()">수정</button></div></div></div>';
 }
 
 /* --------------------------- 기획전 관리 (실측) --------------------------- */
@@ -908,17 +927,38 @@ function screen_cList() {
 
 /* ------------------------ 기획전 수정 모달 (실측) ------------------------ */
 let COLLPICK = false;
-window.openColl = function (id) { VIEW.id = id; MODAL = 'coll'; COLLPICK = false; render(); };
+let COLLSEL = {};
+window.collSel = function (id, on) { if (on) COLLSEL[id] = true; else delete COLLSEL[id]; render(); };
+window.collSelAll = function (on) { COLLSEL = {}; if (on) { const c = C(VIEW.id); (isStoreColl(c) ? c.stores : c.products).forEach(x => COLLSEL[x] = true); } render(); };
+window.collDelSel = function () {
+  const c = C(VIEW.id), ids = Object.keys(COLLSEL);
+  if (!ids.length) return;
+  if (isStoreColl(c)) { c.stores = c.stores.filter(x => ids.indexOf(x) === -1); logChange(c, '구성 항목 · 스토어 삭제', ids.length + '건', '-'); }
+  else { c.products = c.products.filter(x => ids.indexOf(x) === -1); logChange(c, '구성 항목 · 상품 삭제', ids.length + '건', '-'); }
+  COLLSEL = {}; render();
+};
+window.openColl = function (id) { VIEW.id = id; MODAL = 'coll'; COLLPICK = false; COLLSEL = {}; render(); };
 window.collPick = function (v) { COLLPICK = v; render(); };
 window.setCollType = function (t) {
   const c = C(VIEW.id); if (c.type === t) return;
-  logChange(c, '기획전 유형', c.type, t);
-  const was = isStoreColl(c) ? c.stores.length : c.products.length;
-  c.type = t;
-  /* 담는 종류가 바뀌므로 앞 유형에 담아 둔 항목은 비운다 */
-  if (isStoreColl(c)) { if (c.products.length) logChange(c, '구성 항목 · 상품 비움', c.products.length + '건', '0건'); c.products = []; }
-  else { if (c.stores.length) logChange(c, '구성 항목 · 스토어 비움', c.stores.length + '건', '0건'); c.stores = []; }
-  void was; render();
+  const wasStore = isStoreColl(c);
+  const nowStore = t === '병원';
+  const kept = wasStore ? c.stores.length : c.products.length;
+  const apply = () => {
+    logChange(c, '기획전 유형', c.type, t);
+    c.type = t;
+    /* 담는 종류가 바뀌므로 앞 유형에 담아 둔 항목은 비운다 */
+    if (nowStore) { if (c.products.length) logChange(c, '구성 항목 · 상품 비움', c.products.length + '건', '0건'); c.products = []; }
+    else { if (c.stores.length) logChange(c, '구성 항목 · 스토어 비움', c.stores.length + '건', '0건'); c.stores = []; }
+    render();
+  };
+  if (wasStore !== nowStore && kept) {
+    confirmBox('유형을 바꿀까요',
+      '<p>' + MSG.typeSwitch(wasStore ? '스토어' : '상품', kept, nowStore ? '스토어' : '상품') + '</p>',
+      apply, function () { render(); }, '바꾸기');
+    return;
+  }
+  apply();
 };
 window.addCollStore = function (sid) { const c = C(VIEW.id); if (c.stores.indexOf(sid) === -1) { c.stores.push(sid); logChange(c, '구성 항목 · 스토어 추가', '-', S(sid).name); } render(); };
 window.addCollProduct = function (pid) { const c = C(VIEW.id); if (c.products.indexOf(pid) === -1) { c.products.push(pid); logChange(c, '구성 항목 · 상품 추가', '-', P(pid).name); } render(); };
@@ -926,14 +966,17 @@ window.delCollStore = function (sid) { const c = C(VIEW.id); c.stores = c.stores
 window.delCollProduct = function (pid) { const c = C(VIEW.id); c.products = c.products.filter(x => x !== pid); logChange(c, '구성 항목 · 상품 삭제', P(pid) ? P(pid).name : pid, '-'); render(); };
 function modal_coll() {
   const c = C(VIEW.id), j = judgeCollection(c), langOk = ALI_LANGS.indexOf(c.lang) !== -1, byStore = isStoreColl(c);
-  const chk = '<td class="c"><input type="checkbox"></td>';
+  const chk = id => '<td class="c"><input type="checkbox"' + (COLLSEL[id] ? ' checked' : '') + ' onchange="collSel(\'' + id + '\',this.checked)"></td>';
+  const selN = Object.keys(COLLSEL).length;
+  const allChk = '<th style="width:40px" class="c"><input type="checkbox"' + (selN && selN === (isStoreColl(c) ? c.stores.length : c.products.length) ? ' checked' : '') + ' onchange="collSelAll(this.checked)"></th>';
+  const delBtn = w => '<button class="btn"' + (selN ? ' onclick="collDelSel()"' : ' disabled') + '>선택된 ' + w + ' 삭제</button>';
   const prodRows = c.products.map((id, k) => { const p = P(id); if (!p) return ''; const pj = judgeProduct(p);
-    return '<tr>' + chk + '<td>' + (k + 1) + '</td><td>' + esc(p.name) + '</td><td>' + p.lang + '</td><td>' + esc(S(p.store).name) + '</td>' +
+    return '<tr>' + chk(id) + '<td>' + (k + 1) + '</td><td>' + esc(p.name) + '</td><td>' + p.lang + '</td><td>' + esc(S(p.store).name) + '</td>' +
       '<td class="new c">' + visCell(pj) + '</td>' +
-      '<td>' + p.price + '</td><td>0</td><td>0</td><td>0</td><td>' + swch(S(p.store).aliVisible === '노출') + '</td><td>' + swch(p.active) + '</td><td>' + swch(p.hidden) + '</td>' +
+      '<td>' + p.price + '</td><td>0</td><td>0</td><td>0</td><td>' + swch(S(p.store).active) + '</td><td>' + swch(p.active) + '</td><td>' + swch(p.hidden) + '</td>' +
       '<td><button class="btn sm red" onclick="delCollProduct(\'' + id + '\')">삭제</button></td></tr>'; }).join('');
   const storeRows = c.stores.map(id => { const st = S(id); if (!st) return ''; const sj = judgeStore(st);
-    return '<tr>' + chk + '<td>' + esc(st.name) + '</td><td>0</td><td>0</td>' +
+    return '<tr>' + chk(id) + '<td>' + esc(st.name) + '</td><td>0</td><td>0</td>' +
       '<td class="new c">' + visCell(sj) + '</td>' +
       '<td><button class="btn sm red" onclick="delCollStore(\'' + id + '\')">삭제</button></td></tr>'; }).join('');
   const emptyRow = (n, w) => '<tr><td colspan="' + n + '" class="c tblnote" style="padding:38px 0">선택된 ' + w + ' 정보가 없습니다</td></tr>';
@@ -943,27 +986,27 @@ function modal_coll() {
   const comp = byStore
     ? '<div class="compcard"><div class="chd"><b>스토어 ' + c.stores.length + '개 선택</b><span class="frow">' +
       '<button class="btn dash" onclick="collPick(' + (COLLPICK ? 'false' : 'true') + ')">+ 스토어 추가</button>' +
-      '<button class="btn" disabled>선택된 스토어 삭제</button></span></div>' +
+      delBtn('스토어') + '</span></div>' +
       (COLLPICK ? '<div class="pickrow"><div class="frow"><select id="addst">' + addable.map(x => '<option value="' + x.id + '">' + esc(x.name) + '</option>').join('') + '</select>' +
         '<button class="btn" onclick="addCollStore(document.getElementById(\'addst\').value)"' + (addable.length ? '' : ' disabled') + '>추가</button>' +
         '<button class="btn" onclick="collPick(false)">닫기</button></div>' +
         '<div class="note" style="margin:8px 0 0"><b>시안 설명</b>실제 화면은 상품 추가와 같은 검색 창이 뜹니다. 이 시안에서는 목록에서 고르게 했습니다.</div></div>' : '') +
-      '<div class="tblwrap"><table><thead><tr><th style="width:40px" class="c"><input type="checkbox"></th><th>스토어명</th><th>조회수</th><th>클릭수</th>' +
+      '<div class="tblwrap"><table><thead><tr>' + allChk + '<th>스토어명</th><th>조회수</th><th>클릭수</th>' +
       '<th class="new">알리페이 노출<span class="newbadge">신규</span></th><th>action</th></tr></thead><tbody>' + (storeRows || emptyRow(6, '스토어')) + '</tbody></table></div></div>'
     : '<div class="compcard"><div class="chd"><b>상품 ' + c.products.length + '개 선택</b><span class="frow">' +
       '<button class="btn dash" onclick="collPick(' + (COLLPICK ? 'false' : 'true') + ')">+ 상품 추가</button>' +
-      '<button class="btn" disabled>선택된 상품 삭제</button></span></div>' +
+      delBtn('상품') + '</span></div>' +
       (COLLPICK ? '<div class="pickrow"><div class="frow"><select id="addpd">' + addableP.map(x => '<option value="' + x.id + '">' + esc(x.name) + ' · ' + x.lang + '</option>').join('') + '</select>' +
         '<button class="btn" onclick="addCollProduct(document.getElementById(\'addpd\').value)"' + (addableP.length ? '' : ' disabled') + '>추가</button>' +
         '<button class="btn" onclick="collPick(false)">닫기</button></div>' +
         '<div class="note" style="margin:8px 0 0"><b>시안 설명</b>실제 화면은 검색 창이 뜹니다. 이 시안에서는 목록에서 고르게 했습니다.</div></div>' : '') +
-      '<div class="tblwrap"><table><thead><tr><th style="width:40px" class="c"><input type="checkbox"></th><th>No.</th><th>상품명</th><th>언어</th><th>스토어명(언어)</th>' +
+      '<div class="tblwrap"><table><thead><tr>' + allChk + '<th>No.</th><th>상품명</th><th>언어</th><th>스토어명(언어)</th>' +
       '<th class="new">알리페이 노출<span class="newbadge">신규</span></th>' +
       '<th>가격</th><th>노출수</th><th>클릭수</th><th>조회수</th><th>스토어 활성화</th><th>상품 활성화</th><th>히든</th><th>action</th></tr></thead><tbody>' + (prodRows || emptyRow(14, '상품')) + '</tbody></table></div></div>';
   return '<div class="mask"><div class="modal" style="max-width:1020px"><div class="hd">기획전 수정<button class="x" onclick="closeMD()">✕</button></div><div class="bd">' +
     '<div class="row"><div class="lbl"><span class="req">*</span>기획전명(내부)</div><div class="val"><input type="text" value="' + esc(c.inner) + '" style="width:100%"></div></div>' +
     '<div class="row"><div class="lbl"><span class="req">*</span>언어</div><div class="val"><span class="rg">' +
-    COLL_LANGS.map(L => radio('cl', L, c.lang.indexOf(L) === 0 ? L : '', 'void(0)')).join('') + '</span></div></div>' +
+    COLL_LANGS.map(L => radio('cl', L.label, c.lang === L.value ? L.label : '', 'void(0)', true)).join('') + '</span></div></div>' +
     '<div class="row"><div class="lbl"><span class="req">*</span>기획전 유형</div><div class="val"><span class="rg">' +
     COLL_TYPES.map(T => radio('ct', T, c.type, "setCollType('" + T + "')")).join('') + '</span></div></div>' +
     '<div class="row"><div class="lbl"><span class="req">*</span>알리페이 노출<span class="newbadge">신규</span></div><div class="val"><span class="rg">' +
@@ -974,7 +1017,8 @@ function modal_coll() {
     comp +
     '<div class="row"><div class="lbl"><span class="req">*</span>기획전 노출 기간</div><div class="val"><input type="text" value="' + c.from + ' → ' + c.to + '" style="width:280px" readonly></div></div>' +
     '<div class="row"><div class="lbl">기획전 활성화 여부</div><div class="val"><span class="rg">' +
-    radio('ca', '활성화', c.active === '활성' ? '활성화' : '비활성화', 'void(0)') + radio('ca', '비활성화', c.active === '활성' ? '활성화' : '비활성화', 'void(0)') + '</span></div></div>' +
+    radio('ca', '활성화', c.active === '활성' ? '활성화' : '비활성화', 'void(0)', true) + radio('ca', '비활성화', c.active === '활성' ? '활성화' : '비활성화', 'void(0)', true) + '</span></div></div>' +
+    historyCard(c) +
     '</div><div class="ft"><button class="btn" onclick="closeMD()">Cancel</button><button class="btn blue" onclick="saveColl()">OK</button></div></div></div>';
 }
 /* --------------------------- 호스트 상품 수정 --------------------------- */
@@ -1043,14 +1087,16 @@ window.tryInsertLink = function () {
   m.body = cur + ' <a href="' + v.trim() + '">' + v.trim() + '</a>';
   window.EDBUF = null; MODAL = null; LINKERR = ''; render();
 };
+/* 배너는 링크 종류와 하단 버튼에서 이미 잠금과 안내로 알리므로 저장 확인을 따로 받지 않는다 */
+window.saveAd = function () { closeMD(); alertBox('저장했습니다', '목록과 고객 화면에 바로 반영됩니다.'); };
 window.saveMagazine = function () {
   const m = M('M1');
   const cur = window.EDBUF != null ? window.EDBUF : m.body;
   const sc = scanBody(cur);
-  const n = sc.ext.length + sc.emb.length;
+  const u = sc.ext.length, e = sc.emb.length;
   m.body = stripBody(cur); window.EDBUF = null;
   render();
-  alertBox('저장했습니다', n ? MSG.edStrip(n) : '본문을 저장했습니다.');
+  alertBox('저장했습니다', (u || e) ? MSG.edStrip(u, e) : '본문을 저장했습니다.');
 };
 function screen_mEdit() {
   const m = M('M1');
@@ -1115,7 +1161,7 @@ window.save = function (kind) {
   if (kind === 'store' && obj.aliVisible === '미노출' && VIEW.savedVis === '노출' && obj.prodCount >= 10) {
     const im = impactOfHiding(obj);
     confirmBox('알리페이 미노출로 저장',
-      '<p><b>' + esc(obj.name) + '</b></p><p>이 스토어를 알리페이 앱에서 숨기면 소속 상품 ' + obj.prodCount + '건이 함께 보이지 않게 됩니다. 이 스토어나 소속 상품을 가리키는 배너 ' + im.M + '건, 담은 항목이 모두 없어지는 기획전 ' + im.K + '건도 알리페이 앱에서 보이지 않습니다.</p><p class="hint">웹에서는 그대로 보입니다.</p>',
+      '<p><b>' + esc(obj.name) + '</b></p><p>이 스토어를 알리페이 앱에서 숨기면 소속 상품 ' + obj.prodCount + '건이 함께 보이지 않게 됩니다. 이 스토어를 숨기면 함께 보이지 않게 되는 배너가 ' + im.M + '건, 담은 항목이 모두 없어지는 기획전이 ' + im.K + '건 있습니다.</p><p class="hint">웹에서는 그대로 보입니다.</p>',
       function () { VIEW.savedVis = '미노출'; done(); }, function () {}, '미노출로 저장');
     return;
   }
