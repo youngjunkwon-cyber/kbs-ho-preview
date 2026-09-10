@@ -374,7 +374,7 @@ function judgeProduct(p) {
   if (!c1) reason = '직접 끔';
   else if (!c3) reason = '스토어 설정';
   else if (!c2) reason = '알리페이 버튼 없음';
-  else if (DB.errors[p.id]) reason = '판정 오류';
+  else if (DB.errors[p.id]) reason = '확인 실패';
   if (DB.errors[p.id]) conds.push({ s: 'no', t: '대상 조회 오류로 판정 실패. 미노출로 두고 재판정 큐가 처리한다.' });
   return { na: false, visible: !reason, reason, conds };
 }
@@ -390,7 +390,7 @@ function judgeStore(st) {
   let reason = '';
   if (!c1) reason = '직접 끔';
   else if (!c2) reason = '알리페이 버튼 없음';
-  else if (DB.errors[st.id]) reason = '판정 오류';
+  else if (DB.errors[st.id]) reason = '확인 실패';
   if (!c2 && c1) conds.push({ s: 'sk', t: '스토어 페이지만 보이지 않고, 소속 상품은 각자 조건대로 나간다.' });
   if (DB.errors[st.id]) conds.push({ s: 'no', t: '대상 조회 오류로 판정 실패. 재판정 큐가 처리한다.' });
   return { na: false, visible: !reason, reason, conds };
@@ -429,7 +429,7 @@ function judgeAd(b) {
   else if (ext) reason = '외부 연결';
   else if (noBtn) reason = '알리페이 버튼 없음';
   else if (targetOut) reason = '연결 대상 미노출';
-  else if (DB.errors[b.id]) reason = '판정 오류';
+  else if (DB.errors[b.id]) reason = '확인 실패';
   return { na: false, visible: !reason, reason, conds };
 }
 // 기획전 조건 ④ = 유형에 맞는 구성 항목만 센다. 추천상품은 상품, 병원은 스토어.
@@ -451,7 +451,7 @@ function judgeCollection(c) {
   let reason = '';
   if (!c1) reason = '직접 끔';
   else if (!live) reason = '노출 가능 항목 없음';
-  else if (DB.errors[c.id]) reason = '판정 오류';
+  else if (DB.errors[c.id]) reason = '확인 실패';
   return { na: false, visible: !reason, reason, conds, liveCount: live };
 }
 
@@ -662,7 +662,7 @@ function screen_pList() {
     '<div class="card"><div class="filters">' +
     '<div class="frow">' + dimSel('심사상태', ['심사상태']) + dimSel('활성', ['활성']) + dimSel('히든', ['히든']) + langSelect() + dimSel('카테고리', ['카테고리']) + dimSel('스토어 선택', ['스토어 선택']) + '</div>' +
     '<div class="frow">' + dimSel('세부분류', ['세부분류']) + dimSel('Vat포함', ['Vat포함']) + dimSel('전/후사진 연결 여부', ['전/후사진 연결 여부']) + dimSel('외부링크 활성 여부', ['외부링크 활성 여부']) + '</div>' +
-    '<div class="frow">' + aliFilterRow(['전체', '직접 끔', '스토어 설정', '알리페이 버튼 없음', '판정 오류']) + dimSel('단독 상품 포함 여부', ['단독 상품 포함 여부']) + dimSel('등록일', ['등록일']) + '</div>' +
+    '<div class="frow">' + aliFilterRow(['전체', '직접 끔', '스토어 설정', '알리페이 버튼 없음', '확인 실패']) + dimSel('단독 상품 포함 여부', ['단독 상품 포함 여부']) + dimSel('등록일', ['등록일']) + '</div>' +
     '<div class="frow"><button class="btn">오늘</button><button class="btn">어제</button><button class="btn">이번주</button><button class="btn">이번달</button>' +
     '<input type="text" placeholder="Start date" style="width:120px"> ~ <input type="text" placeholder="End date" style="width:120px"></div>' +
     '<div class="frow"><input type="text" placeholder="검색어" style="width:220px"><button class="btn blue">검색</button></div>' +
@@ -723,7 +723,7 @@ function screen_sList() {
     '<div style="display:flex;gap:8px"><button class="btn">칼럼설정</button><button class="btn">신규 스토어등록</button><button class="btn">엑셀 다운로드</button></div></div>' +
     '<div class="card"><div class="filters">' +
     '<div class="frow">' + dimSel('언어', ['언어']) + dimSel('카테고리 선택', ['카테고리 선택']) + dimSel('스토어 선택', ['스토어 선택']) + dimSel('지하철정보', ['지하철정보']) + dimSel('지역', ['지역']) + '</div>' +
-    '<div class="frow">' + aliFilterRow(['전체', '직접 끔', '알리페이 버튼 없음', '판정 오류']) + '</div>' +
+    '<div class="frow">' + aliFilterRow(['전체', '직접 끔', '알리페이 버튼 없음', '확인 실패']) + '</div>' +
     '<div class="frow"><input type="text" placeholder="검색어" style="width:220px"><button class="btn blue">검색</button></div>' +
     '</div></div>' +
     '<div class="card"><div class="hd">스토어 목록</div><div class="tblwrap"><table><thead><tr>' +
@@ -748,7 +748,8 @@ function screen_sEdit() {
       '<div class="row"><div class="lbl"><span class="req">*</span>알리페이 노출<span class="newbadge">신규</span></div><div class="val"><span class="rg">' +
       radio('sv', '노출', st.aliVisible, "setVis('store','노출')") + radio('sv', '미노출', st.aliVisible, "setVis('store','미노출')") + '</span>' +
       '<div class="hint">스토어는 언어를 나누지 않습니다. 이 설정 하나가 모든 언어에 함께 적용됩니다.</div>' +
-      (st.aliVisible === '미노출' ? '<div class="notice">' + MSG.storeHide(st.prodCount) + '</div>' : '') + '</div></div>' +
+      (st.aliVisible === '미노출' ? '<div class="notice">' + MSG.storeHide(st.prodCount) + '</div>' : '') +
+      (st.aliVisible === '노출' && onCount(effStoreBtns(st).btns, ROWS_STORE, 'ali') === 0 ? '<div class="notice">' + MSG.noAliBtn('이 스토어는') + '</div>' : '') + '</div></div>' +
       "<div class=\"note\"><b>시안 설명</b>" + '소속 상품 ' + st.prodCount + '건은 스토어 데이터의 전체 상품 수입니다. 이 시안 목록에는 그중 일부만 넣었습니다.</div></div>';
   } else if (i === 8) {
     bd = '<div class="bd"><div class="row"><div class="lbl"><span class="req">*</span>예약 사용</div><div class="val">' +
@@ -792,7 +793,7 @@ function screen_aList() {
     '<div><button class="btn">광고등록</button></div></div>' +
     '<div class="card"><div class="filters">' +
     '<div class="frow"><button class="btn">오늘</button><button class="btn">이번주</button><button class="btn">이번달</button>' + dimSel('광고일', ['광고일']) + langSelect() + dimSel('노출위치', ['노출위치']) + dimSel('링크종류', ['링크종류']) + '</div>' +
-    '<div class="frow">' + aliFilterRow(['전체', '직접 끔', '외부 연결', '알리페이 버튼 없음', '연결 대상 미노출', '판정 오류']) + '<button class="btn blue" style="align-self:flex-end">검색</button></div>' +
+    '<div class="frow">' + aliFilterRow(['전체', '직접 끔', '외부 연결', '알리페이 버튼 없음', '연결 대상 미노출', '확인 실패']) + '<button class="btn blue" style="align-self:flex-end">검색</button></div>' +
     '</div><div class="tblwrap"><table><thead><tr>' +
     '<th>광고등록일</th><th>광고시작일</th><th>광고종료일</th><th>언어</th><th>노출위치</th>' +
     '<th class="new">알리페이 노출<span class="newbadge">신규</span></th><th class="new">사유<span class="newbadge">신규</span></th>' +
@@ -897,7 +898,7 @@ function screen_cList() {
     '<div><button class="btn">기획전 추가</button></div></div>' +
     '<div class="card"><div class="filters">' +
     '<div class="frow"><button class="btn">오늘</button><button class="btn">어제</button><button class="btn">이번주</button><button class="btn">이번달</button>' + dimSel('상태', ['상태']) + langSelect() + dimSel('유형', ['유형'].concat(COLL_TYPES)) + '</div>' +
-    '<div class="frow">' + aliFilterRow(['전체', '직접 끔', '노출 가능 항목 없음', '판정 오류']) + '<button class="btn blue" style="align-self:flex-end">검색</button></div>' +
+    '<div class="frow">' + aliFilterRow(['전체', '직접 끔', '노출 가능 항목 없음', '확인 실패']) + '<button class="btn blue" style="align-self:flex-end">검색</button></div>' +
     '</div><div class="tblwrap"><table><thead><tr>' +
     '<th>기획전 상태</th><th>언어</th><th>노출 기간</th><th>유형</th><th>기획전명</th>' +
     '<th class="new">알리페이 노출<span class="newbadge">신규</span></th><th class="new">사유<span class="newbadge">신규</span></th>' +
@@ -920,6 +921,7 @@ window.setCollType = function (t) {
   void was; render();
 };
 window.addCollStore = function (sid) { const c = C(VIEW.id); if (c.stores.indexOf(sid) === -1) { c.stores.push(sid); logChange(c, '구성 항목 · 스토어 추가', '-', S(sid).name); } render(); };
+window.addCollProduct = function (pid) { const c = C(VIEW.id); if (c.products.indexOf(pid) === -1) { c.products.push(pid); logChange(c, '구성 항목 · 상품 추가', '-', P(pid).name); } render(); };
 window.delCollStore = function (sid) { const c = C(VIEW.id); c.stores = c.stores.filter(x => x !== sid); logChange(c, '구성 항목 · 스토어 삭제', S(sid).name, '-'); render(); };
 window.delCollProduct = function (pid) { const c = C(VIEW.id); c.products = c.products.filter(x => x !== pid); logChange(c, '구성 항목 · 상품 삭제', P(pid) ? P(pid).name : pid, '-'); render(); };
 function modal_coll() {
@@ -936,6 +938,7 @@ function modal_coll() {
       '<td><button class="btn sm red" onclick="delCollStore(\'' + id + '\')">삭제</button></td></tr>'; }).join('');
   const emptyRow = (n, w) => '<tr><td colspan="' + n + '" class="c tblnote" style="padding:38px 0">선택된 ' + w + ' 정보가 없습니다</td></tr>';
   const addable = DB.stores.filter(x => c.stores.indexOf(x.id) === -1);
+  const addableP = DB.products.filter(x => x.lang === c.lang && c.products.indexOf(x.id) === -1);
   /* 구성 항목은 유형이 정한다. 병원이면 스토어 표, 나머지 유형은 상품 표 하나만 나온다. */
   const comp = byStore
     ? '<div class="compcard"><div class="chd"><b>스토어 ' + c.stores.length + '개 선택</b><span class="frow">' +
@@ -948,7 +951,12 @@ function modal_coll() {
       '<div class="tblwrap"><table><thead><tr><th style="width:40px" class="c"><input type="checkbox"></th><th>스토어명</th><th>조회수</th><th>클릭수</th>' +
       '<th class="new">알리페이 노출<span class="newbadge">신규</span></th><th>action</th></tr></thead><tbody>' + (storeRows || emptyRow(6, '스토어')) + '</tbody></table></div></div>'
     : '<div class="compcard"><div class="chd"><b>상품 ' + c.products.length + '개 선택</b><span class="frow">' +
-      '<button class="btn dash">+ 상품 추가</button><button class="btn" disabled>선택된 상품 삭제</button></span></div>' +
+      '<button class="btn dash" onclick="collPick(' + (COLLPICK ? 'false' : 'true') + ')">+ 상품 추가</button>' +
+      '<button class="btn" disabled>선택된 상품 삭제</button></span></div>' +
+      (COLLPICK ? '<div class="pickrow"><div class="frow"><select id="addpd">' + addableP.map(x => '<option value="' + x.id + '">' + esc(x.name) + ' · ' + x.lang + '</option>').join('') + '</select>' +
+        '<button class="btn" onclick="addCollProduct(document.getElementById(\'addpd\').value)"' + (addableP.length ? '' : ' disabled') + '>추가</button>' +
+        '<button class="btn" onclick="collPick(false)">닫기</button></div>' +
+        '<div class="note" style="margin:8px 0 0"><b>시안 설명</b>실제 화면은 검색 창이 뜹니다. 이 시안에서는 목록에서 고르게 했습니다.</div></div>' : '') +
       '<div class="tblwrap"><table><thead><tr><th style="width:40px" class="c"><input type="checkbox"></th><th>No.</th><th>상품명</th><th>언어</th><th>스토어명(언어)</th>' +
       '<th class="new">알리페이 노출<span class="newbadge">신규</span></th>' +
       '<th>가격</th><th>노출수</th><th>클릭수</th><th>조회수</th><th>스토어 활성화</th><th>상품 활성화</th><th>히든</th><th>action</th></tr></thead><tbody>' + (prodRows || emptyRow(14, '상품')) + '</tbody></table></div></div>';
@@ -1160,7 +1168,7 @@ function railFor() {
       '<div class="result ' + cls + '">' + lab + (j.reason ? '<small>사유 : ' + j.reason + '</small>' : j.na ? '<small>대상 언어가 아닙니다. 목록에서는 두 칼럼이 "-"로 보입니다.</small>' : '<small>사유 칼럼은 비어 있습니다.</small>') + '</div>' +
       j.conds.map(c => '<div class="cond ' + c.s + '"><span class="mk">' + (c.s === 'ok' ? '✓' : c.s === 'no' ? '✕' : '·') + '</span><span>' + c.t + '</span></div>').join('') +
       '<div class="hint" style="margin-top:10px">판정 결과와 사유는 저장 컬럼(SYS-CH-01)에 두고 목록이 읽습니다. 산출 로직은 SYS-CH-02.</div>' +
-      '<div style="margin-top:12px"><label class="rd"><input type="checkbox"' + (DB.errors[obj.id] ? ' checked' : '') + ' onchange="setErr(\'' + obj.id + '\',this.checked)"><span>대상 조회 오류 재현 (사유 판정 오류)</span></label></div>' +
+      '<div style="margin-top:12px"><label class="rd"><input type="checkbox"' + (DB.errors[obj.id] ? ' checked' : '') + ' onchange="setErr(\'' + obj.id + '\',this.checked)"><span>대상 조회 오류 재현 (사유 확인 실패)</span></label></div>' +
       '</div></div>';
   }
   html += '<div class="rail"><div class="hd">엣지케이스 시나리오</div><div class="bd">' +
