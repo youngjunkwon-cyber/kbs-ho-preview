@@ -146,6 +146,8 @@ select.dim{color:#8c8c8c}
    ========================================================================= */
 const ALI_LANGS = ['중국어(간체)', '중국어(번체)', '영어'];
 const ALL_LANGS = [...ALI_LANGS, '일본어', '인도네시아어', '몽골어'];
+// 스토어 정보 수정의 언어 탭 순서 (라이브 어드민 2026-08-28 실측)
+const STORE_TABS = ['중국어(간체)', '영어', '중국어(번체)', '일본어', '인도네시아어', '몽골어'];
 const CAP = 2;
 
 // 실측 버튼 항목. 채팅은 이번에 신설, 예약은 스토어에만 있다.
@@ -525,8 +527,8 @@ function btnTable(kind, obj) {
   const locked = !isStore && obj.mode === '기본 설정';
   const aliOffAll = !langOk || selfHidden || storeHidden || locked;
 
-  let html = '<div class="tblwrap"><table><thead><tr><th style="min-width:280px">항목</th><th style="width:200px">웹</th>' +
-    '<th class="new" style="width:200px">알리페이<span class="newbadge">신규</span></th><th style="min-width:220px"></th></tr></thead><tbody>';
+  let html = '<div class="tblwrap"><table><thead><tr><th style="min-width:300px">항목</th><th style="width:180px">웹</th>' +
+    '<th class="new" style="width:180px">알리페이<span class="newbadge">신규</span></th><th style="min-width:160px"></th></tr></thead><tbody>';
   rows.forEach(r => {
     const e = eff.btns[r.k];
     let webDis = locked, aliDis = aliOffAll || r.aliHardOff, note = '';
@@ -727,7 +729,7 @@ function screen_sEdit() {
   const st = S(VIEW.id), i = VIEW.sect;
   let bd = '';
   if (i === 2) {
-    bd = '<div class="langtabs">' + ['원본'].concat(ALL_LANGS).map(l => '<div class="langtab ' + (l === '원본' ? 'on' : '') + '">' + l + '</div>').join('') + '</div>' +
+    bd = '<div class="langtabs">' + ['원본'].concat(STORE_TABS).map(l => '<div class="langtab ' + (l === '원본' ? 'on' : '') + '">' + l + '</div>').join('') + '</div>' +
       '<div class="bd"><div class="row"><div class="lbl">스토어명</div><div class="val">' + esc(st.name) + ' <span class="tblnote">(기존)</span></div></div>' +
       '<div class="row"><div class="lbl">메인 문구</div><div class="val"><span class="tblnote">0 / 20 (기존)</span></div></div>' +
       '<div class="row"><div class="lbl"><span class="req">*</span>알리페이 노출<span class="newbadge">신규</span></div><div class="val"><span class="rg">' +
@@ -742,7 +744,7 @@ function screen_sEdit() {
   } else if (i === 11) {
     bd = '<div class="bd">' + btnTable('store', st) +
       '<div class="blk">언어별 메신저 설정</div><div class="hint" style="margin-top:0">' + MSG.msgLang + '</div>' +
-      '<div class="langtabs" style="padding:0;margin-top:10px;border-bottom:1px solid #f0f0f0">' + ALL_LANGS.map((l, k) => '<div class="langtab ' + (k === 0 ? 'on' : '') + '">' + l + '</div>').join('') + '</div>' +
+      '<div class="langtabs" style="padding:0;margin-top:10px;border-bottom:1px solid #f0f0f0">' + STORE_TABS.map((l, k) => '<div class="langtab ' + (k === 0 ? 'on' : '') + '">' + l + '</div>').join('') + '</div>' +
       '<div class="row" style="margin-top:12px"><div class="lbl">기본채널</div><div class="val"><span class="tblnote">' + (st.messenger.length ? st.messenger[0].base : '미사용') + ' (기존)</span></div></div>' +
       '<div class="row"><div class="lbl">유형</div><div class="val"><span class="tblnote">' + (st.messenger.length ? st.messenger[0].type : '-') + ' (기존)</span></div></div>' +
       '<div class="row"><div class="lbl">메신저 링크 URL</div><div class="val"><span class="mono">' + (st.messenger.length ? esc(st.messenger[0].url) : '-') + '</span></div></div>' +
@@ -841,9 +843,10 @@ function modal_ad() {
     '<div class="hint">앞은 내부링크 종류, 뒤는 대상입니다. 병원과 기획전만 알리페이 노출을 판정합니다. 인플루언서와 직접입력은 판정하지 않습니다.</div></div></div>';
   h += '<div class="row"><div class="lbl"><span class="req">*</span>대표 이미지</div><div class="val"><span class="tblnote">banner_' + b.id + '.jpg (기존)</span></div></div>';
   if (isLanding) h += '<div class="row"><div class="lbl"><span class="req">*</span>상세 이미지</div><div class="val"><span class="tblnote">landing_' + b.id + '.jpg (기존)</span></div></div>';
+  let tail = '';
   if (langOk && b.aliVisible === '노출') {
-    if (j.reason === '알리페이 버튼 없음' && !extBtn) h += '<div class="notice">' + MSG.bnBtnOff + '</div>';
-    else if (j.reason === '연결 대상 미노출') h += '<div class="notice">' + MSG.bnTarget + '</div>';
+    if (j.reason === '알리페이 버튼 없음' && !extBtn) tail = '<div class="notice">' + MSG.bnBtnOff + '</div>';
+    else if (j.reason === '연결 대상 미노출') tail = '<div class="notice">' + MSG.bnTarget + '</div>';
   }
   if (isLanding && b.btn) {
     const bnHidden = b.aliVisible === '미노출';
@@ -856,12 +859,13 @@ function modal_ad() {
       '</div></div>' +
       '<div class="row"><div class="lbl"><span class="req">*</span>버튼 텍스트</div><div class="val"><input type="text" value="' + esc(b.btn.label) + '" style="width:260px"></div></div>' +
       '<div class="row"><div class="lbl"><span class="req">*</span>버튼 링크 종류</div><div class="val">' +
-      '<select onchange="setBtnLinkKind(this.value)">' + ['링크없음', '외부링크', '내부링크'].map(v => '<option' + (v === b.btn.linkKind ? ' selected' : '') + '>' + v + (v === '내부링크' ? ' (신규)' : '') + '</option>').join('') + '</select></div></div>' +
+      '<select onchange="setBtnLinkKind(this.value)">' + ['링크없음', '외부링크', '내부링크'].map(v => '<option' + (v === b.btn.linkKind ? ' selected' : '') + '>' + v + '</option>').join('') + '</select></div></div>' +
       (b.btn.linkKind === '외부링크' ? '<div class="row"><div class="lbl">버튼 링크</div><div class="val"><input type="text" style="width:100%" value="' + esc(b.btn.url || '') + '"></div></div>' : '') +
       (b.btn.linkKind === '내부링크' ? '<div class="row"><div class="lbl">버튼 링크</div><div class="val">' +
         innerPicker('setBtnInnerKind(this.value)', 'setBtnInnerId(this.value)', b.btn.inner) +
         '<div class="hint">배너 자체의 내부링크와 같은 셀렉터입니다.</div></div></div>' : '');
   }
+  h += tail;
   return '<div class="mask"><div class="modal" style="max-width:720px"><div class="hd">수정<button class="x" onclick="closeMD()">✕</button></div>' +
     '<div class="bd">' + h + '</div><div class="ft"><button class="btn" onclick="closeMD()">취소</button><button class="btn blue" onclick="closeMD()">수정</button></div></div></div>';
 }
