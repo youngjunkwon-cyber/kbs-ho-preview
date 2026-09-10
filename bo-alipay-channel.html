@@ -177,6 +177,7 @@ const MSG = {
   cap:         '고객 화면 아래에는 버튼을 2개까지 보여 줍니다. 웹과 알리페이 앱이 각각 2개입니다.',
   langOnly:    '알리페이 앱에는 중국어(간체), 중국어(번체), 영어로 만든 것만 나갑니다. 이 건은 대상이 아니라 설정할 것이 없습니다.',
   exhEmpty:    s => '이 기획전에 담은 ' + s + ' 알리페이 앱에서 모두 보이지 않는 상태입니다. 그래서 기획전도 알리페이 앱에 보이지 않습니다.',
+  exhNone:     (s, o) => '이 기획전에 아직 담은 ' + s + ' 없습니다. ' + o + ' 담아야 알리페이 앱에 보입니다.',
   storeHide:   n => '이 스토어의 상품 ' + n + '건도 알리페이 앱에서 함께 보이지 않게 됩니다.',
   saveProd:    '알리페이 앱에서 켠 버튼이 없습니다. 이대로 저장하면 이 상품은 알리페이 앱에 보이지 않습니다. 저장할까요?',
   saveStore:   '알리페이 앱에서 켠 버튼이 없습니다. 이대로 저장하면 이 스토어는 알리페이 앱에 보이지 않습니다. 저장할까요?',
@@ -458,8 +459,6 @@ const FILTERS = { 'p-list': { ali: '전체', rsn: '전체' }, 's-list': { ali: '
 const F = () => FILTERS[VIEW.name] || { ali: '전체', rsn: '전체' };
 const el = s => document.querySelector(s);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const TITLES = { 'p-list': '입점사 스토어별 상품 정보 관리', 's-list': '스토어 정보 관리', 's-edit': '스토어 정보 수정',
-  'a-list': '광고 관리', 'c-list': '기획전 관리', 'm-edit': '매거진 등록·수정', 'btn-spec': '버튼 설정 공통 구조', 'h-edit': '상품 수정 (호스트)' };
 const SCREEN_ID = { 'p-list': 'BO-CH-02 / BO-CH-01', 's-list': 'BO-CH-04', 's-edit': 'BO-CH-03', 'a-list': 'BO-CH-06 / BO-CH-05', 'c-list': 'BO-CH-09 / BO-CH-08', 'm-edit': 'BO-CH-07', 'btn-spec': 'BO-CH-10', 'h-edit': 'HOST-CH-01' };
 
 function go(name, id) { VIEW.name = name; if (id !== undefined) VIEW.id = id; if (name === 's-edit') { VIEW.sect = 2; VIEW.savedVis = S(VIEW.id).aliVisible; } render(); window.scrollTo(0, 0); }
@@ -468,7 +467,6 @@ window.go = go;
 const aliLangOk = () => ALI_LANGS.indexOf(VIEW.lang) !== -1;
 const visCell = j => j.na ? '<span class="tag na">-</span>' : (j.visible ? '<span class="tag on">노출</span>' : '<span class="tag off">미노출</span>');
 const rsnCell = j => j.na ? '<span class="tblnote">-</span>' : (j.reason ? '<span class="tag rsn">' + j.reason + '</span>' : '');
-const hostNote = j => j.na ? '이 언어로 만든 상품은 알리페이 앱에 나가지 않아요.' : (!j.reason ? '이 상품은 알리페이 앱에서도 보여요.' : MSG.hostHidden);
 
 function radio(nm, val, cur, handler, dis) {
   return '<label class="rd ' + (dis ? 'dis' : '') + '"><input type="radio" name="' + nm + '"' + (val === cur ? ' checked' : '') + (dis ? ' disabled' : '') + ' onchange="' + handler + '"><span>' + val + '</span></label>';
@@ -909,7 +907,16 @@ function screen_cList() {
 let COLLPICK = false;
 window.openColl = function (id) { VIEW.id = id; MODAL = 'coll'; COLLPICK = false; render(); };
 window.collPick = function (v) { COLLPICK = v; render(); };
-window.setCollType = function (t) { const c = C(VIEW.id); if (c.type === t) return; logChange(c, '기획전 유형', c.type, t); c.type = t; render(); };
+window.setCollType = function (t) {
+  const c = C(VIEW.id); if (c.type === t) return;
+  logChange(c, '기획전 유형', c.type, t);
+  const was = isStoreColl(c) ? c.stores.length : c.products.length;
+  c.type = t;
+  /* 담는 종류가 바뀌므로 앞 유형에 담아 둔 항목은 비운다 */
+  if (isStoreColl(c)) { if (c.products.length) logChange(c, '구성 항목 · 상품 비움', c.products.length + '건', '0건'); c.products = []; }
+  else { if (c.stores.length) logChange(c, '구성 항목 · 스토어 비움', c.stores.length + '건', '0건'); c.stores = []; }
+  void was; render();
+};
 window.addCollStore = function (sid) { const c = C(VIEW.id); if (c.stores.indexOf(sid) === -1) { c.stores.push(sid); logChange(c, '구성 항목 · 스토어 추가', '-', S(sid).name); } render(); };
 window.delCollStore = function (sid) { const c = C(VIEW.id); c.stores = c.stores.filter(x => x !== sid); logChange(c, '구성 항목 · 스토어 삭제', S(sid).name, '-'); render(); };
 window.delCollProduct = function (pid) { const c = C(VIEW.id); c.products = c.products.filter(x => x !== pid); logChange(c, '구성 항목 · 상품 삭제', P(pid) ? P(pid).name : pid, '-'); render(); };
@@ -952,7 +959,8 @@ function modal_coll() {
     '<div class="row"><div class="lbl"><span class="req">*</span>알리페이 노출<span class="newbadge">신규</span></div><div class="val"><span class="rg">' +
     radio('cv', '노출', langOk ? c.aliVisible : '노출', "setVis('coll','노출')", !langOk) + radio('cv', '미노출', langOk ? c.aliVisible : '노출', "setVis('coll','미노출')", !langOk) + '</span>' +
     (langOk ? '' : '<div class="hint">' + MSG.langOnly + '</div>') +
-    (langOk && c.aliVisible === '노출' && j.liveCount === 0 ? '<div class="notice">' + MSG.exhEmpty(byStore ? '스토어가' : '상품이') + '</div>' : '') + '</div></div>' +
+    (langOk && c.aliVisible === '노출' && j.liveCount === 0
+      ? '<div class="notice">' + ((byStore ? c.stores.length : c.products.length) ? MSG.exhEmpty(byStore ? '스토어가' : '상품이') : MSG.exhNone(byStore ? '스토어가' : '상품이', byStore ? '스토어를' : '상품을')) + '</div>' : '') + '</div></div>' +
     comp +
     '<div class="row"><div class="lbl"><span class="req">*</span>기획전 노출 기간</div><div class="val"><input type="text" value="' + c.from + ' → ' + c.to + '" style="width:280px" readonly></div></div>' +
     '<div class="row"><div class="lbl">기획전 활성화 여부</div><div class="val"><span class="rg">' +
