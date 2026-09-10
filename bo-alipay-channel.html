@@ -181,6 +181,8 @@ const MSG = {
   storeHide:   n => '이 스토어의 상품 ' + n + '건도 알리페이 앱에서 함께 보이지 않게 됩니다.',
   saveProd:    '알리페이 앱에서 켠 버튼이 없습니다. 이대로 저장하면 이 상품은 알리페이 앱에 보이지 않습니다. 저장할까요?',
   saveStore:   '알리페이 앱에서 켠 버튼이 없습니다. 이대로 저장하면 이 스토어는 알리페이 앱에 보이지 않습니다. 저장할까요?',
+  saveColl:    s => '담은 ' + s + ' 알리페이 앱에서 모두 보이지 않습니다. 이대로 저장하면 이 기획전은 알리페이 앱에 보이지 않습니다. 저장할까요?',
+  saveCollNone:s => '아직 담은 ' + s + ' 없습니다. 이대로 저장하면 이 기획전은 알리페이 앱에 보이지 않습니다. 저장할까요?',
   bnExtLock:   '누르면 외부 사이트로 나가는 배너입니다. 알리페이 앱은 외부로 나가는 것을 막기 때문에 이 배너는 알리페이 앱에 보이지 않고, 이 설정도 바꿀 수 없습니다.',
   bnBtnExtLock:'하단 버튼이 외부 사이트로 나가서 알리페이 앱에서는 켤 수 없습니다. 눌러도 갈 곳이 없어 이 배너도 알리페이 앱에 보이지 않습니다.',
   lockSelf:    '위에서 알리페이 노출을 미노출로 두었습니다. 알리페이 쪽 버튼은 손댈 수 없고, 켜 둔 값은 그대로 남아 있습니다.',
@@ -965,7 +967,7 @@ function modal_coll() {
     '<div class="row"><div class="lbl"><span class="req">*</span>기획전 노출 기간</div><div class="val"><input type="text" value="' + c.from + ' → ' + c.to + '" style="width:280px" readonly></div></div>' +
     '<div class="row"><div class="lbl">기획전 활성화 여부</div><div class="val"><span class="rg">' +
     radio('ca', '활성화', c.active === '활성' ? '활성화' : '비활성화', 'void(0)') + radio('ca', '비활성화', c.active === '활성' ? '활성화' : '비활성화', 'void(0)') + '</span></div></div>' +
-    '</div><div class="ft"><button class="btn" onclick="closeMD()">Cancel</button><button class="btn blue" onclick="closeMD()">OK</button></div></div></div>';
+    '</div><div class="ft"><button class="btn" onclick="closeMD()">Cancel</button><button class="btn blue" onclick="saveColl()">OK</button></div></div></div>';
 }
 /* --------------------------- 호스트 상품 수정 --------------------------- */
 function screen_hEdit() {
@@ -1076,7 +1078,27 @@ function modal_link() {
 }
 
 /* ------------------------------- 저장 ------------------------------- */
+window.saveColl = function () {
+  const c = C(VIEW.id), j = judgeCollection(c), byStore = isStoreColl(c);
+  const langOk = ALI_LANGS.indexOf(c.lang) !== -1;
+  const done = () => { closeMD(); alertBox('저장했습니다', '목록과 고객 화면에 바로 반영됩니다.'); };
+  if (!langOk || c.aliVisible !== '노출' || j.liveCount > 0) { done(); return; }
+  const total = byStore ? c.stores.length : c.products.length;
+  const word = byStore ? '스토어가' : '상품이';
+  /* 담은 항목마다 왜 안 보이는지 한 줄씩 */
+  const lines = (byStore ? c.stores : c.products).map(id => {
+    const o = byStore ? S(id) : P(id); if (!o) return '';
+    const oj = byStore ? judgeStore(o) : judgeProduct(o);
+    const why = oj.na ? '알리페이 앱 대상 언어가 아님' : (oj.visible ? '보임' : oj.reason);
+    return '<p class="hint" style="margin:2px 0">' + esc(o.name) + ' → ' + why + '</p>';
+  }).join('');
+  confirmBox('저장 확인',
+    '<p>' + (total ? MSG.saveColl(word) : MSG.saveCollNone(word)) + '</p>' + lines +
+    '<p class="hint">웹에서는 그대로 보입니다.</p>',
+    done, function () {});
+};
 window.save = function (kind) {
+  const done = () => { closeMD(); alertBox('저장했습니다', '목록과 고객 화면에 바로 반영됩니다.'); };
   const obj = kind === 'store' ? S(VIEW.id) : P(VIEW.id);
   const rows = kind === 'store' ? ROWS_STORE : ROWS_PRODUCT;
   const eff = kind === 'store' ? effStoreBtns(obj) : effBtns(obj);
@@ -1086,17 +1108,17 @@ window.save = function (kind) {
     const im = impactOfHiding(obj);
     confirmBox('알리페이 미노출로 저장',
       '<p><b>' + esc(obj.name) + '</b></p><p>이 스토어를 알리페이 앱에서 숨기면 소속 상품 ' + obj.prodCount + '건이 함께 보이지 않게 됩니다. 이 스토어나 소속 상품을 가리키는 배너 ' + im.M + '건, 담은 항목이 모두 없어지는 기획전 ' + im.K + '건도 알리페이 앱에서 보이지 않습니다.</p><p class="hint">웹에서는 그대로 보입니다.</p>',
-      function () { VIEW.savedVis = '미노출'; alertBox('저장했습니다', '목록과 고객 화면에 바로 반영됩니다.'); }, function () {}, '미노출로 저장');
+      function () { VIEW.savedVis = '미노출'; done(); }, function () {}, '미노출로 저장');
     return;
   }
   if (webCnt > CAP || aliCnt > CAP) { alertBox('저장할 수 없습니다', MSG.cap + ' 지금은 웹 ' + webCnt + '개(' + ctaList(eff.btns, rows, 'web').join(' / ') + '), 알리페이 앱 ' + aliCnt + '개(' + ctaList(eff.btns, rows, 'ali').join(' / ') + ')가 나갑니다. 2개로 줄인 뒤 저장해 주세요.'); return; }
   const langOk = kind === 'store' ? true : ALI_LANGS.indexOf(obj.lang) !== -1;
   if (langOk && obj.aliVisible === '노출' && aliCnt === 0) {
     confirmBox('저장 확인', kind === 'store' ? MSG.saveStore : MSG.saveProd,
-      function () { alertBox('저장했습니다', '목록과 고객 화면에 바로 반영됩니다.'); }, function () {});
+      done, function () {});
     return;
   }
-  alertBox('저장했습니다', '목록과 고객 화면에 바로 반영됩니다.');
+  done();
 };
 
 /* ------------------------------- 모달 ------------------------------- */
