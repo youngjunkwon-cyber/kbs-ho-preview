@@ -203,27 +203,27 @@ const DB = {
   stores: [
     { id: 'S1', no: 226, code: '준오헤어명동', name: '준오헤어 명동점', biz: '준오헤어(주)', cat: '헤어/메이크업',
       langs: '중국어(간체), 영어, 일본어', tel: '02-000-0000', bizno: '123-45-67890', email: 'a@a.com',
-      zip: '04533', area: '중구', reg: '2026-09-03 18:33', aliVisible: '노출', active: true, prodCount: 12, bookingEnabled: true,
+      zip: '04533', area: '중구', reg: '2026-09-03 18:33', aliVisible: '노출', active: true, prodCount: 12, baseCount: 9, bookingEnabled: true,
       btns: { consult: btn({ web: true, ali: true }), inquiry: btn(), chat: btn(), extlink: btn(), messenger: btn(), booking: btn({ web: true, ali: true }) },
       messenger: [{ lang: '중국어(간체)', type: '🐉 WeChat', url: 'https://weixin.qq.com/r/xxx', base: '사용' }], history: [] },
     { id: 'S2', no: 225, code: '리엔장', name: '리엔장 피부과', biz: '리엔장의원', cat: '피부과',
       langs: '중국어(간체), 중국어(번체)', tel: '02-111-1111', bizno: '223-45-67890', email: 'b@b.com',
-      zip: '06236', area: '강남구', reg: '2026-09-02 17:12', aliVisible: '노출', active: true, prodCount: 6, bookingEnabled: false,
+      zip: '06236', area: '강남구', reg: '2026-09-02 17:12', aliVisible: '노출', active: true, prodCount: 6, baseCount: 4, bookingEnabled: false,
       btns: { consult: btn({ web: true, ali: true }), inquiry: btn(), chat: btn({ web: true, ali: true }), extlink: btn(), messenger: btn(), booking: btn() },
       messenger: [], history: [] },
     { id: 'S3', no: 224, code: '뷰티랩강남', name: '뷰티랩 강남', biz: '뷰티랩(주)', cat: '스킨케어',
       langs: '중국어(간체), 영어, 인도네시아어', tel: '02-222-2222', bizno: '323-45-67890', email: 'c@c.com',
-      zip: '06120', area: '강남구', reg: '2026-09-01 15:03', aliVisible: '노출', active: true, prodCount: 3, bookingEnabled: true,
+      zip: '06120', area: '강남구', reg: '2026-09-01 15:03', aliVisible: '노출', active: true, prodCount: 3, baseCount: 2, bookingEnabled: true,
       btns: { consult: btn(), inquiry: btn(), chat: btn({ web: true }), extlink: btn(), messenger: btn(), booking: btn({ web: true, ali: true }) },
       messenger: [], history: [] },
     { id: 'S4', no: 223, code: '모모클리닉', name: '모모클리닉', biz: '모모의원', cat: '성형외과',
       langs: '중국어(번체), 일본어', tel: '02-333-3333', bizno: '423-45-67890', email: 'd@d.com',
-      zip: '06010', area: '강남구', reg: '2026-08-31 18:16', aliVisible: '미노출', active: true, prodCount: 7, bookingEnabled: false,
+      zip: '06010', area: '강남구', reg: '2026-08-31 18:16', aliVisible: '미노출', active: true, prodCount: 7, baseCount: 5, bookingEnabled: false,
       btns: { consult: btn({ web: true, ali: true }), inquiry: btn(), chat: btn({ web: true, ali: true }), extlink: btn(), messenger: btn(), booking: btn() },
       messenger: [], history: [] },
     { id: 'S5', no: 222, code: '글로우스킨홍대', name: '글로우스킨 홍대', biz: '글로우스킨', cat: '스킨케어',
       langs: '중국어(간체)', tel: '02-444-4444', bizno: '523-45-67890', email: 'e@e.com',
-      zip: '04039', area: '마포구', reg: '2026-08-27 15:58', aliVisible: '노출', active: true, prodCount: 2, bookingEnabled: false,
+      zip: '04039', area: '마포구', reg: '2026-08-27 15:58', aliVisible: '노출', active: true, prodCount: 2, baseCount: 1, bookingEnabled: false,
       btns: { consult: btn({ web: true }), inquiry: btn(), chat: btn(), extlink: btn({ web: true }), messenger: btn(), booking: btn() },
       messenger: [], history: [] }
   ],
@@ -531,9 +531,12 @@ function renderSide() {
 }
 
 /* ------------------------------ 변경 이력 ------------------------------ */
+let LOGSEQ = 0;
 function logChange(obj, field, from, to, affected) {
   obj.history = obj.history || [];
-  obj.history.unshift({ field, from: String(from), to: String(to), by: '관리자', at: '2026-09-08 14:20', affected: affected == null ? '' : affected });
+  const m = 20 + (LOGSEQ++ % 40);
+  const at = '2026-09-08 14:' + (m < 10 ? '0' + m : m);
+  obj.history.unshift({ field, from: String(from), to: String(to), by: '관리자', at: at, affected: affected == null ? '' : affected });
 }
 function historyCard(obj) {
   const h = obj.history || [];
@@ -561,8 +564,14 @@ function btnTable(kind, obj) {
     const e = eff.btns[r.k];
     let webDis = locked, aliDis = aliOffAll || r.aliHardOff, note = '';
     if (r.aliHardOff) note = MSG.hardOff;
-    if (r.needConsult && !eff.btns.consult.web) { webDis = true; note = MSG.needConsult; }
-    if (r.needConsult && !eff.btns.consult.ali) { aliDis = true; note = MSG.needConsult; }
+    if (r.needConsult) {
+      const offWeb = !eff.btns.consult.web, offAli = !eff.btns.consult.ali;
+      if (offWeb) webDis = true;
+      if (offAli) aliDis = true;
+      if (offWeb && offAli) note = MSG.needConsult;
+      else if (offWeb) note = '웹은 상담접수를 먼저 켜야 이 버튼을 켤 수 있습니다.';
+      else if (offAli) note = '알리페이 앱은 상담접수를 먼저 켜야 이 버튼을 켤 수 있습니다.';
+    }
     if (r.needBooking && !obj.bookingEnabled) { webDis = true; aliDis = true; note = MSG.needBooking; }
     if (r.k === 'chat' && !isStore && eff.chatAuto) note = '스토어에 켠 알리페이 버튼이 없어 채팅이 자동으로 켜집니다.';
     html += '<tr><td><span class="req">*</span>' + r.label + (r.isNew ? '<span class="newbadge">신규</span>' : '') + '</td>' +
@@ -604,7 +613,7 @@ window.setBtn = function (kind, k, ch, on) {
   obj.btns[k][ch] = !!on;
   const cascade = k === 'consult' && !on && obj.btns.inquiry[ch];
   if (k === 'consult' && !on) obj.btns.inquiry[ch] = false;
-  const note = [kind === 'store' ? '소속 상품 ' + obj.prodCount + '건' : '', cascade ? '문의하기 통합도 OFF' : ''].filter(Boolean).join(' · ');
+  const note = [kind === 'store' ? '기본 설정으로 따라가는 소속 상품 ' + obj.baseCount + '건' : '', cascade ? '문의하기 통합도 OFF' : ''].filter(Boolean).join(' · ');
   logChange(obj, '버튼 설정 · ' + label + ' · ' + (ch === 'web' ? '웹' : '알리페이'), before, on ? 'ON' : 'OFF', note);
   render();
 };
@@ -634,19 +643,37 @@ window.setMode = function (v) {
   p.mode = v; render();
 };
 window.setErr = function (id, on) { if (on) DB.errors[id] = true; else delete DB.errors[id]; render(); };
-window.setBooking = function (on) { const st = S(VIEW.id); logChange(st, '예약설정 · 예약 사용', st.bookingEnabled ? '사용' : '미사용', on ? '사용' : '미사용'); st.bookingEnabled = !!on; render(); };
+window.setBooking = function (on) {
+  const st = S(VIEW.id);
+  if (on && !st.bookingEnabled) {
+    /* 예약을 켜면 켜 둔 예약 버튼이 다시 세어진다. 상한을 넘으면 켜지 않는다 */
+    const keep = st.bookingEnabled; st.bookingEnabled = true;
+    const e = effStoreBtns(st);
+    const w = onCount(e.btns, ROWS_STORE, 'web'), a = onCount(e.btns, ROWS_STORE, 'ali');
+    st.bookingEnabled = keep;
+    if (w > CAP || a > CAP) {
+      const over = w > CAP ? '웹' : '알리페이 앱';
+      alertBox('예약을 켤 수 없습니다', MSG.cap + ' 예약을 켜면 ' + over + ' 버튼이 ' + Math.max(w, a) + '개가 됩니다. 다른 버튼을 하나 끈 뒤에 켜 주세요.');
+      render(); return;
+    }
+  }
+  logChange(st, '예약설정 · 예약 사용', st.bookingEnabled ? '사용' : '미사용', on ? '사용' : '미사용');
+  st.bookingEnabled = !!on; render();
+};
 
 /* ------------------------------ 목록 공통 ------------------------------ */
+const langFree = () => VIEW.name === 's-list';   /* 스토어는 언어를 나누지 않는다 */
 function aliFilterRow(opts) {
-  const dis = aliLangOk() ? '' : ' disabled';
-  return '<div class="fl newf"><span>알리페이 노출 · 신규</span><select' + dis + ' onchange="F().ali=this.value;render()">' +
+  const dis = (langFree() || aliLangOk()) ? '' : ' disabled';
+  const nb = '<span class="newbadge">신규</span>';
+  return '<div class="fl newf"><span>알리페이 노출' + nb + '</span><select' + dis + ' onchange="F().ali=this.value;render()">' +
     ['전체', '노출', '미노출'].map(l => '<option' + (l === F().ali ? ' selected' : '') + '>' + l + '</option>').join('') + '</select></div>' +
-    '<div class="fl newf"><span>사유 · 신규</span><select' + dis + ' onchange="F().rsn=this.value;render()">' +
+    '<div class="fl newf"><span>사유' + nb + '</span><select' + dis + ' onchange="F().rsn=this.value;render()">' +
     opts.map(l => '<option' + (l === F().rsn ? ' selected' : '') + '>' + l + '</option>').join('') + '</select></div>';
 }
 function passFilter(j) {
   const f = F();
-  if (!aliLangOk()) return true;
+  if (!langFree() && !aliLangOk()) return true;
   if (f.ali !== '전체') { if (j.na) return false; if ((f.ali === '노출') !== j.visible) return false; }
   if (f.rsn !== '전체') { if (j.na || j.reason !== f.rsn) return false; }
   return true;
@@ -722,11 +749,11 @@ function modal_product() {
       btnTable('product', p) +
       '<div class="row" style="margin-top:14px"><div class="lbl">메신저</div><div class="val"><span class="tblnote">인스타그램 (기존)</span></div></div>' +
       '<div class="row"><div class="lbl">인스타그램 임베디드 노출 여부</div><div class="val">' + onoff('pins', p.insta === 'ON', 'void(%V%)', true) +
-      "<div class=\"note\"><b>시안 설명</b>" + '기존 항목입니다. 값은 그대로 두고 알리페이 앱에서만 이 영역을 숨깁니다.</div></div>' + historyCard(p) + '</div>';
+      "<div class=\"note\"><b>시안 설명</b>" + '기존 항목입니다. 값은 그대로 두고 알리페이 앱에서만 이 영역을 숨깁니다.</div></div></div>';
   }
   return '<div class="mask"><div class="modal" style="max-width:900px"><div class="hd">상품정보 수정<button class="x" onclick="closeMD()">✕</button></div>' +
     '<div class="mtabs">' + tabs.map((t, i) => '<div class="mtab ' + (i === VIEW.tab ? 'on' : '') + '" onclick="VIEW.tab=' + i + ';render()">' + t + '</div>').join('') + '</div>' +
-    '<div class="bd">' + bd + '</div>' +
+    '<div class="bd">' + bd + historyCard(p) + '</div>' +
     '<div class="ft"><button class="btn" onclick="closeMD()">Cancel</button><button class="btn blue" onclick="save(\'product\')">OK</button></div></div></div>';
 }
 
@@ -761,15 +788,16 @@ function screen_sEdit() {
   const st = S(VIEW.id), i = VIEW.sect;
   let bd = '';
   if (i === 2) {
-    bd = '<div class="langtabs">' + ['원본'].concat(STORE_TABS).map(l => '<div class="langtab ' + (l === '원본' ? 'on' : '') + '">' + l + '</div>').join('') + '</div>' +
-      '<div class="bd"><div class="row"><div class="lbl">스토어명</div><div class="val">' + esc(st.name) + ' <span class="tblnote">(기존)</span></div></div>' +
-      '<div class="row"><div class="lbl">메인 문구</div><div class="val"><span class="tblnote">0 / 20 (기존)</span></div></div>' +
-      '<div class="row"><div class="lbl"><span class="req">*</span>알리페이 노출<span class="newbadge">신규</span></div><div class="val"><span class="rg">' +
+    /* 알리페이 노출은 언어를 나누지 않으므로 언어 탭 위에 둔다 */
+    bd = '<div class="bd" style="padding-bottom:0"><div class="row"><div class="lbl"><span class="req">*</span>알리페이 노출<span class="newbadge">신규</span></div><div class="val"><span class="rg">' +
       radio('sv', '노출', st.aliVisible, "setVis('store','노출')") + radio('sv', '미노출', st.aliVisible, "setVis('store','미노출')") + '</span>' +
       '<div class="hint">스토어는 언어를 나누지 않습니다. 이 설정 하나가 모든 언어에 함께 적용됩니다.</div>' +
       (st.aliVisible === '미노출' ? '<div class="notice">' + MSG.storeHide(st.prodCount) + '</div>' : '') +
-      (st.aliVisible === '노출' && onCount(effStoreBtns(st).btns, ROWS_STORE, 'ali') === 0 ? '<div class="notice">' + MSG.noAliBtn('이 스토어는') + '</div>' : '') + '</div></div>' +
-      "<div class=\"note\"><b>시안 설명</b>" + '소속 상품 ' + st.prodCount + '건은 스토어 데이터의 전체 상품 수입니다. 이 시안 목록에는 그중 일부만 넣었습니다.</div></div>';
+      (st.aliVisible === '노출' && onCount(effStoreBtns(st).btns, ROWS_STORE, 'ali') === 0 ? '<div class="notice">' + MSG.noAliBtn('이 스토어는') + '</div>' : '') + '</div></div></div>' +
+      '<div class="langtabs">' + ['원본'].concat(STORE_TABS).map(l => '<div class="langtab ' + (l === '원본' ? 'on' : '') + '">' + l + '</div>').join('') + '</div>' +
+      '<div class="bd"><div class="row"><div class="lbl">스토어명</div><div class="val">' + esc(st.name) + ' <span class="tblnote">(기존)</span></div></div>' +
+      '<div class="row"><div class="lbl">메인 문구</div><div class="val"><span class="tblnote">0 / 20 (기존)</span></div></div>' +
+      "<div class=\"note\"><b>시안 설명</b>" + '소속 상품 ' + st.prodCount + '건은 스토어 데이터의 전체 상품 수입니다. 이 시안 목록에는 그중 일부만 넣었습니다. 언어 탭 아래는 언어마다 따로 쓰는 항목입니다.</div></div>';
   } else if (i === 8) {
     bd = '<div class="bd"><div class="row"><div class="lbl"><span class="req">*</span>예약 사용</div><div class="val">' +
       onoff('sbk', st.bookingEnabled, 'setBooking(%V%)', false, ['사용', '미사용']) +
@@ -950,6 +978,7 @@ window.setCollType = function (t) {
     /* 담는 종류가 바뀌므로 앞 유형에 담아 둔 항목은 비운다 */
     if (nowStore) { if (c.products.length) logChange(c, '구성 항목 · 상품 비움', c.products.length + '건', '0건'); c.products = []; }
     else { if (c.stores.length) logChange(c, '구성 항목 · 스토어 비움', c.stores.length + '건', '0건'); c.stores = []; }
+    COLLSEL = {};
     render();
   };
   if (wasStore !== nowStore && kept) {
@@ -962,8 +991,8 @@ window.setCollType = function (t) {
 };
 window.addCollStore = function (sid) { const c = C(VIEW.id); if (c.stores.indexOf(sid) === -1) { c.stores.push(sid); logChange(c, '구성 항목 · 스토어 추가', '-', S(sid).name); } render(); };
 window.addCollProduct = function (pid) { const c = C(VIEW.id); if (c.products.indexOf(pid) === -1) { c.products.push(pid); logChange(c, '구성 항목 · 상품 추가', '-', P(pid).name); } render(); };
-window.delCollStore = function (sid) { const c = C(VIEW.id); c.stores = c.stores.filter(x => x !== sid); logChange(c, '구성 항목 · 스토어 삭제', S(sid).name, '-'); render(); };
-window.delCollProduct = function (pid) { const c = C(VIEW.id); c.products = c.products.filter(x => x !== pid); logChange(c, '구성 항목 · 상품 삭제', P(pid) ? P(pid).name : pid, '-'); render(); };
+window.delCollStore = function (sid) { const c = C(VIEW.id); c.stores = c.stores.filter(x => x !== sid); delete COLLSEL[sid]; logChange(c, '구성 항목 · 스토어 삭제', S(sid).name, '-'); render(); };
+window.delCollProduct = function (pid) { const c = C(VIEW.id); c.products = c.products.filter(x => x !== pid); delete COLLSEL[pid]; logChange(c, '구성 항목 · 상품 삭제', P(pid) ? P(pid).name : pid, '-'); render(); };
 function modal_coll() {
   const c = C(VIEW.id), j = judgeCollection(c), langOk = ALI_LANGS.indexOf(c.lang) !== -1, byStore = isStoreColl(c);
   const chk = id => '<td class="c"><input type="checkbox"' + (COLLSEL[id] ? ' checked' : '') + ' onchange="collSel(\'' + id + '\',this.checked)"></td>';
@@ -1092,15 +1121,18 @@ window.saveAd = function () { closeMD(); alertBox('저장했습니다', '목록�
 window.saveMagazine = function () {
   const m = M('M1');
   const cur = window.EDBUF != null ? window.EDBUF : m.body;
-  const sc = scanBody(cur);
-  const u = sc.ext.length, e = sc.emb.length;
+  const emb = scanBody(cur).emb.length;
+  /* 임베드 안의 주소가 주소 개수에 겹쳐 잡히지 않도록 임베드를 먼저 지운 뒤 센다 */
+  const withoutEmb = String(cur).replace(/<\s*(iframe|script|object|embed)\b[^>]*>[\s\S]*?<\/\s*\1\s*>/gi, '').replace(/<\s*(iframe|script|object|embed)\b[^>]*\/?>/gi, '');
+  const u = scanBody(withoutEmb).ext.length, e = emb;
   m.body = stripBody(cur); window.EDBUF = null;
   render();
   alertBox('저장했습니다', (u || e) ? MSG.edStrip(u, e) : '본문을 저장했습니다.');
 };
 function screen_mEdit() {
   const m = M('M1');
-  const sc = scanBody(m.body);
+  const cur = window.EDBUF != null ? window.EDBUF : m.body;
+  const sc = scanBody(cur);
   return '<div class="phd"><div><h2 class="page">매거진 등록·수정</h2>' +
     '<div class="pdesc">매거진 본문에 외부 사이트 주소와 외부 영상·SNS 넣기를 넣을 수 없게 막습니다. 알리페이 노출 설정은 두지 않습니다.</div></div>' +
     '<div><button class="btn">목록</button></div></div>' +
@@ -1113,7 +1145,7 @@ function screen_mEdit() {
     '<div class="card"><div class="hd">본문<span class="newbadge">링크 차단 신규</span></div><div class="bd">' +
     '<div class="frow" style="margin-bottom:10px"><button class="btn" onclick="openLinkModal()">링크 넣기</button>' +
     '<span class="tblnote" style="align-self:center">' + MSG.edBlock + '</span></div>' +
-    '<textarea oninput="EDBUF=this.value">' + esc(m.body) + '</textarea>' +
+    '<textarea oninput="EDBUF=this.value">' + esc(cur) + '</textarea>' +
     (sc.ext.length || sc.emb.length ? '<div class="notice">지금 본문에 외부 사이트 주소 ' + sc.ext.length + '개, 외부 영상·SNS 넣기 ' + sc.emb.length + '개가 남아 있습니다. 저장하면 지웁니다.</div>' : '') +
     '<div class="hint">넣은 주소는 저장할 때 K-Beauty Station 안의 주소 형태로 바뀝니다.</div>' +
     "<div class=\"note\"><b>시안 설명</b>" + '내부 주소인지는 도메인이 정확히 같은지로 봅니다. http, https, 그리고 슬래시로 시작하는 주소만 넣을 수 있습니다.</div>' +
@@ -1143,7 +1175,7 @@ window.saveColl = function () {
   const lines = (byStore ? c.stores : c.products).map(id => {
     const o = byStore ? S(id) : P(id); if (!o) return '';
     const oj = byStore ? judgeStore(o) : judgeProduct(o);
-    const why = oj.na ? '알리페이 앱 대상 언어가 아님' : (oj.visible ? '보임' : oj.reason);
+    const why = oj.na ? '알리페이 앱 대상 언어가 아닙니다' : (oj.visible ? '보입니다' : oj.reason);
     return '<p class="hint" style="margin:2px 0">' + esc(o.name) + ' → ' + why + '</p>';
   }).join('');
   confirmBox('저장 확인',
@@ -1158,12 +1190,19 @@ window.save = function (kind) {
   const eff = kind === 'store' ? effStoreBtns(obj) : effBtns(obj);
   const webCnt = onCount(eff.btns, rows, 'web'), aliCnt = onCount(eff.btns, rows, 'ali');
   // 저장을 막는 것은 개수 상한 초과뿐이다. 다른 확인보다 먼저 본다
-  if (webCnt > CAP || aliCnt > CAP) { alertBox('저장할 수 없습니다', MSG.cap + ' 지금은 웹 ' + webCnt + '개(' + ctaList(eff.btns, rows, 'web').join(' / ') + '), 알리페이 앱 ' + aliCnt + '개(' + ctaList(eff.btns, rows, 'ali').join(' / ') + ')가 나갑니다. 2개로 줄인 뒤 저장해 주세요.'); return; }
+  if (webCnt > CAP || aliCnt > CAP) {
+    const wc = ctaList(eff.btns, rows, 'web'), ac = ctaList(eff.btns, rows, 'ali');
+    alertBox('저장할 수 없습니다', MSG.cap + ' 지금은 웹 ' + webCnt + '개' + (wc.length ? '(' + wc.join(' / ') + ')' : '') +
+      ', 알리페이 앱 ' + aliCnt + '개' + (ac.length ? '(' + ac.join(' / ') + ')' : '') + '가 나갑니다. 2개로 줄인 뒤 저장해 주세요.');
+    return;
+  }
   // 스토어를 이번 편집에서 미노출로 바꿨고 소속 상품이 10건 이상이면 저장 시 영향 범위를 확인한다
   if (kind === 'store' && obj.aliVisible === '미노출' && VIEW.savedVis === '노출' && obj.prodCount >= 10) {
     const im = impactOfHiding(obj);
     confirmBox('알리페이 미노출로 저장',
-      '<p><b>' + esc(obj.name) + '</b></p><p>이 스토어를 알리페이 앱에서 숨기면 소속 상품 ' + obj.prodCount + '건이 함께 보이지 않게 됩니다. 이 스토어를 숨기면 함께 보이지 않게 되는 배너가 ' + im.M + '건, 담은 항목이 모두 없어지는 기획전이 ' + im.K + '건 있습니다.</p><p class="hint">웹에서는 그대로 보입니다.</p>',
+      '<p><b>' + esc(obj.name) + '</b></p><p>이 스토어를 알리페이 앱에서 숨기면 소속 상품 ' + obj.prodCount + '건이 함께 보이지 않게 됩니다.</p>' +
+      ((im.M || im.K) ? '<p>' + [im.M ? '함께 보이지 않게 되는 배너 ' + im.M + '건' : '', im.K ? '담은 항목이 모두 없어지는 기획전 ' + im.K + '건' : ''].filter(Boolean).join(', ') + '도 있습니다.</p>' : '') +
+      '<p class="hint">웹에서는 그대로 보입니다.</p>',
       function () { VIEW.savedVis = '미노출'; done(); }, function () {}, '미노출로 저장');
     return;
   }
@@ -1243,17 +1282,17 @@ function scenarios() {
       run: function () { newProduct(); } },
     { id: 'BO-CH-01-e5', t: '대상 언어가 아닌 상품 건', d: '일본어로 만든 상품은 알리페이 노출 라디오가 노출로 고정되고, 알리페이 쪽 버튼도 손댈 수 없습니다.',
       run: function () { VIEW.lang = '일본어'; go('p-list'); openProduct('P6'); } },
-    { id: 'BO-CH-01', t: '상담접수를 끄면 알리페이 버튼이 빌 때', d: '알리페이 쪽 상담접수를 OFF로 누르면 안내가 뜨고, OK를 누를 때 저장 확인이 뜹니다.',
+    { id: 'BO-CH-01-e3', t: '상담접수를 끄면 알리페이 버튼이 빌 때', d: '알리페이 쪽 상담접수를 OFF로 누르면 안내가 뜨고, OK를 누를 때 저장 확인이 뜹니다.',
       run: function () { const p = P('P2'); p.mode = '개별 설정'; ROWS_PRODUCT.forEach(r => p.btns[r.k].ali = false); p.btns.consult.ali = true; VIEW.lang = p.lang; go('p-list'); openProduct('P2'); } },
-    { id: 'BO-CH-02', t: '소속 스토어가 미노출인 상품', d: '상품을 노출로 두어도 알리페이 앱에서 보이지 않습니다. 목록의 사유는 스토어 설정으로 나옵니다.',
+    { id: 'BO-CH-01-e6', t: '소속 스토어가 미노출인 상품', d: '상품을 노출로 두어도 알리페이 앱에서 보이지 않습니다. 목록의 사유는 스토어 설정으로 나옵니다.',
       run: function () { VIEW.lang = '중국어(번체)'; go('p-list'); openProduct('P4'); } },
     { id: 'BO-CH-03-e1', t: '스토어를 미노출로', d: '이 스토어의 상품이 모든 언어에서 함께 보이지 않게 됩니다. 미노출을 고르면 상품 수 안내가 뜨고, 12건이라 저장을 누를 때 확인 창이 뜹니다.',
       run: function () { go('s-edit', 'S1'); VIEW.sect = 2; render(); } },
     { id: 'BO-CH-03-e2', t: '스토어에 켠 알리페이 버튼이 없을 때', d: '스토어 페이지만 보이지 않고, 소속 상품은 각자 조건대로 남습니다.',
       run: function () { const st = S('S5'); ROWS_STORE.forEach(r => st.btns[r.k].ali = false); go('s-edit', 'S5'); VIEW.sect = 11; render(); } },
-    { id: 'BO-CH-03', t: '예약은 예약설정을 먼저 켜야 한다', d: '예약설정에서 예약을 켜지 않으면 예약 버튼을 웹과 알리페이 앱 모두 켤 수 없습니다.',
+    { id: 'BO-CH-03-e3', t: '예약은 예약설정을 먼저 켜야 한다', d: '예약설정에서 예약을 켜지 않으면 예약 버튼을 웹과 알리페이 앱 모두 켤 수 없습니다.',
       run: function () { go('s-edit', 'S2'); VIEW.sect = 11; render(); } },
-    { id: 'BO-CH-03', t: '예약만 켠 스토어 + 기본 설정 상품', d: '상품에는 예약이 없어 알리페이 쪽이 비고, 채팅이 자동으로 켜져 보입니다.',
+    { id: 'BO-CH-01-e2', t: '예약만 켠 스토어 + 기본 설정 상품', d: '상품에는 예약이 없어 알리페이 쪽이 비고, 채팅이 자동으로 켜져 보입니다.',
       run: function () { const st = S('S3'); ROWS_STORE.forEach(r => st.btns[r.k].ali = false); st.btns.booking.ali = true; const p = P('P3'); p.mode = '기본 설정'; VIEW.lang = p.lang; go('p-list'); openProduct('P3'); } },
     { id: 'BO-CH-05-e1', t: '링크종류 = 외부링크', d: '알리페이 노출 라디오가 잠기고 값은 그대로 남습니다. 목록의 사유는 외부 연결로 나옵니다.',
       run: function () { const b = A('B2'); VIEW.lang = b.lang; go('a-list'); openAd('B2'); } },
@@ -1265,9 +1304,9 @@ function scenarios() {
       run: function () { const b = A('B5'); VIEW.lang = b.lang; go('a-list'); openAd('B5'); } },
     { id: 'BO-CH-05-e3', t: '버튼 내부링크 대상 기획전이 미노출', d: '랜딩페이지 배너의 알리페이 버튼이 연결한 기획전이 보이지 않으면 배너도 보이지 않습니다.',
       run: function () { C('E1').aliVisible = '미노출'; const b = A('B3'); VIEW.lang = b.lang; go('a-list'); openAd('B3'); } },
-    { id: 'BO-CH-05', t: '내부링크 대상 = 인플루언서', d: '인플루언서는 이번 범위의 설정 대상이 아니라 확인하지 않고 그대로 보여 줍니다.',
+    { id: 'BO-CH-05-e6', t: '내부링크 대상 = 인플루언서', d: '인플루언서는 이번 범위의 설정 대상이 아니라 확인하지 않고 그대로 보여 줍니다.',
       run: function () { const b = A('B6'); VIEW.lang = b.lang; go('a-list'); openAd('B6'); } },
-    { id: 'BO-CH-08', t: '기획전에 노출 가능 항목 0건', d: '유형이 병원이라 담은 스토어만 셉니다. 보이는 스토어가 0건이면 기획전 자체가 보이지 않습니다.',
+    { id: 'BO-CH-08-e1', t: '기획전에 노출 가능 항목 0건', d: '유형이 병원이라 담은 스토어만 셉니다. 보이는 스토어가 0건이면 기획전 자체가 보이지 않습니다.',
       run: function () { const c = C('E2'); VIEW.lang = c.lang; go('c-list'); openColl('E2'); } },
     { id: 'BO-CH-08', t: '기획전 구성에 스토어 추가', d: '보이는 스토어를 하나 넣으면 기획전이 다시 살아납니다. 스토어 추가를 눌러 보세요.',
       run: function () { const c = C('E2'); c.stores = []; VIEW.lang = c.lang; go('c-list'); openColl('E2'); } },
