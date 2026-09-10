@@ -872,13 +872,13 @@ function modal_ad() {
 }
 
 /* --------------------------- 기획전 관리 (실측) --------------------------- */
+// 대상 클릭수·채팅수·상담수·채널별 클릭수 12칼럼은 이번 검토에 필요 없어 시안에서 뺐다. 라이브에는 그대로 있다.
 function screen_cList() {
   const rows = DB.collections.filter(c => c.lang === VIEW.lang);
   const body = rows.map(c => { const j = judgeCollection(c); if (!passFilter(j)) return '';
     return '<tr><td>' + c.active + '</td><td>' + c.lang + '</td><td>' + c.from + ' ~ ' + c.to + '</td><td>' + c.type + '</td><td>' + esc(c.name) + '</td>' +
       '<td class="new c">' + visCell(j) + '</td><td class="new">' + rsnCell(j) + '</td>' +
       '<td>' + c.products.length + '</td><td>' + c.stores.length + '</td>' +
-      '<td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>' +
       '<td>2026-08-25</td><td>2026-09-08</td>' +
       '<td><button class="btn sm" onclick="openColl(\'' + c.id + '\')">수정</button></td></tr>'; }).join('');
   return '<div class="phd"><div><h2 class="page">기획전 관리</h2><div class="pdesc">기획전 노출 정보와 연결 상품, 스토어 성과를 관리합니다.</div></div>' +
@@ -889,9 +889,8 @@ function screen_cList() {
     '</div><div class="tblwrap"><table><thead><tr>' +
     '<th>기획전 상태</th><th>언어</th><th>노출 기간</th><th>유형</th><th>기획전명</th>' +
     '<th class="new">알리페이 노출<span class="newbadge">신규</span></th><th class="new">사유<span class="newbadge">신규</span></th>' +
-    '<th>상품</th><th>스토어</th><th>대상 클릭수</th><th>채팅수</th><th>상담수</th>' +
-    '<th>상담접수</th><th>인앱채팅</th><th>외부링크</th><th>위챗</th><th>샤오홍슈</th><th>왓츠앱</th><th>라인</th><th>카카오톡</th><th>페이스북</th>' +
-    '<th>등록일</th><th>수정일</th><th>관리</th></tr></thead><tbody>' + (body || empty(24)) + '</tbody></table></div></div>';
+    '<th>상품</th><th>스토어</th>' +
+    '<th>등록일</th><th>수정일</th><th>관리</th></tr></thead><tbody>' + (body || empty(12)) + '</tbody></table></div></div>';
 }
 
 /* ------------- 기획전 수정 모달 (실측 + 스토어 선택 신설) ------------- */
