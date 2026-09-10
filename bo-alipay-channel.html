@@ -626,9 +626,9 @@ const langSelect = () => '<div class="fl"><span>언어</span><select onchange="V
   ALL_LANGS.map(l => '<option' + (l === VIEW.lang ? ' selected' : '') + '>' + l + '</option>').join('') + '</select></div>';
 
 /* --------------------------- 상품 목록 (실측) --------------------------- */
+// 채팅수·상담수·버튼 클릭수·채널별 클릭수 12칼럼은 이번 검토에 필요 없어 시안에서 뺐다. 라이브에는 그대로 있다.
 const P_COLS = ['상태', '활성화', '히든 여부', '언어', '스토어코드', '상품명', '카테고리', '세부분류', '가격', 'Vat포함여부',
-  '외부링크', '외부링크 클릭수', '기본채널 사용', '노출수', '내부진입수', '직접유입수', '채팅수', '상담수', '버튼 클릭수',
-  '상담접수', '인앱채팅', '외부링크', '위챗', '샤오홍슈', '왓츠앱', '라인', '카카오톡', '페이스북',
+  '외부링크', '외부링크 클릭수', '기본채널 사용', '노출수', '내부진입수', '직접유입수',
   '전/후사진 연결', '썸네일', '상세이미지', '등록일', '수정일', '삭제일', '관리'];
 function screen_pList() {
   const rows = DB.products.filter(p => p.lang === VIEW.lang);
@@ -637,12 +637,11 @@ function screen_pList() {
     P_COLS.slice(3).map(c => '<th>' + c + '</th>').join('') + '</tr>';
   const body = rows.map(p => { const j = judgeProduct(p); if (!passFilter(j)) return '';
     const st = S(p.store);
-    const stat = ['0', '0', '0', '0', '0', '0'];
+    const stat = ['0', '0', '0'];
     return '<tr><td>' + p.status + ' ⌄</td><td>' + swch(p.active) + '</td><td>' + swch(p.hidden) + '</td>' +
       '<td class="new c">' + visCell(j) + '</td><td class="new">' + rsnCell(j) + '</td>' +
       '<td>' + p.lang + '</td><td>' + esc(st.code) + '</td><td>' + esc(p.name) + '</td><td>' + p.cat + '</td><td>' + p.sub + '</td><td>' + p.price + '</td><td>' + p.vat + '</td>' +
       '<td class="tblnote">-</td><td>0</td><td>' + (S(p.store).messenger.length ? S(p.store).messenger[0].base : '미사용') + '</td>' + stat.map(v => '<td>' + v + '</td>').join('') +
-      '<td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>' +
       '<td class="tblnote">-</td><td class="tblnote">-</td><td class="tblnote">-</td><td>2026-09-01</td><td>2026-09-05</td><td class="tblnote">-</td>' +
       '<td><button class="btn sm">미리보기</button> <button class="btn sm" onclick="openProduct(\'' + p.id + '\')">수정</button> <button class="btn sm red">삭제</button></td></tr>'; }).join('');
   return '<div class="phd"><div><h2 class="page">입점사 스토어별 상품 정보 관리</h2>' +
@@ -655,7 +654,7 @@ function screen_pList() {
     '<div class="frow"><button class="btn">오늘</button><button class="btn">어제</button><button class="btn">이번주</button><button class="btn">이번달</button>' +
     '<input type="text" placeholder="Start date" style="width:120px"> ~ <input type="text" placeholder="End date" style="width:120px"></div>' +
     '<div class="frow"><input type="text" placeholder="검색어" style="width:220px"><button class="btn blue">검색</button></div>' +
-    '</div><div class="tblwrap"><table><thead>' + head + '</thead><tbody>' + (body || empty(37)) + '</tbody></table></div></div>';
+    '</div><div class="tblwrap"><table><thead>' + head + '</thead><tbody>' + (body || empty(25)) + '</tbody></table></div></div>';
 }
 
 /* ------------------ 상품정보 수정 모달 (실측: 탭 2개, Cancel/OK) ------------------ */
