@@ -106,6 +106,13 @@ select.dim{color:#8c8c8c}
 .blk{font-weight:700;font-size:14px;padding:14px 0 6px;border-top:1px solid #f0f0f0;margin-top:8px}
 .blk:first-child{border-top:0;margin-top:0;padding-top:0}
 .newbadge{display:inline-block;background:#fff0f4;color:#e8537a;border:1px solid #ffc9d8;border-radius:3px;padding:0 5px;font-size:11px;margin-left:6px;vertical-align:middle}
+.compcard{border:1px solid #f0f0f0;border-radius:6px;margin:14px 0}
+.compcard>.chd{display:flex;justify-content:space-between;align-items:center;padding:14px 16px}
+.compcard>.chd b{font-size:14px}
+.compcard>.tblwrap{padding:0 16px 16px}
+.btn.dash{border-style:dashed;border-color:#1677ff;color:#1677ff}
+.btn.dash:hover{border-color:#1677ff;color:#1677ff}
+.pickrow{margin:0 16px 14px;padding:10px 12px;border:1px dashed #d9d9d9;border-radius:4px;background:#fafafa}
 .rail{background:#fff;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:16px}
 .rail>.hd{padding:12px 16px;border-bottom:1px solid #f0f0f0;font-weight:700;font-size:14px}
 .rail>.bd{padding:14px 16px}
@@ -423,6 +430,8 @@ function judgeAd(b) {
   return { na: false, visible: !reason, reason, conds };
 }
 // 기획전 조건 ④ = 유형에 맞는 구성 항목만 센다. 추천상품은 상품, 병원은 스토어.
+const COLL_TYPES = ['병원', '추천상품', '특가', 'TOP10'];
+const COLL_LANGS = ['중국어(간체)', '영어', '중국어(번체)', '일본어', '인도네시아', '몽골어'];
 const isStoreColl = c => c.type === '병원';
 function judgeCollection(c) {
   if (ALI_LANGS.indexOf(c.lang) === -1) return { na: true, visible: false, reason: '', conds: [{ s: 'sk', t: '언어 = ' + c.lang + '. 대상 언어가 아니라 판정하지 않는다.' }] };
@@ -887,7 +896,7 @@ function screen_cList() {
   return '<div class="phd"><div><h2 class="page">기획전 관리</h2><div class="pdesc">기획전 노출 정보와 연결 상품, 스토어 성과를 관리합니다.</div></div>' +
     '<div><button class="btn">기획전 추가</button></div></div>' +
     '<div class="card"><div class="filters">' +
-    '<div class="frow"><button class="btn">오늘</button><button class="btn">어제</button><button class="btn">이번주</button><button class="btn">이번달</button>' + dimSel('상태', ['상태']) + langSelect() + dimSel('유형', ['유형']) + '</div>' +
+    '<div class="frow"><button class="btn">오늘</button><button class="btn">어제</button><button class="btn">이번주</button><button class="btn">이번달</button>' + dimSel('상태', ['상태']) + langSelect() + dimSel('유형', ['유형'].concat(COLL_TYPES)) + '</div>' +
     '<div class="frow">' + aliFilterRow(['전체', '직접 끔', '노출 가능 항목 없음', '판정 오류']) + '<button class="btn blue" style="align-self:flex-end">검색</button></div>' +
     '</div><div class="tblwrap"><table><thead><tr>' +
     '<th>기획전 상태</th><th>언어</th><th>노출 기간</th><th>유형</th><th>기획전명</th>' +
@@ -897,51 +906,59 @@ function screen_cList() {
 }
 
 /* ------------------------ 기획전 수정 모달 (실측) ------------------------ */
-window.openColl = function (id) { VIEW.id = id; MODAL = 'coll'; render(); };
+let COLLPICK = false;
+window.openColl = function (id) { VIEW.id = id; MODAL = 'coll'; COLLPICK = false; render(); };
+window.collPick = function (v) { COLLPICK = v; render(); };
+window.setCollType = function (t) { const c = C(VIEW.id); if (c.type === t) return; logChange(c, '기획전 유형', c.type, t); c.type = t; render(); };
 window.addCollStore = function (sid) { const c = C(VIEW.id); if (c.stores.indexOf(sid) === -1) { c.stores.push(sid); logChange(c, '구성 항목 · 스토어 추가', '-', S(sid).name); } render(); };
 window.delCollStore = function (sid) { const c = C(VIEW.id); c.stores = c.stores.filter(x => x !== sid); logChange(c, '구성 항목 · 스토어 삭제', S(sid).name, '-'); render(); };
 window.delCollProduct = function (pid) { const c = C(VIEW.id); c.products = c.products.filter(x => x !== pid); logChange(c, '구성 항목 · 상품 삭제', P(pid) ? P(pid).name : pid, '-'); render(); };
 function modal_coll() {
   const c = C(VIEW.id), j = judgeCollection(c), langOk = ALI_LANGS.indexOf(c.lang) !== -1, byStore = isStoreColl(c);
+  const chk = '<td class="c"><input type="checkbox"></td>';
   const prodRows = c.products.map((id, k) => { const p = P(id); if (!p) return ''; const pj = judgeProduct(p);
-    return '<tr><td>' + (k + 1) + '</td><td>' + esc(p.name) + '</td><td>' + p.lang + '</td><td>' + esc(S(p.store).name) + '</td>' +
+    return '<tr>' + chk + '<td>' + (k + 1) + '</td><td>' + esc(p.name) + '</td><td>' + p.lang + '</td><td>' + esc(S(p.store).name) + '</td>' +
       '<td class="new c">' + visCell(pj) + '</td>' +
       '<td>' + p.price + '</td><td>0</td><td>0</td><td>0</td><td>' + swch(S(p.store).aliVisible === '노출') + '</td><td>' + swch(p.active) + '</td><td>' + swch(p.hidden) + '</td>' +
       '<td><button class="btn sm red" onclick="delCollProduct(\'' + id + '\')">삭제</button></td></tr>'; }).join('');
-  const storeRows = c.stores.map((id, k) => { const st = S(id); if (!st) return ''; const sj = judgeStore(st);
-    return '<tr><td>' + (k + 1) + '</td><td>' + esc(st.name) + '</td><td class="tblnote">' + st.langs + '</td><td>' + st.cat + '</td>' +
+  const storeRows = c.stores.map(id => { const st = S(id); if (!st) return ''; const sj = judgeStore(st);
+    return '<tr>' + chk + '<td>' + esc(st.name) + '</td><td>0</td><td>0</td>' +
       '<td class="new c">' + visCell(sj) + '</td>' +
       '<td><button class="btn sm red" onclick="delCollStore(\'' + id + '\')">삭제</button></td></tr>'; }).join('');
-  const addable = DB.stores.filter(s => c.stores.indexOf(s.id) === -1);
-  /* 구성 항목은 유형이 정한다. 추천상품이면 상품 표, 병원이면 스토어 표 하나만 나온다. */
+  const emptyRow = (n, w) => '<tr><td colspan="' + n + '" class="c tblnote" style="padding:38px 0">선택된 ' + w + ' 정보가 없습니다</td></tr>';
+  const addable = DB.stores.filter(x => c.stores.indexOf(x.id) === -1);
+  /* 구성 항목은 유형이 정한다. 병원이면 스토어 표, 나머지 유형은 상품 표 하나만 나온다. */
   const comp = byStore
-    ? '<div class="blk">스토어 ' + c.stores.length + '개 선택</div>' +
-      '<div class="frow" style="margin-bottom:10px"><select id="addst">' + addable.map(s => '<option value="' + s.id + '">' + esc(s.name) + '</option>').join('') + '</select>' +
-      '<button class="btn" onclick="addCollStore(document.getElementById(\'addst\').value)"' + (addable.length ? '' : ' disabled') + '>스토어 추가</button>' +
-      '<button class="btn">선택된 스토어 삭제</button></div>' +
-      '<div class="tblwrap"><table><thead><tr><th>No.</th><th>스토어명</th><th>지원언어</th><th>카테고리</th>' +
-      '<th class="new">알리페이 노출<span class="newbadge">신규</span></th><th>action</th></tr></thead><tbody>' + (storeRows || '<tr><td colspan="6" class="c tblnote">선택된 스토어 정보가 없습니다</td></tr>') + '</tbody></table></div>' +
-      '<div class="note"><b>시안 설명</b>스토어 추가는 실제 화면에서 검색 창으로 고릅니다. 이 시안에서는 셀렉트로 대신했습니다.</div>'
-    : '<div class="blk">상품 ' + c.products.length + '개 선택</div>' +
-      '<div class="frow" style="margin-bottom:10px"><button class="btn">상품 추가</button><button class="btn">선택된 상품 삭제</button></div>' +
-      '<div class="tblwrap"><table><thead><tr><th>No.</th><th>상품명</th><th>언어</th><th>스토어명(언어)</th>' +
+    ? '<div class="compcard"><div class="chd"><b>스토어 ' + c.stores.length + '개 선택</b><span class="frow">' +
+      '<button class="btn dash" onclick="collPick(' + (COLLPICK ? 'false' : 'true') + ')">+ 스토어 추가</button>' +
+      '<button class="btn" disabled>선택된 스토어 삭제</button></span></div>' +
+      (COLLPICK ? '<div class="pickrow"><div class="frow"><select id="addst">' + addable.map(x => '<option value="' + x.id + '">' + esc(x.name) + '</option>').join('') + '</select>' +
+        '<button class="btn" onclick="addCollStore(document.getElementById(\'addst\').value)"' + (addable.length ? '' : ' disabled') + '>추가</button>' +
+        '<button class="btn" onclick="collPick(false)">닫기</button></div>' +
+        '<div class="note" style="margin:8px 0 0"><b>시안 설명</b>실제 화면은 상품 추가와 같은 검색 창이 뜹니다. 이 시안에서는 목록에서 고르게 했습니다.</div></div>' : '') +
+      '<div class="tblwrap"><table><thead><tr><th style="width:40px" class="c"><input type="checkbox"></th><th>스토어명</th><th>조회수</th><th>클릭수</th>' +
+      '<th class="new">알리페이 노출<span class="newbadge">신규</span></th><th>action</th></tr></thead><tbody>' + (storeRows || emptyRow(6, '스토어')) + '</tbody></table></div></div>'
+    : '<div class="compcard"><div class="chd"><b>상품 ' + c.products.length + '개 선택</b><span class="frow">' +
+      '<button class="btn dash">+ 상품 추가</button><button class="btn" disabled>선택된 상품 삭제</button></span></div>' +
+      '<div class="tblwrap"><table><thead><tr><th style="width:40px" class="c"><input type="checkbox"></th><th>No.</th><th>상품명</th><th>언어</th><th>스토어명(언어)</th>' +
       '<th class="new">알리페이 노출<span class="newbadge">신규</span></th>' +
-      '<th>가격</th><th>노출수</th><th>클릭수</th><th>조회수</th><th>스토어 활성화</th><th>상품 활성화</th><th>히든</th><th>action</th></tr></thead><tbody>' + (prodRows || '<tr><td colspan="13" class="c tblnote">선택된 상품 정보가 없습니다</td></tr>') + '</tbody></table></div>';
+      '<th>가격</th><th>노출수</th><th>클릭수</th><th>조회수</th><th>스토어 활성화</th><th>상품 활성화</th><th>히든</th><th>action</th></tr></thead><tbody>' + (prodRows || emptyRow(14, '상품')) + '</tbody></table></div></div>';
   return '<div class="mask"><div class="modal" style="max-width:1020px"><div class="hd">기획전 수정<button class="x" onclick="closeMD()">✕</button></div><div class="bd">' +
-    '<div class="row"><div class="lbl"><span class="req">*</span>기획전명(내부)</div><div class="val"><input type="text" value="' + esc(c.inner) + '" style="width:320px"></div></div>' +
-    '<div class="row"><div class="lbl"><span class="req">*</span>언어</div><div class="val">' + c.lang + '</div></div>' +
-    '<div class="row"><div class="lbl"><span class="req">*</span>기획전 유형</div><div class="val">' + c.type + '</div></div>' +
+    '<div class="row"><div class="lbl"><span class="req">*</span>기획전명(내부)</div><div class="val"><input type="text" value="' + esc(c.inner) + '" style="width:100%"></div></div>' +
+    '<div class="row"><div class="lbl"><span class="req">*</span>언어</div><div class="val"><span class="rg">' +
+    COLL_LANGS.map(L => radio('cl', L, c.lang.indexOf(L) === 0 ? L : '', 'void(0)')).join('') + '</span></div></div>' +
+    '<div class="row"><div class="lbl"><span class="req">*</span>기획전 유형</div><div class="val"><span class="rg">' +
+    COLL_TYPES.map(T => radio('ct', T, c.type, "setCollType('" + T + "')")).join('') + '</span></div></div>' +
     '<div class="row"><div class="lbl"><span class="req">*</span>알리페이 노출<span class="newbadge">신규</span></div><div class="val"><span class="rg">' +
     radio('cv', '노출', langOk ? c.aliVisible : '노출', "setVis('coll','노출')", !langOk) + radio('cv', '미노출', langOk ? c.aliVisible : '노출', "setVis('coll','미노출')", !langOk) + '</span>' +
     (langOk ? '' : '<div class="hint">' + MSG.langOnly + '</div>') +
     (langOk && c.aliVisible === '노출' && j.liveCount === 0 ? '<div class="notice">' + MSG.exhEmpty(byStore ? '스토어가' : '상품이') + '</div>' : '') + '</div></div>' +
     comp +
-    '<div class="row" style="margin-top:14px"><div class="lbl"><span class="req">*</span>기획전 노출 기간</div><div class="val">' + c.from + ' ~ ' + c.to + '</div></div>' +
-    '<div class="row"><div class="lbl"><span class="req">*</span>기획전 활성화 여부</div><div class="val"><span class="rg">' +
+    '<div class="row"><div class="lbl"><span class="req">*</span>기획전 노출 기간</div><div class="val"><input type="text" value="' + c.from + ' → ' + c.to + '" style="width:280px" readonly></div></div>' +
+    '<div class="row"><div class="lbl">기획전 활성화 여부</div><div class="val"><span class="rg">' +
     radio('ca', '활성화', c.active === '활성' ? '활성화' : '비활성화', 'void(0)') + radio('ca', '비활성화', c.active === '활성' ? '활성화' : '비활성화', 'void(0)') + '</span></div></div>' +
     '</div><div class="ft"><button class="btn" onclick="closeMD()">Cancel</button><button class="btn blue" onclick="closeMD()">OK</button></div></div></div>';
 }
-
 /* --------------------------- 호스트 상품 수정 --------------------------- */
 function screen_hEdit() {
   const p = P('P8'), j = judgeProduct(p);
