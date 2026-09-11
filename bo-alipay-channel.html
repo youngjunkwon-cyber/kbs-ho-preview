@@ -149,7 +149,8 @@ const MSG = {
   needBooking: '예약설정에서 예약을 사용하면 켤 수 있습니다.',
   cap:         '웹·알리페이 앱 각 2개까지 켤 수 있습니다.',
   exhEmpty:    s => '노출 가능한 ' + s + ' 없습니다. 기획전이 알리페이에 노출되지 않습니다.',
-  exhNone:     s => '담은 ' + s + ' 없습니다. 기획전이 알리페이에 노출되지 않습니다.',
+  exhNone:     s => '담은 ' + s + ' 없습니다. 1개 이상 담아야 저장할 수 있습니다.',
+  collEmpty:   s => s + ' 1개 이상 담아야 저장할 수 있습니다.',
   storeHide:   n => '미노출로 저장하면 이 스토어 상품 ' + n + '건도 알리페이에 노출되지 않습니다.',
   saveProd:    '알리페이 앱 버튼이 없습니다. 저장하면 상품이 알리페이에 노출되지 않습니다. 저장할까요?',
   saveStore:   '알리페이 앱 버튼이 없습니다. 저장하면 스토어가 알리페이에 노출되지 않습니다. 저장할까요?',
@@ -158,7 +159,6 @@ const MSG = {
   saveAdExt:   '외부링크 배너는 알리페이에 노출되지 않습니다. 저장할까요?',
   typeSwitch:  (was, n, now) => '유형을 변경하면 담은 ' + was + ' ' + n + '건이 삭제되고 ' + now + '만 담을 수 있습니다. 변경할까요?',
   saveColl:    s => '노출 가능한 ' + s + ' 없습니다. 저장하면 기획전이 알리페이에 노출되지 않습니다. 저장할까요?',
-  saveCollNone:s => '담은 ' + s + ' 없습니다. 저장하면 기획전이 알리페이에 노출되지 않습니다. 저장할까요?',
   bnExtLock:   '외부링크 배너는 알리페이에 노출되지 않습니다. 이 설정은 수정할 수 없습니다.',
   bnBtnExtLock:'하단 버튼이 외부링크입니다. 알리페이 앱에서 켤 수 없어 배너도 노출되지 않습니다.',
   lockSelf:    '미노출 상태에서는 알리페이 앱 버튼을 수정할 수 없습니다. 설정값은 유지됩니다.',
@@ -394,7 +394,8 @@ function innerTargetOk(inner) {
     if (!f) return { ok: false, label: '인플루언서 · 대상 없음' };
     /* 인플루언서 기획전은 우리 상품으로 구성된다. 상품 판정에 알리페이 버튼 조건이 이미 들어 있다 */
     const live = (f.products || []).filter(id => { const p = P(id); if (!p) return false; const j = judgeProduct(p); return !j.na && j.visible; }).length;
-    return { ok: live > 0, label: '인플루언서 · ' + f.name, live };
+    const langOk = ALI_LANGS.indexOf(f.lang) !== -1;
+    return { ok: langOk && f.active !== false && live > 0, label: '인플루언서 · ' + f.name, live };
   }
   return { ok: true, label: '직접입력', skip: true };
 }
@@ -1113,8 +1114,10 @@ window.saveColl = function () {
   const c = C(VIEW.id), j = judgeCollection(c), byStore = isStoreColl(c);
   const langOk = ALI_LANGS.indexOf(c.lang) !== -1;
   const done = () => { closeMD(); alertBox('저장했습니다', MSG.saveDone); };
-  if (!langOk || c.aliVisible !== '노출' || j.liveCount > 0) { done(); return; }
   const total = byStore ? c.stores.length : c.products.length;
+  /* 구성 항목은 필수다. 하나도 없으면 저장하지 않는다 */
+  if (!total) { alertBox('저장할 수 없습니다', MSG.collEmpty(byStore ? '스토어를' : '상품을')); return; }
+  if (!langOk || c.aliVisible !== '노출' || j.liveCount > 0) { done(); return; }
   const word = byStore ? '스토어가' : '상품이';
   /* 담은 항목마다 왜 안 보이는지 한 줄씩 */
   const lines = (byStore ? c.stores : c.products).map(id => {
@@ -1125,7 +1128,7 @@ window.saveColl = function () {
     return '<p class="hint" style="margin:2px 0">' + esc(o.name) + ' → ' + why + '</p>';
   }).join('');
   confirmBox('저장 확인',
-    '<p>' + (total ? MSG.saveColl(word) : MSG.saveCollNone(word)) + '</p>' + lines +
+    '<p>' + MSG.saveColl(word) + '</p>' + lines +
     '<p class="hint">웹 노출에는 영향이 없습니다.</p>',
     done, function () {});
 };
