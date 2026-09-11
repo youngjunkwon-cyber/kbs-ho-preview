@@ -755,7 +755,7 @@ function modal_product() {
       (p.mode === '기본 설정' ? '' : '<div class="hint">' + MSG.storeDefault + '</div>') + '</div></div>' +
       btnTable('product', p) +
       '<div class="row" style="margin-top:14px"><div class="lbl">메신저</div><div class="val"><span class="tblnote">인스타그램</span></div></div>' +
-      '<div class="row"><div class="lbl">인스타그램 임베디드 노출 여부</div><div class="val">' + onoff('pins', p.insta === 'ON', 'void(%V%)', true);
+      '<div class="row"><div class="lbl">인스타그램 임베디드 노출 여부</div><div class="val">' + onoff('pins', p.insta === 'ON', 'void(%V%)', true) + '</div></div>';
   }
   return '<div class="mask"><div class="modal" style="max-width:900px"><div class="hd">상품정보 수정<button class="x" onclick="closeMD()">✕</button></div>' +
     '<div class="mtabs">' + tabs.map((t, i) => '<div class="mtab ' + (i === VIEW.tab ? 'on' : '') + '" onclick="VIEW.tab=' + i + ';render()">' + t + '</div>').join('') + '</div>' +
@@ -911,7 +911,7 @@ function modal_ad() {
     '<select onchange="setAdLinkType(this.value)">' + ['외부링크', '내부링크', '내부이미지랜딩페이지'].map(v => '<option' + (v === b.linkType ? ' selected' : '') + '>' + v + '</option>').join('') + '</select></div></div>';
   if (isExt) h += '<div class="row"><div class="lbl"><span class="req">*</span>외부링크</div><div class="val"><input type="text" style="width:100%" value="' + esc(b.url) + '"></div></div>';
   if (b.linkType === '내부링크') h += '<div class="row"><div class="lbl"><span class="req">*</span>내부링크</div><div class="val">' +
-    innerPicker('setAdInnerKind(this.value)', 'setAdInnerId(this.value)', b.inner);
+    innerPicker('setAdInnerKind(this.value)', 'setAdInnerId(this.value)', b.inner) + '</div></div>';
   h += '<div class="row"><div class="lbl"><span class="req">*</span>대표 이미지</div><div class="val"><span class="tblnote">banner_' + b.id + '.jpg</span></div></div>';
   if (isLanding) h += '<div class="row"><div class="lbl"><span class="req">*</span>상세 이미지</div><div class="val"><span class="tblnote">landing_' + b.id + '.jpg</span></div></div>';
   let tail = '';
