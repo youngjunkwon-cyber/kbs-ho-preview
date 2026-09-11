@@ -150,7 +150,7 @@ const MSG = {
   cap:         '웹·알리페이 앱 각 2개까지 켤 수 있습니다.',
   exhEmpty:    s => '노출 가능한 ' + s + ' 없습니다. 기획전이 알리페이에 노출되지 않습니다.',
   exhNone:     s => '담은 ' + s + ' 없습니다. 기획전이 알리페이에 노출되지 않습니다.',
-  storeHide:   n => '미노출로 저장하면 소속 상품 ' + n + '건도 알리페이에 노출되지 않습니다.',
+  storeHide:   n => '미노출로 저장하면 이 스토어 상품 ' + n + '건도 알리페이에 노출되지 않습니다.',
   saveProd:    '알리페이 앱 버튼이 없습니다. 저장하면 상품이 알리페이에 노출되지 않습니다. 저장할까요?',
   saveStore:   '알리페이 앱 버튼이 없습니다. 저장하면 스토어가 알리페이에 노출되지 않습니다. 저장할까요?',
   saveAdBtn:   '알리페이 앱 버튼이 없습니다. 저장하면 배너가 알리페이에 노출되지 않습니다. 저장할까요?',
@@ -575,7 +575,7 @@ window.setBtn = function (kind, k, ch, on) {
   obj.btns[k][ch] = !!on;
   const cascade = k === 'consult' && !on && obj.btns.inquiry[ch];
   if (k === 'consult' && !on) obj.btns.inquiry[ch] = false;
-  const note = [kind === 'store' ? '기본 설정으로 따라가는 소속 상품 ' + obj.baseCount + '건' : '', cascade ? '문의하기 통합도 OFF' : ''].filter(Boolean).join(' · ');
+  const note = [kind === 'store' ? '기본 설정으로 따라가는 상품 ' + obj.baseCount + '건' : '', cascade ? '문의하기 통합도 OFF' : ''].filter(Boolean).join(' · ');
   render();
 };
 window.setVis = function (kind, v) {
@@ -603,18 +603,6 @@ window.setMode = function (v) {
 };
 window.setBooking = function (on) {
   const st = S(VIEW.id);
-  if (on && !st.bookingEnabled) {
-    /* 예약을 켜면 켜 둔 예약 버튼이 다시 세어진다. 상한을 넘으면 켜지 않는다 */
-    const keep = st.bookingEnabled; st.bookingEnabled = true;
-    const e = effStoreBtns(st);
-    const w = onCount(e.btns, ROWS_STORE, 'web'), a = onCount(e.btns, ROWS_STORE, 'ali');
-    st.bookingEnabled = keep;
-    if (w > CAP || a > CAP) {
-      const over = w > CAP ? '웹' : '알리페이 앱';
-      alertBox('예약을 켤 수 없습니다', over + ' 버튼은 2개까지 켤 수 있습니다. 예약을 켜면 ' + Math.max(w, a) + '개가 됩니다.');
-      render(); return;
-    }
-  }
   st.bookingEnabled = !!on; render();
 };
 
@@ -1145,12 +1133,12 @@ window.save = function (kind) {
       ', 알리페이 앱 ' + aliCnt + '개' + (ac.length ? '(' + ac.join(' / ') + ')' : '') + '입니다. 채널당 2개 이하여야 저장할 수 있습니다.');
     return;
   }
-  // 스토어를 이번 편집에서 미노출로 바꿨고 소속 상품이 10건 이상이면 저장 시 영향 범위를 확인한다
+  // 스토어를 이번 편집에서 미노출로 바꿨고 영향받는 상품·배너·기획전이 있으면 저장 시 확인한다
   const im0 = kind === 'store' ? impactOfHiding(obj) : null;
   if (kind === 'store' && obj.aliVisible === '미노출' && VIEW.savedVis === '노출' && (obj.prodCount > 0 || im0.M || im0.K)) {
     const im = im0;
     confirmBox('알리페이 미노출로 저장',
-      '<p><b>' + esc(obj.name) + '</b></p><p>이 스토어를 알리페이 앱에서 숨기면 소속 상품 ' + obj.prodCount + '건이 함께 보이지 않게 됩니다.</p>' +
+      '<p><b>' + esc(obj.name) + '</b></p><p>이 스토어를 알리페이 앱에서 숨기면 등록된 상품 ' + obj.prodCount + '건도 함께 보이지 않습니다.</p>' +
       ((im.M || im.K) ? '<p>이 스토어가 빠지면서 알리페이 앱에 보이지 않게 되는 ' + [im.M ? '배너 ' + im.M + '건' : '', im.K ? '기획전 ' + im.K + '건' : ''].filter(Boolean).join('과 ') + '도 있습니다. 지워지는 것은 없습니다.</p>' : '') +
       '<p class="hint">웹 노출에는 영향이 없습니다.</p>',
       function () { done(); }, function () {}, '미노출로 저장');
