@@ -207,6 +207,14 @@ function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catc
 function get(id) { return state[id] || { v: '', m: '' }; }
 function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
+/* 1차 검수(2026-09-11)에서 통과로 기록한 항목을 되살린다. 기기마다 한 번만 적용한다 */
+var SEED1 = ['P-01', 'P-02', 'P-03', 'P-04', 'P-07', 'P-08', 'P-10', 'P-11', 'P-12', 'P-13', 'PL-02', 'PL-03', 'PL-04'];
+if (!state.seed1) {
+  SEED1.forEach(function (id) { if (!state[id]) state[id] = { v: 'p', m: '' }; });
+  state.seed1 = 1;
+  save();
+}
+
 function runInPreview(code, alsoReset) {
   var w = frame.contentWindow;
   try {
@@ -332,7 +340,7 @@ document.getElementById('doCopy').addEventListener('click', function () {
 });
 document.getElementById('reset').addEventListener('click', function () {
   if (!confirm('기록한 통과·실패와 메모를 모두 지웁니다. 계속할까요?')) return;
-  state = {}; save(); render();
+  state = { seed1: 1 }; save(); render();
 });
 render();
 </script>
