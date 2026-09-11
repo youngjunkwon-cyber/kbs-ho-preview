@@ -170,36 +170,36 @@ const ROWS_PRODUCT = [
 const ROWS_STORE = [...ROWS_PRODUCT, { k: 'booking', label: '예약', needBooking: true }];
 
 const MSG = {
-  noAliBtn:    (s, where) => '알리페이 앱에서 켠 버튼이 없어서 ' + s + ' 알리페이 앱에 보이지 않습니다. ' + (where || '아래 버튼 설정') + '에서 알리페이 앱 버튼을 하나 켜면 보입니다.',
-  hardOff:     '알리페이 앱 밖으로 나가는 버튼이라 켤 수 없습니다.',
-  needConsult: '상담접수를 먼저 켜야 이 버튼을 켤 수 있습니다.',
-  needBooking: '예약설정에서 예약 사용을 먼저 켜 주세요.',
-  cap:         '고객 화면 아래에는 버튼을 2개까지 보여 줍니다. 웹과 알리페이 앱이 각각 2개입니다.',
-  langOnly:    (L, s) => (s || '이 건은') + ' ' + L + '로 만들어서 알리페이 앱에 보이지 않습니다. 알리페이 앱에는 중국어(간체), 중국어(번체), 영어로 만든 것만 보입니다.',
-  exhEmpty:    s => '이 기획전에 담은 ' + s + ' 알리페이 앱에서 모두 보이지 않는 상태입니다. 그래서 기획전도 알리페이 앱에 보이지 않습니다.',
-  exhNone:     (s, o) => '이 기획전에 아직 담은 ' + s + ' 없습니다. ' + o + ' 담아야 알리페이 앱에 보입니다.',
-  storeHide:   n => '이 스토어를 미노출로 저장하면 이 스토어의 상품 ' + n + '건도 알리페이 앱에 보이지 않습니다.',
-  saveProd:    '알리페이 앱에서 켠 버튼이 없습니다. 이대로 저장하면 이 상품은 알리페이 앱에 보이지 않습니다. 저장할까요?',
-  saveStore:   '알리페이 앱에서 켠 버튼이 없습니다. 이대로 저장하면 이 스토어는 알리페이 앱에 보이지 않습니다. 저장할까요?',
-  saveAdBtn:   '알리페이 앱에서 누를 수 있는 버튼이 없습니다. 이대로 저장하면 이 배너는 알리페이 앱에 보이지 않습니다. 저장할까요?',
-  saveAdTgt:   t => '이 배너가 연결된 대상(' + t + ')이 알리페이 앱에 보이지 않습니다. 이대로 저장하면 이 배너도 알리페이 앱에 보이지 않습니다. 저장할까요?',
-  saveAdExt:   '링크 종류가 외부링크라 이 배너는 알리페이 앱에 보이지 않습니다. 이대로 저장할까요?',
-  typeSwitch:  (was, n, now) => '유형을 바꾸면 이 기획전에는 ' + now + '만 담을 수 있습니다. 지금 담아 둔 ' + was + ' ' + n + '건은 목록에서 모두 지워집니다. 바꿀까요?',
-  saveColl:    s => '담은 ' + s + ' 알리페이 앱에서 모두 보이지 않습니다. 이대로 저장하면 이 기획전은 알리페이 앱에 보이지 않습니다. 저장할까요?',
-  saveCollNone:s => '아직 담은 ' + s + ' 없습니다. 이대로 저장하면 이 기획전은 알리페이 앱에 보이지 않습니다. 저장할까요?',
-  bnExtLock:   '누르면 외부 사이트로 나가는 배너입니다. 알리페이 앱은 외부로 나가는 것을 막기 때문에 이 배너는 알리페이 앱에 보이지 않고, 이 설정도 바꿀 수 없습니다.',
-  bnBtnExtLock:'하단 버튼의 링크 종류가 외부링크라 알리페이 앱에서는 켤 수 없습니다. 알리페이 앱에서 누를 수 있는 버튼이 없어 이 배너도 알리페이 앱에 보이지 않습니다.',
-  lockSelf:    where => (where || '위') + '에서 알리페이 노출을 미노출로 두었습니다. 그래서 알리페이 앱 버튼은 바꿀 수 없습니다. 켜 둔 값은 그대로 남아 있습니다.',
-  lockStore:   '이 상품이 속한 스토어가 알리페이 앱에 보이지 않게 설정되어 있습니다. 여기서 노출로 두어도 이 상품은 알리페이 앱에 보이지 않고, 아래 알리페이 앱 버튼도 바꿀 수 없습니다. 스토어 정보 관리 > 노출정보에서 스토어 설정을 먼저 바꿔 주세요.',
-  bnBtnOff:    '알리페이 앱에서 누를 수 있는 버튼이 없어 이 배너는 알리페이 앱에 보이지 않습니다. 위 버튼 표시여부에서 알리페이를 활성화하면 보입니다.',
-  bnTarget:    t => '이 배너가 연결된 대상(' + t + ')이 알리페이 앱에 보이지 않습니다. 그래서 이 배너도 알리페이 앱에 보이지 않습니다. 연결한 대상을 노출로 바꾸면 이 배너도 함께 보입니다.',
+  noAliBtn:    (s, where) => s + ' 알리페이 앱 버튼이 하나도 없어 보이지 않습니다.' + (where ? ' ' + where + '에서 켜 주세요.' : ''),
+  hardOff:     '알리페이 앱 밖으로 나가는 버튼이라 알리페이 앱에서는 켤 수 없습니다.',
+  needConsult: '상담접수를 켜야 이 버튼을 켤 수 있습니다.',
+  needBooking: '예약설정에서 예약 사용을 켜야 이 버튼을 켤 수 있습니다.',
+  cap:         '버튼은 웹 2개, 알리페이 앱 2개까지 켤 수 있습니다.',
+  langOnly:    (L, s) => (s || '이 건은') + ' ' + L + '라서 알리페이 앱에 보이지 않습니다. 중국어(간체)·중국어(번체)·영어만 보입니다.',
+  exhEmpty:    s => '담은 ' + s + ' 모두 알리페이 앱에 보이지 않아 이 기획전도 알리페이 앱에 보이지 않습니다.',
+  exhNone:     s => '담은 ' + s + ' 없어 이 기획전은 알리페이 앱에 보이지 않습니다.',
+  storeHide:   n => '이 스토어를 미노출로 저장하면 소속 상품 ' + n + '건도 알리페이 앱에 보이지 않습니다.',
+  saveProd:    '알리페이 앱 버튼이 하나도 없습니다. 저장하면 이 상품은 알리페이 앱에 보이지 않습니다. 저장할까요?',
+  saveStore:   '알리페이 앱 버튼이 하나도 없습니다. 저장하면 이 스토어는 알리페이 앱에 보이지 않습니다. 저장할까요?',
+  saveAdBtn:   '알리페이 앱에서 누를 버튼이 없습니다. 저장하면 이 배너는 알리페이 앱에 보이지 않습니다. 저장할까요?',
+  saveAdTgt:   t => '연결 대상(' + t + ')이 알리페이 앱에 보이지 않습니다. 저장하면 이 배너도 알리페이 앱에 보이지 않습니다. 저장할까요?',
+  saveAdExt:   '외부링크 배너라 알리페이 앱에 보이지 않습니다. 저장할까요?',
+  typeSwitch:  (was, n, now) => '유형을 바꾸면 담아 둔 ' + was + ' ' + n + '건이 지워지고 ' + now + '만 담을 수 있습니다. 바꿀까요?',
+  saveColl:    s => '담은 ' + s + ' 모두 알리페이 앱에 보이지 않습니다. 저장하면 이 기획전도 알리페이 앱에 보이지 않습니다. 저장할까요?',
+  saveCollNone:s => '담은 ' + s + ' 없습니다. 저장하면 이 기획전은 알리페이 앱에 보이지 않습니다. 저장할까요?',
+  bnExtLock:   '외부링크 배너라 알리페이 앱에 보이지 않습니다. 알리페이 노출은 바꿀 수 없습니다.',
+  bnBtnExtLock:'하단 버튼이 외부링크라 알리페이 앱에서 켤 수 없습니다. 이 배너도 알리페이 앱에 보이지 않습니다.',
+  lockSelf:    '알리페이 노출이 미노출이라 알리페이 앱 버튼은 바꿀 수 없습니다. 켜 둔 값은 그대로 남습니다.',
+  lockStore:   '소속 스토어가 알리페이 앱에 보이지 않아 이 상품도 보이지 않습니다. 스토어 정보 관리 > 노출정보에서 바꿔 주세요.',
+  bnBtnOff:    '하단 버튼이 알리페이 앱에서 꺼져 있어 이 배너는 알리페이 앱에 보이지 않습니다.',
+  bnTarget:    t => '연결 대상(' + t + ')이 보이지 않아 이 배너도 알리페이 앱에 보이지 않습니다.',
   hostHidden:  '이 상품은 알리페이 앱에서는 보이지 않아요.',
   storeDefault:'기본 설정은 스토어에 설정한 버튼을 그대로 따릅니다.',
-  msgLang:     '위에서 메신저 설정을 켜면 언어마다 메신저를 하나씩 넣을 수 있습니다.',
-  edBlock:     '외부 사이트 주소는 넣을 수 없습니다. K-Beauty Station 안의 주소만 넣을 수 있습니다.',
+  msgLang:     '메신저 설정을 켜면 언어마다 메신저를 하나씩 넣을 수 있습니다.',
+  edBlock:     '외부 사이트 주소는 넣을 수 없습니다.',
+  edBlockErr:  '외부 사이트 주소라 넣을 수 없습니다. K-Beauty Station 안의 주소만 됩니다.',
   edStrip:     (u, e) => [u ? '외부 사이트 주소 ' + u + '개' : '', e ? '외부에서 불러온 영상·SNS ' + e + '개' : ''].filter(Boolean).join('와 ') + '를 지웠습니다.',
-  edBlockErr:  '넣으신 주소는 외부 사이트라 넣을 수 없습니다. K-Beauty Station 안의 주소만 넣을 수 있습니다.',
-  saveDone:    '목록과 웹, 알리페이 앱에 바로 반영됩니다.'
+  saveDone:    '목록과 고객 화면에 바로 반영됩니다.'
 };
 
 /* ------------------------------- 데이터 ------------------------------- */
@@ -604,8 +604,8 @@ function btnTable(kind, obj) {
     html += '<div class="notice red">지금 ' + over + ' 켜져 있습니다. 2개까지만 저장할 수 있으니 하나를 꺼 주세요.</div>';
   }
   if (locked) html += '<div class="hint">기본 설정이라 잠겨 있습니다. 바꾸려면 위에서 개별 설정을 고르세요.</div>';
-  else if (selfHidden) html += '<div class="hint">' + MSG.lockSelf(isStore ? '노출정보' : '위') + '</div>';
-  if (langOk && !selfHidden && !storeHidden && aliCnt === 0) html += '<div class="notice">' + MSG.noAliBtn(isStore ? '이 스토어는' : '이 상품은') + '</div>';
+  else if (selfHidden) html += '<div class="hint">' + MSG.lockSelf + '</div>';
+  if (langOk && !selfHidden && !storeHidden && aliCnt === 0) html += '<div class="notice">' + MSG.noAliBtn(isStore ? '이 스토어는' : '이 상품은', isStore ? '' : '아래 버튼 설정') + '</div>';
   return html;
 }
 
@@ -807,7 +807,7 @@ function screen_sEdit() {
     /* 알리페이 노출은 언어를 나누지 않으므로 언어 탭 위에 둔다 */
     bd = '<div class="bd" style="padding-bottom:0"><div class="row"><div class="lbl"><span class="req">*</span>알리페이 노출<span class="newbadge">신규</span></div><div class="val"><span class="rg">' +
       radio('sv', '노출', st.aliVisible, "setVis('store','노출')") + radio('sv', '미노출', st.aliVisible, "setVis('store','미노출')") + '</span>' +
-      '<div class="hint">스토어는 언어를 나누지 않습니다. 이 설정 하나가 모든 언어에 함께 적용됩니다.</div>' +
+      '<div class="hint">스토어는 언어를 나누지 않아 이 설정 하나가 모든 언어에 적용됩니다.</div>' +
       (st.aliVisible === '미노출' ? '<div class="notice">' + MSG.storeHide(st.prodCount) + '</div>' : '') +
       (st.aliVisible === '노출' && onCount(effStoreBtns(st).btns, ROWS_STORE, 'ali') === 0 ? '<div class="notice">' + MSG.noAliBtn('이 스토어는', '버튼 및 메신저 설정') + '</div>' : '') + '</div></div></div>' +
       '<div class="langtabs">' + ['원본'].concat(STORE_TABS).map(l => '<div class="langtab ' + (l === '원본' ? 'on' : '') + '">' + l + '</div>').join('') + '</div>' +
@@ -817,8 +817,8 @@ function screen_sEdit() {
   } else if (i === 8) {
     bd = '<div class="bd"><div class="row"><div class="lbl"><span class="req">*</span>예약 사용</div><div class="val">' +
       onoff('sbk', st.bookingEnabled, 'setBooking(%V%)', false, ['사용', '미사용']) +
-      '<div class="hint">예약을 켜면 버튼 및 메신저 설정에서 예약 버튼을 켤 수 있습니다. 웹과 알리페이 앱 모두 같습니다.</div>' +
-      (!st.bookingEnabled && (st.btns.booking.web || st.btns.booking.ali) ? '<div class="notice">예약을 미사용으로 두어 예약 버튼이 웹과 알리페이 앱 모두 꺼져 있습니다. 켜 둔 값은 그대로 남아 있어 예약을 다시 켜면 살아납니다.</div>' : '') +
+      '<div class="hint">예약을 켜야 버튼 및 메신저 설정에서 예약 버튼을 켤 수 있습니다.</div>' +
+      (!st.bookingEnabled && (st.btns.booking.web || st.btns.booking.ali) ? '<div class="notice">예약 미사용이라 예약 버튼이 웹과 알리페이 앱 모두 꺼져 있습니다. 다시 켜면 살아납니다.</div>' : '') +
       (st.aliVisible === '노출' && onCount(effStoreBtns(st).btns, ROWS_STORE, 'ali') === 0 ? '<div class="notice">' + MSG.noAliBtn('이 스토어는', '버튼 및 메신저 설정') + '</div>' : '') +
       '</div></div></div>';
   } else if (i === 11) {
@@ -936,7 +936,7 @@ function modal_ad() {
       '<div style="display:flex;gap:36px;flex-wrap:wrap;align-items:center">' +
       '<span><span class="tblnote" style="margin-right:8px">웹</span>' + onoff('bshw', b.btn.web, "setAdBtnShow('web',%V%)", false, ['활성화', '비활성화']) + '</span>' +
       '<span class="' + (extBtn || bnHidden ? 'lock' : '') + '"><span class="tblnote" style="margin-right:8px">알리페이<span class="newbadge">신규</span></span>' + onoff('bsha', b.btn.ali, "setAdBtnShow('ali',%V%)", extBtn || bnHidden || !langOk, ['활성화', '비활성화']) + '</span></div>' +
-      (extBtn ? '<div class="hint">' + MSG.bnBtnExtLock + '</div>' : bnHidden ? '<div class="hint">' + MSG.lockSelf('위') + '</div>' : '') +
+      (extBtn ? '<div class="hint">' + MSG.bnBtnExtLock + '</div>' : bnHidden ? '<div class="hint">' + MSG.lockSelf + '</div>' : '') +
       '</div></div>' +
       '<div class="row"><div class="lbl"><span class="req">*</span>버튼 텍스트</div><div class="val"><input type="text" value="' + esc(b.btn.label) + '" style="width:260px"></div></div>' +
       '<div class="row"><div class="lbl"><span class="req">*</span>버튼 링크 종류</div><div class="val">' +
@@ -1062,7 +1062,7 @@ function modal_coll() {
     radio('cv', '노출', langOk ? c.aliVisible : '노출', "setVis('coll','노출')", !langOk) + radio('cv', '미노출', langOk ? c.aliVisible : '노출', "setVis('coll','미노출')", !langOk) + '</span>' +
     (langOk ? '' : '<div class="hint">' + MSG.langOnly(c.lang, '이 기획전은') + '</div>') +
     (langOk && c.aliVisible === '노출' && j.liveCount === 0
-      ? '<div class="notice">' + ((byStore ? c.stores.length : c.products.length) ? MSG.exhEmpty(byStore ? '스토어가' : '상품이') : MSG.exhNone(byStore ? '스토어가' : '상품이', byStore ? '스토어를' : '상품을')) + '</div>' : '') + '</div></div>' +
+      ? '<div class="notice">' + ((byStore ? c.stores.length : c.products.length) ? MSG.exhEmpty(byStore ? '스토어가' : '상품이') : MSG.exhNone(byStore ? '스토어가' : '상품이')) + '</div>' : '') + '</div></div>' +
     comp +
     '<div class="row"><div class="lbl"><span class="req">*</span>기획전 노출 기간</div><div class="val"><input type="text" value="' + c.from + ' → ' + c.to + '" style="width:280px" readonly></div></div>' +
     '<div class="row"><div class="lbl">기획전 활성화 여부</div><div class="val"><span class="rg">' +
@@ -1075,7 +1075,7 @@ function screen_hEdit() {
   const p = P('P8'), j = judgeProduct(p);
   return '<div class="phd"><div><h2 class="page">상품 수정</h2><div class="pdesc">내 상품 &gt; ' + esc(p.name) + ' (호스트 화면)</div></div></div>' +
     (j.na || j.visible ? '' : '<div class="card"><div class="bd"><div class="notice">' + MSG.hostHidden + '</div>' +
-      '<div class="hint">알리페이 앱에도 보이게 하려면 K-Beauty Station 담당자에게 문의해 주세요. 이 화면에서는 바꿀 수 없어요.</div></div></div>') +
+      '<div class="hint">알리페이 앱 노출은 K-Beauty Station 담당자에게 문의해 주세요.</div></div></div>') +
     '<div class="card"><div class="hd">상품 정보</div><div class="bd">' +
     '<div class="row"><div class="lbl">상품명</div><div class="val">' + esc(p.name) + '</div></div>' +
     '<div class="row"><div class="lbl">언어</div><div class="val">' + p.lang + '</div></div>' +
@@ -1087,11 +1087,11 @@ function screen_hEdit() {
 /* --------------------- BO-CH-10 · 버튼 설정 공통 구조 --------------------- */
 const SPEC_ROWS = [
   ['상담접수', 0, '웹과 알리페이 앱 모두 켤 수 있습니다. K-Beauty Station 안에서 열리는 기능입니다.'],
-  ['문의하기(상담+채팅)로 통합 노출', 0, '웹에서 켜려면 웹 상담접수를, 알리페이 앱에서 켜려면 알리페이 앱 상담접수를 먼저 켜야 합니다. 상담접수와 합쳐 버튼 하나로 보입니다.'],
+  ['문의하기(상담+채팅)로 통합 노출', 0, '같은 채널의 상담접수를 켜야 켤 수 있습니다. 상담접수와 합쳐 버튼 하나로 보입니다.'],
   ['채팅', 1, '웹과 알리페이 앱 모두 켤 수 있습니다. 알리페이 앱을 벗어나지 않고 그 안에서 열립니다.'],
   ['외부링크 설정', 0, '알리페이 앱에서는 켤 수 없습니다. 알리페이 앱이 다른 사이트로 나가는 것을 막습니다.'],
   ['메신저 설정', 0, '알리페이 앱에서는 켤 수 없습니다. 메신저는 다른 앱을 열어야 해서 알리페이 앱이 막습니다.'],
-  ['예약', 0, '웹과 알리페이 앱 모두 켤 수 있습니다. 예약설정에서 예약 사용을 먼저 켜야 합니다. 예약은 스토어에만 있습니다.']
+  ['예약', 0, '웹과 알리페이 앱 모두 켤 수 있습니다. 예약설정에서 예약 사용을 먼저 켜야 합니다.']
 ];
 function screen_btnSpec() {
   const ON = { '상담접수': 1, '문의하기(상담+채팅)로 통합 노출': 1, '예약': 1 };
