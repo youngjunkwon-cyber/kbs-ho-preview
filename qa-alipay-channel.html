@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>알리페이 채널 분기 · QA 체크리스트</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:"Noto Sans KR","Malgun Gothic",sans-serif;font-size:14px;color:#262626;background:#f5f6f8}
+.top{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid #e8e8e8;padding:14px 24px}
+.top .r1{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+h1{margin:0;font-size:18px;font-weight:700}
+h1 .sub{font-size:12px;color:#8c8c8c;font-weight:400;margin-left:8px}
+.spacer{flex:1}
+.btn{padding:6px 12px;border:1px solid #d9d9d9;background:#fff;border-radius:4px;cursor:pointer;color:#434343;font-size:13px;font-family:inherit}
+.btn:hover{border-color:#e8537a;color:#e8537a}
+.btn.pri{background:#e8537a;border-color:#e8537a;color:#fff}
+.btn.pri:hover{opacity:.9;color:#fff}
+.btn.on{background:#1f1f1f;border-color:#1f1f1f;color:#fff}
+.stat{display:flex;gap:18px;align-items:center;margin-top:10px;font-size:13px;color:#595959;flex-wrap:wrap}
+.stat b{color:#262626;font-size:15px}
+.bar{height:6px;border-radius:3px;background:#f0f0f0;overflow:hidden;flex:1;min-width:180px;display:flex}
+.bar i{display:block;height:100%}
+.bar .p{background:#52c41a}
+.bar .f{background:#ff4d4f}
+.wrap{padding:20px 24px 80px;max-width:1100px}
+.grp{margin-bottom:22px}
+.grp h2{font-size:14px;margin:0 0 8px;color:#595959;display:flex;align-items:center;gap:8px}
+.grp h2 .n{font-size:12px;color:#bfbfbf;font-weight:400}
+.tc{background:#fff;border:1px solid #f0f0f0;border-radius:6px;padding:14px 16px;margin-bottom:8px}
+.tc.pass{border-color:#b7eb8f;background:#fcfffa}
+.tc.fail{border-color:#ffa39e;background:#fffafa}
+.tc .hd{display:flex;gap:10px;align-items:flex-start}
+.tc .id{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#8c8c8c;flex:0 0 62px;padding-top:3px}
+.tc .ti{font-weight:600;flex:1;line-height:1.5}
+.tc .acts{display:flex;gap:6px;flex:0 0 auto}
+.tc .acts .btn{padding:4px 10px;font-size:12px}
+.tc .acts .btn.p.on{background:#52c41a;border-color:#52c41a;color:#fff}
+.tc .acts .btn.f.on{background:#ff4d4f;border-color:#ff4d4f;color:#fff}
+.tc dl{margin:10px 0 0 72px;display:grid;grid-template-columns:44px 1fr;gap:4px 10px;font-size:13px;line-height:1.6}
+.tc dt{color:#8c8c8c;font-size:12px;padding-top:1px}
+.tc dd{margin:0}
+.tc dd.exp{color:#262626}
+.memo{margin:10px 0 0 72px;display:none}
+.memo.show{display:block}
+.memo textarea{width:100%;min-height:56px;padding:8px 10px;border:1px solid #d9d9d9;border-radius:4px;font-family:inherit;font-size:13px;resize:vertical;line-height:1.6}
+.memo textarea:focus{outline:none;border-color:#e8537a}
+.memo .lbl{font-size:12px;color:#8c8c8c;margin-bottom:4px}
+.hint{font-size:12px;color:#8c8c8c;line-height:1.7;margin:0 0 16px}
+.empty{background:#fff;border:1px dashed #d9d9d9;border-radius:6px;padding:30px;text-align:center;color:#8c8c8c;font-size:13px}
+dialog{border:none;border-radius:8px;padding:0;max-width:760px;width:92%;box-shadow:0 8px 32px rgba(0,0,0,.18)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog .dh{padding:16px 20px;border-bottom:1px solid #f0f0f0;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+dialog .db{padding:16px 20px}
+dialog .df{padding:12px 20px;border-top:1px solid #f0f0f0;display:flex;justify-content:flex-end;gap:8px}
+dialog textarea{width:100%;height:340px;font-family:ui-monospace,Menlo,monospace;font-size:12px;line-height:1.6;padding:10px;border:1px solid #d9d9d9;border-radius:4px}
+.x{background:none;border:none;font-size:16px;cursor:pointer;color:#8c8c8c}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="r1">
+    <h1>알리페이 채널 분기 · QA 체크리스트<span class="sub">시안 검수용</span></h1>
+    <div class="spacer"></div>
+    <button class="btn" id="openPrev">시안 새 창으로 열기</button>
+    <button class="btn" data-f="all" id="fAll">전체</button>
+    <button class="btn" data-f="todo">미확인</button>
+    <button class="btn" data-f="fail">실패만</button>
+    <button class="btn pri" id="copy">결과 복사</button>
+    <button class="btn" id="reset">초기화</button>
+  </div>
+  <div class="stat">
+    <span>통과 <b id="nPass">0</b></span>
+    <span>실패 <b id="nFail">0</b></span>
+    <span>미확인 <b id="nTodo">0</b></span>
+    <div class="bar"><i class="p" id="barP"></i><i class="f" id="barF"></i></div>
+    <span id="pct">0%</span>
+  </div>
+</div>
+<div class="wrap">
+  <p class="hint">각 케이스는 시안의 <b>초기화</b> 직후 상태를 전제로 합니다. 앞 케이스에서 값을 바꿨으면 시안 우측 패널 아래 초기화를 누르고 시작하세요.<br>
+  실패를 누르면 메모 칸이 열립니다. 무엇이 어떻게 달랐는지 적어 두시면 결과 복사에 같이 담깁니다. 입력한 내용은 이 브라우저에 저장됩니다.</p>
+  <div id="list"></div>
+</div>
+
+<dialog id="dlg">
+  <div class="dh">결과<button class="x" onclick="document.getElementById('dlg').close()">✕</button></div>
+  <div class="db"><textarea id="out" readonly></textarea></div>
+  <div class="df">
+    <button class="btn" onclick="document.getElementById('dlg').close()">닫기</button>
+    <button class="btn pri" id="doCopy">클립보드로 복사</button>
+  </div>
+</dialog>
+
+<script>
+var PREVIEW = 'bo-alipay-channel.html';
+var DATA = [
+["상품 수정", [
+["P-01","노출 상품 기본 상태","상품정보관리 · 언어 중국어(간체) · P2 레이저 토닝 1회 수정 · 관리자설정 탭","알리페이 노출 = 노출. 안내 없음. 표 아래: 웹 2개 (상담접수 / 채팅) · 알리페이 앱 2개 (상담접수 / 채팅) · 각 2개까지"],
+["P-02","미노출로 바꾸면 알리페이 칸이 잠긴다","P2 수정에서 알리페이 노출 = 미노출","알리페이 칸 전체 회색 잠금. 표 아래: 미노출 상태에서는 알리페이 앱 버튼을 수정할 수 없습니다. 설정값은 유지됩니다."],
+["P-03","미노출 상품의 목록 표기","P-02 상태로 모달 닫기","알리페이 노출 = 미노출, 사유 = 직접 끔"],
+["P-04","알리페이 버튼이 없는 상품","P8 모공 타이트닝 수정","안내: 알리페이 앱 버튼이 없어 알리페이에 노출되지 않습니다. 아래 버튼 설정에서 1개 이상 켜면 노출됩니다. 노출 라디오는 조작 가능"],
+["P-05","소속 스토어가 미노출","언어 중국어(번체) · P4 눈매교정 상담 수정","안내: 소속 스토어가 미노출입니다. 스토어 정보 관리 &gt; 노출정보에서 변경할 수 있습니다. 알리페이 칸 잠금. 목록 사유 = 스토어 설정"],
+["P-06","대상 언어가 아닌 상품","언어 일본어 · P6 수정","노출 라디오가 노출로 고정 잠금. 안내: 일본어는 알리페이 대상 언어가 아닙니다. 중국어(간체)·중국어(번체)·영어만 노출됩니다."],
+["P-07","기본 설정 상품","언어 영어 · P3 아쿠아 필링 수정","스토어 설정 적용 = 기본 설정. 표 전체 잠금. 안내: 기본 설정 적용 중입니다. 개별 설정을 선택하면 수정할 수 있습니다."],
+["P-08","기본 설정에서 채팅 자동 적용","P3 수정 · 채팅 행 확인","채팅 알리페이 ON. 행 안내: 스토어 버튼이 없어 채팅이 자동 적용됩니다."],
+["P-09","기본 설정 → 개별 설정","P3에서 개별 설정 선택","알리페이 칸이 모두 꺼진 채 풀림. 웹 값은 스토어에서 가져옴"],
+["P-10","외부링크·메신저는 알리페이 미지원","P2 수정 · 두 행의 알리페이 칸","두 칸 모두 회색 잠금. 안내: 알리페이 앱 미지원 항목입니다."],
+["P-11","상담접수를 끄면 문의하기도 꺼진다","P2 수정에서 알리페이 상담접수 OFF","문의하기 통합도 함께 OFF"],
+["P-12","알리페이 칸을 비우고 저장","P-11 이어서 알리페이 칸 모두 OFF → OK","확인: 알리페이 앱 버튼이 없습니다. 저장하면 상품이 알리페이에 노출되지 않습니다. 저장할까요? 취소=모달 유지, 저장=닫힘"],
+["P-13","세 번째 버튼은 막힌다","P2 수정에서 웹 외부링크 ON","경고: 웹 버튼은 2개까지 켤 수 있습니다. 현재 상담접수, 채팅이 켜져 있습니다. 토글이 원위치"],
+["P-14","예전 데이터 (웹 3개)","P10 속눈썹 연장 수정","표 아래 빨간 안내: 웹 버튼 3개입니다. 채널당 2개 이하여야 저장할 수 있습니다. OK를 누르면 저장 거부"]
+]],
+["상품 목록", [
+["PL-01","신규 칼럼 위치","상품정보관리","알리페이 노출·사유 칼럼이 히든 여부 바로 뒤. 신규 뱃지 표시"],
+["PL-02","사유 값 목록","사유 필터 열기","전체 / 직접 끔 / 스토어 설정 / 알리페이 버튼 없음"],
+["PL-03","사유로 거르기","사유 = 알리페이 버튼 없음","P8 모공 타이트닝만 남음"],
+["PL-04","대상 언어가 아닌 언어","언어 = 일본어","두 칼럼이 - 로 표시되고 두 필터가 잠김. 잠기기 전 고른 값은 전체로 되돌아감"]
+]],
+["스토어 정보 수정", [
+["S-01","노출 설정 위치","스토어 &gt; 정보관리 · S1 준오헤어 명동점 · 노출정보","알리페이 노출이 언어 탭 위에 있음. 안내: 스토어는 언어 구분이 없습니다. 이 설정은 모든 언어에 적용됩니다."],
+["S-02","미노출 선택","S1 노출정보에서 미노출 선택","안내: 미노출로 저장하면 소속 상품 12건도 알리페이에 노출되지 않습니다. 이 시점에는 확인 창이 뜨지 않음"],
+["S-03","미노출 저장 확인","S-02에서 저장","확인 창에 소속 상품 12건 + 배너 2건과 기획전 1건 + 지워지는 것은 없다 + 웹 노출에는 영향이 없습니다"],
+["S-04","영향이 작은 스토어도 확인","S4 모모클리닉을 노출로 저장 → 다시 미노출로 저장","상품 7건이어도 확인 창이 뜸"],
+["S-05","같은 화면 두 번째 왕복","S-04를 한 번 더 반복","두 번째에도 확인 창이 뜸"],
+["S-06","알리페이 버튼이 없는 스토어","S5 글로우스킨 홍대 · 노출정보","안내: 알리페이 앱 버튼이 없어 알리페이에 노출되지 않습니다. 버튼 및 메신저 설정에서 1개 이상 켜면 노출됩니다. 버튼 및 메신저 설정 섹션에도 같은 안내"],
+["S-07","예약 미사용 전환","S1 · 예약설정 · 미사용","예약 버튼이 웹·알리페이 모두 꺼짐. 안내: 예약 미사용 상태입니다. 예약 버튼은 웹·알리페이 앱 모두 꺼집니다. 설정값은 유지됩니다."],
+["S-08","예약 재사용 시 상한 검사","S3 뷰티랩 강남 · 예약 미사용 → 버튼 및 메신저 설정에서 웹 2개 채움 → 예약 사용","경고: 웹 버튼은 2개까지 켤 수 있습니다. 예약을 켜면 3개가 됩니다. 예약은 켜지지 않음"],
+["S-09","범위 밖 섹션","좌측 섹션 앵커 중 회색 항목 클릭","눌리지 않음. 노출정보·예약설정·버튼 및 메신저 설정만 이동"],
+["S-10","스토어 목록은 언어 무관","상품 목록에서 언어를 일본어로 바꾼 뒤 스토어 목록","알리페이 노출·사유 필터가 잠기지 않음"],
+["S-11","버튼 설정 표 폭","S1 · 버튼 및 메신저 설정과 상품 수정 모달 비교","스토어는 웹·알리페이 각 220, 상품 모달은 각 180"]
+]],
+["배너 (광고정보관리)", [
+["B-01","링크종류 외부링크","B2 피부과 이벤트 수정","노출 라디오 잠금. 안내: 외부링크 배너는 알리페이에 노출되지 않습니다. 이 설정은 수정할 수 없습니다. 목록 사유 = 외부 연결"],
+["B-02","하단 버튼이 외부링크","B4 성형 상담 배너 수정","알리페이 표시여부 비활성 잠금. 안내: 하단 버튼이 외부링크입니다. 알리페이 앱에서 켤 수 없어 배너도 노출되지 않습니다. 목록 사유 = 알리페이 버튼 없음"],
+["B-03","연결 대상이 미노출","B5 모모클리닉 단독 수정","안내: 연결 대상(병원 · 모모클리닉)이 미노출입니다. 배너도 알리페이에 노출되지 않습니다. 목록 사유 = 연결 대상 미노출"],
+["B-04","대상을 되돌리면 배너도 돌아온다","스토어에서 모모클리닉을 노출로 바꾼 뒤 광고 목록","B5가 별도 조작 없이 노출로 바뀜"],
+["B-05","인플루언서는 판정 제외","B6 인플루언서 협업전 수정","노출 유지. 우측 패널에 판정 대상이 아니라는 줄"],
+["B-06","직접입력","B1 수정 · 내부링크 종류 = 직접입력","입력칸 읽기 전용 + 직접입력은 알리페이 노출 확인 대상이 아닙니다."],
+["B-07","저장 확인 · 버튼 없음","B4 수정 → 수정 버튼","확인: 알리페이 앱 버튼이 없습니다. 저장하면 배너가 알리페이에 노출되지 않습니다. 저장할까요?"],
+["B-08","저장 확인 · 연결 대상","B5 수정 → 수정","확인: 연결 대상(병원 · 모모클리닉)이 미노출입니다. 저장하면 배너도 알리페이에 노출되지 않습니다."],
+["B-09","저장 확인 · 외부링크","B2 수정 → 수정","확인: 외부링크 배너는 알리페이에 노출되지 않습니다. 저장할까요?"],
+["B-10","보이는 배너는 확인 없음","B1 수정 → 수정","확인 없이 저장 알림"]
+]],
+["기획전", [
+["E-01","유형이 구성 항목을 정한다","기획전 관리 · E1 가을 K-뷰티 위크 수정","유형 = 추천상품. 상품 표만 표시. 스토어 표 없음"],
+["E-02","병원 유형","E2 성형 특별전 수정","유형 = 병원. 스토어 표만 표시. 칼럼 = 체크박스 · 스토어명 · 조회수 · 클릭수 · 알리페이 노출 · action"],
+["E-03","노출 가능 항목 0건","E2 수정","안내: 노출 가능한 스토어가 없습니다. 기획전이 알리페이에 노출되지 않습니다. 목록 사유 = 노출 가능 항목 없음"],
+["E-04","스토어를 담으면 살아난다","E2에서 + 스토어 추가 → 노출 상태 스토어 선택","안내가 사라지고 목록이 노출로 바뀜"],
+["E-05","유형 전환 확인","E1에서 유형을 병원으로","확인: 유형을 변경하면 담은 상품 2건이 삭제되고 스토어만 담을 수 있습니다. 변경할까요? 취소 시 유형이 되돌아감"],
+["E-06","체크박스 선택 삭제","E1에서 행 체크","선택된 상품 삭제 버튼 활성. 선택 해제 시 비활성"],
+["E-07","담은 것이 없을 때 저장","E1에서 상품 모두 삭제 후 OK","확인: 담은 상품이 없습니다. 저장하면 기획전이 알리페이에 노출되지 않습니다. 저장할까요?"],
+["E-08","대상 언어가 아닌 기획전","언어 일본어 · E4 일본 고객 추천전","노출로 고정 잠금 + 언어 안내"],
+["E-09","목록 건수","기획전 관리 목록","병원 행의 상품 칸 0, 추천상품 행의 스토어 칸 0"]
+]],
+["매거진 본문", [
+["M-01","외부 주소 차단","매거진 · 링크 넣기 · 외부 주소 입력 · 넣기","오류: 외부 사이트 주소입니다. K-Beauty Station 내부 주소만 입력할 수 있습니다. 입력한 주소가 칸에 그대로 남음"],
+["M-02","내부 주소는 통과","같은 창에 K-Beauty Station 주소 입력 · 넣기","본문에 삽입. 안내: 입력한 주소는 저장 시 내부 주소 형식으로 변환됩니다."],
+["M-03","남은 항목 개수","매거진 화면 진입","안내: 본문에 외부 사이트 주소 1개, 외부 영상·SNS 1개가 있습니다. 저장 시 삭제됩니다."],
+["M-04","저장 결과 개수 일치","저장","알림 개수가 M-03과 같음: 외부 사이트 주소 1개, 외부 영상·SNS 1개를 삭제했습니다."],
+["M-05","임시 입력 정리","본문 입력 → 다른 화면 → 매거진 재진입","입력한 내용이 남아 있지 않음"]
+]],
+["호스트 화면", [
+["H-01","버튼이 없어 안 보일 때","호스트 상품 수정","상단 안내: 이 상품은 알리페이 앱에서는 보이지 않아요. + 담당자 문의 안내"],
+["H-02","스토어 때문에 안 보일 때도","스토어에서 뷰티랩 강남을 미노출로 바꾼 뒤 호스트 화면","같은 안내가 그대로 뜸"],
+["H-03","호스트에는 설정이 없다","호스트 상품 수정","알리페이 관련 설정 항목 없음. 쉬운 말 문체 유지"]
+]],
+["공통 · 회귀", [
+["G-01","시나리오 전수","우측 엣지케이스 시나리오 26건을 위에서부터 클릭","모두 오류 없이 열리고 설명과 화면이 일치"],
+["G-02","판정 패널","각 화면·모달에서 우측 판정 결과 확인","조건이 번호순(①②③)으로 나오고 결과·사유가 목록과 일치"],
+["G-03","초기화","값 변경 후 초기화","시드 상태로 복귀"],
+["G-04","시안 흔적 없음","전 화면","회색 시안 설명 밴드, (기존) 표시 없음"],
+["G-05","금지 표현","전 화면","긴 줄표, KBS 줄임, 열·판정 같은 내부 용어가 화면 문구에 없음"]
+]]
+];
+
+var KEY = 'kbs_qa_alipay';
+var state = {};
+try { state = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { state = {}; }
+var filter = 'all';
+var list = document.getElementById('list');
+
+function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+function get(id) { return state[id] || { v: '', m: '' }; }
+
+function esc(s) { return String(s).replace(/&(?!(amp|lt|gt|#\d+);)/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+function render() {
+  list.innerHTML = '';
+  var total = 0, pass = 0, fail = 0;
+  DATA.forEach(function (g) { g[1].forEach(function (c) { total++; var v = get(c[0]).v; if (v === 'p') pass++; else if (v === 'f') fail++; }); });
+  var todo = total - pass - fail;
+  document.getElementById('nPass').textContent = pass;
+  document.getElementById('nFail').textContent = fail;
+  document.getElementById('nTodo').textContent = todo;
+  document.getElementById('barP').style.width = (total ? pass / total * 100 : 0) + '%';
+  document.getElementById('barF').style.width = (total ? fail / total * 100 : 0) + '%';
+  document.getElementById('pct').textContent = Math.round((pass + fail) / total * 100) + '%';
+
+  var shownAny = false;
+  DATA.forEach(function (g) {
+    var cards = [], shown = 0;
+    g[1].forEach(function (c) {
+      var st = get(c[0]);
+      if (filter === 'fail' && st.v !== 'f') return;
+      if (filter === 'todo' && st.v) return;
+      shown++; shownAny = true;
+      var d = document.createElement('div');
+      d.className = 'tc' + (st.v === 'p' ? ' pass' : st.v === 'f' ? ' fail' : '');
+      d.innerHTML =
+        '<div class="hd"><span class="id">' + c[0] + '</span><span class="ti">' + esc(c[1]) + '</span>' +
+        '<span class="acts">' +
+        '<button class="btn p' + (st.v === 'p' ? ' on' : '') + '" data-v="p">통과</button>' +
+        '<button class="btn f' + (st.v === 'f' ? ' on' : '') + '" data-v="f">실패</button>' +
+        '</span></div>' +
+        '<dl><dt>절차</dt><dd>' + esc(c[2]) + '</dd><dt>기대</dt><dd class="exp">' + esc(c[3]) + '</dd></dl>' +
+        '<div class="memo' + (st.v === 'f' || st.m ? ' show' : '') + '">' +
+        '<div class="lbl">무엇이 어떻게 달랐나요</div>' +
+        '<textarea placeholder="예: 안내 문구가 안 뜸 / 토글이 안 잠김 / 숫자가 12가 아니라 3">' + esc(st.m) + '</textarea></div>';
+      d.querySelectorAll('.acts .btn').forEach(function (b) {
+        b.addEventListener('click', function () {
+          var cur = get(c[0]);
+          var nv = cur.v === b.dataset.v ? '' : b.dataset.v;
+          state[c[0]] = { v: nv, m: cur.m || '' };
+          save(); render();
+          if (nv === 'f') {
+            var el = document.querySelector('[data-focus="' + c[0] + '"]');
+            if (el) el.focus();
+          }
+        });
+      });
+      var ta = d.querySelector('textarea');
+      ta.setAttribute('data-focus', c[0]);
+      ta.addEventListener('input', function () {
+        var cur = get(c[0]);
+        state[c[0]] = { v: cur.v, m: ta.value };
+        save();
+        document.getElementById('copy').textContent = '결과 복사';
+      });
+      cards.push(d);
+    });
+    if (!shown) return;
+    var wrap = document.createElement('div');
+    wrap.className = 'grp';
+    var h = document.createElement('h2');
+    h.innerHTML = esc(g[0]) + '<span class="n">' + shown + '건</span>';
+    wrap.appendChild(h);
+    cards.forEach(function (c) { wrap.appendChild(c); });
+    list.appendChild(wrap);
+  });
+  if (!shownAny) {
+    var e = document.createElement('div');
+    e.className = 'empty';
+    e.textContent = filter === 'fail' ? '실패로 표시한 케이스가 없습니다.' : '미확인 케이스가 없습니다.';
+    list.appendChild(e);
+  }
+}
+
+function buildReport() {
+  var lines = [], pass = 0, fail = 0, todo = 0;
+  DATA.forEach(function (g) {
+    var rows = [];
+    g[1].forEach(function (c) {
+      var st = get(c[0]);
+      if (st.v === 'p') pass++; else if (st.v === 'f') fail++; else todo++;
+      if (st.v !== 'f') return;
+      rows.push('- ' + c[0] + ' ' + c[1] + (st.m ? '\n  ' + st.m.replace(/\n/g, '\n  ') : '\n  (메모 없음)'));
+    });
+    if (rows.length) { lines.push('[' + g[0] + ']'); lines.push(rows.join('\n')); lines.push(''); }
+  });
+  var head = '알리페이 채널 분기 시안 QA 결과\n통과 ' + pass + ' / 실패 ' + fail + ' / 미확인 ' + todo + '\n\n';
+  return head + (lines.length ? '실패 건\n\n' + lines.join('\n') : '실패 건 없음');
+}
+
+document.getElementById('openPrev').addEventListener('click', function () { window.open(PREVIEW, '_blank'); });
+document.querySelectorAll('[data-f]').forEach(function (b) {
+  b.addEventListener('click', function () {
+    filter = b.dataset.f;
+    document.querySelectorAll('[data-f]').forEach(function (x) { x.classList.toggle('on', x === b); });
+    render();
+  });
+});
+document.getElementById('fAll').classList.add('on');
+document.getElementById('copy').addEventListener('click', function () {
+  document.getElementById('out').value = buildReport();
+  document.getElementById('dlg').showModal();
+});
+document.getElementById('doCopy').addEventListener('click', function () {
+  var ta = document.getElementById('out');
+  ta.removeAttribute('readonly'); ta.select();
+  try { document.execCommand('copy'); } catch (e) {}
+  if (navigator.clipboard) { navigator.clipboard.writeText(ta.value).catch(function () {}); }
+  ta.setAttribute('readonly', '');
+  this.textContent = '복사했습니다';
+  var b = this;
+  setTimeout(function () { b.textContent = '클립보드로 복사'; }, 1500);
+});
+document.getElementById('reset').addEventListener('click', function () {
+  if (!confirm('기록한 통과·실패와 메모를 모두 지웁니다. 계속할까요?')) return;
+  state = {}; save(); render();
+});
+render();
+</script>
+</body>
+</html>
