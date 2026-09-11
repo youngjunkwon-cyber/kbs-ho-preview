@@ -621,7 +621,7 @@ window.setBtn = function (kind, k, ch, on) {
     const e1 = kind === 'store' ? effStoreBtns(obj) : effBtns(obj);
     const after = onCount(e1.btns, rows, ch);
     obj.btns[k][ch] = keep;
-    if (after > CAP) { alertBox('켤 수 없습니다', (ch === 'web' ? '웹' : '알리페이 앱') + ' 버튼은 2개까지 켤 수 있습니다. 현재 ' + already.join(', ') + '이 켜져 있습니다. 하나를 끄면 켤 수 있습니다.'); render(); return; }
+    if (after > CAP) { alertBox('켤 수 없습니다', (ch === 'web' ? '웹' : '알리페이 앱') + ' 버튼은 2개까지 켤 수 있습니다. 현재 ' + already.join(', ') + '이 켜져 있습니다.'); render(); return; }
   }
   const before = obj.btns[k][ch] ? 'ON' : 'OFF';
   obj.btns[k][ch] = !!on;
@@ -667,7 +667,7 @@ window.setBooking = function (on) {
     st.bookingEnabled = keep;
     if (w > CAP || a > CAP) {
       const over = w > CAP ? '웹' : '알리페이 앱';
-      alertBox('예약을 켤 수 없습니다', '예약을 켜면 ' + over + ' 버튼이 ' + Math.max(w, a) + '개가 됩니다. 다른 버튼을 끄면 켤 수 있습니다.');
+      alertBox('예약을 켤 수 없습니다', over + ' 버튼은 2개까지 켤 수 있습니다. 예약을 켜면 ' + Math.max(w, a) + '개가 됩니다.');
       render(); return;
     }
   }
