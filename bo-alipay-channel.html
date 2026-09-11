@@ -171,9 +171,9 @@ const ROWS_STORE = [...ROWS_PRODUCT, { k: 'booking', label: '예약', needBookin
 
 const MSG = {
   noAliBtn:    (s, where) => s + ' 알리페이 앱 버튼이 하나도 없어 보이지 않습니다.' + (where ? ' ' + where + '에서 켜 주세요.' : ''),
-  hardOff:     '알리페이 앱 밖으로 나가는 버튼이라 알리페이 앱에서는 켤 수 없습니다.',
-  needConsult: '상담접수를 켜야 이 버튼을 켤 수 있습니다.',
-  needBooking: '예약설정에서 예약 사용을 켜야 이 버튼을 켤 수 있습니다.',
+  hardOff:     '알리페이 앱 밖으로 나가서 켤 수 없습니다.',
+  needConsult: '상담접수를 먼저 켜 주세요.',
+  needBooking: '예약설정에서 예약 사용을 켜 주세요.',
   cap:         '버튼은 웹 2개, 알리페이 앱 2개까지 켤 수 있습니다.',
   langOnly:    (L, s) => (s || '이 건은') + ' ' + L + '라서 알리페이 앱에 보이지 않습니다. 중국어(간체)·중국어(번체)·영어만 보입니다.',
   exhEmpty:    s => '담은 ' + s + ' 모두 알리페이 앱에 보이지 않아 이 기획전도 알리페이 앱에 보이지 않습니다.',
@@ -189,7 +189,7 @@ const MSG = {
   saveCollNone:s => '담은 ' + s + ' 없습니다. 저장하면 이 기획전은 알리페이 앱에 보이지 않습니다. 저장할까요?',
   bnExtLock:   '외부링크 배너라 알리페이 앱에 보이지 않습니다. 알리페이 노출은 바꿀 수 없습니다.',
   bnBtnExtLock:'하단 버튼이 외부링크라 알리페이 앱에서 켤 수 없습니다. 이 배너도 알리페이 앱에 보이지 않습니다.',
-  lockSelf:    '알리페이 노출이 미노출이라 알리페이 앱 버튼은 바꿀 수 없습니다. 켜 둔 값은 그대로 남습니다.',
+  lockSelf:    '미노출이라 알리페이 앱 버튼은 잠겼습니다. 켜 둔 값은 남습니다.',
   lockStore:   '소속 스토어가 알리페이 앱에 보이지 않아 이 상품도 보이지 않습니다. 스토어 정보 관리 > 노출정보에서 바꿔 주세요.',
   bnBtnOff:    '하단 버튼이 알리페이 앱에서 꺼져 있어 이 배너는 알리페이 앱에 보이지 않습니다.',
   bnTarget:    t => '연결 대상(' + t + ')이 보이지 않아 이 배너도 알리페이 앱에 보이지 않습니다.',
@@ -519,7 +519,7 @@ const MENU = [
   ['광고정보관리', null, 'a-list'], ['쿠폰'],
   ['기획전', ['기획전 관리', 'c-list'], ['유형 관리']],
   ['인플루언서'], ['통계'],
-  ['버튼 설정 공통 (시안용)', null, 'btn-spec'], ['호스트 상품 수정 (시안용)', null, 'h-edit']
+  ['버튼 설정 공통', null, 'btn-spec'], ['호스트 상품 수정', null, 'h-edit']
 ];
 function renderSide() {
   let h = '<div class="logo">ADMIN</div>';
@@ -584,11 +584,11 @@ function btnTable(kind, obj) {
       if (offWeb) webDis = true;
       if (offAli) aliDis = true;
       if (offWeb && offAli) note = MSG.needConsult;
-      else if (offWeb) note = '웹은 상담접수를 먼저 켜야 이 버튼을 켤 수 있습니다.';
-      else if (offAli) note = '알리페이 앱은 상담접수를 먼저 켜야 이 버튼을 켤 수 있습니다.';
+      else if (offWeb) note = '웹 상담접수를 먼저 켜 주세요.';
+      else if (offAli) note = '알리페이 앱 상담접수를 먼저 켜 주세요.';
     }
     if (r.needBooking && !obj.bookingEnabled) { webDis = true; aliDis = true; note = MSG.needBooking; }
-    if (r.k === 'chat' && !isStore && eff.chatAuto) note = '이 스토어의 알리페이 버튼 중 상품에 쓸 수 있는 것이 없어 채팅이 자동으로 켜집니다.';
+    if (r.k === 'chat' && !isStore && eff.chatAuto) note = '스토어에 쓸 버튼이 없어 채팅이 자동으로 켜집니다.';
     html += '<tr><td><span class="req">*</span>' + r.label + (r.isNew ? '<span class="newbadge">신규</span>' : '') + '</td>' +
       '<td>' + onoff('w_' + kind + '_' + r.k, e.web, "setBtn('" + kind + "','" + r.k + "','web',%V%)", webDis) + '</td>' +
       '<td class="new' + (aliDis ? ' lock' : '') + '">' + onoff('a_' + kind + '_' + r.k, e.ali, "setBtn('" + kind + "','" + r.k + "','ali',%V%)", aliDis) + '</td>' +
@@ -745,14 +745,13 @@ function modal_product() {
       '<div class="row"><div class="lbl">카테고리</div><div class="val">' + p.cat + ' / ' + p.sub + '</div></div>' +
       '<div class="row"><div class="lbl">상품 간략 설명</div><div class="val"><span class="tblnote">0 / 2000</span></div></div>' +
       '<div class="row"><div class="lbl">Vat포함여부</div><div class="val">' + p.vat + '</div></div>' +
-      '<div class="row"><div class="lbl">대표 이미지 / 상세 이미지</div><div class="val"><span class="tblnote">Upload (기존)</span></div></div>' +
-      "<div class=\"note\"><b>시안 설명</b>" + '상품정보 탭은 이번 작업에서 바뀌는 것이 없습니다. 상품에는 본문 에디터가 없어 링크를 막을 일도 없습니다.</div>';
+      '<div class="row"><div class="lbl">대표 이미지 / 상세 이미지</div><div class="val"><span class="tblnote">Upload</span></div></div>';
   } else {
     bd = '<div class="blk">노출 설정</div>' +
-      '<div class="row"><div class="lbl">상태</div><div class="val">' + p.status + ' <span class="tblnote">(기존)</span></div></div>' +
-      '<div class="row"><div class="lbl">반려사유</div><div class="val"><span class="tblnote">- (기존)</span></div></div>' +
-      '<div class="row"><div class="lbl">활성화</div><div class="val">' + onoff('pact', p.active, 'void(%V%)', true) + ' <span class="tblnote">(기존)</span></div></div>' +
-      '<div class="row"><div class="lbl">히든 여부</div><div class="val">' + onoff('phid', p.hidden, 'void(%V%)', true) + ' <span class="tblnote">(기존)</span></div></div>' +
+      '<div class="row"><div class="lbl">상태</div><div class="val">' + p.status + '</div></div>' +
+      '<div class="row"><div class="lbl">반려사유</div><div class="val"><span class="tblnote">-</span></div></div>' +
+      '<div class="row"><div class="lbl">활성화</div><div class="val">' + onoff('pact', p.active, 'void(%V%)', true) + '</div></div>' +
+      '<div class="row"><div class="lbl">히든 여부</div><div class="val">' + onoff('phid', p.hidden, 'void(%V%)', true) + '</div></div>' +
       '<div class="row"><div class="lbl"><span class="req">*</span>알리페이 노출<span class="newbadge">신규</span></div><div class="val"><span class="rg">' +
       radio('pv', '노출', langOk ? p.aliVisible : '노출', "setVis('product','노출')", !langOk) + radio('pv', '미노출', langOk ? p.aliVisible : '노출', "setVis('product','미노출')", !langOk) + '</span>' +
       (langOk ? '' : '<div class="hint">' + MSG.langOnly(p.lang, '이 상품은') + '</div>') +
@@ -763,9 +762,8 @@ function modal_product() {
       radio('pm', '개별 설정', p.mode, "setMode('개별 설정')") + radio('pm', '기본 설정', p.mode, "setMode('기본 설정')") + '</span>' +
       (p.mode === '기본 설정' ? '' : '<div class="hint">' + MSG.storeDefault + '</div>') + '</div></div>' +
       btnTable('product', p) +
-      '<div class="row" style="margin-top:14px"><div class="lbl">메신저</div><div class="val"><span class="tblnote">인스타그램 (기존)</span></div></div>' +
-      '<div class="row"><div class="lbl">인스타그램 임베디드 노출 여부</div><div class="val">' + onoff('pins', p.insta === 'ON', 'void(%V%)', true) +
-      "<div class=\"note\"><b>시안 설명</b>" + '기존 항목입니다. 값은 그대로 두고 알리페이 앱에서만 이 영역을 숨깁니다.</div></div></div>';
+      '<div class="row" style="margin-top:14px"><div class="lbl">메신저</div><div class="val"><span class="tblnote">인스타그램</span></div></div>' +
+      '<div class="row"><div class="lbl">인스타그램 임베디드 노출 여부</div><div class="val">' + onoff('pins', p.insta === 'ON', 'void(%V%)', true);
   }
   return '<div class="mask"><div class="modal" style="max-width:900px"><div class="hd">상품정보 수정<button class="x" onclick="closeMD()">✕</button></div>' +
     '<div class="mtabs">' + tabs.map((t, i) => '<div class="mtab ' + (i === VIEW.tab ? 'on' : '') + '" onclick="VIEW.tab=' + i + ';render()">' + t + '</div>').join('') + '</div>' +
@@ -793,7 +791,7 @@ function screen_sList() {
     '<th class="new">알리페이 노출<span class="newbadge">신규</span></th><th class="new">사유<span class="newbadge">신규</span></th>' +
     '<th>카테고리</th><th>지원언어</th><th>대표번호</th><th>사업자번호</th><th>이메일</th><th>우편번호</th><th>지역</th><th>위도</th><th>경도</th><th>지하철 정보</th><th>Actions</th>' +
     '</tr></thead><tbody>' + (body || empty(17)) + '</tbody></table></div></div>' +
-    '<div class="card"><div class="bd">' + "<div class=\"note\"><b>시안 설명</b>" + '스토어는 언어를 나누지 않아 알리페이 노출도 하나입니다. 목록에 언어 필터가 있어도 두 칼럼의 결과는 언어에 따라 달라지지 않습니다.</div></div></div>';
+    '<div class="card"><div class="bd">';
 }
 
 /* ------------------- 스토어 정보 수정 (실측: 섹션 앵커 페이지) ------------------- */
@@ -811,9 +809,9 @@ function screen_sEdit() {
       (st.aliVisible === '미노출' ? '<div class="notice">' + MSG.storeHide(st.prodCount) + '</div>' : '') +
       (st.aliVisible === '노출' && onCount(effStoreBtns(st).btns, ROWS_STORE, 'ali') === 0 ? '<div class="notice">' + MSG.noAliBtn('이 스토어는', '버튼 및 메신저 설정') + '</div>' : '') + '</div></div></div>' +
       '<div class="langtabs">' + ['원본'].concat(STORE_TABS).map(l => '<div class="langtab ' + (l === '원본' ? 'on' : '') + '">' + l + '</div>').join('') + '</div>' +
-      '<div class="bd"><div class="row"><div class="lbl">스토어명</div><div class="val">' + esc(st.name) + ' <span class="tblnote">(기존)</span></div></div>' +
-      '<div class="row"><div class="lbl">메인 문구</div><div class="val"><span class="tblnote">0 / 20 (기존)</span></div></div>' +
-      "<div class=\"note\"><b>시안 설명</b>" + '소속 상품 ' + st.prodCount + '건은 스토어 데이터의 전체 상품 수입니다. 이 시안 목록에는 그중 일부만 넣었습니다. 언어 탭 아래는 언어마다 따로 쓰는 항목입니다.</div></div>';
+      '<div class="bd"><div class="row"><div class="lbl">스토어명</div><div class="val">' + esc(st.name) + '</div></div>' +
+      '<div class="row"><div class="lbl">메인 문구</div><div class="val"><span class="tblnote">0 / 20</span></div></div>' +
+      '</div>';
   } else if (i === 8) {
     bd = '<div class="bd"><div class="row"><div class="lbl"><span class="req">*</span>예약 사용</div><div class="val">' +
       onoff('sbk', st.bookingEnabled, 'setBooking(%V%)', false, ['사용', '미사용']) +
@@ -825,13 +823,12 @@ function screen_sEdit() {
     bd = '<div class="bd">' + btnTable('store', st) +
       '<div class="blk">언어별 메신저 설정</div><div class="hint" style="margin-top:0">' + MSG.msgLang + '</div>' +
       '<div class="langtabs" style="padding:0;margin-top:10px;border-bottom:1px solid #f0f0f0">' + STORE_TABS.map((l, k) => '<div class="langtab ' + (k === 0 ? 'on' : '') + '">' + l + '</div>').join('') + '</div>' +
-      '<div class="row" style="margin-top:12px"><div class="lbl">기본채널</div><div class="val"><span class="tblnote">' + (st.messenger.length ? st.messenger[0].base : '미사용') + ' (기존)</span></div></div>' +
-      '<div class="row"><div class="lbl">유형</div><div class="val"><span class="tblnote">' + (st.messenger.length ? st.messenger[0].type : '-') + ' (기존)</span></div></div>' +
+      '<div class="row" style="margin-top:12px"><div class="lbl">기본채널</div><div class="val"><span class="tblnote">' + (st.messenger.length ? st.messenger[0].base : '미사용') + '</span></div></div>' +
+      '<div class="row"><div class="lbl">유형</div><div class="val"><span class="tblnote">' + (st.messenger.length ? st.messenger[0].type : '-') + '</span></div></div>' +
       '<div class="row"><div class="lbl">메신저 링크 URL</div><div class="val"><span class="mono">' + (st.messenger.length ? esc(st.messenger[0].url) : '-') + '</span></div></div>' +
-      '<div class="row"><div class="lbl">메신저 QR코드 이미지</div><div class="val"><span class="tblnote">이미지 업로드 (기존)</span></div></div>' +
-      "<div class=\"note\"><b>시안 설명</b>" + '언어별 메신저는 지금 구조 그대로입니다. 알리페이 쪽 버튼과는 상관이 없습니다.</div></div>';
+      '<div class="row"><div class="lbl">메신저 QR코드 이미지</div><div class="val"><span class="tblnote">이미지 업로드</span></div></div>';
   } else {
-    bd = '<div class="bd">' + "<div class=\"note\"><b>시안 설명</b>" + '이번 작업 범위가 아닌 섹션입니다. 노출정보, 예약설정, 버튼 및 메신저 설정을 확인해 주세요.</div></div>';
+    bd = '<div class="bd">';
   }
   return '<div class="phd"><div><h2 class="page">스토어 정보 수정</h2><div class="pdesc">' + esc(st.name) + '</div><div class="pdesc">스토어 기본 정보와 운영 설정을 수정합니다.</div></div></div>' +
     '<div class="anchors" style="justify-content:space-between;align-items:center">' +
@@ -920,10 +917,9 @@ function modal_ad() {
     '<select onchange="setAdLinkType(this.value)">' + ['외부링크', '내부링크', '내부이미지랜딩페이지'].map(v => '<option' + (v === b.linkType ? ' selected' : '') + '>' + v + '</option>').join('') + '</select></div></div>';
   if (isExt) h += '<div class="row"><div class="lbl"><span class="req">*</span>외부링크</div><div class="val"><input type="text" style="width:100%" value="' + esc(b.url) + '"></div></div>';
   if (b.linkType === '내부링크') h += '<div class="row"><div class="lbl"><span class="req">*</span>내부링크</div><div class="val">' +
-    innerPicker('setAdInnerKind(this.value)', 'setAdInnerId(this.value)', b.inner) +
-    "<div class=\"note\"><b>시안 설명</b>" + '앞은 내부링크 종류, 뒤는 연결할 대상입니다. 병원과 기획전만 알리페이 앱에 보이는지 확인하고, 인플루언서와 직접입력은 확인하지 않습니다.</div></div></div>';
-  h += '<div class="row"><div class="lbl"><span class="req">*</span>대표 이미지</div><div class="val"><span class="tblnote">banner_' + b.id + '.jpg (기존)</span></div></div>';
-  if (isLanding) h += '<div class="row"><div class="lbl"><span class="req">*</span>상세 이미지</div><div class="val"><span class="tblnote">landing_' + b.id + '.jpg (기존)</span></div></div>';
+    innerPicker('setAdInnerKind(this.value)', 'setAdInnerId(this.value)', b.inner);
+  h += '<div class="row"><div class="lbl"><span class="req">*</span>대표 이미지</div><div class="val"><span class="tblnote">banner_' + b.id + '.jpg</span></div></div>';
+  if (isLanding) h += '<div class="row"><div class="lbl"><span class="req">*</span>상세 이미지</div><div class="val"><span class="tblnote">landing_' + b.id + '.jpg</span></div></div>';
   let tail = '';
   if (langOk && b.aliVisible === '노출') {
     if (j.reason === '알리페이 버튼 없음' && !extBtn) tail = '<div class="notice">' + MSG.bnBtnOff + '</div>';
@@ -943,8 +939,7 @@ function modal_ad() {
       '<select onchange="setBtnLinkKind(this.value)">' + ['링크없음', '외부링크', '내부링크'].map(v => '<option' + (v === b.btn.linkKind ? ' selected' : '') + '>' + v + '</option>').join('') + '</select></div></div>' +
       (b.btn.linkKind === '외부링크' ? '<div class="row"><div class="lbl">버튼 링크</div><div class="val"><input type="text" style="width:100%" value="' + esc(b.btn.url || '') + '"></div></div>' : '') +
       (b.btn.linkKind === '내부링크' ? '<div class="row"><div class="lbl">버튼 링크</div><div class="val">' +
-        innerPicker('setBtnInnerKind(this.value)', 'setBtnInnerId(this.value)', b.btn.inner) +
-        "<div class=\"note\"><b>시안 설명</b>" + '배너 자체의 내부링크와 같은 방식으로 고릅니다.</div></div></div>' : '');
+        innerPicker('setBtnInnerKind(this.value)', 'setBtnInnerId(this.value)', b.btn.inner) + '</div></div>' : '');
   }
   h += tail;
   return '<div class="mask"><div class="modal" style="max-width:720px"><div class="hd">수정<button class="x" onclick="closeMD()">✕</button></div>' +
@@ -1039,7 +1034,7 @@ function modal_coll() {
       (COLLPICK ? '<div class="pickrow"><div class="frow"><select id="addst">' + addable.map(x => '<option value="' + x.id + '">' + esc(x.name) + '</option>').join('') + '</select>' +
         '<button class="btn" onclick="addCollStore(document.getElementById(\'addst\').value)"' + (addable.length ? '' : ' disabled') + '>추가</button>' +
         '<button class="btn" onclick="collPick(false)">닫기</button></div>' +
-        '<div class="note" style="margin:8px 0 0"><b>시안 설명</b>실제 화면은 상품 추가와 같은 검색 창이 뜹니다. 이 시안에서는 목록에서 고르게 했습니다.</div></div>' : '') +
+        '</div>' : '') +
       '<div class="tblwrap"><table><thead><tr>' + allChk + '<th>스토어명</th><th>조회수</th><th>클릭수</th>' +
       '<th class="new">알리페이 노출<span class="newbadge">신규</span></th><th>action</th></tr></thead><tbody>' + (storeRows || emptyRow(6, '스토어')) + '</tbody></table></div></div>'
     : '<div class="compcard"><div class="chd"><b>상품 ' + c.products.length + '개 선택</b><span class="frow">' +
@@ -1048,7 +1043,7 @@ function modal_coll() {
       (COLLPICK ? '<div class="pickrow"><div class="frow"><select id="addpd">' + addableP.map(x => '<option value="' + x.id + '">' + esc(x.name) + ' · ' + x.lang + '</option>').join('') + '</select>' +
         '<button class="btn" onclick="addCollProduct(document.getElementById(\'addpd\').value)"' + (addableP.length ? '' : ' disabled') + '>추가</button>' +
         '<button class="btn" onclick="collPick(false)">닫기</button></div>' +
-        '<div class="note" style="margin:8px 0 0"><b>시안 설명</b>실제 화면은 검색 창이 뜹니다. 이 시안에서는 목록에서 고르게 했습니다.</div></div>' : '') +
+        '</div>' : '') +
       '<div class="tblwrap"><table><thead><tr>' + allChk + '<th>No.</th><th>상품명</th><th>언어</th><th>스토어명(언어)</th>' +
       '<th class="new">알리페이 노출<span class="newbadge">신규</span></th>' +
       '<th>가격</th><th>노출수</th><th>클릭수</th><th>조회수</th><th>스토어 활성화</th><th>상품 활성화</th><th>히든</th><th>action</th></tr></thead><tbody>' + (prodRows || emptyRow(14, '상품')) + '</tbody></table></div></div>';
@@ -1073,15 +1068,13 @@ function modal_coll() {
 /* --------------------------- 호스트 상품 수정 --------------------------- */
 function screen_hEdit() {
   const p = P('P8'), j = judgeProduct(p);
-  return '<div class="phd"><div><h2 class="page">상품 수정</h2><div class="pdesc">내 상품 &gt; ' + esc(p.name) + ' (호스트 화면)</div></div></div>' +
+  return '<div class="phd"><div><h2 class="page">상품 수정</h2><div class="pdesc">내 상품 &gt; ' + esc(p.name) + '</div></div></div>' +
     (j.na || j.visible ? '' : '<div class="card"><div class="bd"><div class="notice">' + MSG.hostHidden + '</div>' +
       '<div class="hint">알리페이 앱 노출은 K-Beauty Station 담당자에게 문의해 주세요.</div></div></div>') +
     '<div class="card"><div class="hd">상품 정보</div><div class="bd">' +
     '<div class="row"><div class="lbl">상품명</div><div class="val">' + esc(p.name) + '</div></div>' +
     '<div class="row"><div class="lbl">언어</div><div class="val">' + p.lang + '</div></div>' +
-    '<div class="row"><div class="lbl">상품 설명</div><div class="val"><span class="tblnote">간략 설명과 사진 올리기 (기존)</span></div></div>' +
-    "<div class=\"note\"><b>시안 설명</b>" + '호스트 화면에는 알리페이 관련 설정이 없습니다. 호스트가 상품을 올리면 알리페이 앱에도 보이도록 자동 저장되고, 버튼은 스토어에 설정한 것을 따릅니다. 상품에는 본문 에디터가 없어 링크를 막을 일도 없습니다.</div>' +
-    '</div></div>';
+    '<div class="row"><div class="lbl">상품 설명</div><div class="val"><span class="tblnote">간략 설명과 사진 올리기</span></div></div>' + '</div></div>';
 }
 
 /* --------------------- BO-CH-10 · 버튼 설정 공통 구조 --------------------- */
@@ -1109,18 +1102,14 @@ function screen_btnSpec() {
     '<div class="card"><div class="hd">표 구조</div><div class="bd"><div class="tblwrap">' +
     '<table><thead><tr><th style="min-width:300px">항목</th><th style="width:220px">웹</th>' +
     '<th class="new" style="width:220px">알리페이<span class="newbadge">신규</span></th><th style="min-width:320px">항목별 안내</th></tr></thead>' +
-    '<tbody>' + rows + '</tbody></table></div>' +
-    "<div class=\"note\"><b>시안 설명</b>" + '표 폭은 항목 300입니다. 웹과 알리페이는 스토어 정보 수정에서 각각 220, 상품 수정 모달에서 각각 180입니다. 칸은 ON·OFF 라디오이고 필수 표시는 기존과 같습니다.</div>' +
-    '</div></div>' +
+    '<tbody>' + rows + '</tbody></table></div>' + '</div></div>' +
     '<div class="card"><div class="hd">버튼 개수 세는 법</div><div class="bd">' +
     '<div class="row"><div class="lbl">세는 법</div><div class="val">문의하기 통합을 켜면 문의하기 버튼 하나로 셉니다(상담접수 포함). 통합을 끄고 상담접수만 켜면 상담접수 버튼 하나입니다. 채팅, 외부링크, 메신저, 예약은 각각 버튼 하나입니다.</div></div>' +
     '<div class="row"><div class="lbl">최대 개수</div><div class="val">웹 2개, 알리페이 앱 2개까지입니다. 두 곳을 각각 2개씩 켤 수 있고, 세 번째를 켜려 하면 막습니다.</div></div>' +
     '<div class="row"><div class="lbl">지금 예시</div><div class="val">웹 2개(문의하기, 예약), 알리페이 앱 2개(문의하기, 예약)입니다. 최대 개수에 딱 맞습니다.</div></div>' +
     '</div></div>' +
     '<div class="card"><div class="hd">알리페이 앱에서 켠 버튼이 없을 때</div><div class="bd">' +
-    '<div class="notice">' + MSG.noAliBtn('이 상품은') + '</div>' +
-    "<div class=\"note\"><b>시안 설명</b>" + '이 안내는 버튼 설정 표 아래에 나옵니다. 알리페이 노출 라디오는 그대로 누를 수 있습니다.</div>' +
-    '</div></div>';
+    '<div class="notice">' + MSG.noAliBtn('이 상품은') + '</div>' + '</div></div>';
 }
 
 /* --------------------- BO-CH-07 · 매거진 등록·수정 --------------------- */
@@ -1165,17 +1154,13 @@ function screen_mEdit() {
     '<div class="card"><div class="hd">기본 정보</div><div class="bd">' +
     '<div class="row"><div class="lbl">제목</div><div class="val">' + esc(m.title) + '</div></div>' +
     '<div class="row"><div class="lbl">언어</div><div class="val">' + m.lang + '</div></div>' +
-    '<div class="row"><div class="lbl">상태</div><div class="val"><span class="tag on">' + m.status + '</span> <span class="tblnote">기존 항목</span></div></div>' +
-    "<div class=\"note\"><b>시안 설명</b>" + '매거진은 알리페이 노출 설정 대상이 아니라 관련 항목이 없습니다.</div>' +
-    '</div></div>' +
+    '<div class="row"><div class="lbl">상태</div><div class="val"><span class="tag on">' + m.status + '</span></div></div>' + '</div></div>' +
     '<div class="card"><div class="hd">본문<span class="newbadge">링크 차단 신규</span></div><div class="bd">' +
     '<div class="frow" style="margin-bottom:10px"><button class="btn" onclick="openLinkModal()">링크 넣기</button>' +
     '<span class="tblnote" style="align-self:center">' + MSG.edBlock + '</span></div>' +
     '<textarea oninput="EDBUF=this.value">' + esc(cur) + '</textarea>' +
     (sc.ext.length || sc.emb.length ? '<div class="notice">지금 본문에 외부 사이트 주소 ' + sc.ext.length + '개, 외부에서 불러온 영상·SNS ' + sc.emb.length + '개가 남아 있습니다. 저장하면 지웁니다.</div>' : '') +
-    '<div class="hint">넣은 주소는 저장할 때 K-Beauty Station 안의 주소 형태로 바뀝니다.</div>' +
-    "<div class=\"note\"><b>시안 설명</b>" + '내부 주소인지는 도메인이 정확히 같은지로 봅니다. http, https, 그리고 슬래시로 시작하는 주소만 넣을 수 있습니다.</div>' +
-    '</div><div class="ft"><button class="btn" onclick="EDBUF=null;render()">취소</button>' +
+    '<div class="hint">넣은 주소는 저장할 때 K-Beauty Station 안의 주소 형태로 바뀝니다.</div>' + '</div><div class="ft"><button class="btn" onclick="EDBUF=null;render()">취소</button>' +
     '<button class="btn blue" onclick="saveMagazine()">저장</button></div></div>';
 }
 function modal_link() {
