@@ -170,10 +170,10 @@ const ROWS_PRODUCT = [
 const ROWS_STORE = [...ROWS_PRODUCT, { k: 'booking', label: '예약', needBooking: true }];
 
 const MSG = {
-  noAliBtn:    (s, where) => '알리페이 앱 버튼이 없어 알리페이에 노출되지 않습니다.' + (where ? ' ' + where + '에서 1개 이상 켜세요.' : ''),
+  noAliBtn:    (s, where) => '알리페이 앱 버튼이 없어 알리페이에 노출되지 않습니다.' + (where ? ' ' + where + '에서 1개 이상 켜면 노출됩니다.' : ''),
   hardOff:     '알리페이 앱 미지원 항목입니다.',
-  needConsult: '상담접수를 먼저 켜세요.',
-  needBooking: '예약설정에서 예약 사용을 켜세요.',
+  needConsult: '상담접수를 켜면 사용할 수 있습니다.',
+  needBooking: '예약설정에서 예약을 사용하면 켤 수 있습니다.',
   cap:         '웹·알리페이 앱 각 2개까지 켤 수 있습니다.',
   langOnly:    (L, s) => L + '는 알리페이 대상 언어가 아닙니다. 중국어(간체)·중국어(번체)·영어만 노출됩니다.',
   exhEmpty:    s => '노출 가능한 ' + s + ' 없습니다. 기획전이 알리페이에 노출되지 않습니다.',
@@ -190,14 +190,14 @@ const MSG = {
   bnExtLock:   '외부링크 배너는 알리페이에 노출되지 않습니다. 이 설정은 수정할 수 없습니다.',
   bnBtnExtLock:'하단 버튼이 외부링크입니다. 알리페이 앱에서 켤 수 없어 배너도 노출되지 않습니다.',
   lockSelf:    '미노출 상태에서는 알리페이 앱 버튼을 수정할 수 없습니다. 설정값은 유지됩니다.',
-  lockStore:   '소속 스토어가 미노출입니다. 스토어 정보 관리 > 노출정보에서 변경하세요.',
+  lockStore:   '소속 스토어가 미노출입니다. 스토어 정보 관리 > 노출정보에서 변경할 수 있습니다.',
   bnBtnOff:    '하단 버튼이 알리페이 앱에서 꺼져 있어 배너가 노출되지 않습니다.',
   bnTarget:    t => '연결 대상(' + t + ')이 미노출입니다. 배너도 알리페이에 노출되지 않습니다.',
   hostHidden:  '이 상품은 알리페이 앱에서는 보이지 않아요.',
   storeDefault:'기본 설정은 스토어 버튼 구성을 그대로 적용합니다.',
   msgLang:     '메신저 설정을 켜면 언어별로 1개씩 등록할 수 있습니다.',
   edBlock:     '외부 사이트 주소는 입력할 수 없습니다.',
-  edBlockErr:  '외부 사이트 주소입니다. K-Beauty Station 내부 주소만 입력하세요.',
+  edBlockErr:  '외부 사이트 주소입니다. K-Beauty Station 내부 주소만 입력할 수 있습니다.',
   edStrip:     (u, e) => [u ? '외부 사이트 주소 ' + u + '개' : '', e ? '외부 영상·SNS ' + e + '개' : ''].filter(Boolean).join(', ') + '를 삭제했습니다.',
   saveDone:    '목록과 고객 화면에 즉시 반영됩니다.'
 };
@@ -584,8 +584,8 @@ function btnTable(kind, obj) {
       if (offWeb) webDis = true;
       if (offAli) aliDis = true;
       if (offWeb && offAli) note = MSG.needConsult;
-      else if (offWeb) note = '웹 상담접수를 먼저 켜세요.';
-      else if (offAli) note = '알리페이 앱 상담접수를 먼저 켜세요.';
+      else if (offWeb) note = '웹 상담접수를 켜면 사용할 수 있습니다.';
+      else if (offAli) note = '알리페이 앱 상담접수를 켜면 사용할 수 있습니다.';
     }
     if (r.needBooking && !obj.bookingEnabled) { webDis = true; aliDis = true; note = MSG.needBooking; }
     if (r.k === 'chat' && !isStore && eff.chatAuto) note = '스토어 버튼이 없어 채팅이 자동 적용됩니다.';
@@ -601,9 +601,9 @@ function btnTable(kind, obj) {
     ' · 알리페이 앱 ' + aliCnt + '개' + (aliCta.length ? ' (' + aliCta.join(' / ') + ')' : '') + ' · 각 2개까지</div>';
   if (webCnt > CAP || aliCnt > CAP) {
     const over = [webCnt > CAP ? '웹 버튼 ' + webCnt + '개' : '', aliCnt > CAP ? '알리페이 앱 버튼 ' + aliCnt + '개' : ''].filter(Boolean).join(', ');
-    html += '<div class="notice red">' + over + '입니다. 채널당 2개 이하로 조정 후 저장하세요.</div>';
+    html += '<div class="notice red">' + over + '입니다. 채널당 2개 이하여야 저장할 수 있습니다.</div>';
   }
-  if (locked) html += '<div class="hint">기본 설정 적용 중입니다. 수정하려면 개별 설정을 선택하세요.</div>';
+  if (locked) html += '<div class="hint">기본 설정 적용 중입니다. 개별 설정을 선택하면 수정할 수 있습니다.</div>';
   else if (selfHidden) html += '<div class="hint">' + MSG.lockSelf + '</div>';
   if (langOk && !selfHidden && !storeHidden && aliCnt === 0) html += '<div class="notice">' + MSG.noAliBtn(isStore ? '이 스토어는' : '이 상품은', isStore ? '' : '아래 버튼 설정') + '</div>';
   return html;
@@ -621,7 +621,7 @@ window.setBtn = function (kind, k, ch, on) {
     const e1 = kind === 'store' ? effStoreBtns(obj) : effBtns(obj);
     const after = onCount(e1.btns, rows, ch);
     obj.btns[k][ch] = keep;
-    if (after > CAP) { alertBox('켤 수 없습니다', (ch === 'web' ? '웹' : '알리페이 앱') + ' 버튼은 2개까지 켤 수 있습니다. 현재 ' + already.join(', ') + '이 켜져 있습니다. 하나를 먼저 끄세요.'); render(); return; }
+    if (after > CAP) { alertBox('켤 수 없습니다', (ch === 'web' ? '웹' : '알리페이 앱') + ' 버튼은 2개까지 켤 수 있습니다. 현재 ' + already.join(', ') + '이 켜져 있습니다. 하나를 끄면 켤 수 있습니다.'); render(); return; }
   }
   const before = obj.btns[k][ch] ? 'ON' : 'OFF';
   obj.btns[k][ch] = !!on;
@@ -667,7 +667,7 @@ window.setBooking = function (on) {
     st.bookingEnabled = keep;
     if (w > CAP || a > CAP) {
       const over = w > CAP ? '웹' : '알리페이 앱';
-      alertBox('예약을 켤 수 없습니다', '예약을 켜면 ' + over + ' 버튼이 ' + Math.max(w, a) + '개가 됩니다. 다른 버튼을 먼저 끄세요.');
+      alertBox('예약을 켤 수 없습니다', '예약을 켜면 ' + over + ' 버튼이 ' + Math.max(w, a) + '개가 됩니다. 다른 버튼을 끄면 켤 수 있습니다.');
       render(); return;
     }
   }
@@ -1205,7 +1205,7 @@ window.save = function (kind) {
   if (webCnt > CAP || aliCnt > CAP) {
     const wc = ctaList(eff.btns, rows, 'web'), ac = ctaList(eff.btns, rows, 'ali');
     alertBox('저장할 수 없습니다', MSG.cap + ' 지금은 웹 ' + webCnt + '개' + (wc.length ? '(' + wc.join(' / ') + ')' : '') +
-      ', 알리페이 앱 ' + aliCnt + '개' + (ac.length ? '(' + ac.join(' / ') + ')' : '') + '가 나갑니다. 2개로 줄인 뒤 저장해 주세요.');
+      ', 알리페이 앱 ' + aliCnt + '개' + (ac.length ? '(' + ac.join(' / ') + ')' : '') + '입니다. 채널당 2개 이하여야 저장할 수 있습니다.');
     return;
   }
   // 스토어를 이번 편집에서 미노출로 바꿨고 소속 상품이 10건 이상이면 저장 시 영향 범위를 확인한다
