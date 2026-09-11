@@ -196,6 +196,7 @@ const MSG = {
   hostHidden:  '이 상품은 알리페이 앱에서는 보이지 않아요.',
   storeDefault:'기본 설정은 스토어 버튼 구성을 그대로 적용합니다.',
   msgLang:     '메신저 설정을 켜면 언어별로 1개씩 등록할 수 있습니다.',
+  pending:     '알리페이 노출 상태를 확인하지 못했습니다. 다시 계산될 때까지 알리페이에 노출되지 않습니다.',
   edBlock:     '외부 사이트 주소는 입력할 수 없습니다.',
   edBlockErr:  '외부 사이트 주소입니다. K-Beauty Station 내부 주소만 입력할 수 있습니다.',
   edStrip:     (u, e) => [u ? '외부 사이트 주소 ' + u + '개' : '', e ? '외부 영상·SNS ' + e + '개' : ''].filter(Boolean).join(', ') + '를 삭제했습니다.',
@@ -303,9 +304,10 @@ const DB = {
       products: [], stores: [], history: [] }
   ],
   influencers: [{ id: 'IF1', name: '지우 (@jiwoo)' }],
+  /* 판정 계산에 실패한 건. 서버가 다시 계산하면 사라진다 */
+  pending: { P9: true },
   magazines: [{ id: 'M1', title: '가을 두피 관리 가이드', lang: '중국어(간체)', status: '게시', reg: '2026-09-02 11:20',
     body: '가을에는 두피가 건조해집니다. 자세한 코스는 <a href="https://k-beautystation.com/products/P1">상품 페이지</a>에서 확인하세요. 후기 영상은 https://www.instagram.com/p/abc/ 에서 볼 수 있습니다. <iframe src="https://www.youtube.com/embed/xyz"></iframe>' }],
-  errors: {}
 };
 /* 에디터 링크 판정 (BO-CH-07). 본문 에디터는 매거진과 스토어 칼럼에만 있다. */
 const INTERNAL_HOSTS = ['k-beautystation.com', 'www.k-beautystation.com', 'host.kbstations.com', 'admin.k-beautystation.com'];
@@ -393,8 +395,7 @@ function judgeProduct(p) {
   if (!c1) reason = '직접 끔';
   else if (!c3) reason = '스토어 설정';
   else if (!c2) reason = '알리페이 버튼 없음';
-  else if (DB.errors[p.id]) reason = '확인 실패';
-  if (reason === '확인 실패') conds.push({ s: 'no', t: '대상 조회 오류로 판정 실패. 미노출로 두고 재판정 큐가 처리한다.' });
+  if (DB.pending[p.id]) return { na: false, visible: false, reason: '', pending: true, conds };
   return { na: false, visible: !reason, reason, conds };
 }
 function judgeStore(st) {
@@ -409,9 +410,8 @@ function judgeStore(st) {
   let reason = '';
   if (!c1) reason = '직접 끔';
   else if (!c2) reason = '알리페이 버튼 없음';
-  else if (DB.errors[st.id]) reason = '확인 실패';
   if (!c2 && c1) conds.push({ s: 'sk', t: '스토어 페이지만 보이지 않고, 소속 상품은 각자 조건대로 나간다.' });
-  if (reason === '확인 실패') conds.push({ s: 'no', t: '대상 조회 오류로 판정 실패. 재판정 큐가 처리한다.' });
+  if (DB.pending[st.id]) return { na: false, visible: false, reason: '', pending: true, conds };
   return { na: false, visible: !reason, reason, conds };
 }
 // 내부링크 대상 판정. 병원·기획전만 보고 인플루언서·직접입력은 그대로 통과한다.
@@ -450,9 +450,9 @@ function judgeAd(b) {
   else if (ext) reason = '외부 연결';
   else if (noBtn) reason = '알리페이 버튼 없음';
   else if (targetOut) reason = '연결 대상 미노출';
-  else if (DB.errors[b.id]) reason = '확인 실패';
   /* 미노출과 외부링크가 겹치면 두 원인을 모두 적는다. 사유는 우선순위대로 하나만 쓴다 */
   if (!c1 && ext) conds.push({ s: 'no', t: '알리페이 노출이 미노출이고 링크종류도 외부링크다. 사유는 우선순위에 따라 직접 끔으로 적는다.' });
+  if (DB.pending[b.id]) return { na: false, visible: false, reason: '', pending: true, conds, targetLabel: '' };
   return { na: false, visible: !reason, reason, conds, targetLabel: targetOut || '' };
 }
 // 기획전 조건 ④ = 유형에 맞는 구성 항목만 센다. 추천상품은 상품, 병원은 스토어.
@@ -479,7 +479,7 @@ function judgeCollection(c) {
   let reason = '';
   if (!c1) reason = '직접 끔';
   else if (!live) reason = '노출 가능 항목 없음';
-  else if (DB.errors[c.id]) reason = '확인 실패';
+  if (DB.pending[c.id]) return { na: false, visible: false, reason: '', pending: true, conds, liveCount: live };
   return { na: false, visible: !reason, reason, conds, liveCount: live };
 }
 
@@ -495,7 +495,7 @@ function go(name, id) { if (VIEW.name === 'm-edit' && name !== 'm-edit') window.
 window.go = go;
 
 const aliLangOk = () => ALI_LANGS.indexOf(VIEW.lang) !== -1;
-const visCell = j => j.na ? '<span class="tag na">-</span>' : (j.visible ? '<span class="tag on">노출</span>' : '<span class="tag off">미노출</span>');
+const visCell = j => j.na ? '<span class="tag na">-</span>' : j.pending ? '<span class="tag na">확인 중</span>' : (j.visible ? '<span class="tag on">노출</span>' : '<span class="tag off">미노출</span>');
 const rsnCell = j => j.na ? '<span class="tblnote">-</span>' : (j.reason ? '<span class="tag rsn">' + j.reason + '</span>' : '');
 
 function radio(nm, val, cur, handler, dis) {
@@ -656,7 +656,6 @@ window.setMode = function (v) {
   logChange(p, '스토어 설정 적용', p.mode, v, fromDefault ? '웹은 스토어 값을 복사하고 알리페이는 비움' : '');
   p.mode = v; render();
 };
-window.setErr = function (id, on) { if (on) DB.errors[id] = true; else delete DB.errors[id]; render(); };
 window.setBooking = function (on) {
   const st = S(VIEW.id);
   if (on && !st.bookingEnabled) {
@@ -724,7 +723,7 @@ function screen_pList() {
     '<div class="card"><div class="filters">' +
     '<div class="frow">' + dimSel('심사상태', ['심사상태']) + dimSel('활성', ['활성']) + dimSel('히든', ['히든']) + langSelect() + dimSel('카테고리', ['카테고리']) + dimSel('스토어 선택', ['스토어 선택']) + '</div>' +
     '<div class="frow">' + dimSel('세부분류', ['세부분류']) + dimSel('Vat포함', ['Vat포함']) + dimSel('전/후사진 연결 여부', ['전/후사진 연결 여부']) + dimSel('외부링크 활성 여부', ['외부링크 활성 여부']) + '</div>' +
-    '<div class="frow">' + aliFilterRow(['전체', '직접 끔', '스토어 설정', '알리페이 버튼 없음', '확인 실패']) + dimSel('단독 상품 포함 여부', ['단독 상품 포함 여부']) + dimSel('등록일', ['등록일']) + '</div>' +
+    '<div class="frow">' + aliFilterRow(['전체', '직접 끔', '스토어 설정', '알리페이 버튼 없음']) + dimSel('단독 상품 포함 여부', ['단독 상품 포함 여부']) + dimSel('등록일', ['등록일']) + '</div>' +
     '<div class="frow"><button class="btn">오늘</button><button class="btn">어제</button><button class="btn">이번주</button><button class="btn">이번달</button>' +
     '<input type="text" placeholder="Start date" style="width:120px"> ~ <input type="text" placeholder="End date" style="width:120px"></div>' +
     '<div class="frow"><input type="text" placeholder="검색어" style="width:220px"><button class="btn blue">검색</button></div>' +
@@ -734,7 +733,7 @@ function screen_pList() {
 /* ------------------ 상품정보 수정 모달 (실측: 탭 2개, Cancel/OK) ------------------ */
 window.openProduct = function (id) { VIEW.id = id; VIEW.tab = 1; MODAL = 'product'; render(); };
 function modal_product() {
-  const p = P(VIEW.id), st = S(p.store), langOk = ALI_LANGS.indexOf(p.lang) !== -1;
+  const p = P(VIEW.id), st = S(p.store), langOk = ALI_LANGS.indexOf(p.lang) !== -1, j = judgeProduct(p);
   const tabs = ['상품정보', '관리자설정'];
   let bd = '';
   if (VIEW.tab === 0) {
@@ -756,6 +755,7 @@ function modal_product() {
       radio('pv', '노출', langOk ? p.aliVisible : '노출', "setVis('product','노출')", !langOk) + radio('pv', '미노출', langOk ? p.aliVisible : '노출', "setVis('product','미노출')", !langOk) + '</span>' +
       (langOk ? '' : '<div class="hint">' + MSG.langOnly(p.lang, '이 상품은') + '</div>') +
       (langOk && st.aliVisible === '미노출' ? '<div class="notice">' + MSG.lockStore + '</div>' : '') +
+      (j.pending ? '<div class="notice">' + MSG.pending + '</div>' : '') +
       '</div></div>' +
       '<div class="blk">버튼 설정</div>' +
       '<div class="row"><div class="lbl"><span class="req">*</span>스토어 설정 적용</div><div class="val"><span class="rg">' +
@@ -783,7 +783,7 @@ function screen_sList() {
     '<div style="display:flex;gap:8px"><button class="btn">칼럼설정</button><button class="btn">신규 스토어등록</button><button class="btn">엑셀 다운로드</button></div></div>' +
     '<div class="card"><div class="filters">' +
     '<div class="frow">' + dimSel('언어', ['언어']) + dimSel('카테고리 선택', ['카테고리 선택']) + dimSel('스토어 선택', ['스토어 선택']) + dimSel('지하철정보', ['지하철정보']) + dimSel('지역', ['지역']) + '</div>' +
-    '<div class="frow">' + aliFilterRow(['전체', '직접 끔', '알리페이 버튼 없음', '확인 실패']) + '</div>' +
+    '<div class="frow">' + aliFilterRow(['전체', '직접 끔', '알리페이 버튼 없음']) + '</div>' +
     '<div class="frow"><input type="text" placeholder="검색어" style="width:220px"><button class="btn blue">검색</button></div>' +
     '</div></div>' +
     '<div class="card"><div class="hd">스토어 목록</div><div class="tblwrap"><table><thead><tr>' +
@@ -807,7 +807,8 @@ function screen_sEdit() {
       radio('sv', '노출', st.aliVisible, "setVis('store','노출')") + radio('sv', '미노출', st.aliVisible, "setVis('store','미노출')") + '</span>' +
       '<div class="hint">스토어는 언어 구분이 없습니다. 이 설정은 모든 언어에 적용됩니다.</div>' +
       (st.aliVisible === '미노출' ? '<div class="notice">' + MSG.storeHide(st.prodCount) + '</div>' : '') +
-      (st.aliVisible === '노출' && onCount(effStoreBtns(st).btns, ROWS_STORE, 'ali') === 0 ? '<div class="notice">' + MSG.noAliBtn('이 스토어는', '버튼 및 메신저 설정') + '</div>' : '') + '</div></div></div>' +
+      (st.aliVisible === '노출' && onCount(effStoreBtns(st).btns, ROWS_STORE, 'ali') === 0 ? '<div class="notice">' + MSG.noAliBtn('이 스토어는', '버튼 및 메신저 설정') + '</div>' : '') +
+      (judgeStore(st).pending ? '<div class="notice">' + MSG.pending + '</div>' : '') + '</div></div></div>' +
       '<div class="langtabs">' + ['원본'].concat(STORE_TABS).map(l => '<div class="langtab ' + (l === '원본' ? 'on' : '') + '">' + l + '</div>').join('') + '</div>' +
       '<div class="bd"><div class="row"><div class="lbl">스토어명</div><div class="val">' + esc(st.name) + '</div></div>' +
       '<div class="row"><div class="lbl">메인 문구</div><div class="val"><span class="tblnote">0 / 20</span></div></div>' +
@@ -856,7 +857,7 @@ function screen_aList() {
     '<div><button class="btn">광고등록</button></div></div>' +
     '<div class="card"><div class="filters">' +
     '<div class="frow"><button class="btn">오늘</button><button class="btn">이번주</button><button class="btn">이번달</button>' + dimSel('광고일', ['광고일']) + langSelect() + dimSel('노출위치', ['노출위치']) + dimSel('링크종류', ['링크종류']) + '</div>' +
-    '<div class="frow">' + aliFilterRow(['전체', '직접 끔', '외부 연결', '알리페이 버튼 없음', '연결 대상 미노출', '확인 실패']) + '<button class="btn blue" style="align-self:flex-end">검색</button></div>' +
+    '<div class="frow">' + aliFilterRow(['전체', '직접 끔', '외부 연결', '알리페이 버튼 없음', '연결 대상 미노출']) + '<button class="btn blue" style="align-self:flex-end">검색</button></div>' +
     '</div><div class="tblwrap"><table><thead><tr>' +
     '<th>광고등록일</th><th>광고시작일</th><th>광고종료일</th><th>언어</th><th>노출위치</th>' +
     '<th class="new">알리페이 노출<span class="newbadge">신규</span></th><th class="new">사유<span class="newbadge">신규</span></th>' +
@@ -912,7 +913,8 @@ function modal_ad() {
     '<div class="row"><div class="lbl"><span class="req">*</span>알리페이 노출<span class="newbadge">신규</span></div><div class="val"><span class="rg">' +
     radio('bv', '노출', langOk ? b.aliVisible : '노출', "setVis('ad','노출')", !langOk || visLock) + radio('bv', '미노출', langOk ? b.aliVisible : '노출', "setVis('ad','미노출')", !langOk || visLock) + '</span>' +
     (langOk ? '' : '<div class="hint">' + MSG.langOnly(b.lang, '이 배너는') + '</div>') +
-    (langOk && visLock ? '<div class="hint">' + MSG.bnExtLock + '</div>' : '') + '</div></div>' +
+    (langOk && visLock ? '<div class="hint">' + MSG.bnExtLock + '</div>' : '') +
+    (j.pending ? '<div class="notice">' + MSG.pending + '</div>' : '') + '</div></div>' +
     '<div class="row"><div class="lbl"><span class="req">*</span>링크종류</div><div class="val">' +
     '<select onchange="setAdLinkType(this.value)">' + ['외부링크', '내부링크', '내부이미지랜딩페이지'].map(v => '<option' + (v === b.linkType ? ' selected' : '') + '>' + v + '</option>').join('') + '</select></div></div>';
   if (isExt) h += '<div class="row"><div class="lbl"><span class="req">*</span>외부링크</div><div class="val"><input type="text" style="width:100%" value="' + esc(b.url) + '"></div></div>';
@@ -960,7 +962,7 @@ function screen_cList() {
     '<div><button class="btn">기획전 추가</button></div></div>' +
     '<div class="card"><div class="filters">' +
     '<div class="frow"><button class="btn">오늘</button><button class="btn">어제</button><button class="btn">이번주</button><button class="btn">이번달</button>' + dimSel('상태', ['상태']) + langSelect() + dimSel('유형', ['유형'].concat(COLL_TYPES)) + '</div>' +
-    '<div class="frow">' + aliFilterRow(['전체', '직접 끔', '노출 가능 항목 없음', '확인 실패']) + '<button class="btn blue" style="align-self:flex-end">검색</button></div>' +
+    '<div class="frow">' + aliFilterRow(['전체', '직접 끔', '노출 가능 항목 없음']) + '<button class="btn blue" style="align-self:flex-end">검색</button></div>' +
     '</div><div class="tblwrap"><table><thead><tr>' +
     '<th>기획전 상태</th><th>언어</th><th>노출 기간</th><th>유형</th><th>기획전명</th>' +
     '<th class="new">알리페이 노출<span class="newbadge">신규</span></th><th class="new">사유<span class="newbadge">신규</span></th>' +
@@ -1056,6 +1058,7 @@ function modal_coll() {
     '<div class="row"><div class="lbl"><span class="req">*</span>알리페이 노출<span class="newbadge">신규</span></div><div class="val"><span class="rg">' +
     radio('cv', '노출', langOk ? c.aliVisible : '노출', "setVis('coll','노출')", !langOk) + radio('cv', '미노출', langOk ? c.aliVisible : '노출', "setVis('coll','미노출')", !langOk) + '</span>' +
     (langOk ? '' : '<div class="hint">' + MSG.langOnly(c.lang, '이 기획전은') + '</div>') +
+    (j.pending ? '<div class="notice">' + MSG.pending + '</div>' : '') +
     (langOk && c.aliVisible === '노출' && j.liveCount === 0
       ? '<div class="notice">' + ((byStore ? c.stores.length : c.products.length) ? MSG.exhEmpty(byStore ? '스토어가' : '상품이') : MSG.exhNone(byStore ? '스토어가' : '상품이')) + '</div>' : '') + '</div></div>' +
     comp +
@@ -1186,7 +1189,7 @@ window.saveColl = function () {
   const lines = (byStore ? c.stores : c.products).map(id => {
     const o = byStore ? S(id) : P(id); if (!o) return '';
     const oj = byStore ? judgeStore(o) : judgeProduct(o);
-    const WHY = { '직접 끔': '알리페이 노출 미노출', '스토어 설정': '소속 스토어 미노출', '알리페이 버튼 없음': '알리페이 앱 버튼 없음', '확인 실패': '상태 확인 실패' };
+    const WHY = { '직접 끔': '알리페이 노출 미노출', '스토어 설정': '소속 스토어 미노출', '알리페이 버튼 없음': '알리페이 앱 버튼 없음' };
     const why = oj.na ? '대상 언어 아님' : (oj.visible ? '노출' : (WHY[oj.reason] || oj.reason));
     return '<p class="hint" style="margin:2px 0">' + esc(o.name) + ' → ' + why + '</p>';
   }).join('');
@@ -1267,7 +1270,6 @@ function railFor() {
       '<div class="result ' + cls + '">' + lab + (j.reason ? '<small>사유 : ' + j.reason + '</small>' : j.na ? '<small>대상 언어가 아닙니다. 목록에서는 두 칼럼이 "-"로 보입니다.</small>' : '<small>사유 칼럼은 비어 있습니다.</small>') + '</div>' +
       j.conds.map(c => '<div class="cond ' + c.s + '"><span class="mk">' + (c.s === 'ok' ? '✓' : c.s === 'no' ? '✕' : '·') + '</span><span>' + c.t + '</span></div>').join('') +
       '<div class="hint" style="margin-top:10px">판정 결과와 사유는 저장 컬럼(SYS-CH-01)에 두고 목록이 읽습니다. 산출 로직은 SYS-CH-02.<br>이 시안은 값을 바꾸는 즉시 결과에 반영합니다. 실제 화면의 저장 시점 처리는 기능정의서를 따릅니다. 대상 조회 오류 재현은 모달을 닫은 상태에서 켤 수 있습니다.</div>' +
-      '<div style="margin-top:12px"><label class="rd"><input type="checkbox"' + (DB.errors[obj.id] ? ' checked' : '') + ' onchange="setErr(\'' + obj.id + '\',this.checked)"><span>대상 조회 오류 재현 (사유 확인 실패)</span></label></div>' +
       '</div></div>';
   }
   html += '<div class="rail"><div class="hd">엣지케이스 시나리오</div><div class="bd">' +
@@ -1352,7 +1354,6 @@ function applyBase() {
   const b = JSON.parse(BASE);
   ['products', 'stores', 'ads', 'collections', 'magazines'].forEach(k => { DB[k].length = 0; b[k].forEach(x => DB[k].push(x)); });
   window.EDBUF = null;
-  Object.keys(DB.errors).forEach(k => delete DB.errors[k]);
 }
 function clearFilters() { Object.keys(FILTERS).forEach(k => { FILTERS[k].ali = '전체'; FILTERS[k].rsn = '전체'; }); }
 window.resetDB = function () { applyBase(); MODAL = null; VIEW.lang = '중국어(간체)'; clearFilters(); go('p-list'); };
