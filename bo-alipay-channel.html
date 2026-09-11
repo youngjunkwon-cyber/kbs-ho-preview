@@ -162,7 +162,7 @@ const MSG = {
   bnExtLock:   '외부링크 배너는 알리페이에 노출되지 않습니다. 이 설정은 수정할 수 없습니다.',
   bnBtnExtLock:'하단 버튼이 외부링크입니다. 알리페이 앱에서 켤 수 없어 배너도 노출되지 않습니다.',
   lockSelf:    '미노출 상태에서는 알리페이 앱 버튼을 수정할 수 없습니다. 설정값은 유지됩니다.',
-  lockStore:   '소속 스토어가 미노출입니다. 스토어 정보 관리 > 노출정보에서 변경할 수 있습니다.',
+  lockStore:   '스토어가 미노출이라 이 상품도 알리페이에 노출되지 않습니다. 스토어 정보 관리 > 노출정보에서 바꿀 수 있습니다.',
   bnBtnOff:    '하단 버튼이 알리페이 앱에서 꺼져 있어 배너가 노출되지 않습니다.',
   bnTarget:    t => '연결 대상(' + t + ')이 미노출입니다. 배너도 알리페이에 노출되지 않습니다.',
   hostHidden:  '이 상품은 알리페이 앱에서는 보이지 않아요.',
@@ -357,7 +357,7 @@ function judgeProduct(p) {
   const conds = [
     { s: c1 ? 'ok' : 'no', t: '① 알리페이 노출 설정 = ' + p.aliVisible },
     { s: c2 ? 'ok' : 'no', t: '② 알리페이 앱에서 누를 수 있는 버튼 ' + onCount(e.btns, ROWS_PRODUCT, 'ali') + '개' + (e.chatAuto ? ' (기본 설정 · 채팅 자동 ON)' : '') },
-    { s: c3 ? 'ok' : 'no', t: '③ 소속 스토어(' + st.name + ') 알리페이 노출 설정 = ' + st.aliVisible },
+    { s: c3 ? 'ok' : 'no', t: '③ 스토어(' + st.name + ') 알리페이 노출 설정 = ' + st.aliVisible },
     { s: 'sk', t: '고객 화면 아래에 나가는 버튼 : ' + (ctaList(e.btns, ROWS_PRODUCT, 'ali').join(' / ') || '없음') }
   ];
   let reason = '';
@@ -378,7 +378,7 @@ function judgeStore(st) {
   let reason = '';
   if (!c1) reason = '직접 끔';
   else if (!c2) reason = '알리페이 버튼 없음';
-  if (!c2 && c1) conds.push({ s: 'sk', t: '스토어 페이지만 보이지 않고, 소속 상품은 각자 조건대로 나간다.' });
+  if (!c2 && c1) conds.push({ s: 'sk', t: '스토어 페이지만 보이지 않고, 이 스토어 상품은 각자 조건대로 나간다.' });
   return { na: false, visible: !reason, reason, conds };
 }
 // 내부링크 대상 판정. 병원·기획전만 보고 인플루언서·직접입력은 그대로 통과한다.
@@ -1111,7 +1111,7 @@ window.saveColl = function () {
   const lines = (byStore ? c.stores : c.products).map(id => {
     const o = byStore ? S(id) : P(id); if (!o) return '';
     const oj = byStore ? judgeStore(o) : judgeProduct(o);
-    const WHY = { '직접 끔': '알리페이 노출 미노출', '스토어 설정': '소속 스토어 미노출', '알리페이 버튼 없음': '알리페이 앱 버튼 없음' };
+    const WHY = { '직접 끔': '알리페이 노출 미노출', '스토어 설정': '스토어가 미노출', '알리페이 버튼 없음': '알리페이 앱 버튼 없음' };
     const why = oj.na ? '대상 언어 아님' : (oj.visible ? '노출' : (WHY[oj.reason] || oj.reason));
     return '<p class="hint" style="margin:2px 0">' + esc(o.name) + ' → ' + why + '</p>';
   }).join('');
