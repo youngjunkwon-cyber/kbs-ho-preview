@@ -25,7 +25,6 @@ body{margin:0;font-family:"Noto Sans KR","Malgun Gothic",sans-serif;font-size:14
 .top .who{color:#595959;font-size:13px}
 .body{padding:24px;display:flex;gap:20px;align-items:flex-start}
 .col-main{flex:1;min-width:0}
-.col-rail{width:330px;flex:0 0 330px}
 .phd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;gap:12px;flex-wrap:wrap}
 h2.page{margin:0 0 4px;font-size:22px;font-weight:700}
 .pdesc{color:#8c8c8c;font-size:13px}
@@ -113,28 +112,6 @@ select.dim{color:#8c8c8c}
 .btn.dash{border-style:dashed;border-color:#1677ff;color:#1677ff}
 .btn.dash:hover{border-color:#1677ff;color:#1677ff}
 .pickrow{margin:0 16px 14px;padding:10px 12px;border:1px dashed #d9d9d9;border-radius:4px;background:#fafafa}
-.rail{background:#fff;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:16px}
-.rail>.hd{padding:12px 16px;border-bottom:1px solid #f0f0f0;font-weight:700;font-size:14px}
-.rail>.bd{padding:14px 16px}
-.cond{display:flex;gap:8px;padding:7px 0;font-size:13px;line-height:1.6;border-bottom:1px dashed #f0f0f0}
-.cond:last-child{border-bottom:0}
-.cond .mk{width:16px;flex:0 0 16px;font-weight:700}
-.cond.ok .mk{color:#389e0d}
-.cond.no .mk{color:#cf1322}
-.cond.sk .mk{color:#bfbfbf}
-.cond.sk{color:#8c8c8c}
-.result{padding:12px 14px;border-radius:4px;font-weight:700;margin-bottom:12px}
-.result.y{background:#f6ffed;border:1px solid #b7eb8f;color:#389e0d}
-.result.n{background:#fff1f0;border:1px solid #ffa39e;color:#cf1322}
-.result.q{background:#fafafa;border:1px solid #d9d9d9;color:#595959}
-.result small{display:block;font-weight:400;color:#595959;margin-top:4px}
-.scn{display:block;width:100%;text-align:left;padding:9px 11px;border:1px solid #f0f0f0;background:#fff;border-radius:4px;margin-bottom:6px;cursor:pointer;line-height:1.5}
-.scn:hover{border-color:#e8537a;background:#fff8fa}
-.scn b{display:block;font-size:13px}
-.scn span{font-size:12px;color:#8c8c8c}
-.toolbar{border-left:3px solid #e8537a}
-.toolbar .bd{font-size:12px;color:#595959;line-height:1.7}
-.toolbar b{color:#262626}
 </style>
 </head>
 <body>
@@ -142,7 +119,7 @@ select.dim{color:#8c8c8c}
   <nav class="side" id="side"></nav>
   <div class="main">
     <div class="top"><div class="who">관리자</div></div>
-    <div class="body"><div class="col-main" id="screen"></div><div class="col-rail" id="rail"></div></div>
+    <div class="body"><div class="col-main" id="screen"></div></div>
   </div>
 </div>
 <div id="modals"></div>
@@ -482,7 +459,6 @@ const FILTERS = { 'p-list': { ali: '전체', rsn: '전체' }, 's-list': { ali: '
 const F = () => FILTERS[VIEW.name] || { ali: '전체', rsn: '전체' };
 const el = s => document.querySelector(s);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const SCREEN_ID = { 'p-list': 'BO-CH-02 / BO-CH-01', 's-list': 'BO-CH-04', 's-edit': 'BO-CH-03', 'a-list': 'BO-CH-06 / BO-CH-05', 'c-list': 'BO-CH-09 / BO-CH-08', 'm-edit': 'BO-CH-07', 'btn-spec': 'BO-CH-10', 'h-edit': 'HOST-CH-01' };
 
 function go(name, id) { if (VIEW.name === 'm-edit' && name !== 'm-edit') window.EDBUF = null; VIEW.name = name; if (id !== undefined) VIEW.id = id; if (name === 's-edit') { VIEW.sect = 2; VIEW.savedVis = S(VIEW.id).aliVisible; } render(); window.scrollTo(0, 0); }
 window.go = go;
@@ -1213,106 +1189,7 @@ window.modalYes = function () { const f = _yes; closeModal(); if (f) f(); };
 window.modalNo = function () { const f = _no; closeModal(); if (f) f(); };
 window.alertBox = alertBox;
 
-/* --------------------------- 확인용 패널 --------------------------- */
-function railFor() {
-  let obj = null, j = null, title = '', noJudge = '';
-  if (MODAL === 'product') { obj = P(VIEW.id); j = judgeProduct(obj); title = obj.name; }
-  else if (VIEW.name === 's-edit') { obj = S(VIEW.id); j = judgeStore(obj); title = obj.name; }
-  else if (MODAL === 'ad') { obj = A(VIEW.id); j = judgeAd(obj); title = obj.title; }
-  else if (MODAL === 'coll') { obj = C(VIEW.id); j = judgeCollection(obj); title = obj.name; }
-  else if (VIEW.name === 'h-edit') { obj = P('P8'); j = judgeProduct(obj); title = obj.name; }
-  else if (VIEW.name === 'm-edit' || VIEW.name === 'btn-spec') noJudge = VIEW.name === 'm-edit'
-    ? '매거진은 알리페이 노출 설정 대상이 아닙니다. 판정이 없고 에디터의 링크 차단만 적용됩니다.'
-    : '공통 구조를 보여 주는 화면이라 판정 대상이 없습니다. 실제 판정은 상품 수정과 스토어 정보 수정에서 확인합니다.';
 
-  let html = '<div class="rail toolbar"><div class="bd">아래 패널은 화면이 아니라 로직을 확인하기 위한 도구입니다. 개발 대상이 아닙니다.<br>' +
-    '화면 골격은 라이브 어드민 실측 기준이고, 분홍색 <span class="newbadge">신규</span> 표시가 이번에 추가되는 항목입니다.<br>' +
-    '지금 화면 <b>' + (SCREEN_ID[VIEW.name] || '-') + '</b></div></div>';
-  if (noJudge) html += '<div class="rail"><div class="hd">판정 결과</div><div class="bd"><div class="result q">판정 대상 아님<small>' + noJudge + '</small></div></div></div>';
-  if (j) {
-    const cls = j.na ? 'q' : j.visible ? 'y' : 'n';
-    const lab = j.na ? '판정 대상 아님' : j.visible ? '알리페이에 노출' : '알리페이에 미노출';
-    html += '<div class="rail"><div class="hd">판정 결과 <span class="tblnote">' + esc(title) + '</span></div><div class="bd">' +
-      '<div class="result ' + cls + '">' + lab + (j.reason ? '<small>사유 : ' + j.reason + '</small>' : j.na ? '<small>대상 언어가 아닙니다. 목록에서는 두 칼럼이 "-"로 보입니다.</small>' : '<small>사유 칼럼은 비어 있습니다.</small>') + '</div>' +
-      j.conds.map(c => '<div class="cond ' + c.s + '"><span class="mk">' + (c.s === 'ok' ? '✓' : c.s === 'no' ? '✕' : '·') + '</span><span>' + c.t + '</span></div>').join('') +
-      '<div class="hint" style="margin-top:10px">판정 결과와 사유는 저장 컬럼(SYS-CH-01)에 두고 목록이 읽습니다. 산출 로직은 SYS-CH-02.<br>이 시안은 값을 바꾸는 즉시 결과에 반영합니다. 실제 화면의 저장 시점 처리는 기능정의서를 따릅니다. 대상 조회 오류 재현은 모달을 닫은 상태에서 켤 수 있습니다.</div>' +
-      '</div></div>';
-  }
-  html += '<div class="rail"><div class="hd">지금 상태 요약</div><div class="bd"><div class="tblwrap"><table><thead><tr><th>대상</th><th class="c">노출</th><th>사유</th></tr></thead><tbody>' +
-    DB.products.map(p => { const q = judgeProduct(p); return '<tr><td class="tblnote" style="white-space:normal">상품 · ' + esc(p.name) + '</td><td class="c">' + visCell(q) + '</td><td class="tblnote">' + (q.na ? '-' : q.reason || '') + '</td></tr>'; }).join('') +
-    DB.stores.map(x => { const q = judgeStore(x); return '<tr><td class="tblnote" style="white-space:normal">스토어 · ' + esc(x.name) + '</td><td class="c">' + visCell(q) + '</td><td class="tblnote">' + (q.reason || '') + '</td></tr>'; }).join('') +
-    DB.ads.map(x => { const q = judgeAd(x); return '<tr><td class="tblnote" style="white-space:normal">광고 · ' + esc(x.title) + '</td><td class="c">' + visCell(q) + '</td><td class="tblnote">' + (q.na ? '-' : q.reason || '') + '</td></tr>'; }).join('') +
-    DB.collections.map(x => { const q = judgeCollection(x); return '<tr><td class="tblnote" style="white-space:normal">기획전 · ' + esc(x.name) + '</td><td class="c">' + visCell(q) + '</td><td class="tblnote">' + (q.na ? '-' : q.reason || '') + '</td></tr>'; }).join('') +
-    '</tbody></table></div><div style="margin-top:12px"><button class="btn" onclick="resetDB()">처음 상태로</button></div>' +
-    '</div></div>';
-  return html;
-}
-
-/* --------------------------- 엣지케이스 --------------------------- */
-function scenarios() {
-  return [
-    { id: 'BO-CH-01-e1', t: '알리페이 노출을 미노출로', d: '알리페이 쪽 버튼이 전부 잠기고 켜 둔 값은 그대로 남습니다. 목록의 사유는 직접 끔으로 나옵니다.',
-      run: function () { const p = P('P2'); p.aliVisible = '미노출'; VIEW.lang = p.lang; go('p-list'); openProduct('P2'); } },
-    { id: 'BO-CH-01-e2', t: '스토어 설정 적용 = 기본 설정', d: '알리페이 쪽 버튼이 스토어 값으로 잠깁니다. 예약은 상품에 없으니 빼고, 그래서 켤 것이 없으면 채팅이 자동으로 켜집니다.',
-      run: function () { const p = P('P3'); p.mode = '기본 설정'; VIEW.lang = p.lang; go('p-list'); openProduct('P3'); } },
-    { id: 'BO-CH-01-e3', t: '알리페이 앱에 켠 버튼이 없을 때', d: '안내가 뜨고 상품이 알리페이 앱에서 보이지 않습니다. 알리페이 노출 라디오는 그대로 누를 수 있습니다.',
-      run: function () { const p = P('P8'); p.mode = '개별 설정'; ROWS_PRODUCT.forEach(r => p.btns[r.k].ali = false); VIEW.lang = p.lang; go('p-list'); openProduct('P8'); } },
-    { id: 'BO-CH-01-e4', t: '새 상품의 알리페이 버튼 초기값', d: '웹에서 켠 상담접수·문의하기·채팅은 알리페이도 켜지고, 외부링크·메신저는 꺼진 채 시작합니다. 메신저만 켠 건은 알리페이 쪽이 비어 시작합니다.',
-      run: function () { newProduct(); } },
-    { id: 'BO-CH-01-e5', t: '대상 언어가 아닌 상품 건', d: '일본어로 만든 상품은 알리페이 노출 라디오가 노출로 고정되고, 알리페이 쪽 버튼도 손댈 수 없습니다.',
-      run: function () { VIEW.lang = '일본어'; go('p-list'); openProduct('P6'); } },
-    { id: 'BO-CH-01-e3', t: '상담접수를 끄면 알리페이 버튼이 빌 때', d: '알리페이 쪽 상담접수를 OFF로 누르면 안내가 뜨고, OK를 누를 때 저장 확인이 뜹니다.',
-      run: function () { const p = P('P2'); p.mode = '개별 설정'; ROWS_PRODUCT.forEach(r => p.btns[r.k].ali = false); p.btns.consult.ali = true; VIEW.lang = p.lang; go('p-list'); openProduct('P2'); } },
-    { id: 'BO-CH-01-e6', t: '소속 스토어가 미노출인 상품', d: '상품을 노출로 두어도 알리페이 앱에서 보이지 않습니다. 목록의 사유는 스토어 설정으로 나옵니다.',
-      run: function () { VIEW.lang = '중국어(번체)'; go('p-list'); openProduct('P4'); } },
-    { id: 'BO-CH-03-e1', t: '스토어를 미노출로', d: '이 스토어의 상품이 모든 언어에서 함께 보이지 않게 됩니다. 미노출을 고르면 상품 수 안내가 뜨고, 12건이라 저장을 누를 때 확인 창이 뜹니다.',
-      run: function () { go('s-edit', 'S1'); VIEW.sect = 2; render(); } },
-    { id: 'BO-CH-03-e2', t: '스토어에 켠 알리페이 버튼이 없을 때', d: '스토어 페이지만 보이지 않고, 소속 상품은 각자 조건대로 남습니다.',
-      run: function () { const st = S('S5'); ROWS_STORE.forEach(r => st.btns[r.k].ali = false); go('s-edit', 'S5'); VIEW.sect = 11; render(); } },
-    { id: 'BO-CH-03-e3', t: '예약은 예약설정을 먼저 켜야 한다', d: '예약설정에서 예약을 켜지 않으면 예약 버튼을 웹과 알리페이 앱 모두 켤 수 없습니다.',
-      run: function () { go('s-edit', 'S2'); VIEW.sect = 11; render(); } },
-    { id: 'BO-CH-01-e2', t: '예약만 켠 스토어 + 기본 설정 상품', d: '상품에는 예약이 없어 알리페이 쪽이 비고, 채팅이 자동으로 켜져 보입니다.',
-      run: function () { const st = S('S3'); ROWS_STORE.forEach(r => st.btns[r.k].ali = false); st.btns.booking.ali = true; const p = P('P3'); p.mode = '기본 설정'; VIEW.lang = p.lang; go('p-list'); openProduct('P3'); } },
-    { id: 'BO-CH-05-e1', t: '링크종류 = 외부링크', d: '알리페이 노출 라디오가 잠기고 값은 그대로 남습니다. 목록의 사유는 외부 연결로 나옵니다.',
-      run: function () { const b = A('B2'); VIEW.lang = b.lang; go('a-list'); openAd('B2'); } },
-    { id: 'BO-CH-05-e2', t: '하단 버튼 링크 종류 = 외부링크', d: '알리페이 표시여부가 비활성화로 잠기고, 배너가 알리페이 앱에서 보이지 않습니다.',
-      run: function () { const b = A('B4'); VIEW.lang = b.lang; go('a-list'); openAd('B4'); } },
-    { id: 'BO-CH-05', t: '하단 버튼 링크 종류 = 링크없음', d: '링크없음이면 알리페이 표시여부를 켤 수 있고, 켜면 배너가 보입니다.',
-      run: function () { const b = A('B4'); b.btn.linkKind = '링크없음'; b.btn.ali = true; VIEW.lang = b.lang; go('a-list'); openAd('B4'); } },
-    { id: 'BO-CH-05-e3', t: '내부링크 대상 병원이 미노출', d: '연결한 병원이 보이지 않으면 배너도 보이지 않습니다. 병원을 노출로 되돌리면 배너도 별도 조작 없이 돌아옵니다.',
-      run: function () { const b = A('B5'); VIEW.lang = b.lang; go('a-list'); openAd('B5'); } },
-    { id: 'BO-CH-05-e3', t: '버튼 내부링크 대상 기획전이 미노출', d: '랜딩페이지 배너의 알리페이 버튼이 연결한 기획전이 보이지 않으면 배너도 보이지 않습니다.',
-      run: function () { C('E1').aliVisible = '미노출'; const b = A('B3'); VIEW.lang = b.lang; go('a-list'); openAd('B3'); } },
-    { id: 'BO-CH-05-e6', t: '내부링크 대상 = 인플루언서', d: '인플루언서는 이번 범위의 설정 대상이 아니라 확인하지 않고 그대로 보여 줍니다.',
-      run: function () { const b = A('B6'); VIEW.lang = b.lang; go('a-list'); openAd('B6'); } },
-    { id: 'BO-CH-08-e1', t: '기획전에 노출 가능 항목 0건', d: '유형이 병원이라 담은 스토어만 셉니다. 보이는 스토어가 0건이면 기획전 자체가 보이지 않습니다.',
-      run: function () { const c = C('E2'); VIEW.lang = c.lang; go('c-list'); openColl('E2'); } },
-    { id: 'BO-CH-08', t: '기획전 구성에 스토어 추가', d: '보이는 스토어를 하나 넣으면 기획전이 다시 살아납니다. 스토어 추가를 눌러 보세요.',
-      run: function () { const c = C('E2'); c.stores = []; VIEW.lang = c.lang; go('c-list'); openColl('E2'); } },
-    { id: 'HOST-CH-01', t: '호스트 화면 안내', d: '알리페이 쪽 버튼이 빈 상품은 상단에 안내만 보이고, 호스트가 고칠 항목은 없습니다.',
-      run: function () { const p = P('P8'); p.mode = '개별 설정'; ROWS_PRODUCT.forEach(r => p.btns[r.k].ali = false); go('h-edit'); } },
-    { id: '공통', t: '문의하기 통합은 상담접수와 버튼 하나', d: '상담접수와 통합을 모두 켜도 고객 화면에는 문의하기 하나만 나갑니다. 개수도 1로 셉니다.',
-      run: function () { const p = P('P2'); p.mode = '개별 설정'; p.btns.consult.ali = true; p.btns.inquiry.ali = true; p.btns.chat.ali = false; VIEW.lang = p.lang; go('p-list'); openProduct('P2'); } },
-    { id: '공통', t: '버튼은 2개까지만', d: '문의하기와 채팅으로 2개가 차 있습니다. 세 번째를 켜려 하면 막힙니다.',
-      run: function () { const p = P('P2'); p.mode = '개별 설정'; p.btns.consult.ali = true; p.btns.inquiry.ali = true; p.btns.chat.ali = true; p.btns.consult.web = true; p.btns.inquiry.web = true; p.btns.chat.web = true; VIEW.lang = p.lang; go('p-list'); openProduct('P2'); } },
-    { id: 'SYS-CH-03', t: '예전 데이터 (웹 버튼 3개)', d: '예전 데이터라 웹 버튼이 3개 켜진 건입니다. OK를 누르면 개수 검사에 걸립니다.',
-      run: function () { const p = P('P10'); p.btns.consult.web = true; p.btns.chat.web = true; p.btns.messenger.web = true; VIEW.lang = p.lang; go('p-list'); openProduct('P10'); } },
-    { id: 'BO-CH-07', t: '매거진 본문 외부 링크 차단', d: '링크 넣기에서 외부 사이트 주소를 넣으면 막습니다. 저장하면 본문에 남은 외부 사이트 주소와 외부 영상·SNS 넣기를 지우고 개수를 알려 줍니다.',
-      run: function () { go('m-edit'); } },
-    { id: 'BO-CH-10', t: '버튼 설정 공통 구조', d: '상품과 스토어가 함께 쓰는 표 구조와 버튼 개수 규칙을 한 화면에서 봅니다.',
-      run: function () { go('btn-spec'); } },
-    { id: 'SYS-CH-03', t: '메신저만 켜져 있던 상품', d: '알리페이 앱에서는 메신저를 켤 수 없어, 채팅을 켜서 보이게 만듭니다.',
-      run: function () { const p = P('P8'); p.mode = '개별 설정'; ROWS_PRODUCT.forEach(r => { p.btns[r.k].web = false; p.btns[r.k].ali = false; }); p.btns.messenger.web = true; p.btns.chat.ali = true; VIEW.lang = p.lang; go('p-list'); openProduct('P8'); } }
-  ];
-}
-function newProduct() {
-  const p = { id: 'PN', name: '신규 상품 (메신저만 켠 건)', lang: '중국어(간체)', store: 'S2', status: '대기', active: false, hidden: false,
-    cat: '뷰티', sub: '기타', price: '50,000', vat: '포함', ext: '', aliVisible: '노출', mode: '개별 설정', insta: 'OFF',
-    btns: { consult: btn(), inquiry: btn(), chat: btn(), extlink: btn(), messenger: btn({ web: true }) }, history: [] };
-  ['consult', 'inquiry', 'chat'].forEach(k => { p.btns[k].ali = !!p.btns[k].web; });
-  if (!P('PN')) DB.products.push(p); else Object.assign(P('PN'), p);
-  VIEW.lang = p.lang; go('p-list'); openProduct('PN');
-}
 const BASE = JSON.stringify({ products: DB.products, stores: DB.stores, ads: DB.ads, collections: DB.collections, magazines: DB.magazines });
 function applyBase() {
   const b = JSON.parse(BASE);
@@ -1321,7 +1198,6 @@ function applyBase() {
 }
 function clearFilters() { Object.keys(FILTERS).forEach(k => { FILTERS[k].ali = '전체'; FILTERS[k].rsn = '전체'; }); }
 window.resetDB = function () { applyBase(); MODAL = null; VIEW.lang = '중국어(간체)'; clearFilters(); go('p-list'); };
-window.runScn = function (i) { applyBase(); MODAL = null; clearFilters(); scenarios()[i].run(); };
 
 /* ------------------------------- 렌더 ------------------------------- */
 function render() {
@@ -1329,7 +1205,6 @@ function render() {
     'm-edit': screen_mEdit, 'btn-spec': screen_btnSpec, 'h-edit': screen_hEdit };
   el('#side').innerHTML = renderSide();
   el('#screen').innerHTML = map[VIEW.name]();
-  el('#rail').innerHTML = railFor();
   const md = { product: modal_product, ad: modal_ad, coll: modal_coll, link: modal_link };
   const holder = document.getElementById('mdholder') || (function () { const d = document.createElement('div'); d.id = 'mdholder'; document.body.appendChild(d); return d; })();
   holder.innerHTML = MODAL && md[MODAL] ? md[MODAL]() : '';
