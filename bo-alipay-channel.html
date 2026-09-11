@@ -196,7 +196,6 @@ const MSG = {
   hostHidden:  '이 상품은 알리페이 앱에서는 보이지 않아요.',
   storeDefault:'기본 설정은 스토어 버튼 구성을 그대로 적용합니다.',
   msgLang:     '메신저 설정을 켜면 언어별로 1개씩 등록할 수 있습니다.',
-  pending:     '알리페이 노출 상태를 확인하지 못했습니다. 다시 계산될 때까지 알리페이에 노출되지 않습니다.',
   edBlock:     '외부 사이트 주소는 입력할 수 없습니다.',
   edBlockErr:  '외부 사이트 주소입니다. K-Beauty Station 내부 주소만 입력할 수 있습니다.',
   edStrip:     (u, e) => [u ? '외부 사이트 주소 ' + u + '개' : '', e ? '외부 영상·SNS ' + e + '개' : ''].filter(Boolean).join(', ') + '를 삭제했습니다.',
@@ -304,8 +303,6 @@ const DB = {
       products: [], stores: [], history: [] }
   ],
   influencers: [{ id: 'IF1', name: '지우 (@jiwoo)' }],
-  /* 판정 계산에 실패한 건. 서버가 다시 계산하면 사라진다 */
-  pending: { P9: true },
   magazines: [{ id: 'M1', title: '가을 두피 관리 가이드', lang: '중국어(간체)', status: '게시', reg: '2026-09-02 11:20',
     body: '가을에는 두피가 건조해집니다. 자세한 코스는 <a href="https://k-beautystation.com/products/P1">상품 페이지</a>에서 확인하세요. 후기 영상은 https://www.instagram.com/p/abc/ 에서 볼 수 있습니다. <iframe src="https://www.youtube.com/embed/xyz"></iframe>' }],
 };
@@ -395,7 +392,6 @@ function judgeProduct(p) {
   if (!c1) reason = '직접 끔';
   else if (!c3) reason = '스토어 설정';
   else if (!c2) reason = '알리페이 버튼 없음';
-  if (DB.pending[p.id]) return { na: false, visible: false, reason: '', pending: true, conds };
   return { na: false, visible: !reason, reason, conds };
 }
 function judgeStore(st) {
@@ -411,7 +407,6 @@ function judgeStore(st) {
   if (!c1) reason = '직접 끔';
   else if (!c2) reason = '알리페이 버튼 없음';
   if (!c2 && c1) conds.push({ s: 'sk', t: '스토어 페이지만 보이지 않고, 소속 상품은 각자 조건대로 나간다.' });
-  if (DB.pending[st.id]) return { na: false, visible: false, reason: '', pending: true, conds };
   return { na: false, visible: !reason, reason, conds };
 }
 // 내부링크 대상 판정. 병원·기획전만 보고 인플루언서·직접입력은 그대로 통과한다.
@@ -452,7 +447,6 @@ function judgeAd(b) {
   else if (targetOut) reason = '연결 대상 미노출';
   /* 미노출과 외부링크가 겹치면 두 원인을 모두 적는다. 사유는 우선순위대로 하나만 쓴다 */
   if (!c1 && ext) conds.push({ s: 'no', t: '알리페이 노출이 미노출이고 링크종류도 외부링크다. 사유는 우선순위에 따라 직접 끔으로 적는다.' });
-  if (DB.pending[b.id]) return { na: false, visible: false, reason: '', pending: true, conds, targetLabel: '' };
   return { na: false, visible: !reason, reason, conds, targetLabel: targetOut || '' };
 }
 // 기획전 조건 ④ = 유형에 맞는 구성 항목만 센다. 추천상품은 상품, 병원은 스토어.
@@ -479,7 +473,6 @@ function judgeCollection(c) {
   let reason = '';
   if (!c1) reason = '직접 끔';
   else if (!live) reason = '노출 가능 항목 없음';
-  if (DB.pending[c.id]) return { na: false, visible: false, reason: '', pending: true, conds, liveCount: live };
   return { na: false, visible: !reason, reason, conds, liveCount: live };
 }
 
@@ -495,7 +488,7 @@ function go(name, id) { if (VIEW.name === 'm-edit' && name !== 'm-edit') window.
 window.go = go;
 
 const aliLangOk = () => ALI_LANGS.indexOf(VIEW.lang) !== -1;
-const visCell = j => j.na ? '<span class="tag na">-</span>' : j.pending ? '<span class="tag na">확인 중</span>' : (j.visible ? '<span class="tag on">노출</span>' : '<span class="tag off">미노출</span>');
+const visCell = j => j.na ? '<span class="tag na">-</span>' : (j.visible ? '<span class="tag on">노출</span>' : '<span class="tag off">미노출</span>');
 const rsnCell = j => j.na ? '<span class="tblnote">-</span>' : (j.reason ? '<span class="tag rsn">' + j.reason + '</span>' : '');
 
 function radio(nm, val, cur, handler, dis) {
@@ -755,7 +748,6 @@ function modal_product() {
       radio('pv', '노출', langOk ? p.aliVisible : '노출', "setVis('product','노출')", !langOk) + radio('pv', '미노출', langOk ? p.aliVisible : '노출', "setVis('product','미노출')", !langOk) + '</span>' +
       (langOk ? '' : '<div class="hint">' + MSG.langOnly(p.lang, '이 상품은') + '</div>') +
       (langOk && st.aliVisible === '미노출' ? '<div class="notice">' + MSG.lockStore + '</div>' : '') +
-      (j.pending ? '<div class="notice">' + MSG.pending + '</div>' : '') +
       '</div></div>' +
       '<div class="blk">버튼 설정</div>' +
       '<div class="row"><div class="lbl"><span class="req">*</span>스토어 설정 적용</div><div class="val"><span class="rg">' +
@@ -808,7 +800,7 @@ function screen_sEdit() {
       '<div class="hint">스토어는 언어 구분이 없습니다. 이 설정은 모든 언어에 적용됩니다.</div>' +
       (st.aliVisible === '미노출' ? '<div class="notice">' + MSG.storeHide(st.prodCount) + '</div>' : '') +
       (st.aliVisible === '노출' && onCount(effStoreBtns(st).btns, ROWS_STORE, 'ali') === 0 ? '<div class="notice">' + MSG.noAliBtn('이 스토어는', '버튼 및 메신저 설정') + '</div>' : '') +
-      (judgeStore(st).pending ? '<div class="notice">' + MSG.pending + '</div>' : '') + '</div></div></div>' +
+      '</div></div></div>' +
       '<div class="langtabs">' + ['원본'].concat(STORE_TABS).map(l => '<div class="langtab ' + (l === '원본' ? 'on' : '') + '">' + l + '</div>').join('') + '</div>' +
       '<div class="bd"><div class="row"><div class="lbl">스토어명</div><div class="val">' + esc(st.name) + '</div></div>' +
       '<div class="row"><div class="lbl">메인 문구</div><div class="val"><span class="tblnote">0 / 20</span></div></div>' +
@@ -914,7 +906,7 @@ function modal_ad() {
     radio('bv', '노출', langOk ? b.aliVisible : '노출', "setVis('ad','노출')", !langOk || visLock) + radio('bv', '미노출', langOk ? b.aliVisible : '노출', "setVis('ad','미노출')", !langOk || visLock) + '</span>' +
     (langOk ? '' : '<div class="hint">' + MSG.langOnly(b.lang, '이 배너는') + '</div>') +
     (langOk && visLock ? '<div class="hint">' + MSG.bnExtLock + '</div>' : '') +
-    (j.pending ? '<div class="notice">' + MSG.pending + '</div>' : '') + '</div></div>' +
+    '</div></div>' +
     '<div class="row"><div class="lbl"><span class="req">*</span>링크종류</div><div class="val">' +
     '<select onchange="setAdLinkType(this.value)">' + ['외부링크', '내부링크', '내부이미지랜딩페이지'].map(v => '<option' + (v === b.linkType ? ' selected' : '') + '>' + v + '</option>').join('') + '</select></div></div>';
   if (isExt) h += '<div class="row"><div class="lbl"><span class="req">*</span>외부링크</div><div class="val"><input type="text" style="width:100%" value="' + esc(b.url) + '"></div></div>';
@@ -1058,7 +1050,6 @@ function modal_coll() {
     '<div class="row"><div class="lbl"><span class="req">*</span>알리페이 노출<span class="newbadge">신규</span></div><div class="val"><span class="rg">' +
     radio('cv', '노출', langOk ? c.aliVisible : '노출', "setVis('coll','노출')", !langOk) + radio('cv', '미노출', langOk ? c.aliVisible : '노출', "setVis('coll','미노출')", !langOk) + '</span>' +
     (langOk ? '' : '<div class="hint">' + MSG.langOnly(c.lang, '이 기획전은') + '</div>') +
-    (j.pending ? '<div class="notice">' + MSG.pending + '</div>' : '') +
     (langOk && c.aliVisible === '노출' && j.liveCount === 0
       ? '<div class="notice">' + ((byStore ? c.stores.length : c.products.length) ? MSG.exhEmpty(byStore ? '스토어가' : '상품이') : MSG.exhNone(byStore ? '스토어가' : '상품이')) + '</div>' : '') + '</div></div>' +
     comp +
