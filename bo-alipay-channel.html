@@ -538,21 +538,8 @@ function renderSide() {
   return h;
 }
 
-/* ------------------------------ 변경 이력 ------------------------------ */
-let LOGSEQ = 0;
-function logChange(obj, field, from, to, affected) {
-  obj.history = obj.history || [];
-  const m = 20 + (LOGSEQ++ % 40);
-  const at = '2026-09-08 14:' + (m < 10 ? '0' + m : m);
-  obj.history.unshift({ field, from: String(from), to: String(to), by: '관리자', at: at, affected: affected == null ? '' : affected });
-}
-function historyCard(obj) {
-  const h = obj.history || [];
-  return '<div class="card"><div class="hd">변경 이력<span class="newbadge">신규</span></div><div class="bd"><div class="tblwrap">' +
-    '<table><thead><tr><th style="min-width:250px">항목</th><th>전 값</th><th>후 값</th><th>영향 건수</th><th>변경자 · 시각</th></tr></thead><tbody>' +
-    (h.length ? h.map(r => '<tr><td>' + esc(r.field) + '</td><td>' + esc(r.from) + '</td><td>' + esc(r.to) + '</td><td>' + esc(r.affected) + '</td><td class="tblnote">' + esc(r.by) + ' · ' + r.at + '</td></tr>').join('')
-      : '<tr><td colspan="5" class="c tblnote">값을 바꾸면 여기에 쌓입니다.</td></tr>') + '</tbody></table></div></div></div>';
-}
+/* 이 시안에서는 변경 이력을 다루지 않는다. 값 변경 지점에 남아 있는 호출은 아무 일도 하지 않는다 */
+function logChange() {}
 
 /* -------------------- 버튼 설정 표 (BO-CH-10 · 알리페이 열 신설) -------------------- */
 function btnTable(kind, obj) {
@@ -759,7 +746,7 @@ function modal_product() {
   }
   return '<div class="mask"><div class="modal" style="max-width:900px"><div class="hd">상품정보 수정<button class="x" onclick="closeMD()">✕</button></div>' +
     '<div class="mtabs">' + tabs.map((t, i) => '<div class="mtab ' + (i === VIEW.tab ? 'on' : '') + '" onclick="VIEW.tab=' + i + ';render()">' + t + '</div>').join('') + '</div>' +
-    '<div class="bd">' + bd + historyCard(p) + '</div>' +
+    '<div class="bd">' + bd + '</div>' +
     '<div class="ft"><button class="btn" onclick="closeMD()">Cancel</button><button class="btn blue" onclick="save(\'product\')">OK</button></div></div></div>';
 }
 
@@ -827,8 +814,7 @@ function screen_sEdit() {
     '<div class="anchors" style="justify-content:space-between;align-items:center">' +
     '<div style="display:flex;flex-wrap:wrap;gap:6px;flex:1">' + SECTS.map((s, k) => '<div class="anchor ' + (k === i ? 'on' : SECT_IN_SCOPE.indexOf(k) === -1 ? 'dim' : '') + '"' + (SECT_IN_SCOPE.indexOf(k) === -1 ? '' : ' onclick="VIEW.sect=' + k + ';render()"') + '>' + s + '</div>').join('') + '</div>' +
     '<div style="display:flex;gap:8px;margin-left:12px"><button class="btn" onclick="go(\'s-list\')">취소</button><button class="btn" style="background:#1F1F1F;border-color:#1F1F1F;color:#fff" onclick="save(\'store\')">저장</button></div></div>' +
-    '<div class="card"><div class="hd">' + SECTS[i] + '<button class="btn" onclick="save(\'store\')">저장</button></div>' + bd + '</div>' +
-    historyCard(st);
+    '<div class="card"><div class="hd">' + SECTS[i] + '<button class="btn" onclick="save(\'store\')">저장</button></div>' + bd + '</div>';
 }
 
 /* --------------------------- 광고 관리 (실측) --------------------------- */
@@ -937,7 +923,7 @@ function modal_ad() {
   }
   h += tail;
   return '<div class="mask"><div class="modal" style="max-width:720px"><div class="hd">수정<button class="x" onclick="closeMD()">✕</button></div>' +
-    '<div class="bd">' + h + historyCard(b) + '</div><div class="ft"><button class="btn" onclick="closeMD()">취소</button><button class="btn blue" onclick="saveAd()">수정</button></div></div></div>';
+    '<div class="bd">' + h + '</div><div class="ft"><button class="btn" onclick="closeMD()">취소</button><button class="btn blue" onclick="saveAd()">수정</button></div></div></div>';
 }
 
 /* --------------------------- 기획전 관리 (실측) --------------------------- */
@@ -1056,7 +1042,6 @@ function modal_coll() {
     '<div class="row"><div class="lbl"><span class="req">*</span>기획전 노출 기간</div><div class="val"><input type="text" value="' + c.from + ' → ' + c.to + '" style="width:280px" readonly></div></div>' +
     '<div class="row"><div class="lbl">기획전 활성화 여부</div><div class="val"><span class="rg">' +
     radio('ca', '활성화', c.active === '활성' ? '활성화' : '비활성화', 'void(0)', true) + radio('ca', '비활성화', c.active === '활성' ? '활성화' : '비활성화', 'void(0)', true) + '</span></div></div>' +
-    historyCard(c) +
     '</div><div class="ft"><button class="btn" onclick="closeMD()">Cancel</button><button class="btn blue" onclick="saveColl()">OK</button></div></div></div>';
 }
 /* --------------------------- 호스트 상품 수정 --------------------------- */
