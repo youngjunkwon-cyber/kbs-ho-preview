@@ -538,9 +538,6 @@ function renderSide() {
   return h;
 }
 
-/* 이 시안에서는 변경 이력을 다루지 않는다. 값 변경 지점에 남아 있는 호출은 아무 일도 하지 않는다 */
-function logChange() {}
-
 /* -------------------- 버튼 설정 표 (BO-CH-10 · 알리페이 열 신설) -------------------- */
 function btnTable(kind, obj) {
   const isStore = kind === 'store';
@@ -608,14 +605,12 @@ window.setBtn = function (kind, k, ch, on) {
   const cascade = k === 'consult' && !on && obj.btns.inquiry[ch];
   if (k === 'consult' && !on) obj.btns.inquiry[ch] = false;
   const note = [kind === 'store' ? '기본 설정으로 따라가는 소속 상품 ' + obj.baseCount + '건' : '', cascade ? '문의하기 통합도 OFF' : ''].filter(Boolean).join(' · ');
-  logChange(obj, '버튼 설정 · ' + label + ' · ' + (ch === 'web' ? '웹' : '알리페이 앱'), before, on ? 'ON' : 'OFF', note);
   render();
 };
 window.setVis = function (kind, v) {
   const obj = kind === 'store' ? S(VIEW.id) : kind === 'product' ? P(VIEW.id) : kind === 'ad' ? A(VIEW.id) : C(VIEW.id);
   const before = obj.aliVisible;
   obj.aliVisible = v;
-  logChange(obj, '알리페이 노출', before, v, kind === 'store' ? '소속 상품 ' + obj.prodCount + '건' : '');
   render();
 };
 function impactOfHiding(st) {
@@ -633,7 +628,6 @@ window.setMode = function (v) {
   const p = P(VIEW.id), st = S(p.store);
   const fromDefault = v === '개별 설정' && p.mode === '기본 설정';
   if (fromDefault) ROWS_PRODUCT.forEach(r => { p.btns[r.k].web = !!st.btns[r.k].web; p.btns[r.k].ali = false; });
-  logChange(p, '스토어 설정 적용', p.mode, v, fromDefault ? '웹은 스토어 값을 복사하고 알리페이는 비움' : '');
   p.mode = v; render();
 };
 window.setBooking = function (on) {
@@ -650,8 +644,6 @@ window.setBooking = function (on) {
       render(); return;
     }
   }
-  logChange(st, '예약설정 · 예약 사용', st.bookingEnabled ? '사용' : '미사용', on ? '사용' : '미사용',
-    (!on && (st.btns.booking.web || st.btns.booking.ali)) ? '예약 버튼도 함께 꺼짐' : '');
   st.bookingEnabled = !!on; render();
 };
 
@@ -862,18 +854,17 @@ window.openAd = function (id) { VIEW.id = id; MODAL = 'ad'; render(); };
 window.setAdLinkType = function (v) { const b = A(VIEW.id); const before = b.linkType; b.linkType = v;
   if (v === '내부링크' && !b.inner) b.inner = { kind: '병원', id: DB.stores[0].id };
   if (v === '내부이미지랜딩페이지' && !b.btn) b.btn = { label: '자세히 보기', linkKind: '링크없음', web: true, ali: true };
-  logChange(b, '링크종류', before, v); render(); };
+   render(); };
 window.setAdInnerKind = function (k) { const b = A(VIEW.id); const o = innerOpts(k)[0]; b.inner = { kind: k, id: o ? o[0] : '' }; render(); };
 window.setAdInnerId = function (id) { const b = A(VIEW.id); b.inner = { kind: b.inner.kind, id }; render(); };
 window.setBtnLinkKind = function (v) { const b = A(VIEW.id); const before = b.btn.linkKind; b.btn.linkKind = v;
   if (v === '내부링크' && !b.btn.inner) b.btn.inner = { kind: '병원', id: DB.stores[0].id };
-  logChange(b, '하단 버튼 · 버튼 링크 종류', before, v);
-  if (v === '외부링크') { if (b.btn.ali) { logChange(b, '하단 버튼 · 알리페이 표시여부', '활성화', '비활성화', '버튼 링크 종류 외부링크로 고정'); } b.btn.ali = false; }
+  if (v === '외부링크') { if (b.btn.ali) { } b.btn.ali = false; }
   render(); };
 window.setBtnInnerKind = function (k) { const b = A(VIEW.id); const o = innerOpts(k)[0]; b.btn.inner = { kind: k, id: o ? o[0] : '' }; render(); };
 window.setBtnInnerId = function (id) { const b = A(VIEW.id); b.btn.inner = { kind: b.btn.inner.kind, id }; render(); };
 window.setAdBtnShow = function (ch, v) { const b = A(VIEW.id); const before = b.btn[ch] ? '활성화' : '비활성화'; b.btn[ch] = !!v;
-  logChange(b, '하단 버튼 · ' + (ch === 'web' ? '웹' : '알리페이') + ' 표시여부', before, v ? '활성화' : '비활성화'); render(); };
+   render(); };
 
 function modal_ad() {
   const b = A(VIEW.id), langOk = ALI_LANGS.indexOf(b.lang) !== -1;
@@ -956,8 +947,8 @@ window.collSelAll = function (on) { COLLSEL = {}; if (on) { const c = C(VIEW.id)
 window.collDelSel = function () {
   const c = C(VIEW.id), ids = Object.keys(COLLSEL);
   if (!ids.length) return;
-  if (isStoreColl(c)) { c.stores = c.stores.filter(x => ids.indexOf(x) === -1); logChange(c, '구성 항목 · 스토어 삭제', ids.length + '건', '-'); }
-  else { c.products = c.products.filter(x => ids.indexOf(x) === -1); logChange(c, '구성 항목 · 상품 삭제', ids.length + '건', '-'); }
+  if (isStoreColl(c)) { c.stores = c.stores.filter(x => ids.indexOf(x) === -1); }
+  else { c.products = c.products.filter(x => ids.indexOf(x) === -1); }
   COLLSEL = {}; render();
 };
 window.openColl = function (id) { VIEW.id = id; MODAL = 'coll'; COLLPICK = false; COLLSEL = {}; render(); };
@@ -968,11 +959,10 @@ window.setCollType = function (t) {
   const nowStore = t === '병원';
   const kept = wasStore ? c.stores.length : c.products.length;
   const apply = () => {
-    logChange(c, '기획전 유형', c.type, t);
     c.type = t;
     /* 담는 종류가 바뀌므로 앞 유형에 담아 둔 항목은 비운다 */
-    if (nowStore) { if (c.products.length) logChange(c, '구성 항목 · 상품 비움', c.products.length + '건', '0건'); c.products = []; }
-    else { if (c.stores.length) logChange(c, '구성 항목 · 스토어 비움', c.stores.length + '건', '0건'); c.stores = []; }
+    if (nowStore) { if (c.products.length) c.products = []; }
+    else { if (c.stores.length) c.stores = []; }
     COLLSEL = {};
     render();
   };
@@ -984,10 +974,10 @@ window.setCollType = function (t) {
   }
   apply();
 };
-window.addCollStore = function (sid) { const c = C(VIEW.id); if (c.stores.indexOf(sid) === -1) { c.stores.push(sid); logChange(c, '구성 항목 · 스토어 추가', '-', S(sid).name); } render(); };
-window.addCollProduct = function (pid) { const c = C(VIEW.id); if (c.products.indexOf(pid) === -1) { c.products.push(pid); logChange(c, '구성 항목 · 상품 추가', '-', P(pid).name); } render(); };
-window.delCollStore = function (sid) { const c = C(VIEW.id); c.stores = c.stores.filter(x => x !== sid); delete COLLSEL[sid]; logChange(c, '구성 항목 · 스토어 삭제', S(sid).name, '-'); render(); };
-window.delCollProduct = function (pid) { const c = C(VIEW.id); c.products = c.products.filter(x => x !== pid); delete COLLSEL[pid]; logChange(c, '구성 항목 · 상품 삭제', P(pid) ? P(pid).name : pid, '-'); render(); };
+window.addCollStore = function (sid) { const c = C(VIEW.id); if (c.stores.indexOf(sid) === -1) { c.stores.push(sid); } render(); };
+window.addCollProduct = function (pid) { const c = C(VIEW.id); if (c.products.indexOf(pid) === -1) { c.products.push(pid); } render(); };
+window.delCollStore = function (sid) { const c = C(VIEW.id); c.stores = c.stores.filter(x => x !== sid); delete COLLSEL[sid]; render(); };
+window.delCollProduct = function (pid) { const c = C(VIEW.id); c.products = c.products.filter(x => x !== pid); delete COLLSEL[pid]; render(); };
 function modal_coll() {
   const c = C(VIEW.id), j = judgeCollection(c), langOk = ALI_LANGS.indexOf(c.lang) !== -1, byStore = isStoreColl(c);
   const chk = id => '<td class="c"><input type="checkbox"' + (COLLSEL[id] ? ' checked' : '') + ' onchange="collSel(\'' + id + '\',this.checked)"></td>';
