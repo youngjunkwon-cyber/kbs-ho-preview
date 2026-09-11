@@ -171,7 +171,7 @@ const ROWS_STORE = [...ROWS_PRODUCT, { k: 'booking', label: '예약', needBookin
 
 const MSG = {
   noAliBtn:    (s, where) => '알리페이 앱에서 켠 버튼이 없어서 ' + s + ' 알리페이 앱에 보이지 않습니다. ' + (where || '아래 버튼 설정') + '에서 알리페이 앱 버튼을 하나 켜면 보입니다.',
-  hardOff:     '알리페이 앱은 다른 사이트나 앱으로 나가는 버튼을 막습니다. 알리페이 앱에서는 켤 수 없고, 웹에서는 켤 수 있습니다.',
+  hardOff:     '알리페이 앱 밖으로 나가는 버튼이라 켤 수 없습니다.',
   needConsult: '상담접수를 먼저 켜야 이 버튼을 켤 수 있습니다.',
   needBooking: '예약설정에서 예약 사용을 먼저 켜 주세요.',
   cap:         '고객 화면 아래에는 버튼을 2개까지 보여 줍니다. 웹과 알리페이 앱이 각각 2개입니다.',
@@ -194,7 +194,7 @@ const MSG = {
   bnBtnOff:    '알리페이 앱에서 누를 수 있는 버튼이 없어 이 배너는 알리페이 앱에 보이지 않습니다. 위 버튼 표시여부에서 알리페이를 활성화하면 보입니다.',
   bnTarget:    t => '이 배너가 연결된 대상(' + t + ')이 알리페이 앱에 보이지 않습니다. 그래서 이 배너도 알리페이 앱에 보이지 않습니다. 연결한 대상을 노출로 바꾸면 이 배너도 함께 보입니다.',
   hostHidden:  '이 상품은 알리페이 앱에서는 보이지 않아요.',
-  storeDefault:'기본 설정을 고르면 이 상품의 버튼을 스토어에 설정한 것과 똑같이 맞춥니다. 개별 설정을 고르면 웹 값만 스토어에서 가져오고, 알리페이 앱 버튼은 모두 꺼진 채로 시작합니다.',
+  storeDefault:'기본 설정은 스토어에 설정한 버튼을 그대로 따릅니다.',
   msgLang:     '위에서 메신저 설정을 켜면 언어마다 메신저를 하나씩 넣을 수 있습니다.',
   edBlock:     '외부 사이트 주소는 넣을 수 없습니다. K-Beauty Station 안의 주소만 넣을 수 있습니다.',
   edStrip:     (u, e) => [u ? '외부 사이트 주소 ' + u + '개' : '', e ? '외부에서 불러온 영상·SNS ' + e + '개' : ''].filter(Boolean).join('와 ') + '를 지웠습니다.',
@@ -597,14 +597,13 @@ function btnTable(kind, obj) {
   html += '</tbody></table></div>';
   const webCnt = onCount(eff.btns, rows, 'web'), aliCnt = onCount(eff.btns, rows, 'ali');
   const webCta = ctaList(eff.btns, rows, 'web'), aliCta = ctaList(eff.btns, rows, 'ali');
-  html += '<div class="hint">고객 화면 아래에는 버튼을 2개까지 보여 줍니다. 웹과 알리페이 앱이 각각 2개입니다. 상담접수와 문의하기 통합은 둘이 합쳐 버튼 하나로 보이고, 통합을 켜면 그 버튼이 문의하기가 됩니다.' +
-    '<br>지금 켜 둔 것은 웹 ' + webCnt + '개' + (webCta.length ? ' (' + webCta.join(' / ') + ')' : '') +
-    ', 알리페이 앱 ' + aliCnt + '개' + (aliCta.length ? ' (' + aliCta.join(' / ') + ')' : '') + '입니다.</div>';
+  html += '<div class="hint">웹 ' + webCnt + '개' + (webCta.length ? ' (' + webCta.join(' / ') + ')' : '') +
+    ' · 알리페이 앱 ' + aliCnt + '개' + (aliCta.length ? ' (' + aliCta.join(' / ') + ')' : '') + ' · 각 2개까지</div>';
   if (webCnt > CAP || aliCnt > CAP) {
     const over = [webCnt > CAP ? '웹 버튼이 ' + webCnt + '개' : '', aliCnt > CAP ? '알리페이 앱 버튼이 ' + aliCnt + '개' : ''].filter(Boolean).join(', ');
     html += '<div class="notice red">지금 ' + over + ' 켜져 있습니다. 2개까지만 저장할 수 있으니 하나를 꺼 주세요.</div>';
   }
-  if (locked) html += '<div class="hint">기본 설정이라 스토어에 설정한 버튼을 따라갑니다. 스토어에만 있는 예약은 상품에 쓰지 않고, 그래서 켤 것이 없으면 채팅이 대신 켜집니다. 여기서 바꾸려면 위에서 개별 설정을 고르고, 스토어 값 자체를 바꾸려면 스토어 정보 수정 > 버튼 및 메신저 설정에서 바꿔 주세요.</div>';
+  if (locked) html += '<div class="hint">기본 설정이라 잠겨 있습니다. 바꾸려면 위에서 개별 설정을 고르세요.</div>';
   else if (selfHidden) html += '<div class="hint">' + MSG.lockSelf(isStore ? '노출정보' : '위') + '</div>';
   if (langOk && !selfHidden && !storeHidden && aliCnt === 0) html += '<div class="notice">' + MSG.noAliBtn(isStore ? '이 스토어는' : '이 상품은') + '</div>';
   return html;
