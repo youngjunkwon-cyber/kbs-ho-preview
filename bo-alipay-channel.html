@@ -142,7 +142,7 @@ select.dim{color:#8c8c8c}
   <nav class="side" id="side"></nav>
   <div class="main">
     <div class="top"><div class="who">관리자</div></div>
-    <div class="body"><div class="col-main" id="screen"></div></div>
+    <div class="body"><div class="col-main" id="screen"></div><div class="col-rail" id="rail"></div></div>
   </div>
 </div>
 <div id="modals"></div>
@@ -1356,7 +1356,7 @@ function render() {
     'm-edit': screen_mEdit, 'btn-spec': screen_btnSpec, 'h-edit': screen_hEdit };
   el('#side').innerHTML = renderSide();
   el('#screen').innerHTML = map[VIEW.name]();
-  /* 검토용 패널은 쓰지 않는다 */
+  el('#rail').innerHTML = railFor();
   const md = { product: modal_product, ad: modal_ad, coll: modal_coll, link: modal_link };
   const holder = document.getElementById('mdholder') || (function () { const d = document.createElement('div'); d.id = 'mdholder'; document.body.appendChild(d); return d; })();
   holder.innerHTML = MODAL && md[MODAL] ? md[MODAL]() : '';
