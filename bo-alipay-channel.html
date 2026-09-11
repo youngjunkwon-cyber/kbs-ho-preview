@@ -181,6 +181,9 @@ const MSG = {
   storeHide:   n => '이 스토어를 미노출로 저장하면 이 스토어의 상품 ' + n + '건도 알리페이 앱에 보이지 않습니다.',
   saveProd:    '알리페이 앱에서 켠 버튼이 없습니다. 이대로 저장하면 이 상품은 알리페이 앱에 보이지 않습니다. 저장할까요?',
   saveStore:   '알리페이 앱에서 켠 버튼이 없습니다. 이대로 저장하면 이 스토어는 알리페이 앱에 보이지 않습니다. 저장할까요?',
+  saveAdBtn:   '알리페이 앱에서 누를 수 있는 버튼이 없습니다. 이대로 저장하면 이 배너는 알리페이 앱에 보이지 않습니다. 저장할까요?',
+  saveAdTgt:   t => '이 배너가 연결된 대상(' + t + ')이 알리페이 앱에 보이지 않습니다. 이대로 저장하면 이 배너도 알리페이 앱에 보이지 않습니다. 저장할까요?',
+  saveAdExt:   '링크 종류가 외부링크라 이 배너는 알리페이 앱에 보이지 않습니다. 이대로 저장할까요?',
   typeSwitch:  (was, n, now) => '유형을 바꾸면 이 기획전에는 ' + now + '만 담을 수 있습니다. 지금 담아 둔 ' + was + ' ' + n + '건은 목록에서 모두 지워집니다. 바꿀까요?',
   saveColl:    s => '담은 ' + s + ' 알리페이 앱에서 모두 보이지 않습니다. 이대로 저장하면 이 기획전은 알리페이 앱에 보이지 않습니다. 저장할까요?',
   saveCollNone:s => '아직 담은 ' + s + ' 없습니다. 이대로 저장하면 이 기획전은 알리페이 앱에 보이지 않습니다. 저장할까요?',
@@ -1134,8 +1137,16 @@ window.tryInsertLink = function () {
   m.body = cur + ' <a href="' + v.trim() + '">' + v.trim() + '</a>';
   window.EDBUF = null; MODAL = null; LINKERR = ''; render();
 };
-/* 배너는 링크 종류와 하단 버튼에서 이미 잠금과 안내로 알리므로 저장 확인을 따로 받지 않는다 */
-window.saveAd = function () { closeMD(); alertBox('저장했습니다', MSG.saveDone); };
+window.saveAd = function () {
+  const b = A(VIEW.id), j = judgeAd(b);
+  const done = () => { closeMD(); alertBox('저장했습니다', MSG.saveDone); };
+  /* 알리페이 노출을 노출로 두었는데 실제로는 보이지 않는 상태면 저장 전에 한 번 확인한다 */
+  if (j.na || j.visible || b.aliVisible !== '노출') { done(); return; }
+  const body = j.reason === '연결 대상 미노출' ? MSG.saveAdTgt(j.targetLabel || '대상')
+    : j.reason === '외부 연결' ? MSG.saveAdExt
+    : MSG.saveAdBtn;
+  confirmBox('저장 확인', '<p>' + body + '</p><p class="hint">웹에서는 그대로 보입니다.</p>', done, function () {});
+};
 window.saveMagazine = function () {
   const m = M('M1');
   const cur = window.EDBUF != null ? window.EDBUF : m.body;
