@@ -1194,10 +1194,10 @@ window.modalNo = function () { const f = _no; closeModal(); if (f) f(); };
 window.alertBox = alertBox;
 
 
-const BASE = JSON.stringify({ products: DB.products, stores: DB.stores, ads: DB.ads, collections: DB.collections, magazines: DB.magazines });
+const BASE = JSON.stringify({ products: DB.products, stores: DB.stores, ads: DB.ads, collections: DB.collections, magazines: DB.magazines, influencers: DB.influencers });
 function applyBase() {
   const b = JSON.parse(BASE);
-  ['products', 'stores', 'ads', 'collections', 'magazines'].forEach(k => { DB[k].length = 0; b[k].forEach(x => DB[k].push(x)); });
+  ['products', 'stores', 'ads', 'collections', 'magazines', 'influencers'].forEach(k => { DB[k].length = 0; b[k].forEach(x => DB[k].push(x)); });
   window.EDBUF = null;
 }
 function clearFilters() { Object.keys(FILTERS).forEach(k => { FILTERS[k].ali = '전체'; FILTERS[k].rsn = '전체'; }); }
