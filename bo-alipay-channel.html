@@ -248,7 +248,7 @@ const DB = {
     { id: 'B3', reg: '2026-08-30 09:10', from: '2026-09-01', to: '2026-09-30', lang: '영어', pos: '메인중단배너',
       linkType: '내부이미지랜딩페이지', url: '', biz: '뷰티랩', title: '스킨케어 기획전 안내',
       adNotice: '활성화', aliVisible: '노출',
-      btn: { label: '지금 보기', linkKind: '내부링크', inner: { kind: '기획전', id: 'E1' }, url: '', web: true, ali: true }, history: [] },
+      btn: { label: '지금 보기', linkKind: '내부링크', inner: { kind: '기획전', id: 'CT1' }, url: '', web: true, ali: true }, history: [] },
     { id: 'B4', reg: '2026-08-29 14:02', from: '2026-09-01', to: '2026-09-30', lang: '중국어(간체)', pos: '메인중단배너',
       linkType: '내부이미지랜딩페이지', url: '', biz: '모모클리닉', title: '성형 상담 배너',
       adNotice: '활성화', aliVisible: '노출',
@@ -260,20 +260,30 @@ const DB = {
       linkType: '내부링크', inner: { kind: '인플루언서', id: 'IF1' }, url: '', biz: '글로픽스', title: '인플루언서 협업전',
       adNotice: '활성화', aliVisible: '노출', btn: null, history: [] }
   ],
+  // 기획전 유형 레코드. 유형 값 네 가지가 언어별로 하나씩 있고, 배너 내부링크는 이 레코드를 고른다
+  collTypes: [
+    { id: 'CT1', type: '추천상품', lang: '중국어(간체)', name: 'K-Beauty Station 精选商家' },
+    { id: 'CT2', type: '병원', lang: '중국어(간체)', name: '和值得信赖的医院聊聊吧' },
+    { id: 'CT3', type: '추천상품', lang: '영어', name: "K-Beauty Station's PICK!" },
+    { id: 'CT4', type: '추천상품', lang: '일본어', name: 'K-Beauty Stationおすすめ' }
+  ],
   // 기획전. 유형이 구성 항목을 가른다. 추천상품은 상품만, 병원은 스토어만 담는다.
   collections: [
-    { id: 'E1', name: '가을 K-뷰티 위크', inner: '가을위크_SC', lang: '중국어(간체)', type: '추천상품',
+    { id: 'E1', name: '가을 K-뷰티 위크', inner: '가을위크_SC', lang: '중국어(간체)', type: '추천상품', typeId: 'CT1',
       from: '2026-09-01', to: '2026-09-30', active: '활성', aliVisible: '노출',
       products: ['P1', 'P5'], stores: [], history: [] },
-    { id: 'E2', name: '성형 특별전', inner: '성형전_SC', lang: '중국어(간체)', type: '병원',
+    { id: 'E2', name: '성형 특별전', inner: '성형전_SC', lang: '중국어(간체)', type: '병원', typeId: 'CT2',
       from: '2026-09-10', to: '2026-10-10', active: '활성', aliVisible: '노출',
       products: [], stores: ['S4'], history: [] },
-    { id: 'E3', name: '영어권 스킨케어전', inner: 'skincare_EN', lang: '영어', type: '추천상품',
+    { id: 'E3', name: '영어권 스킨케어전', inner: 'skincare_EN', lang: '영어', type: '추천상품', typeId: 'CT3',
       from: '2026-09-05', to: '2026-09-25', active: '활성', aliVisible: '미노출',
       products: ['P3'], stores: [], history: [] },
-    { id: 'E4', name: '일본 고객 추천전', inner: '추천전_JP', lang: '일본어', type: '추천상품',
+    { id: 'E4', name: '일본 고객 추천전', inner: '추천전_JP', lang: '일본어', type: '추천상품', typeId: 'CT4',
       from: '2026-09-01', to: '2026-09-30', active: '활성', aliVisible: '노출',
-      products: [], stores: [], history: [] }
+      products: [], stores: [], history: [] },
+    { id: 'E5', name: '영어 PICK 2차', inner: 'pick2_EN', lang: '영어', type: '추천상품', typeId: 'CT3',
+      from: '2026-09-01', to: '2026-10-31', active: '활성', aliVisible: '노출',
+      products: ['P3'], stores: [], history: [] }
   ],
   influencers: [
     { id: 'IF1', name: '카인드스페셜_중국', show: 'KIND 한정 플랜 3종', lang: '중국어(간체)', active: true, from: '2026-09-01', to: '2026-10-31', products: ['P1', 'P8', 'P10'] },
@@ -318,6 +328,7 @@ const S = id => DB.stores.filter(x => x.id === id)[0];
 const P = id => DB.products.filter(x => x.id === id)[0];
 const A = id => DB.ads.filter(x => x.id === id)[0];
 const C = id => DB.collections.filter(x => x.id === id)[0];
+const CT = id => DB.collTypes.filter(x => x.id === id)[0];
 const M = id => DB.magazines.filter(x => x.id === id)[0];
 
 /* ---------------------------- 유효 버튼 ---------------------------- */
@@ -396,10 +407,13 @@ function innerTargetOk(inner, lang) {
   if (!inner) return { ok: true, label: '대상 없음', skip: true };
   if (inner.kind === '병원') { const st = S(inner.id); if (!st) return { ok: false, label: '병원 · 대상 없음' }; const j = judgeStore(st); return { ok: j.visible, label: '병원 · ' + st.name, j }; }
   if (inner.kind === '기획전') {
-    const c = C(inner.id); if (!c) return { ok: false, label: '기획전 · 대상 없음' };
-    const j = judgeCollection(c);
-    const ok = !j.na && j.visible && liveNow(c) && (!lang || c.lang === lang);
-    return { ok, label: '기획전 · ' + c.name, j };
+    /* 배너가 고르는 것은 기획전 한 건이 아니라 그 언어의 유형 레코드다 */
+    const t = CT(inner.id); if (!t) return { ok: false, label: '기획전 · 대상 없음' };
+    const list = DB.collections.filter(c => c.typeId === t.id);
+    /* 유형에 붙은 기획전 중 하나라도 알리페이에 노출되면 통과 */
+    const live = list.filter(c => { if (!liveNow(c)) return false; const j = judgeCollection(c); return !j.na && j.visible; }).length;
+    const ok = (!lang || t.lang === lang) && live > 0;
+    return { ok, label: '기획전 · ' + t.name, live, total: list.length };
   }
   if (inner.kind === '인플루언서') {
     const f = DB.influencers.filter(x => x.id === inner.id)[0];
@@ -796,7 +810,7 @@ function screen_aList() {
     const link = b.linkType === '외부링크' ? b.url
       : b.linkType === '내부이미지랜딩페이지' ? '랜딩페이지'
       : !b.inner || b.inner.kind === '직접입력' ? '직접입력'
-      : b.inner.kind + ' · ' + innerTargetOk(b.inner).label.split(' · ')[1];
+      : innerTargetOk(b.inner).label;
     return '<tr><td>' + b.reg + '</td><td>' + b.from + '</td><td>' + b.to + '</td><td>' + b.lang + '</td><td>' + b.pos + '</td>' +
       '<td class="c">' + visCell(j) + '</td><td>' + rsnCell(j) + '</td>' +
       '<td>' + b.linkType + '</td>' +
@@ -819,7 +833,7 @@ function screen_aList() {
 const INNER_KINDS = ['직접입력', '병원', '기획전', '인플루언서'];
 function innerOpts(kind) {
   if (kind === '병원') return DB.stores.map(s => [s.id, s.name]);
-  if (kind === '기획전') return DB.collections.map(c => [c.id, c.name]);
+  if (kind === '기획전') return DB.collTypes.map(t => [t.id, t.name + ' (' + t.type + ' · ' + t.lang + ')']);
   if (kind === '인플루언서') return DB.influencers.map(f => [f.id, f.name]);
   return [];
 }
@@ -1194,10 +1208,10 @@ window.modalNo = function () { const f = _no; closeModal(); if (f) f(); };
 window.alertBox = alertBox;
 
 
-const BASE = JSON.stringify({ products: DB.products, stores: DB.stores, ads: DB.ads, collections: DB.collections, magazines: DB.magazines, influencers: DB.influencers });
+const BASE = JSON.stringify({ products: DB.products, stores: DB.stores, ads: DB.ads, collections: DB.collections, magazines: DB.magazines, influencers: DB.influencers, collTypes: DB.collTypes });
 function applyBase() {
   const b = JSON.parse(BASE);
-  ['products', 'stores', 'ads', 'collections', 'magazines', 'influencers'].forEach(k => { DB[k].length = 0; b[k].forEach(x => DB[k].push(x)); });
+  ['products', 'stores', 'ads', 'collections', 'magazines', 'influencers', 'collTypes'].forEach(k => { DB[k].length = 0; b[k].forEach(x => DB[k].push(x)); });
   window.EDBUF = null;
 }
 function clearFilters() { Object.keys(FILTERS).forEach(k => { FILTERS[k].ali = '전체'; FILTERS[k].rsn = '전체'; }); }
@@ -1214,7 +1228,7 @@ function render() {
   holder.innerHTML = MODAL && md[MODAL] ? md[MODAL]() : '';
 }
 window.render = render; window.VIEW = VIEW; window.DB = DB; window.F = F;
-window.P = P; window.S = S; window.A = A; window.C = C;
+window.P = P; window.S = S; window.A = A; window.C = C; window.CT = CT;
 render();
 </script>
 </body>
