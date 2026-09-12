@@ -953,6 +953,9 @@ window.setCollType = function (t) {
   const kept = wasStore ? c.stores.length : c.products.length;
   const apply = () => {
     c.type = t;
+    /* 유형 레코드는 유형 값과 언어로 정해진다. 같은 언어에 그 유형 레코드가 없으면 어느 유형에도 붙지 않는다 */
+    const rec = DB.collTypes.filter(x => x.type === t && x.lang === c.lang)[0];
+    c.typeId = rec ? rec.id : null;
     /* 담는 종류가 바뀌므로 앞 유형에 담아 둔 항목은 비운다 */
     if (nowStore) { if (c.products.length) c.products = []; }
     else { if (c.stores.length) c.stores = []; }
