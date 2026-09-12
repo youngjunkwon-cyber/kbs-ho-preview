@@ -127,6 +127,7 @@ select.dim{color:#8c8c8c}
    규칙은 알리페이/ 폴더의 PRD·기능정의서 최신본 기준
    ========================================================================= */
 const ALI_LANGS = ['중국어(간체)', '중국어(번체)', '영어'];
+const TODAY = '2026-09-13';   // 시안 기준일. 노출 기간 판정에 쓴다
 const ALL_LANGS = [...ALI_LANGS, '일본어', '인도네시아어', '몽골어'];
 // 스토어 정보 수정의 언어 탭 순서 (라이브 어드민 2026-08-28 실측)
 const STORE_TABS = ['중국어(간체)', '영어', '중국어(번체)', '일본어', '인도네시아어', '몽골어'];
@@ -157,7 +158,7 @@ const MSG = {
   saveAdBtn:   '알리페이 앱 버튼이 없습니다. 저장하면 배너가 알리페이에 노출되지 않습니다. 저장할까요?',
   saveAdTgt:   t => '연결 대상(' + t + ')이 미노출입니다. 저장하면 배너도 알리페이에 노출되지 않습니다. 저장할까요?',
   saveAdExt:   '외부링크 배너는 알리페이에 노출되지 않습니다. 저장할까요?',
-  typeSwitch:  (was, n, now) => '유형을 변경하면 담은 ' + was + ' ' + n + '건이 삭제되고 ' + now + '만 담을 수 있습니다. 변경할까요?',
+  typeSwitch:  (was, n, now) => '유형을 변경하면 담은 ' + was + ' ' + n + '건이 삭제되고 ' + now + '만 담을 수 있습니다. ' + now + '를 1개 이상 담아야 저장할 수 있습니다. 변경할까요?',
   saveColl:    s => '노출 가능한 ' + s + ' 없습니다. 저장하면 기획전이 알리페이에 노출되지 않습니다. 저장할까요?',
   bnExtLock:   '외부링크 배너는 알리페이에 노출되지 않습니다. 이 설정은 수정할 수 없습니다.',
   bnBtnExtLock:'하단 버튼이 외부링크입니다. 알리페이 앱에서 켤 수 없어 배너도 노출되지 않습니다.',
@@ -275,8 +276,8 @@ const DB = {
       products: [], stores: [], history: [] }
   ],
   influencers: [
-    { id: 'IF1', name: '카인드스페셜_중국', show: 'KIND 한정 플랜 3종', lang: '중국어(간체)', active: true, products: ['P1', 'P8', 'P10'] },
-    { id: 'IF2', name: '디올레스페셜_중국', show: 'Diore 추천 플랜', lang: '중국어(간체)', active: true, products: ['P4', 'P8'] }
+    { id: 'IF1', name: '카인드스페셜_중국', show: 'KIND 한정 플랜 3종', lang: '중국어(간체)', active: true, from: '2026-09-01', to: '2026-10-31', products: ['P1', 'P8', 'P10'] },
+    { id: 'IF2', name: '디올레스페셜_중국', show: 'Diore 추천 플랜', lang: '중국어(간체)', active: true, from: '2026-09-01', to: '2026-10-31', products: ['P4', 'P8'] }
   ],
   magazines: [{ id: 'M1', title: '가을 두피 관리 가이드', lang: '중국어(간체)', status: '게시', reg: '2026-09-02 11:20',
     body: '가을에는 두피가 건조해집니다. 자세한 코스는 <a href="https://k-beautystation.com/products/P1">상품 페이지</a>에서 확인하세요. 후기 영상은 https://www.instagram.com/p/abc/ 에서 볼 수 있습니다. <iframe src="https://www.youtube.com/embed/xyz"></iframe>' }],
@@ -384,18 +385,29 @@ function judgeStore(st) {
   if (!c2 && c1) conds.push({ s: 'sk', t: '스토어 페이지만 보이지 않고, 이 스토어 상품은 각자 조건대로 나간다.' });
   return { na: false, visible: !reason, reason, conds };
 }
+/* 기존 노출 조건. 웹에서 이미 빠진 건은 알리페이에서도 연결 대상으로 치지 않는다 */
+function liveNow(o) {
+  const on = o.active === undefined ? true : (o.active === '활성' || o.active === true);
+  return on && (!o.from || o.from <= TODAY) && (!o.to || o.to >= TODAY);
+}
 // 내부링크 대상 판정. 병원·기획전·인플루언서는 대상을 보고, 직접입력만 그대로 통과한다.
-function innerTargetOk(inner) {
+// 배너와 대상의 언어가 다르면 눌렀을 때 다른 언어 화면으로 가므로 통과시키지 않는다. 스토어는 언어가 없어 제외한다.
+function innerTargetOk(inner, lang) {
   if (!inner) return { ok: true, label: '대상 없음', skip: true };
   if (inner.kind === '병원') { const st = S(inner.id); if (!st) return { ok: false, label: '병원 · 대상 없음' }; const j = judgeStore(st); return { ok: j.visible, label: '병원 · ' + st.name, j }; }
-  if (inner.kind === '기획전') { const c = C(inner.id); if (!c) return { ok: false, label: '기획전 · 대상 없음' }; const j = judgeCollection(c); return { ok: !j.na && j.visible, label: '기획전 · ' + c.name, j }; }
+  if (inner.kind === '기획전') {
+    const c = C(inner.id); if (!c) return { ok: false, label: '기획전 · 대상 없음' };
+    const j = judgeCollection(c);
+    const ok = !j.na && j.visible && liveNow(c) && (!lang || c.lang === lang);
+    return { ok, label: '기획전 · ' + c.name, j };
+  }
   if (inner.kind === '인플루언서') {
     const f = DB.influencers.filter(x => x.id === inner.id)[0];
     if (!f) return { ok: false, label: '인플루언서 · 대상 없음' };
     /* 인플루언서 기획전은 우리 상품으로 구성된다. 상품 판정에 알리페이 버튼 조건이 이미 들어 있다 */
     const live = (f.products || []).filter(id => { const p = P(id); if (!p) return false; const j = judgeProduct(p); return !j.na && j.visible; }).length;
-    const langOk = ALI_LANGS.indexOf(f.lang) !== -1;
-    return { ok: langOk && f.active !== false && live > 0, label: '인플루언서 · ' + f.name, live };
+    const ok = live > 0 && liveNow(f) && (!lang || f.lang === lang);
+    return { ok, label: '인플루언서 · ' + f.name, live };
   }
   return { ok: true, label: '직접입력', skip: true };
 }
@@ -407,7 +419,7 @@ function judgeAd(b) {
   let noBtn = false, targetOut = null;
   if (ext) conds.push({ s: 'no', t: '② 외부링크는 알리페이 앱에서 열리지 않는다' });
   else if (b.linkType === '내부링크') {
-    const tv = innerTargetOk(b.inner);
+    const tv = innerTargetOk(b.inner, b.lang);
     conds.push({ s: tv.skip ? 'sk' : tv.ok ? 'ok' : 'no', t: '② 내부링크 대상(' + tv.label + ')' + (tv.skip ? '은 판정 대상이 아니라 그대로 노출한다' : tv.ok ? '이 알리페이에 노출된다' : '이 알리페이에 노출되지 않는다') });
     if (!tv.ok) targetOut = tv.label;
   } else {
@@ -417,7 +429,7 @@ function judgeAd(b) {
     noBtn = !bt || !bt.ali || btExt;
     conds.push({ s: noBtn ? 'no' : 'ok', t: '② 하단 버튼 알리페이 표시여부 = ' + (!bt ? '버튼 없음' : btExt ? '비활성화 (버튼 링크 종류가 외부링크라 잠김)' : bt.ali ? '활성화' : '비활성화') });
     if (!noBtn && bt.linkKind === '내부링크') {
-      const tv = innerTargetOk(bt.inner);
+      const tv = innerTargetOk(bt.inner, b.lang);
       conds.push({ s: tv.skip ? 'sk' : tv.ok ? 'ok' : 'no', t: '버튼 내부링크 대상(' + tv.label + ')' + (tv.skip ? '은 판정 대상이 아니다' : tv.ok ? '이 알리페이에 노출된다' : '이 알리페이에 노출되지 않는다') });
       if (!tv.ok) targetOut = tv.label;
     } else if (!noBtn) conds.push({ s: 'sk', t: '버튼 링크 종류가 ' + (bt.linkKind || '링크없음') + '이라 연결 대상을 보지 않는다' });
@@ -1202,6 +1214,7 @@ function render() {
   holder.innerHTML = MODAL && md[MODAL] ? md[MODAL]() : '';
 }
 window.render = render; window.VIEW = VIEW; window.DB = DB; window.F = F;
+window.P = P; window.S = S; window.A = A; window.C = C;
 render();
 </script>
 </body>
