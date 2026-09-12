@@ -1162,7 +1162,7 @@ window.save = function (kind) {
   if (kind === 'store' && obj.aliVisible === '미노출' && VIEW.savedVis === '노출' && (obj.prodCount > 0 || im0.M || im0.K)) {
     const im = im0;
     confirmBox('알리페이 미노출로 저장',
-      '<p><b>' + esc(obj.name) + '</b></p><p>이 스토어를 알리페이 앱에서 숨기면 등록된 상품 ' + obj.prodCount + '건도 함께 보이지 않습니다.</p>' +
+      '<p><b>' + esc(obj.name) + '</b></p><p>이 스토어를 알리페이 앱에서 숨기면 이 스토어 상품 ' + obj.prodCount + '건도 함께 보이지 않습니다.</p>' +
       ((im.M || im.K) ? '<p>이 스토어가 빠지면서 알리페이 앱에 보이지 않게 되는 ' + [im.M ? '배너 ' + im.M + '건' : '', im.K ? '기획전 ' + im.K + '건' : ''].filter(Boolean).join('과 ') + '도 있습니다. 지워지는 것은 없습니다.</p>' : '') +
       '<p class="hint">웹 노출에는 영향이 없습니다.</p>',
       function () { done(); }, function () {}, '미노출로 저장');
