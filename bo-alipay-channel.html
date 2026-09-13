@@ -53,17 +53,12 @@ tbody tr:hover td{background:#fcfcfc}
 td.c,th.c{text-align:center}
 .tblnote{font-size:12px;color:#8c8c8c;white-space:normal}
 .notice{background:#fff7e6;border:1px solid #ffe7b8;color:#d46b08;padding:10px 14px;border-radius:4px;font-size:13px;line-height:1.7;margin:12px 0}
-.notice.grey{background:#fafafa;border-color:#f0f0f0;color:#595959}
 .notice.red{background:#fff1f0;border-color:#ffccc7;color:#cf1322}
-.note{background:#f7f7f8;border:1px dashed #d9d9d9;color:#595959;padding:9px 12px;border-radius:4px;font-size:12px;line-height:1.7;margin:10px 0}
-.note b{display:inline-block;background:#e9e9ec;color:#595959;font-size:11px;font-weight:600;border-radius:3px;padding:1px 6px;margin-right:6px;vertical-align:1px}
 button{font-family:inherit;font-size:13px}
 .btn{padding:6px 14px;border:1px solid #d9d9d9;background:#fff;border-radius:4px;cursor:pointer;color:#434343}
 .btn:hover{border-color:#e8537a;color:#e8537a}
 .btn.blue{background:#1677ff;border-color:#1677ff;color:#fff}
 .btn.blue:hover{opacity:.9;color:#fff}
-.btn.pri{background:#e8537a;border-color:#e8537a;color:#fff}
-.btn.pri:hover{opacity:.9;color:#fff}
 .btn.sm{padding:3px 9px;font-size:12px}
 .btn.red{color:#ff4d4f;border-color:#ffa39e}
 .btn:disabled{background:#f5f5f5;border-color:#d9d9d9;color:#bfbfbf;cursor:not-allowed}
@@ -265,7 +260,9 @@ const DB = {
     { id: 'CT1', type: '추천상품', lang: '중국어(간체)', name: 'K-Beauty Station 精选商家' },
     { id: 'CT2', type: '병원', lang: '중국어(간체)', name: '和值得信赖的医院聊聊吧' },
     { id: 'CT3', type: '추천상품', lang: '영어', name: "K-Beauty Station's PICK!" },
-    { id: 'CT4', type: '추천상품', lang: '일본어', name: 'K-Beauty Stationおすすめ' }
+    { id: 'CT4', type: '추천상품', lang: '일본어', name: 'K-Beauty Stationおすすめ' },
+    { id: 'CT5', type: '특가', lang: '중국어(간체)', name: '限时特惠' },
+    { id: 'CT6', type: 'TOP10', lang: '중국어(간체)', name: 'TOP 10' }
   ],
   // 기획전. 유형이 구성 항목을 가른다. 추천상품은 상품만, 병원은 스토어만 담는다.
   collections: [
@@ -467,7 +464,7 @@ const COLL_LANGS = [
 ];
 const isStoreColl = c => c.type === '병원';
 function judgeCollection(c) {
-  if (ALI_LANGS.indexOf(c.lang) === -1) return { na: true, visible: false, reason: '', conds: [{ s: 'sk', t: '언어 = ' + c.lang + '. 대상 언어가 아니라 판정하지 않는다.' }] };
+  if (ALI_LANGS.indexOf(c.lang) === -1) return { na: true, visible: false, reason: '', liveCount: 0, conds: [{ s: 'sk', t: '언어 = ' + c.lang + '. 대상 언어가 아니라 판정하지 않는다.' }] };
   const c1 = c.aliVisible === '노출';
   const byStore = isStoreColl(c);
   const total = byStore ? c.stores.length : c.products.length;
@@ -588,7 +585,7 @@ function btnTable(kind, obj) {
     html += '<div class="notice red">' + over + '입니다. 채널당 2개 이하여야 저장할 수 있습니다.</div>';
   }
   if (locked) html += '<div class="hint">기본 설정 적용 중입니다. 개별 설정을 선택하면 수정할 수 있습니다.</div>';
-  else if (selfHidden) html += '<div class="hint">' + MSG.lockSelf + '</div>';
+  else if (selfHidden && langOk) html += '<div class="hint">' + MSG.lockSelf + '</div>';
   if (langOk && !selfHidden && !storeHidden && aliCnt === 0) html += '<div class="notice">' + MSG.noAliBtn(isStore ? '이 스토어는' : '이 상품은', isStore ? '' : '아래 버튼 설정') + '</div>';
   return html;
 }
@@ -755,8 +752,7 @@ function screen_sList() {
     '<th>No.</th><th>등록일</th><th>사업자명</th><th>스토어명</th>' +
     '<th>알리페이 노출</th><th>사유</th>' +
     '<th>카테고리</th><th>지원언어</th><th>대표번호</th><th>사업자번호</th><th>이메일</th><th>우편번호</th><th>지역</th><th>위도</th><th>경도</th><th>지하철 정보</th><th>Actions</th>' +
-    '</tr></thead><tbody>' + (body || empty(17)) + '</tbody></table></div></div>' +
-    '<div class="card"><div class="bd">';
+    '</tr></thead><tbody>' + (body || empty(17)) + '</tbody></table></div></div>';
 }
 
 /* ------------------- 스토어 정보 수정 (실측: 섹션 앵커 페이지) ------------------- */
@@ -794,7 +790,7 @@ function screen_sEdit() {
       '<div class="row"><div class="lbl">메신저 링크 URL</div><div class="val"><span class="mono">' + (st.messenger.length ? esc(st.messenger[0].url) : '-') + '</span></div></div>' +
       '<div class="row"><div class="lbl">메신저 QR코드 이미지</div><div class="val"><span class="tblnote">이미지 업로드</span></div></div>';
   } else {
-    bd = '<div class="bd">';
+    bd = '<div class="bd"></div>';
   }
   return '<div class="phd"><div><h2 class="page">스토어 정보 수정</h2><div class="pdesc">' + esc(st.name) + '</div><div class="pdesc">스토어 기본 정보와 운영 설정을 수정합니다.</div></div></div>' +
     '<div class="anchors" style="justify-content:space-between;align-items:center">' +
@@ -895,8 +891,8 @@ function modal_ad() {
       '<div class="row"><div class="lbl"><span class="req">*</span>버튼 표시여부</div><div class="val">' +
       '<div style="display:flex;gap:36px;flex-wrap:wrap;align-items:center">' +
       '<span><span class="tblnote" style="margin-right:8px">웹</span>' + onoff('bshw', b.btn.web, "setAdBtnShow('web',%V%)", false, ['활성화', '비활성화']) + '</span>' +
-      '<span class="' + (extBtn || bnHidden ? 'lock' : '') + '"><span class="tblnote" style="margin-right:8px">알리페이</span>' + onoff('bsha', b.btn.ali, "setAdBtnShow('ali',%V%)", extBtn || bnHidden || !langOk, ['활성화', '비활성화']) + '</span></div>' +
-      (extBtn ? '<div class="hint">' + MSG.bnBtnExtLock + '</div>' : bnHidden ? '<div class="hint">' + MSG.lockSelf + '</div>' : '') +
+      '<span class="' + (extBtn || bnHidden || !langOk ? 'lock' : '') + '"><span class="tblnote" style="margin-right:8px">알리페이</span>' + onoff('bsha', b.btn.ali, "setAdBtnShow('ali',%V%)", extBtn || bnHidden || !langOk, ['활성화', '비활성화']) + '</span></div>' +
+      (!langOk ? '' : extBtn ? '<div class="hint">' + MSG.bnBtnExtLock + '</div>' : bnHidden ? '<div class="hint">' + MSG.lockSelf + '</div>' : '') +
       '</div></div>' +
       '<div class="row"><div class="lbl"><span class="req">*</span>버튼 텍스트</div><div class="val"><input type="text" value="' + esc(b.btn.label) + '" style="width:260px"></div></div>' +
       '<div class="row"><div class="lbl"><span class="req">*</span>버튼 링크 종류</div><div class="val">' +
@@ -1062,10 +1058,10 @@ function screen_btnSpec() {
       '<td class="tblnote">' + r[2] + '</td></tr>';
   });
   return '<div class="phd"><div><h2 class="page">버튼 설정 공통 구조</h2>' +
-    '<div class="pdesc">상품과 스토어가 같은 구조를 씁니다. 이 화면은 구조만 보여 주는 곳이고, 실제 조작은 상품 수정과 스토어 정보 수정에서 합니다.</div></div></div>' +
+    '<div class="pdesc">상품과 스토어의 버튼 설정이 공유하는 항목과 규칙입니다.</div></div></div>' +
     '<div class="card"><div class="hd">표 구조</div><div class="bd"><div class="tblwrap">' +
     '<table><thead><tr><th style="min-width:300px">항목</th><th style="width:220px">웹</th>' +
-    '<th style="width:220px">알리페이</th><th style="min-width:320px">항목별 안내</th></tr></thead>' +
+    '<th style="width:220px">알리페이 앱</th><th style="min-width:320px">항목별 안내</th></tr></thead>' +
     '<tbody>' + rows + '</tbody></table></div>' + '</div></div>' +
     '<div class="card"><div class="hd">버튼 개수 세는 법</div><div class="bd">' +
     '<div class="row"><div class="lbl">세는 법</div><div class="val">문의하기 통합을 켜면 문의하기 버튼 하나로 셉니다(상담접수 포함). 통합을 끄고 상담접수만 켜면 상담접수 버튼 하나입니다. 채팅, 외부링크, 메신저, 예약은 각각 버튼 하나입니다.</div></div>' +
@@ -1113,7 +1109,7 @@ function screen_mEdit() {
   const cur = window.EDBUF != null ? window.EDBUF : m.body;
   const sc = scanBody(cur);
   return '<div class="phd"><div><h2 class="page">매거진 등록·수정</h2>' +
-    '<div class="pdesc">매거진 본문에 외부 사이트 주소와 외부 영상·SNS 넣기를 넣을 수 없게 막습니다. 알리페이 노출 설정은 두지 않습니다.</div></div>' +
+    '<div class="pdesc">매거진 글을 등록, 수정, 삭제할 수 있습니다.</div></div>' +
     '<div><button class="btn">목록</button></div></div>' +
     '<div class="card"><div class="hd">기본 정보</div><div class="bd">' +
     '<div class="row"><div class="lbl">제목</div><div class="val">' + esc(m.title) + '</div></div>' +
