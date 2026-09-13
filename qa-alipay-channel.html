@@ -211,13 +211,6 @@ function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catc
 function get(id) { return state[id] || { v: '', m: '' }; }
 function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
-/* 2026-09-13 규칙 변경으로 다시 확인한 케이스 11건. 실측으로 통과를 확인해 기록한다. 기기마다 한 번만 */
-var SEED2 = ['S-03', 'E-05', 'E-07', 'E-08', 'E-10', 'B-05', 'B-13', 'B-14', 'B-15', 'B-16', 'B-17'];
-if (!state.seed2) {
-  SEED2.forEach(function (id) { state[id] = { v: 'p', m: '' }; });
-  state.seed2 = 1;
-  save();
-}
 
 function runInPreview(code, alsoReset) {
   var w = frame.contentWindow;
@@ -344,7 +337,7 @@ document.getElementById('doCopy').addEventListener('click', function () {
 });
 document.getElementById('reset').addEventListener('click', function () {
   if (!confirm('기록한 통과·실패와 메모를 모두 지웁니다. 계속할까요?')) return;
-  state = { seed2: 1 }; save(); render();
+  state = {}; save(); render();
 });
 render();
 </script>
