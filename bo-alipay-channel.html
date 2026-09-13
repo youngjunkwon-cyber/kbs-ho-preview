@@ -394,6 +394,7 @@ function judgeStore(st) {
   return { na: false, visible: !reason, reason, conds };
 }
 /* 기존 노출 조건. 웹에서 이미 빠진 건은 알리페이에서도 연결 대상으로 치지 않는다 */
+const liveProduct = p => p.status === '승인' && p.active !== false && !p.hidden;
 function liveNow(o) {
   const on = o.active === undefined ? true : (o.active === '활성' || o.active === true);
   return on && (!o.from || o.from <= TODAY) && (!o.to || o.to >= TODAY);
@@ -416,7 +417,7 @@ function innerTargetOk(inner, lang) {
     const f = DB.influencers.filter(x => x.id === inner.id)[0];
     if (!f) return { ok: false, label: '인플루언서 · 대상 없음' };
     /* 인플루언서 기획전은 우리 상품으로 구성된다. 상품 판정에 알리페이 버튼 조건이 이미 들어 있다 */
-    const live = (f.products || []).filter(id => { const p = P(id); if (!p) return false; const j = judgeProduct(p); return !j.na && j.visible; }).length;
+    const live = (f.products || []).filter(id => { const p = P(id); if (!p || !liveProduct(p)) return false; const j = judgeProduct(p); return !j.na && j.visible; }).length;
     const ok = live > 0 && liveNow(f) && (!lang || f.lang === lang);
     return { ok, label: '인플루언서 · ' + f.name, live };
   }
@@ -469,8 +470,8 @@ function judgeCollection(c) {
   const byStore = isStoreColl(c);
   const total = byStore ? c.stores.length : c.products.length;
   const live = byStore
-    ? c.stores.filter(id => { const st = S(id); return st && judgeStore(st).visible; }).length
-    : c.products.filter(id => { const p = P(id); if (!p) return false; const j = judgeProduct(p); return !j.na && j.visible; }).length;
+    ? c.stores.filter(id => { const st = S(id); return st && st.active !== false && judgeStore(st).visible; }).length
+    : c.products.filter(id => { const p = P(id); if (!p || !liveProduct(p)) return false; const j = judgeProduct(p); return !j.na && j.visible; }).length;
   const conds = [{ s: c1 ? 'ok' : 'no', t: '① 알리페이 노출 설정 = ' + c.aliVisible },
                  { s: live ? 'ok' : 'no', t: '④ 노출 가능 ' + (byStore ? '스토어' : '상품') + ' ' + live + '건 (담은 ' + total + '건)' }];
   if (byStore) c.stores.forEach(id => { const st = S(id); if (!st) return; const j = judgeStore(st); conds.push({ s: j.visible ? 'ok' : 'no', t: '스토어 · ' + st.name + ' → ' + (j.visible ? '노출' : '미노출 (' + j.reason + ')') }); });
@@ -717,7 +718,7 @@ function modal_product() {
       '<div class="row"><div class="lbl">히든 여부</div><div class="val">' + onoff('phid', p.hidden, 'void(%V%)', true) + '</div></div>' +
       '<div class="row"><div class="lbl"><span class="req">*</span>알리페이 노출</div><div class="val"><span class="rg">' +
       radio('pv', '노출', langOk ? p.aliVisible : '노출', "setVis('product','노출')", visDis) + radio('pv', '미노출', langOk ? p.aliVisible : '노출', "setVis('product','미노출')", visDis) + '</span>' +
-      (langOk && st.aliVisible === '미노출' ? '<div class="notice">' + MSG.lockStore + '</div>' : '') +
+      (langOk && st.aliVisible === '미노출' ? '<div class="hint">' + MSG.lockStore + '</div>' : '') +
       '</div></div>' +
       '<div class="blk">버튼 설정</div>' +
       '<div class="row"><div class="lbl"><span class="req">*</span>스토어 설정 적용</div><div class="val"><span class="rg">' +
@@ -827,15 +828,17 @@ function screen_aList() {
 
 /* ------------------ 광고 수정 모달 (실측 폼 + 알리페이 항목) ------------------ */
 const INNER_KINDS = ['직접입력', '병원', '기획전', '인플루언서'];
-function innerOpts(kind) {
+function innerOpts(kind, keepId) {
+  const b = A(VIEW.id), lang = b && b.lang;
+  const same = x => !lang || x.lang === lang || x.id === keepId;
   if (kind === '병원') return DB.stores.map(s => [s.id, s.name]);
-  if (kind === '기획전') return DB.collTypes.map(t => [t.id, t.name + ' (' + t.type + ' · ' + t.lang + ')']);
-  if (kind === '인플루언서') return DB.influencers.map(f => [f.id, f.name]);
+  if (kind === '기획전') return DB.collTypes.filter(same).map(t => [t.id, t.name + ' (' + t.type + ' · ' + t.lang + ')']);
+  if (kind === '인플루언서') return DB.influencers.filter(same).map(f => [f.id, f.name]);
   return [];
 }
 function innerPicker(kindH, idH, cur) {
   const kind = (cur && cur.kind) || '직접입력';
-  const opts = innerOpts(kind);
+  const opts = innerOpts(kind, cur && cur.id);
   return '<select onchange="' + kindH + '">' + INNER_KINDS.map(k => '<option' + (k === kind ? ' selected' : '') + '>' + k + '</option>').join('') + '</select> ' +
     (kind === '직접입력' ? '<input type="text" placeholder="/stores/226" style="width:220px" readonly> <span class="tblnote">직접입력은 알리페이 노출 확인 대상이 아닙니다.</span>'
       : '<select onchange="' + idH + '">' + opts.map(o => '<option value="' + o[0] + '"' + (cur && cur.id === o[0] ? ' selected' : '') + '>' + esc(o[1]) + '</option>').join('') + '</select>');
@@ -931,6 +934,7 @@ function screen_cList() {
 /* ------------------------ 기획전 수정 모달 (실측) ------------------------ */
 let COLLPICK = false;
 let COLLSEL = {};
+let COLLSNAP = null;   // 기획전 모달을 열 때의 원본. 취소하면 되돌린다
 window.collSel = function (id, on) { if (on) COLLSEL[id] = true; else delete COLLSEL[id]; render(); };
 window.collSelAll = function (on) { COLLSEL = {}; if (on) { const c = C(VIEW.id); (isStoreColl(c) ? c.stores : c.products).forEach(x => COLLSEL[x] = true); } render(); };
 window.collDelSel = function () {
@@ -940,7 +944,7 @@ window.collDelSel = function () {
   else { c.products = c.products.filter(x => ids.indexOf(x) === -1); }
   COLLSEL = {}; render();
 };
-window.openColl = function (id) { VIEW.id = id; MODAL = 'coll'; COLLPICK = false; COLLSEL = {}; render(); };
+window.openColl = function (id) { VIEW.id = id; MODAL = 'coll'; COLLPICK = false; COLLSEL = {}; COLLSNAP = JSON.stringify(C(id)); render(); };
 window.collPick = function (v) { COLLPICK = v; render(); };
 window.setCollType = function (t) {
   const c = C(VIEW.id); if (c.type === t) return;
@@ -1138,7 +1142,7 @@ function modal_link() {
 window.saveColl = function () {
   const c = C(VIEW.id), j = judgeCollection(c), byStore = isStoreColl(c);
   const langOk = ALI_LANGS.indexOf(c.lang) !== -1;
-  const done = () => { closeMD(); alertBox('저장했습니다', MSG.saveDone); };
+  const done = () => { COLLSNAP = null; closeMD(); alertBox('저장했습니다', MSG.saveDone); };
   const total = byStore ? c.stores.length : c.products.length;
   /* 구성 항목은 필수다. 하나도 없으면 저장하지 않는다 */
   if (!total) { alertBox('저장할 수 없습니다', MSG.collEmpty(byStore ? '스토어를' : '상품을')); return; }
@@ -1192,7 +1196,10 @@ window.save = function (kind) {
 
 /* ------------------------------- 모달 ------------------------------- */
 let MODAL = null;
-window.closeMD = function () { MODAL = null; render(); };
+window.closeMD = function () {
+  if (MODAL === 'coll' && COLLSNAP) { const c = C(VIEW.id); if (c) Object.assign(c, JSON.parse(COLLSNAP)); }
+  COLLSNAP = null; MODAL = null; render();
+};
 function alertBox(title, body) {
   el('#modals').innerHTML = '<div class="mask" style="z-index:80"><div class="modal" style="max-width:520px"><div class="hd">' + title + '<button class="x" onclick="closeModal()">✕</button></div><div class="bd">' + body + '</div><div class="ft"><button class="btn blue" onclick="closeModal()">확인</button></div></div></div>';
 }
