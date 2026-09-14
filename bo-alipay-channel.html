@@ -568,7 +568,7 @@ function btnTable(kind, obj) {
 
   const cw = 220;   // 상품·스토어 모두 페이지라 같은 폭을 쓴다
   let html = '<div class="tblwrap"><table><thead><tr><th style="min-width:300px">항목</th><th style="width:' + cw + 'px">웹</th>' +
-    '<th style="width:' + cw + 'px">알리페이 앱</th><th style="min-width:160px"></th></tr></thead><tbody>';
+    '<th style="width:' + cw + 'px">알리페이</th><th style="min-width:160px"></th></tr></thead><tbody>';
   rows.forEach(r => {
     const e = eff.btns[r.k];
     let webDis = locked, aliDis = aliOffAll || r.aliHardOff, note = '';
@@ -1086,7 +1086,7 @@ function screen_btnSpec() {
     '<div class="pdesc">상품과 스토어의 버튼 설정이 공유하는 항목과 규칙입니다.</div></div></div>' +
     '<div class="card"><div class="hd">표 구조</div><div class="bd"><div class="tblwrap">' +
     '<table><thead><tr><th style="min-width:300px">항목</th><th style="width:220px">웹</th>' +
-    '<th style="width:220px">알리페이 앱</th><th style="min-width:320px">항목별 안내</th></tr></thead>' +
+    '<th style="width:220px">알리페이</th><th style="min-width:320px"></th></tr></thead>' +
     '<tbody>' + rows + '</tbody></table></div>' + '</div></div>' +
     '<div class="card"><div class="hd">버튼 개수 세는 법</div><div class="bd">' +
     '<div class="row"><div class="lbl">세는 법</div><div class="val">문의하기 통합을 켜면 문의하기 버튼 하나로 셉니다(상담접수 포함). 통합을 끄고 상담접수만 켜면 상담접수 버튼 하나입니다. 채팅, 외부링크, 메신저, 예약은 각각 버튼 하나입니다.</div></div>' +
@@ -1173,8 +1173,7 @@ window.saveColl = function () {
   const lines = (byStore ? c.stores : c.products).map(id => {
     const o = byStore ? S(id) : P(id); if (!o) return '';
     const oj = byStore ? judgeStore(o) : judgeProduct(o);
-    const WHY = { '미노출 설정': '알리페이 노출 미노출', '스토어 설정 미노출': '스토어가 미노출', '알리페이 버튼 미설정': '알리페이 앱 버튼 없음' };
-    const why = oj.na ? '대상 언어 아님' : (oj.visible ? '노출' : (WHY[oj.reason] || oj.reason));
+    const why = oj.na ? '대상 언어 아님' : (oj.visible ? '노출' : oj.reason);
     return '<p class="hint" style="margin:2px 0">' + esc(o.name) + ' → ' + why + '</p>';
   }).join('');
   confirmBox('저장 확인',
@@ -1201,7 +1200,8 @@ window.save = function (kind) {
     const im = im0;
     confirmBox('알리페이 미노출로 저장',
       '<p><b>' + esc(obj.name) + '</b></p><p>이 스토어를 알리페이 앱에서 숨기면 이 스토어 상품 ' + obj.prodCount + '건도 함께 보이지 않습니다.</p>' +
-      ((im.M || im.K) ? '<p>이 스토어가 빠지면서 알리페이 앱에 보이지 않게 되는 ' + [im.M ? '배너 ' + im.M + '건' : '', im.K ? '기획전 ' + im.K + '건' : ''].filter(Boolean).join('과 ') + '도 있습니다. 지워지는 것은 없습니다.</p>' : '') +
+      ((im.M || im.K) ? '<p>이 스토어가 빠지면서 알리페이 앱에 보이지 않게 되는 ' + [im.M ? '배너 ' + im.M + '건' : '', im.K ? '기획전 ' + im.K + '건' : ''].filter(Boolean).join('과 ') + '도 있습니다.</p>' : '') +
+      '<p>지워지는 것은 없습니다.</p>' +
       '<p class="hint">웹 노출에는 영향이 없습니다.</p>',
       function () { done(); }, function () {}, '미노출로 저장');
     return;
@@ -1222,12 +1222,12 @@ window.closeMD = function () {
   COLLSNAP = null; MODAL = null; render();
 };
 function alertBox(title, body) {
-  el('#modals').innerHTML = '<div class="mask" style="z-index:80"><div class="modal" style="max-width:520px"><div class="hd">' + title + '<button class="x" onclick="closeModal()">✕</button></div><div class="bd">' + body + '</div><div class="ft"><button class="btn blue" onclick="closeModal()">확인</button></div></div></div>';
+  el('#modals').innerHTML = '<div class="mask" style="z-index:80"><div class="modal" style="max-width:620px"><div class="hd">' + title + '<button class="x" onclick="closeModal()">✕</button></div><div class="bd">' + body + '</div><div class="ft"><button class="btn blue" onclick="closeModal()">확인</button></div></div></div>';
 }
 let _yes = null, _no = null;
 function confirmBox(title, body, yes, no, okLabel) {
   _yes = yes; _no = no;
-  el('#modals').innerHTML = '<div class="mask" style="z-index:80"><div class="modal" style="max-width:560px"><div class="hd">' + title + '<button class="x" onclick="modalNo()">✕</button></div><div class="bd">' + body + '</div><div class="ft"><button class="btn" onclick="modalNo()">취소</button><button class="btn blue" onclick="modalYes()">' + (okLabel || '저장') + '</button></div></div></div>';
+  el('#modals').innerHTML = '<div class="mask" style="z-index:80"><div class="modal" style="max-width:620px"><div class="hd">' + title + '<button class="x" onclick="modalNo()">✕</button></div><div class="bd">' + body + '</div><div class="ft"><button class="btn" onclick="modalNo()">취소</button><button class="btn blue" onclick="modalYes()">' + (okLabel || '저장') + '</button></div></div></div>';
 }
 window.closeModal = function () { el('#modals').innerHTML = ''; };
 window.modalYes = function () { const f = _yes; closeModal(); if (f) f(); };
