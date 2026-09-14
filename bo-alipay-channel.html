@@ -147,8 +147,10 @@ const ROWS_PRODUCT = [
 ];
 const ROWS_STORE = [...ROWS_PRODUCT, { k: 'booking', label: '예약', needBooking: true }];
 
+/* 받침이 있으면 을, 없으면 를 */
+const eul = w => ((w.charCodeAt(w.length - 1) - 0xAC00) % 28 ? '을' : '를');
 const MSG = {
-  noAliBtn:    (s, where) => '알리페이 앱 버튼이 없어 알리페이에 노출되지 않습니다.' + (where ? ' ' + where + '에서 1개 이상 켜면 노출됩니다.' : ''),
+  noAliBtn:    where => '알리페이 앱 버튼이 없어 알리페이에 노출되지 않습니다.' + (where ? ' ' + where + '에서 1개 이상 켜면 노출됩니다.' : ''),
   hardOff:     '알리페이 앱 미지원 항목입니다.',
   needConsult: '상담접수를 켜면 사용할 수 있습니다.',
   needBooking: '예약설정에서 예약을 사용하면 켤 수 있습니다.',
@@ -162,7 +164,7 @@ const MSG = {
   saveAdBtn:   '알리페이 앱 버튼이 없습니다. 저장하면 배너가 알리페이에 노출되지 않습니다. 저장할까요?',
   saveAdTgt:   t => '연결 대상(' + t + ')이 미노출입니다. 저장하면 배너도 알리페이에 노출되지 않습니다. 저장할까요?',
   saveAdExt:   '외부링크 배너는 알리페이에 노출되지 않습니다. 저장할까요?',
-  typeSwitch:  (was, n, now) => '유형을 변경하면 담은 ' + was + ' ' + n + '건이 삭제되고 ' + now + '만 담을 수 있습니다. ' + now + '를 1개 이상 담아야 저장할 수 있습니다. 변경할까요?',
+  typeSwitch:  (was, n, now) => '유형을 변경하면 담은 ' + was + ' ' + n + '건이 삭제되고 ' + now + '만 담을 수 있습니다. ' + now + eul(now) + ' 1개 이상 담아야 저장할 수 있습니다. 변경할까요?',
   saveColl:    s => '노출 가능한 ' + s + ' 없습니다. 저장하면 기획전이 알리페이에 노출되지 않습니다. 저장할까요?',
   bnExtLock:   '외부링크 배너는 알리페이에 노출되지 않습니다. 이 설정은 수정할 수 없습니다.',
   bnBtnExtLock:'하단 버튼이 외부링크입니다. 알리페이 앱에서 켤 수 없어 배너도 노출되지 않습니다.',
@@ -371,36 +373,24 @@ const onCount = (b, rows, ch) => ctaList(b, rows, ch).length;
 
 /* ------------------------------- 판정 ------------------------------- */
 function judgeProduct(p) {
-  if (ALI_LANGS.indexOf(p.lang) === -1) return { na: true, visible: false, reason: '', conds: [{ s: 'sk', t: '언어 = ' + p.lang + '. 알리페이 채널 대상 언어가 아니라 판정하지 않는다.' }] };
+  if (ALI_LANGS.indexOf(p.lang) === -1) return { na: true, visible: false, reason: '' };
   const st = S(p.store), e = effBtns(p);
   const c1 = p.aliVisible === '노출', c3 = st.aliVisible === '노출';
   const c2 = onCount(e.btns, ROWS_PRODUCT, 'ali') > 0;
-  const conds = [
-    { s: c1 ? 'ok' : 'no', t: '① 알리페이 노출 설정 = ' + p.aliVisible },
-    { s: c2 ? 'ok' : 'no', t: '② 알리페이 앱에서 누를 수 있는 버튼 ' + onCount(e.btns, ROWS_PRODUCT, 'ali') + '개' + (e.chatAuto ? ' (기본 설정 · 채팅 자동 ON)' : '') },
-    { s: c3 ? 'ok' : 'no', t: '③ 스토어(' + st.name + ') 알리페이 노출 설정 = ' + st.aliVisible },
-    { s: 'sk', t: '고객 화면 아래에 나가는 버튼 : ' + (ctaList(e.btns, ROWS_PRODUCT, 'ali').join(' / ') || '없음') }
-  ];
   let reason = '';
   if (!c1) reason = '미노출 설정';
   else if (!c3) reason = '스토어 설정 미노출';
   else if (!c2) reason = '알리페이 버튼 미설정';
-  return { na: false, visible: !reason, reason, conds };
+  return { na: false, visible: !reason, reason };
 }
 function judgeStore(st) {
   const e = effStoreBtns(st);
   const c1 = st.aliVisible === '노출';
   const c2 = onCount(e.btns, ROWS_STORE, 'ali') > 0;
-  const conds = [
-    { s: c1 ? 'ok' : 'no', t: '① 알리페이 노출 설정 = ' + st.aliVisible },
-    { s: c2 ? 'ok' : 'no', t: '② 알리페이 앱에서 누를 수 있는 버튼 ' + onCount(e.btns, ROWS_STORE, 'ali') + '개' },
-    { s: 'sk', t: '고객 화면 아래에 나가는 버튼 : ' + (ctaList(e.btns, ROWS_STORE, 'ali').join(' / ') || '없음') }
-  ];
   let reason = '';
   if (!c1) reason = '미노출 설정';
   else if (!c2) reason = '알리페이 버튼 미설정';
-  if (!c2 && c1) conds.push({ s: 'sk', t: '스토어 페이지만 보이지 않고, 이 스토어 상품은 각자 조건대로 나간다.' });
-  return { na: false, visible: !reason, reason, conds };
+  return { na: false, visible: !reason, reason };
 }
 /* 기존 노출 조건. 웹에서 이미 빠진 건은 알리페이에서도 연결 대상으로 치지 않는다 */
 const liveProduct = p => p.status === '승인' && p.active !== false && !p.hidden;
@@ -433,36 +423,30 @@ function innerTargetOk(inner, lang) {
   return { ok: true, label: '직접입력', skip: true };
 }
 function judgeAd(b) {
-  if (ALI_LANGS.indexOf(b.lang) === -1) return { na: true, visible: false, reason: '', conds: [{ s: 'sk', t: '언어 = ' + b.lang + '. 대상 언어가 아니라 판정하지 않는다.' }] };
+  if (ALI_LANGS.indexOf(b.lang) === -1) return { na: true, visible: false, reason: '' };
   const c1 = b.aliVisible === '노출';
-  const conds = [{ s: c1 ? 'ok' : 'no', t: '① 알리페이 노출 설정 = ' + b.aliVisible }, { s: 'sk', t: '링크종류 = ' + b.linkType }];
   const ext = b.linkType === '외부링크';
   let noBtn = false, targetOut = null;
-  if (ext) conds.push({ s: 'no', t: '② 외부링크는 알리페이 앱에서 열리지 않는다' });
-  else if (b.linkType === '내부링크') {
+  if (!ext && b.linkType === '내부링크') {
     const tv = innerTargetOk(b.inner, b.lang);
-    conds.push({ s: tv.skip ? 'sk' : tv.ok ? 'ok' : 'no', t: '② 내부링크 대상(' + tv.label + ')' + (tv.skip ? '은 판정 대상이 아니라 그대로 노출한다' : tv.ok ? '이 알리페이에 노출된다' : '이 알리페이에 노출되지 않는다') });
     if (!tv.ok) targetOut = tv.label;
-  } else {
+  } else if (!ext) {
     const bt = b.btn;
     /* 버튼 링크 종류가 외부링크면 저장된 값과 무관하게 알리페이에서 꺼진 것으로 본다 */
     const btExt = !!bt && bt.linkKind === '외부링크';
     noBtn = !bt || !bt.ali || btExt;
-    conds.push({ s: noBtn ? 'no' : 'ok', t: '② 하단 버튼 알리페이 표시여부 = ' + (!bt ? '버튼 없음' : btExt ? '비활성화 (버튼 링크 종류가 외부링크라 잠김)' : bt.ali ? '활성화' : '비활성화') });
     if (!noBtn && bt.linkKind === '내부링크') {
       const tv = innerTargetOk(bt.inner, b.lang);
-      conds.push({ s: tv.skip ? 'sk' : tv.ok ? 'ok' : 'no', t: '버튼 내부링크 대상(' + tv.label + ')' + (tv.skip ? '은 판정 대상이 아니다' : tv.ok ? '이 알리페이에 노출된다' : '이 알리페이에 노출되지 않는다') });
       if (!tv.ok) targetOut = tv.label;
-    } else if (!noBtn) conds.push({ s: 'sk', t: '버튼 링크 종류가 ' + (bt.linkKind || '링크없음') + '이라 연결 대상을 보지 않는다' });
+    }
   }
+  /* 미노출과 외부링크가 겹쳐도 사유는 우선순위대로 하나만 쓴다 */
   let reason = '';
   if (!c1) reason = '미노출 설정';
   else if (ext) reason = '외부 사이트 연결';
   else if (noBtn) reason = '알리페이 버튼 미설정';
   else if (targetOut) reason = '노출 대상 없음';
-  /* 미노출과 외부링크가 겹치면 두 원인을 모두 적는다. 사유는 우선순위대로 하나만 쓴다 */
-  if (!c1 && ext) conds.push({ s: 'no', t: '알리페이 노출이 미노출이고 링크종류도 외부링크다. 사유는 우선순위에 따라 미노출 설정으로 적는다.' });
-  return { na: false, visible: !reason, reason, conds, targetLabel: targetOut || '' };
+  return { na: false, visible: !reason, reason, targetLabel: targetOut || '' };
 }
 // 기획전 조건 ④ = 유형에 맞는 구성 항목만 센다. 추천상품은 상품, 병원은 스토어.
 const COLL_TYPES = ['병원', '추천상품', '특가', 'TOP10'];
@@ -474,21 +458,17 @@ const COLL_LANGS = [
 ];
 const isStoreColl = c => c.type === '병원';
 function judgeCollection(c) {
-  if (ALI_LANGS.indexOf(c.lang) === -1) return { na: true, visible: false, reason: '', liveCount: 0, conds: [{ s: 'sk', t: '언어 = ' + c.lang + '. 대상 언어가 아니라 판정하지 않는다.' }] };
+  if (ALI_LANGS.indexOf(c.lang) === -1) return { na: true, visible: false, reason: '', liveCount: 0 };
   const c1 = c.aliVisible === '노출';
   const byStore = isStoreColl(c);
   const total = byStore ? c.stores.length : c.products.length;
   const live = byStore
     ? c.stores.filter(id => { const st = S(id); return st && st.active !== false && judgeStore(st).visible; }).length
     : c.products.filter(id => { const p = P(id); if (!p || !liveProduct(p)) return false; const j = judgeProduct(p); return !j.na && j.visible; }).length;
-  const conds = [{ s: c1 ? 'ok' : 'no', t: '① 알리페이 노출 설정 = ' + c.aliVisible },
-                 { s: live ? 'ok' : 'no', t: '④ 노출 가능 ' + (byStore ? '스토어' : '상품') + ' ' + live + '건 (담은 ' + total + '건)' }];
-  if (byStore) c.stores.forEach(id => { const st = S(id); if (!st) return; const j = judgeStore(st); conds.push({ s: j.visible ? 'ok' : 'no', t: '스토어 · ' + st.name + ' → ' + (j.visible ? '노출' : '미노출 (' + j.reason + ')') }); });
-  else c.products.forEach(id => { const p = P(id); if (!p) return; const j = judgeProduct(p); conds.push({ s: !j.na && j.visible ? 'ok' : 'no', t: '상품 · ' + p.name + ' → ' + (j.na ? '대상 언어 아님' : j.visible ? '노출' : '미노출 (' + j.reason + ')') }); });
   let reason = '';
   if (!c1) reason = '미노출 설정';
   else if (!live) reason = '노출 대상 없음';
-  return { na: false, visible: !reason, reason, conds, liveCount: live };
+  return { na: false, visible: !reason, reason, liveCount: live };
 }
 
 /* ================================ 화면 ================================ */
@@ -578,8 +558,8 @@ function btnTable(kind, obj) {
       if (offWeb) webDis = true;
       if (offAli) aliDis = true;
       if (offWeb && offAli) note = MSG.needConsult;
-      else if (offWeb) note = '웹 상담접수를 켜면 사용할 수 있습니다.';
-      else if (offAli) note = '알리페이 앱 상담접수를 켜면 사용할 수 있습니다.';
+      else if (offWeb) note = '웹 ' + MSG.needConsult;
+      else if (offAli) note = '알리페이 앱 ' + MSG.needConsult;
     }
     if (r.needBooking && !obj.bookingEnabled) { webDis = true; aliDis = true; note = MSG.needBooking; }
     if (r.k === 'chat' && !isStore && eff.chatAuto) note = '스토어 버튼이 없어 채팅이 자동 적용됩니다.';
@@ -599,7 +579,7 @@ function btnTable(kind, obj) {
   }
   if (locked) html += '<div class="hint">기본 설정 적용 중입니다. 개별 설정을 선택하면 수정할 수 있습니다.</div>';
   else if (selfHidden && langOk) html += '<div class="hint">' + MSG.lockSelf + '</div>';
-  if (langOk && !selfHidden && !storeHidden && aliCnt === 0) html += '<div class="notice">' + MSG.noAliBtn(isStore ? '이 스토어는' : '이 상품은', isStore ? '' : '버튼 설정') + '</div>';
+  if (langOk && !selfHidden && !storeHidden && aliCnt === 0) html += '<div class="notice">' + MSG.noAliBtn(isStore ? '' : '버튼 설정') + '</div>';
   return html;
 }
 
@@ -615,7 +595,7 @@ window.setBtn = function (kind, k, ch, on) {
     const e1 = kind === 'store' ? effStoreBtns(obj) : effBtns(obj);
     const after = onCount(e1.btns, rows, ch);
     obj.btns[k][ch] = keep;
-    if (after > CAP) { alertBox('켤 수 없습니다', (ch === 'web' ? '웹' : '알리페이 앱') + ' 버튼은 2개까지 켤 수 있습니다. 현재 ' + already.join(', ') + '이 켜져 있습니다.'); render(); return; }
+    if (after > CAP) { alertBox('켤 수 없습니다', MSG.cap + ' 지금 ' + (ch === 'web' ? '웹' : '알리페이 앱') + '은 ' + already.join(', ') + '으로 2개입니다.'); render(); return; }
   }
   const before = obj.btns[k][ch] ? 'ON' : 'OFF';
   obj.btns[k][ch] = !!on;
@@ -789,7 +769,7 @@ function screen_sEdit() {
         radio('sv', '노출', st.aliVisible, "setVis('store','노출')") + radio('sv', '미노출', st.aliVisible, "setVis('store','미노출')") + '</span>' +
         '<div class="hint">지원언어와 무관하게 이 설정 하나가 모든 언어에 적용됩니다.</div>' +
         (st.aliVisible === '미노출' ? '<div class="notice">' + MSG.storeHide(st.prodCount) + '</div>' : '') +
-        (st.aliVisible === '노출' && onCount(effStoreBtns(st).btns, ROWS_STORE, 'ali') === 0 ? '<div class="notice">' + MSG.noAliBtn('이 스토어는', '버튼 및 메신저 설정') + '</div>' : '')) +
+        (st.aliVisible === '노출' && onCount(effStoreBtns(st).btns, ROWS_STORE, 'ali') === 0 ? '<div class="notice">' + MSG.noAliBtn('버튼 및 메신저 설정') + '</div>' : '')) +
       fld('대표번호', true, fbox(st.tel)) +
       fld('사업자명', true, fbox(st.biz)) +
       fld('사업자번호', true, fbox(st.bizno)) +
@@ -800,7 +780,7 @@ function screen_sEdit() {
       onoff('sbk', st.bookingEnabled, 'setBooking(%V%)', false, ['사용', '미사용']) +
       '<div class="hint">예약을 사용해야 버튼 및 메신저 설정에서 예약 버튼을 켤 수 있습니다.</div>' +
       (!st.bookingEnabled && (st.btns.booking.web || st.btns.booking.ali) ? '<div class="notice">예약 미사용 상태입니다. 예약 버튼은 웹·알리페이 앱 모두 꺼집니다. 설정값은 유지됩니다.</div>' : '') +
-      (st.aliVisible === '노출' && onCount(effStoreBtns(st).btns, ROWS_STORE, 'ali') === 0 ? '<div class="notice">' + MSG.noAliBtn('이 스토어는', '버튼 및 메신저 설정') + '</div>' : '') +
+      (st.aliVisible === '노출' && onCount(effStoreBtns(st).btns, ROWS_STORE, 'ali') === 0 ? '<div class="notice">' + MSG.noAliBtn('버튼 및 메신저 설정') + '</div>' : '') +
       '</div></div></div>';
   } else if (i === 11) {
     bd = '<div class="bd">' + btnTable('store', st) +
@@ -1094,7 +1074,7 @@ function screen_btnSpec() {
     '<div class="row"><div class="lbl">지금 예시</div><div class="val">웹 2개(문의하기, 예약), 알리페이 앱 2개(문의하기, 예약)입니다. 최대 개수에 딱 맞습니다.</div></div>' +
     '</div></div>' +
     '<div class="card"><div class="hd">알리페이 앱에서 켠 버튼이 없을 때</div><div class="bd">' +
-    '<div class="notice">' + MSG.noAliBtn('이 상품은') + '</div>' + '</div></div>';
+    '<div class="notice">' + MSG.noAliBtn() + '</div>' + '</div></div>';
 }
 
 /* --------------------- BO-CH-07 · 매거진 등록·수정 --------------------- */
