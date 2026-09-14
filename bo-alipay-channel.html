@@ -94,6 +94,12 @@ select.dim{color:#8c8c8c}
 .x{cursor:pointer;color:#8c8c8c;font-size:18px;line-height:1;border:0;background:none}
 .mono{font-family:Consolas,monospace;font-size:12px;color:#8c8c8c}
 .lock{opacity:.45}
+.fld{padding:8px 0}
+.flbl{font-size:12px;color:#595959;font-weight:500;margin-bottom:6px}
+.fbox{width:100%;box-sizing:border-box;height:32px;border:1px solid #d9d9d9;border-radius:4px;padding:0 10px;font-size:12px;color:#222;background:#fff;display:flex;align-items:center;justify-content:space-between}
+.fbox .cv{color:#8c8c8c;font-size:12px}
+.chkrow{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.chkit{display:inline-flex;gap:6px;align-items:center;font-size:12px;color:#595959}
 .blk{font-weight:700;font-size:14px;padding:14px 0 6px;border-top:1px solid #f0f0f0;margin-top:8px}
 .blk:first-child{border-top:0;margin-top:0;padding-top:0}
 .compcard{border:1px solid #f0f0f0;border-radius:6px;margin:14px 0}
@@ -764,20 +770,24 @@ function screen_sEdit() {
   const st = S(VIEW.id), i = VIEW.sect;
   let bd = '';
   if (i === 0) {
-    /* 알리페이 노출은 언어를 나누지 않으므로 지원언어 바로 아래에 둔다 */
+    /* 라이브 기본정보 탭 구조. 알리페이 노출은 언어를 나누지 않으므로 지원언어 바로 아래에 둔다 */
+    const STLANG = ['중국어(간체)', '영어', '중국어(번체)', '일본어', '인도네시아어', '몽골어'];
+    const has = L => (st.langs || '').split(', ').indexOf(L) !== -1;
+    const fld = (label, req, ctrl) => '<div class="fld"><div class="flbl">' + (req ? '<span class="req">*</span>' : '') + label + '</div>' + ctrl + '</div>';
+    const fbox = (v, caret) => '<div class="fbox"><span>' + esc(v) + '</span>' + (caret ? '<span class="cv">⌄</span>' : '') + '</div>';
     bd = '<div class="bd">' +
-      '<div class="row"><div class="lbl">카테고리</div><div class="val">' + esc(st.cat) + '</div></div>' +
-      '<div class="row"><div class="lbl">지원언어</div><div class="val">' + esc(st.langs) + '</div></div>' +
-      '<div class="row"><div class="lbl">알리페이 노출</div><div class="val"><span class="rg">' +
-      radio('sv', '노출', st.aliVisible, "setVis('store','노출')") + radio('sv', '미노출', st.aliVisible, "setVis('store','미노출')") + '</span>' +
-      '<div class="hint">지원언어와 무관하게 이 설정 하나가 모든 언어에 적용됩니다.</div>' +
-      (st.aliVisible === '미노출' ? '<div class="notice">' + MSG.storeHide(st.prodCount) + '</div>' : '') +
-      (st.aliVisible === '노출' && onCount(effStoreBtns(st).btns, ROWS_STORE, 'ali') === 0 ? '<div class="notice">' + MSG.noAliBtn('이 스토어는', '버튼 및 메신저 설정') + '</div>' : '') +
-      '</div></div>' +
-      '<div class="row"><div class="lbl">대표번호</div><div class="val">' + esc(st.tel) + '</div></div>' +
-      '<div class="row"><div class="lbl">사업자명</div><div class="val">' + esc(st.biz) + '</div></div>' +
-      '<div class="row"><div class="lbl">사업자번호</div><div class="val">' + esc(st.bizno) + '</div></div>' +
-      '<div class="row"><div class="lbl">이메일</div><div class="val">' + esc(st.email) + '</div></div>' +
+      fld('카테고리', true, fbox(st.cat, true)) +
+      fld('지원언어', false, '<div class="chkrow">' + STLANG.map(L =>
+        '<span class="chkit"><input type="checkbox"' + (has(L) ? ' checked' : '') + ' onclick="return false"> ' + L + '</span>').join('') + '</div>') +
+      fld('알리페이 노출', false, '<span class="rg">' +
+        radio('sv', '노출', st.aliVisible, "setVis('store','노출')") + radio('sv', '미노출', st.aliVisible, "setVis('store','미노출')") + '</span>' +
+        '<div class="hint">지원언어와 무관하게 이 설정 하나가 모든 언어에 적용됩니다.</div>' +
+        (st.aliVisible === '미노출' ? '<div class="notice">' + MSG.storeHide(st.prodCount) + '</div>' : '') +
+        (st.aliVisible === '노출' && onCount(effStoreBtns(st).btns, ROWS_STORE, 'ali') === 0 ? '<div class="notice">' + MSG.noAliBtn('이 스토어는', '버튼 및 메신저 설정') + '</div>' : '')) +
+      fld('대표번호', true, fbox(st.tel)) +
+      fld('사업자명', true, fbox(st.biz)) +
+      fld('사업자번호', true, fbox(st.bizno)) +
+      fld('이메일', true, fbox(st.email)) +
       '</div>';
   } else if (i === 8) {
     bd = '<div class="bd"><div class="row"><div class="lbl">예약 사용</div><div class="val">' +
