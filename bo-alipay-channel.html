@@ -571,7 +571,7 @@ function btnTable(kind, obj) {
     }
     if (r.needBooking && !obj.bookingEnabled) { webDis = true; aliDis = true; note = MSG.needBooking; }
     if (r.k === 'chat' && !isStore && eff.chatAuto) note = '스토어 버튼이 없어 채팅이 자동 적용됩니다.';
-    html += '<tr><td><span class="req">*</span>' + r.label + '</td>' +
+    html += '<tr><td>' + r.label + '</td>' +
       '<td>' + onoff('w_' + kind + '_' + r.k, e.web, "setBtn('" + kind + "','" + r.k + "','web',%V%)", webDis) + '</td>' +
       '<td' + (aliDis ? ' class="lock"' : '') + '>' + onoff('a_' + kind + '_' + r.k, e.ali, "setBtn('" + kind + "','" + r.k + "','ali',%V%)", aliDis) + '</td>' +
       '<td class="tblnote">' + note + '</td></tr>';
@@ -716,12 +716,12 @@ function modal_product() {
       '<div class="row"><div class="lbl">반려사유</div><div class="val"><span class="tblnote">-</span></div></div>' +
       '<div class="row"><div class="lbl">활성화</div><div class="val">' + onoff('pact', p.active, 'void(%V%)', true) + '</div></div>' +
       '<div class="row"><div class="lbl">히든 여부</div><div class="val">' + onoff('phid', p.hidden, 'void(%V%)', true) + '</div></div>' +
-      '<div class="row"><div class="lbl"><span class="req">*</span>알리페이 노출</div><div class="val"><span class="rg">' +
+      '<div class="row"><div class="lbl">알리페이 노출</div><div class="val"><span class="rg">' +
       radio('pv', '노출', langOk ? p.aliVisible : '노출', "setVis('product','노출')", visDis) + radio('pv', '미노출', langOk ? p.aliVisible : '노출', "setVis('product','미노출')", visDis) + '</span>' +
       (langOk && st.aliVisible === '미노출' ? '<div class="hint">' + MSG.lockStore + '</div>' : '') +
       '</div></div>' +
       '<div class="blk">버튼 설정</div>' +
-      '<div class="row"><div class="lbl"><span class="req">*</span>스토어 설정 적용</div><div class="val"><span class="rg">' +
+      '<div class="row"><div class="lbl">스토어 설정 적용</div><div class="val"><span class="rg">' +
       radio('pm', '개별 설정', p.mode, "setMode('개별 설정')") + radio('pm', '기본 설정', p.mode, "setMode('기본 설정')") + '</span>' +
       (p.mode === '기본 설정' ? '' : '<div class="hint">' + MSG.storeDefault + '</div>') + '</div></div>' +
       btnTable('product', p) +
@@ -765,7 +765,7 @@ function screen_sEdit() {
   let bd = '';
   if (i === 2) {
     /* 알리페이 노출은 언어를 나누지 않으므로 언어 탭 위에 둔다 */
-    bd = '<div class="bd" style="padding-bottom:0"><div class="row"><div class="lbl"><span class="req">*</span>알리페이 노출</div><div class="val"><span class="rg">' +
+    bd = '<div class="bd" style="padding-bottom:0"><div class="row"><div class="lbl">알리페이 노출</div><div class="val"><span class="rg">' +
       radio('sv', '노출', st.aliVisible, "setVis('store','노출')") + radio('sv', '미노출', st.aliVisible, "setVis('store','미노출')") + '</span>' +
       '<div class="hint">스토어는 언어 구분이 없습니다. 이 설정은 모든 언어에 적용됩니다.</div>' +
       (st.aliVisible === '미노출' ? '<div class="notice">' + MSG.storeHide(st.prodCount) + '</div>' : '') +
@@ -776,7 +776,7 @@ function screen_sEdit() {
       '<div class="row"><div class="lbl">메인 문구</div><div class="val"><span class="tblnote">0 / 20</span></div></div>' +
       '</div>';
   } else if (i === 8) {
-    bd = '<div class="bd"><div class="row"><div class="lbl"><span class="req">*</span>예약 사용</div><div class="val">' +
+    bd = '<div class="bd"><div class="row"><div class="lbl">예약 사용</div><div class="val">' +
       onoff('sbk', st.bookingEnabled, 'setBooking(%V%)', false, ['사용', '미사용']) +
       '<div class="hint">예약을 사용해야 버튼 및 메신저 설정에서 예약 버튼을 켤 수 있습니다.</div>' +
       (!st.bookingEnabled && (st.btns.booking.web || st.btns.booking.ali) ? '<div class="notice">예약 미사용 상태입니다. 예약 버튼은 웹·알리페이 앱 모두 꺼집니다. 설정값은 유지됩니다.</div>' : '') +
