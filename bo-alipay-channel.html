@@ -158,7 +158,7 @@ const MSG = {
   bnExtLock:   '외부링크 배너는 알리페이에 노출되지 않습니다. 이 설정은 수정할 수 없습니다.',
   bnBtnExtLock:'하단 버튼이 외부링크입니다. 알리페이 앱에서 켤 수 없어 배너도 노출되지 않습니다.',
   lockSelf:    '미노출 상태에서는 알리페이 앱 버튼을 수정할 수 없습니다. 설정값은 유지됩니다.',
-  lockStore:   '스토어가 미노출이라 이 상품도 알리페이에 노출되지 않습니다. 스토어 정보 관리 > 노출정보에서 바꿀 수 있습니다.',
+  lockStore:   '스토어가 미노출이라 이 상품도 알리페이에 노출되지 않습니다. 스토어 정보 관리 > 기본정보에서 바꿀 수 있습니다.',
   bnBtnOff:    '하단 버튼이 알리페이 앱에서 꺼져 있어 배너가 노출되지 않습니다.',
   bnTarget:    t => '연결 대상(' + t + ')이 미노출입니다. 배너도 알리페이에 노출되지 않습니다.',
   hostHidden:  '이 상품은 알리페이 앱에서는 보이지 않아요.',
@@ -483,13 +483,13 @@ function judgeCollection(c) {
 }
 
 /* ================================ 화면 ================================ */
-let VIEW = { name: 'p-list', id: null, tab: 1, lang: '중국어(간체)', sect: 2, openMenu: '상품' };
+let VIEW = { name: 'p-list', id: null, tab: 1, lang: '중국어(간체)', sect: 0, openMenu: '상품' };
 const FILTERS = { 'p-list': { ali: '전체', rsn: '전체' }, 's-list': { ali: '전체', rsn: '전체' }, 'a-list': { ali: '전체', rsn: '전체' }, 'c-list': { ali: '전체', rsn: '전체' } };
 const F = () => FILTERS[VIEW.name] || { ali: '전체', rsn: '전체' };
 const el = s => document.querySelector(s);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-function go(name, id) { if (VIEW.name === 'm-edit' && name !== 'm-edit') window.EDBUF = null; VIEW.name = name; if (id !== undefined) VIEW.id = id; if (name === 's-edit') { VIEW.sect = 2; VIEW.savedVis = S(VIEW.id).aliVisible; } render(); window.scrollTo(0, 0); }
+function go(name, id) { if (VIEW.name === 'm-edit' && name !== 'm-edit') window.EDBUF = null; VIEW.name = name; if (id !== undefined) VIEW.id = id; if (name === 's-edit') { VIEW.sect = 0; VIEW.savedVis = S(VIEW.id).aliVisible; } render(); window.scrollTo(0, 0); }
 window.go = go;
 
 const aliLangOk = () => ALI_LANGS.indexOf(VIEW.lang) !== -1;
@@ -759,21 +759,25 @@ function screen_sList() {
 /* ------------------- 스토어 정보 수정 (실측: 섹션 앵커 페이지) ------------------- */
 const SECTS = ['기본정보', '이미지 정보', '노출정보', '담당자 및 연락처', '인스타그램', '채팅 환영 메시지', '위치정보', '운영시간',
   '예약설정', '스토어 특징', '콘텐츠 채널 정보', '버튼 및 메신저 설정', '리뷰 설정', '스토어 칼럼 설정', '챗봇 설정', 'AI 소개', 'FAQ'];
-const SECT_IN_SCOPE = [2, 8, 11];
+const SECT_IN_SCOPE = [0, 8, 11];
 function screen_sEdit() {
   const st = S(VIEW.id), i = VIEW.sect;
   let bd = '';
-  if (i === 2) {
-    /* 알리페이 노출은 언어를 나누지 않으므로 언어 탭 위에 둔다 */
-    bd = '<div class="bd" style="padding-bottom:0"><div class="row"><div class="lbl">알리페이 노출</div><div class="val"><span class="rg">' +
+  if (i === 0) {
+    /* 알리페이 노출은 언어를 나누지 않으므로 지원언어 바로 아래에 둔다 */
+    bd = '<div class="bd">' +
+      '<div class="row"><div class="lbl">카테고리</div><div class="val">' + esc(st.cat) + '</div></div>' +
+      '<div class="row"><div class="lbl">지원언어</div><div class="val">' + esc(st.langs) + '</div></div>' +
+      '<div class="row"><div class="lbl">알리페이 노출</div><div class="val"><span class="rg">' +
       radio('sv', '노출', st.aliVisible, "setVis('store','노출')") + radio('sv', '미노출', st.aliVisible, "setVis('store','미노출')") + '</span>' +
-      '<div class="hint">스토어는 언어 구분이 없습니다. 이 설정은 모든 언어에 적용됩니다.</div>' +
+      '<div class="hint">지원언어와 무관하게 이 설정 하나가 모든 언어에 적용됩니다.</div>' +
       (st.aliVisible === '미노출' ? '<div class="notice">' + MSG.storeHide(st.prodCount) + '</div>' : '') +
       (st.aliVisible === '노출' && onCount(effStoreBtns(st).btns, ROWS_STORE, 'ali') === 0 ? '<div class="notice">' + MSG.noAliBtn('이 스토어는', '버튼 및 메신저 설정') + '</div>' : '') +
-      '</div></div></div>' +
-      '<div class="langtabs">' + ['원본'].concat(STORE_TABS).map(l => '<div class="langtab ' + (l === '원본' ? 'on' : '') + '">' + l + '</div>').join('') + '</div>' +
-      '<div class="bd"><div class="row"><div class="lbl">스토어명</div><div class="val">' + esc(st.name) + '</div></div>' +
-      '<div class="row"><div class="lbl">메인 문구</div><div class="val"><span class="tblnote">0 / 20</span></div></div>' +
+      '</div></div>' +
+      '<div class="row"><div class="lbl">대표번호</div><div class="val">' + esc(st.tel) + '</div></div>' +
+      '<div class="row"><div class="lbl">사업자명</div><div class="val">' + esc(st.biz) + '</div></div>' +
+      '<div class="row"><div class="lbl">사업자번호</div><div class="val">' + esc(st.bizno) + '</div></div>' +
+      '<div class="row"><div class="lbl">이메일</div><div class="val">' + esc(st.email) + '</div></div>' +
       '</div>';
   } else if (i === 8) {
     bd = '<div class="bd"><div class="row"><div class="lbl">예약 사용</div><div class="val">' +
