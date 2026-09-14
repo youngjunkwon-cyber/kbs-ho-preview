@@ -373,9 +373,9 @@ function judgeProduct(p) {
     { s: 'sk', t: '고객 화면 아래에 나가는 버튼 : ' + (ctaList(e.btns, ROWS_PRODUCT, 'ali').join(' / ') || '없음') }
   ];
   let reason = '';
-  if (!c1) reason = '직접 끔';
-  else if (!c3) reason = '스토어 설정';
-  else if (!c2) reason = '알리페이 버튼 없음';
+  if (!c1) reason = '미노출 설정';
+  else if (!c3) reason = '스토어 설정 미노출';
+  else if (!c2) reason = '알리페이 버튼 미설정';
   return { na: false, visible: !reason, reason, conds };
 }
 function judgeStore(st) {
@@ -388,8 +388,8 @@ function judgeStore(st) {
     { s: 'sk', t: '고객 화면 아래에 나가는 버튼 : ' + (ctaList(e.btns, ROWS_STORE, 'ali').join(' / ') || '없음') }
   ];
   let reason = '';
-  if (!c1) reason = '직접 끔';
-  else if (!c2) reason = '알리페이 버튼 없음';
+  if (!c1) reason = '미노출 설정';
+  else if (!c2) reason = '알리페이 버튼 미설정';
   if (!c2 && c1) conds.push({ s: 'sk', t: '스토어 페이지만 보이지 않고, 이 스토어 상품은 각자 조건대로 나간다.' });
   return { na: false, visible: !reason, reason, conds };
 }
@@ -447,12 +447,12 @@ function judgeAd(b) {
     } else if (!noBtn) conds.push({ s: 'sk', t: '버튼 링크 종류가 ' + (bt.linkKind || '링크없음') + '이라 연결 대상을 보지 않는다' });
   }
   let reason = '';
-  if (!c1) reason = '직접 끔';
-  else if (ext) reason = '외부 연결';
-  else if (noBtn) reason = '알리페이 버튼 없음';
-  else if (targetOut) reason = '연결 대상 미노출';
+  if (!c1) reason = '미노출 설정';
+  else if (ext) reason = '외부 사이트 연결';
+  else if (noBtn) reason = '알리페이 버튼 미설정';
+  else if (targetOut) reason = '노출 대상 없음';
   /* 미노출과 외부링크가 겹치면 두 원인을 모두 적는다. 사유는 우선순위대로 하나만 쓴다 */
-  if (!c1 && ext) conds.push({ s: 'no', t: '알리페이 노출이 미노출이고 링크종류도 외부링크다. 사유는 우선순위에 따라 직접 끔으로 적는다.' });
+  if (!c1 && ext) conds.push({ s: 'no', t: '알리페이 노출이 미노출이고 링크종류도 외부링크다. 사유는 우선순위에 따라 미노출 설정으로 적는다.' });
   return { na: false, visible: !reason, reason, conds, targetLabel: targetOut || '' };
 }
 // 기획전 조건 ④ = 유형에 맞는 구성 항목만 센다. 추천상품은 상품, 병원은 스토어.
@@ -477,8 +477,8 @@ function judgeCollection(c) {
   if (byStore) c.stores.forEach(id => { const st = S(id); if (!st) return; const j = judgeStore(st); conds.push({ s: j.visible ? 'ok' : 'no', t: '스토어 · ' + st.name + ' → ' + (j.visible ? '노출' : '미노출 (' + j.reason + ')') }); });
   else c.products.forEach(id => { const p = P(id); if (!p) return; const j = judgeProduct(p); conds.push({ s: !j.na && j.visible ? 'ok' : 'no', t: '상품 · ' + p.name + ' → ' + (j.na ? '대상 언어 아님' : j.visible ? '노출' : '미노출 (' + j.reason + ')') }); });
   let reason = '';
-  if (!c1) reason = '직접 끔';
-  else if (!live) reason = '노출 가능 항목 없음';
+  if (!c1) reason = '미노출 설정';
+  else if (!live) reason = '노출 대상 없음';
   return { na: false, visible: !reason, reason, conds, liveCount: live };
 }
 
@@ -687,7 +687,7 @@ function screen_pList() {
     '<div class="card"><div class="filters">' +
     '<div class="frow">' + dimSel('심사상태', ['심사상태']) + dimSel('활성', ['활성']) + dimSel('히든', ['히든']) + langSelect() + dimSel('카테고리', ['카테고리']) + dimSel('스토어 선택', ['스토어 선택']) + '</div>' +
     '<div class="frow">' + dimSel('세부분류', ['세부분류']) + dimSel('Vat포함', ['Vat포함']) + dimSel('전/후사진 연결 여부', ['전/후사진 연결 여부']) + dimSel('외부링크 활성 여부', ['외부링크 활성 여부']) + '</div>' +
-    '<div class="frow">' + aliFilterRow(['전체', '직접 끔', '스토어 설정', '알리페이 버튼 없음']) + dimSel('단독 상품 포함 여부', ['단독 상품 포함 여부']) + dimSel('등록일', ['등록일']) + '</div>' +
+    '<div class="frow">' + aliFilterRow(['전체', '미노출 설정', '스토어 설정 미노출', '알리페이 버튼 미설정']) + dimSel('단독 상품 포함 여부', ['단독 상품 포함 여부']) + dimSel('등록일', ['등록일']) + '</div>' +
     '<div class="frow"><button class="btn">오늘</button><button class="btn">어제</button><button class="btn">이번주</button><button class="btn">이번달</button>' +
     '<input type="text" placeholder="Start date" style="width:120px"> ~ <input type="text" placeholder="End date" style="width:120px"></div>' +
     '<div class="frow"><input type="text" placeholder="검색어" style="width:220px"><button class="btn blue">검색</button></div>' +
@@ -746,7 +746,7 @@ function screen_sList() {
     '<div style="display:flex;gap:8px"><button class="btn">칼럼설정</button><button class="btn">신규 스토어등록</button><button class="btn">엑셀 다운로드</button></div></div>' +
     '<div class="card"><div class="filters">' +
     '<div class="frow">' + dimSel('언어', ['언어']) + dimSel('카테고리 선택', ['카테고리 선택']) + dimSel('스토어 선택', ['스토어 선택']) + dimSel('지하철정보', ['지하철정보']) + dimSel('지역', ['지역']) + '</div>' +
-    '<div class="frow">' + aliFilterRow(['전체', '직접 끔', '알리페이 버튼 없음']) + '</div>' +
+    '<div class="frow">' + aliFilterRow(['전체', '미노출 설정', '알리페이 버튼 미설정']) + '</div>' +
     '<div class="frow"><input type="text" placeholder="검색어" style="width:220px"><button class="btn blue">검색</button></div>' +
     '</div></div>' +
     '<div class="card"><div class="hd">스토어 목록</div><div class="tblwrap"><table><thead><tr>' +
@@ -818,7 +818,7 @@ function screen_aList() {
     '<div><button class="btn">광고등록</button></div></div>' +
     '<div class="card"><div class="filters">' +
     '<div class="frow"><button class="btn">오늘</button><button class="btn">이번주</button><button class="btn">이번달</button>' + dimSel('광고일', ['광고일']) + langSelect() + dimSel('노출위치', ['노출위치']) + dimSel('링크종류', ['링크종류']) + '</div>' +
-    '<div class="frow">' + aliFilterRow(['전체', '직접 끔', '외부 연결', '알리페이 버튼 없음', '연결 대상 미노출']) + '<button class="btn blue" style="align-self:flex-end">검색</button></div>' +
+    '<div class="frow">' + aliFilterRow(['전체', '미노출 설정', '외부 사이트 연결', '알리페이 버튼 미설정', '노출 대상 없음']) + '<button class="btn blue" style="align-self:flex-end">검색</button></div>' +
     '</div><div class="tblwrap"><table><thead><tr>' +
     '<th>광고등록일</th><th>광고시작일</th><th>광고종료일</th><th>언어</th><th>노출위치</th>' +
     '<th>알리페이 노출</th><th>사유</th>' +
@@ -885,8 +885,8 @@ function modal_ad() {
   if (isLanding) h += '<div class="row"><div class="lbl"><span class="req">*</span>상세 이미지</div><div class="val"><span class="tblnote">landing_' + b.id + '.jpg</span></div></div>';
   let tail = '';
   if (langOk && b.aliVisible === '노출') {
-    if (j.reason === '알리페이 버튼 없음' && !extBtn) tail = '<div class="notice">' + MSG.bnBtnOff + '</div>';
-    else if (j.reason === '연결 대상 미노출') tail = '<div class="notice">' + MSG.bnTarget(j.targetLabel || '대상') + '</div>';
+    if (j.reason === '알리페이 버튼 미설정' && !extBtn) tail = '<div class="notice">' + MSG.bnBtnOff + '</div>';
+    else if (j.reason === '노출 대상 없음') tail = '<div class="notice">' + MSG.bnTarget(j.targetLabel || '대상') + '</div>';
   }
   if (isLanding && b.btn) {
     const bnHidden = b.aliVisible === '미노출';
@@ -923,7 +923,7 @@ function screen_cList() {
     '<div><button class="btn">기획전 추가</button></div></div>' +
     '<div class="card"><div class="filters">' +
     '<div class="frow"><button class="btn">오늘</button><button class="btn">어제</button><button class="btn">이번주</button><button class="btn">이번달</button>' + dimSel('상태', ['상태']) + langSelect() + dimSel('유형', ['유형'].concat(COLL_TYPES)) + '</div>' +
-    '<div class="frow">' + aliFilterRow(['전체', '직접 끔', '노출 가능 항목 없음']) + '<button class="btn blue" style="align-self:flex-end">검색</button></div>' +
+    '<div class="frow">' + aliFilterRow(['전체', '미노출 설정', '노출 대상 없음']) + '<button class="btn blue" style="align-self:flex-end">검색</button></div>' +
     '</div><div class="tblwrap"><table><thead><tr>' +
     '<th>기획전 상태</th><th>언어</th><th>노출 기간</th><th>유형</th><th>기획전명</th>' +
     '<th>알리페이 노출</th><th>사유</th>' +
@@ -1095,8 +1095,8 @@ window.saveAd = function () {
   const done = () => { closeMD(); alertBox('저장했습니다', MSG.saveDone); };
   /* 알리페이 노출을 노출로 두었는데 실제로는 보이지 않는 상태면 저장 전에 한 번 확인한다 */
   if (j.na || j.visible || b.aliVisible !== '노출') { done(); return; }
-  const body = j.reason === '연결 대상 미노출' ? MSG.saveAdTgt(j.targetLabel || '대상')
-    : j.reason === '외부 연결' ? MSG.saveAdExt
+  const body = j.reason === '노출 대상 없음' ? MSG.saveAdTgt(j.targetLabel || '대상')
+    : j.reason === '외부 사이트 연결' ? MSG.saveAdExt
     : MSG.saveAdBtn;
   confirmBox('저장 확인', '<p>' + body + '</p><p class="hint">웹 노출에는 영향이 없습니다.</p>', done, function () {});
 };
@@ -1153,7 +1153,7 @@ window.saveColl = function () {
   const lines = (byStore ? c.stores : c.products).map(id => {
     const o = byStore ? S(id) : P(id); if (!o) return '';
     const oj = byStore ? judgeStore(o) : judgeProduct(o);
-    const WHY = { '직접 끔': '알리페이 노출 미노출', '스토어 설정': '스토어가 미노출', '알리페이 버튼 없음': '알리페이 앱 버튼 없음' };
+    const WHY = { '미노출 설정': '알리페이 노출 미노출', '스토어 설정 미노출': '스토어가 미노출', '알리페이 버튼 미설정': '알리페이 앱 버튼 없음' };
     const why = oj.na ? '대상 언어 아님' : (oj.visible ? '노출' : (WHY[oj.reason] || oj.reason));
     return '<p class="hint" style="margin:2px 0">' + esc(o.name) + ' → ' + why + '</p>';
   }).join('');
