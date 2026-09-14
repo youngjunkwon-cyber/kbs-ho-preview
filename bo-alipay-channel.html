@@ -98,6 +98,9 @@ select.dim{color:#8c8c8c}
 .flbl{font-size:12px;color:#595959;font-weight:500;margin-bottom:6px}
 .fbox{width:100%;box-sizing:border-box;height:32px;border:1px solid #d9d9d9;border-radius:4px;padding:0 10px;font-size:12px;color:#222;background:#fff;display:flex;align-items:center;justify-content:space-between}
 .fbox .cv{color:#8c8c8c;font-size:12px}
+.fin{width:100%;box-sizing:border-box;border:1px solid #d9d9d9;border-radius:4px;padding:7px 10px;font-size:12px;color:#222;font-family:inherit}
+.cnt{text-align:right;color:#8c8c8c;font-size:12px;margin-top:4px}
+.empt{margin-top:8px;border:1px solid #f0f0f0;border-radius:4px;padding:22px;text-align:center;color:#bfbfbf;font-size:12px}
 .chkrow{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
 .chkit{display:inline-flex;gap:6px;align-items:center;font-size:12px;color:#595959}
 .blk{font-weight:700;font-size:14px;padding:14px 0 6px;border-top:1px solid #f0f0f0;margin-top:8px}
@@ -495,13 +498,16 @@ const F = () => FILTERS[VIEW.name] || { ali: '전체', rsn: '전체' };
 const el = s => document.querySelector(s);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-function go(name, id) { if (VIEW.name === 'm-edit' && name !== 'm-edit') window.EDBUF = null; VIEW.name = name; if (id !== undefined) VIEW.id = id; if (name === 's-edit') { VIEW.sect = 0; VIEW.savedVis = S(VIEW.id).aliVisible; } render(); window.scrollTo(0, 0); }
+function go(name, id) { if (VIEW.name === 'm-edit' && name !== 'm-edit') window.EDBUF = null; VIEW.name = name; if (id !== undefined) VIEW.id = id; if (name === 's-edit') { VIEW.sect = 0; VIEW.savedVis = S(VIEW.id).aliVisible; }
+  if (name === 'p-edit') { VIEW.tab = 1; } render(); window.scrollTo(0, 0); }
 window.go = go;
 
 const aliLangOk = () => ALI_LANGS.indexOf(VIEW.lang) !== -1;
 const visCell = j => j.na ? '<span class="tag na">-</span>' : (j.visible ? '<span class="tag on">노출</span>' : '<span class="tag off">미노출</span>');
 const rsnCell = j => j.na ? '<span class="tblnote">-</span>' : (j.reason ? '<span class="tag rsn">' + j.reason + '</span>' : '');
 
+function fld(label, req, ctrl) { return '<div class="fld"><div class="flbl">' + (req ? '<span class="req">*</span>' : '') + label + '</div>' + ctrl + '</div>'; }
+function fbox(v, caret) { return '<div class="fbox"><span>' + esc(v) + '</span>' + (caret ? '<span class="cv">⌄</span>' : '') + '</div>'; }
 function radio(nm, val, cur, handler, dis) {
   return '<label class="rd ' + (dis ? 'dis' : '') + '"><input type="radio" name="' + nm + '"' + (val === cur ? ' checked' : '') + (dis ? ' disabled' : '') + ' onchange="' + handler + '"><span>' + val + '</span></label>';
 }
@@ -560,7 +566,7 @@ function btnTable(kind, obj) {
   const locked = !isStore && obj.mode === '기본 설정';
   const aliOffAll = !langOk || selfHidden || storeHidden || locked;
 
-  const cw = isStore ? 220 : 180;
+  const cw = 220;   // 상품·스토어 모두 페이지라 같은 폭을 쓴다
   let html = '<div class="tblwrap"><table><thead><tr><th style="min-width:300px">항목</th><th style="width:' + cw + 'px">웹</th>' +
     '<th style="width:' + cw + 'px">알리페이 앱</th><th style="min-width:160px"></th></tr></thead><tbody>';
   rows.forEach(r => {
@@ -686,7 +692,7 @@ function screen_pList() {
       '<td>' + p.lang + '</td><td>' + esc(st.code) + '</td><td>' + esc(p.name) + '</td><td>' + p.cat + '</td><td>' + p.sub + '</td><td>' + p.price + '</td><td>' + p.vat + '</td>' +
       '<td class="tblnote">-</td><td>0</td><td>' + (S(p.store).messenger.length ? S(p.store).messenger[0].base : '미사용') + '</td>' + stat.map(v => '<td>' + v + '</td>').join('') +
       '<td class="tblnote">-</td><td class="tblnote">-</td><td class="tblnote">-</td><td>2026-09-01</td><td>2026-09-05</td><td class="tblnote">-</td>' +
-      '<td><button class="btn sm">미리보기</button> <button class="btn sm" onclick="openProduct(\'' + p.id + '\')">수정</button> <button class="btn sm red">삭제</button></td></tr>'; }).join('');
+      '<td><button class="btn sm">미리보기</button> <button class="btn sm" onclick="go(\'p-edit\',\'' + p.id + '\')">수정</button> <button class="btn sm red">삭제</button></td></tr>'; }).join('');
   return '<div class="phd"><div><h2 class="page">입점사 스토어별 상품 정보 관리</h2>' +
     '<div class="pdesc">입점사 스토어별 상품 정보 관리 페이지입니다. 상품정보를 등록, 수정, 삭제할 수 있습니다.</div></div>' +
     '<div><button class="btn">신규상품등록</button></div></div>' +
@@ -700,22 +706,23 @@ function screen_pList() {
     '</div><div class="tblwrap"><table><thead>' + head + '</thead><tbody>' + (body || empty(25)) + '</tbody></table></div></div>';
 }
 
-/* ------------------ 상품정보 수정 모달 (실측: 탭 2개, Cancel/OK) ------------------ */
-window.openProduct = function (id) { VIEW.id = id; VIEW.tab = 1; MODAL = 'product'; render(); };
-function modal_product() {
-  const p = P(VIEW.id), st = S(p.store), langOk = ALI_LANGS.indexOf(p.lang) !== -1, j = judgeProduct(p);
+/* ---- 상품정보 수정 (라이브: /products/{id}/edit 페이지, 탭 2개, 우상단 취소/수정) ---- */
+function screen_pEdit() {
+  const p = P(VIEW.id), st = S(p.store), langOk = ALI_LANGS.indexOf(p.lang) !== -1;
   const visDis = !langOk || st.aliVisible === '미노출';
   const tabs = ['상품정보', '관리자설정'];
   let bd = '';
   if (VIEW.tab === 0) {
-    bd = '<div class="row"><div class="lbl">선택된 스토어</div><div class="val">' + esc(st.name) + '</div></div>' +
-      '<div class="row"><div class="lbl">선택된 언어</div><div class="val">' + p.lang + '</div></div>' +
-      '<div class="row"><div class="lbl"><span class="req">*</span>상품명</div><div class="val"><input type="text" style="width:100%" value="' + esc(p.name) + '"></div></div>' +
-      '<div class="row"><div class="lbl"><span class="req">*</span>상품가</div><div class="val">' + p.price + '</div></div>' +
-      '<div class="row"><div class="lbl">카테고리</div><div class="val">' + p.cat + ' / ' + p.sub + '</div></div>' +
-      '<div class="row"><div class="lbl">상품 간략 설명</div><div class="val"><span class="tblnote">0 / 2000</span></div></div>' +
-      '<div class="row"><div class="lbl">Vat포함여부</div><div class="val">' + p.vat + '</div></div>' +
-      '<div class="row"><div class="lbl">대표 이미지 / 상세 이미지</div><div class="val"><span class="tblnote">Upload</span></div></div>';
+    bd = fld('선택된 스토어', false, fbox(st.name)) +
+      fld('선택된 언어', false, fbox(p.lang)) +
+      fld('상품명', true, '<input type="text" class="fin" value="' + esc(p.name) + '">') +
+      fld('상품가', true, '<input type="text" class="fin" value="' + esc(p.price) + '">') +
+      fld('단독 상품', false, '<span class="chkit"><input type="checkbox" onclick="return false"> 단독 상품</span>') +
+      fld('카테고리', true, fbox(p.cat, true)) +
+      fld('세부분류 선택', true, fbox(p.sub, true)) +
+      fld('전/후사진 연결', false, '<button class="btn sm">연결</button><div class="empt">데이터 없음</div>') +
+      fld('상품 간략 설명', true, '<textarea class="fin" rows="3" onclick="return false"></textarea><div class="cnt">0 / 2000</div>') +
+      fld('키워드 선택', false, fbox('', true));
   } else {
     bd = '<div class="blk">노출 설정</div>' +
       '<div class="row"><div class="lbl">상태</div><div class="val">' + p.status + '</div></div>' +
@@ -734,10 +741,11 @@ function modal_product() {
       '<div class="row" style="margin-top:14px"><div class="lbl">메신저</div><div class="val"><span class="tblnote">인스타그램</span></div></div>' +
       '<div class="row"><div class="lbl">인스타그램 임베디드 노출 여부</div><div class="val">' + onoff('pins', p.insta === 'ON', 'void(%V%)', true) + '</div></div>';
   }
-  return '<div class="mask"><div class="modal" style="max-width:900px"><div class="hd">상품정보 수정<button class="x" onclick="closeMD()">✕</button></div>' +
-    '<div class="mtabs">' + tabs.map((t, i) => '<div class="mtab ' + (i === VIEW.tab ? 'on' : '') + '" onclick="VIEW.tab=' + i + ';render()">' + t + '</div>').join('') + '</div>' +
-    '<div class="bd">' + bd + '</div>' +
-    '<div class="ft"><button class="btn" onclick="closeMD()">Cancel</button><button class="btn blue" onclick="save(\'product\')">OK</button></div></div></div>';
+  return '<div class="phd"><div><h2 class="page">상품정보 수정</h2><div class="pdesc">상품의 기본 정보와 노출 설정을 입력합니다.</div></div>' +
+    '<div style="display:flex;gap:8px"><button class="btn" onclick="go(\'p-list\')">취소</button>' +
+    '<button class="btn" style="background:#1F1F1F;border-color:#1F1F1F;color:#fff" onclick="save(\'product\')">수정</button></div></div>' +
+    '<div class="card"><div class="mtabs">' + tabs.map((t, i) => '<div class="mtab ' + (i === VIEW.tab ? 'on' : '') + '" onclick="VIEW.tab=' + i + ';render()">' + t + '</div>').join('') + '</div>' +
+    '<div class="bd">' + bd + '</div></div>';
 }
 
 /* --------------------------- 스토어 목록 (실측) --------------------------- */
@@ -773,8 +781,6 @@ function screen_sEdit() {
     /* 라이브 기본정보 탭 구조. 알리페이 노출은 언어를 나누지 않으므로 지원언어 바로 아래에 둔다 */
     const STLANG = ['중국어(간체)', '영어', '중국어(번체)', '일본어', '인도네시아어', '몽골어'];
     const has = L => (st.langs || '').split(', ').indexOf(L) !== -1;
-    const fld = (label, req, ctrl) => '<div class="fld"><div class="flbl">' + (req ? '<span class="req">*</span>' : '') + label + '</div>' + ctrl + '</div>';
-    const fbox = (v, caret) => '<div class="fbox"><span>' + esc(v) + '</span>' + (caret ? '<span class="cv">⌄</span>' : '') + '</div>';
     bd = '<div class="bd">' +
       fld('카테고리', true, fbox(st.cat, true)) +
       fld('지원언어', false, '<div class="chkrow">' + STLANG.map(L =>
@@ -1178,7 +1184,7 @@ window.saveColl = function () {
 };
 window.save = function (kind) {
   const obj = kind === 'store' ? S(VIEW.id) : P(VIEW.id);
-  const done = () => { if (kind === 'store') VIEW.savedVis = obj.aliVisible; closeMD(); alertBox('저장했습니다', MSG.saveDone); };
+  const done = () => { if (kind === 'store') VIEW.savedVis = obj.aliVisible; else go('p-list'); alertBox('저장했습니다', MSG.saveDone); };
   const rows = kind === 'store' ? ROWS_STORE : ROWS_PRODUCT;
   const eff = kind === 'store' ? effStoreBtns(obj) : effBtns(obj);
   const webCnt = onCount(eff.btns, rows, 'web'), aliCnt = onCount(eff.btns, rows, 'ali');
@@ -1240,11 +1246,11 @@ window.resetDB = function () { applyBase(); MODAL = null; VIEW.lang = '중국어
 
 /* ------------------------------- 렌더 ------------------------------- */
 function render() {
-  const map = { 'p-list': screen_pList, 's-list': screen_sList, 's-edit': screen_sEdit, 'a-list': screen_aList, 'c-list': screen_cList,
+  const map = { 'p-list': screen_pList, 'p-edit': screen_pEdit, 's-list': screen_sList, 's-edit': screen_sEdit, 'a-list': screen_aList, 'c-list': screen_cList,
     'm-edit': screen_mEdit, 'btn-spec': screen_btnSpec, 'h-edit': screen_hEdit };
   el('#side').innerHTML = renderSide();
   el('#screen').innerHTML = map[VIEW.name]();
-  const md = { product: modal_product, ad: modal_ad, coll: modal_coll, link: modal_link };
+  const md = { ad: modal_ad, coll: modal_coll, link: modal_link };
   const holder = document.getElementById('mdholder') || (function () { const d = document.createElement('div'); d.id = 'mdholder'; document.body.appendChild(d); return d; })();
   holder.innerHTML = MODAL && md[MODAL] ? md[MODAL]() : '';
 }
