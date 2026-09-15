@@ -198,7 +198,7 @@ const DB = {
     { id: 'S3', no: 224, code: '뷰티랩강남', name: '뷰티랩 강남', biz: '뷰티랩(주)', cat: '스킨케어',
       langs: '중국어(간체), 영어, 인도네시아어', tel: '02-222-2222', bizno: '323-45-67890', email: 'c@c.com',
       zip: '06120', area: '강남구', reg: '2026-09-01 15:03', aliVisible: '노출', active: true, bookingEnabled: true,
-      btns: { consult: btn(), inquiry: btn(), chat: btn({ web: true }), extlink: btn(), messenger: btn(), booking: btn({ web: true, ali: true }) },
+      btns: { consult: btn(), inquiry: btn(), chat: btn(), extlink: btn(), messenger: btn({ web: true }), booking: btn({ web: true, ali: true }) },
       messenger: [], history: [] },
     { id: 'S4', no: 223, code: '모모클리닉', name: '모모클리닉', biz: '모모의원', cat: '성형외과',
       langs: '중국어(번체), 일본어', tel: '02-333-3333', bizno: '423-45-67890', email: 'd@d.com',
@@ -220,7 +220,7 @@ const DB = {
       btns: { consult: btn({ web: true, ali: true }), inquiry: btn(), chat: btn({ web: true, ali: true }), extlink: btn(), messenger: btn() }, history: [] },
     { id: 'P3', name: '아쿠아 필링', lang: '영어', store: 'S3', status: '승인', active: true, hidden: false,
       cat: '피부', sub: '필링', price: '70,000', vat: '미포함', ext: '', aliVisible: '노출', mode: '기본 설정', insta: 'OFF',
-      btns: { consult: btn(), inquiry: btn(), chat: btn({ web: true }), extlink: btn(), messenger: btn() }, history: [] },
+      btns: { consult: btn(), inquiry: btn(), chat: btn(), extlink: btn(), messenger: btn() }, history: [] },
     { id: 'P4', name: '눈매교정 상담', lang: '중국어(번체)', store: 'S4', status: '승인', active: true, hidden: false,
       cat: '성형', sub: '눈', price: '상담', vat: '미포함', ext: '', aliVisible: '노출', mode: '개별 설정', insta: 'OFF',
       btns: { consult: btn({ web: true, ali: true }), inquiry: btn(), chat: btn(), extlink: btn(), messenger: btn({ web: true }) }, history: [] },
@@ -232,7 +232,7 @@ const DB = {
       btns: { consult: btn({ web: true }), inquiry: btn(), chat: btn({ web: true }), extlink: btn(), messenger: btn() }, history: [] },
     { id: 'P7', name: 'Perawatan Kulit', lang: '인도네시아어', store: 'S3', status: '대기', active: false, hidden: false,
       cat: '피부', sub: '필링', price: '70,000', vat: '미포함', ext: '', aliVisible: '노출', mode: '기본 설정', insta: 'OFF',
-      btns: { consult: btn(), inquiry: btn(), chat: btn({ web: true }), extlink: btn(), messenger: btn() }, history: [] },
+      btns: { consult: btn(), inquiry: btn(), chat: btn(), extlink: btn(), messenger: btn() }, history: [] },
     { id: 'P8', name: '모공 타이트닝', lang: '중국어(간체)', store: 'S3', status: '승인', active: true, hidden: false,
       cat: '피부', sub: '리프팅', price: '150,000', vat: '포함', ext: '', aliVisible: '노출', mode: '개별 설정', insta: 'OFF',
       btns: { consult: btn({ web: true }), inquiry: btn(), chat: btn({ web: true }), extlink: btn(), messenger: btn() }, history: [] },
@@ -1115,10 +1115,22 @@ window.saveMagazine = function () {
   render();
   alertBox('저장했습니다', (u || e) ? MSG.edStrip(u, e) : '본문을 저장했습니다.');
 };
+let MPICK = null;   // 'p' | 's' | null. 상품·스토어 추가는 이미 있는 기능이다
+window.mPick = function (kind) { MPICK = MPICK === kind ? null : kind; render(); };
+window.mInsert = function (kind, id) {
+  const m = M('M1'), cur = window.EDBUF != null ? window.EDBUF : m.body;
+  const o = kind === 'p' ? DB.products.find(x => x.id === id) : DB.stores.find(x => x.id === id);
+  if (!o) return;
+  window.EDBUF = cur + ' [' + (kind === 'p' ? '상품' : '스토어') + ' 카드: ' + o.name + ']';
+  MPICK = null; render();
+};
 function screen_mEdit() {
   const m = M('M1');
   const cur = window.EDBUF != null ? window.EDBUF : m.body;
   const sc = scanBody(cur);
+  const pickRow = (kind, list) => '<div class="pickrow"><div class="frow">' +
+    '<select id="mpk_' + kind + '">' + list.map(x => '<option value="' + x.id + '">' + esc(x.name) + '</option>').join('') + '</select>' +
+    '<button class="btn blue sm" onclick="mInsert(\'' + kind + '\', el(\'#mpk_' + kind + '\').value)">추가</button></div></div>';
   return '<div class="phd"><div><h2 class="page">매거진 등록·수정</h2>' +
     '<div class="pdesc">매거진 글을 등록, 수정, 삭제할 수 있습니다.</div></div>' +
     '<div><button class="btn">목록</button></div></div>' +
@@ -1127,11 +1139,16 @@ function screen_mEdit() {
     '<div class="row"><div class="lbl">언어</div><div class="val">' + m.lang + '</div></div>' +
     '<div class="row"><div class="lbl">상태</div><div class="val"><span class="tag on">' + m.status + '</span></div></div>' + '</div></div>' +
     '<div class="card"><div class="hd">본문</div><div class="bd">' +
-    '<div class="frow" style="margin-bottom:10px"><button class="btn" onclick="openLinkModal()">링크 넣기</button>' +
+    '<div class="frow" style="margin-bottom:10px">' +
+    '<button class="btn dash" onclick="mPick(\'p\')">상품 추가</button>' +
+    '<button class="btn dash" onclick="mPick(\'s\')">스토어 추가</button>' +
+    '<button class="btn" onclick="openLinkModal()">링크 넣기</button>' +
     '<span class="tblnote" style="align-self:center">' + MSG.edBlock + '</span></div>' +
+    (MPICK === 'p' ? pickRow('p', DB.products) : '') +
+    (MPICK === 's' ? pickRow('s', DB.stores) : '') +
     '<textarea oninput="EDBUF=this.value">' + esc(cur) + '</textarea>' +
     (sc.ext.length || sc.emb.length ? '<div class="notice">본문에 외부 사이트 주소 ' + sc.ext.length + '개, 외부 영상·SNS ' + sc.emb.length + '개가 있습니다. 저장 시 삭제됩니다.</div>' : '') +
-    '<div class="hint">입력한 주소는 저장 시 내부 주소 형식으로 변환됩니다.</div>' + '</div><div class="ft"><button class="btn" onclick="EDBUF=null;render()">취소</button>' +
+    '<div class="hint">상품·스토어 추가로 넣은 카드는 내부 참조라 이 차단·변환 대상이 아닙니다. 이미 있는 기능이라 이번 범위에서 손대지 않습니다.<br>링크 넣기로 직접 입력한 K-Beauty Station 주소만 저장 시 내부 주소 형식으로 변환됩니다.</div>' + '</div><div class="ft"><button class="btn" onclick="EDBUF=null;MPICK=null;render()">취소</button>' +
     '<button class="btn blue" onclick="saveMagazine()">저장</button></div></div>';
 }
 function modal_link() {
