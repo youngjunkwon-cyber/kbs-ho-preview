@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FO Figma v1.8 제작 검수</title>
+<style>
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:"Noto Sans KR","Malgun Gothic",sans-serif;font-size:13px;color:#25201F;background:#F6F3F1;overflow:hidden}
+.app{display:flex;height:100vh}
+
+/* 좌: 기준표 */
+.left{flex:0 0 430px;display:flex;flex-direction:column;background:#fff;border-right:1px solid #E9E3DF}
+.ltabs{flex:0 0 auto;display:flex;gap:4px;padding:12px 14px 10px;border-bottom:1px solid #E9E3DF;flex-wrap:wrap}
+.ltabs button{border:1px solid #E9E3DF;background:#fff;border-radius:14px;height:28px;padding:0 11px;
+  font-family:inherit;font-size:11.5px;color:#746B68;cursor:pointer;white-space:nowrap}
+.ltabs button.on{background:#25201F;border-color:#25201F;color:#fff;font-weight:700}
+.lbody{flex:1;overflow-y:auto;padding:14px}
+.lbody h3{font-size:12px;margin:0 0 8px;color:#746B68;font-weight:700}
+.lbody h3+h3{margin-top:18px}
+.ref{width:100%;border-collapse:collapse;font-size:11.5px;border:1px solid #E9E3DF}
+.ref th{background:#FBF7F3;text-align:left;font-weight:700;color:#746B68;padding:6px 8px;border-bottom:1px solid #E9E3DF;font-size:10.5px;white-space:nowrap}
+.ref td{padding:6px 8px;border-bottom:1px solid #F2EDEA;line-height:1.55;vertical-align:top}
+.ref tr:last-child td{border-bottom:0}
+.sw{display:inline-block;width:13px;height:13px;border-radius:3px;border:1px solid rgba(0,0,0,.12);vertical-align:-2px;margin-right:6px}
+.mono{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;color:#746B68}
+pre.flow{background:#FBF7F3;border:1px solid #E9E3DF;border-radius:6px;padding:10px 12px;
+  font-family:ui-monospace,Menlo,monospace;font-size:10.5px;line-height:1.8;white-space:pre-wrap;margin:0}
+
+/* 우: 체크리스트 */
+.right{flex:1;min-width:0;display:flex;flex-direction:column;background:#fff}
+.top{flex:0 0 auto;border-bottom:1px solid #E9E3DF;padding:13px 18px}
+.top h1{margin:0 0 3px;font-size:15px;font-weight:900;letter-spacing:-.3px}
+.top .sub{font-size:11.5px;color:#746B68;margin-bottom:10px;line-height:1.7}
+.btn{padding:5px 10px;border:1px solid #E9E3DF;background:#fff;border-radius:4px;cursor:pointer;
+  color:#25201F;font-size:11.5px;font-family:inherit;white-space:nowrap}
+.btn:hover{border-color:#D95662;color:#D95662}
+.btn.pri{background:#D95662;border-color:#D95662;color:#fff}
+.btn.pri:hover{opacity:.9;color:#fff}
+.btn.on{background:#25201F;border-color:#25201F;color:#fff}
+.row1{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:9px;align-items:center}
+.stat{display:flex;gap:12px;align-items:center;font-size:11.5px;color:#746B68}
+.stat b{color:#25201F;font-size:14px}
+.bar{height:5px;border-radius:3px;background:#EFE9E5;overflow:hidden;flex:1;min-width:80px;display:flex}
+.bar i{display:block;height:100%}
+.bar .p{background:#31715D}.bar .f{background:#D95662}
+.scroll{flex:1;overflow-y:auto;padding:14px 18px 80px}
+
+.grp{margin-bottom:18px}
+.grp h2{font-size:12px;margin:0 0 7px;color:#746B68;font-weight:700;display:flex;gap:7px;align-items:center;cursor:pointer}
+.grp h2 .n{font-weight:400;color:#B7ADA9}
+.grp h2 .ref9{font-size:10px;background:#FFF0F1;color:#B0434E;border-radius:3px;padding:2px 6px;font-weight:700}
+.grp h2 .ar{margin-left:auto;color:#B7ADA9;font-size:11px}
+.grp.fold .items{display:none}
+.tc{border:1px solid #F2EDEA;border-radius:6px;padding:9px 11px;margin-bottom:5px;background:#fff}
+.tc.pass{border-color:#BFD8CE;background:#FAFDFB}
+.tc.fail{border-color:#F0C3C7;background:#FFFAFA}
+.tc .hd{display:flex;gap:8px;align-items:flex-start}
+.tc .id{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;color:#B7ADA9;flex:0 0 46px;padding-top:2px}
+.tc .ti{font-weight:600;flex:1;line-height:1.5;font-size:12.5px}
+.tc .acts{display:flex;gap:4px;flex:0 0 auto}
+.tc .acts .btn{padding:3px 8px;font-size:11px}
+.tc .acts .btn.p.on{background:#31715D;border-color:#31715D;color:#fff}
+.tc .acts .btn.f.on{background:#D95662;border-color:#D95662;color:#fff}
+.tc .how{margin:6px 0 0 54px;font-size:11.5px;color:#746B68;line-height:1.65}
+.tc .how b{color:#25201F;font-weight:600}
+.memo{margin:7px 0 0 54px;display:none}
+.memo.show{display:block}
+.memo textarea{width:100%;min-height:46px;padding:6px 8px;border:1px solid #E9E3DF;border-radius:4px;
+  font-family:inherit;font-size:12px;resize:vertical;line-height:1.5}
+.memo textarea:focus{outline:none;border-color:#D95662}
+.memo .lbl{font-size:10.5px;color:#B7ADA9;margin-bottom:3px}
+.hint{font-size:11.5px;color:#746B68;line-height:1.75;margin:0 0 14px;background:#FBF7F3;
+  border:1px solid #E9E3DF;border-radius:6px;padding:11px 13px}
+.hint b{color:#25201F}
+.empty{border:1px dashed #E9E3DF;border-radius:6px;padding:24px;text-align:center;color:#B7ADA9;font-size:12px}
+dialog{border:none;border-radius:8px;padding:0;max-width:760px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.18)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog .dh{padding:14px 18px;border-bottom:1px solid #F2EDEA;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+dialog .db{padding:14px 18px}
+dialog .df{padding:10px 18px;border-top:1px solid #F2EDEA;display:flex;justify-content:flex-end;gap:8px}
+dialog textarea{width:100%;height:340px;font-family:ui-monospace,Menlo,monospace;font-size:12px;line-height:1.6;padding:10px;border:1px solid #E9E3DF;border-radius:4px}
+.x{background:none;border:none;font-size:15px;cursor:pointer;color:#B7ADA9}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="left">
+    <div class="ltabs">
+      <button data-l="screens" class="on">화면 19</button>
+      <button data-l="tokens">색 토큰</button>
+      <button data-l="comp">컴포넌트</button>
+      <button data-l="proto">프로토타입</button>
+      <button data-l="struct">파일 구조</button>
+    </div>
+    <div class="lbody" id="lbody"></div>
+  </div>
+
+  <div class="right">
+    <div class="top">
+      <h1>FO Figma v1.8 제작 검수</h1>
+      <div class="sub">제작 가이드 v1.0 §9 완료 기준을 항목 단위로 펼친 목록입니다. 그룹 제목 옆 분홍 표시가 §9의 어느 줄에 해당하는지 나타냅니다.</div>
+      <div class="row1">
+        <button class="btn on" data-f="all">전체</button>
+        <button class="btn" data-f="todo">미확인</button>
+        <button class="btn" data-f="fail">실패만</button>
+        <span style="flex:1"></span>
+        <button class="btn" id="foldAll">전체 접기</button>
+        <button class="btn pri" id="copy">결과 복사</button>
+        <button class="btn" id="reset">기록 초기화</button>
+      </div>
+      <div class="stat">
+        <span>통과 <b id="nPass">0</b></span>
+        <span>실패 <b id="nFail">0</b></span>
+        <span>미확인 <b id="nTodo">0</b></span>
+        <div class="bar"><i class="p" id="barP"></i><i class="f" id="barF"></i></div>
+        <span id="pct">0%</span>
+      </div>
+    </div>
+    <div class="scroll">
+      <p class="hint">
+        Figma 파일을 열어 놓고 항목을 위에서부터 확인합니다. <b>실패</b>를 누르면 메모 칸이 열립니다.
+        기록은 이 브라우저에 저장되므로 창을 닫아도 남습니다.<br>
+        마지막에 <b>결과 복사</b>로 실패 항목만 뽑아 제작자에게 전달합니다.
+      </p>
+      <div id="list"></div>
+    </div>
+  </div>
+</div>
+
+<dialog id="dlg">
+  <div class="dh">검수 결과<button class="x" onclick="document.getElementById('dlg').close()">✕</button></div>
+  <div class="db"><textarea id="out" readonly></textarea></div>
+  <div class="df">
+    <button class="btn" onclick="document.getElementById('dlg').close()">닫기</button>
+    <button class="btn pri" id="doCopy">클립보드로 복사</button>
+  </div>
+</dialog>
+
+<script>
+/* ═════════ 좌측 기준표 ═════════ */
+var SCREENS=[
+ ['01','FO-01 탐색 홈','fo-explore','A_Explore'],
+ ['02','FO-02 탐색 내 검색','fo-search','A_Explore'],
+ ['03','FO-03 서비스 목록','fo-services','B_Service & Category'],
+ ['04','FO-04 카테고리 목록','fo-categories','B_Service & Category'],
+ ['05','FO-05 카테고리 중분류','fo-medical','B_Service & Category'],
+ ['06','FO-06 카테고리별 서비스','fo-skin-category','B_Service & Category'],
+ ['07','FO-07 고민 목록','fo-concerns','C_Concern'],
+ ['08','FO-08 고민 상세','fo-concern-detail','C_Concern'],
+ ['09','FO-09 지역 찾기','fo-find','D_Location'],
+ ['10','FO-10 장소 선택','fo-location-picker','D_Location'],
+ ['11','FO-11 지역 탐색 결과','fo-find-results','D_Location'],
+ ['12','FO-12 지역 상세','fo-location','D_Location'],
+ ['13','FO-13 서비스 상세','fo-service','B_Service & Category'],
+ ['14','FO-14 상품 목록','fo-products','E_Product & Booking'],
+ ['15','FO-15 상품 상세','fo-product-detail','E_Product & Booking'],
+ ['16','FO-16 예약 정보','fo-booking','E_Product & Booking'],
+ ['17','FO-17 예약 확인','fo-booking-review','E_Product & Booking'],
+ ['18','FO-18 스토어 목록','fo-stores','F_Store'],
+ ['19','FO-19 스토어 상세','fo-store-detail','F_Store']
+];
+var TOKENS=[
+ ['Ink','#25201F','기본 텍스트'],['Muted','#746B68','보조 텍스트'],['Line','#E9E3DF','구분선·테두리'],
+ ['Background','#F6F3F1','외곽 배경'],['Paper','#FFFFFF','화면·카드 배경'],['Primary','#D95662','주요 CTA'],
+ ['Primary Soft','#FFF0F1','선택·강조 배경'],['Navy','#2B2423','강한 텍스트'],['Green','#31715D','긍정·지원 상태'],
+ ['Green Soft','#EDF7F2','긍정 상태 배경'],['Amber','#9B611F','주의 상태'],['Amber Soft','#FFF5E9','주의 상태 배경'],
+ ['Cream','#FBF7F3','탐색 카드·히어로 배경'],['Rose','#F4D9DA','보조 강조']
+];
+var COMPS=[
+ ['FO/Status Bar','기본'],['FO/App Header','제목 / 뒤로가기 / 뒤로가기+액션'],
+ ['FO/Bottom Nav','Home / Explore / Stores / Products / My 활성 상태'],
+ ['FO/Button/Primary','기본 / Sticky 영역'],['FO/Button/Secondary','기본'],['FO/Button/Icon','기본'],
+ ['FO/Chip','기본 / 선택'],['FO/Card/Choice','아이콘·제목·설명'],['FO/Card/Row','썸네일 있음 / 없음'],
+ ['FO/Card/Product','기본'],['FO/Card/Editorial','기본'],['FO/Section Title','제목만 / 우측 링크 포함'],
+ ['FO/Form/Field','기본'],['FO/Filter','기본 / 선택값 있음'],['FO/FAQ','접힘 / 펼침'],['FO/Sticky Action','기본']
+];
+var PROTO=`탐색 홈
+├─ 탐색 내 검색 → 서비스·고민·카테고리·지역 결과
+├─ 서비스 목록 → 서비스 상세
+├─ 카테고리 목록 → 카테고리 중분류 → 카테고리별 서비스 → 서비스 상세
+├─ 고민 목록 → 고민 상세 → 서비스 상세
+└─ 지역 찾기 → 장소 선택 → 지역 탐색 결과
+
+서비스 상세 → 상품 목록/상품 상세 → 예약 정보 → 예약 확인
+지역 탐색 결과 → 스토어 상세 또는 상품 상세
+스토어 목록 → 스토어 상세 → 상품 상세
+지역 상세 → 지역 찾기 또는 서비스/스토어·상품
+
+하단 탭  Home / Explore / Stores / Products / My
+Explore → FO-01,  Stores → FO-18,  Products → FO-14
+Home·My 는 목적 화면 미정이므로 링크를 만들지 않는다`;
+var STRUCT=`01_FO Screens
+├─ A_Explore
+├─ B_Service & Category
+├─ C_Concern
+├─ D_Location
+├─ E_Product & Booking
+└─ F_Store
+
+02_FO Components
+└─ 공통 컴포넌트와 Variant
+
+99_Source
+└─ 원본 HTML 캡처 또는 비교용 기준 프레임
+
+파일명   K-Beauty Station · FO Wireframe v1.8
+프레임   390 × 780px
+배치     각 Section 안에서 왼쪽에서 오른쪽으로 번호순`;
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function drawLeft(k){
+  var h='';
+  if(k==='screens'){
+    h='<h3>FO 화면 19개</h3><table class="ref"><thead><tr><th>프레임명</th><th>원본 ID</th><th>Section</th></tr></thead><tbody>'+
+      SCREENS.map(function(r){ return '<tr><td><b>'+esc(r[1])+'</b></td><td class="mono">'+esc(r[2])+'</td><td>'+esc(r[3])+'</td></tr>'; }).join('')+
+      '</tbody></table>';
+  } else if(k==='tokens'){
+    h='<h3>색상 토큰 14</h3><table class="ref"><thead><tr><th>토큰</th><th>값</th><th>용도</th></tr></thead><tbody>'+
+      TOKENS.map(function(r){ return '<tr><td><span class="sw" style="background:'+r[1]+'"></span><b>'+esc(r[0])+'</b></td>'+
+        '<td class="mono">'+r[1]+'</td><td>'+esc(r[2])+'</td></tr>'; }).join('')+'</tbody></table>'+
+      '<h3>글꼴</h3><table class="ref"><tbody>'+
+      '<tr><td><b>기본</b></td><td>Pretendard Variable</td></tr>'+
+      '<tr><td><b>대체 순서</b></td><td>Pretendard → Apple SD Gothic Neo → Noto Sans KR</td></tr>'+
+      '<tr><td><b>금지</b></td><td>Inter 로 임의 교체</td></tr></tbody></table>';
+  } else if(k==='comp'){
+    h='<h3>공통 컴포넌트 16</h3><table class="ref"><thead><tr><th>컴포넌트</th><th>Variant · 상태</th></tr></thead><tbody>'+
+      COMPS.map(function(r){ return '<tr><td class="mono"><b>'+esc(r[0])+'</b></td><td>'+esc(r[1])+'</td></tr>'; }).join('')+
+      '</tbody></table><h3>규칙</h3><table class="ref"><tbody>'+
+      '<tr><td>컨테이너에 Auto Layout 을 쓴다</td></tr>'+
+      '<tr><td>텍스트는 모두 편집 가능해야 한다</td></tr>'+
+      '<tr><td>화면별 문구는 인스턴스 속성으로 바꾼다</td></tr>'+
+      '<tr><td>원본에 없는 별도 디자인 시스템은 만들지 않는다</td></tr></tbody></table>';
+  } else if(k==='proto'){
+    h='<h3>프로토타입 연결</h3><pre class="flow">'+esc(PROTO)+'</pre>';
+  } else {
+    h='<h3>파일 구조</h3><pre class="flow">'+esc(STRUCT)+'</pre>';
+  }
+  document.getElementById('lbody').innerHTML=h;
+}
+document.querySelectorAll('[data-l]').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('[data-l]').forEach(function(x){ x.classList.toggle('on',x===b); });
+    drawLeft(b.dataset.l);
+  });
+});
+drawLeft('screens');
+
+/* ═════════ 체크리스트 ═════════ */
+/* [id, 확인할 행동, 확인 방법] */
+var screenRows = SCREENS.map(function(r){
+  return ['S-'+r[0], r[1]+' 프레임이 '+r[3]+' 안에 있고 이름이 표와 똑같은지 확인한다',
+    '레이어 패널에서 <b>'+r[3]+'</b> 를 펼쳐 프레임명을 표와 글자 단위로 대조한다. 원본 ID <b>'+r[2]+'</b> 화면과 내용이 같은지 함께 본다.'];
+});
+var compRows = COMPS.map(function(r,i){
+  var num=(i+1<10?'0':'')+(i+1);
+  return ['C-'+num, r[0]+' 가 컴포넌트로 만들어졌고 변형이 「'+r[1]+'」 인지 확인한다',
+    'Assets 패널에서 <b>'+r[0]+'</b> 를 찾아 Variant 개수와 이름을 본다. 02_FO Components 페이지에 원본이 있어야 한다.'];
+});
+
+var DATA=[
+["파일·구조", "§9-1", [
+["A-01","파일명이 「K-Beauty Station · FO Wireframe v1.8」 인지 확인한다","Figma 상단 파일명을 본다. 가운뎃점과 띄어쓰기까지 같아야 한다."],
+["A-02","파일이 eightint 팀에 저장돼 있는지 확인한다","파일명 옆 경로 또는 파일 브라우저에서 소속 팀을 본다."],
+["A-03","페이지가 01_FO Screens · 02_FO Components · 99_Source 세 개인지 확인한다","좌측 상단 페이지 목록을 본다. 이름과 순서가 같아야 한다."],
+["A-04","01_FO Screens 안에 A_Explore부터 F_Store까지 Section 6개가 있는지 확인한다","페이지를 열고 Section 이름과 개수를 센다."],
+["A-05","각 Section 안에서 프레임이 왼쪽에서 오른쪽으로 번호순인지 확인한다","캔버스에서 프레임 X 좌표 순서와 번호 순서를 대조한다."],
+["A-06","99_Source에 비교용 기준 프레임이나 원본 캡처가 있는지 확인한다","99_Source 페이지를 열어 비어 있지 않은지 본다."],
+["A-07","컴포넌트 원본이 02_FO Components 밖에 흩어져 있지 않은지 확인한다","Assets 패널에서 각 컴포넌트를 선택해 어느 페이지에 있는지 본다."]
+]],
+
+["화면 19개", "§9-1", screenRows],
+
+["프레임 규격", "§9-2", [
+["F-01","모든 프레임의 크기가 390 × 780px 인지 확인한다","프레임을 전부 선택해 우측 패널 W·H 가 단일 값 390 / 780 으로 뜨는지 본다. 값이 섞이면 Mixed 로 뜬다."],
+["F-02","프레임 이름에 번호와 한글명이 표와 똑같이 들어갔는지 확인한다","레이어 이름을 표와 대조한다. FO-01 처럼 번호에 하이픈이 있어야 한다."],
+["F-03","원본의 휴대폰 테두리가 유지됐는지 확인한다","v1.8 화면과 나란히 놓고 테두리 유무와 두께를 본다."],
+["F-04","프레임 밖으로 삐져나온 레이어가 없는지 확인한다","프레임의 Clip content 를 껐다 켜며 넘치는 요소가 있는지 본다."],
+["F-05","한 Section 안에서 프레임 간 간격이 일정한지 확인한다","프레임 두 개씩 선택해 간격 수치를 비교한다."]
+]],
+
+["제외 항목", "§9-3", [
+["X-01","BO 화면이 하나도 없는지 확인한다","페이지 전체를 훑고 레이어 검색으로 BO 를 찾는다."],
+["X-02","HOST 화면이 하나도 없는지 확인한다","같은 방법으로 HOST 를 찾는다."],
+["X-03","검토용 설명 영역이 없는지 확인한다","화면 바깥의 설명 텍스트·주석 블록이 남아 있는지 본다."],
+["X-04","승인 폼이 없는지 확인한다","확인·승인·코멘트 입력 영역이 화면에 들어가 있는지 본다."]
+]],
+
+["글꼴", "§9-4", [
+["T-01","모든 텍스트가 Pretendard Variable 로 지정됐는지 확인한다","텍스트 레이어를 전부 선택해 우측 Font 가 단일 값으로 뜨는지 본다."],
+["T-02","Inter 로 바뀐 텍스트가 한 곳도 없는지 확인한다","Fonts 또는 텍스트 일괄 선택으로 Inter 가 목록에 잡히는지 본다."],
+["T-03","원본에 없는 굵기를 임의로 쓴 곳이 없는지 확인한다","원본 화면과 제목·본문·캡션 굵기를 나란히 비교한다."],
+["T-04","대체 글꼴을 쓴 경우 Pretendard → Apple SD Gothic Neo → Noto Sans KR 순서를 지켰는지 확인한다","대체가 일어난 레이어를 찾아 어떤 글꼴로 떨어졌는지 본다."],
+["T-05","글꼴 누락 경고가 떠 있지 않은지 확인한다","파일을 열 때 Missing fonts 알림이 뜨는지 본다."]
+]],
+
+["색상", "§9-7", [
+["K-01","기본 텍스트에 Ink #25201F 가 쓰였는지 확인한다","제목·본문 텍스트를 찍어 색값을 본다."],
+["K-02","보조 텍스트에 Muted #746B68 이 쓰였는지 확인한다","캡션·설명 텍스트를 찍어 본다."],
+["K-03","구분선과 테두리에 Line #E9E3DF 가 쓰였는지 확인한다","카드 테두리와 섹션 구분선을 찍어 본다."],
+["K-04","주요 CTA 에 Primary #D95662 가 쓰였는지 확인한다","Sticky 영역 버튼을 찍어 본다."],
+["K-05","선택·강조 배경에 Primary Soft #FFF0F1 이 쓰였는지 확인한다","선택된 칩과 강조 블록을 찍어 본다."],
+["K-06","외곽 배경 Background #F6F3F1 과 화면 배경 Paper #FFFFFF 가 구분돼 있는지 확인한다","캔버스 바탕과 프레임 바탕 색을 각각 본다."],
+["K-07","상태 색 Green·Amber 와 배경 Green Soft·Amber Soft 가 원본과 같은 자리에 쓰였는지 확인한다","상태 배지와 안내 블록을 원본과 대조한다."],
+["K-08","Navy #2B2423 · Cream #FBF7F3 · Rose #F4D9DA 가 원본과 같은 자리에 쓰였는지 확인한다","강한 텍스트, 히어로 배경, 보조 강조 영역을 대조한다."],
+["K-09","토큰 표에 없는 색이 새로 들어간 곳이 없는지 확인한다","우측 패널의 색 목록 또는 Selection colors 로 전체 색 종류를 훑는다."]
+]],
+
+["컴포넌트", "§9-6", compRows.concat([
+["C-17","반복 요소가 전부 인스턴스로 교체됐는지 확인한다","각 화면에서 헤더·탭·카드가 인스턴스 표시로 보이는지 본다."],
+["C-18","떼어낸 인스턴스가 남아 있지 않은지 확인한다","레이어 아이콘이 인스턴스가 아닌 프레임으로 바뀐 것이 있는지 본다."],
+["C-19","컴포넌트화 과정에서 화면 모양과 간격이 바뀌지 않았는지 확인한다","교체 전후를 원본과 나란히 비교한다."],
+["C-20","컨테이너에 Auto Layout 이 적용됐는지 확인한다","섹션과 카드 컨테이너를 선택해 Auto layout 표시를 본다."],
+["C-21","같은 컴포넌트라도 화면별 문구를 인스턴스에서 바꿀 수 있는지 확인한다","인스턴스 하나의 텍스트를 실제로 바꿔 보고 되돌린다."],
+["C-22","원본에 없는 별도 디자인 시스템 컴포넌트를 만들지 않았는지 확인한다","Assets 목록을 표의 16개와 대조해 여분이 있는지 본다."]
+])],
+
+["레이어 편집 가능성", "§9-5", [
+["L-01","화면이 이미지 한 장으로 평면화되지 않았는지 확인한다","프레임을 펼쳐 자식 레이어가 있는지 본다. Image 하나면 실패다."],
+["L-02","텍스트가 개별 텍스트 레이어인지 확인한다","아무 문구나 더블클릭해 커서가 들어가는지 본다."],
+["L-03","버튼이 개별 레이어인지 확인한다","버튼을 선택해 배경과 라벨이 분리돼 있는지 본다."],
+["L-04","카드가 개별 레이어인지 확인한다","카드를 펼쳐 썸네일·제목·가격이 각각 잡히는지 본다."],
+["L-05","텍스트를 실제로 수정해 보고 되돌린다","문구 하나를 바꿔 본 뒤 실행 취소한다."]
+]],
+
+["프로토타입 연결", "§9-1", [
+["P-01","탐색 홈에서 탐색 내 검색으로 가는 연결을 확인한다","Prototype 탭에서 FO-01 의 연결선을 따라간다."],
+["P-02","탐색 내 검색에서 서비스·고민·카테고리·지역 결과로 가는 연결을 확인한다","FO-02 의 연결선 네 갈래를 본다."],
+["P-03","서비스 목록에서 서비스 상세로 가는 연결을 확인한다","FO-03 → FO-13 연결을 본다."],
+["P-04","카테고리 목록 → 중분류 → 카테고리별 서비스 → 서비스 상세 연결을 확인한다","FO-04 → 05 → 06 → 13 을 순서대로 따라간다."],
+["P-05","고민 목록 → 고민 상세 → 서비스 상세 연결을 확인한다","FO-07 → 08 → 13 을 따라간다."],
+["P-06","지역 찾기 → 장소 선택 → 지역 탐색 결과 연결을 확인한다","FO-09 → 10 → 11 을 따라간다."],
+["P-07","서비스 상세 → 상품 목록·상품 상세 → 예약 정보 → 예약 확인 연결을 확인한다","FO-13 → 14·15 → 16 → 17 을 따라간다."],
+["P-08","지역 탐색 결과에서 스토어 상세 또는 상품 상세로 가는 연결을 확인한다","FO-11 의 연결선을 본다."],
+["P-09","스토어 목록 → 스토어 상세 → 상품 상세 연결을 확인한다","FO-18 → 19 → 15 를 따라간다."],
+["P-10","지역 상세에서 지역 찾기 또는 서비스·스토어·상품으로 가는 연결을 확인한다","FO-12 의 연결선을 본다."],
+["P-11","하단 탭이 Home · Explore · Stores · Products · My 다섯 개인지 확인한다","Bottom Nav 컴포넌트의 항목 수를 센다."],
+["P-12","Explore 가 FO-01, Stores 가 FO-18, Products 가 FO-14 에 연결됐는지 확인한다","각 탭의 연결 대상을 본다."],
+["P-13","Home 과 My 에 임의 링크를 만들지 않았는지 확인한다","두 탭에 연결선이 없어야 한다."],
+["P-14","원본 data-target 에 없는 연결을 새로 만들지 않았는지 확인한다","연결 목록을 원본 HTML 의 data-target 값과 대조한다."]
+]],
+
+["원본 대조", "§9-7", [
+["V-01","FO-01 탐색 홈을 원본과 나란히 놓고 정보 순서·간격·색상·고정 영역이 일치하는지 확인한다","원본 fo-explore 를 같은 배율로 띄우고 위에서 아래로 훑는다."],
+["V-02","FO-04 카테고리 목록을 같은 방식으로 대조한다","원본 fo-categories 와 나란히 본다."],
+["V-03","FO-11 지역 탐색 결과를 같은 방식으로 대조한다","원본 fo-find-results 와 나란히 본다."],
+["V-04","FO-13 서비스 상세를 같은 방식으로 대조한다","원본 fo-service 와 나란히 본다."],
+["V-05","FO-15 상품 상세를 같은 방식으로 대조한다","원본 fo-product-detail 와 나란히 본다."],
+["V-06","FO-19 스토어 상세를 같은 방식으로 대조한다","원본 fo-store-detail 와 나란히 본다."]
+]],
+
+["마감", "§9-8 · §9-9", [
+["Z-01","긴 텍스트가 잘린 곳이 없는지 확인한다","한 줄로 눌린 제목과 말줄임표가 생긴 문구를 찾는다."],
+["Z-02","레이어가 겹친 곳이 없는지 확인한다","화면을 확대해 글자와 요소가 서로 물린 곳을 찾는다."],
+["Z-03","하단 탭과 Sticky CTA 가 충돌하지 않는지 확인한다","둘이 같이 있는 화면에서 겹침과 가림을 본다."],
+["Z-04","원본 v1.8 HTML 파일이 수정되지 않았는지 확인한다","파일 수정 시각이 받은 그대로인지 본다."],
+["Z-05","캡처용 로컬 서버를 종료했는지 확인한다","터미널에서 서버 프로세스를 끊는다."],
+["Z-06","실패 항목을 결과 복사로 뽑아 제작자에게 전달했는지 확인한다","상단 결과 복사 버튼을 쓴다."]
+]]
+];
+
+var KEY='kbs_qa_fo_figma_v18';
+var state={}; try{ state=JSON.parse(localStorage.getItem(KEY)||'{}'); }catch(e){ state={}; }
+var folded={}; try{ folded=JSON.parse(localStorage.getItem(KEY+'_fold')||'{}'); }catch(e){ folded={}; }
+var filter='all';
+var list=document.getElementById('list');
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(state)); localStorage.setItem(KEY+'_fold',JSON.stringify(folded)); }catch(e){} }
+function get(id){ return state[id]||{v:'',m:''}; }
+
+function render(){
+  list.innerHTML='';
+  var total=0,pass=0,fail=0;
+  DATA.forEach(function(g){ g[2].forEach(function(c){ total++; var v=get(c[0]).v; if(v==='p')pass++; else if(v==='f')fail++; }); });
+  document.getElementById('nPass').textContent=pass;
+  document.getElementById('nFail').textContent=fail;
+  document.getElementById('nTodo').textContent=total-pass-fail;
+  document.getElementById('barP').style.width=(pass/total*100)+'%';
+  document.getElementById('barF').style.width=(fail/total*100)+'%';
+  document.getElementById('pct').textContent=Math.round((pass+fail)/total*100)+'%';
+
+  var any=false;
+  DATA.forEach(function(g){
+    var cards=[];
+    g[2].forEach(function(c){
+      var st=get(c[0]);
+      if(filter==='fail'&&st.v!=='f') return;
+      if(filter==='todo'&&st.v) return;
+      any=true;
+      var d=document.createElement('div');
+      d.className='tc'+(st.v==='p'?' pass':st.v==='f'?' fail':'');
+      d.innerHTML=
+        '<div class="hd"><span class="id">'+c[0]+'</span><span class="ti">'+esc(c[1])+'</span>'+
+        '<span class="acts">'+
+        '<button class="btn p'+(st.v==='p'?' on':'')+'" data-v="p">통과</button>'+
+        '<button class="btn f'+(st.v==='f'?' on':'')+'" data-v="f">실패</button>'+
+        '</span></div>'+
+        (c[2]?'<div class="how">'+c[2]+'</div>':'')+
+        '<div class="memo'+(st.v==='f'||st.m?' show':'')+'">'+
+        '<div class="lbl">무엇이 어떻게 달랐나요</div>'+
+        '<textarea placeholder="예: FO-07 프레임이 778px / Bottom Nav 변형에 My 없음 / CTA 색이 #FB6F92">'+esc(st.m)+'</textarea></div>';
+      d.querySelectorAll('.acts .btn').forEach(function(b){
+        b.addEventListener('click',function(){
+          var cur=get(c[0]); var nv=cur.v===b.dataset.v?'':b.dataset.v;
+          state[c[0]]={v:nv,m:cur.m||''}; save(); render();
+          if(nv==='f'){ var el=document.querySelector('[data-focus="'+c[0]+'"]'); if(el) el.focus(); }
+        });
+      });
+      var ta=d.querySelector('textarea');
+      ta.setAttribute('data-focus',c[0]);
+      ta.addEventListener('input',function(){ var cur=get(c[0]); state[c[0]]={v:cur.v,m:ta.value}; save(); });
+      cards.push(d);
+    });
+    if(!cards.length) return;
+    var gp=0,gf=0;
+    g[2].forEach(function(c){ var v=get(c[0]).v; if(v==='p')gp++; else if(v==='f')gf++; });
+    var wrap=document.createElement('div');
+    wrap.className='grp'+(folded[g[0]]?' fold':'');
+    var h=document.createElement('h2');
+    h.innerHTML=esc(g[0])+'<span class="ref9">'+esc(g[1])+'</span>'+
+      '<span class="n">'+gp+' / '+g[2].length+(gf?' · 실패 '+gf:'')+'</span>'+
+      '<span class="ar">'+(folded[g[0]]?'펼치기':'접기')+'</span>';
+    h.addEventListener('click',function(){ folded[g[0]]=!folded[g[0]]; save(); render(); });
+    wrap.appendChild(h);
+    var box=document.createElement('div'); box.className='items';
+    cards.forEach(function(x){ box.appendChild(x); });
+    wrap.appendChild(box);
+    list.appendChild(wrap);
+  });
+  if(!any){
+    var e=document.createElement('div'); e.className='empty';
+    e.textContent=filter==='fail'?'실패로 표시한 항목이 없습니다.':'미확인 항목이 없습니다.';
+    list.appendChild(e);
+  }
+}
+
+function report(){
+  var lines=[],pass=0,fail=0,todo=0;
+  DATA.forEach(function(g){
+    var rows=[];
+    g[2].forEach(function(c){
+      var st=get(c[0]);
+      if(st.v==='p')pass++; else if(st.v==='f')fail++; else todo++;
+      if(st.v!=='f') return;
+      rows.push('- '+c[0]+' '+c[1]+(st.m?'\n  '+st.m.replace(/\n/g,'\n  '):'\n  (메모 없음)'));
+    });
+    if(rows.length){ lines.push('['+g[0]+' '+g[1]+']'); lines.push(rows.join('\n')); lines.push(''); }
+  });
+  var todoList=[];
+  DATA.forEach(function(g){ g[2].forEach(function(c){ if(!get(c[0]).v) todoList.push(c[0]); }); });
+  return 'FO Figma v1.8 제작 검수 결과\n통과 '+pass+' / 실패 '+fail+' / 미확인 '+todo+'\n\n'+
+    (lines.length?'실패 항목\n\n'+lines.join('\n'):'실패 항목 없음\n')+
+    (todo?'\n미확인 항목\n'+todoList.join(', ')+'\n':'');
+}
+
+document.querySelectorAll('[data-f]').forEach(function(b){
+  b.addEventListener('click',function(){
+    filter=b.dataset.f;
+    document.querySelectorAll('[data-f]').forEach(function(x){ x.classList.toggle('on',x===b); });
+    render();
+  });
+});
+document.getElementById('foldAll').addEventListener('click',function(){
+  var allFolded=DATA.every(function(g){ return folded[g[0]]; });
+  DATA.forEach(function(g){ folded[g[0]]=!allFolded; });
+  this.textContent=allFolded?'전체 접기':'전체 펼치기';
+  save(); render();
+});
+document.getElementById('copy').addEventListener('click',function(){
+  document.getElementById('out').value=report();
+  document.getElementById('dlg').showModal();
+});
+document.getElementById('doCopy').addEventListener('click',function(){
+  var ta=document.getElementById('out');
+  ta.removeAttribute('readonly'); ta.select();
+  try{ document.execCommand('copy'); }catch(e){}
+  if(navigator.clipboard) navigator.clipboard.writeText(ta.value).catch(function(){});
+  ta.setAttribute('readonly','');
+  var b=this; b.textContent='복사했습니다';
+  setTimeout(function(){ b.textContent='클립보드로 복사'; },1500);
+});
+document.getElementById('reset').addEventListener('click',function(){
+  if(!confirm('기록한 통과·실패와 메모를 모두 지웁니다. 계속할까요?')) return;
+  state={}; save(); render();
+});
+render();
+</script>
+</body>
+</html>
