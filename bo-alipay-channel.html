@@ -382,7 +382,7 @@ function judgeProduct(p) {
   const c2 = onCount(e.btns, ROWS_PRODUCT, 'ali') > 0;
   let reason = '';
   if (!c1) reason = '미노출 설정';
-  else if (!c3) reason = '스토어 설정 미노출';
+  else if (!c3) reason = '스토어 미노출 설정';
   else if (!c2) reason = '알리페이 버튼 미설정';
   return { na: false, visible: !reason, reason };
 }
@@ -686,7 +686,7 @@ function screen_pList() {
     '<div class="card"><div class="filters">' +
     '<div class="frow">' + dimSel('심사상태', ['심사상태']) + dimSel('활성', ['활성']) + dimSel('히든', ['히든']) + langSelect() + dimSel('카테고리', ['카테고리']) + dimSel('스토어 선택', ['스토어 선택']) + '</div>' +
     '<div class="frow">' + dimSel('세부분류', ['세부분류']) + dimSel('Vat포함', ['Vat포함']) + dimSel('전/후사진 연결 여부', ['전/후사진 연결 여부']) + dimSel('외부링크 활성 여부', ['외부링크 활성 여부']) + '</div>' +
-    '<div class="frow">' + aliFilterRow(['전체', '미노출 설정', '스토어 설정 미노출', '알리페이 버튼 미설정']) + dimSel('단독 상품 포함 여부', ['단독 상품 포함 여부']) + dimSel('등록일', ['등록일']) + '</div>' +
+    '<div class="frow">' + aliFilterRow(['전체', '미노출 설정', '스토어 미노출 설정', '알리페이 버튼 미설정']) + dimSel('단독 상품 포함 여부', ['단독 상품 포함 여부']) + dimSel('등록일', ['등록일']) + '</div>' +
     '<div class="frow"><button class="btn">오늘</button><button class="btn">어제</button><button class="btn">이번주</button><button class="btn">이번달</button>' +
     '<input type="text" placeholder="Start date" style="width:120px"> ~ <input type="text" placeholder="End date" style="width:120px"></div>' +
     '<div class="frow"><input type="text" placeholder="검색어" style="width:220px"><button class="btn blue">검색</button></div>' +

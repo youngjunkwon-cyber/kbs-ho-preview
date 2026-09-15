@@ -149,7 +149,7 @@ var DATA = [
 ["P-02","미노출로 바꾸면 알리페이 칸이 잠긴다","P2 수정에서 알리페이 노출 = 미노출","알리페이 칸 전체 회색 잠금. 표 아래: 미노출 상태에서는 알리페이 앱 버튼을 수정할 수 없습니다. 설정값은 유지됩니다.","VIEW.lang='중국어(간체)';go('p-list');go('p-edit','P2');VIEW.tab=1;render()"],
 ["P-03","미노출 상품의 목록 표기","P-02 상태로 목록 복귀","알리페이 노출 = 미노출, 사유 = 미노출 설정","VIEW.lang='중국어(간체)';go('p-list');go('p-edit','P2');setVis('product','미노출');go('p-list')"],
 ["P-04","알리페이 버튼이 없는 상품","P8 모공 타이트닝 수정","안내: 알리페이 앱 버튼이 없어 알리페이에 노출되지 않습니다. 버튼 설정에서 1개 이상 켜면 노출됩니다. 노출 라디오는 조작 가능","VIEW.lang='중국어(간체)';go('p-list');go('p-edit','P8');VIEW.tab=1;render()"],
-["P-05","스토어가 미노출인 상품","언어 중국어(번체) · P4 눈매교정 상담 수정","노출 라디오와 알리페이 칸이 모두 잠김. 안내: 스토어가 미노출이라 이 상품도 알리페이에 노출되지 않습니다. 스토어 정보 관리 > 기본정보에서 바꿀 수 있습니다. 목록 사유 = 스토어 설정 미노출","VIEW.lang='중국어(번체)';go('p-list');go('p-edit','P4');VIEW.tab=1;render()"],
+["P-05","스토어가 미노출인 상품","언어 중국어(번체) · P4 눈매교정 상담 수정","노출 라디오와 알리페이 칸이 모두 잠김. 안내: 스토어가 미노출이라 이 상품도 알리페이에 노출되지 않습니다. 스토어 정보 관리 > 기본정보에서 바꿀 수 있습니다. 목록 사유 = 스토어 미노출 설정","VIEW.lang='중국어(번체)';go('p-list');go('p-edit','P4');VIEW.tab=1;render()"],
 ["P-06","대상 언어가 아닌 상품","언어 일본어 · P6 수정","노출 라디오와 알리페이 칸이 모두 잠김. 안내 문구는 없음. 목록의 두 칼럼은 -","VIEW.lang='일본어';go('p-list');go('p-edit','P6');VIEW.tab=1;render()"],
 ["P-07","기본 설정 상품","언어 영어 · P3 아쿠아 필링 수정","스토어 설정 적용 = 기본 설정. 표 전체 잠금. 안내: 기본 설정 적용 중입니다. 개별 설정을 선택하면 수정할 수 있습니다.","VIEW.lang='영어';go('p-list');go('p-edit','P3');VIEW.tab=1;render()"],
 ["P-08","기본 설정에서 채팅 자동 적용","P3 수정 · 채팅 행 확인","채팅 알리페이 ON. 행 안내: 알리페이 앱 버튼이 없어 채팅이 자동 적용됩니다.","VIEW.lang='영어';go('p-list');go('p-edit','P3');VIEW.tab=1;render()"],
@@ -161,7 +161,7 @@ var DATA = [
 ]],
 ["상품 목록", [
 ["PL-01","알리페이 칼럼 위치","상품정보관리","알리페이 노출·사유 칼럼이 히든 여부 바로 뒤","VIEW.lang='중국어(간체)';go('p-list')"],
-["PL-02","사유 값 목록","사유 필터 열기","전체 / 미노출 설정 / 스토어 설정 미노출 / 알리페이 버튼 미설정","VIEW.lang='중국어(간체)';go('p-list')"],
+["PL-02","사유 값 목록","사유 필터 열기","전체 / 미노출 설정 / 스토어 미노출 설정 / 알리페이 버튼 미설정","VIEW.lang='중국어(간체)';go('p-list')"],
 ["PL-03","사유로 거르기","사유 = 알리페이 버튼 미설정","P8 모공 타이트닝만 남음","VIEW.lang='중국어(간체)';go('p-list')"],
 ["PL-04","대상 언어가 아닌 언어","언어 = 일본어","두 칼럼이 - 로 표시되고 두 필터가 잠김. 잠기기 전 고른 값은 전체로 되돌아감","VIEW.lang='중국어(간체)';go('p-list')"]
 ]],
@@ -241,7 +241,7 @@ var DATA = [
 ["알리페이 회원 화면", [
 ["U-08","프로필 동의 회원의 마이페이지","프로필 제공에 동의한 상태","내 정보에 이름·성별·생년월일·국적이 채워지고 불러오기 버튼이 없다","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.view='fo11';render()"],
 ["U-09","프로필 거부 회원의 마이페이지","프로필 제공을 거부한 상태","이름 자리에 아무 호칭도 쓰지 않는다. 무엇을 가져올 수 있는지 한 줄과 불러오기 버튼만 보인다","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=false;S.view='fo11';render()"],
-["U-10","불러오기 버튼","거부 상태에서 불러오기 누르기","프로필이 채워지고 버튼이 사라진다","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=false;S.view='fo11';render()"],
+["U-10","불러오기 버튼은 동의 창을 다시 띄운다","거부 상태에서 불러오기 누르기","클릭 한 번으로 채워지지 않는다. 알리페이 프로필 제공 동의 창이 다시 뜨고, 동의를 눌러야 프로필이 채워지고 버튼이 사라진다. 거부를 누르면 그대로 유지된다","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=false;S.view='fo11';render()"],
 ["U-11","비밀번호 변경이 없다","마이페이지 메뉴","비밀번호 변경 자리가 점선으로만 표시되고 실제 메뉴에 없다. 비밀번호가 없는 계정이기 때문","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.view='fo11';render()"],
 ["U-12","별개 계정 안내","마이페이지 내 정보 아래","알리페이로 로그인된 상태입니다. K-Beauty Station 로그인 정보와는 다른 계정이며, 이용 기록은 계정별로 따로 관리됩니다.","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.view='fo11';render()"],
 ["U-13","로그인 경로가 없다","로그인 영역 정리 화면","로그인·회원가입, 소셜 로그인, 비밀번호 찾기 세 자리가 모두 없다","resetDB();S.joined=true;S.view='fo10';render()"],
@@ -254,8 +254,9 @@ var DATA = [
 ["U-17","여권 영문명은 채우지 않는다","같은 화면","여권 영문명이 비어 있다. 알리페이 이름은 여권 표기가 보장되지 않기 때문","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.view='fo13';render()"],
 ["U-18","프로필 거부 회원의 예약 폼","프로필 거부 상태에서 예약 입력","국적·성별·생년월일이 모두 빈 칸이고 자동 채움 표시가 없다","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=false;S.view='fo13';render()"],
 ["U-19","이메일 입력칸과 인증 버튼","동의·거부 두 경우 모두","이메일 칸이 빈 상태로 노출되고 옆에 인증메일 보내기 버튼이 있다","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.view='fo13';render()"],
-["U-22","인증 전에는 예약을 넘길 수 없다","이메일 인증을 하지 않은 상태","예약 요청 버튼이 회색 비활성이고 인증을 마쳐야 한다는 안내가 있다","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.view='fo13';render()"],
-["U-23","인증하면 예약을 넘길 수 있다","인증메일 보내기 누른 뒤","버튼이 인증됨으로 바뀌고 예약 요청이 활성된다","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.email='xiaomei.w@qq.com';S.mailOk=true;S.view='fo13';render()"],
+["U-22","인증 전에는 예약을 넘길 수 없다","이메일 인증을 하지 않은 상태","예약 요청 버튼이 회색 비활성이다. 휴대폰 번호·연락 메신저도 현행 그대로 필수라 이것까지 채워야 활성된다는 안내가 있다","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.view='fo13';render()"],
+["U-22b","휴대폰·메신저를 채워도 이메일 인증 전이면 막힌다","이메일만 미인증인 상태","이메일 칸을 뺀 나머지를 다 채워도 예약 요청은 비활성이다","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.tel='13900001111';S.msg='위챗 wxid_alipay01';S.view='fo13';render()"],
+["U-23","이메일·휴대폰·메신저를 모두 채우면 예약을 넘길 수 있다","인증메일 보내기, 휴대폰 번호, 연락 메신저를 차례로 누른 뒤","인증메일 보내기 버튼이 인증됨으로 바뀌고, 휴대폰·메신저도 채워지면 그제서야 예약 요청이 활성된다","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.email='xiaomei.w@qq.com';S.mailOk=true;S.tel='13900001111';S.msg='위챗 wxid_alipay01';S.view='fo13';render()"],
 ["U-20","인증한 이메일이 회원 정보에 남는다","예약을 넘긴 뒤 마이페이지","마이페이지 이메일 칸에 그 값이 보이고 인증된 주소라고 적힌다","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.email='xiaomei.w@qq.com';S.mailOk=true;S.view='fo11';render()"]
 ]],
 

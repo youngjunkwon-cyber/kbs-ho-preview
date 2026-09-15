@@ -128,6 +128,9 @@ function resetDB() {
     permit:   true,    // 알리페이 회원정보 조회 권한 개통 여부
     wallet:   'CN',    // CN 중국 / HK 홍콩
     email:    '',      // 예약에서 입력하면 채워진다
+    reAsk:    false,   // 마이페이지 불러오기 버튼을 눌러 재동의 창이 뜬 상태
+    tel:      '',      // 예약 폼 휴대폰 번호 (직접 입력, 현행 그대로 필수)
+    msg:      '',      // 예약 폼 메신저 연락처 (직접 입력, 현행 그대로 필수)
     view:     'fo09'
   };
 }
@@ -252,7 +255,7 @@ function fo11() {
   var prof = S.agProf
     ? '<div class="nm">' + ALI.name + '</div><div class="sub">' + ALI.sex + '<br>' + ALI.birth + '<br>' + ALI.nation + '</div>'
     : '<div class="sub" style="margin-top:0">알리페이 계정의 이름, 성별, 생년월일, 국적을 가져올 수 있습니다.</div>' +
-      '<div class="cta ghost" style="margin:12px 0 0" onclick="S.agProf=true;render()">알리페이에서 불러오기</div>';
+      '<div class="cta ghost" style="margin:12px 0 0" onclick="S.reAsk=true;render()">알리페이에서 불러오기</div>';
 
   var mail = '<div class="fld"><div class="l">이메일</div>' +
     '<div class="in ' + (S.email ? '' : 'plc') + '">' + (S.email || '예약 확인을 받을 이메일') + '</div>' +
@@ -262,11 +265,21 @@ function fo11() {
     .map(function (t) { return '<div class="mrow"><span>' + t + '</span><span class="a">›</span></div>'; }).join('') +
     '<div class="mrow" onclick="go(\'fo12\')" style="cursor:pointer"><span>회원 탈퇴</span><span class="a">›</span></div>';
 
+  /* 불러오기 버튼은 클릭 한 번으로 끝나지 않는다. FO-CH-08 그대로 동의 창을 한 번 더 띄운다 */
+  var overlay = S.reAsk
+    ? '<div class="dim"><div class="mdl">' +
+        '<h3>알리페이 프로필 제공</h3>' +
+        '<p class="d">이름, 성별, 생년월일, 국적을 가져옵니다.</p>' +
+        '<div class="cta" onclick="S.agProf=true;S.reAsk=false;render()">동의</div>' +
+        '<div class="cta ghost" onclick="S.reAsk=false;render()">거부</div>' +
+      '</div></div>'
+    : '';
+
   return phone('마이페이지',
     '<div class="sec"><div class="h">내 정보</div><div class="box">' + prof + mail + '</div></div>' +
     '<div class="note">알리페이로 로그인된 상태입니다. K-Beauty Station 로그인 정보와는 다른 계정이며, 이용 기록은 계정별로 따로 관리됩니다.</div>' +
     '<div class="gone">알리페이 채널에서는 이 자리가 없습니다<br>비밀번호 변경</div>' +
-    '<div class="sec">' + rows + '</div>');
+    '<div class="sec">' + rows + '</div>', overlay);
 }
 
 /* ────────────────────────────────────────────────
@@ -306,7 +319,15 @@ function fo13() {
       '<div class="in ' + (S.email ? '' : 'plc') + '">' + (S.email || '예약 확인을 받을 이메일') + '</div>' + btn +
       '</div>' + (S.mailOk ? '' : '<div class="sub">인증을 마쳐야 예약을 넘길 수 있습니다.</div>') + '</div>';
   }
+  /* 휴대폰 번호·메신저 연락처는 현행 그대로 필수다. 클릭하면 입력한 것으로 본다 */
+  function tapField(label, stateKey, ph, example) {
+    var v = S[stateKey];
+    return '<div class="fld"><div class="l">' + label + '</div>' +
+      '<div class="in ' + (v ? '' : 'plc') + '" onclick="S.' + stateKey + '=S.' + stateKey + '||\'' + example + '\';render()">' +
+      (v || ph) + '</div></div>';
+  }
   var auto = S.agProf;
+  var ready = S.mailOk && S.tel && S.msg;
   return phone('예약하기',
     '<div class="sec"><div class="h">예약자 정보</div><div class="box">' +
     fld('여권 영문명', '', { ph: '여권에 적힌 영문 이름' }) +
@@ -314,14 +335,15 @@ function fo13() {
     fld('성별', auto ? ALI.sex : '', { auto: auto, ph: '성별 선택' }) +
     fld('생년월일', auto ? ALI.birth : '', { auto: auto, ph: '생년월일 선택' }) +
     mailField() +
-    fld('휴대폰 번호', '', { ph: '문자 인증이 필요합니다' }) +
-    fld('연락 메신저', '', { ph: '위챗 아이디' }) +
+    tapField('휴대폰 번호', 'tel', '눌러서 입력 (문자 인증 필요)', '13900001111') +
+    tapField('연락 메신저', 'msg', '눌러서 입력', '위챗 wxid_alipay01') +
     '</div></div>' +
     '<div class="note">' + (auto
       ? '프로필 제공에 동의해 국적·성별·생년월일이 채워졌습니다. 이용자가 고칠 수 있습니다.'
       : '프로필 제공을 거부해 전부 직접 입력합니다.') +
-    '<br>여권 영문명은 채우지 않습니다. 알리페이가 주는 이름은 여권 표기가 보장되지 않습니다.</div>' +
-    '<div class="cta ' + (S.mailOk ? '' : 'dis') + '" ' + (S.mailOk ? 'onclick="go(\'fo11\')"' : '') + '>예약 요청</div>', '', '‹');
+    '<br>여권 영문명은 채우지 않습니다. 알리페이가 주는 이름은 여권 표기가 보장되지 않습니다.' +
+    '<br>휴대폰 번호와 메신저 연락처는 현행 그대로 필수입니다.</div>' +
+    '<div class="cta ' + (ready ? '' : 'dis') + '" ' + (ready ? 'onclick="go(\'fo11\')"' : '') + '>예약 요청</div>', '', '‹');
 }
 
 /* ────────────────────────────────────────────────
