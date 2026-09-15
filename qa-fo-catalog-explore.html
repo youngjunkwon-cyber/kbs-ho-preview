@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>FO 카탈로그·탐색 · 와이어프레임 검수</title>
+<title>FO 카탈로그·탐색 · 화면 검수</title>
 <style>
 *{box-sizing:border-box}
 html,body{height:100%}
@@ -69,7 +69,7 @@ dialog textarea{width:100%;height:320px;font-family:ui-monospace,Menlo,monospace
 <div class="app">
   <div class="left">
     <div class="lbar">
-      <span class="t">와이어프레임</span>
+      <span class="t">화면</span>
       <button class="btn" id="reload">새로고침</button>
       <button class="btn" id="resetPrev">시드 초기화</button>
       <span class="sp"></span>
@@ -98,7 +98,7 @@ dialog textarea{width:100%;height:320px;font-family:ui-monospace,Menlo,monospace
       </div>
     </div>
     <div class="scroll">
-      <p class="hint">케이스의 <b>이 화면 열기</b>를 누르면 왼쪽 와이어프레임이 그 상태로 바로 맞춰집니다.<br>
+      <p class="hint">케이스의 <b>이 화면 열기</b>를 누르면 왼쪽 화면이 그 상태로 바로 맞춰집니다.<br>
       실패를 누르면 메모 칸이 열립니다. 기록은 이 브라우저에 저장됩니다.</p>
       <div id="list"></div>
     </div>
@@ -243,7 +243,7 @@ var DATA = [
 
 ["공통 · 회귀", [
 ["G-01","시드 초기화","값을 바꾼 뒤 상단 시드 초기화","처음 상태(영어 탐색 홈)로 복귀","go('explore')"],
-["G-02","와이어프레임 원칙","전 화면","색·아이콘·이미지 없이 회색 테두리와 굵기로만 위계가 잡혀 있음","go('explore')"],
+["G-02","디자인 일관성","전 화면","헤더 52px·하단 메뉴 4개·카드 라운드·브랜드 핑크는 주 버튼과 선택 상태에만 쓰임","go('explore')"],
 ["G-03","검토용 장치 없음","전 화면","화면 안에 시안 설명, 기능 ID, 케이스 번호가 없음","go('svc','S1')"],
 ["G-04","금지 표현","전 화면","긴 줄표, 서비스명 줄임, 정본·축 같은 내부 용어가 화면 문구에 없음","go('explore')"],
 ["G-05","0건과 오류를 구분","0건 화면과 실패 화면을 비교","0건은 원인과 다음 조건, 오류는 다시 시도. 문구가 서로 다름","applyConds([{axis:'plc',id:'PM'}],'product')"],
@@ -271,7 +271,7 @@ function runInPreview(code, alsoReset){
     frame.contentWindow.focus();
     return true;
   } catch(e){
-    alert('와이어프레임을 제어하지 못했습니다.\n' + e.message +
+    alert('화면을 제어하지 못했습니다.\n' + e.message +
       '\n\n파일을 직접 연 경우 브라우저가 막습니다. 배포 주소로 열어 주세요.');
     return false;
   }
@@ -353,7 +353,7 @@ function buildReport(){
     });
     if(rows.length){ lines.push('['+g[0]+']'); lines.push(rows.join('\n')); lines.push(''); }
   });
-  return 'FO 카탈로그·탐색 와이어프레임 검수 결과\n통과 '+pass+' / 실패 '+fail+' / 미확인 '+todo+'\n\n'+
+  return 'FO 카탈로그·탐색 화면 검수 결과\n통과 '+pass+' / 실패 '+fail+' / 미확인 '+todo+'\n\n'+
     (lines.length ? '실패 건\n\n'+lines.join('\n') : '실패 건 없음');
 }
 
