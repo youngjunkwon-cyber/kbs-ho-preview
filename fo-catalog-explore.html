@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FO 카탈로그·탐색 화면 시안 — K-Beauty Station</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#fb6f92;
+  --primary-deep:#eb517a;
+  --primary-light:#fff2f6;
+  --primary-mid:#fde8ef;
+  --text1:#1a1a1a;
+  --text2:#3d3d3d;
+  --text3:#777;
+  --text4:#aaa;
+  --border:#e8e8e8;
+  --border2:#f1f1f1;
+  --gray-bg:#f7f7f7;
+  --gray-mid:#f2f2f2;
+}
+html{font-size:14px}
+body{
+  font-family:'Pretendard',-apple-system,'Apple SD Gothic Neo',sans-serif;
+  background:#eceded;color:var(--text1);
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ============ 페이지 헤더 ============ */
+.page-head{padding:40px 32px 8px;max-width:1720px;margin:0 auto}
+.page-head h1{font-size:24px;font-weight:800;letter-spacing:-.4px}
+.page-head p{margin-top:8px;font-size:13px;color:var(--text3);line-height:1.7}
+.page-head .docs{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}
+.page-head .docs span{
+  font-size:11px;font-weight:600;color:var(--text2);
+  background:#fff;border:1px solid var(--border);border-radius:6px;padding:5px 10px;
+}
+.legend{
+  margin:20px 32px 0;max-width:1720px;
+  background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 18px;
+  font-size:12px;color:var(--text3);line-height:1.8;
+}
+.legend b{color:var(--text1);font-weight:700}
+
+/* ============ 갤러리 ============ */
+.stage{
+  display:flex;flex-wrap:wrap;gap:48px 36px;
+  padding:36px 32px 80px;max-width:1720px;margin:0 auto;
+  align-items:flex-start;
+}
+.frame{width:375px}
+.frame-label{margin-bottom:12px}
+.frame-id{
+  display:inline-block;font-size:10px;font-weight:700;letter-spacing:.4px;
+  color:var(--text2);background:#fff;border:1px solid var(--border);
+  border-radius:5px;padding:3px 7px;margin-bottom:6px;
+}
+.frame-title{font-size:14px;font-weight:700;letter-spacing:-.2px}
+.frame-desc{margin-top:4px;font-size:11.5px;color:var(--text3);line-height:1.6}
+
+/* ============ 폰 셸 ============ */
+.phone{
+  width:375px;height:812px;background:#fff;border-radius:28px;
+  overflow:hidden;position:relative;
+  box-shadow:0 16px 48px rgba(0,0,0,.14);
+  border:1px solid #dcdcdc;
+}
+.scroll{
+  position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;
+}
+.scroll::-webkit-scrollbar{width:0}
+.scroll.has-nav{padding-bottom:62px}
+.scroll.has-nav.has-cta{padding-bottom:126px}
+
+/* ============ FO 헤더 ============ */
+.hdr{
+  position:sticky;top:0;z-index:30;height:52px;background:#fff;
+  display:flex;align-items:center;gap:4px;padding:0 6px 0 4px;
+  border-bottom:1px solid var(--border2);
+}
+.hdr-ico{
+  width:40px;height:40px;flex:0 0 40px;border:0;background:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;color:var(--text1);border-radius:50%;
+}
+.hdr-back{font-size:22px;font-weight:300}
+.hdr-title{
+  flex:1;text-align:center;font-size:15px;font-weight:700;letter-spacing:-.2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 2px;
+}
+.hdr-logo{flex:1;font-size:14px;font-weight:800;color:var(--primary);letter-spacing:-.3px;padding-left:12px}
+.hdr-sp{width:40px;flex:0 0 40px}
+
+/* ============ 하단 전역 메뉴 ============ */
+.nav{
+  position:absolute;left:0;right:0;bottom:0;z-index:40;height:62px;background:#fff;
+  border-top:1px solid var(--border);display:flex;padding-bottom:6px;
+}
+.nav-i{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  font-size:10px;font-weight:600;color:var(--text4);cursor:pointer;
+}
+.nav-i .g{font-size:19px;line-height:1;filter:grayscale(1);opacity:.5}
+.nav-i.on{color:var(--primary)}
+.nav-i.on .g{filter:none;opacity:1}
+
+/* ============ 공통 섹션 ============ */
+.sec{padding:20px 16px}
+.sec+.sec{border-top:8px solid var(--gray-mid)}
+.sec-tight+.sec-tight{border-top:1px solid var(--border2)}
+.sec-t{font-size:15px;font-weight:700;letter-spacing:-.2px;margin-bottom:2px}
+.sec-s{font-size:11.5px;color:var(--text3);margin-bottom:12px;line-height:1.5}
+.sec-row{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px}
+.sec-row .sec-t{margin-bottom:0}
+.more{font-size:11.5px;font-weight:600;color:var(--text3);cursor:pointer;white-space:nowrap}
+.more::after{content:' ›'}
+
+/* ============ 검색 ============ */
+.searchbar{
+  display:flex;align-items:center;gap:8px;height:44px;border-radius:10px;
+  background:var(--gray-bg);border:1px solid var(--border);padding:0 12px;
+  font-size:13px;color:var(--text4);
+}
+.searchbar .mg{font-size:15px;opacity:.55}
+.searchfield{
+  display:flex;align-items:center;gap:8px;height:42px;border-radius:10px;
+  background:#fff;border:1.5px solid var(--primary);padding:0 10px 0 12px;
+}
+.searchfield input{
+  flex:1;border:0;outline:0;font:inherit;font-size:13.5px;font-weight:500;color:var(--text1);background:none;
+}
+.clear-x{
+  width:20px;height:20px;border-radius:50%;background:#d8d8d8;color:#fff;border:0;
+  font-size:11px;line-height:1;cursor:pointer;flex:0 0 20px;
+}
+
+/* ============ 탐색 축 그리드 ============ */
+.axis-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.axis{
+  border:1px solid var(--border);border-radius:12px;padding:14px 12px;background:#fff;cursor:pointer;
+}
+.axis .ic{font-size:20px;line-height:1;margin-bottom:8px;display:block}
+.axis .nm{font-size:13.5px;font-weight:700;letter-spacing:-.2px}
+.axis .ct{font-size:11px;color:var(--text3);margin-top:3px}
+
+/* ============ 칩 ============ */
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chips-scroll{display:flex;gap:7px;overflow-x:auto;padding-bottom:2px;margin:0 -16px;padding-left:16px;padding-right:16px}
+.chips-scroll::-webkit-scrollbar{display:none}
+.chip{
+  display:inline-flex;align-items:center;gap:5px;
+  height:32px;padding:0 12px;border-radius:16px;
+  border:1px solid var(--border);background:#fff;
+  font-size:12.5px;font-weight:500;color:var(--text2);white-space:nowrap;cursor:pointer;
+}
+.chip.on{border-color:var(--primary);background:var(--primary-light);color:var(--primary-deep);font-weight:600}
+.chip.applied{border-color:var(--primary);background:var(--primary-light);color:var(--primary-deep);font-weight:600}
+.chip .x{font-size:13px;opacity:.75;margin-left:1px}
+.chip.ghost{border-style:dashed;color:var(--text3)}
+
+/* ============ 리스트 행(서비스/정본) ============ */
+.row{
+  display:flex;align-items:flex-start;gap:12px;padding:13px 0;
+  border-bottom:1px solid var(--border2);cursor:pointer;
+}
+.row:last-child{border-bottom:0}
+.row-thumb{
+  width:52px;height:52px;flex:0 0 52px;border-radius:10px;
+  background:var(--primary-mid);display:flex;align-items:center;justify-content:center;font-size:21px;
+}
+.row-thumb.gray{background:var(--gray-mid)}
+.row-b{flex:1;min-width:0}
+.row-nm{font-size:14px;font-weight:700;letter-spacing:-.2px;line-height:1.35}
+.row-path{font-size:11px;color:var(--text3);margin-top:3px}
+.row-desc{font-size:12px;color:var(--text3);margin-top:4px;line-height:1.5;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.row-arrow{align-self:center;color:var(--text4);font-size:17px;font-weight:300}
+.match{
+  display:inline-block;margin-top:5px;font-size:10.5px;font-weight:600;
+  color:var(--primary-deep);background:var(--primary-light);
+  border:1px solid var(--primary-mid);border-radius:4px;padding:2px 6px;
+}
+
+/* 결과 유형 그룹 헤더 */
+.grp{
+  font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.3px;
+  padding:14px 0 2px;text-transform:uppercase;
+}
+
+/* ============ 탭 ============ */
+.tabs{
+  display:flex;background:#fff;border-bottom:1px solid var(--border);
+  position:sticky;top:52px;z-index:20;
+}
+.tab{
+  flex:1;height:44px;display:flex;align-items:center;justify-content:center;gap:4px;
+  font-size:13px;font-weight:600;color:var(--text3);cursor:pointer;
+  border-bottom:2px solid transparent;margin-bottom:-1px;
+}
+.tab.on{color:var(--text1);font-weight:700;border-bottom-color:var(--text1)}
+.tab .n{font-size:11.5px;color:var(--text4);font-weight:600}
+.tab.on .n{color:var(--primary)}
+
+.tabs-pill{display:flex;gap:5px;overflow-x:auto;padding:10px 16px;border-bottom:1px solid var(--border2)}
+.tabs-pill .chip{height:30px;padding:0 10px;font-size:12px}
+.tabs-pill::-webkit-scrollbar{display:none}
+
+/* ============ 정렬 바 ============ */
+.sortbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 16px;border-bottom:1px solid var(--border2);
+}
+.count{font-size:12px;color:var(--text3)}
+.count b{color:var(--text1);font-weight:700}
+.sortbtn{
+  display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:600;
+  color:var(--text2);border:1px solid var(--border);border-radius:8px;
+  height:30px;padding:0 10px;background:#fff;cursor:pointer;
+}
+
+/* ============ 상품 카드 ============ */
+.pcard{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--border2);cursor:pointer}
+.pcard:last-child{border-bottom:0}
+.pthumb{
+  width:88px;height:88px;flex:0 0 88px;border-radius:10px;overflow:hidden;
+  background:linear-gradient(135deg,#fde8ef,#f3dde3);
+  display:flex;align-items:center;justify-content:center;font-size:26px;
+}
+.pthumb.b{background:linear-gradient(135deg,#e6eef7,#dbe4ee)}
+.pthumb.c{background:linear-gradient(135deg,#eaf1e8,#dfe8dc)}
+.pbody{flex:1;min-width:0;display:flex;flex-direction:column}
+.pstore{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:4px}
+.pname{font-size:13.5px;font-weight:700;line-height:1.4;margin-top:3px;letter-spacing:-.2px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ptags{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.ptag{font-size:10px;color:var(--text3);background:var(--gray-mid);border-radius:4px;padding:2px 6px}
+.pprice{margin-top:auto;padding-top:6px;font-size:15px;font-weight:800;letter-spacing:-.3px}
+.pprice small{font-size:11px;font-weight:500;color:var(--text3);margin-left:3px}
+
+/* ============ 스토어 카드 ============ */
+.scard{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--border2);cursor:pointer}
+.scard:last-child{border-bottom:0}
+.sthumb{
+  width:72px;height:72px;flex:0 0 72px;border-radius:10px;
+  background:linear-gradient(135deg,#f0e6ea,#e3d7dd);
+  display:flex;align-items:center;justify-content:center;font-size:24px;
+}
+.sname{font-size:14px;font-weight:700;letter-spacing:-.2px}
+.smeta{font-size:11.5px;color:var(--text3);margin-top:4px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.star{color:#f5a623;font-weight:700}
+.dot{color:var(--border);}
+
+/* ============ 콘텐츠 카드 ============ */
+.ccard{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid var(--border2);cursor:pointer}
+.ccard:last-child{border-bottom:0}
+.cthumb{
+  width:76px;height:64px;flex:0 0 76px;border-radius:8px;
+  background:linear-gradient(135deg,#efeaf5,#e3dcec);
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+}
+.ckind{font-size:10px;font-weight:700;letter-spacing:.3px;color:var(--text3);text-transform:uppercase}
+.ctitle{font-size:13px;font-weight:700;line-height:1.45;margin-top:3px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cmeta{font-size:10.5px;color:var(--text4);margin-top:5px}
+
+/* ============ 랜딩 헤드 ============ */
+.crumb{
+  font-size:11px;color:var(--text3);padding:14px 16px 0;line-height:1.6;
+}
+.crumb a{color:var(--text3);text-decoration:none}
+.crumb .cur{color:var(--text1);font-weight:600}
+.land-head{padding:8px 16px 18px}
+.land-h1{font-size:21px;font-weight:800;letter-spacing:-.5px;line-height:1.3}
+.land-sub{font-size:12px;color:var(--text3);margin-top:6px}
+.land-body{font-size:13px;color:var(--text2);line-height:1.75;margin-top:12px}
+
+/* 선택 기준 박스 */
+.critbox{
+  margin-top:14px;border:1px solid var(--border);border-radius:10px;
+  background:var(--gray-bg);padding:14px;
+}
+.critbox .t{font-size:12.5px;font-weight:700;margin-bottom:8px}
+.critline{display:flex;gap:7px;font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:6px}
+.critline:last-child{margin-bottom:0}
+.critline .b{color:var(--primary);flex:0 0 auto;font-weight:700}
+
+/* 관계 라벨 */
+.rel-l{font-size:11.5px;font-weight:700;color:var(--text3);margin-bottom:7px}
+.rel-b+.rel-b{margin-top:14px}
+
+/* ============ 빈 상태 / 오류 ============ */
+.empty{padding:34px 20px;text-align:center}
+.empty .ic{font-size:30px;margin-bottom:12px}
+.empty .t{font-size:15px;font-weight:700;letter-spacing:-.2px}
+.empty .d{font-size:12.5px;color:var(--text3);margin-top:7px;line-height:1.65}
+.empty-acts{margin-top:18px;display:flex;flex-direction:column;gap:8px;text-align:left}
+.act{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  border:1px solid var(--border);border-radius:10px;padding:12px 13px;background:#fff;cursor:pointer;
+}
+.act .l{font-size:12.5px;font-weight:600;color:var(--text1)}
+.act .s{font-size:11px;color:var(--text3);margin-top:2px}
+.act .a{color:var(--text4);font-size:16px;font-weight:300}
+.act.primary{border-color:var(--primary);background:var(--primary-light)}
+.act.primary .l{color:var(--primary-deep)}
+
+.unblock{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-top:14px}
+.unblock-h{font-size:11.5px;font-weight:700;color:var(--text3);padding:11px 13px;background:var(--gray-bg);border-bottom:1px solid var(--border)}
+.unblock-r{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;border-bottom:1px solid var(--border2)}
+.unblock-r:last-child{border-bottom:0}
+.unblock-r .nm{font-size:12.5px;font-weight:600}
+.unblock-r .nm i{font-style:normal;font-size:10.5px;color:var(--text3);font-weight:500;display:block;margin-top:2px}
+.mini{
+  height:28px;padding:0 11px;border-radius:14px;border:1px solid var(--border);
+  background:#fff;font:inherit;font-size:11.5px;font-weight:600;color:var(--text2);cursor:pointer;flex:0 0 auto;
+}
+.mini.pink{border-color:var(--primary);color:var(--primary-deep);background:var(--primary-light)}
+
+/* 영역 단위 오류 */
+.retry{
+  border:1px solid var(--border);border-radius:10px;background:var(--gray-bg);
+  padding:20px 14px;text-align:center;
+}
+.retry .t{font-size:12.5px;color:var(--text3);line-height:1.6}
+.retry .b{margin-top:10px}
+
+/* 인라인 0건(거래 영역) */
+.zero{
+  border:1px dashed var(--border);border-radius:10px;padding:20px 14px;text-align:center;background:var(--gray-bg);
+}
+.zero .t{font-size:12.5px;font-weight:600;color:var(--text2)}
+.zero .d{font-size:11.5px;color:var(--text3);margin-top:5px;line-height:1.6}
+.zero .b{margin-top:12px}
+
+/* 스켈레톤 */
+.sk{background:linear-gradient(90deg,#f0f0f0 25%,#e6e6e6 37%,#f0f0f0 63%);
+  background-size:400% 100%;border-radius:6px;animation:sh 1.3s ease infinite}
+@keyframes sh{0%{background-position:100% 50%}100%{background-position:0 50%}}
+.sk-row{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid var(--border2)}
+
+/* ============ 버튼 ============ */
+.btn{
+  width:100%;height:46px;border-radius:10px;border:1px solid var(--border);
+  background:#fff;font:inherit;font-size:13.5px;font-weight:700;color:var(--text1);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.btn.fill{background:var(--primary-deep);border-color:var(--primary-deep);color:#fff}
+.btn.sm{height:40px;font-size:12.5px}
+.btn-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* 하단 CTA */
+.cta{
+  position:absolute;left:0;right:0;bottom:62px;z-index:35;
+  background:#fff;border-top:1px solid var(--border);
+  padding:10px 16px 12px;display:flex;gap:8px;align-items:center;
+}
+.cta-fav{
+  width:46px;height:46px;flex:0 0 46px;border-radius:10px;border:1px solid var(--border);
+  background:#fff;font-size:19px;color:var(--text3);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+.cta-fav.on{border-color:var(--primary);background:var(--primary-light);color:var(--primary-deep)}
+.cta .btn{flex:1;width:auto}
+
+/* 스티키 조건 바 */
+.condbar{
+  position:sticky;top:52px;z-index:22;background:#fff;
+  border-bottom:1px solid var(--border);padding:10px 0;
+  display:flex;align-items:center;gap:8px;
+}
+.condbar-in{flex:1;min-width:0;display:flex;gap:7px;overflow-x:auto;padding:0 0 0 16px}
+.condbar-in::-webkit-scrollbar{display:none}
+.condbar-fade{
+  flex:0 0 auto;padding:0 14px 0 10px;
+  background:linear-gradient(90deg,rgba(255,255,255,0),#fff 12px);
+}
+.reset{
+  font-size:11.5px;font-weight:600;color:var(--text3);text-decoration:underline;
+  white-space:nowrap;cursor:pointer;background:none;border:0;font-family:inherit;padding:0;
+}
+
+/* 장소 역/노선 */
+.stn{display:flex;flex-direction:column;gap:8px}
+.stn-r{display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:10px;padding:11px 12px}
+.stn-nm{font-size:13px;font-weight:700}
+.line-b{font-size:10px;font-weight:700;color:#fff;border-radius:9px;padding:2px 7px;white-space:nowrap}
+.l2{background:#00a84d}.l9{background:#bb8336}.lsb{background:#d31145}
+
+/* 언어 미공개 */
+.lang-list{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-top:16px}
+.lang-r{display:flex;align-items:center;justify-content:space-between;padding:13px;border-bottom:1px solid var(--border2);cursor:pointer}
+.lang-r:last-child{border-bottom:0}
+.lang-r .nm{font-size:13px;font-weight:600}
+.lang-r .a{color:var(--text4);font-size:16px;font-weight:300}
+
+/* 홈 고정 헤더(탐색 홈 전용) */
+.exp-hero{padding:16px 16px 18px}
+.exp-h1{font-size:19px;font-weight:800;letter-spacing:-.4px;line-height:1.35}
+.exp-p{font-size:12px;color:var(--text3);margin-top:6px;line-height:1.6}
+</style>
+</head>
+<body>
+
+<div class="page-head">
+  <h1>FO 카탈로그·탐색 개편 화면 시안</h1>
+  <p>
+    탐색 홈, 정본 검색, 조건 결과, 정식 랜딩 4종과 기능정의서가 요구하는 필수 상태를 실제 FO 디자인(375px, Pretendard, 브랜드 핑크)으로 구성했습니다.<br>
+    FO는 한국어 UI가 없어 화면 안 문구는 영어로 작성했고, 각 프레임 위 회색 라벨은 검토용 표기입니다.
+  </p>
+  <div class="docs">
+    <span>PRD v4.6</span><span>기능정의서 v1.5</span><span>FO-NAV-01</span><span>FO-EXP-01~04</span><span>FO-LAND-01~04</span><span>CONTENT-04</span><span>FO-SAVE-01</span>
+  </div>
+</div>
+
+<div class="legend">
+  <b>담긴 규칙.</b>
+  전역 메뉴는 홈·탐색·저장·마이페이지 4개 고정, 상품·스토어는 전체 보기로만 진입.
+  정본 검색은 서비스·관심사·카테고리·장소만 검색하고 동의어는 별도 결과를 만들지 않으며 다중 후보는 대표 카테고리 경로로 구분.
+  조건 결과는 같은 축 복수 선택은 OR, 다른 축은 AND이고 가격 정렬은 상품 탭에서만 노출.
+  랜딩은 상품·스토어 0건이어도 정보 영역을 유지하고 거래 버튼만 숨김.
+  관련 콘텐츠는 승인·현재 언어 공개·연결 대상 공개를 모두 만족한 카드만, 중복은 한 번만 표시.
+</div>
+
+<div class="stage">
+
+<!-- ═══════════════ 1. 탐색 홈 ═══════════════ -->
+<div class="frame">
+  <div class="frame-label">
+    <div class="frame-id">FO-S02 / FO-EXP-01 · FO-NAV-01</div>
+    <div class="frame-title">탐색 홈 (기본)</div>
+    <div class="frame-desc">정본 검색 + 4개 탐색축 + 추천 영역 + 전체 상품·스토어 진입점. 하단 전역 메뉴 4개.</div>
+  </div>
+  <div class="phone">
+    <div class="scroll has-nav">
+      <header class="hdr">
+        <div class="hdr-logo">K-Beauty Station</div>
+        <button class="hdr-ico">🌐</button>
+      </header>
+
+      <div class="exp-hero">
+        <div class="exp-h1">Find the right treatment,<br>even if you don't know its name</div>
+        <div class="exp-p">Start from a category, a concern, a body area, or a place in Korea.</div>
+      </div>
+
+      <div style="padding:0 16px 18px">
+        <div class="searchbar">
+          <span class="mg">🔍</span>
+          <span>Search treatments, concerns or places</span>
+        </div>
+      </div>
+
+      <div class="sec" style="border-top:8px solid var(--gray-mid)">
+        <div class="sec-t">Start from</div>
+        <div class="sec-s">Pick any starting point. You can combine them later.</div>
+        <div class="axis-grid">
+          <div class="axis"><span class="ic">🗂️</span><div class="nm">Categories</div><div class="ct">6 main · 44 sub</div></div>
+          <div class="axis"><span class="ic">💭</span><div class="nm">Concerns</div><div class="ct">18 concerns</div></div>
+          <div class="axis"><span class="ic">🧍</span><div class="nm">Body areas</div><div class="ct">12 areas</div></div>
+          <div class="axis"><span class="ic">📍</span><div class="nm">Places</div><div class="ct">Seoul · Busan · Jeju</div></div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-row">
+          <div class="sec-t">Popular services</div>
+          <div class="more">See all</div>
+        </div>
+        <div class="row">
+          <div class="row-thumb">💫</div>
+          <div class="row-b">
+            <div class="row-nm">Shurink Universe</div>
+            <div class="row-path">Lifting &amp; Contouring › Ultrasound Lifting</div>
+          </div>
+          <div class="row-arrow">›</div>
+        </div>
+        <div class="row">
+          <div class="row-thumb">💧</div>
+          <div class="row-b">
+            <div class="row-nm">Rejuran Healer</div>
+            <div class="row-path">Skin Care › Skin Booster</div>
+          </div>
+          <div class="row-arrow">›</div>
+        </div>
+        <div class="row">
+          <div class="row-thumb">✨</div>
+          <div class="row-b">
+            <div class="row-nm">Ultherapy</div>
+            <div class="row-path">Lifting &amp; Contouring › Ultrasound Lifting</div>
+          </div>
+          <div class="row-arrow">›</div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-row">
+          <div class="sec-t">Popular places</div>
+          <div class="more">See all</div>
+        </div>
+        <div class="chips">
+          <span class="chip">Gangnam</span>
+          <span class="chip">Apgujeong Rodeo</span>
+          <span class="chip">Myeong-dong</span>
+          <span class="chip">Hongdae</span>
+          <span class="chip">Sinsa</span>
+          <span class="chip">Seomyeon</span>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-t">Browse everything</div>
+        <div class="sec-s">Product and store lists stay available from here.</div>
+        <div class="btn-pair">
+          <button class="btn sm">All products</button>
+          <button class="btn sm">All stores</button>
+        </div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-i"><span class="g">🏠</span>Home</div>
+      <div class="nav-i on"><span class="g">🧭</span>Explore</div>
+      <div class="nav-i"><span class="g">🤍</span>Saved</div>
+      <div class="nav-i"><span class="g">👤</span>My</div>
+    </nav>
+  </div>
+</div>
+
+<!-- ═══════════════ 2. 탐색 홈 · 추천만 실패 ═══════════════ -->
+<div class="frame">
+  <div class="frame-label">
+    <div class="frame-id">FO-S02 / FO-EXP-01 · FO-EXP-04</div>
+    <div class="frame-title">탐색 홈 (추천만 로딩·실패)</div>
+    <div class="frame-desc">추천 조회만 실패하면 해당 영역에 재시도만 두고 검색과 4개 축은 그대로 사용 가능.</div>
+  </div>
+  <div class="phone">
+    <div class="scroll has-nav">
+      <header class="hdr">
+        <div class="hdr-logo">K-Beauty Station</div>
+        <button class="hdr-ico">🌐</button>
+      </header>
+
+      <div class="exp-hero">
+        <div class="exp-h1">Find the right treatment,<br>even if you don't know its name</div>
+        <div class="exp-p">Start from a category, a concern, a body area, or a place in Korea.</div>
+      </div>
+
+      <div style="padding:0 16px 18px">
+        <div class="searchbar">
+          <span class="mg">🔍</span>
+          <span>Search treatments, concerns or places</span>
+        </div>
+      </div>
+
+      <div class="sec" style="border-top:8px solid var(--gray-mid)">
+        <div class="sec-t">Start from</div>
+        <div class="sec-s">Pick any starting point. You can combine them later.</div>
+        <div class="axis-grid">
+          <div class="axis"><span class="ic">🗂️</span><div class="nm">Categories</div><div class="ct">6 main · 44 sub</div></div>
+          <div class="axis"><span class="ic">💭</span><div class="nm">Concerns</div><div class="ct">18 concerns</div></div>
+          <div class="axis"><span class="ic">🧍</span><div class="nm">Body areas</div><div class="ct">12 areas</div></div>
+          <div class="axis"><span class="ic">📍</span><div class="nm">Places</div><div class="ct">Seoul · Busan · Jeju</div></div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-t" style="margin-bottom:12px">Popular services</div>
+        <div class="retry">
+          <div class="t">We couldn't load recommendations.<br>Search and the four starting points still work.</div>
+          <div class="b"><button class="mini pink">Try again</button></div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-t" style="margin-bottom:12px">Popular places</div>
+        <div class="sk-row" style="border:0;padding:0">
+          <div class="sk" style="width:84px;height:32px;border-radius:16px"></div>
+          <div class="sk" style="width:110px;height:32px;border-radius:16px"></div>
+          <div class="sk" style="width:70px;height:32px;border-radius:16px"></div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-t">Browse everything</div>
+        <div class="sec-s">Product and store lists stay available from here.</div>
+        <div class="btn-pair">
+          <button class="btn sm">All products</button>
+          <button class="btn sm">All stores</button>
+        </div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-i"><span class="g">🏠</span>Home</div>
+      <div class="nav-i on"><span class="g">🧭</span>Explore</div>
+      <div class="nav-i"><span class="g">🤍</span>Saved</div>
+      <div class="nav-i"><span class="g">👤</span>My</div>
+    </nav>
+  </div>
+</div>
+
+<!-- ═══════════════ 3. 정본 검색 · 다중 후보 ═══════════════ -->
+<div class="frame">
+  <div class="frame-label">
+    <div class="frame-id">FO-S03 / FO-EXP-02 · CAT-03</div>
+    <div class="frame-title">정본 검색 (동의어 다중 후보)</div>
+    <div class="frame-desc">동의어는 별도 결과를 만들지 않고 연결된 정본 서비스 행에 일치 표시. 후보가 여럿이면 대표 카테고리 경로로 구분하고 자동 이동하지 않음.</div>
+  </div>
+  <div class="phone">
+    <div class="scroll has-nav">
+      <header class="hdr">
+        <button class="hdr-ico hdr-back">‹</button>
+        <div class="hdr-title">Search</div>
+        <div class="hdr-sp"></div>
+      </header>
+
+      <div style="padding:12px 16px">
+        <div class="searchfield">
+          <span class="mg" style="font-size:14px;opacity:.5">🔍</span>
+          <input value="ulthera" readonly>
+          <button class="clear-x">✕</button>
+        </div>
+      </div>
+
+      <div class="tabs-pill">
+        <span class="chip on">All 5</span>
+        <span class="chip">Services 3</span>
+        <span class="chip">Concerns 0</span>
+        <span class="chip">Categories 1</span>
+        <span class="chip">Places 1</span>
+      </div>
+
+      <div style="padding:0 16px 20px">
+        <div class="grp">Services</div>
+        <div class="row">
+          <div class="row-thumb">✨</div>
+          <div class="row-b">
+            <div class="row-nm">Ultherapy</div>
+            <div class="row-path">Lifting &amp; Contouring › Ultrasound Lifting</div>
+            <span class="match">Matched by name</span>
+          </div>
+          <div class="row-arrow">›</div>
+        </div>
+        <div class="row">
+          <div class="row-thumb">💫</div>
+          <div class="row-b">
+            <div class="row-nm">Shurink Universe</div>
+            <div class="row-path">Lifting &amp; Contouring › Ultrasound Lifting</div>
+            <span class="match">Also called “ulthera”</span>
+          </div>
+          <div class="row-arrow">›</div>
+        </div>
+        <div class="row">
+          <div class="row-thumb">🌀</div>
+          <div class="row-b">
+            <div class="row-nm">Onda Lifting</div>
+            <div class="row-path">Lifting &amp; Contouring › RF Lifting</div>
+            <span class="match">Also called “ulthera”</span>
+          </div>
+          <div class="row-arrow">›</div>
+        </div>
+
+        <div class="grp">Categories</div>
+        <div class="row">
+          <div class="row-thumb gray">🗂️</div>
+          <div class="row-b">
+            <div class="row-nm">Ultrasound Lifting</div>
+            <div class="row-path">Lifting &amp; Contouring › Ultrasound Lifting</div>
+          </div>
+          <div class="row-arrow">›</div>
+        </div>
+
+        <div class="grp">Places</div>
+        <div class="row">
+          <div class="row-thumb gray">📍</div>
+          <div class="row-b">
+            <div class="row-nm">Apgujeong Rodeo</div>
+            <div class="row-path">Seoul › Gangnam-gu › Apgujeong Rodeo</div>
+          </div>
+          <div class="row-arrow">›</div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-i"><span class="g">🏠</span>Home</div>
+      <div class="nav-i on"><span class="g">🧭</span>Explore</div>
+      <div class="nav-i"><span class="g">🤍</span>Saved</div>
+      <div class="nav-i"><span class="g">👤</span>My</div>
+    </nav>
+  </div>
+</div>
+
+<!-- ═══════════════ 4. 정본 검색 · 0건 ═══════════════ -->
+<div class="frame">
+  <div class="frame-label">
+    <div class="frame-id">FO-S03 / FO-EXP-02 · FO-EXP-04</div>
+    <div class="frame-title">정본 검색 (0건 복구)</div>
+    <div class="frame-desc">검색어와 선택 유형을 유지한 채 검색어 수정·다른 결과 유형·4개 탐색축·전체 보기로 복구 행동 제공. 오류 문구와 분리.</div>
+  </div>
+  <div class="phone">
+    <div class="scroll has-nav">
+      <header class="hdr">
+        <button class="hdr-ico hdr-back">‹</button>
+        <div class="hdr-title">Search</div>
+        <div class="hdr-sp"></div>
+      </header>
+
+      <div style="padding:12px 16px">
+        <div class="searchfield">
+          <span class="mg" style="font-size:14px;opacity:.5">🔍</span>
+          <input value="glow injection" readonly>
+          <button class="clear-x">✕</button>
+        </div>
+      </div>
+
+      <div class="tabs-pill">
+        <span class="chip on">All 0</span>
+        <span class="chip">Services 0</span>
+        <span class="chip">Concerns 0</span>
+        <span class="chip">Categories 0</span>
+        <span class="chip">Places 0</span>
+      </div>
+
+      <div class="empty">
+        <div class="ic">🔍</div>
+        <div class="t">No results for “glow injection”</div>
+        <div class="d">We search treatments, concerns, categories<br>and places only. Try another wording.</div>
+        <div class="empty-acts">
+          <div class="act primary">
+            <div><div class="l">Edit your keyword</div><div class="s">Your text stays in the search box</div></div>
+            <div class="a">›</div>
+          </div>
+          <div class="act">
+            <div><div class="l">Browse by concern</div><div class="s">Brightening, Pore care, Anti-aging and more</div></div>
+            <div class="a">›</div>
+          </div>
+          <div class="act">
+            <div><div class="l">Browse by category</div><div class="s">6 main categories</div></div>
+            <div class="a">›</div>
+          </div>
+          <div class="act">
+            <div><div class="l">See all products</div><div class="s">Go to the full product list</div></div>
+            <div class="a">›</div>
+          </div>
+          <div class="act">
+            <div><div class="l">See all stores</div><div class="s">Go to the full store list</div></div>
+            <div class="a">›</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-i"><span class="g">🏠</span>Home</div>
+      <div class="nav-i on"><span class="g">🧭</span>Explore</div>
+      <div class="nav-i"><span class="g">🤍</span>Saved</div>
+      <div class="nav-i"><span class="g">👤</span>My</div>
+    </nav>
+  </div>
+</div>
+
+<!-- ═══════════════ 5. 조건 결과 · 상품 탭 ═══════════════ -->
+<div class="frame">
+  <div class="frame-label">
+    <div class="frame-id">FO-S04 / FO-EXP-03</div>
+    <div class="frame-title">조건 선택·결과 (상품 탭)</div>
+    <div class="frame-desc">적용 조건 칩은 개별 해제 가능. 서비스·상품·스토어 탭을 바꿔도 조건 유지. 가격 정렬은 상품 탭에서만 노출.</div>
+  </div>
+  <div class="phone">
+    <div class="scroll has-nav">
+      <header class="hdr">
+        <button class="hdr-ico hdr-back">‹</button>
+        <div class="hdr-title">Results</div>
+        <button class="hdr-ico">🌐</button>
+      </header>
+
+      <div class="condbar">
+        <div class="condbar-in">
+          <span class="chip applied">Lifting &amp; Contouring <span class="x">✕</span></span>
+          <span class="chip applied">Anti-aging <span class="x">✕</span></span>
+          <span class="chip applied">Gangnam <span class="x">✕</span></span>
+        </div>
+        <div class="condbar-fade"><button class="reset">Reset all</button></div>
+      </div>
+
+      <div class="tabs">
+        <div class="tab">Services <span class="n">12</span></div>
+        <div class="tab on">Products <span class="n">48</span></div>
+        <div class="tab">Stores <span class="n">9</span></div>
+      </div>
+
+      <div class="sortbar">
+        <div class="count"><b>48</b> products</div>
+        <button class="sortbtn">Most viewed ▾</button>
+      </div>
+
+      <div style="padding:0 16px 16px">
+        <div class="pcard">
+          <div class="pthumb">💫</div>
+          <div class="pbody">
+            <div class="pstore">CIEL Aesthetic Clinic <span class="dot">·</span> Gangnam</div>
+            <div class="pname">Shurink Universe 300 shots (Full face)</div>
+            <div class="ptags"><span class="ptag">Ultrasound Lifting</span><span class="ptag">Anti-aging</span></div>
+            <div class="pprice">₩390,000</div>
+          </div>
+        </div>
+        <div class="pcard">
+          <div class="pthumb b">✨</div>
+          <div class="pbody">
+            <div class="pstore">Bloom Dermatology <span class="dot">·</span> Sinsa</div>
+            <div class="pname">Ultherapy 400 shots (Face + Neck)</div>
+            <div class="ptags"><span class="ptag">Ultrasound Lifting</span><span class="ptag">Jawline</span></div>
+            <div class="pprice">₩1,250,000</div>
+          </div>
+        </div>
+        <div class="pcard">
+          <div class="pthumb c">🌀</div>
+          <div class="pbody">
+            <div class="pstore">Lumiere Clinic <span class="dot">·</span> Apgujeong Rodeo</div>
+            <div class="pname">Onda Lifting Body Contour 1 session</div>
+            <div class="ptags"><span class="ptag">RF Lifting</span><span class="ptag">Anti-aging</span></div>
+            <div class="pprice">₩260,000</div>
+          </div>
+        </div>
+        <div class="pcard">
+          <div class="pthumb">🧵</div>
+          <div class="pbody">
+            <div class="pstore">Seoul Line Clinic <span class="dot">·</span> Gangnam</div>
+            <div class="pname">Mint Thread Lift 10 threads</div>
+            <div class="ptags"><span class="ptag">Thread Lift</span><span class="ptag">Jawline</span></div>
+            <div class="pprice">₩880,000</div>
+          </div>
+        </div>
+        <div class="pcard">
+          <div class="pthumb b">💧</div>
+          <div class="pbody">
+            <div class="pstore">Bloom Dermatology <span class="dot">·</span> Sinsa</div>
+            <div class="pname">Rejuran Healer 2cc with lifting care</div>
+            <div class="ptags"><span class="ptag">Skin Booster</span><span class="ptag">Anti-aging</span></div>
+            <div class="pprice">₩320,000</div>
+          </div>
+        </div>
+        <div style="padding-top:14px">
+          <button class="btn sm">Load more</button>
+        </div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-i"><span class="g">🏠</span>Home</div>
+      <div class="nav-i on"><span class="g">🧭</span>Explore</div>
+      <div class="nav-i"><span class="g">🤍</span>Saved</div>
+      <div class="nav-i"><span class="g">👤</span>My</div>
+    </nav>
+  </div>
+</div>
+
+<!-- ═══════════════ 6. 조건 결과 · 0건 ═══════════════ -->
+<div class="frame">
+  <div class="frame-label">
+    <div class="frame-id">FO-S04 / FO-EXP-03</div>
+    <div class="frame-title">조건 결과 (0건 · 조건 해제)</div>
+    <div class="frame-desc">결과를 막는 조건을 지목해 개별 해제와 전체 초기화를 제공. 탭·정렬·스크롤 위치는 유지.</div>
+  </div>
+  <div class="phone">
+    <div class="scroll has-nav">
+      <header class="hdr">
+        <button class="hdr-ico hdr-back">‹</button>
+        <div class="hdr-title">Results</div>
+        <button class="hdr-ico">🌐</button>
+      </header>
+
+      <div class="condbar">
+        <div class="condbar-in">
+          <span class="chip applied">Thread Lift <span class="x">✕</span></span>
+          <span class="chip applied">Acne scars <span class="x">✕</span></span>
+          <span class="chip applied">Jeju <span class="x">✕</span></span>
+        </div>
+        <div class="condbar-fade"><button class="reset">Reset all</button></div>
+      </div>
+
+      <div class="tabs">
+        <div class="tab">Services <span class="n">0</span></div>
+        <div class="tab on">Products <span class="n">0</span></div>
+        <div class="tab">Stores <span class="n">0</span></div>
+      </div>
+
+      <div class="empty" style="padding-top:28px">
+        <div class="ic">🧭</div>
+        <div class="t">No results for these conditions</div>
+        <div class="d">Different condition types have to match together.<br>Removing one usually brings results back.</div>
+
+        <div class="unblock">
+          <div class="unblock-h">REMOVE A CONDITION</div>
+          <div class="unblock-r">
+            <div class="nm">Jeju <i>Removing this gives 34 results</i></div>
+            <button class="mini pink">Remove</button>
+          </div>
+          <div class="unblock-r">
+            <div class="nm">Acne scars <i>Removing this gives 6 results</i></div>
+            <button class="mini">Remove</button>
+          </div>
+          <div class="unblock-r">
+            <div class="nm">Thread Lift <i>Removing this gives 2 results</i></div>
+            <button class="mini">Remove</button>
+          </div>
+        </div>
+
+        <div class="empty-acts">
+          <div class="act">
+            <div><div class="l">Reset all conditions</div><div class="s">Go back to Explore home</div></div>
+            <div class="a">›</div>
+          </div>
+          <div class="act">
+            <div><div class="l">See all products</div><div class="s">Opens without any condition applied</div></div>
+            <div class="a">›</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-i"><span class="g">🏠</span>Home</div>
+      <div class="nav-i on"><span class="g">🧭</span>Explore</div>
+      <div class="nav-i"><span class="g">🤍</span>Saved</div>
+      <div class="nav-i"><span class="g">👤</span>My</div>
+    </nav>
+  </div>
+</div>
+
+<!-- ═══════════════ 7. 카테고리 랜딩 ═══════════════ -->
+<div class="frame">
+  <div class="frame-label">
+    <div class="frame-id">FO-S05 / FO-LAND-01</div>
+    <div class="frame-title">카테고리 랜딩</div>
+    <div class="frame-desc">설명 → 하위 분류 → 관련 서비스 → 실제 상품·스토어로 이어지는 경로. 관련 콘텐츠는 필수 영역이 아님.</div>
+  </div>
+  <div class="phone">
+    <div class="scroll has-nav">
+      <header class="hdr">
+        <button class="hdr-ico hdr-back">‹</button>
+        <div class="hdr-title">Lifting &amp; Contouring</div>
+        <button class="hdr-ico">🌐</button>
+      </header>
+
+      <div class="crumb">
+        <a href="#">Explore</a> › <a href="#">Categories</a> › <span class="cur">Lifting &amp; Contouring</span>
+      </div>
+      <div class="land-head">
+        <div class="land-h1">Lifting &amp; Contouring</div>
+        <div class="land-sub">44 services · 210 products · 38 stores</div>
+        <div class="land-body">
+          Treatments that work on skin firmness and facial lines using ultrasound, radiofrequency or threads.
+          Clinics in Korea usually group them by the device used and by how long the effect is expected to last.
+        </div>
+      </div>
+
+      <div class="sec" style="border-top:8px solid var(--gray-mid)">
+        <div class="sec-t" style="margin-bottom:12px">Sub categories</div>
+        <div class="chips">
+          <span class="chip">Ultrasound Lifting</span>
+          <span class="chip">RF Lifting</span>
+          <span class="chip">Thread Lift</span>
+          <span class="chip">Facial Contouring</span>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-row">
+          <div class="sec-t">Services in this category</div>
+          <div class="more">See all 44</div>
+        </div>
+        <div class="row">
+          <div class="row-thumb">💫</div>
+          <div class="row-b">
+            <div class="row-nm">Shurink Universe</div>
+            <div class="row-path">Ultrasound Lifting</div>
+            <div class="row-desc">Focused ultrasound applied in lines across the face, commonly chosen for jawline and cheek firmness.</div>
+          </div>
+          <div class="row-arrow">›</div>
+        </div>
+        <div class="row">
+          <div class="row-thumb">✨</div>
+          <div class="row-b">
+            <div class="row-nm">Ultherapy</div>
+            <div class="row-path">Ultrasound Lifting</div>
+            <div class="row-desc">Ultrasound lifting with real-time imaging, priced per shot count and treated area.</div>
+          </div>
+          <div class="row-arrow">›</div>
+        </div>
+        <div class="row">
+          <div class="row-thumb">🧵</div>
+          <div class="row-b">
+            <div class="row-nm">Thread Lift</div>
+            <div class="row-path">Thread Lift</div>
+            <div class="row-desc">Absorbable threads placed under the skin, usually counted per thread.</div>
+          </div>
+          <div class="row-arrow">›</div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-row">
+          <div class="sec-t">Products</div>
+          <div class="more">All products</div>
+        </div>
+        <div class="pcard">
+          <div class="pthumb">💫</div>
+          <div class="pbody">
+            <div class="pstore">CIEL Aesthetic Clinic <span class="dot">·</span> Gangnam</div>
+            <div class="pname">Shurink Universe 300 shots (Full face)</div>
+            <div class="pprice">₩390,000</div>
+          </div>
+        </div>
+        <div class="pcard">
+          <div class="pthumb b">✨</div>
+          <div class="pbody">
+            <div class="pstore">Bloom Dermatology <span class="dot">·</span> Sinsa</div>
+            <div class="pname">Ultherapy 400 shots (Face + Neck)</div>
+            <div class="pprice">₩1,250,000</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-row">
+          <div class="sec-t">Stores</div>
+          <div class="more">All stores</div>
+        </div>
+        <div class="scard">
+          <div class="sthumb">🏥</div>
+          <div class="row-b">
+            <div class="sname">CIEL Aesthetic Clinic</div>
+            <div class="smeta"><span class="star">★ 4.9</span><span>(2,341)</span><span class="dot">·</span><span>Gangnam-gu, Seoul</span></div>
+            <div class="ptags" style="margin-top:7px"><span class="ptag">Ultrasound Lifting</span><span class="ptag">Thread Lift</span></div>
+          </div>
+        </div>
+        <div class="scard">
+          <div class="sthumb">🏥</div>
+          <div class="row-b">
+            <div class="sname">Bloom Dermatology</div>
+            <div class="smeta"><span class="star">★ 4.8</span><span>(1,120)</span><span class="dot">·</span><span>Sinsa, Seoul</span></div>
+            <div class="ptags" style="margin-top:7px"><span class="ptag">Ultrasound Lifting</span><span class="ptag">Skin Booster</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-i"><span class="g">🏠</span>Home</div>
+      <div class="nav-i on"><span class="g">🧭</span>Explore</div>
+      <div class="nav-i"><span class="g">🤍</span>Saved</div>
+      <div class="nav-i"><span class="g">👤</span>My</div>
+    </nav>
+  </div>
+</div>
+
+<!-- ═══════════════ 8. 서비스 랜딩 ═══════════════ -->
+<div class="frame">
+  <div class="frame-label">
+    <div class="frame-id">FO-S06 / FO-LAND-02 · CONTENT-04 · FO-SAVE-01</div>
+    <div class="frame-title">서비스 랜딩 (기본)</div>
+    <div class="frame-desc">정의·선택 기준·대표 카테고리 경로는 공개 필수값. 관심사·부위·관련 서비스·장소·상품·스토어·승인 콘텐츠를 한 화면에. 하단 저장 버튼.</div>
+  </div>
+  <div class="phone">
+    <div class="scroll has-nav has-cta">
+      <header class="hdr">
+        <button class="hdr-ico hdr-back">‹</button>
+        <div class="hdr-title">Shurink Universe</div>
+        <button class="hdr-ico">🌐</button>
+      </header>
+
+      <div class="crumb">
+        <a href="#">Explore</a> › <a href="#">Lifting &amp; Contouring</a> › <span class="cur">Ultrasound Lifting</span>
+      </div>
+      <div class="land-head">
+        <div class="land-h1">Shurink Universe</div>
+        <div class="land-sub">Ultrasound Lifting · Also called Shurink, 슈링크</div>
+        <div class="land-body">
+          A focused ultrasound treatment delivered in lines across the face. Clinics count it in shots,
+          and the number of shots and the treated area are what usually change the price.
+          Sessions are commonly booked as a single visit.
+        </div>
+
+        <div class="critbox">
+          <div class="t">What to check before booking</div>
+          <div class="critline"><span class="b">·</span><span>How many shots are included and which areas they cover</span></div>
+          <div class="critline"><span class="b">·</span><span>Whether the price covers anesthetic cream and aftercare</span></div>
+          <div class="critline"><span class="b">·</span><span>Which device generation the clinic currently uses</span></div>
+        </div>
+      </div>
+
+      <div class="sec" style="border-top:8px solid var(--gray-mid)">
+        <div class="sec-t" style="margin-bottom:14px">Related</div>
+        <div class="rel-b">
+          <div class="rel-l">Concerns</div>
+          <div class="chips"><span class="chip">Sagging skin</span><span class="chip">Anti-aging</span><span class="chip">Face slimming</span></div>
+        </div>
+        <div class="rel-b">
+          <div class="rel-l">Body areas</div>
+          <div class="chips"><span class="chip">Face</span><span class="chip">Jawline</span><span class="chip">Neck</span></div>
+        </div>
+        <div class="rel-b">
+          <div class="rel-l">Similar services</div>
+          <div class="chips"><span class="chip">Ultherapy</span><span class="chip">Onda Lifting</span><span class="chip">Thread Lift</span></div>
+        </div>
+        <div class="rel-b">
+          <div class="rel-l">Places offering it</div>
+          <div class="chips"><span class="chip">Gangnam</span><span class="chip">Apgujeong Rodeo</span><span class="chip">Myeong-dong</span></div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-row">
+          <div class="sec-t">Products with this service</div>
+          <div class="more">All 26</div>
+        </div>
+        <div class="pcard">
+          <div class="pthumb">💫</div>
+          <div class="pbody">
+            <div class="pstore">CIEL Aesthetic Clinic <span class="dot">·</span> Gangnam</div>
+            <div class="pname">Shurink Universe 300 shots (Full face)</div>
+            <div class="ptags"><span class="ptag">Full face</span><span class="ptag">Single visit</span></div>
+            <div class="pprice">₩390,000</div>
+          </div>
+        </div>
+        <div class="pcard">
+          <div class="pthumb c">💫</div>
+          <div class="pbody">
+            <div class="pstore">Seoul Line Clinic <span class="dot">·</span> Gangnam</div>
+            <div class="pname">Shurink Universe 600 shots with cooling care</div>
+            <div class="ptags"><span class="ptag">Face + Neck</span></div>
+            <div class="pprice">₩690,000</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-row">
+          <div class="sec-t">Stores offering it</div>
+          <div class="more">All 18</div>
+        </div>
+        <div class="scard">
+          <div class="sthumb">🏥</div>
+          <div class="row-b">
+            <div class="sname">CIEL Aesthetic Clinic</div>
+            <div class="smeta"><span class="star">★ 4.9</span><span>(2,341)</span><span class="dot">·</span><span>Gangnam-gu, Seoul</span></div>
+          </div>
+        </div>
+        <div class="scard">
+          <div class="sthumb">🏥</div>
+          <div class="row-b">
+            <div class="sname">Seoul Line Clinic</div>
+            <div class="smeta"><span class="star">★ 4.7</span><span>(864)</span><span class="dot">·</span><span>Gangnam-gu, Seoul</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-t" style="margin-bottom:12px">Read about this treatment</div>
+        <div class="ccard">
+          <div class="cthumb">📰</div>
+          <div class="row-b">
+            <div class="ckind">Magazine</div>
+            <div class="ctitle">Ultrasound lifting in Korea: what the shot count actually means</div>
+            <div class="cmeta">K-Beauty Station · Sep 2, 2026</div>
+          </div>
+        </div>
+        <div class="ccard">
+          <div class="cthumb">✍️</div>
+          <div class="row-b">
+            <div class="ckind">Store column</div>
+            <div class="ctitle">How we plan a lifting schedule for first-time visitors</div>
+            <div class="cmeta">CIEL Aesthetic Clinic · Aug 21, 2026</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta">
+      <button class="cta-fav">♡</button>
+      <button class="btn fill">See 26 products</button>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-i"><span class="g">🏠</span>Home</div>
+      <div class="nav-i on"><span class="g">🧭</span>Explore</div>
+      <div class="nav-i"><span class="g">🤍</span>Saved</div>
+      <div class="nav-i"><span class="g">👤</span>My</div>
+    </nav>
+  </div>
+</div>
+
+<!-- ═══════════════ 9. 서비스 랜딩 · 거래 0건 + 영역 실패 ═══════════════ -->
+<div class="frame">
+  <div class="frame-label">
+    <div class="frame-id">FO-S06 / FO-LAND-02 · FO-EXP-04</div>
+    <div class="frame-title">서비스 랜딩 (거래 0건 · 일부 영역 실패)</div>
+    <div class="frame-desc">상품·스토어 0건이어도 정보 영역과 200 응답 유지, 하단 CTA에서 거래 버튼 제거. 콘텐츠 영역만 실패해 재시도.</div>
+  </div>
+  <div class="phone">
+    <div class="scroll has-nav has-cta">
+      <header class="hdr">
+        <button class="hdr-ico hdr-back">‹</button>
+        <div class="hdr-title">Exosome Skin Booster</div>
+        <button class="hdr-ico">🌐</button>
+      </header>
+
+      <div class="crumb">
+        <a href="#">Explore</a> › <a href="#">Skin Care</a> › <span class="cur">Skin Booster</span>
+      </div>
+      <div class="land-head">
+        <div class="land-h1">Exosome Skin Booster</div>
+        <div class="land-sub">Skin Booster</div>
+        <div class="land-body">
+          An injectable skin booster line that clinics in Korea introduce alongside laser or microneedling sessions.
+          Programs differ by the number of sessions and by what the clinic combines it with.
+        </div>
+        <div class="critbox">
+          <div class="t">What to check before booking</div>
+          <div class="critline"><span class="b">·</span><span>How many sessions the clinic recommends as one program</span></div>
+          <div class="critline"><span class="b">·</span><span>Which treatments it is combined with, and at what price</span></div>
+        </div>
+      </div>
+
+      <div class="sec" style="border-top:8px solid var(--gray-mid)">
+        <div class="sec-t" style="margin-bottom:14px">Related</div>
+        <div class="rel-b">
+          <div class="rel-l">Concerns</div>
+          <div class="chips"><span class="chip">Dull skin</span><span class="chip">Skin texture</span></div>
+        </div>
+        <div class="rel-b">
+          <div class="rel-l">Similar services</div>
+          <div class="chips"><span class="chip">Rejuran Healer</span><span class="chip">Juvelook</span></div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-t" style="margin-bottom:12px">Products with this service</div>
+        <div class="zero">
+          <div class="t">No products are listed yet</div>
+          <div class="d">No store on K-Beauty Station currently sells<br>this service. Similar services do have products.</div>
+          <div class="b"><button class="mini pink">See Rejuran Healer</button></div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-t" style="margin-bottom:12px">Stores offering it</div>
+        <div class="zero">
+          <div class="t">No stores are listed yet</div>
+          <div class="d">Try browsing this service's category instead.</div>
+          <div class="b"><button class="mini">Go to Skin Booster</button></div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-t" style="margin-bottom:12px">Read about this treatment</div>
+        <div class="retry">
+          <div class="t">We couldn't load related articles.</div>
+          <div class="b"><button class="mini pink">Try again</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta">
+      <button class="cta-fav on">♥</button>
+      <button class="btn">Back to Skin Booster</button>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-i"><span class="g">🏠</span>Home</div>
+      <div class="nav-i on"><span class="g">🧭</span>Explore</div>
+      <div class="nav-i"><span class="g">🤍</span>Saved</div>
+      <div class="nav-i"><span class="g">👤</span>My</div>
+    </nav>
+  </div>
+</div>
+
+<!-- ═══════════════ 10. 관심사 랜딩 ═══════════════ -->
+<div class="frame">
+  <div class="frame-label">
+    <div class="frame-id">FO-S08 / FO-LAND-03 · CONTENT-04</div>
+    <div class="frame-title">관심사 랜딩</div>
+    <div class="frame-desc">고객이 쓰는 표현으로 설명하되 의료 효능을 확정하지 않음. 관심사 → 서비스 → 실제 상품·스토어 흐름.</div>
+  </div>
+  <div class="phone">
+    <div class="scroll has-nav">
+      <header class="hdr">
+        <button class="hdr-ico hdr-back">‹</button>
+        <div class="hdr-title">Acne scars</div>
+        <button class="hdr-ico">🌐</button>
+      </header>
+
+      <div class="crumb">
+        <a href="#">Explore</a> › <a href="#">Concerns</a> › <span class="cur">Acne scars</span>
+      </div>
+      <div class="land-head">
+        <div class="land-h1">Acne scars</div>
+        <div class="land-sub">14 services · 96 products · 31 stores</div>
+        <div class="land-body">
+          People usually describe this as uneven texture or marks left after breakouts.
+          Korean clinics approach it with different treatment types depending on the depth and the surrounding skin tone,
+          and most offer a consultation before deciding.
+        </div>
+      </div>
+
+      <div class="sec" style="border-top:8px solid var(--gray-mid)">
+        <div class="sec-row">
+          <div class="sec-t">Services for this concern</div>
+          <div class="more">See all 14</div>
+        </div>
+        <div class="row">
+          <div class="row-thumb">🔬</div>
+          <div class="row-b">
+            <div class="row-nm">Fractional CO2 Laser</div>
+            <div class="row-path">Skin Care › Laser</div>
+            <div class="row-desc">Ablative laser applied in a grid pattern, usually planned as a series of sessions.</div>
+          </div>
+          <div class="row-arrow">›</div>
+        </div>
+        <div class="row">
+          <div class="row-thumb">💧</div>
+          <div class="row-b">
+            <div class="row-nm">Rejuran Healer</div>
+            <div class="row-path">Skin Care › Skin Booster</div>
+            <div class="row-desc">Injectable booster, counted in cc and often combined with laser programs.</div>
+          </div>
+          <div class="row-arrow">›</div>
+        </div>
+        <div class="row">
+          <div class="row-thumb">🪡</div>
+          <div class="row-b">
+            <div class="row-nm">Microneedling RF</div>
+            <div class="row-path">Skin Care › Microneedling</div>
+            <div class="row-desc">Needle-based radiofrequency, priced per session and per treated area.</div>
+          </div>
+          <div class="row-arrow">›</div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-row">
+          <div class="sec-t">Products</div>
+          <div class="more">All products</div>
+        </div>
+        <div class="pcard">
+          <div class="pthumb c">🔬</div>
+          <div class="pbody">
+            <div class="pstore">Bloom Dermatology <span class="dot">·</span> Sinsa</div>
+            <div class="pname">Fractional CO2 Laser 1 session (Full face)</div>
+            <div class="pprice">₩280,000</div>
+          </div>
+        </div>
+        <div class="pcard">
+          <div class="pthumb b">💧</div>
+          <div class="pbody">
+            <div class="pstore">Lumiere Clinic <span class="dot">·</span> Apgujeong Rodeo</div>
+            <div class="pname">Rejuran Healer 2cc + soothing care</div>
+            <div class="pprice">₩330,000</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-row">
+          <div class="sec-t">Stores</div>
+          <div class="more">All stores</div>
+        </div>
+        <div class="scard">
+          <div class="sthumb">🏥</div>
+          <div class="row-b">
+            <div class="sname">Bloom Dermatology</div>
+            <div class="smeta"><span class="star">★ 4.8</span><span>(1,120)</span><span class="dot">·</span><span>Sinsa, Seoul</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-t" style="margin-bottom:12px">Read about this concern</div>
+        <div class="ccard">
+          <div class="cthumb">📰</div>
+          <div class="row-b">
+            <div class="ckind">Magazine</div>
+            <div class="ctitle">Acne scar treatments in Korea: how clinics decide the order of sessions</div>
+            <div class="cmeta">K-Beauty Station · Aug 14, 2026</div>
+          </div>
+        </div>
+        <div class="ccard">
+          <div class="cthumb">✍️</div>
+          <div class="row-b">
+            <div class="ckind">Store column</div>
+            <div class="ctitle">What we ask first when someone visits for scar care</div>
+            <div class="cmeta">Bloom Dermatology · Jul 30, 2026</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-i"><span class="g">🏠</span>Home</div>
+      <div class="nav-i on"><span class="g">🧭</span>Explore</div>
+      <div class="nav-i"><span class="g">🤍</span>Saved</div>
+      <div class="nav-i"><span class="g">👤</span>My</div>
+    </nav>
+  </div>
+</div>
+
+<!-- ═══════════════ 11. 장소 랜딩 ═══════════════ -->
+<div class="frame">
+  <div class="frame-label">
+    <div class="frame-id">FO-S09 / FO-LAND-04</div>
+    <div class="frame-title">장소 랜딩</div>
+    <div class="frame-desc">상위 지역·주변 역·노선·관련 서비스·검수된 스토어. 하단 행동은 같은 장소 조건을 적용한 조건 결과로 이동.</div>
+  </div>
+  <div class="phone">
+    <div class="scroll has-nav has-cta">
+      <header class="hdr">
+        <button class="hdr-ico hdr-back">‹</button>
+        <div class="hdr-title">Gangnam</div>
+        <button class="hdr-ico">🌐</button>
+      </header>
+
+      <div class="crumb">
+        <a href="#">Explore</a> › <a href="#">Places</a> › <a href="#">Seoul</a> › <span class="cur">Gangnam-gu</span>
+      </div>
+      <div class="land-head">
+        <div class="land-h1">Gangnam</div>
+        <div class="land-sub">Gangnam-gu, Seoul · 38 stores · 210 products</div>
+        <div class="land-body">
+          The district with the highest concentration of dermatology and aesthetic clinics in Seoul.
+          Most clinics sit within a few minutes of Gangnam Station or along Teheran-ro, and many keep
+          English or Chinese speaking staff on weekdays.
+        </div>
+      </div>
+
+      <div class="sec" style="border-top:8px solid var(--gray-mid)">
+        <div class="sec-t" style="margin-bottom:12px">Getting there</div>
+        <div class="stn">
+          <div class="stn-r">
+            <div class="row-b">
+              <div class="stn-nm">Gangnam Station</div>
+              <div class="smeta">22 stores within 10 min walk</div>
+            </div>
+            <span class="line-b l2">Line 2</span>
+            <span class="line-b lsb">Sinbundang</span>
+          </div>
+          <div class="stn-r">
+            <div class="row-b">
+              <div class="stn-nm">Sinnonhyeon Station</div>
+              <div class="smeta">9 stores within 10 min walk</div>
+            </div>
+            <span class="line-b l9">Line 9</span>
+          </div>
+        </div>
+        <div style="margin-top:12px">
+          <div class="rel-l">Nearby places</div>
+          <div class="chips"><span class="chip">Apgujeong Rodeo</span><span class="chip">Sinsa</span><span class="chip">Samseong</span></div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-row">
+          <div class="sec-t">Popular services here</div>
+          <div class="more">See all</div>
+        </div>
+        <div class="chips">
+          <span class="chip">Shurink Universe</span>
+          <span class="chip">Ultherapy</span>
+          <span class="chip">Rejuran Healer</span>
+          <span class="chip">Skin Botox</span>
+          <span class="chip">Thread Lift</span>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-row">
+          <div class="sec-t">Stores in Gangnam</div>
+          <div class="more">All 38</div>
+        </div>
+        <div class="scard">
+          <div class="sthumb">🏥</div>
+          <div class="row-b">
+            <div class="sname">CIEL Aesthetic Clinic</div>
+            <div class="smeta"><span class="star">★ 4.9</span><span>(2,341)</span><span class="dot">·</span><span>5 min from Gangnam Stn.</span></div>
+            <div class="ptags" style="margin-top:7px"><span class="ptag">Ultrasound Lifting</span><span class="ptag">Skin Booster</span></div>
+          </div>
+        </div>
+        <div class="scard">
+          <div class="sthumb">🏥</div>
+          <div class="row-b">
+            <div class="sname">Seoul Line Clinic</div>
+            <div class="smeta"><span class="star">★ 4.7</span><span>(864)</span><span class="dot">·</span><span>3 min from Sinnonhyeon Stn.</span></div>
+            <div class="ptags" style="margin-top:7px"><span class="ptag">Thread Lift</span></div>
+          </div>
+        </div>
+        <div class="scard">
+          <div class="sthumb">🏥</div>
+          <div class="row-b">
+            <div class="sname">Aurora Skin Clinic</div>
+            <div class="smeta"><span class="star">★ 4.6</span><span>(512)</span><span class="dot">·</span><span>8 min from Gangnam Stn.</span></div>
+            <div class="ptags" style="margin-top:7px"><span class="ptag">Laser</span><span class="ptag">Microneedling</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta">
+      <button class="btn fill">See all results in Gangnam</button>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-i"><span class="g">🏠</span>Home</div>
+      <div class="nav-i on"><span class="g">🧭</span>Explore</div>
+      <div class="nav-i"><span class="g">🤍</span>Saved</div>
+      <div class="nav-i"><span class="g">👤</span>My</div>
+    </nav>
+  </div>
+</div>
+
+<!-- ═══════════════ 12. 현재 언어 미공개 ═══════════════ -->
+<div class="frame">
+  <div class="frame-label">
+    <div class="frame-id">FO-S05/06/08/09 / FO-EXP-04 · SEO-02</div>
+    <div class="frame-title">현재 언어 미공개 (찾을 수 없음)</div>
+    <div class="frame-desc">다른 언어로 자동 전환하지 않고 가능한 언어 이동과 탐색 홈 이동만 제공. 전역 메뉴는 유지.</div>
+  </div>
+  <div class="phone">
+    <div class="scroll has-nav">
+      <header class="hdr">
+        <button class="hdr-ico hdr-back">‹</button>
+        <div class="hdr-title">Not available</div>
+        <button class="hdr-ico">🌐</button>
+      </header>
+
+      <div class="empty" style="padding-top:80px">
+        <div class="ic">🌐</div>
+        <div class="t">This page isn't published in English</div>
+        <div class="d">The page you opened exists, but it hasn't been<br>published in the language you're using.</div>
+
+        <div class="lang-list">
+          <div class="lang-r"><div class="nm">日本語</div><div class="a">›</div></div>
+          <div class="lang-r"><div class="nm">简体中文</div><div class="a">›</div></div>
+          <div class="lang-r"><div class="nm">繁體中文</div><div class="a">›</div></div>
+        </div>
+
+        <div class="empty-acts">
+          <div class="act primary">
+            <div><div class="l">Go to Explore</div><div class="s">Browse what is published in English</div></div>
+            <div class="a">›</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-i"><span class="g">🏠</span>Home</div>
+      <div class="nav-i on"><span class="g">🧭</span>Explore</div>
+      <div class="nav-i"><span class="g">🤍</span>Saved</div>
+      <div class="nav-i"><span class="g">👤</span>My</div>
+    </nav>
+  </div>
+</div>
+
+<!-- ═══════════════ 13. 저장 ═══════════════ -->
+<div class="frame">
+  <div class="frame-label">
+    <div class="frame-id">FO-S14 / FO-SAVE-01 · FO-NAV-01</div>
+    <div class="frame-title">저장 (서비스 유형 추가)</div>
+    <div class="frame-desc">기존 저장 화면에 서비스 유형이 추가됨. 저장 후 비공개로 바뀐 대상은 삭제하지 않고 볼 수 없는 항목으로 구분해 해제할 수 있게 함.</div>
+  </div>
+  <div class="phone">
+    <div class="scroll has-nav">
+      <header class="hdr">
+        <div class="hdr-title" style="text-align:left;padding-left:16px;font-size:17px;font-weight:800">Saved</div>
+        <button class="hdr-ico">🌐</button>
+      </header>
+
+      <div class="tabs-pill">
+        <span class="chip on">All 14</span>
+        <span class="chip">Services 3</span>
+        <span class="chip">Products 8</span>
+        <span class="chip">Stores 3</span>
+      </div>
+
+      <div style="padding:0 16px 8px">
+        <div class="grp">Services</div>
+        <div class="row">
+          <div class="row-thumb">💫</div>
+          <div class="row-b">
+            <div class="row-nm">Shurink Universe</div>
+            <div class="row-path">Lifting &amp; Contouring › Ultrasound Lifting</div>
+          </div>
+          <button class="cta-fav on" style="width:36px;height:36px;flex:0 0 36px;font-size:15px;align-self:center">♥</button>
+        </div>
+        <div class="row">
+          <div class="row-thumb">💧</div>
+          <div class="row-b">
+            <div class="row-nm">Rejuran Healer</div>
+            <div class="row-path">Skin Care › Skin Booster</div>
+          </div>
+          <button class="cta-fav on" style="width:36px;height:36px;flex:0 0 36px;font-size:15px;align-self:center">♥</button>
+        </div>
+
+        <div class="grp">Products</div>
+        <div class="pcard">
+          <div class="pthumb">💫</div>
+          <div class="pbody">
+            <div class="pstore">CIEL Aesthetic Clinic <span class="dot">·</span> Gangnam</div>
+            <div class="pname">Shurink Universe 300 shots (Full face)</div>
+            <div class="pprice">₩390,000</div>
+          </div>
+        </div>
+
+        <div class="pcard">
+          <div class="pthumb c">🔬</div>
+          <div class="pbody">
+            <div class="pstore">Bloom Dermatology <span class="dot">·</span> Sinsa</div>
+            <div class="pname">Fractional CO2 Laser 1 session (Full face)</div>
+            <div class="pprice">₩280,000</div>
+          </div>
+        </div>
+
+        <div class="grp">Stores</div>
+        <div class="scard">
+          <div class="sthumb">🏥</div>
+          <div class="row-b">
+            <div class="sname">CIEL Aesthetic Clinic</div>
+            <div class="smeta"><span class="star">★ 4.9</span><span>(2,341)</span><span class="dot">·</span><span>Gangnam-gu, Seoul</span></div>
+          </div>
+          <button class="cta-fav on" style="width:36px;height:36px;flex:0 0 36px;font-size:15px;align-self:center">♥</button>
+        </div>
+
+        <div class="grp">Not available now</div>
+        <div class="pcard" style="opacity:.55">
+          <div class="pthumb b" style="filter:grayscale(1)">✨</div>
+          <div class="pbody">
+            <div class="pstore">Bloom Dermatology <span class="dot">·</span> Sinsa</div>
+            <div class="pname">Ultherapy 400 shots (Face + Neck)</div>
+            <div class="ptags"><span class="ptag">Not published right now</span></div>
+          </div>
+          <button class="mini" style="align-self:center">Remove</button>
+        </div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-i"><span class="g">🏠</span>Home</div>
+      <div class="nav-i"><span class="g">🧭</span>Explore</div>
+      <div class="nav-i on"><span class="g">🤍</span>Saved</div>
+      <div class="nav-i"><span class="g">👤</span>My</div>
+    </nav>
+  </div>
+</div>
+
+</div><!-- /stage -->
+
+</body>
+</html>
