@@ -47,6 +47,7 @@ td.c,th.c{text-align:center}
 .newcol{background:#fffaf2}
 th.newcol{background:#fff4e6}
 .dash{color:#bfbfbf}
+td.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;letter-spacing:-.2px}
 .pill{display:inline-block;padding:1px 8px;border-radius:3px;font-size:11.5px;border:1px solid #d9d9d9;background:#fafafa;color:#595959}
 .pill.ali{background:#fff0f4;border-color:#f7c3d2;color:#c9376a}
 .pill.yes{background:#f6ffed;border-color:#b7eb8f;color:#389e0d}
@@ -330,9 +331,9 @@ var BOG = { quit: false, mkt: true, ali: true };   // 칼럼설정 그룹
 var BOF = 'all';                                   // 가입 경로 필터
 
 var MEM = [
-  { no: 1341, join: '2026-09-15 09:02', quit: '', last: '2026-09-15 09:02', name: '', mail: '', pp: '', nat: '', lang: '중국어 간체', tel: '', bk: 0, ns: 0, mkt: '동의', mktd: '2026-09-15 09:02', path: 'ali', wallet: 'CN', prof: '거부', profd: '2026-09-15 09:02', self: true },
-  { no: 1340, join: '2026-09-15 08:41', quit: '', last: '2026-09-15 08:41', name: '천메이링', mail: '', pp: '', nat: '중국', lang: '중국어 번체', tel: '', bk: 0, ns: 0, mkt: '동의', mktd: '2026-09-15 08:41', path: 'ali', wallet: 'HK', prof: '동의', profd: '2026-09-15 08:41' },
-  { no: 1339, join: '2026-09-15 07:55', quit: '', last: '2026-09-15 08:10', name: '리우팅', mail: 'liuting@qq.com', pp: 'LIU TING', nat: '중국', lang: '중국어 간체', tel: '13900001111', bk: 1, ns: 0, mkt: '동의', mktd: '2026-09-15 07:55', path: 'ali', wallet: 'CN', prof: '동의', profd: '2026-09-15 07:55' },
+  { no: 1341, join: '2026-09-15 09:02', quit: '', last: '2026-09-15 09:02', name: '', mail: '', pp: '', nat: '', lang: '중국어 간체', tel: '', bk: 0, ns: 0, mkt: '동의', mktd: '2026-09-15 09:02', path: 'ali', wallet: 'CN', prof: '거부', profd: '2026-09-15 09:02', aid: '2088712034559781', self: true },
+  { no: 1340, join: '2026-09-15 08:41', quit: '', last: '2026-09-15 08:41', name: '천메이링', mail: '', pp: '', nat: '중국', lang: '중국어 번체', tel: '', bk: 0, ns: 0, mkt: '동의', mktd: '2026-09-15 08:41', path: 'ali', wallet: 'HK', prof: '동의', profd: '2026-09-15 08:41', aid: '2088041663827450' },
+  { no: 1339, join: '2026-09-15 07:55', quit: '', last: '2026-09-15 08:10', name: '리우팅', mail: 'liuting@qq.com', pp: 'LIU TING', nat: '중국', lang: '중국어 간체', tel: '13900001111', bk: 1, ns: 0, mkt: '동의', mktd: '2026-09-15 07:55', path: 'ali', wallet: 'CN', prof: '동의', profd: '2026-09-15 07:55', aid: '2088926610334872' },
   { no: 1337, join: '2026-09-15 06:04', quit: '', last: '2026-09-15 08:37', name: 'aji', mail: 'ajiro.t@gmail.com', pp: 'TOMOMI AJIRO', nat: '일본', lang: '', tel: '09025614888', bk: 0, ns: 0, mkt: '동의', mktd: '2026-09-15 13:48', path: 'mail' },
   { no: 1335, join: '2026-09-14 09:59', quit: '', last: '2026-09-14 16:18', name: 'iuwxxxynn', mail: 'scarlett.iwy@gmail.com', pp: 'Scarlett Iu', nat: '미국', lang: '영어', tel: '4159665390', bk: 1, ns: 0, mkt: '동의', mktd: '2026-09-15 13:48', path: 'sns' },
   { no: 1332, join: '2026-09-13 13:30', quit: '', last: '', name: 'PP', mail: '150130158@qq.com', pp: 'zhangyali', nat: '중국', lang: '', tel: '', bk: 0, ns: 0, mkt: '동의', mktd: '2026-09-15 13:48', path: 'mail' }
@@ -348,6 +349,7 @@ function bo11() {
   me.lang = LANG[S.wallet];
   me.wallet = S.wallet;
   me.prof = S.agProf ? '동의' : '거부';
+  me.aid = S.wallet === 'CN' ? '2088712034559781' : '2088558801247390';
 
 
   var list = MEM.filter(function (m) { return BOF === 'all' || m.path === BOF; });
@@ -359,11 +361,11 @@ function bo11() {
     '<th rowspan="2">여권명</th><th rowspan="2">국적</th><th rowspan="2">언어</th><th rowspan="2">연락처</th>' +
     '<th rowspan="2" class="c">예약</th><th rowspan="2" class="c">노쇼</th>' +
     (BOG.mkt ? '<th colspan="2" class="grp">마케팅 활용 정보</th>' : '') +
-    (BOG.ali ? '<th colspan="4" class="grp newcol">알리페이 정보</th>' : '') +
+    (BOG.ali ? '<th colspan="5" class="grp newcol">알리페이 정보</th>' : '') +
     '</tr>';
   var head2 = '<tr>' +
     (BOG.mkt ? '<th class="c">동의 여부</th><th>동의 일자</th>' : '') +
-    (BOG.ali ? '<th class="c newcol">가입 경로</th><th class="c newcol">월렛</th><th class="c newcol">프로필 동의</th><th class="newcol">동의 일자</th>' : '') +
+    (BOG.ali ? '<th class="c newcol">가입 경로</th><th class="newcol">알리페이 식별자</th><th class="c newcol">월렛</th><th class="c newcol">프로필 동의</th><th class="newcol">동의 일자</th>' : '') +
     '</tr>';
 
   var rows = list.map(function (m) {
@@ -383,6 +385,7 @@ function bo11() {
       (BOG.mkt ? '<td class="c"><span class="pill ' + (m.mkt === '동의' ? 'yes' : 'no') + '">' + m.mkt + '</span></td><td>' + m.mktd + '</td>' : '') +
       (BOG.ali
         ? '<td class="c newcol"><span class="pill ' + (isAli ? 'ali' : '') + '">' + PATH[m.path] + '</span></td>' +
+          '<td class="newcol mono">' + (isAli ? m.aid : '<span class="dash">-</span>') + '</td>' +
           '<td class="c newcol">' + (isAli ? (m.wallet === 'CN' ? '알리페이 중국' : '알리페이 홍콩') : '<span class="dash">-</span>') + '</td>' +
           '<td class="c newcol">' + (isAli ? '<span class="pill ' + (m.prof === '동의' ? 'yes' : 'no') + '">' + m.prof + '</span>' : '<span class="dash">-</span>') + '</td>' +
           '<td class="newcol">' + (isAli ? m.profd : '<span class="dash">-</span>') + '</td>'
@@ -416,7 +419,7 @@ function bo11() {
         '</span>' +
       '</div>' +
       '<div class="tblwrap"><table><thead>' + head1 + head2 + '</thead><tbody>' + rows + '</tbody></table></div>' +
-      '<div class="foot">검색어로 알리페이 식별자를 찾을 수 있습니다. 예 ' + ALI.id + '</div>' +
+      '<div class="foot">알리페이 식별자는 검색어로도 찾을 수 있습니다. 완전 일치로 찾습니다.</div>' +
     '</div>' +
   '</div>';
 }
