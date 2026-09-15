@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FO v1.8 화면</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+  background:#F6F3F1;color:#25201F;display:flex;flex-direction:column;align-items:center}
+body.bare{background:#fff}
+
+.bar{flex:0 0 auto;width:100%;background:#fff;border-bottom:1px solid #E9E3DF;
+  display:flex;align-items:center;gap:8px;padding:8px 12px}
+body.bare .bar,body.embed .bar{display:none}
+.bar select{height:30px;border:1px solid #E9E3DF;border-radius:6px;padding:0 8px;font-family:inherit;font-size:12px;color:#25201F;background:#fff}
+.bar .nb{height:30px;border:1px solid #E9E3DF;border-radius:6px;background:#fff;font-family:inherit;
+  font-size:12px;color:#746B68;padding:0 10px;cursor:pointer}
+.bar .nb:hover{border-color:#D95662;color:#D95662}
+.bar .sp{flex:1}
+.bar .cnt{font-size:11.5px;color:#746B68}
+
+.stage{flex:1;min-height:0;width:100%;display:flex;align-items:flex-start;justify-content:center;
+  overflow:auto;padding:16px 0}
+body.bare .stage{padding:0;align-items:stretch}
+
+/* v1.8 기준 프레임 */
+.frame{width:390px;height:780px;background:#fff;position:relative;overflow:hidden;flex:0 0 auto;
+  border:1px solid #E9E3DF}
+body.bare .frame{border:0}
+.fscroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden}
+.fscroll::-webkit-scrollbar{width:0}
+
+/* 원본 미수신 자리 */
+.ph{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;padding:32px 28px;text-align:center}
+.ph .id{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#fff;background:#25201F;
+  border-radius:4px;padding:3px 8px;letter-spacing:.3px}
+.ph .nm{font-size:17px;font-weight:700;letter-spacing:-.3px}
+.ph .src{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:#746B68}
+.ph .sec{font-size:11.5px;color:#746B68}
+.ph .msg{margin-top:6px;font-size:12px;color:#746B68;line-height:1.85;
+  border-top:1px solid #E9E3DF;padding-top:14px}
+.ph .box{width:100%;height:120px;border:1px dashed #E9E3DF;border-radius:8px;background:#FBF7F3;
+  display:flex;align-items:center;justify-content:center;font-size:11.5px;color:#B7ADA9}
+</style>
+</head>
+<body>
+  <div class="bar">
+    <button class="nb" id="prev">이전</button>
+    <select id="sel"></select>
+    <button class="nb" id="next">다음</button>
+    <span class="cnt" id="cnt"></span>
+    <span class="sp"></span>
+    <span class="cnt">390 × 780</span>
+  </div>
+  <div class="stage"><div class="frame" id="frame"></div></div>
+
+<script>
+/* 제작 가이드 v1.0 §4 화면 목록 */
+var SCREENS=[
+ {id:'fo-explore',        no:'FO-01', nm:'탐색 홈',            sec:'A_Explore'},
+ {id:'fo-search',         no:'FO-02', nm:'탐색 내 검색',        sec:'A_Explore'},
+ {id:'fo-services',       no:'FO-03', nm:'서비스 목록',         sec:'B_Service & Category'},
+ {id:'fo-categories',     no:'FO-04', nm:'카테고리 목록',       sec:'B_Service & Category'},
+ {id:'fo-medical',        no:'FO-05', nm:'카테고리 중분류',     sec:'B_Service & Category'},
+ {id:'fo-skin-category',  no:'FO-06', nm:'카테고리별 서비스',   sec:'B_Service & Category'},
+ {id:'fo-concerns',       no:'FO-07', nm:'고민 목록',           sec:'C_Concern'},
+ {id:'fo-concern-detail', no:'FO-08', nm:'고민 상세',           sec:'C_Concern'},
+ {id:'fo-find',           no:'FO-09', nm:'지역 찾기',           sec:'D_Location'},
+ {id:'fo-location-picker',no:'FO-10', nm:'장소 선택',           sec:'D_Location'},
+ {id:'fo-find-results',   no:'FO-11', nm:'지역 탐색 결과',      sec:'D_Location'},
+ {id:'fo-location',       no:'FO-12', nm:'지역 상세',           sec:'D_Location'},
+ {id:'fo-service',        no:'FO-13', nm:'서비스 상세',         sec:'B_Service & Category'},
+ {id:'fo-products',       no:'FO-14', nm:'상품 목록',           sec:'E_Product & Booking'},
+ {id:'fo-product-detail', no:'FO-15', nm:'상품 상세',           sec:'E_Product & Booking'},
+ {id:'fo-booking',        no:'FO-16', nm:'예약 정보',           sec:'E_Product & Booking'},
+ {id:'fo-booking-review', no:'FO-17', nm:'예약 확인',           sec:'E_Product & Booking'},
+ {id:'fo-stores',         no:'FO-18', nm:'스토어 목록',         sec:'F_Store'},
+ {id:'fo-store-detail',   no:'FO-19', nm:'스토어 상세',         sec:'F_Store'}
+];
+
+/* 원본 수신 뒤 이 자리에 화면별 마크업을 채운다. 키는 위 id 와 같다. */
+var BODY={};
+
+var qs=new URLSearchParams(location.search);
+if(qs.get('bare')==='1') document.body.classList.add('bare');
+if(qs.get('embed')==='1') document.body.classList.add('embed');
+
+var cur=0;
+function idx(id){ for(var i=0;i<SCREENS.length;i++) if(SCREENS[i].id===id) return i; return -1; }
+
+function showScreen(id){
+  var i=(typeof id==='number')?id:idx(id);
+  if(i<0) return false;
+  cur=i;
+  var s=SCREENS[i];
+  var f=document.getElementById('frame');
+  f.innerHTML = BODY[s.id]
+    ? '<div class="fscroll">'+BODY[s.id]+'</div>'
+    : '<div class="ph"><span class="id">'+s.no+'</span>'+
+      '<div class="nm">'+s.nm+'</div>'+
+      '<div class="src">'+s.id+'</div>'+
+      '<div class="sec">'+s.sec+'</div>'+
+      '<div class="box">화면 자리</div>'+
+      '<div class="msg">원본 v1.8 와이어프레임을 아직 받지 못했습니다.<br>파일이 오면 이 자리에 같은 화면을 그대로 채웁니다.</div></div>';
+  var sel=document.getElementById('sel'); if(sel) sel.value=s.id;
+  var cnt=document.getElementById('cnt'); if(cnt) cnt.textContent=(i+1)+' / '+SCREENS.length;
+  try{ history.replaceState(null,'','?screen='+s.id+(qs.get('embed')==='1'?'&embed=1':'')+(qs.get('bare')==='1'?'&bare=1':'')); }catch(e){}
+  return true;
+}
+function listScreens(){ return SCREENS.map(function(s){ return s.id; }); }
+function hasBody(){ return Object.keys(BODY).length; }
+
+var sel=document.getElementById('sel');
+sel.innerHTML=SCREENS.map(function(s){ return '<option value="'+s.id+'">'+s.no+'  '+s.nm+'</option>'; }).join('');
+sel.addEventListener('change',function(){ showScreen(this.value); });
+document.getElementById('prev').addEventListener('click',function(){ showScreen((cur-1+SCREENS.length)%SCREENS.length); });
+document.getElementById('next').addEventListener('click',function(){ showScreen((cur+1)%SCREENS.length); });
+
+showScreen(qs.get('screen')||SCREENS[0].id);
+</script>
+</body>
+</html>

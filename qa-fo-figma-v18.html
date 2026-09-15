@@ -17,6 +17,9 @@ body{margin:0;font-family:"Noto Sans KR","Malgun Gothic",sans-serif;font-size:13
   font-family:inherit;font-size:11.5px;color:#746B68;cursor:pointer;white-space:nowrap}
 .ltabs button.on{background:#25201F;border-color:#25201F;color:#fff;font-weight:700}
 .lbody{flex:1;overflow-y:auto;padding:14px}
+#live{flex:1;width:100%;border:0;background:#F6F3F1}
+body.ref-mode #live{display:none}
+body:not(.ref-mode) .lbody{display:none}
 .lbody h3{font-size:12px;margin:0 0 8px;color:#746B68;font-weight:700}
 .lbody h3+h3{margin-top:18px}
 .ref{width:100%;border-collapse:collapse;font-size:11.5px;border:1px solid #E9E3DF}
@@ -65,6 +68,8 @@ pre.flow{background:#FBF7F3;border:1px solid #E9E3DF;border-radius:6px;padding:1
 .tc .acts .btn{padding:3px 8px;font-size:11px}
 .tc .acts .btn.p.on{background:#31715D;border-color:#31715D;color:#fff}
 .tc .acts .btn.f.on{background:#D95662;border-color:#D95662;color:#fff}
+.tc .go{margin:7px 0 0 54px}
+.tc .go .btn{padding:3px 9px;font-size:11px}
 .tc .how{margin:6px 0 0 54px;font-size:11.5px;color:#746B68;line-height:1.65}
 .tc .how b{color:#25201F;font-weight:600}
 .memo{margin:7px 0 0 54px;display:none}
@@ -90,13 +95,15 @@ dialog textarea{width:100%;height:340px;font-family:ui-monospace,Menlo,monospace
 <div class="app">
   <div class="left">
     <div class="ltabs">
-      <button data-l="screens" class="on">화면 19</button>
+      <button data-l="live" class="on">화면</button>
+      <button data-l="screens">화면 19</button>
       <button data-l="tokens">색 토큰</button>
       <button data-l="comp">컴포넌트</button>
       <button data-l="proto">프로토타입</button>
       <button data-l="struct">파일 구조</button>
     </div>
     <div class="lbody" id="lbody"></div>
+    <iframe id="live" src="fo-v18-screens.html?embed=1"></iframe>
   </div>
 
   <div class="right">
@@ -122,7 +129,7 @@ dialog textarea{width:100%;height:340px;font-family:ui-monospace,Menlo,monospace
     </div>
     <div class="scroll">
       <p class="hint">
-        Figma 파일을 열어 놓고 항목을 위에서부터 확인합니다. <b>실패</b>를 누르면 메모 칸이 열립니다.
+        왼쪽 <b>화면</b> 탭에서 해당 화면을 보면서 항목을 위에서부터 확인합니다. 화면 항목의 <b>이 화면 열기</b>를 누르면 왼쪽이 그 화면으로 바뀝니다. <b>실패</b>를 누르면 메모 칸이 열립니다.
         기록은 이 브라우저에 저장되므로 창을 닫아도 남습니다.<br>
         마지막에 <b>결과 복사</b>로 실패 항목만 뽑아 제작자에게 전달합니다.
       </p>
@@ -241,19 +248,27 @@ function drawLeft(k){
   }
   document.getElementById('lbody').innerHTML=h;
 }
+function selectLeft(k){
+  document.querySelectorAll('[data-l]').forEach(function(x){ x.classList.toggle('on',x.dataset.l===k); });
+  if(k==='live'){ document.body.classList.remove('ref-mode'); }
+  else { document.body.classList.add('ref-mode'); drawLeft(k); }
+}
 document.querySelectorAll('[data-l]').forEach(function(b){
-  b.addEventListener('click',function(){
-    document.querySelectorAll('[data-l]').forEach(function(x){ x.classList.toggle('on',x===b); });
-    drawLeft(b.dataset.l);
-  });
+  b.addEventListener('click',function(){ selectLeft(b.dataset.l); });
 });
-drawLeft('screens');
+function openScreen(id){
+  selectLeft('live');
+  var w=document.getElementById('live').contentWindow;
+  try{ if(w.showScreen) w.showScreen(id); else document.getElementById('live').src='fo-v18-screens.html?embed=1&screen='+id; }
+  catch(e){ document.getElementById('live').src='fo-v18-screens.html?embed=1&screen='+id; }
+}
+selectLeft('live');
 
 /* ═════════ 체크리스트 ═════════ */
 /* [id, 확인할 행동, 확인 방법] */
 var screenRows = SCREENS.map(function(r){
-  return ['S-'+r[0], r[1]+' 프레임이 '+r[3]+' 안에 있고 이름이 표와 똑같은지 확인한다',
-    '레이어 패널에서 <b>'+r[3]+'</b> 를 펼쳐 프레임명을 표와 글자 단위로 대조한다. 원본 ID <b>'+r[2]+'</b> 화면과 내용이 같은지 함께 본다.'];
+  return ['S-'+r[0], r[1]+' 화면이 원본과 같은지 확인한다',
+    '왼쪽 화면과 원본 <b>'+r[2]+'</b> 를 나란히 놓고 정보 순서·문구·간격·색을 대조한다. Figma 단계에서는 <b>'+r[3]+'</b> Section 안의 프레임명도 함께 본다.', r[2]];
 });
 var compRows = COMPS.map(function(r,i){
   var num=(i+1<10?'0':'')+(i+1);
@@ -397,6 +412,7 @@ function render(){
         '<button class="btn p'+(st.v==='p'?' on':'')+'" data-v="p">통과</button>'+
         '<button class="btn f'+(st.v==='f'?' on':'')+'" data-v="f">실패</button>'+
         '</span></div>'+
+        (c[3]?'<div class="go"><button class="btn goBtn" data-scr="'+c[3]+'">이 화면 열기</button></div>':'')+
         (c[2]?'<div class="how">'+c[2]+'</div>':'')+
         '<div class="memo'+(st.v==='f'||st.m?' show':'')+'">'+
         '<div class="lbl">무엇이 어떻게 달랐나요</div>'+
@@ -408,6 +424,8 @@ function render(){
           if(nv==='f'){ var el=document.querySelector('[data-focus="'+c[0]+'"]'); if(el) el.focus(); }
         });
       });
+      var gb=d.querySelector('.goBtn');
+      if(gb) gb.addEventListener('click',function(){ openScreen(gb.dataset.scr); });
       var ta=d.querySelector('textarea');
       ta.setAttribute('data-focus',c[0]);
       ta.addEventListener('input',function(){ var cur=get(c[0]); state[c[0]]={v:cur.v,m:ta.value}; save(); });
