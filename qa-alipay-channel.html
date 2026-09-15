@@ -137,7 +137,7 @@ var GMETA = {
   '회원 진입·동의':      ['FO', MEMBER],
   '알리페이 회원 화면':   ['FO', MEMBER],
   '예약 입력':          ['FO', MEMBER],
-  '회원 관리 (어드민)':   ['BO', MEMBER]
+  '알리페이 회원 (어드민)': ['BO', MEMBER]
 };
 var area = 'all';
 function gmeta(name) { return GMETA[name] || ['BO', ADMIN]; }
@@ -259,16 +259,18 @@ var DATA = [
 ["U-20","인증한 이메일이 회원 정보에 남는다","예약을 넘긴 뒤 마이페이지","마이페이지 이메일 칸에 그 값이 보이고 인증된 주소라고 적힌다","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.email='xiaomei.w@qq.com';S.mailOk=true;S.view='fo11';render()"]
 ]],
 
-["회원 관리 (어드민)", [
-["UB-01","가입 경로 필터 신설","회원 관리 화면 필터 줄","마케팅 수신 여부 오른쪽에 가입 경로 셀렉트가 있다. 값은 전체 / 이메일 가입 / 소셜 로그인 / 알리페이","resetDB();BOF='all';BOG={quit:false,mkt:true,ali:true};S.view='bo11';render()"],
-["UB-02","가입 경로로 거르기","가입 경로 = 알리페이","알리페이로 만들어진 회원만 남는다","resetDB();BOF='ali';BOG={quit:false,mkt:true,ali:true};S.view='bo11';render()"],
-["UB-03","알리페이 정보 칼럼 그룹","회원 목록 우상단에서 알리페이 정보 끄기","가입 경로·월렛·프로필 동의·동의 일자 네 칼럼이 사라진다. 기존 탈퇴정보·마케팅 활용 정보와 같은 방식","resetDB();BOF='all';BOG={quit:false,mkt:true,ali:true};S.view='bo11';render()"],
-["UB-04","알리페이 회원의 빈 값","프로필 거부 회원 행","이름·이메일·여권명·연락처가 하이픈으로 보인다. 알리페이가 주지 않는 값이다","resetDB();S.agProf=false;S.email='';BOF='ali';BOG={quit:false,mkt:true,ali:true};S.view='bo11';render()"],
-["UB-05","프로필 동의가 목록에 반영","프로필 동의로 바꾼 뒤 목록","보는 중 행의 이름과 국적이 채워지고 프로필 동의가 동의로 바뀐다","resetDB();S.agProf=true;BOF='ali';BOG={quit:false,mkt:true,ali:true};S.view='bo11';render()"],
-["UB-06","월렛 구분","상단 월렛 바꾸기 후 목록","월렛 칼럼이 알리페이 중국 / 알리페이 홍콩으로 바뀌고 언어 칼럼도 간체 / 번체로 따라 바뀐다","resetDB();S.wallet='HK';S.agProf=true;BOF='ali';BOG={quit:false,mkt:true,ali:true};S.view='bo11';render()"],
-["UB-07","상세 화면이 없다","목록에서 행 눌러 보기","상세로 넘어가는 동작이 없다. 라이브도 목록 하나뿐이라 이번에도 만들지 않는다","resetDB();BOF='all';BOG={quit:false,mkt:true,ali:true};S.view='bo11';render()"],
-["UB-08","엑셀 다운로드를 만들지 않는다","카드 헤더","다운로드 버튼이 없다. 라이브에 없는 기능이라 신설하지 않는다","resetDB();BOF='all';BOG={quit:false,mkt:true,ali:true};S.view='bo11';render()"]
-]]
+["알리페이 회원 (어드민)", [
+["UB-01","화면 위치","회원 메뉴 아래 알리페이 회원","알리페이 계정으로 만들어진 회원만 모여 있다. 기존 회원 관리 정보조회 화면은 손대지 않는다","resetDB();BOW='all';BOP='all';BOQ=false;S.view='bo11';render()"],
+["UB-02","가입 경로 필터가 없다","필터 줄","이 목록에는 알리페이 회원만 있어 가입 경로를 고를 필요가 없다. 대신 월렛과 프로필 동의 필터가 있다","resetDB();BOW='all';BOP='all';BOQ=false;S.view='bo11';render()"],
+["UB-03","월렛으로 거르기","월렛 = 알리페이 홍콩","홍콩 월렛 회원만 남는다","resetDB();BOW='HK';BOP='all';BOQ=false;S.view='bo11';render()"],
+["UB-04","프로필 동의로 거르기","프로필 동의 = 거부","거부한 회원만 남는다. 이름과 국적이 비어 있는 행들이다","resetDB();BOW='all';BOP='거부';BOQ=false;S.view='bo11';render()"],
+["UB-05","알리페이 식별자 칼럼","목록 칼럼","식별자가 전체 자리로 보인다. 이메일·여권명·연락처가 비는 회원을 이 값으로 가려낸다","resetDB();BOW='all';BOP='all';BOQ=false;S.view='bo11';render()"],
+["UB-06","프로필 거부 회원의 빈 값","보는 중 행","이름·국적·이메일·여권명·연락처가 하이픈으로 보인다. 알리페이가 주지 않는 값이다","resetDB();S.agProf=false;S.email='';BOW='all';BOP='all';BOQ=false;S.view='bo11';render()"],
+["UB-07","프로필 동의가 목록에 반영","프로필 동의로 바꾼 뒤 목록","보는 중 행의 이름과 국적이 채워지고 프로필 동의가 동의로 바뀐다","resetDB();S.agProf=true;BOW='all';BOP='all';BOQ=false;S.view='bo11';render()"],
+["UB-08","월렛을 바꾸면 따라 바뀐다","상단 월렛 바꾸기 후 목록","보는 중 행의 월렛과 식별자가 바뀌고 언어도 간체에서 번체로 따라 바뀐다","resetDB();S.wallet='HK';S.agProf=true;BOW='all';BOP='all';BOQ=false;S.view='bo11';render()"],
+["UB-09","탈퇴정보 칼럼","우상단 탈퇴정보 켜기","탈퇴일 칼럼이 나타난다. 기존 회원 화면과 같은 방식","resetDB();BOW='all';BOP='all';BOQ=true;S.view='bo11';render()"],
+["UB-10","상세 화면이 없다","목록에서 행 눌러 보기","상세로 넘어가는 동작이 없다. 기존 회원 화면도 목록 하나뿐이라 같은 방식으로 둔다","resetDB();BOW='all';BOP='all';BOQ=false;S.view='bo11';render()"]
+]]]
 ];
 
 var KEY = 'kbs_qa_alipay';

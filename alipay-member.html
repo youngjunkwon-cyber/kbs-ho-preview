@@ -170,7 +170,7 @@ var VIEWS = [
   ['fo11', 'FO-CH-11 마이페이지'],
   ['fo12', 'FO-CH-12 회원 탈퇴'],
   ['fo13', 'FO-CH-13 예약 입력'],
-  ['bo11', 'BO-CH-11 회원 관리']
+  ['bo11', 'BO-CH-11 알리페이 회원']
 ];
 var CAPS = {
   fo09: '알리페이에서 식별자를 받은 직후 한 번 뜹니다. 회원을 만들기 전입니다. 이용약관과 개인정보처리방침에 모두 체크해야 동의 버튼이 켜집니다. 닫으면 회원을 만들지 않고 로그인하지 않은 상태로 둘러봅니다. 회원이 안 만들어지므로 거부를 기록하지 않습니다.',
@@ -178,7 +178,7 @@ var CAPS = {
   fo11: '프로필 제공 동의 여부에 따라 내 정보가 달라집니다. 비밀번호가 없는 계정이라 비밀번호 변경이 없고, 알리페이로 로그인된 상태라는 안내를 예약 내역 위에 둡니다.',
   fo12: '마이페이지의 기존 탈퇴 경로를 그대로 씁니다. 알리페이 연결도 함께 끊기고 다시 들어오면 새 회원이 됩니다.',
   fo13: '이메일은 예약 필수 항목인데 알리페이 회원은 회원 정보에 값이 없어 입력칸이 뜹니다. 인증을 마쳐야 예약을 넘길 수 있습니다. 프로필 제공에 동의했으면 국적·성별·생년월일이 채워집니다. 여권 영문명은 채우지 않습니다.',
-  bo11: '어드민 회원 메뉴의 정보조회 화면입니다. 회원 상세 화면은 없습니다. 주황색이 이번에 늘어나는 자리입니다. 가입 경로 필터와 알리페이 정보 칼럼 그룹이 신설입니다.'
+  bo11: '회원 메뉴 아래에 새로 두는 화면입니다. 알리페이 회원만 모여 있어 가입 경로 필터가 필요 없습니다. 기존 회원 관리 정보조회 화면은 손대지 않습니다. 상세 화면은 두지 않습니다.'
 };
 
 /* ── 유틸 ── */
@@ -325,101 +325,84 @@ function fo13() {
 }
 
 /* ────────────────────────────────────────────────
-   BO-CH-11 회원 관리
+   BO-CH-11 알리페이 회원 (회원 메뉴 아래 별도 화면)
    ──────────────────────────────────────────────── */
-var BOG = { quit: false, mkt: true, ali: true };   // 칼럼설정 그룹
-var BOF = 'all';                                   // 가입 경로 필터
+var BOW = 'all';    // 월렛 필터
+var BOP = 'all';    // 프로필 동의 필터
+var BOQ = false;    // 탈퇴정보 칼럼
 
 var MEM = [
-  { no: 1341, join: '2026-09-15 09:02', quit: '', last: '2026-09-15 09:02', name: '', mail: '', pp: '', nat: '', lang: '중국어 간체', tel: '', bk: 0, ns: 0, mkt: '동의', mktd: '2026-09-15 09:02', path: 'ali', wallet: 'CN', prof: '거부', profd: '2026-09-15 09:02', aid: '2088712034559781', self: true },
-  { no: 1340, join: '2026-09-15 08:41', quit: '', last: '2026-09-15 08:41', name: '천메이링', mail: '', pp: '', nat: '중국', lang: '중국어 번체', tel: '', bk: 0, ns: 0, mkt: '동의', mktd: '2026-09-15 08:41', path: 'ali', wallet: 'HK', prof: '동의', profd: '2026-09-15 08:41', aid: '2088041663827450' },
-  { no: 1339, join: '2026-09-15 07:55', quit: '', last: '2026-09-15 08:10', name: '리우팅', mail: 'liuting@qq.com', pp: 'LIU TING', nat: '중국', lang: '중국어 간체', tel: '13900001111', bk: 1, ns: 0, mkt: '동의', mktd: '2026-09-15 07:55', path: 'ali', wallet: 'CN', prof: '동의', profd: '2026-09-15 07:55', aid: '2088926610334872' },
-  { no: 1337, join: '2026-09-15 06:04', quit: '', last: '2026-09-15 08:37', name: 'aji', mail: 'ajiro.t@gmail.com', pp: 'TOMOMI AJIRO', nat: '일본', lang: '', tel: '09025614888', bk: 0, ns: 0, mkt: '동의', mktd: '2026-09-15 13:48', path: 'mail' },
-  { no: 1335, join: '2026-09-14 09:59', quit: '', last: '2026-09-14 16:18', name: 'iuwxxxynn', mail: 'scarlett.iwy@gmail.com', pp: 'Scarlett Iu', nat: '미국', lang: '영어', tel: '4159665390', bk: 1, ns: 0, mkt: '동의', mktd: '2026-09-15 13:48', path: 'sns' },
-  { no: 1332, join: '2026-09-13 13:30', quit: '', last: '', name: 'PP', mail: '150130158@qq.com', pp: 'zhangyali', nat: '중국', lang: '', tel: '', bk: 0, ns: 0, mkt: '동의', mktd: '2026-09-15 13:48', path: 'mail' }
+  { no: 'A-1041', join: '2026-09-15 09:02', quit: '', last: '2026-09-15 09:02', name: '', nat: '', lang: '중국어 간체', mail: '', pp: '', tel: '', bk: 0, ns: 0, wallet: 'CN', prof: '거부', profd: '2026-09-15 09:02', aid: '2088712034559781', self: true },
+  { no: 'A-1040', join: '2026-09-15 08:41', quit: '', last: '2026-09-15 08:41', name: '천메이링', nat: '중국', lang: '중국어 번체', mail: '', pp: '', tel: '', bk: 0, ns: 0, wallet: 'HK', prof: '동의', profd: '2026-09-15 08:41', aid: '2088041663827450' },
+  { no: 'A-1039', join: '2026-09-15 07:55', quit: '', last: '2026-09-15 08:10', name: '리우팅', nat: '중국', lang: '중국어 간체', mail: 'liuting@qq.com', pp: 'LIU TING', tel: '13900001111', bk: 1, ns: 0, wallet: 'CN', prof: '동의', profd: '2026-09-15 07:55', aid: '2088926610334872' },
+  { no: 'A-1036', join: '2026-09-14 21:12', quit: '2026-09-15 10:40', last: '2026-09-14 21:20', name: '', nat: '', lang: '중국어 간체', mail: '', pp: '', tel: '', bk: 0, ns: 0, wallet: 'CN', prof: '거부', profd: '2026-09-14 21:12', aid: '2088350417726693' },
+  { no: 'A-1033', join: '2026-09-13 18:27', quit: '', last: '2026-09-14 09:05', name: '황즈웨이', nat: '중국', lang: '영어', mail: 'zw.huang@163.com', pp: 'HUANG ZHIWEI', tel: '13612347788', bk: 2, ns: 1, wallet: 'HK', prof: '동의', profd: '2026-09-13 18:27', aid: '2088174902265318' }
 ];
-var PATH = { ali: '알리페이', mail: '이메일 가입', sns: '소셜 로그인' };
 
 function bo11() {
   /* 지금 따라가는 회원을 목록 첫 줄에 반영한다 */
   var me = MEM[0];
   me.name = S.agProf ? ALI.name : '';
-  me.nat = S.agProf ? ALI.nation : '';
+  me.nat  = S.agProf ? ALI.nation : '';
   me.mail = S.email;
   me.lang = LANG[S.wallet];
   me.wallet = S.wallet;
   me.prof = S.agProf ? '동의' : '거부';
   me.aid = S.wallet === 'CN' ? '2088712034559781' : '2088558801247390';
 
+  var list = MEM.filter(function (m) {
+    if (BOW !== 'all' && m.wallet !== BOW) return false;
+    if (BOP !== 'all' && m.prof !== BOP) return false;
+    return true;
+  });
 
-  var list = MEM.filter(function (m) { return BOF === 'all' || m.path === BOF; });
-
-  var head1 = '<tr>' +
-    '<th rowspan="2" class="c">No.</th><th rowspan="2">가입일</th>' +
-    (BOG.quit ? '<th rowspan="2">탈퇴일</th>' : '') +
-    '<th rowspan="2">마지막 로그인</th><th rowspan="2">이름</th><th rowspan="2">이메일</th>' +
-    '<th rowspan="2">여권명</th><th rowspan="2">국적</th><th rowspan="2">언어</th><th rowspan="2">연락처</th>' +
-    '<th rowspan="2" class="c">예약</th><th rowspan="2" class="c">노쇼</th>' +
-    (BOG.mkt ? '<th colspan="2" class="grp">마케팅 활용 정보</th>' : '') +
-    (BOG.ali ? '<th colspan="5" class="grp newcol">알리페이 정보</th>' : '') +
-    '</tr>';
-  var head2 = '<tr>' +
-    (BOG.mkt ? '<th class="c">동의 여부</th><th>동의 일자</th>' : '') +
-    (BOG.ali ? '<th class="c newcol">가입 경로</th><th class="newcol">알리페이 식별자</th><th class="c newcol">월렛</th><th class="c newcol">프로필 동의</th><th class="newcol">동의 일자</th>' : '') +
-    '</tr>';
+  var head = '<tr>' +
+    '<th>회원번호</th><th>가입일</th>' + (BOQ ? '<th>탈퇴일</th>' : '') +
+    '<th>마지막 로그인</th><th>알리페이 식별자</th><th class="c">월렛</th>' +
+    '<th>이름</th><th>국적</th><th>언어</th><th>이메일</th><th>여권명</th><th>연락처</th>' +
+    '<th class="c">예약</th><th class="c">노쇼</th>' +
+    '<th class="c">프로필 동의</th><th>동의 일자</th></tr>';
 
   var rows = list.map(function (m) {
-    var isAli = m.path === 'ali';
     return '<tr>' +
-      '<td class="c">' + m.no + (m.self ? ' <span class="pill ali">보는 중</span>' : '') + '</td>' +
+      '<td class="mono">' + m.no + (m.self ? ' <span class="pill ali">보는 중</span>' : '') + '</td>' +
       '<td>' + m.join + '</td>' +
-      (BOG.quit ? '<td>' + dash(m.quit) + '</td>' : '') +
+      (BOQ ? '<td>' + dash(m.quit) + '</td>' : '') +
       '<td>' + dash(m.last) + '</td>' +
-      '<td>' + dash(m.name) + '</td>' +
-      '<td>' + dash(m.mail) + '</td>' +
-      '<td>' + dash(m.pp) + '</td>' +
-      '<td>' + dash(m.nat) + '</td>' +
-      '<td>' + dash(m.lang) + '</td>' +
-      '<td>' + dash(m.tel) + '</td>' +
+      '<td class="mono">' + m.aid + '</td>' +
+      '<td class="c">' + (m.wallet === 'CN' ? '중국' : '홍콩') + '</td>' +
+      '<td>' + dash(m.name) + '</td><td>' + dash(m.nat) + '</td><td>' + dash(m.lang) + '</td>' +
+      '<td>' + dash(m.mail) + '</td><td>' + dash(m.pp) + '</td><td>' + dash(m.tel) + '</td>' +
       '<td class="c">' + m.bk + '</td><td class="c">' + m.ns + '</td>' +
-      (BOG.mkt ? '<td class="c"><span class="pill ' + (m.mkt === '동의' ? 'yes' : 'no') + '">' + m.mkt + '</span></td><td>' + m.mktd + '</td>' : '') +
-      (BOG.ali
-        ? '<td class="c newcol"><span class="pill ' + (isAli ? 'ali' : '') + '">' + PATH[m.path] + '</span></td>' +
-          '<td class="newcol mono">' + (isAli ? m.aid : '<span class="dash">-</span>') + '</td>' +
-          '<td class="c newcol">' + (isAli ? (m.wallet === 'CN' ? '알리페이 중국' : '알리페이 홍콩') : '<span class="dash">-</span>') + '</td>' +
-          '<td class="c newcol">' + (isAli ? '<span class="pill ' + (m.prof === '동의' ? 'yes' : 'no') + '">' + m.prof + '</span>' : '<span class="dash">-</span>') + '</td>' +
-          '<td class="newcol">' + (isAli ? m.profd : '<span class="dash">-</span>') + '</td>'
-        : '') +
+      '<td class="c"><span class="pill ' + (m.prof === '동의' ? 'yes' : 'no') + '">' + m.prof + '</span></td>' +
+      '<td>' + m.profd + '</td>' +
       '</tr>';
   }).join('');
 
+  var sel = function (id, cur, opts, fn) {
+    return '<select class="sel new" onchange="' + fn + '=this.value;render()">' +
+      opts.map(function (o) { return '<option value="' + o[0] + '"' + (cur === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') +
+      '</select>';
+  };
+
   return '<div class="adm">' +
-    '<div class="phd"><h2>회원 관리</h2><div class="pdesc">회원 관리 페이지입니다. 회원을 검색하고, 회원 정보를 확인할 수 있습니다.</div></div>' +
+    '<div class="phd"><h2>알리페이 회원</h2><div class="pdesc">알리페이 계정으로 만들어진 회원입니다. 기존 회원과 별개로 관리합니다.</div></div>' +
     '<div class="filt">' +
       '<select class="sel"><option>가입 기간</option></select>' +
       '<input class="inp" placeholder="가입 시작일" style="width:110px">' +
       '<input class="inp" placeholder="가입 종료일" style="width:110px">' +
       '<select class="sel"><option>미탈퇴</option></select>' +
-      '<select class="sel"><option>마케팅 수신 여부</option></select>' +
-      '<select class="sel new" onchange="BOF=this.value;render()">' +
-        '<option value="all"' + (BOF === 'all' ? ' selected' : '') + '>가입 경로 (전체)</option>' +
-        '<option value="mail"' + (BOF === 'mail' ? ' selected' : '') + '>이메일 가입</option>' +
-        '<option value="sns"' + (BOF === 'sns' ? ' selected' : '') + '>소셜 로그인</option>' +
-        '<option value="ali"' + (BOF === 'ali' ? ' selected' : '') + '>알리페이</option>' +
-      '</select>' +
+      sel('w', BOW, [['all','월렛 (전체)'],['CN','알리페이 중국'],['HK','알리페이 홍콩']], 'BOW') +
+      sel('p', BOP, [['all','프로필 동의 (전체)'],['동의','동의'],['거부','거부']], 'BOP') +
       '<input class="inp" placeholder="검색어" style="width:150px">' +
       '<button class="btn blue">검색</button>' +
     '</div>' +
     '<div class="card">' +
       '<div class="hd"><span>회원 목록</span>' +
-        '<span class="grpbtn new">' +
-          '<span class="g' + (BOG.quit ? ' on' : '') + '" onclick="BOG.quit=!BOG.quit;render()">탈퇴정보</span>' +
-          '<span class="g' + (BOG.mkt ? ' on' : '') + '" onclick="BOG.mkt=!BOG.mkt;render()">마케팅 활용 정보</span>' +
-          '<span class="g' + (BOG.ali ? ' on' : '') + '" onclick="BOG.ali=!BOG.ali;render()">알리페이 정보</span>' +
-        '</span>' +
+        '<span class="grpbtn"><span class="g' + (BOQ ? ' on' : '') + '" onclick="BOQ=!BOQ;render()">탈퇴정보</span></span>' +
       '</div>' +
-      '<div class="tblwrap"><table><thead>' + head1 + head2 + '</thead><tbody>' + rows + '</tbody></table></div>' +
-      '<div class="foot">알리페이 식별자는 검색어로도 찾을 수 있습니다. 완전 일치로 찾습니다.</div>' +
+      '<div class="tblwrap"><table><thead>' + head + '</thead><tbody>' + rows + '</tbody></table></div>' +
+      '<div class="foot">검색어는 알리페이 식별자, 이름, 이메일을 봅니다. 식별자는 완전 일치로 찾습니다.</div>' +
     '</div>' +
   '</div>';
 }
