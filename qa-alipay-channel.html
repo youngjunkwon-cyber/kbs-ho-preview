@@ -11,6 +11,8 @@ body{margin:0;font-family:"Noto Sans KR","Malgun Gothic",sans-serif;font-size:14
 .app{display:flex;height:100vh}
 .left{flex:1;min-width:0;display:flex;flex-direction:column;border-right:1px solid #e0e0e0}
 .left iframe{flex:1;width:100%;border:0;background:#fff}
+.lbar .areaBtn.on{background:#e8537a;border-color:#e8537a;color:#fff}
+.lbar .sp2{width:1px;height:18px;background:#e0e0e0;margin:0 4px}
 .lbar{height:44px;flex:0 0 44px;background:#fff;border-bottom:1px solid #e8e8e8;display:flex;align-items:center;gap:8px;padding:0 12px}
 .lbar .t{font-size:13px;font-weight:600}
 .lbar .sp{flex:1}
@@ -70,6 +72,11 @@ dialog textarea{width:100%;height:320px;font-family:ui-monospace,Menlo,monospace
   <div class="left">
     <div class="lbar">
       <span class="t">시안</span>
+      <button class="btn areaBtn on" data-a="all">전체</button>
+      <button class="btn areaBtn" data-a="BO">BO</button>
+      <button class="btn areaBtn" data-a="HOST">HOST</button>
+      <button class="btn areaBtn" data-a="FO">FO</button>
+      <span class="sp2"></span>
       <button class="btn" id="reload">새로고침</button>
       <button class="btn" id="resetPrev">시드 초기화</button>
       <span class="sp"></span>
@@ -115,6 +122,25 @@ dialog textarea{width:100%;height:320px;font-family:ui-monospace,Menlo,monospace
 </dialog>
 
 <script>
+/* 그룹마다 어느 영역이고 어느 시안 파일에서 도는지 */
+var ADMIN = 'bo-alipay-channel.html', MEMBER = 'alipay-member.html';
+var GMETA = {
+  '상품 수정':          ['BO', ADMIN],
+  '상품 목록':          ['BO', ADMIN],
+  '스토어 정보 수정':    ['BO', ADMIN],
+  '배너 (광고정보관리)':  ['BO', ADMIN],
+  '기획전':             ['BO', ADMIN],
+  '매거진 본문':         ['BO', ADMIN],
+  '호스트 화면':         ['HOST', ADMIN],
+  '공통 · 회귀':        ['BO', ADMIN],
+  '회원 진입·동의':      ['FO', MEMBER],
+  '알리페이 회원 화면':   ['FO', MEMBER],
+  '예약 입력':          ['FO', MEMBER],
+  '회원 관리 (어드민)':   ['BO', MEMBER]
+};
+var area = 'all';
+function gmeta(name) { return GMETA[name] || ['BO', ADMIN]; }
+
 /* [id, 제목, 절차, 기대, 시안 세팅 코드] */
 var DATA = [
 ["상품 수정", [
@@ -165,7 +191,7 @@ var DATA = [
 ["B-13","배너와 연결 대상의 언어가 다름","영어 배너 B3의 하단 버튼이 중국어(간체) 기획전 유형을 가리킴","눌러도 다른 언어 화면으로 가므로 배너는 미노출. 목록 사유 = 노출 대상 없음","VIEW.lang='영어';go('a-list')"],
 ["B-14","연결 대상의 노출 기간이 끝남","B3의 대상을 영어 유형으로 바꾸고, 그 유형에 붙은 기획전 두 건의 종료일을 어제로","기간이 끝난 것은 연결 대상으로 치지 않는다. 언어를 맞춰도 배너는 미노출","A('B3').btn.inner.id='CT3';C('E3').to='2026-09-12';C('E5').to='2026-09-12';VIEW.lang='영어';go('a-list')"],
 ["B-15","인플루언서 기획전의 언어가 다름","카인드스페셜_중국의 언어를 일본어로 바꾸고 B6 확인","배너는 중국어(간체)인데 대상이 일본어라 미노출. 목록 사유 = 노출 대상 없음","DB.influencers.filter(function(x){return x.id==='IF1'})[0].lang='일본어';VIEW.lang='중국어(간체)';go('a-list')"],
-["B-16","유형에 붙은 기획전이 여러 건","B3의 대상을 영어 유형으로 바꿈. 그 유형에는 미노출인 영어권 스킨케어전과 노출인 영어 PICK 2차가 붙어 있음","하나라도 노출되면 통과한다. 배너는 노출","A('B3').btn.inner.id='CT3';VIEW.lang='영어';go('a-list')"]
+["B-16","유형에 붙은 기획전이 여러 건","B3의 대상을 영어 유형으로 바꿈. 그 유형에는 미노출인 영어권 스킨케어전과 노출인 영어 PICK 2차가 붙어 있음","하나라도 노출되면 통과한다. 배너는 노출","A('B3').btn.inner.id='CT3';VIEW.lang='영어';go('a-list')"],
 ["B-17","연결 대상 목록은 배너 언어만","영어 배너 B3 수정 · 하단 버튼 내부링크 종류를 기획전으로","선택 목록에 영어 유형만 보임. 이미 고른 간체 유형은 남아 있음","VIEW.lang='영어';go('a-list');openAd('B3')"],
 ]],
 ["기획전", [
@@ -177,7 +203,7 @@ var DATA = [
 ["E-06","체크박스 선택 삭제","E1에서 행 체크","선택된 상품 삭제 버튼 활성. 선택 해제 시 비활성","VIEW.lang='중국어(간체)';go('c-list');openColl('E1')"],
 ["E-07","담은 것이 없을 때 저장","E1에서 상품 모두 삭제 후 OK","저장 거부. 안내: 상품을 1개 이상 담아야 저장할 수 있습니다. 모달은 열린 채로 유지","VIEW.lang='중국어(간체)';go('c-list');openColl('E1');C('E1').products=[];render()"],
 ["E-08","대상 언어가 아닌 기획전","언어 일본어 · E4 일본 고객 추천전","노출 라디오 잠금. 안내 문구는 없고 목록의 두 칼럼은 -","VIEW.lang='일본어';go('c-list');openColl('E4')"],
-["E-09","목록 건수","기획전 관리 목록","병원 행의 상품 칸 0, 추천상품 행의 스토어 칸 0","VIEW.lang='중국어(간체)';go('c-list')"]
+["E-09","목록 건수","기획전 관리 목록","병원 행의 상품 칸 0, 추천상품 행의 스토어 칸 0","VIEW.lang='중국어(간체)';go('c-list')"],
 ["E-10","유형 전환 후 취소","E1에서 유형을 병원으로 바꿔 확인한 뒤 모달 오른쪽 위 ✕ 또는 Cancel","목록의 E1은 여전히 추천상품이고 상품 2건이 그대로. 저장을 눌러야 반영","VIEW.lang='중국어(간체)';go('c-list');openColl('E1')"],
 ]],
 ["매거진 본문", [
@@ -198,6 +224,47 @@ var DATA = [
 ["G-05","금지 표현","전 화면","긴 줄표, 서비스명 줄임, 열·판정 같은 내부 용어가 화면 문구에 없음","go('p-list')"],
 ["G-06","버튼 설정 공통 화면","사이드바 버튼 설정 공통","표 구조와 개수 규칙, 켠 버튼 없음 안내가 함께 보임","go('btn-spec')"]
 ]]
+,
+
+["회원 진입·동의", [
+["U-01","동의 창 기본 상태","알리페이로 처음 진입","가운데 모달. 이용 약관·개인정보 처리방침은 필수, 알리페이 프로필 제공·광고성 정보 수신은 선택. 동의 버튼은 회색 비활성","resetDB();S.view='fo09';render()"],
+["U-02","필수 둘을 체크해야 버튼이 켜진다","이용 약관만 체크한 상태","동의 버튼이 여전히 비활성","resetDB();S.agTerms=true;S.view='fo09';render()"],
+["U-03","동의하고 시작","필수 둘 체크 후 동의하고 시작하기","회원이 만들어지고 로그인된다. 상단 상태의 회원 = 생성됨","resetDB();S.agTerms=true;S.agPriv=true;S.view='fo09';render()"],
+["U-04","닫으면 회원을 만들지 않는다","닫기 (회원을 만들지 않고 둘러보기)","회원 = 아직 아님. 로그인하지 않은 상태 화면으로 이동","resetDB();S.view='fo09';render()"],
+["U-05","로그인 필요 지점에서 다시 띄운다","둘러보기 상태에서 예약하기","동의 창이 다시 뜬다. 둘러보는 동안에는 뜨지 않는다","resetDB();S.joined=false;S.view='fo10';render()"],
+["U-06","조회 권한 미개통","상단 조회 권한 끄기 후 동의 창","알리페이 프로필 제공 항목이 창에서 사라지고 필수 둘과 광고성 정보 수신만 남는다","resetDB();S.permit=false;S.view='fo09';render()"],
+["U-07","이탈은 기록하지 않는다","닫은 뒤 다시 진입","동의 창이 다시 뜬다. 3회 연속 이탈이면 거부로 기록한다","resetDB();S.view='fo09';render()"]
+]],
+
+["알리페이 회원 화면", [
+["U-08","프로필 동의 회원의 마이페이지","프로필 제공에 동의한 상태","내 정보에 이름·성별·생년월일·국적이 채워지고 불러오기 버튼이 없다","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.view='fo11';render()"],
+["U-09","프로필 거부 회원의 마이페이지","프로필 제공을 거부한 상태","이름과 국적이 비고 알리페이에서 불러오기 버튼이 보인다","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=false;S.view='fo11';render()"],
+["U-10","불러오기 버튼","거부 상태에서 불러오기 누르기","프로필이 채워지고 버튼이 사라진다","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=false;S.view='fo11';render()"],
+["U-11","비밀번호 변경이 없다","마이페이지 메뉴","비밀번호 변경 자리가 점선으로만 표시되고 실제 메뉴에 없다. 비밀번호가 없는 계정이기 때문","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.view='fo11';render()"],
+["U-12","별개 계정 안내","마이페이지 내 정보 아래","알리페이 계정으로 이용 중입니다. 웹에서 만든 계정과는 별개라 그쪽 예약 내역은 보이지 않습니다.","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.view='fo11';render()"],
+["U-13","로그인 경로가 없다","로그인 영역 정리 화면","로그인·회원가입, 소셜 로그인, 비밀번호 찾기 세 자리가 모두 없다","resetDB();S.joined=true;S.view='fo10';render()"],
+["U-14","탈퇴 안내","마이페이지에서 회원 탈퇴","연결 끊김, 내역 못 봄, 재진입 시 새 회원, 알리페이 계정 무영향 네 줄이 모두 보인다","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.view='fo12';render()"],
+["U-15","탈퇴하면 처음으로 돌아간다","탈퇴하기 누르기","회원 = 아직 아님으로 초기화되고 동의 창이 다시 뜬다","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.view='fo12';render()"]
+]],
+
+["예약 입력", [
+["U-16","프로필 동의 회원의 예약 폼","프로필 동의 상태에서 예약 입력","국적·성별·생년월일에 회원 정보에서 채움 표시가 붙고 값이 들어가 있다","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.view='fo13';render()"],
+["U-17","여권 영문명은 채우지 않는다","같은 화면","여권 영문명이 비어 있다. 알리페이 이름은 여권 표기가 보장되지 않기 때문","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.view='fo13';render()"],
+["U-18","프로필 거부 회원의 예약 폼","프로필 거부 상태에서 예약 입력","국적·성별·생년월일이 모두 빈 칸이고 자동 채움 표시가 없다","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=false;S.view='fo13';render()"],
+["U-19","이메일 입력칸","동의·거부 두 경우 모두","이메일 칸이 빈 상태로 노출된다. 회원 정보에 값이 없기 때문","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.view='fo13';render()"],
+["U-20","입력한 이메일이 회원 정보에 남는다","예약 요청을 누른 뒤 마이페이지","마이페이지 이메일 칸에 방금 입력한 값이 보인다","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.email='xiaomei.w@qq.com';S.view='fo11';render()"]
+]],
+
+["회원 관리 (어드민)", [
+["UB-01","가입 경로 필터 신설","회원 관리 화면 필터 줄","마케팅 수신 여부 오른쪽에 가입 경로 셀렉트가 있다. 값은 전체 / 이메일 가입 / 소셜 로그인 / 알리페이","resetDB();BOF='all';BOG={quit:false,mkt:true,ali:true};S.view='bo11';render()"],
+["UB-02","가입 경로로 거르기","가입 경로 = 알리페이","알리페이로 만들어진 회원만 남는다","resetDB();BOF='ali';BOG={quit:false,mkt:true,ali:true};S.view='bo11';render()"],
+["UB-03","알리페이 정보 칼럼 그룹","회원 목록 우상단에서 알리페이 정보 끄기","가입 경로·월렛·프로필 동의·동의 일자 네 칼럼이 사라진다. 기존 탈퇴정보·마케팅 활용 정보와 같은 방식","resetDB();BOF='all';BOG={quit:false,mkt:true,ali:true};S.view='bo11';render()"],
+["UB-04","알리페이 회원의 빈 값","프로필 거부 회원 행","이름·이메일·여권명·연락처가 하이픈으로 보인다. 알리페이가 주지 않는 값이다","resetDB();S.agProf=false;S.email='';BOF='ali';BOG={quit:false,mkt:true,ali:true};S.view='bo11';render()"],
+["UB-05","프로필 동의가 목록에 반영","프로필 동의로 바꾼 뒤 목록","보는 중 행의 이름과 국적이 채워지고 프로필 동의가 동의로 바뀐다","resetDB();S.agProf=true;BOF='ali';BOG={quit:false,mkt:true,ali:true};S.view='bo11';render()"],
+["UB-06","월렛 구분","상단 월렛 바꾸기 후 목록","월렛 칼럼이 알리페이 중국 / 알리페이 홍콩으로 바뀌고 언어 칼럼도 간체 / 번체로 따라 바뀐다","resetDB();S.wallet='HK';S.agProf=true;BOF='ali';BOG={quit:false,mkt:true,ali:true};S.view='bo11';render()"],
+["UB-07","상세 화면이 없다","목록에서 행 눌러 보기","상세로 넘어가는 동작이 없다. 라이브도 목록 하나뿐이라 이번에도 만들지 않는다","resetDB();BOF='all';BOG={quit:false,mkt:true,ali:true};S.view='bo11';render()"],
+["UB-08","엑셀 다운로드를 만들지 않는다","카드 헤더","다운로드 버튼이 없다. 라이브에 없는 기능이라 신설하지 않는다","resetDB();BOF='all';BOG={quit:false,mkt:true,ali:true};S.view='bo11';render()"]
+]]
 ];
 
 var KEY = 'kbs_qa_alipay';
@@ -211,6 +278,17 @@ function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catc
 function get(id) { return state[id] || { v: '', m: '' }; }
 function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
+
+/* 필요한 시안 파일로 바꾼 뒤 세팅 코드를 실행한다 */
+function openCase(src, code) {
+  var cur = (frame.getAttribute('src') || '').split('/').pop();
+  if (cur === src) { runInPreview(code, true); return; }
+  frame.addEventListener('load', function once() {
+    frame.removeEventListener('load', once);
+    runInPreview(code, true);
+  });
+  frame.setAttribute('src', src);
+}
 
 function runInPreview(code, alsoReset) {
   var w = frame.contentWindow;
@@ -228,7 +306,10 @@ function runInPreview(code, alsoReset) {
 function render() {
   list.innerHTML = '';
   var total = 0, pass = 0, fail = 0;
-  DATA.forEach(function (g) { g[1].forEach(function (c) { total++; var v = get(c[0]).v; if (v === 'p') pass++; else if (v === 'f') fail++; }); });
+  DATA.forEach(function (g) {
+    if (area !== 'all' && gmeta(g[0])[0] !== area) return;
+    g[1].forEach(function (c) { total++; var v = get(c[0]).v; if (v === 'p') pass++; else if (v === 'f') fail++; });
+  });
   document.getElementById('nPass').textContent = pass;
   document.getElementById('nFail').textContent = fail;
   document.getElementById('nTodo').textContent = total - pass - fail;
@@ -239,6 +320,7 @@ function render() {
 
   var any = false;
   DATA.forEach(function (g) {
+    if (area !== 'all' && gmeta(g[0])[0] !== area) return;
     var cards = [];
     g[1].forEach(function (c) {
       var st = get(c[0]);
@@ -268,7 +350,7 @@ function render() {
         });
       });
       var gb = d.querySelector('.goBtn');
-      if (gb) gb.addEventListener('click', function () { runInPreview(c[4], true); });
+      if (gb) gb.addEventListener('click', function () { openCase(gmeta(g[0])[1], c[4]); });
       var ta = d.querySelector('textarea');
       ta.setAttribute('data-focus', c[0]);
       ta.addEventListener('input', function () { var cur = get(c[0]); state[c[0]] = { v: cur.v, m: ta.value }; save(); });
@@ -314,9 +396,18 @@ document.querySelectorAll('[data-f]').forEach(function (b) {
     render();
   });
 });
+document.querySelectorAll('.areaBtn').forEach(function (b) {
+  b.addEventListener('click', function () {
+    area = b.dataset.a;
+    document.querySelectorAll('.areaBtn').forEach(function (x) { x.classList.toggle('on', x === b); });
+    var want = area === 'FO' ? MEMBER : ADMIN;
+    if ((frame.getAttribute('src') || '').split('/').pop() !== want) frame.setAttribute('src', want);
+    render();
+  });
+});
 document.getElementById('reload').addEventListener('click', function () { frame.src = frame.src; });
 document.getElementById('resetPrev').addEventListener('click', function () { runInPreview('', true); });
-document.getElementById('newwin').addEventListener('click', function () { window.open('bo-alipay-channel.html', '_blank'); });
+document.getElementById('newwin').addEventListener('click', function () { window.open(frame.getAttribute('src'), '_blank'); });
 document.getElementById('widen').addEventListener('click', function () {
   var r = document.getElementById('right');
   r.classList.toggle('wide');
