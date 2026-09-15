@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FO 카탈로그·탐색 · 와이어프레임 검수</title>
+<style>
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:"Noto Sans KR","Malgun Gothic",sans-serif;font-size:14px;color:#262626;background:#f5f6f8;overflow:hidden}
+.app{display:flex;height:100vh}
+.left{flex:1;min-width:0;display:flex;flex-direction:column;border-right:1px solid #e0e0e0}
+.left iframe{flex:1;width:100%;border:0;background:#fff}
+.lbar{height:44px;flex:0 0 44px;background:#fff;border-bottom:1px solid #e8e8e8;display:flex;align-items:center;gap:8px;padding:0 12px}
+.lbar .t{font-size:13px;font-weight:600}
+.lbar .sp{flex:1}
+.right{flex:0 0 460px;display:flex;flex-direction:column;background:#fff;min-width:0}
+.right.wide{flex-basis:680px}
+.top{flex:0 0 auto;border-bottom:1px solid #e8e8e8;padding:12px 16px}
+.top h1{margin:0 0 8px;font-size:15px;font-weight:700}
+.top h1 .sub{font-size:11px;color:#8c8c8c;font-weight:400;margin-left:6px}
+.btn{padding:5px 10px;border:1px solid #d9d9d9;background:#fff;border-radius:4px;cursor:pointer;color:#434343;font-size:12px;font-family:inherit;white-space:nowrap}
+.btn:hover{border-color:#1f1f1f;color:#1f1f1f}
+.btn.pri{background:#1f1f1f;border-color:#1f1f1f;color:#fff}
+.btn.pri:hover{opacity:.9;color:#fff}
+.btn.on{background:#1f1f1f;border-color:#1f1f1f;color:#fff}
+.row1{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+.stat{display:flex;gap:12px;align-items:center;font-size:12px;color:#595959}
+.stat b{color:#262626;font-size:14px}
+.bar{height:5px;border-radius:3px;background:#f0f0f0;overflow:hidden;flex:1;min-width:80px;display:flex}
+.bar i{display:block;height:100%}
+.bar .p{background:#52c41a}.bar .f{background:#ff4d4f}
+.scroll{flex:1;overflow-y:auto;padding:12px 16px 60px}
+.grp{margin-bottom:16px}
+.grp h2{font-size:12px;margin:0 0 6px;color:#8c8c8c;font-weight:600;display:flex;gap:6px;align-items:center}
+.grp h2 .n{font-weight:400;color:#bfbfbf}
+.tc{border:1px solid #f0f0f0;border-radius:6px;padding:10px 12px;margin-bottom:6px;background:#fff}
+.tc.pass{border-color:#b7eb8f;background:#fcfffa}
+.tc.fail{border-color:#ffa39e;background:#fffafa}
+.tc .hd{display:flex;gap:8px;align-items:flex-start}
+.tc .id{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#8c8c8c;flex:0 0 54px;padding-top:2px}
+.tc .ti{font-weight:600;flex:1;line-height:1.45;font-size:13px}
+.tc .acts{display:flex;gap:4px;flex:0 0 auto}
+.tc .acts .btn{padding:3px 8px;font-size:11px}
+.tc .acts .btn.p.on{background:#52c41a;border-color:#52c41a;color:#fff}
+.tc .acts .btn.f.on{background:#ff4d4f;border-color:#ff4d4f;color:#fff}
+.tc dl{margin:8px 0 0 62px;display:grid;grid-template-columns:36px 1fr;gap:3px 8px;font-size:12px;line-height:1.6}
+.tc dt{color:#8c8c8c}
+.tc dd{margin:0}
+.tc .go{margin:8px 0 0 62px}
+.tc .go .btn{padding:3px 9px;font-size:11px}
+.memo{margin:8px 0 0 62px;display:none}
+.memo.show{display:block}
+.memo textarea{width:100%;min-height:50px;padding:6px 8px;border:1px solid #d9d9d9;border-radius:4px;font-family:inherit;font-size:12px;resize:vertical;line-height:1.5}
+.memo textarea:focus{outline:none;border-color:#1f1f1f}
+.memo .lbl{font-size:11px;color:#8c8c8c;margin-bottom:3px}
+.hint{font-size:11px;color:#8c8c8c;line-height:1.7;margin:0 0 12px}
+.empty{border:1px dashed #d9d9d9;border-radius:6px;padding:24px;text-align:center;color:#8c8c8c;font-size:12px}
+dialog{border:none;border-radius:8px;padding:0;max-width:720px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.18)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog .dh{padding:14px 18px;border-bottom:1px solid #f0f0f0;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+dialog .db{padding:14px 18px}
+dialog .df{padding:10px 18px;border-top:1px solid #f0f0f0;display:flex;justify-content:flex-end;gap:8px}
+dialog textarea{width:100%;height:320px;font-family:ui-monospace,Menlo,monospace;font-size:12px;line-height:1.6;padding:10px;border:1px solid #d9d9d9;border-radius:4px}
+.x{background:none;border:none;font-size:15px;cursor:pointer;color:#8c8c8c}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="left">
+    <div class="lbar">
+      <span class="t">와이어프레임</span>
+      <button class="btn" id="reload">새로고침</button>
+      <button class="btn" id="resetPrev">시드 초기화</button>
+      <span class="sp"></span>
+      <button class="btn" id="widen">체크리스트 넓게</button>
+      <button class="btn" id="newwin">새 창</button>
+    </div>
+    <iframe id="prev" src="fo-catalog-explore.html"></iframe>
+  </div>
+  <div class="right" id="right">
+    <div class="top">
+      <h1>검수 체크리스트<span class="sub" id="cnt"></span></h1>
+      <div class="row1">
+        <button class="btn on" data-f="all">전체</button>
+        <button class="btn" data-f="todo">미확인</button>
+        <button class="btn" data-f="fail">실패만</button>
+        <span style="flex:1"></span>
+        <button class="btn pri" id="copy">결과 복사</button>
+        <button class="btn" id="reset">기록 초기화</button>
+      </div>
+      <div class="stat">
+        <span>통과 <b id="nPass">0</b></span>
+        <span>실패 <b id="nFail">0</b></span>
+        <span>미확인 <b id="nTodo">0</b></span>
+        <div class="bar"><i class="p" id="barP"></i><i class="f" id="barF"></i></div>
+        <span id="pct">0%</span>
+      </div>
+    </div>
+    <div class="scroll">
+      <p class="hint">케이스의 <b>이 화면 열기</b>를 누르면 왼쪽 와이어프레임이 그 상태로 바로 맞춰집니다.<br>
+      실패를 누르면 메모 칸이 열립니다. 기록은 이 브라우저에 저장됩니다.</p>
+      <div id="list"></div>
+    </div>
+  </div>
+</div>
+
+<dialog id="dlg">
+  <div class="dh">결과<button class="x" onclick="document.getElementById('dlg').close()">✕</button></div>
+  <div class="db"><textarea id="out" readonly></textarea></div>
+  <div class="df">
+    <button class="btn" onclick="document.getElementById('dlg').close()">닫기</button>
+    <button class="btn pri" id="doCopy">클립보드로 복사</button>
+  </div>
+</dialog>
+
+<script>
+/* [id, 제목, 절차, 기대, 세팅 코드] */
+var DATA = [
+
+["전역 메뉴 (FO-NAV-01)", [
+["N-01","메뉴 4개와 순서","아무 화면 하단","홈 / 탐색 / 저장 / 마이페이지 네 개만. 상품·스토어 메뉴 없음","go('explore')"],
+["N-02","현재 위치 표시","탐색 홈","탐색 항목만 진하게 채워짐","go('explore')"],
+["N-03","상품·스토어 접근 유지","탐색 홈 맨 아래","전체 상품 / 전체 스토어 버튼으로 기존 목록에 들어감","go('explore')"],
+["N-04","본문이 실패해도 메뉴는 남는다","추천 실패 상태의 탐색 홈","추천 영역만 재시도로 바뀌고 하단 메뉴는 그대로","go('explore');setFail('reco',true)"],
+["N-05","비로그인 저장 진입","하단 저장 탭","로그인 화면으로 이동. 뒤로가 아니라 나중에 하기로도 원래 화면 복귀","go('explore');navTo('saved')"]
+]],
+
+["탐색 홈 (FO-EXP-01)", [
+["E-01","네 개 시작점","탐색 홈","분류 4개 대분류·7개 중분류 / 고민 5개 / 부위 4개 / 지역 4개","go('explore')"],
+["E-02","검색 진입","상단 검색칸 누름","검색 화면으로 이동하고 입력 전 안내가 뜸","go('explore')"],
+["E-03","인기 서비스","탐색 홈 인기 서비스","슈링크 유니버스 · 리쥬란 힐러 · 울쎄라피 순서, 각 행에 대표 카테고리 경로","go('explore')"],
+["E-04","추천만 실패","추천 조회 실패 상태","인기 서비스 자리에만 재시도가 뜨고 인기 지역 영역은 사라짐. 검색과 네 축은 그대로","go('explore');setFail('reco',true)"],
+["E-05","숨김·미공개는 시작점에서 빠진다","분류 고르기 진입","바디케어(숨김)와 헤어·두피(영어 미공개)가 목록에 없음","openPick('cat')"]
+]],
+
+["정본 검색 (FO-EXP-02)", [
+["Q-01","동의어 다중 후보","검색어 울쎄라","서비스 3건. 슈링크 유니버스(울쎄라로도 불립니다) / 울쎄라피(이름 일치) / 온다 리프팅(울쎄라로도 불립니다). 자동 이동하지 않음","openSearch('울쎄라')"],
+["Q-02","동의어 별도 결과 없음","Q-01 상태","울쎄라라는 이름의 독립 결과 행이 없음. 각 행은 대표 카테고리 경로로 구분됨","openSearch('울쎄라')"],
+["Q-03","결과 유형 기본값","Q-01 상태","전체가 선택된 상태. 전체 3 / 서비스 3 / 고민·부위 0 / 분류 0 / 지역 0","openSearch('울쎄라')"],
+["Q-04","유형으로 거르기","검색어 리프팅 · 분류 선택","분류 4건만 남음 (리프팅·윤곽, 초음파 리프팅, 고주파 리프팅, 실 리프팅)","openSearch('리프팅');VIEW.stype='category';render()"],
+["Q-05","상품·스토어는 섞이지 않는다","검색어 슈링크","서비스 슈링크 유니버스만 나오고 상품명(슈링크 유니버스 300샷)은 결과에 없음","openSearch('슈링크')"],
+["Q-06","0건 복구 행동","검색어 하이푸","0건 안내와 함께 검색어 고치기·고민·분류·전체 상품·전체 스토어 다섯 가지 행동","openSearch('하이푸')"],
+["Q-07","0건에서 검색어 유지","Q-06 상태","검색칸에 하이푸가 그대로 남아 있고 유형 선택도 유지","openSearch('하이푸')"],
+["Q-08","공백만 입력","검색칸을 공백으로 두고 검색","검색하지 않고 검색어를 입력해 주세요 안내만 뜸","openSearch('');VIEW.q='   ';render();submitSearch()"],
+["Q-09","숨김 서비스 제외","검색어 바디","0건 화면이 뜨고 바디 컨투어링(숨김)이 나오지 않음","openSearch('바디')"]
+]],
+
+["조건 선택 (FO-EXP-03)", [
+["F-01","적용 버튼 비활성","분류 고르기 진입 직후","선택한 것이 없어 적용 버튼이 눌리지 않음","openPick('cat')"],
+["F-02","선택하면 활성","리프팅·윤곽 전체 선택","버튼 문구가 1개 조건 적용으로 바뀌고 활성","openPick('cat');pickToggle('C2')"],
+["F-03","이미 적용된 조건은 체크된 채로 열린다","조건이 있는 상태에서 분류 고르기 다시 열기","리프팅·윤곽 전체가 체크된 상태","applyConds([{axis:'cat',id:'C2'}],'product');openPick('cat')"],
+["F-04","모두 지우면 탐색 홈","F-03에서 체크 해제 후 적용","조건이 없어져 탐색 홈으로 이동","applyConds([{axis:'cat',id:'C2'}],'product');openPick('cat');pickToggle('C2')"],
+["F-05","지역은 상위·하위가 함께","지역 고르기","서울 전체 아래에 강남·압구정로데오·명동. 홍대(숨김) 없음","openPick('plc')"]
+]],
+
+["조건 결과 (FO-EXP-03)", [
+["R-01","기본 상태","분류 리프팅·윤곽 + 지역 강남","서비스 2 / 상품 4 / 스토어 2. 기본 정렬 조회순","applyConds([{axis:'cat',id:'C2'},{axis:'plc',id:'PG'}],'product')"],
+["R-02","탭을 바꿔도 조건 유지","R-01에서 스토어 탭","조건 칩 두 개가 그대로 있고 스토어 2건","applyConds([{axis:'cat',id:'C2'},{axis:'plc',id:'PG'}],'store')"],
+["R-03","가격순은 상품 탭에만","서비스 탭에서 정렬 열기","조회순·인기순만. 낮은 가격순·높은 가격순 없음","applyConds([{axis:'cat',id:'C2'},{axis:'plc',id:'PG'}],'service');VIEW.sheet='sort';render()"],
+["R-04","가격순은 상품 탭에 있다","상품 탭에서 정렬 열기","조회순·인기순·낮은 가격순·높은 가격순 네 가지","applyConds([{axis:'plc',id:'PG'}],'product');VIEW.sheet='sort';render()"],
+["R-05","가격 없는 상품은 뒤로","지역 강남 · 낮은 가격순 · 더 보기까지","스킨 보톡스 15만원부터 오르고, 상담 후 결정인 프리미엄 리프팅 프로그램이 맨 뒤","applyConds([{axis:'plc',id:'PG'}],'product');setSort('asc');VIEW.page=2;render()"],
+["R-06","더 보기","지역 강남 · 상품 탭","6건 중 5건 표시, 더 보기 (1건 남음)","applyConds([{axis:'plc',id:'PG'}],'product')"],
+["R-07","추가 로딩 실패","R-06에서 더 보기 실패","이미 본 5건은 그대로 남고 실패 영역에만 다시 시도","applyConds([{axis:'plc',id:'PG'}],'product');setFail('more',true)"],
+["R-08","같은 축은 하나만 맞으면 된다","지역 강남 + 압구정로데오","강남 또는 압구정로데오 상품이 모두 나옴 (10건)","applyConds([{axis:'plc',id:'PG'},{axis:'plc',id:'PA'}],'product')"],
+["R-09","다른 축은 모두 맞아야 한다","분류 초음파 리프팅 + 지역 압구정로데오","울쎄라피 400샷 1건만","applyConds([{axis:'cat',id:'C21'},{axis:'plc',id:'PA'}],'product')"],
+["R-10","0건과 조건 해제","초음파 리프팅 + 여드름 흉터 + 강남","0건 안내. 해제 목록이 여드름 흉터 3건 / 초음파 리프팅 1건 / 강남 0건 순, 맨 위만 진한 해제 버튼","applyConds([{axis:'cat',id:'C21'},{axis:'itr',id:'I4'},{axis:'plc',id:'PG'}],'product')"],
+["R-11","조건 하나 해제","R-10에서 여드름 흉터 해제","조건 두 개가 남고 상품 3건이 보임","applyConds([{axis:'cat',id:'C21'},{axis:'itr',id:'I4'},{axis:'plc',id:'PG'}],'product')"],
+["R-12","모두 해제","조건 칩 오른쪽 모두 해제","탐색 홈으로 이동","applyConds([{axis:'cat',id:'C2'},{axis:'plc',id:'PG'}],'product')"],
+["R-13","미승인 연결은 결과에 없다","지역 강남 · 상품 탭","리프팅 체험 1회(연결 보류)가 목록에 없음","applyConds([{axis:'plc',id:'PG'}],'product')"],
+["R-14","비공개 스토어 상품 제외","지역 명동 · 상품 탭","하늘의원(비공개)의 울쎄라피 목 집중이 없어 0건 안내","applyConds([{axis:'plc',id:'PM'}],'product')"],
+["R-15","중복 카드 없음","지역 강남 + 분류 리프팅·윤곽","프리미엄 리프팅 프로그램이 두 서비스에 걸려 있어도 카드는 한 번만","applyConds([{axis:'cat',id:'C2'},{axis:'plc',id:'PG'}],'product')"]
+]],
+
+["분류 랜딩 (FO-LAND-01)", [
+["LC-01","기본 구성","리프팅·윤곽 랜딩","설명 → 하위 분류 3개 → 서비스 → 상품 → 스토어 순서","go('cat','C2')"],
+["LC-02","건수","같은 화면 상단","서비스 4 · 상품 6 · 스토어 4","go('cat','C2')"],
+["LC-03","현재 경로","같은 화면","탐색 > 분류 > 리프팅·윤곽","go('cat','C2')"],
+["LC-04","하위 분류 랜딩","초음파 리프팅 랜딩","경로가 탐색 > 분류 > 리프팅·윤곽 > 초음파 리프팅. 하위 분류 영역은 없음","go('cat','C21')"],
+["LC-05","숨김 분류","바디케어 주소로 진입","찾을 수 없음 화면과 탐색 홈 이동","go('cat','C5')"],
+["LC-06","전체 보기","서비스 영역의 전체 4건","이 분류를 조건으로 건 결과 화면, 서비스 탭","go('cat','C2')"]
+]],
+
+["서비스 랜딩 (FO-LAND-02)", [
+["LS-01","공개 필수값","슈링크 유니버스 랜딩","제목·설명·대표 카테고리·고르기 전에 확인할 것이 모두 표시","go('svc','S1')"],
+["LS-02","동의어 표기","같은 화면 부제","다른 이름: 울쎄라, 슈링크","go('svc','S1')"],
+["LS-03","관련 정보","같은 화면","관련 고민 / 관련 부위 / 비슷한 서비스 / 제공 지역 네 묶음","go('svc','S1')"],
+["LS-04","상품·스토어","같은 화면","상품 3건, 스토어 2건. 하단에 상품 3건 보기","go('svc','S1')"],
+["LS-05","거래 0건","엑소좀 스킨부스터 랜딩","정보 영역은 그대로. 상품·스토어 자리에 0건 안내, 하단은 스킨부스터 분류로","go('svc','S8')"],
+["LS-06","추정 문구 없음","LS-05 상태","가격·효과·옵션을 지어낸 문장이 없음","go('svc','S8')"],
+["LS-07","콘텐츠 영역만 실패","슈링크 랜딩 · 관련 글 실패","상품·스토어 영역은 그대로 뜨고 관련 글에만 다시 시도","go('svc','S1');setFail('content',true)"],
+["LS-08","비슷한 서비스 이동","슈링크 랜딩 · 울쎄라피 칩","울쎄라피 서비스 랜딩으로 이동","go('svc','S1')"],
+["LS-09","숨김 서비스","바디 컨투어링 주소로 진입","찾을 수 없음 화면","go('svc','S12')"]
+]],
+
+["고민·부위 랜딩 (FO-LAND-03)", [
+["LI-01","기본 구성","여드름 흉터 랜딩","설명 → 서비스 3건 → 상품 → 스토어 → 관련 글","go('itr','I4')"],
+["LI-02","의료 효능 단정 없음","같은 화면 설명","좋아진다·없어진다 같은 확정 표현이 없음","go('itr','I4')"],
+["LI-03","부위 랜딩","턱선 랜딩","경로가 탐색 > 부위 > 턱선. 서비스는 슈링크 유니버스·실 리프팅","go('itr','B2')"],
+["LI-04","숨김 고민","탈모 주소로 진입","찾을 수 없음 화면","go('itr','I6')"]
+]],
+
+["지역 랜딩 (FO-LAND-04)", [
+["LP-01","기본 구성","강남 랜딩","설명 → 오는 길(강남역 2호선·신분당선 / 신논현역 9호선) → 가까운 지역 → 서비스 → 스토어","go('plc','PG')"],
+["LP-02","건수","같은 화면 상단","스토어 3 · 상품 6","go('plc','PG')"],
+["LP-03","조건 결과로 이동","하단 강남 조건으로 결과 보기","지역 강남 조건이 걸린 결과 화면","go('plc','PG')"],
+["LP-04","검수되지 않은 스토어 제외","제주 랜딩","제주글로우의원(미검수)이 카드와 건수에서 빠지고 0건 안내. 하단 결과 보기 버튼 없음","go('plc','PJ')"],
+["LP-05","숨김 지역","홍대 주소로 진입","찾을 수 없음 화면","go('plc','PH')"],
+["LP-06","가까운 지역","강남 랜딩","압구정로데오·명동만. 홍대(숨김) 없음","go('plc','PG')"]
+]],
+
+["관련 글 (CONTENT-04)", [
+["CT-01","노출 조건 충족분만","슈링크 유니버스 랜딩 관련 글","매거진 2건 + 스토어 칼럼 1건 = 3건","go('svc','S1')"],
+["CT-02","검수 대기 제외","여드름 흉터 랜딩 관련 글","블룸피부과 칼럼(검수 대기)이 없고 매거진 1건만","go('itr','I4')"],
+["CT-03","다른 언어 제외","CT-01 상태","일본어 공개본 매거진이 영어 화면에 없음","go('svc','S1')"],
+["CT-04","숨김 원문 제외","실 리프팅 랜딩 관련 글","서울라인의원 안내문(숨김)이 없음","go('svc','S7')"],
+["CT-05","중복 없음","실 리프팅 랜딩","턱선 글이 두 서비스에 걸려 있어도 카드는 한 번만","go('svc','S7')"],
+["CT-06","0건이면 영역 숨김","스킨 보톡스 랜딩","관련 글 영역 자체가 없음","go('svc','S9')"],
+["CT-07","분류·지역에는 필수 아님","리프팅·윤곽 랜딩 / 강남 랜딩","두 화면 모두 관련 글 영역이 없어도 정상","go('cat','C2')"]
+]],
+
+["저장·로그인 (FO-SAVE-01)", [
+["SV-01","비로그인 저장","슈링크 랜딩에서 저장","로그인 화면으로 이동하고 안내가 보던 화면으로 돌아간다고 알림","go('svc','S1');toggleSave('svc','S1')"],
+["SV-02","로그인 후 복귀·저장","SV-01에서 로그인","슈링크 랜딩으로 돌아오고 저장됨 상태 + 저장했습니다 안내","go('svc','S1');toggleSave('svc','S1')"],
+["SV-03","나중에 하기","SV-01에서 나중에 하기","저장하지 않고 슈링크 랜딩으로 복귀","go('svc','S1');toggleSave('svc','S1')"],
+["SV-04","저장 목록 유형","서비스·상품·스토어를 각각 저장한 뒤 저장 탭","서비스 / 상품 / 스토어 세 묶음으로 나뉘어 표시","VIEW.loggedIn=true;VIEW.saved=[{kind:'svc',id:'S1'},{kind:'product',id:'PR5'},{kind:'store',id:'ST1'}];go('saved')"],
+["SV-05","중복 저장 없음","저장된 서비스를 다시 저장","건수가 늘지 않고 해제로 동작","VIEW.loggedIn=true;VIEW.saved=[{kind:'svc',id:'S1'}];go('svc','S1')"],
+["SV-06","비공개로 바뀐 저장 대상","저장 후 그 서비스가 숨김이 된 상태의 저장 목록","지금은 볼 수 없는 항목으로 따로 묶이고 삭제만 가능","VIEW.loggedIn=true;VIEW.saved=[{kind:'svc',id:'S1'},{kind:'store',id:'ST1'}];S('S1').status='숨김';go('saved')"],
+["SV-07","빈 목록","저장한 것이 없는 상태","0건 안내와 탐색으로 가기","VIEW.loggedIn=true;VIEW.saved=[];go('saved')"]
+]],
+
+["다국어·주소 (SEO-02 · URL-01)", [
+["LG-01","현재 언어 미공개","영어 화면에서 헤어·두피 분류 진입","이 화면은 영어로 공개되지 않았습니다 + 일본어·중국어(간체)로 보기 + 탐색 홈","go('cat','C6')"],
+["LG-02","자동 전환하지 않는다","LG-01 상태","다른 언어 내용이 바로 뜨지 않고 고를 수 있게만 함","go('cat','C6')"],
+["LG-03","언어를 고르면 그 화면","LG-01에서 일본어로 보기","일본어로 바뀌고 헤어·두피 랜딩이 열림","go('cat','C6')"],
+["LG-04","상위가 미공개면 하위도 막힌다","중국어(번체)에서 리쥬란 힐러 진입","스킨부스터 분류가 번체에 없어 미공개 안내. 가능한 언어는 영어·일본어·중국어(간체)","setLang('zhtw');go('svc','S4')"],
+["LG-05","언어별 시작점 차이","일본어 탐색 홈","분류·고민·지역 건수가 영어와 다름 (헤어·두피가 생김)","setLang('ja');go('explore')"],
+["LG-06","주소 형식","각 랜딩 상단 주소","/en/categories/… /en/services/… /en/interests/… /en/places/…","go('svc','S1')"],
+["LG-07","탐색·결과 주소","탐색 홈과 결과 화면","/en/explore 와 /en/explore/results","applyConds([{axis:'plc',id:'PG'}],'product')"],
+["LG-08","검색 주소","검색 결과","/en/explore/search?q=…","openSearch('울쎄라')"],
+["LG-09","언어를 바꾸면 주소도 바뀐다","서비스 랜딩에서 일본어로 전환","/ja/services/shurink-universe 로 바뀌고 같은 화면 유지","go('svc','S1')"]
+]],
+
+["공통 · 회귀", [
+["G-01","시드 초기화","값을 바꾼 뒤 상단 시드 초기화","처음 상태(영어 탐색 홈)로 복귀","go('explore')"],
+["G-02","와이어프레임 원칙","전 화면","색·아이콘·이미지 없이 회색 테두리와 굵기로만 위계가 잡혀 있음","go('explore')"],
+["G-03","검토용 장치 없음","전 화면","화면 안에 시안 설명, 기능 ID, 케이스 번호가 없음","go('svc','S1')"],
+["G-04","금지 표현","전 화면","긴 줄표, 서비스명 줄임, 정본·축 같은 내부 용어가 화면 문구에 없음","go('explore')"],
+["G-05","0건과 오류를 구분","0건 화면과 실패 화면을 비교","0건은 원인과 다음 조건, 오류는 다시 시도. 문구가 서로 다름","applyConds([{axis:'plc',id:'PM'}],'product')"],
+["G-06","기존 상세로 이동","결과의 상품 카드","기존 상품 상세로 이동하고 하단에 문의하기","applyConds([{axis:'plc',id:'PG'}],'product')"]
+]]
+
+];
+
+var KEY = 'kbs_qa_fo_catalog';
+var state = {};
+try { state = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { state = {}; }
+var filter = 'all';
+var list = document.getElementById('list');
+var frame = document.getElementById('prev');
+
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
+function get(id){ return state[id] || {v:'', m:''}; }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function runInPreview(code, alsoReset){
+  var w = frame.contentWindow;
+  try {
+    if(alsoReset && w.resetDB) w.resetDB();
+    if(code) w.eval(code);
+    frame.contentWindow.focus();
+    return true;
+  } catch(e){
+    alert('와이어프레임을 제어하지 못했습니다.\n' + e.message +
+      '\n\n파일을 직접 연 경우 브라우저가 막습니다. 배포 주소로 열어 주세요.');
+    return false;
+  }
+}
+
+function render(){
+  list.innerHTML = '';
+  var total=0, pass=0, fail=0;
+  DATA.forEach(function(g){ g[1].forEach(function(c){ total++; var v=get(c[0]).v; if(v==='p') pass++; else if(v==='f') fail++; }); });
+  document.getElementById('nPass').textContent = pass;
+  document.getElementById('nFail').textContent = fail;
+  document.getElementById('nTodo').textContent = total-pass-fail;
+  document.getElementById('barP').style.width = (pass/total*100)+'%';
+  document.getElementById('barF').style.width = (fail/total*100)+'%';
+  document.getElementById('pct').textContent = Math.round((pass+fail)/total*100)+'%';
+  document.getElementById('cnt').textContent = total+'건';
+
+  var any=false;
+  DATA.forEach(function(g){
+    var cards=[];
+    g[1].forEach(function(c){
+      var st=get(c[0]);
+      if(filter==='fail' && st.v!=='f') return;
+      if(filter==='todo' && st.v) return;
+      any=true;
+      var d=document.createElement('div');
+      d.className='tc'+(st.v==='p'?' pass':st.v==='f'?' fail':'');
+      d.innerHTML =
+        '<div class="hd"><span class="id">'+c[0]+'</span><span class="ti">'+esc(c[1])+'</span>'+
+        '<span class="acts">'+
+        '<button class="btn p'+(st.v==='p'?' on':'')+'" data-v="p">통과</button>'+
+        '<button class="btn f'+(st.v==='f'?' on':'')+'" data-v="f">실패</button>'+
+        '</span></div>'+
+        '<dl><dt>절차</dt><dd>'+esc(c[2])+'</dd><dt>기대</dt><dd>'+esc(c[3])+'</dd></dl>'+
+        (c[4]?'<div class="go"><button class="btn goBtn">이 화면 열기</button></div>':'')+
+        '<div class="memo'+(st.v==='f'||st.m?' show':'')+'">'+
+        '<div class="lbl">무엇이 어떻게 달랐나요</div>'+
+        '<textarea placeholder="예: 안내 문구가 안 뜸 / 건수가 4가 아니라 2 / 조건이 풀림">'+esc(st.m)+'</textarea></div>';
+      d.querySelectorAll('.acts .btn').forEach(function(b){
+        b.addEventListener('click', function(){
+          var cur=get(c[0]);
+          var nv = cur.v===b.dataset.v ? '' : b.dataset.v;
+          state[c[0]] = {v:nv, m:cur.m||''};
+          save(); render();
+          if(nv==='f'){ var el=document.querySelector('[data-focus="'+c[0]+'"]'); if(el) el.focus(); }
+        });
+      });
+      var gb=d.querySelector('.goBtn');
+      if(gb) gb.addEventListener('click', function(){ runInPreview(c[4], true); });
+      var ta=d.querySelector('textarea');
+      ta.setAttribute('data-focus', c[0]);
+      ta.addEventListener('input', function(){ var cur=get(c[0]); state[c[0]]={v:cur.v, m:ta.value}; save(); });
+      cards.push(d);
+    });
+    if(!cards.length) return;
+    var wrap=document.createElement('div'); wrap.className='grp';
+    var h=document.createElement('h2');
+    h.innerHTML = esc(g[0])+'<span class="n">'+cards.length+'</span>';
+    wrap.appendChild(h);
+    cards.forEach(function(x){ wrap.appendChild(x); });
+    list.appendChild(wrap);
+  });
+  if(!any){
+    var e=document.createElement('div'); e.className='empty';
+    e.textContent = filter==='fail' ? '실패로 표시한 케이스가 없습니다.' : '미확인 케이스가 없습니다.';
+    list.appendChild(e);
+  }
+}
+
+function buildReport(){
+  var lines=[], pass=0, fail=0, todo=0;
+  DATA.forEach(function(g){
+    var rows=[];
+    g[1].forEach(function(c){
+      var st=get(c[0]);
+      if(st.v==='p') pass++; else if(st.v==='f') fail++; else todo++;
+      if(st.v!=='f') return;
+      rows.push('- '+c[0]+' '+c[1]+(st.m?'\n  '+st.m.replace(/\n/g,'\n  '):'\n  (메모 없음)'));
+    });
+    if(rows.length){ lines.push('['+g[0]+']'); lines.push(rows.join('\n')); lines.push(''); }
+  });
+  return 'FO 카탈로그·탐색 와이어프레임 검수 결과\n통과 '+pass+' / 실패 '+fail+' / 미확인 '+todo+'\n\n'+
+    (lines.length ? '실패 건\n\n'+lines.join('\n') : '실패 건 없음');
+}
+
+document.querySelectorAll('[data-f]').forEach(function(b){
+  b.addEventListener('click', function(){
+    filter=b.dataset.f;
+    document.querySelectorAll('[data-f]').forEach(function(x){ x.classList.toggle('on', x===b); });
+    render();
+  });
+});
+document.getElementById('reload').addEventListener('click', function(){ frame.src = frame.src; });
+document.getElementById('resetPrev').addEventListener('click', function(){ runInPreview('', true); });
+document.getElementById('newwin').addEventListener('click', function(){ window.open('fo-catalog-explore.html','_blank'); });
+document.getElementById('widen').addEventListener('click', function(){
+  var r=document.getElementById('right');
+  r.classList.toggle('wide');
+  this.textContent = r.classList.contains('wide') ? '체크리스트 좁게' : '체크리스트 넓게';
+});
+document.getElementById('copy').addEventListener('click', function(){
+  document.getElementById('out').value = buildReport();
+  document.getElementById('dlg').showModal();
+});
+document.getElementById('doCopy').addEventListener('click', function(){
+  var ta=document.getElementById('out');
+  ta.removeAttribute('readonly'); ta.select();
+  try { document.execCommand('copy'); } catch(e){}
+  if(navigator.clipboard) navigator.clipboard.writeText(ta.value).catch(function(){});
+  ta.setAttribute('readonly','');
+  var b=this; b.textContent='복사했습니다';
+  setTimeout(function(){ b.textContent='클립보드로 복사'; }, 1500);
+});
+document.getElementById('reset').addEventListener('click', function(){
+  if(!confirm('기록한 통과·실패와 메모를 모두 지웁니다. 계속할까요?')) return;
+  state={}; save(); render();
+});
+render();
+</script>
+</body>
+</html>

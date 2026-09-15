@@ -1,1662 +1,1403 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FO 카탈로그·탐색 화면 시안 — K-Beauty Station</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FO 카탈로그·탐색 와이어프레임</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --primary:#fb6f92;
-  --primary-deep:#eb517a;
-  --primary-light:#fff2f6;
-  --primary-mid:#fde8ef;
-  --text1:#1a1a1a;
-  --text2:#3d3d3d;
-  --text3:#777;
-  --text4:#aaa;
-  --border:#e8e8e8;
-  --border2:#f1f1f1;
-  --gray-bg:#f7f7f7;
-  --gray-mid:#f2f2f2;
+  --ink:#1a1a1a; --ink2:#555; --ink3:#8c8c8c; --ink4:#aeaeae;
+  --line:#c9c9c9; --line2:#e4e4e4; --fill:#f0f0f0; --fill2:#f8f8f8;
 }
-html{font-size:14px}
+html,body{height:100%}
 body{
-  font-family:'Pretendard',-apple-system,'Apple SD Gothic Neo',sans-serif;
-  background:#eceded;color:var(--text1);
-  -webkit-font-smoothing:antialiased;
+  font-family:"Noto Sans KR","Malgun Gothic",-apple-system,sans-serif;
+  font-size:14px;color:var(--ink);background:#d9d9d9;
+  display:flex;justify-content:center;-webkit-font-smoothing:antialiased;
 }
-
-/* ============ 페이지 헤더 ============ */
-.page-head{padding:40px 32px 8px;max-width:1720px;margin:0 auto}
-.page-head h1{font-size:24px;font-weight:800;letter-spacing:-.4px}
-.page-head p{margin-top:8px;font-size:13px;color:var(--text3);line-height:1.7}
-.page-head .docs{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}
-.page-head .docs span{
-  font-size:11px;font-weight:600;color:var(--text2);
-  background:#fff;border:1px solid var(--border);border-radius:6px;padding:5px 10px;
-}
-.legend{
-  margin:20px 32px 0;max-width:1720px;
-  background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 18px;
-  font-size:12px;color:var(--text3);line-height:1.8;
-}
-.legend b{color:var(--text1);font-weight:700}
-
-/* ============ 갤러리 ============ */
-.stage{
-  display:flex;flex-wrap:wrap;gap:48px 36px;
-  padding:36px 32px 80px;max-width:1720px;margin:0 auto;
-  align-items:flex-start;
-}
-.frame{width:375px}
-.frame-label{margin-bottom:12px}
-.frame-id{
-  display:inline-block;font-size:10px;font-weight:700;letter-spacing:.4px;
-  color:var(--text2);background:#fff;border:1px solid var(--border);
-  border-radius:5px;padding:3px 7px;margin-bottom:6px;
-}
-.frame-title{font-size:14px;font-weight:700;letter-spacing:-.2px}
-.frame-desc{margin-top:4px;font-size:11.5px;color:var(--text3);line-height:1.6}
-
-/* ============ 폰 셸 ============ */
-.phone{
-  width:375px;height:812px;background:#fff;border-radius:28px;
-  overflow:hidden;position:relative;
-  box-shadow:0 16px 48px rgba(0,0,0,.14);
-  border:1px solid #dcdcdc;
-}
-.scroll{
-  position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;
-}
+.device{width:390px;max-width:100%;height:100vh;background:#fff;position:relative;
+  display:flex;flex-direction:column;border-left:1px solid #b5b5b5;border-right:1px solid #b5b5b5}
+.chrome{flex:0 0 30px;background:var(--fill);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;padding:0 10px}
+.chrome .url{max-width:100%;background:#fff;border:1px solid var(--line);height:20px;padding:0 10px;
+  display:flex;align-items:center;font-size:11px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.viewport{flex:1;min-height:0;position:relative;overflow:hidden}
+.scroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden}
 .scroll::-webkit-scrollbar{width:0}
-.scroll.has-nav{padding-bottom:62px}
-.scroll.has-nav.has-cta{padding-bottom:126px}
+.pad-nav{padding-bottom:60px}
+.pad-cta{padding-bottom:122px}
 
-/* ============ FO 헤더 ============ */
-.hdr{
-  position:sticky;top:0;z-index:30;height:52px;background:#fff;
-  display:flex;align-items:center;gap:4px;padding:0 6px 0 4px;
-  border-bottom:1px solid var(--border2);
-}
-.hdr-ico{
-  width:40px;height:40px;flex:0 0 40px;border:0;background:none;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  font-size:17px;color:var(--text1);border-radius:50%;
-}
-.hdr-back{font-size:22px;font-weight:300}
-.hdr-title{
-  flex:1;text-align:center;font-size:15px;font-weight:700;letter-spacing:-.2px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 2px;
-}
-.hdr-logo{flex:1;font-size:14px;font-weight:800;color:var(--primary);letter-spacing:-.3px;padding-left:12px}
-.hdr-sp{width:40px;flex:0 0 40px}
+/* 헤더 */
+.hdr{position:sticky;top:0;z-index:30;height:50px;background:#fff;display:flex;align-items:center;
+  padding:0 6px 0 4px;border-bottom:1px solid var(--line)}
+.hdr-ico{width:38px;height:38px;flex:0 0 38px;border:0;background:none;cursor:pointer;font-family:inherit;
+  display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--ink2)}
+.hdr-ico:hover{background:var(--fill)}
+.hdr-back{font-size:20px;font-weight:300;color:var(--ink)}
+.hdr-title{flex:1;text-align:center;font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdr-big{flex:1;text-align:left;padding-left:12px;font-size:17px;font-weight:700}
+.hdr-logo{flex:1;font-size:13px;font-weight:700;padding-left:12px;letter-spacing:.5px}
+.hdr-sp{width:38px;flex:0 0 38px}
+.lang-btn{height:26px;padding:0 8px;border:1px solid var(--line);background:#fff;font-family:inherit;
+  font-size:11px;color:var(--ink2);cursor:pointer;margin-right:6px;white-space:nowrap}
 
-/* ============ 하단 전역 메뉴 ============ */
-.nav{
-  position:absolute;left:0;right:0;bottom:0;z-index:40;height:62px;background:#fff;
-  border-top:1px solid var(--border);display:flex;padding-bottom:6px;
-}
-.nav-i{
-  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
-  font-size:10px;font-weight:600;color:var(--text4);cursor:pointer;
-}
-.nav-i .g{font-size:19px;line-height:1;filter:grayscale(1);opacity:.5}
-.nav-i.on{color:var(--primary)}
-.nav-i.on .g{filter:none;opacity:1}
+/* 전역 메뉴 */
+.nav{position:absolute;left:0;right:0;bottom:0;z-index:40;height:60px;background:#fff;
+  border-top:1px solid var(--line);display:flex;padding-bottom:6px}
+.nav-i{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+  font-size:11px;color:var(--ink3);cursor:pointer;border:0;background:none;font-family:inherit}
+.nav-i .sq{width:18px;height:18px;border:1px solid var(--ink4)}
+.nav-i.on{color:var(--ink);font-weight:700}
+.nav-i.on .sq{border-color:var(--ink);background:var(--ink)}
 
-/* ============ 공통 섹션 ============ */
-.sec{padding:20px 16px}
-.sec+.sec{border-top:8px solid var(--gray-mid)}
-.sec-tight+.sec-tight{border-top:1px solid var(--border2)}
-.sec-t{font-size:15px;font-weight:700;letter-spacing:-.2px;margin-bottom:2px}
-.sec-s{font-size:11.5px;color:var(--text3);margin-bottom:12px;line-height:1.5}
-.sec-row{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px}
+/* 섹션 */
+.sec{padding:18px 16px}
+.sec+.sec{border-top:6px solid var(--fill)}
+.sec-t{font-size:14px;font-weight:700;margin-bottom:2px}
+.sec-s{font-size:11.5px;color:var(--ink3);margin-bottom:12px;line-height:1.6}
+.sec-row{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;gap:8px}
 .sec-row .sec-t{margin-bottom:0}
-.more{font-size:11.5px;font-weight:600;color:var(--text3);cursor:pointer;white-space:nowrap}
-.more::after{content:' ›'}
+.more{font-size:11.5px;color:var(--ink2);cursor:pointer;white-space:nowrap;background:none;
+  border:0;font-family:inherit;text-decoration:underline}
 
-/* ============ 검색 ============ */
-.searchbar{
-  display:flex;align-items:center;gap:8px;height:44px;border-radius:10px;
-  background:var(--gray-bg);border:1px solid var(--border);padding:0 12px;
-  font-size:13px;color:var(--text4);
-}
-.searchbar .mg{font-size:15px;opacity:.55}
-.searchfield{
-  display:flex;align-items:center;gap:8px;height:42px;border-radius:10px;
-  background:#fff;border:1.5px solid var(--primary);padding:0 10px 0 12px;
-}
-.searchfield input{
-  flex:1;border:0;outline:0;font:inherit;font-size:13.5px;font-weight:500;color:var(--text1);background:none;
-}
-.clear-x{
-  width:20px;height:20px;border-radius:50%;background:#d8d8d8;color:#fff;border:0;
-  font-size:11px;line-height:1;cursor:pointer;flex:0 0 20px;
-}
+/* 검색 */
+.searchbar{display:flex;align-items:center;height:40px;border:1px solid var(--line);background:var(--fill2);
+  padding:0 12px;font-size:13px;color:var(--ink3);cursor:pointer}
+.searchfield{display:flex;align-items:center;gap:6px;height:40px;border:1px solid var(--ink);background:#fff;padding:0 6px 0 10px}
+.searchfield input{flex:1;border:0;outline:0;font:inherit;font-size:13px;color:var(--ink);background:none;min-width:0}
+.clear-x{width:18px;height:18px;border:1px solid var(--line);background:#fff;color:var(--ink3);
+  font-size:10px;line-height:1;cursor:pointer;flex:0 0 18px;font-family:inherit}
+.go-s{height:28px;padding:0 12px;border:1px solid var(--ink);background:var(--ink);color:#fff;
+  font:inherit;font-size:12px;font-weight:700;cursor:pointer;flex:0 0 auto}
 
-/* ============ 탐색 축 그리드 ============ */
+/* 탐색 축 */
 .axis-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.axis{
-  border:1px solid var(--border);border-radius:12px;padding:14px 12px;background:#fff;cursor:pointer;
-}
-.axis .ic{font-size:20px;line-height:1;margin-bottom:8px;display:block}
-.axis .nm{font-size:13.5px;font-weight:700;letter-spacing:-.2px}
-.axis .ct{font-size:11px;color:var(--text3);margin-top:3px}
+.axis{border:1px solid var(--line);padding:16px 12px;background:#fff;cursor:pointer;text-align:left;font-family:inherit}
+.axis:hover{border-color:var(--ink)}
+.axis .nm{font-size:14px;font-weight:700}
+.axis .ct{font-size:11px;color:var(--ink3);margin-top:5px}
 
-/* ============ 칩 ============ */
-.chips{display:flex;flex-wrap:wrap;gap:7px}
-.chips-scroll{display:flex;gap:7px;overflow-x:auto;padding-bottom:2px;margin:0 -16px;padding-left:16px;padding-right:16px}
-.chips-scroll::-webkit-scrollbar{display:none}
-.chip{
-  display:inline-flex;align-items:center;gap:5px;
-  height:32px;padding:0 12px;border-radius:16px;
-  border:1px solid var(--border);background:#fff;
-  font-size:12.5px;font-weight:500;color:var(--text2);white-space:nowrap;cursor:pointer;
-}
-.chip.on{border-color:var(--primary);background:var(--primary-light);color:var(--primary-deep);font-weight:600}
-.chip.applied{border-color:var(--primary);background:var(--primary-light);color:var(--primary-deep);font-weight:600}
-.chip .x{font-size:13px;opacity:.75;margin-left:1px}
-.chip.ghost{border-style:dashed;color:var(--text3)}
+/* 칩 */
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:5px;height:30px;padding:0 11px;border:1px solid var(--line);
+  background:#fff;font:inherit;font-size:12.5px;color:var(--ink2);white-space:nowrap;cursor:pointer}
+.chip:hover{border-color:var(--ink)}
+.chip.on{border-color:var(--ink);background:var(--ink);color:#fff;font-weight:700}
+.chip.add{border-style:dashed;color:var(--ink3)}
 
-/* ============ 리스트 행(서비스/정본) ============ */
-.row{
-  display:flex;align-items:flex-start;gap:12px;padding:13px 0;
-  border-bottom:1px solid var(--border2);cursor:pointer;
-}
-.row:last-child{border-bottom:0}
-.row-thumb{
-  width:52px;height:52px;flex:0 0 52px;border-radius:10px;
-  background:var(--primary-mid);display:flex;align-items:center;justify-content:center;font-size:21px;
-}
-.row-thumb.gray{background:var(--gray-mid)}
+/* 리스트 행 */
+.row{display:flex;align-items:flex-start;gap:12px;padding:13px 0;border-bottom:1px solid var(--line2);
+  cursor:pointer;background:none;border-left:0;border-right:0;border-top:0;width:100%;text-align:left;font-family:inherit}
+.row:last-of-type{border-bottom:0}
+.ph{border:1px solid var(--line);background:
+  linear-gradient(to top right,transparent calc(50% - 1px),var(--line) 50%,transparent calc(50% + 1px)),
+  linear-gradient(to bottom right,transparent calc(50% - 1px),var(--line) 50%,transparent calc(50% + 1px)),
+  var(--fill2);flex:0 0 auto}
+.ph-52{width:52px;height:52px}
+.ph-72{width:72px;height:72px}
+.ph-84{width:84px;height:84px}
+.ph-76{width:76px;height:60px}
 .row-b{flex:1;min-width:0}
-.row-nm{font-size:14px;font-weight:700;letter-spacing:-.2px;line-height:1.35}
-.row-path{font-size:11px;color:var(--text3);margin-top:3px}
-.row-desc{font-size:12px;color:var(--text3);margin-top:4px;line-height:1.5;
+.row-nm{font-size:13.5px;font-weight:700;line-height:1.4}
+.row-path{font-size:11px;color:var(--ink3);margin-top:3px}
+.row-desc{font-size:12px;color:var(--ink3);margin-top:5px;line-height:1.55;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.row-arrow{align-self:center;color:var(--text4);font-size:17px;font-weight:300}
-.match{
-  display:inline-block;margin-top:5px;font-size:10.5px;font-weight:600;
-  color:var(--primary-deep);background:var(--primary-light);
-  border:1px solid var(--primary-mid);border-radius:4px;padding:2px 6px;
-}
+.row-arrow{align-self:center;color:var(--ink4);font-size:16px;font-weight:300}
+.match{display:inline-block;margin-top:5px;font-size:10.5px;color:var(--ink2);
+  border:1px solid var(--line);padding:2px 6px;background:var(--fill2)}
+.grp{font-size:11px;font-weight:700;color:var(--ink3);padding:14px 0 2px;letter-spacing:.5px}
 
-/* 결과 유형 그룹 헤더 */
-.grp{
-  font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.3px;
-  padding:14px 0 2px;text-transform:uppercase;
-}
-
-/* ============ 탭 ============ */
-.tabs{
-  display:flex;background:#fff;border-bottom:1px solid var(--border);
-  position:sticky;top:52px;z-index:20;
-}
-.tab{
-  flex:1;height:44px;display:flex;align-items:center;justify-content:center;gap:4px;
-  font-size:13px;font-weight:600;color:var(--text3);cursor:pointer;
-  border-bottom:2px solid transparent;margin-bottom:-1px;
-}
-.tab.on{color:var(--text1);font-weight:700;border-bottom-color:var(--text1)}
-.tab .n{font-size:11.5px;color:var(--text4);font-weight:600}
-.tab.on .n{color:var(--primary)}
-
-.tabs-pill{display:flex;gap:5px;overflow-x:auto;padding:10px 16px;border-bottom:1px solid var(--border2)}
-.tabs-pill .chip{height:30px;padding:0 10px;font-size:12px}
+/* 탭 */
+.tabs{display:flex;background:#fff;border-bottom:1px solid var(--line);position:sticky;z-index:20}
+.tab{flex:1;height:42px;display:flex;align-items:center;justify-content:center;gap:4px;font:inherit;
+  font-size:13px;color:var(--ink3);cursor:pointer;border:0;background:none;
+  border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab.on{color:var(--ink);font-weight:700;border-bottom-color:var(--ink)}
+.tab .n{font-size:11.5px;color:var(--ink4)}
+.tab.on .n{color:var(--ink2)}
+.tabs-pill{display:flex;gap:5px;overflow-x:auto;padding:10px 16px;border-bottom:1px solid var(--line2)}
 .tabs-pill::-webkit-scrollbar{display:none}
+.tabs-pill .chip{height:28px;padding:0 10px;font-size:12px}
 
-/* ============ 정렬 바 ============ */
-.sortbar{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:10px 16px;border-bottom:1px solid var(--border2);
-}
-.count{font-size:12px;color:var(--text3)}
-.count b{color:var(--text1);font-weight:700}
-.sortbtn{
-  display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:600;
-  color:var(--text2);border:1px solid var(--border);border-radius:8px;
-  height:30px;padding:0 10px;background:#fff;cursor:pointer;
-}
+/* 정렬 */
+.sortbar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;
+  border-bottom:1px solid var(--line2);gap:8px}
+.count{font-size:12px;color:var(--ink3)}
+.count b{color:var(--ink);font-weight:700}
+.sortbtn{display:inline-flex;align-items:center;gap:5px;font:inherit;font-size:12.5px;
+  color:var(--ink);border:1px solid var(--line);height:28px;padding:0 10px;background:#fff;cursor:pointer}
 
-/* ============ 상품 카드 ============ */
-.pcard{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--border2);cursor:pointer}
-.pcard:last-child{border-bottom:0}
-.pthumb{
-  width:88px;height:88px;flex:0 0 88px;border-radius:10px;overflow:hidden;
-  background:linear-gradient(135deg,#fde8ef,#f3dde3);
-  display:flex;align-items:center;justify-content:center;font-size:26px;
-}
-.pthumb.b{background:linear-gradient(135deg,#e6eef7,#dbe4ee)}
-.pthumb.c{background:linear-gradient(135deg,#eaf1e8,#dfe8dc)}
+/* 카드 */
+.pcard,.scard,.ccard{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid var(--line2);cursor:pointer;
+  background:none;border-left:0;border-right:0;border-top:0;width:100%;text-align:left;font-family:inherit}
+.pcard:last-of-type,.scard:last-of-type,.ccard:last-of-type{border-bottom:0}
 .pbody{flex:1;min-width:0;display:flex;flex-direction:column}
-.pstore{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:4px}
-.pname{font-size:13.5px;font-weight:700;line-height:1.4;margin-top:3px;letter-spacing:-.2px;
+.pstore{font-size:11px;color:var(--ink3)}
+.pname{font-size:13px;font-weight:700;line-height:1.45;margin-top:3px;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .ptags{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
-.ptag{font-size:10px;color:var(--text3);background:var(--gray-mid);border-radius:4px;padding:2px 6px}
-.pprice{margin-top:auto;padding-top:6px;font-size:15px;font-weight:800;letter-spacing:-.3px}
-.pprice small{font-size:11px;font-weight:500;color:var(--text3);margin-left:3px}
-
-/* ============ 스토어 카드 ============ */
-.scard{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--border2);cursor:pointer}
-.scard:last-child{border-bottom:0}
-.sthumb{
-  width:72px;height:72px;flex:0 0 72px;border-radius:10px;
-  background:linear-gradient(135deg,#f0e6ea,#e3d7dd);
-  display:flex;align-items:center;justify-content:center;font-size:24px;
-}
-.sname{font-size:14px;font-weight:700;letter-spacing:-.2px}
-.smeta{font-size:11.5px;color:var(--text3);margin-top:4px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
-.star{color:#f5a623;font-weight:700}
-.dot{color:var(--border);}
-
-/* ============ 콘텐츠 카드 ============ */
-.ccard{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid var(--border2);cursor:pointer}
-.ccard:last-child{border-bottom:0}
-.cthumb{
-  width:76px;height:64px;flex:0 0 76px;border-radius:8px;
-  background:linear-gradient(135deg,#efeaf5,#e3dcec);
-  display:flex;align-items:center;justify-content:center;font-size:22px;
-}
-.ckind{font-size:10px;font-weight:700;letter-spacing:.3px;color:var(--text3);text-transform:uppercase}
-.ctitle{font-size:13px;font-weight:700;line-height:1.45;margin-top:3px;
+.ptag{font-size:10px;color:var(--ink3);border:1px solid var(--line2);background:var(--fill2);padding:2px 5px}
+.pprice{margin-top:auto;padding-top:6px;font-size:14px;font-weight:700}
+.pprice.none{font-size:11.5px;font-weight:500;color:var(--ink3)}
+.sname{font-size:13.5px;font-weight:700}
+.smeta{font-size:11.5px;color:var(--ink3);margin-top:4px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.ckind{font-size:10px;font-weight:700;color:var(--ink3)}
+.ctitle{font-size:12.5px;font-weight:700;line-height:1.5;margin-top:3px;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.cmeta{font-size:10.5px;color:var(--text4);margin-top:5px}
+.cmeta{font-size:10.5px;color:var(--ink4);margin-top:5px}
 
-/* ============ 랜딩 헤드 ============ */
-.crumb{
-  font-size:11px;color:var(--text3);padding:14px 16px 0;line-height:1.6;
-}
-.crumb a{color:var(--text3);text-decoration:none}
-.crumb .cur{color:var(--text1);font-weight:600}
+/* 랜딩 */
+.crumb{font-size:11px;color:var(--ink3);padding:14px 16px 0;line-height:1.6}
+.crumb a{color:var(--ink3);cursor:pointer;text-decoration:underline}
+.crumb .cur{color:var(--ink);font-weight:700;text-decoration:none}
 .land-head{padding:8px 16px 18px}
-.land-h1{font-size:21px;font-weight:800;letter-spacing:-.5px;line-height:1.3}
-.land-sub{font-size:12px;color:var(--text3);margin-top:6px}
-.land-body{font-size:13px;color:var(--text2);line-height:1.75;margin-top:12px}
-
-/* 선택 기준 박스 */
-.critbox{
-  margin-top:14px;border:1px solid var(--border);border-radius:10px;
-  background:var(--gray-bg);padding:14px;
-}
+.land-h1{font-size:20px;font-weight:700;line-height:1.35}
+.land-sub{font-size:11.5px;color:var(--ink3);margin-top:6px}
+.land-body{font-size:13px;color:var(--ink2);line-height:1.8;margin-top:12px}
+.critbox{margin-top:14px;border:1px solid var(--line);background:var(--fill2);padding:14px}
 .critbox .t{font-size:12.5px;font-weight:700;margin-bottom:8px}
-.critline{display:flex;gap:7px;font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:6px}
+.critline{display:flex;gap:7px;font-size:12px;color:var(--ink2);line-height:1.65;margin-bottom:6px}
 .critline:last-child{margin-bottom:0}
-.critline .b{color:var(--primary);flex:0 0 auto;font-weight:700}
-
-/* 관계 라벨 */
-.rel-l{font-size:11.5px;font-weight:700;color:var(--text3);margin-bottom:7px}
+.critline .b{flex:0 0 auto;color:var(--ink3)}
+.rel-l{font-size:11.5px;font-weight:700;color:var(--ink3);margin-bottom:7px}
 .rel-b+.rel-b{margin-top:14px}
 
-/* ============ 빈 상태 / 오류 ============ */
-.empty{padding:34px 20px;text-align:center}
-.empty .ic{font-size:30px;margin-bottom:12px}
-.empty .t{font-size:15px;font-weight:700;letter-spacing:-.2px}
-.empty .d{font-size:12.5px;color:var(--text3);margin-top:7px;line-height:1.65}
-.empty-acts{margin-top:18px;display:flex;flex-direction:column;gap:8px;text-align:left}
-.act{
-  display:flex;align-items:center;justify-content:space-between;gap:8px;
-  border:1px solid var(--border);border-radius:10px;padding:12px 13px;background:#fff;cursor:pointer;
-}
-.act .l{font-size:12.5px;font-weight:600;color:var(--text1)}
-.act .s{font-size:11px;color:var(--text3);margin-top:2px}
-.act .a{color:var(--text4);font-size:16px;font-weight:300}
-.act.primary{border-color:var(--primary);background:var(--primary-light)}
-.act.primary .l{color:var(--primary-deep)}
-
-.unblock{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-top:14px}
-.unblock-h{font-size:11.5px;font-weight:700;color:var(--text3);padding:11px 13px;background:var(--gray-bg);border-bottom:1px solid var(--border)}
-.unblock-r{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;border-bottom:1px solid var(--border2)}
+/* 빈 상태 */
+.empty{padding:32px 20px;text-align:center}
+.empty .t{font-size:15px;font-weight:700}
+.empty .d{font-size:12.5px;color:var(--ink3);margin-top:8px;line-height:1.7}
+.empty-acts{margin-top:18px;display:flex;flex-direction:column;gap:7px;text-align:left}
+.act{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line);
+  padding:12px 13px;background:#fff;cursor:pointer;width:100%;text-align:left;font-family:inherit}
+.act:hover{border-color:var(--ink)}
+.act .l{font-size:12.5px;font-weight:700;color:var(--ink)}
+.act .s{font-size:11px;color:var(--ink3);margin-top:3px}
+.act .a{color:var(--ink4);font-size:15px;font-weight:300}
+.act.primary{border-color:var(--ink)}
+.unblock{border:1px solid var(--line);margin-top:14px;text-align:left}
+.unblock-h{font-size:11.5px;font-weight:700;color:var(--ink3);padding:10px 13px;background:var(--fill);border-bottom:1px solid var(--line)}
+.unblock-r{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 13px;border-bottom:1px solid var(--line2)}
 .unblock-r:last-child{border-bottom:0}
-.unblock-r .nm{font-size:12.5px;font-weight:600}
-.unblock-r .nm i{font-style:normal;font-size:10.5px;color:var(--text3);font-weight:500;display:block;margin-top:2px}
-.mini{
-  height:28px;padding:0 11px;border-radius:14px;border:1px solid var(--border);
-  background:#fff;font:inherit;font-size:11.5px;font-weight:600;color:var(--text2);cursor:pointer;flex:0 0 auto;
-}
-.mini.pink{border-color:var(--primary);color:var(--primary-deep);background:var(--primary-light)}
-
-/* 영역 단위 오류 */
-.retry{
-  border:1px solid var(--border);border-radius:10px;background:var(--gray-bg);
-  padding:20px 14px;text-align:center;
-}
-.retry .t{font-size:12.5px;color:var(--text3);line-height:1.6}
+.unblock-r .nm{font-size:12.5px;font-weight:700}
+.unblock-r .nm i{font-style:normal;font-size:10.5px;color:var(--ink3);font-weight:400;display:block;margin-top:3px}
+.mini{height:27px;padding:0 10px;border:1px solid var(--line);background:#fff;font:inherit;
+  font-size:11.5px;color:var(--ink2);cursor:pointer;flex:0 0 auto}
+.mini.on{border-color:var(--ink);background:var(--ink);color:#fff;font-weight:700}
+.retry{border:1px solid var(--line);background:var(--fill2);padding:20px 14px;text-align:center}
+.retry .t{font-size:12.5px;color:var(--ink3);line-height:1.65}
 .retry .b{margin-top:10px}
-
-/* 인라인 0건(거래 영역) */
-.zero{
-  border:1px dashed var(--border);border-radius:10px;padding:20px 14px;text-align:center;background:var(--gray-bg);
-}
-.zero .t{font-size:12.5px;font-weight:600;color:var(--text2)}
-.zero .d{font-size:11.5px;color:var(--text3);margin-top:5px;line-height:1.6}
+.zero{border:1px dashed var(--line);padding:20px 14px;text-align:center;background:var(--fill2)}
+.zero .t{font-size:12.5px;font-weight:700;color:var(--ink2)}
+.zero .d{font-size:11.5px;color:var(--ink3);margin-top:6px;line-height:1.65}
 .zero .b{margin-top:12px}
+.sk{background:var(--fill);border:1px solid var(--line2)}
 
-/* 스켈레톤 */
-.sk{background:linear-gradient(90deg,#f0f0f0 25%,#e6e6e6 37%,#f0f0f0 63%);
-  background-size:400% 100%;border-radius:6px;animation:sh 1.3s ease infinite}
-@keyframes sh{0%{background-position:100% 50%}100%{background-position:0 50%}}
-.sk-row{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid var(--border2)}
-
-/* ============ 버튼 ============ */
-.btn{
-  width:100%;height:46px;border-radius:10px;border:1px solid var(--border);
-  background:#fff;font:inherit;font-size:13.5px;font-weight:700;color:var(--text1);cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:6px;
-}
-.btn.fill{background:var(--primary-deep);border-color:var(--primary-deep);color:#fff}
-.btn.sm{height:40px;font-size:12.5px}
+/* 버튼 */
+.btn{width:100%;height:44px;border:1px solid var(--line);background:#fff;font:inherit;
+  font-size:13px;font-weight:700;color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.btn:hover{border-color:var(--ink)}
+.btn.fill{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn.fill:disabled{background:#fff;border-color:var(--line2);color:var(--ink4);cursor:default}
+.btn.sm{height:38px;font-size:12.5px}
 .btn-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-
-/* 하단 CTA */
-.cta{
-  position:absolute;left:0;right:0;bottom:62px;z-index:35;
-  background:#fff;border-top:1px solid var(--border);
-  padding:10px 16px 12px;display:flex;gap:8px;align-items:center;
-}
-.cta-fav{
-  width:46px;height:46px;flex:0 0 46px;border-radius:10px;border:1px solid var(--border);
-  background:#fff;font-size:19px;color:var(--text3);cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-}
-.cta-fav.on{border-color:var(--primary);background:var(--primary-light);color:var(--primary-deep)}
+.cta{position:absolute;left:0;right:0;bottom:60px;z-index:35;background:#fff;border-top:1px solid var(--line);
+  padding:10px 16px 12px;display:flex;gap:8px;align-items:center}
+.cta-fav{width:44px;height:44px;flex:0 0 44px;border:1px solid var(--line);background:#fff;
+  font-size:11px;color:var(--ink2);cursor:pointer;font-family:inherit;line-height:1.2}
+.cta-fav.on{border-color:var(--ink);background:var(--ink);color:#fff;font-weight:700}
 .cta .btn{flex:1;width:auto}
 
-/* 스티키 조건 바 */
-.condbar{
-  position:sticky;top:52px;z-index:22;background:#fff;
-  border-bottom:1px solid var(--border);padding:10px 0;
-  display:flex;align-items:center;gap:8px;
-}
-.condbar-in{flex:1;min-width:0;display:flex;gap:7px;overflow-x:auto;padding:0 0 0 16px}
+/* 조건 바 */
+.condbar{position:sticky;z-index:22;background:#fff;border-bottom:1px solid var(--line);
+  padding:9px 0;display:flex;align-items:center;gap:8px}
+.condbar-in{flex:1;min-width:0;display:flex;gap:6px;overflow-x:auto;padding-left:16px}
 .condbar-in::-webkit-scrollbar{display:none}
-.condbar-fade{
-  flex:0 0 auto;padding:0 14px 0 10px;
-  background:linear-gradient(90deg,rgba(255,255,255,0),#fff 12px);
-}
-.reset{
-  font-size:11.5px;font-weight:600;color:var(--text3);text-decoration:underline;
-  white-space:nowrap;cursor:pointer;background:none;border:0;font-family:inherit;padding:0;
-}
+.condbar-fade{flex:0 0 auto;padding:0 14px 0 10px;background:linear-gradient(90deg,rgba(255,255,255,0),#fff 12px)}
+.reset{font-size:11.5px;color:var(--ink2);text-decoration:underline;white-space:nowrap;
+  cursor:pointer;background:none;border:0;font-family:inherit;padding:0}
 
-/* 장소 역/노선 */
+/* 조건 선택 */
+.pick-l{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line2);cursor:pointer;
+  background:none;border-left:0;border-right:0;border-top:0;width:100%;text-align:left;font-family:inherit}
+.box{width:18px;height:18px;flex:0 0 18px;border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent}
+.pick-l.on .box{background:var(--ink);border-color:var(--ink);color:#fff}
+.pick-nm{font-size:13.5px;font-weight:600}
+.pick-sub{font-size:11px;color:var(--ink3);margin-top:3px}
+.pick-foot{position:absolute;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:12px 16px}
+.pick-grp{font-size:11px;font-weight:700;color:var(--ink3);padding:12px 16px 4px;background:var(--fill)}
+
+/* 역·노선 */
 .stn{display:flex;flex-direction:column;gap:8px}
-.stn-r{display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:10px;padding:11px 12px}
+.stn-r{display:flex;align-items:center;gap:8px;border:1px solid var(--line);padding:11px 12px}
 .stn-nm{font-size:13px;font-weight:700}
-.line-b{font-size:10px;font-weight:700;color:#fff;border-radius:9px;padding:2px 7px;white-space:nowrap}
-.l2{background:#00a84d}.l9{background:#bb8336}.lsb{background:#d31145}
+.line-b{font-size:10px;color:var(--ink2);border:1px solid var(--line);padding:2px 6px;white-space:nowrap;background:var(--fill2)}
 
-/* 언어 미공개 */
-.lang-list{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-top:16px}
-.lang-r{display:flex;align-items:center;justify-content:space-between;padding:13px;border-bottom:1px solid var(--border2);cursor:pointer}
+/* 언어 목록 */
+.lang-list{border:1px solid var(--line);margin-top:16px;text-align:left}
+.lang-r{display:flex;align-items:center;justify-content:space-between;padding:13px;border-bottom:1px solid var(--line2);
+  cursor:pointer;width:100%;background:#fff;border-left:0;border-right:0;border-top:0;font-family:inherit}
 .lang-r:last-child{border-bottom:0}
 .lang-r .nm{font-size:13px;font-weight:600}
-.lang-r .a{color:var(--text4);font-size:16px;font-weight:300}
+.lang-r .a{color:var(--ink4);font-size:15px;font-weight:300}
 
-/* 홈 고정 헤더(탐색 홈 전용) */
-.exp-hero{padding:16px 16px 18px}
-.exp-h1{font-size:19px;font-weight:800;letter-spacing:-.4px;line-height:1.35}
-.exp-p{font-size:12px;color:var(--text3);margin-top:6px;line-height:1.6}
+/* 시트 */
+.sheet-bg{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.35);display:flex;align-items:flex-end}
+.sheet{width:100%;background:#fff;border-top:1px solid var(--line);padding:4px 0 10px;max-height:70%;overflow-y:auto}
+.sheet-h{font-size:13px;font-weight:700;padding:14px 16px 6px;color:var(--ink3)}
+.sheet-i{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;font-size:13.5px;
+  cursor:pointer;width:100%;background:none;border:0;font-family:inherit;text-align:left;color:var(--ink)}
+.sheet-i.on{font-weight:700}
+
+/* 기타 */
+.hero-home{padding:20px 16px 22px;border-bottom:6px solid var(--fill)}
+.hero-home .t{font-size:19px;font-weight:700;line-height:1.4}
+.hero-home .s{font-size:12px;color:var(--ink3);margin-top:7px}
+.login-wrap{padding:36px 24px}
+.login-wrap .t{font-size:19px;font-weight:700}
+.login-wrap .d{font-size:12.5px;color:var(--ink3);margin-top:8px;line-height:1.7}
+.fld{margin-top:16px}
+.fld label{font-size:11.5px;font-weight:700;color:var(--ink3);display:block;margin-bottom:5px}
+.fld .inp{height:42px;border:1px solid var(--line);display:flex;align-items:center;padding:0 12px;
+  font-size:13px;color:var(--ink3);background:var(--fill2)}
+.toast{position:absolute;left:16px;right:16px;bottom:74px;z-index:70;background:var(--ink);color:#fff;
+  padding:12px 14px;font-size:12.5px;line-height:1.5;text-align:center}
 </style>
 </head>
 <body>
-
-<div class="page-head">
-  <h1>FO 카탈로그·탐색 개편 화면 시안</h1>
-  <p>
-    탐색 홈, 정본 검색, 조건 결과, 정식 랜딩 4종과 기능정의서가 요구하는 필수 상태를 실제 FO 디자인(375px, Pretendard, 브랜드 핑크)으로 구성했습니다.<br>
-    FO는 한국어 UI가 없어 화면 안 문구는 영어로 작성했고, 각 프레임 위 회색 라벨은 검토용 표기입니다.
-  </p>
-  <div class="docs">
-    <span>PRD v4.6</span><span>기능정의서 v1.5</span><span>FO-NAV-01</span><span>FO-EXP-01~04</span><span>FO-LAND-01~04</span><span>CONTENT-04</span><span>FO-SAVE-01</span>
-  </div>
+<div class="device">
+  <div class="chrome"><div class="url" id="urlText">k-beautystation.com</div></div>
+  <div class="viewport" id="vp"></div>
 </div>
 
-<div class="legend">
-  <b>담긴 규칙.</b>
-  전역 메뉴는 홈·탐색·저장·마이페이지 4개 고정, 상품·스토어는 전체 보기로만 진입.
-  정본 검색은 서비스·관심사·카테고리·장소만 검색하고 동의어는 별도 결과를 만들지 않으며 다중 후보는 대표 카테고리 경로로 구분.
-  조건 결과는 같은 축 복수 선택은 OR, 다른 축은 AND이고 가격 정렬은 상품 탭에서만 노출.
-  랜딩은 상품·스토어 0건이어도 정보 영역을 유지하고 거래 버튼만 숨김.
-  관련 콘텐츠는 승인·현재 언어 공개·연결 대상 공개를 모두 만족한 카드만, 중복은 한 번만 표시.
-</div>
-
-<div class="stage">
-
-<!-- ═══════════════ 1. 탐색 홈 ═══════════════ -->
-<div class="frame">
-  <div class="frame-label">
-    <div class="frame-id">FO-S02 / FO-EXP-01 · FO-NAV-01</div>
-    <div class="frame-title">탐색 홈 (기본)</div>
-    <div class="frame-desc">정본 검색 + 4개 탐색축 + 추천 영역 + 전체 상품·스토어 진입점. 하단 전역 메뉴 4개.</div>
-  </div>
-  <div class="phone">
-    <div class="scroll has-nav">
-      <header class="hdr">
-        <div class="hdr-logo">K-Beauty Station</div>
-        <button class="hdr-ico">🌐</button>
-      </header>
-
-      <div class="exp-hero">
-        <div class="exp-h1">Find the right treatment,<br>even if you don't know its name</div>
-        <div class="exp-p">Start from a category, a concern, a body area, or a place in Korea.</div>
-      </div>
-
-      <div style="padding:0 16px 18px">
-        <div class="searchbar">
-          <span class="mg">🔍</span>
-          <span>Search treatments, concerns or places</span>
-        </div>
-      </div>
-
-      <div class="sec" style="border-top:8px solid var(--gray-mid)">
-        <div class="sec-t">Start from</div>
-        <div class="sec-s">Pick any starting point. You can combine them later.</div>
-        <div class="axis-grid">
-          <div class="axis"><span class="ic">🗂️</span><div class="nm">Categories</div><div class="ct">6 main · 44 sub</div></div>
-          <div class="axis"><span class="ic">💭</span><div class="nm">Concerns</div><div class="ct">18 concerns</div></div>
-          <div class="axis"><span class="ic">🧍</span><div class="nm">Body areas</div><div class="ct">12 areas</div></div>
-          <div class="axis"><span class="ic">📍</span><div class="nm">Places</div><div class="ct">Seoul · Busan · Jeju</div></div>
-        </div>
-      </div>
-
-      <div class="sec">
-        <div class="sec-row">
-          <div class="sec-t">Popular services</div>
-          <div class="more">See all</div>
-        </div>
-        <div class="row">
-          <div class="row-thumb">💫</div>
-          <div class="row-b">
-            <div class="row-nm">Shurink Universe</div>
-            <div class="row-path">Lifting &amp; Contouring › Ultrasound Lifting</div>
-          </div>
-          <div class="row-arrow">›</div>
-        </div>
-        <div class="row">
-          <div class="row-thumb">💧</div>
-          <div class="row-b">
-            <div class="row-nm">Rejuran Healer</div>
-            <div class="row-path">Skin Care › Skin Booster</div>
-          </div>
-          <div class="row-arrow">›</div>
-        </div>
-        <div class="row">
-          <div class="row-thumb">✨</div>
-          <div class="row-b">
-            <div class="row-nm">Ultherapy</div>
-            <div class="row-path">Lifting &amp; Contouring › Ultrasound Lifting</div>
-          </div>
-          <div class="row-arrow">›</div>
-        </div>
-      </div>
-
-      <div class="sec">
-        <div class="sec-row">
-          <div class="sec-t">Popular places</div>
-          <div class="more">See all</div>
-        </div>
-        <div class="chips">
-          <span class="chip">Gangnam</span>
-          <span class="chip">Apgujeong Rodeo</span>
-          <span class="chip">Myeong-dong</span>
-          <span class="chip">Hongdae</span>
-          <span class="chip">Sinsa</span>
-          <span class="chip">Seomyeon</span>
-        </div>
-      </div>
-
-      <div class="sec">
-        <div class="sec-t">Browse everything</div>
-        <div class="sec-s">Product and store lists stay available from here.</div>
-        <div class="btn-pair">
-          <button class="btn sm">All products</button>
-          <button class="btn sm">All stores</button>
-        </div>
-      </div>
-    </div>
-
-    <nav class="nav">
-      <div class="nav-i"><span class="g">🏠</span>Home</div>
-      <div class="nav-i on"><span class="g">🧭</span>Explore</div>
-      <div class="nav-i"><span class="g">🤍</span>Saved</div>
-      <div class="nav-i"><span class="g">👤</span>My</div>
-    </nav>
-  </div>
-</div>
-
-<!-- ═══════════════ 2. 탐색 홈 · 추천만 실패 ═══════════════ -->
-<div class="frame">
-  <div class="frame-label">
-    <div class="frame-id">FO-S02 / FO-EXP-01 · FO-EXP-04</div>
-    <div class="frame-title">탐색 홈 (추천만 로딩·실패)</div>
-    <div class="frame-desc">추천 조회만 실패하면 해당 영역에 재시도만 두고 검색과 4개 축은 그대로 사용 가능.</div>
-  </div>
-  <div class="phone">
-    <div class="scroll has-nav">
-      <header class="hdr">
-        <div class="hdr-logo">K-Beauty Station</div>
-        <button class="hdr-ico">🌐</button>
-      </header>
-
-      <div class="exp-hero">
-        <div class="exp-h1">Find the right treatment,<br>even if you don't know its name</div>
-        <div class="exp-p">Start from a category, a concern, a body area, or a place in Korea.</div>
-      </div>
-
-      <div style="padding:0 16px 18px">
-        <div class="searchbar">
-          <span class="mg">🔍</span>
-          <span>Search treatments, concerns or places</span>
-        </div>
-      </div>
-
-      <div class="sec" style="border-top:8px solid var(--gray-mid)">
-        <div class="sec-t">Start from</div>
-        <div class="sec-s">Pick any starting point. You can combine them later.</div>
-        <div class="axis-grid">
-          <div class="axis"><span class="ic">🗂️</span><div class="nm">Categories</div><div class="ct">6 main · 44 sub</div></div>
-          <div class="axis"><span class="ic">💭</span><div class="nm">Concerns</div><div class="ct">18 concerns</div></div>
-          <div class="axis"><span class="ic">🧍</span><div class="nm">Body areas</div><div class="ct">12 areas</div></div>
-          <div class="axis"><span class="ic">📍</span><div class="nm">Places</div><div class="ct">Seoul · Busan · Jeju</div></div>
-        </div>
-      </div>
-
-      <div class="sec">
-        <div class="sec-t" style="margin-bottom:12px">Popular services</div>
-        <div class="retry">
-          <div class="t">We couldn't load recommendations.<br>Search and the four starting points still work.</div>
-          <div class="b"><button class="mini pink">Try again</button></div>
-        </div>
-      </div>
-
-      <div class="sec">
-        <div class="sec-t" style="margin-bottom:12px">Popular places</div>
-        <div class="sk-row" style="border:0;padding:0">
-          <div class="sk" style="width:84px;height:32px;border-radius:16px"></div>
-          <div class="sk" style="width:110px;height:32px;border-radius:16px"></div>
-          <div class="sk" style="width:70px;height:32px;border-radius:16px"></div>
-        </div>
-      </div>
-
-      <div class="sec">
-        <div class="sec-t">Browse everything</div>
-        <div class="sec-s">Product and store lists stay available from here.</div>
-        <div class="btn-pair">
-          <button class="btn sm">All products</button>
-          <button class="btn sm">All stores</button>
-        </div>
-      </div>
-    </div>
-
-    <nav class="nav">
-      <div class="nav-i"><span class="g">🏠</span>Home</div>
-      <div class="nav-i on"><span class="g">🧭</span>Explore</div>
-      <div class="nav-i"><span class="g">🤍</span>Saved</div>
-      <div class="nav-i"><span class="g">👤</span>My</div>
-    </nav>
-  </div>
-</div>
-
-<!-- ═══════════════ 3. 정본 검색 · 다중 후보 ═══════════════ -->
-<div class="frame">
-  <div class="frame-label">
-    <div class="frame-id">FO-S03 / FO-EXP-02 · CAT-03</div>
-    <div class="frame-title">정본 검색 (동의어 다중 후보)</div>
-    <div class="frame-desc">동의어는 별도 결과를 만들지 않고 연결된 정본 서비스 행에 일치 표시. 후보가 여럿이면 대표 카테고리 경로로 구분하고 자동 이동하지 않음.</div>
-  </div>
-  <div class="phone">
-    <div class="scroll has-nav">
-      <header class="hdr">
-        <button class="hdr-ico hdr-back">‹</button>
-        <div class="hdr-title">Search</div>
-        <div class="hdr-sp"></div>
-      </header>
-
-      <div style="padding:12px 16px">
-        <div class="searchfield">
-          <span class="mg" style="font-size:14px;opacity:.5">🔍</span>
-          <input value="ulthera" readonly>
-          <button class="clear-x">✕</button>
-        </div>
-      </div>
-
-      <div class="tabs-pill">
-        <span class="chip on">All 5</span>
-        <span class="chip">Services 3</span>
-        <span class="chip">Concerns 0</span>
-        <span class="chip">Categories 1</span>
-        <span class="chip">Places 1</span>
-      </div>
-
-      <div style="padding:0 16px 20px">
-        <div class="grp">Services</div>
-        <div class="row">
-          <div class="row-thumb">✨</div>
-          <div class="row-b">
-            <div class="row-nm">Ultherapy</div>
-            <div class="row-path">Lifting &amp; Contouring › Ultrasound Lifting</div>
-            <span class="match">Matched by name</span>
-          </div>
-          <div class="row-arrow">›</div>
-        </div>
-        <div class="row">
-          <div class="row-thumb">💫</div>
-          <div class="row-b">
-            <div class="row-nm">Shurink Universe</div>
-            <div class="row-path">Lifting &amp; Contouring › Ultrasound Lifting</div>
-            <span class="match">Also called “ulthera”</span>
-          </div>
-          <div class="row-arrow">›</div>
-        </div>
-        <div class="row">
-          <div class="row-thumb">🌀</div>
-          <div class="row-b">
-            <div class="row-nm">Onda Lifting</div>
-            <div class="row-path">Lifting &amp; Contouring › RF Lifting</div>
-            <span class="match">Also called “ulthera”</span>
-          </div>
-          <div class="row-arrow">›</div>
-        </div>
-
-        <div class="grp">Categories</div>
-        <div class="row">
-          <div class="row-thumb gray">🗂️</div>
-          <div class="row-b">
-            <div class="row-nm">Ultrasound Lifting</div>
-            <div class="row-path">Lifting &amp; Contouring › Ultrasound Lifting</div>
-          </div>
-          <div class="row-arrow">›</div>
-        </div>
-
-        <div class="grp">Places</div>
-        <div class="row">
-          <div class="row-thumb gray">📍</div>
-          <div class="row-b">
-            <div class="row-nm">Apgujeong Rodeo</div>
-            <div class="row-path">Seoul › Gangnam-gu › Apgujeong Rodeo</div>
-          </div>
-          <div class="row-arrow">›</div>
-        </div>
-      </div>
-    </div>
-
-    <nav class="nav">
-      <div class="nav-i"><span class="g">🏠</span>Home</div>
-      <div class="nav-i on"><span class="g">🧭</span>Explore</div>
-      <div class="nav-i"><span class="g">🤍</span>Saved</div>
-      <div class="nav-i"><span class="g">👤</span>My</div>
-    </nav>
-  </div>
-</div>
-
-<!-- ═══════════════ 4. 정본 검색 · 0건 ═══════════════ -->
-<div class="frame">
-  <div class="frame-label">
-    <div class="frame-id">FO-S03 / FO-EXP-02 · FO-EXP-04</div>
-    <div class="frame-title">정본 검색 (0건 복구)</div>
-    <div class="frame-desc">검색어와 선택 유형을 유지한 채 검색어 수정·다른 결과 유형·4개 탐색축·전체 보기로 복구 행동 제공. 오류 문구와 분리.</div>
-  </div>
-  <div class="phone">
-    <div class="scroll has-nav">
-      <header class="hdr">
-        <button class="hdr-ico hdr-back">‹</button>
-        <div class="hdr-title">Search</div>
-        <div class="hdr-sp"></div>
-      </header>
-
-      <div style="padding:12px 16px">
-        <div class="searchfield">
-          <span class="mg" style="font-size:14px;opacity:.5">🔍</span>
-          <input value="glow injection" readonly>
-          <button class="clear-x">✕</button>
-        </div>
-      </div>
-
-      <div class="tabs-pill">
-        <span class="chip on">All 0</span>
-        <span class="chip">Services 0</span>
-        <span class="chip">Concerns 0</span>
-        <span class="chip">Categories 0</span>
-        <span class="chip">Places 0</span>
-      </div>
-
-      <div class="empty">
-        <div class="ic">🔍</div>
-        <div class="t">No results for “glow injection”</div>
-        <div class="d">We search treatments, concerns, categories<br>and places only. Try another wording.</div>
-        <div class="empty-acts">
-          <div class="act primary">
-            <div><div class="l">Edit your keyword</div><div class="s">Your text stays in the search box</div></div>
-            <div class="a">›</div>
-          </div>
-          <div class="act">
-            <div><div class="l">Browse by concern</div><div class="s">Brightening, Pore care, Anti-aging and more</div></div>
-            <div class="a">›</div>
-          </div>
-          <div class="act">
-            <div><div class="l">Browse by category</div><div class="s">6 main categories</div></div>
-            <div class="a">›</div>
-          </div>
-          <div class="act">
-            <div><div class="l">See all products</div><div class="s">Go to the full product list</div></div>
-            <div class="a">›</div>
-          </div>
-          <div class="act">
-            <div><div class="l">See all stores</div><div class="s">Go to the full store list</div></div>
-            <div class="a">›</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <nav class="nav">
-      <div class="nav-i"><span class="g">🏠</span>Home</div>
-      <div class="nav-i on"><span class="g">🧭</span>Explore</div>
-      <div class="nav-i"><span class="g">🤍</span>Saved</div>
-      <div class="nav-i"><span class="g">👤</span>My</div>
-    </nav>
-  </div>
-</div>
-
-<!-- ═══════════════ 5. 조건 결과 · 상품 탭 ═══════════════ -->
-<div class="frame">
-  <div class="frame-label">
-    <div class="frame-id">FO-S04 / FO-EXP-03</div>
-    <div class="frame-title">조건 선택·결과 (상품 탭)</div>
-    <div class="frame-desc">적용 조건 칩은 개별 해제 가능. 서비스·상품·스토어 탭을 바꿔도 조건 유지. 가격 정렬은 상품 탭에서만 노출.</div>
-  </div>
-  <div class="phone">
-    <div class="scroll has-nav">
-      <header class="hdr">
-        <button class="hdr-ico hdr-back">‹</button>
-        <div class="hdr-title">Results</div>
-        <button class="hdr-ico">🌐</button>
-      </header>
-
-      <div class="condbar">
-        <div class="condbar-in">
-          <span class="chip applied">Lifting &amp; Contouring <span class="x">✕</span></span>
-          <span class="chip applied">Anti-aging <span class="x">✕</span></span>
-          <span class="chip applied">Gangnam <span class="x">✕</span></span>
-        </div>
-        <div class="condbar-fade"><button class="reset">Reset all</button></div>
-      </div>
-
-      <div class="tabs">
-        <div class="tab">Services <span class="n">12</span></div>
-        <div class="tab on">Products <span class="n">48</span></div>
-        <div class="tab">Stores <span class="n">9</span></div>
-      </div>
-
-      <div class="sortbar">
-        <div class="count"><b>48</b> products</div>
-        <button class="sortbtn">Most viewed ▾</button>
-      </div>
-
-      <div style="padding:0 16px 16px">
-        <div class="pcard">
-          <div class="pthumb">💫</div>
-          <div class="pbody">
-            <div class="pstore">CIEL Aesthetic Clinic <span class="dot">·</span> Gangnam</div>
-            <div class="pname">Shurink Universe 300 shots (Full face)</div>
-            <div class="ptags"><span class="ptag">Ultrasound Lifting</span><span class="ptag">Anti-aging</span></div>
-            <div class="pprice">₩390,000</div>
-          </div>
-        </div>
-        <div class="pcard">
-          <div class="pthumb b">✨</div>
-          <div class="pbody">
-            <div class="pstore">Bloom Dermatology <span class="dot">·</span> Sinsa</div>
-            <div class="pname">Ultherapy 400 shots (Face + Neck)</div>
-            <div class="ptags"><span class="ptag">Ultrasound Lifting</span><span class="ptag">Jawline</span></div>
-            <div class="pprice">₩1,250,000</div>
-          </div>
-        </div>
-        <div class="pcard">
-          <div class="pthumb c">🌀</div>
-          <div class="pbody">
-            <div class="pstore">Lumiere Clinic <span class="dot">·</span> Apgujeong Rodeo</div>
-            <div class="pname">Onda Lifting Body Contour 1 session</div>
-            <div class="ptags"><span class="ptag">RF Lifting</span><span class="ptag">Anti-aging</span></div>
-            <div class="pprice">₩260,000</div>
-          </div>
-        </div>
-        <div class="pcard">
-          <div class="pthumb">🧵</div>
-          <div class="pbody">
-            <div class="pstore">Seoul Line Clinic <span class="dot">·</span> Gangnam</div>
-            <div class="pname">Mint Thread Lift 10 threads</div>
-            <div class="ptags"><span class="ptag">Thread Lift</span><span class="ptag">Jawline</span></div>
-            <div class="pprice">₩880,000</div>
-          </div>
-        </div>
-        <div class="pcard">
-          <div class="pthumb b">💧</div>
-          <div class="pbody">
-            <div class="pstore">Bloom Dermatology <span class="dot">·</span> Sinsa</div>
-            <div class="pname">Rejuran Healer 2cc with lifting care</div>
-            <div class="ptags"><span class="ptag">Skin Booster</span><span class="ptag">Anti-aging</span></div>
-            <div class="pprice">₩320,000</div>
-          </div>
-        </div>
-        <div style="padding-top:14px">
-          <button class="btn sm">Load more</button>
-        </div>
-      </div>
-    </div>
-
-    <nav class="nav">
-      <div class="nav-i"><span class="g">🏠</span>Home</div>
-      <div class="nav-i on"><span class="g">🧭</span>Explore</div>
-      <div class="nav-i"><span class="g">🤍</span>Saved</div>
-      <div class="nav-i"><span class="g">👤</span>My</div>
-    </nav>
-  </div>
-</div>
-
-<!-- ═══════════════ 6. 조건 결과 · 0건 ═══════════════ -->
-<div class="frame">
-  <div class="frame-label">
-    <div class="frame-id">FO-S04 / FO-EXP-03</div>
-    <div class="frame-title">조건 결과 (0건 · 조건 해제)</div>
-    <div class="frame-desc">결과를 막는 조건을 지목해 개별 해제와 전체 초기화를 제공. 탭·정렬·스크롤 위치는 유지.</div>
-  </div>
-  <div class="phone">
-    <div class="scroll has-nav">
-      <header class="hdr">
-        <button class="hdr-ico hdr-back">‹</button>
-        <div class="hdr-title">Results</div>
-        <button class="hdr-ico">🌐</button>
-      </header>
-
-      <div class="condbar">
-        <div class="condbar-in">
-          <span class="chip applied">Thread Lift <span class="x">✕</span></span>
-          <span class="chip applied">Acne scars <span class="x">✕</span></span>
-          <span class="chip applied">Jeju <span class="x">✕</span></span>
-        </div>
-        <div class="condbar-fade"><button class="reset">Reset all</button></div>
-      </div>
-
-      <div class="tabs">
-        <div class="tab">Services <span class="n">0</span></div>
-        <div class="tab on">Products <span class="n">0</span></div>
-        <div class="tab">Stores <span class="n">0</span></div>
-      </div>
-
-      <div class="empty" style="padding-top:28px">
-        <div class="ic">🧭</div>
-        <div class="t">No results for these conditions</div>
-        <div class="d">Different condition types have to match together.<br>Removing one usually brings results back.</div>
-
-        <div class="unblock">
-          <div class="unblock-h">REMOVE A CONDITION</div>
-          <div class="unblock-r">
-            <div class="nm">Jeju <i>Removing this gives 34 results</i></div>
-            <button class="mini pink">Remove</button>
-          </div>
-          <div class="unblock-r">
-            <div class="nm">Acne scars <i>Removing this gives 6 results</i></div>
-            <button class="mini">Remove</button>
-          </div>
-          <div class="unblock-r">
-            <div class="nm">Thread Lift <i>Removing this gives 2 results</i></div>
-            <button class="mini">Remove</button>
-          </div>
-        </div>
-
-        <div class="empty-acts">
-          <div class="act">
-            <div><div class="l">Reset all conditions</div><div class="s">Go back to Explore home</div></div>
-            <div class="a">›</div>
-          </div>
-          <div class="act">
-            <div><div class="l">See all products</div><div class="s">Opens without any condition applied</div></div>
-            <div class="a">›</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <nav class="nav">
-      <div class="nav-i"><span class="g">🏠</span>Home</div>
-      <div class="nav-i on"><span class="g">🧭</span>Explore</div>
-      <div class="nav-i"><span class="g">🤍</span>Saved</div>
-      <div class="nav-i"><span class="g">👤</span>My</div>
-    </nav>
-  </div>
-</div>
-
-<!-- ═══════════════ 7. 카테고리 랜딩 ═══════════════ -->
-<div class="frame">
-  <div class="frame-label">
-    <div class="frame-id">FO-S05 / FO-LAND-01</div>
-    <div class="frame-title">카테고리 랜딩</div>
-    <div class="frame-desc">설명 → 하위 분류 → 관련 서비스 → 실제 상품·스토어로 이어지는 경로. 관련 콘텐츠는 필수 영역이 아님.</div>
-  </div>
-  <div class="phone">
-    <div class="scroll has-nav">
-      <header class="hdr">
-        <button class="hdr-ico hdr-back">‹</button>
-        <div class="hdr-title">Lifting &amp; Contouring</div>
-        <button class="hdr-ico">🌐</button>
-      </header>
-
-      <div class="crumb">
-        <a href="#">Explore</a> › <a href="#">Categories</a> › <span class="cur">Lifting &amp; Contouring</span>
-      </div>
-      <div class="land-head">
-        <div class="land-h1">Lifting &amp; Contouring</div>
-        <div class="land-sub">44 services · 210 products · 38 stores</div>
-        <div class="land-body">
-          Treatments that work on skin firmness and facial lines using ultrasound, radiofrequency or threads.
-          Clinics in Korea usually group them by the device used and by how long the effect is expected to last.
-        </div>
-      </div>
-
-      <div class="sec" style="border-top:8px solid var(--gray-mid)">
-        <div class="sec-t" style="margin-bottom:12px">Sub categories</div>
-        <div class="chips">
-          <span class="chip">Ultrasound Lifting</span>
-          <span class="chip">RF Lifting</span>
-          <span class="chip">Thread Lift</span>
-          <span class="chip">Facial Contouring</span>
-        </div>
-      </div>
-
-      <div class="sec">
-        <div class="sec-row">
-          <div class="sec-t">Services in this category</div>
-          <div class="more">See all 44</div>
-        </div>
-        <div class="row">
-          <div class="row-thumb">💫</div>
-          <div class="row-b">
-            <div class="row-nm">Shurink Universe</div>
-            <div class="row-path">Ultrasound Lifting</div>
-            <div class="row-desc">Focused ultrasound applied in lines across the face, commonly chosen for jawline and cheek firmness.</div>
-          </div>
-          <div class="row-arrow">›</div>
-        </div>
-        <div class="row">
-          <div class="row-thumb">✨</div>
-          <div class="row-b">
-            <div class="row-nm">Ultherapy</div>
-            <div class="row-path">Ultrasound Lifting</div>
-            <div class="row-desc">Ultrasound lifting with real-time imaging, priced per shot count and treated area.</div>
-          </div>
-          <div class="row-arrow">›</div>
-        </div>
-        <div class="row">
-          <div class="row-thumb">🧵</div>
-          <div class="row-b">
-            <div class="row-nm">Thread Lift</div>
-            <div class="row-path">Thread Lift</div>
-            <div class="row-desc">Absorbable threads placed under the skin, usually counted per thread.</div>
-          </div>
-          <div class="row-arrow">›</div>
-        </div>
-      </div>
-
-      <div class="sec">
-        <div class="sec-row">
-          <div class="sec-t">Products</div>
-          <div class="more">All products</div>
-        </div>
-        <div class="pcard">
-          <div class="pthumb">💫</div>
-          <div class="pbody">
-            <div class="pstore">CIEL Aesthetic Clinic <span class="dot">·</span> Gangnam</div>
-            <div class="pname">Shurink Universe 300 shots (Full face)</div>
-            <div class="pprice">₩390,000</div>
-          </div>
-        </div>
-        <div class="pcard">
-          <div class="pthumb b">✨</div>
-          <div class="pbody">
-            <div class="pstore">Bloom Dermatology <span class="dot">·</span> Sinsa</div>
-            <div class="pname">Ultherapy 400 shots (Face + Neck)</div>
-            <div class="pprice">₩1,250,000</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="sec">
-        <div class="sec-row">
-          <div class="sec-t">Stores</div>
-          <div class="more">All stores</div>
-        </div>
-        <div class="scard">
-          <div class="sthumb">🏥</div>
-          <div class="row-b">
-            <div class="sname">CIEL Aesthetic Clinic</div>
-            <div class="smeta"><span class="star">★ 4.9</span><span>(2,341)</span><span class="dot">·</span><span>Gangnam-gu, Seoul</span></div>
-            <div class="ptags" style="margin-top:7px"><span class="ptag">Ultrasound Lifting</span><span class="ptag">Thread Lift</span></div>
-          </div>
-        </div>
-        <div class="scard">
-          <div class="sthumb">🏥</div>
-          <div class="row-b">
-            <div class="sname">Bloom Dermatology</div>
-            <div class="smeta"><span class="star">★ 4.8</span><span>(1,120)</span><span class="dot">·</span><span>Sinsa, Seoul</span></div>
-            <div class="ptags" style="margin-top:7px"><span class="ptag">Ultrasound Lifting</span><span class="ptag">Skin Booster</span></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <nav class="nav">
-      <div class="nav-i"><span class="g">🏠</span>Home</div>
-      <div class="nav-i on"><span class="g">🧭</span>Explore</div>
-      <div class="nav-i"><span class="g">🤍</span>Saved</div>
-      <div class="nav-i"><span class="g">👤</span>My</div>
-    </nav>
-  </div>
-</div>
-
-<!-- ═══════════════ 8. 서비스 랜딩 ═══════════════ -->
-<div class="frame">
-  <div class="frame-label">
-    <div class="frame-id">FO-S06 / FO-LAND-02 · CONTENT-04 · FO-SAVE-01</div>
-    <div class="frame-title">서비스 랜딩 (기본)</div>
-    <div class="frame-desc">정의·선택 기준·대표 카테고리 경로는 공개 필수값. 관심사·부위·관련 서비스·장소·상품·스토어·승인 콘텐츠를 한 화면에. 하단 저장 버튼.</div>
-  </div>
-  <div class="phone">
-    <div class="scroll has-nav has-cta">
-      <header class="hdr">
-        <button class="hdr-ico hdr-back">‹</button>
-        <div class="hdr-title">Shurink Universe</div>
-        <button class="hdr-ico">🌐</button>
-      </header>
-
-      <div class="crumb">
-        <a href="#">Explore</a> › <a href="#">Lifting &amp; Contouring</a> › <span class="cur">Ultrasound Lifting</span>
-      </div>
-      <div class="land-head">
-        <div class="land-h1">Shurink Universe</div>
-        <div class="land-sub">Ultrasound Lifting · Also called Shurink, 슈링크</div>
-        <div class="land-body">
-          A focused ultrasound treatment delivered in lines across the face. Clinics count it in shots,
-          and the number of shots and the treated area are what usually change the price.
-          Sessions are commonly booked as a single visit.
-        </div>
-
-        <div class="critbox">
-          <div class="t">What to check before booking</div>
-          <div class="critline"><span class="b">·</span><span>How many shots are included and which areas they cover</span></div>
-          <div class="critline"><span class="b">·</span><span>Whether the price covers anesthetic cream and aftercare</span></div>
-          <div class="critline"><span class="b">·</span><span>Which device generation the clinic currently uses</span></div>
-        </div>
-      </div>
-
-      <div class="sec" style="border-top:8px solid var(--gray-mid)">
-        <div class="sec-t" style="margin-bottom:14px">Related</div>
-        <div class="rel-b">
-          <div class="rel-l">Concerns</div>
-          <div class="chips"><span class="chip">Sagging skin</span><span class="chip">Anti-aging</span><span class="chip">Face slimming</span></div>
-        </div>
-        <div class="rel-b">
-          <div class="rel-l">Body areas</div>
-          <div class="chips"><span class="chip">Face</span><span class="chip">Jawline</span><span class="chip">Neck</span></div>
-        </div>
-        <div class="rel-b">
-          <div class="rel-l">Similar services</div>
-          <div class="chips"><span class="chip">Ultherapy</span><span class="chip">Onda Lifting</span><span class="chip">Thread Lift</span></div>
-        </div>
-        <div class="rel-b">
-          <div class="rel-l">Places offering it</div>
-          <div class="chips"><span class="chip">Gangnam</span><span class="chip">Apgujeong Rodeo</span><span class="chip">Myeong-dong</span></div>
-        </div>
-      </div>
-
-      <div class="sec">
-        <div class="sec-row">
-          <div class="sec-t">Products with this service</div>
-          <div class="more">All 26</div>
-        </div>
-        <div class="pcard">
-          <div class="pthumb">💫</div>
-          <div class="pbody">
-            <div class="pstore">CIEL Aesthetic Clinic <span class="dot">·</span> Gangnam</div>
-            <div class="pname">Shurink Universe 300 shots (Full face)</div>
-            <div class="ptags"><span class="ptag">Full face</span><span class="ptag">Single visit</span></div>
-            <div class="pprice">₩390,000</div>
-          </div>
-        </div>
-        <div class="pcard">
-          <div class="pthumb c">💫</div>
-          <div class="pbody">
-            <div class="pstore">Seoul Line Clinic <span class="dot">·</span> Gangnam</div>
-            <div class="pname">Shurink Universe 600 shots with cooling care</div>
-            <div class="ptags"><span class="ptag">Face + Neck</span></div>
-            <div class="pprice">₩690,000</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="sec">
-        <div class="sec-row">
-          <div class="sec-t">Stores offering it</div>
-          <div class="more">All 18</div>
-        </div>
-        <div class="scard">
-          <div class="sthumb">🏥</div>
-          <div class="row-b">
-            <div class="sname">CIEL Aesthetic Clinic</div>
-            <div class="smeta"><span class="star">★ 4.9</span><span>(2,341)</span><span class="dot">·</span><span>Gangnam-gu, Seoul</span></div>
-          </div>
-        </div>
-        <div class="scard">
-          <div class="sthumb">🏥</div>
-          <div class="row-b">
-            <div class="sname">Seoul Line Clinic</div>
-            <div class="smeta"><span class="star">★ 4.7</span><span>(864)</span><span class="dot">·</span><span>Gangnam-gu, Seoul</span></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="sec">
-        <div class="sec-t" style="margin-bottom:12px">Read about this treatment</div>
-        <div class="ccard">
-          <div class="cthumb">📰</div>
-          <div class="row-b">
-            <div class="ckind">Magazine</div>
-            <div class="ctitle">Ultrasound lifting in Korea: what the shot count actually means</div>
-            <div class="cmeta">K-Beauty Station · Sep 2, 2026</div>
-          </div>
-        </div>
-        <div class="ccard">
-          <div class="cthumb">✍️</div>
-          <div class="row-b">
-            <div class="ckind">Store column</div>
-            <div class="ctitle">How we plan a lifting schedule for first-time visitors</div>
-            <div class="cmeta">CIEL Aesthetic Clinic · Aug 21, 2026</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="cta">
-      <button class="cta-fav">♡</button>
-      <button class="btn fill">See 26 products</button>
-    </div>
-
-    <nav class="nav">
-      <div class="nav-i"><span class="g">🏠</span>Home</div>
-      <div class="nav-i on"><span class="g">🧭</span>Explore</div>
-      <div class="nav-i"><span class="g">🤍</span>Saved</div>
-      <div class="nav-i"><span class="g">👤</span>My</div>
-    </nav>
-  </div>
-</div>
-
-<!-- ═══════════════ 9. 서비스 랜딩 · 거래 0건 + 영역 실패 ═══════════════ -->
-<div class="frame">
-  <div class="frame-label">
-    <div class="frame-id">FO-S06 / FO-LAND-02 · FO-EXP-04</div>
-    <div class="frame-title">서비스 랜딩 (거래 0건 · 일부 영역 실패)</div>
-    <div class="frame-desc">상품·스토어 0건이어도 정보 영역과 200 응답 유지, 하단 CTA에서 거래 버튼 제거. 콘텐츠 영역만 실패해 재시도.</div>
-  </div>
-  <div class="phone">
-    <div class="scroll has-nav has-cta">
-      <header class="hdr">
-        <button class="hdr-ico hdr-back">‹</button>
-        <div class="hdr-title">Exosome Skin Booster</div>
-        <button class="hdr-ico">🌐</button>
-      </header>
-
-      <div class="crumb">
-        <a href="#">Explore</a> › <a href="#">Skin Care</a> › <span class="cur">Skin Booster</span>
-      </div>
-      <div class="land-head">
-        <div class="land-h1">Exosome Skin Booster</div>
-        <div class="land-sub">Skin Booster</div>
-        <div class="land-body">
-          An injectable skin booster line that clinics in Korea introduce alongside laser or microneedling sessions.
-          Programs differ by the number of sessions and by what the clinic combines it with.
-        </div>
-        <div class="critbox">
-          <div class="t">What to check before booking</div>
-          <div class="critline"><span class="b">·</span><span>How many sessions the clinic recommends as one program</span></div>
-          <div class="critline"><span class="b">·</span><span>Which treatments it is combined with, and at what price</span></div>
-        </div>
-      </div>
-
-      <div class="sec" style="border-top:8px solid var(--gray-mid)">
-        <div class="sec-t" style="margin-bottom:14px">Related</div>
-        <div class="rel-b">
-          <div class="rel-l">Concerns</div>
-          <div class="chips"><span class="chip">Dull skin</span><span class="chip">Skin texture</span></div>
-        </div>
-        <div class="rel-b">
-          <div class="rel-l">Similar services</div>
-          <div class="chips"><span class="chip">Rejuran Healer</span><span class="chip">Juvelook</span></div>
-        </div>
-      </div>
-
-      <div class="sec">
-        <div class="sec-t" style="margin-bottom:12px">Products with this service</div>
-        <div class="zero">
-          <div class="t">No products are listed yet</div>
-          <div class="d">No store on K-Beauty Station currently sells<br>this service. Similar services do have products.</div>
-          <div class="b"><button class="mini pink">See Rejuran Healer</button></div>
-        </div>
-      </div>
-
-      <div class="sec">
-        <div class="sec-t" style="margin-bottom:12px">Stores offering it</div>
-        <div class="zero">
-          <div class="t">No stores are listed yet</div>
-          <div class="d">Try browsing this service's category instead.</div>
-          <div class="b"><button class="mini">Go to Skin Booster</button></div>
-        </div>
-      </div>
-
-      <div class="sec">
-        <div class="sec-t" style="margin-bottom:12px">Read about this treatment</div>
-        <div class="retry">
-          <div class="t">We couldn't load related articles.</div>
-          <div class="b"><button class="mini pink">Try again</button></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="cta">
-      <button class="cta-fav on">♥</button>
-      <button class="btn">Back to Skin Booster</button>
-    </div>
-
-    <nav class="nav">
-      <div class="nav-i"><span class="g">🏠</span>Home</div>
-      <div class="nav-i on"><span class="g">🧭</span>Explore</div>
-      <div class="nav-i"><span class="g">🤍</span>Saved</div>
-      <div class="nav-i"><span class="g">👤</span>My</div>
-    </nav>
-  </div>
-</div>
-
-<!-- ═══════════════ 10. 관심사 랜딩 ═══════════════ -->
-<div class="frame">
-  <div class="frame-label">
-    <div class="frame-id">FO-S08 / FO-LAND-03 · CONTENT-04</div>
-    <div class="frame-title">관심사 랜딩</div>
-    <div class="frame-desc">고객이 쓰는 표현으로 설명하되 의료 효능을 확정하지 않음. 관심사 → 서비스 → 실제 상품·스토어 흐름.</div>
-  </div>
-  <div class="phone">
-    <div class="scroll has-nav">
-      <header class="hdr">
-        <button class="hdr-ico hdr-back">‹</button>
-        <div class="hdr-title">Acne scars</div>
-        <button class="hdr-ico">🌐</button>
-      </header>
-
-      <div class="crumb">
-        <a href="#">Explore</a> › <a href="#">Concerns</a> › <span class="cur">Acne scars</span>
-      </div>
-      <div class="land-head">
-        <div class="land-h1">Acne scars</div>
-        <div class="land-sub">14 services · 96 products · 31 stores</div>
-        <div class="land-body">
-          People usually describe this as uneven texture or marks left after breakouts.
-          Korean clinics approach it with different treatment types depending on the depth and the surrounding skin tone,
-          and most offer a consultation before deciding.
-        </div>
-      </div>
-
-      <div class="sec" style="border-top:8px solid var(--gray-mid)">
-        <div class="sec-row">
-          <div class="sec-t">Services for this concern</div>
-          <div class="more">See all 14</div>
-        </div>
-        <div class="row">
-          <div class="row-thumb">🔬</div>
-          <div class="row-b">
-            <div class="row-nm">Fractional CO2 Laser</div>
-            <div class="row-path">Skin Care › Laser</div>
-            <div class="row-desc">Ablative laser applied in a grid pattern, usually planned as a series of sessions.</div>
-          </div>
-          <div class="row-arrow">›</div>
-        </div>
-        <div class="row">
-          <div class="row-thumb">💧</div>
-          <div class="row-b">
-            <div class="row-nm">Rejuran Healer</div>
-            <div class="row-path">Skin Care › Skin Booster</div>
-            <div class="row-desc">Injectable booster, counted in cc and often combined with laser programs.</div>
-          </div>
-          <div class="row-arrow">›</div>
-        </div>
-        <div class="row">
-          <div class="row-thumb">🪡</div>
-          <div class="row-b">
-            <div class="row-nm">Microneedling RF</div>
-            <div class="row-path">Skin Care › Microneedling</div>
-            <div class="row-desc">Needle-based radiofrequency, priced per session and per treated area.</div>
-          </div>
-          <div class="row-arrow">›</div>
-        </div>
-      </div>
-
-      <div class="sec">
-        <div class="sec-row">
-          <div class="sec-t">Products</div>
-          <div class="more">All products</div>
-        </div>
-        <div class="pcard">
-          <div class="pthumb c">🔬</div>
-          <div class="pbody">
-            <div class="pstore">Bloom Dermatology <span class="dot">·</span> Sinsa</div>
-            <div class="pname">Fractional CO2 Laser 1 session (Full face)</div>
-            <div class="pprice">₩280,000</div>
-          </div>
-        </div>
-        <div class="pcard">
-          <div class="pthumb b">💧</div>
-          <div class="pbody">
-            <div class="pstore">Lumiere Clinic <span class="dot">·</span> Apgujeong Rodeo</div>
-            <div class="pname">Rejuran Healer 2cc + soothing care</div>
-            <div class="pprice">₩330,000</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="sec">
-        <div class="sec-row">
-          <div class="sec-t">Stores</div>
-          <div class="more">All stores</div>
-        </div>
-        <div class="scard">
-          <div class="sthumb">🏥</div>
-          <div class="row-b">
-            <div class="sname">Bloom Dermatology</div>
-            <div class="smeta"><span class="star">★ 4.8</span><span>(1,120)</span><span class="dot">·</span><span>Sinsa, Seoul</span></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="sec">
-        <div class="sec-t" style="margin-bottom:12px">Read about this concern</div>
-        <div class="ccard">
-          <div class="cthumb">📰</div>
-          <div class="row-b">
-            <div class="ckind">Magazine</div>
-            <div class="ctitle">Acne scar treatments in Korea: how clinics decide the order of sessions</div>
-            <div class="cmeta">K-Beauty Station · Aug 14, 2026</div>
-          </div>
-        </div>
-        <div class="ccard">
-          <div class="cthumb">✍️</div>
-          <div class="row-b">
-            <div class="ckind">Store column</div>
-            <div class="ctitle">What we ask first when someone visits for scar care</div>
-            <div class="cmeta">Bloom Dermatology · Jul 30, 2026</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <nav class="nav">
-      <div class="nav-i"><span class="g">🏠</span>Home</div>
-      <div class="nav-i on"><span class="g">🧭</span>Explore</div>
-      <div class="nav-i"><span class="g">🤍</span>Saved</div>
-      <div class="nav-i"><span class="g">👤</span>My</div>
-    </nav>
-  </div>
-</div>
-
-<!-- ═══════════════ 11. 장소 랜딩 ═══════════════ -->
-<div class="frame">
-  <div class="frame-label">
-    <div class="frame-id">FO-S09 / FO-LAND-04</div>
-    <div class="frame-title">장소 랜딩</div>
-    <div class="frame-desc">상위 지역·주변 역·노선·관련 서비스·검수된 스토어. 하단 행동은 같은 장소 조건을 적용한 조건 결과로 이동.</div>
-  </div>
-  <div class="phone">
-    <div class="scroll has-nav has-cta">
-      <header class="hdr">
-        <button class="hdr-ico hdr-back">‹</button>
-        <div class="hdr-title">Gangnam</div>
-        <button class="hdr-ico">🌐</button>
-      </header>
-
-      <div class="crumb">
-        <a href="#">Explore</a> › <a href="#">Places</a> › <a href="#">Seoul</a> › <span class="cur">Gangnam-gu</span>
-      </div>
-      <div class="land-head">
-        <div class="land-h1">Gangnam</div>
-        <div class="land-sub">Gangnam-gu, Seoul · 38 stores · 210 products</div>
-        <div class="land-body">
-          The district with the highest concentration of dermatology and aesthetic clinics in Seoul.
-          Most clinics sit within a few minutes of Gangnam Station or along Teheran-ro, and many keep
-          English or Chinese speaking staff on weekdays.
-        </div>
-      </div>
-
-      <div class="sec" style="border-top:8px solid var(--gray-mid)">
-        <div class="sec-t" style="margin-bottom:12px">Getting there</div>
-        <div class="stn">
-          <div class="stn-r">
-            <div class="row-b">
-              <div class="stn-nm">Gangnam Station</div>
-              <div class="smeta">22 stores within 10 min walk</div>
-            </div>
-            <span class="line-b l2">Line 2</span>
-            <span class="line-b lsb">Sinbundang</span>
-          </div>
-          <div class="stn-r">
-            <div class="row-b">
-              <div class="stn-nm">Sinnonhyeon Station</div>
-              <div class="smeta">9 stores within 10 min walk</div>
-            </div>
-            <span class="line-b l9">Line 9</span>
-          </div>
-        </div>
-        <div style="margin-top:12px">
-          <div class="rel-l">Nearby places</div>
-          <div class="chips"><span class="chip">Apgujeong Rodeo</span><span class="chip">Sinsa</span><span class="chip">Samseong</span></div>
-        </div>
-      </div>
-
-      <div class="sec">
-        <div class="sec-row">
-          <div class="sec-t">Popular services here</div>
-          <div class="more">See all</div>
-        </div>
-        <div class="chips">
-          <span class="chip">Shurink Universe</span>
-          <span class="chip">Ultherapy</span>
-          <span class="chip">Rejuran Healer</span>
-          <span class="chip">Skin Botox</span>
-          <span class="chip">Thread Lift</span>
-        </div>
-      </div>
-
-      <div class="sec">
-        <div class="sec-row">
-          <div class="sec-t">Stores in Gangnam</div>
-          <div class="more">All 38</div>
-        </div>
-        <div class="scard">
-          <div class="sthumb">🏥</div>
-          <div class="row-b">
-            <div class="sname">CIEL Aesthetic Clinic</div>
-            <div class="smeta"><span class="star">★ 4.9</span><span>(2,341)</span><span class="dot">·</span><span>5 min from Gangnam Stn.</span></div>
-            <div class="ptags" style="margin-top:7px"><span class="ptag">Ultrasound Lifting</span><span class="ptag">Skin Booster</span></div>
-          </div>
-        </div>
-        <div class="scard">
-          <div class="sthumb">🏥</div>
-          <div class="row-b">
-            <div class="sname">Seoul Line Clinic</div>
-            <div class="smeta"><span class="star">★ 4.7</span><span>(864)</span><span class="dot">·</span><span>3 min from Sinnonhyeon Stn.</span></div>
-            <div class="ptags" style="margin-top:7px"><span class="ptag">Thread Lift</span></div>
-          </div>
-        </div>
-        <div class="scard">
-          <div class="sthumb">🏥</div>
-          <div class="row-b">
-            <div class="sname">Aurora Skin Clinic</div>
-            <div class="smeta"><span class="star">★ 4.6</span><span>(512)</span><span class="dot">·</span><span>8 min from Gangnam Stn.</span></div>
-            <div class="ptags" style="margin-top:7px"><span class="ptag">Laser</span><span class="ptag">Microneedling</span></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="cta">
-      <button class="btn fill">See all results in Gangnam</button>
-    </div>
-
-    <nav class="nav">
-      <div class="nav-i"><span class="g">🏠</span>Home</div>
-      <div class="nav-i on"><span class="g">🧭</span>Explore</div>
-      <div class="nav-i"><span class="g">🤍</span>Saved</div>
-      <div class="nav-i"><span class="g">👤</span>My</div>
-    </nav>
-  </div>
-</div>
-
-<!-- ═══════════════ 12. 현재 언어 미공개 ═══════════════ -->
-<div class="frame">
-  <div class="frame-label">
-    <div class="frame-id">FO-S05/06/08/09 / FO-EXP-04 · SEO-02</div>
-    <div class="frame-title">현재 언어 미공개 (찾을 수 없음)</div>
-    <div class="frame-desc">다른 언어로 자동 전환하지 않고 가능한 언어 이동과 탐색 홈 이동만 제공. 전역 메뉴는 유지.</div>
-  </div>
-  <div class="phone">
-    <div class="scroll has-nav">
-      <header class="hdr">
-        <button class="hdr-ico hdr-back">‹</button>
-        <div class="hdr-title">Not available</div>
-        <button class="hdr-ico">🌐</button>
-      </header>
-
-      <div class="empty" style="padding-top:80px">
-        <div class="ic">🌐</div>
-        <div class="t">This page isn't published in English</div>
-        <div class="d">The page you opened exists, but it hasn't been<br>published in the language you're using.</div>
-
-        <div class="lang-list">
-          <div class="lang-r"><div class="nm">日本語</div><div class="a">›</div></div>
-          <div class="lang-r"><div class="nm">简体中文</div><div class="a">›</div></div>
-          <div class="lang-r"><div class="nm">繁體中文</div><div class="a">›</div></div>
-        </div>
-
-        <div class="empty-acts">
-          <div class="act primary">
-            <div><div class="l">Go to Explore</div><div class="s">Browse what is published in English</div></div>
-            <div class="a">›</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <nav class="nav">
-      <div class="nav-i"><span class="g">🏠</span>Home</div>
-      <div class="nav-i on"><span class="g">🧭</span>Explore</div>
-      <div class="nav-i"><span class="g">🤍</span>Saved</div>
-      <div class="nav-i"><span class="g">👤</span>My</div>
-    </nav>
-  </div>
-</div>
-
-<!-- ═══════════════ 13. 저장 ═══════════════ -->
-<div class="frame">
-  <div class="frame-label">
-    <div class="frame-id">FO-S14 / FO-SAVE-01 · FO-NAV-01</div>
-    <div class="frame-title">저장 (서비스 유형 추가)</div>
-    <div class="frame-desc">기존 저장 화면에 서비스 유형이 추가됨. 저장 후 비공개로 바뀐 대상은 삭제하지 않고 볼 수 없는 항목으로 구분해 해제할 수 있게 함.</div>
-  </div>
-  <div class="phone">
-    <div class="scroll has-nav">
-      <header class="hdr">
-        <div class="hdr-title" style="text-align:left;padding-left:16px;font-size:17px;font-weight:800">Saved</div>
-        <button class="hdr-ico">🌐</button>
-      </header>
-
-      <div class="tabs-pill">
-        <span class="chip on">All 14</span>
-        <span class="chip">Services 3</span>
-        <span class="chip">Products 8</span>
-        <span class="chip">Stores 3</span>
-      </div>
-
-      <div style="padding:0 16px 8px">
-        <div class="grp">Services</div>
-        <div class="row">
-          <div class="row-thumb">💫</div>
-          <div class="row-b">
-            <div class="row-nm">Shurink Universe</div>
-            <div class="row-path">Lifting &amp; Contouring › Ultrasound Lifting</div>
-          </div>
-          <button class="cta-fav on" style="width:36px;height:36px;flex:0 0 36px;font-size:15px;align-self:center">♥</button>
-        </div>
-        <div class="row">
-          <div class="row-thumb">💧</div>
-          <div class="row-b">
-            <div class="row-nm">Rejuran Healer</div>
-            <div class="row-path">Skin Care › Skin Booster</div>
-          </div>
-          <button class="cta-fav on" style="width:36px;height:36px;flex:0 0 36px;font-size:15px;align-self:center">♥</button>
-        </div>
-
-        <div class="grp">Products</div>
-        <div class="pcard">
-          <div class="pthumb">💫</div>
-          <div class="pbody">
-            <div class="pstore">CIEL Aesthetic Clinic <span class="dot">·</span> Gangnam</div>
-            <div class="pname">Shurink Universe 300 shots (Full face)</div>
-            <div class="pprice">₩390,000</div>
-          </div>
-        </div>
-
-        <div class="pcard">
-          <div class="pthumb c">🔬</div>
-          <div class="pbody">
-            <div class="pstore">Bloom Dermatology <span class="dot">·</span> Sinsa</div>
-            <div class="pname">Fractional CO2 Laser 1 session (Full face)</div>
-            <div class="pprice">₩280,000</div>
-          </div>
-        </div>
-
-        <div class="grp">Stores</div>
-        <div class="scard">
-          <div class="sthumb">🏥</div>
-          <div class="row-b">
-            <div class="sname">CIEL Aesthetic Clinic</div>
-            <div class="smeta"><span class="star">★ 4.9</span><span>(2,341)</span><span class="dot">·</span><span>Gangnam-gu, Seoul</span></div>
-          </div>
-          <button class="cta-fav on" style="width:36px;height:36px;flex:0 0 36px;font-size:15px;align-self:center">♥</button>
-        </div>
-
-        <div class="grp">Not available now</div>
-        <div class="pcard" style="opacity:.55">
-          <div class="pthumb b" style="filter:grayscale(1)">✨</div>
-          <div class="pbody">
-            <div class="pstore">Bloom Dermatology <span class="dot">·</span> Sinsa</div>
-            <div class="pname">Ultherapy 400 shots (Face + Neck)</div>
-            <div class="ptags"><span class="ptag">Not published right now</span></div>
-          </div>
-          <button class="mini" style="align-self:center">Remove</button>
-        </div>
-      </div>
-    </div>
-
-    <nav class="nav">
-      <div class="nav-i"><span class="g">🏠</span>Home</div>
-      <div class="nav-i"><span class="g">🧭</span>Explore</div>
-      <div class="nav-i on"><span class="g">🤍</span>Saved</div>
-      <div class="nav-i"><span class="g">👤</span>My</div>
-    </nav>
-  </div>
-</div>
-
-</div><!-- /stage -->
-
+<script>
+/* ═══════════════════════════════════════════════════════════
+   데이터. pub = 해당 정본이 공개된 언어. 현재 언어가 없으면 그 언어에 미공개.
+   ═══════════════════════════════════════════════════════════ */
+var LANGS = [['en','영어'],['ja','일본어'],['zh','중국어(간체)'],['zhtw','중국어(번체)']];
+var ALL4 = ['en','ja','zh','zhtw'];
+
+function buildSeed(){
+return {
+categories:[
+ {id:'C1',slug:'skin-care',parent:null,status:'공개',pub:ALL4,n:'스킨케어',
+  d:'피부 톤과 결, 수분 상태를 다루는 시술 묶음입니다. 대부분 여러 회차를 한 프로그램으로 잡습니다.'},
+ {id:'C11',slug:'laser',parent:'C1',status:'공개',pub:ALL4,n:'레이저',d:'파장과 작용 깊이로 나뉘는 레이저 장비 시술입니다.'},
+ {id:'C12',slug:'skin-booster',parent:'C1',status:'공개',pub:['en','ja','zh'],n:'스킨부스터',d:'cc 단위로 주사하는 부스터 시술입니다. 레이저 프로그램과 함께 묶는 경우가 많습니다.'},
+ {id:'C13',slug:'microneedling',parent:'C1',status:'공개',pub:['en','ja'],n:'마이크로니들링',d:'니들 기반 장비 시술로, 회차와 부위 단위로 가격이 정해집니다.'},
+ {id:'C2',slug:'lifting-contouring',parent:null,status:'공개',pub:ALL4,n:'리프팅·윤곽',
+  d:'초음파, 고주파, 실을 써서 피부 탄력과 얼굴 라인을 다루는 시술입니다. 한국 병원은 보통 사용하는 장비와 유지 기간을 기준으로 묶어서 안내합니다.'},
+ {id:'C21',slug:'ultrasound-lifting',parent:'C2',status:'공개',pub:ALL4,n:'초음파 리프팅',d:'라인 단위로 조사하는 집속 초음파 시술이며 샷 수로 계산합니다.'},
+ {id:'C22',slug:'rf-lifting',parent:'C2',status:'공개',pub:['en','ja','zh'],n:'고주파 리프팅',d:'얼굴과 몸에 쓰는 고주파 장비 시술입니다.'},
+ {id:'C23',slug:'thread-lift',parent:'C2',status:'공개',pub:['en','ja'],n:'실 리프팅',d:'피부 아래에 녹는 실을 넣는 시술이며 실 개수로 계산합니다.'},
+ {id:'C3',slug:'injectables',parent:null,status:'공개',pub:ALL4,n:'주사 시술',d:'단위나 용량으로 계획하는 주사 시술입니다.'},
+ {id:'C31',slug:'botox',parent:'C3',status:'공개',pub:ALL4,n:'보톡스',d:'유닛 단위로 계산하는 보툴리눔 톡신 주사입니다.'},
+ {id:'C4',slug:'hair-removal',parent:null,status:'공개',pub:['en','ja'],n:'제모',d:'부위별 회차 패키지로 파는 레이저 제모입니다.'},
+ {id:'C5',slug:'body',parent:null,status:'숨김',pub:ALL4,n:'바디케어',d:'바디 시술입니다.'},
+ {id:'C6',slug:'hair-scalp',parent:null,status:'공개',pub:['ja','zh'],n:'헤어·두피',d:'두피 관리 시술입니다.'}
+],
+services:[
+ {id:'S1',slug:'shurink-universe',status:'공개',pub:ALL4,cats:['C2','C21'],rep:'C21',itr:['I1','I3'],body:['B1','B2'],
+  n:'슈링크 유니버스',
+  d:'얼굴 전체에 라인 단위로 조사하는 집속 초음파 시술입니다. 병원은 샷 수로 계산하며, 샷 수와 시술 범위가 금액을 바꾸는 주된 요소입니다. 보통 한 번 방문으로 끝나는 일정으로 잡습니다.',
+  crit:['샷 수와 그 샷이 덮는 부위','마취 크림과 사후 관리가 금액에 포함되는지','병원이 쓰는 장비 세대'],
+  syn:['울쎄라','슈링크'],views:980,pop:940},
+ {id:'S2',slug:'ultherapy',status:'공개',pub:ALL4,cats:['C2','C21'],rep:'C21',itr:['I1','I3'],body:['B1','B3'],
+  n:'울쎄라피',d:'실시간 영상을 보면서 진행하는 초음파 리프팅입니다. 샷 수와 부위로 금액이 정해지고 보통 한 번 방문으로 끝납니다.',
+  crit:['샷 수와 포함 부위','목까지 같은 회차에 하는지'],syn:['울쎄라'],views:860,pop:880},
+ {id:'S3',slug:'onda-lifting',status:'공개',pub:['en','ja','zh'],cats:['C2','C22'],rep:'C22',itr:['I3'],body:['B1','B4'],
+  n:'온다 리프팅',d:'마이크로웨이브 방식 고주파 장비로 얼굴과 몸에 씁니다. 회차 단위로 판매합니다.',
+  crit:['한 회차가 덮는 부위','병원이 권하는 회차 수'],syn:['울쎄라'],views:420,pop:380},
+ {id:'S4',slug:'rejuran-healer',status:'공개',pub:ALL4,cats:['C1','C12'],rep:'C12',itr:['I4','I5'],body:['B1'],
+  n:'리쥬란 힐러',d:'cc 단위로 주사하는 스킨부스터이며, 레이저나 니들링 프로그램과 묶는 경우가 많습니다.',
+  crit:['한 회차에 쓰는 cc','병원이 함께 묶는 시술'],syn:['리쥬란','연어주사'],views:910,pop:960},
+ {id:'S5',slug:'fractional-co2-laser',status:'공개',pub:ALL4,cats:['C1','C11'],rep:'C11',itr:['I4'],body:['B1'],
+  n:'프락셔널 CO2 레이저',d:'격자 형태로 조사하는 박피형 레이저입니다. 보통 회복 기간을 두고 여러 회차로 계획합니다.',
+  crit:['계획된 회차 수','회복에 걸리는 기간'],syn:['프락셀'],views:520,pop:470},
+ {id:'S6',slug:'microneedling-rf',status:'공개',pub:['en','ja'],cats:['C1','C13'],rep:'C13',itr:['I2','I4'],body:['B1'],
+  n:'니들 고주파',d:'니들을 이용한 고주파 시술로 회차와 부위 단위로 가격이 정해집니다.',
+  crit:['니들 깊이와 시술 부위'],syn:[],views:330,pop:300},
+ {id:'S7',slug:'thread-lift',status:'공개',pub:['en','ja'],cats:['C2','C23'],rep:'C23',itr:['I1'],body:['B2'],
+  n:'실 리프팅',d:'피부 아래에 녹는 실을 넣는 시술입니다. 실 개수로 계산하고 올리려는 부위에 따라 실 종류를 고릅니다.',
+  crit:['실 개수와 실 종류','시술 후 회복 기간'],syn:['민트실'],views:610,pop:520},
+ {id:'S8',slug:'exosome-skin-booster',status:'공개',pub:ALL4,cats:['C1','C12'],rep:'C12',itr:['I5'],body:['B1'],
+  n:'엑소좀 스킨부스터',
+  d:'레이저나 니들링 회차와 함께 안내하는 주사형 스킨부스터 계열입니다. 회차 수와 함께 묶는 시술에 따라 프로그램이 달라집니다.',
+  crit:['한 프로그램으로 권하는 회차 수','어떤 시술과 묶는지와 그때 금액'],syn:[],views:120,pop:90},
+ {id:'S9',slug:'skin-botox',status:'공개',pub:ALL4,cats:['C3','C31'],rep:'C31',itr:['I2'],body:['B1'],
+  n:'스킨 보톡스',d:'얼굴 전체에 얕게 나눠 주사하는 방식이며 유닛 단위로 계산합니다.',
+  crit:['포함된 유닛 수'],syn:[],views:700,pop:650},
+ {id:'S10',slug:'hair-removal-laser',status:'공개',pub:['en','ja'],cats:['C4'],rep:'C4',itr:[],body:['B4'],
+  n:'레이저 제모',d:'회차 패키지로 파는 레이저 제모이며 부위에 따라 금액이 달라집니다.',
+  crit:['패키지에 들어 있는 회차 수'],syn:[],views:280,pop:260},
+ {id:'S11',slug:'scalp-booster',status:'공개',pub:['ja','zh'],cats:['C6'],rep:'C6',itr:[],body:[],
+  n:'두피 부스터',d:'두피에 주사하는 시술입니다.',crit:[],syn:[],views:80,pop:60},
+ {id:'S12',slug:'body-contouring',status:'숨김',pub:ALL4,cats:['C5'],rep:'C5',itr:[],body:['B4'],
+  n:'바디 컨투어링',d:'몸매 관리 시술입니다.',crit:[],syn:['바디라인'],views:40,pop:20}
+],
+interests:[
+ {id:'I1',type:'concern',slug:'sagging-skin',status:'공개',pub:ALL4,n:'처짐',d:'턱선과 볼을 중심으로 얼굴 윤곽이 흐려졌다고 느끼는 상태를 말합니다.'},
+ {id:'I2',type:'concern',slug:'pore-care',status:'공개',pub:['en','ja','zh'],n:'모공',d:'모공이 도드라지고 표면이 고르지 않은 상태로, 피지 관리와 함께 이야기하는 경우가 많습니다.'},
+ {id:'I3',type:'concern',slug:'anti-aging',status:'공개',pub:ALL4,n:'노화 관리',d:'탄력, 잔주름, 전반적인 피부 상태를 폭넓게 묶은 출발점입니다. 대부분 상담을 거쳐 계획을 정합니다.'},
+ {id:'I4',type:'concern',slug:'acne-scars',status:'공개',pub:ALL4,n:'여드름 흉터',
+  d:'트러블이 지나간 뒤 남은 자국이나 울퉁불퉁한 결을 말합니다. 한국 병원은 깊이와 주변 톤에 따라 다른 시술을 제안하며 대부분 상담을 먼저 합니다.'},
+ {id:'I5',type:'concern',slug:'dull-skin',status:'공개',pub:['en','ja'],n:'칙칙함',d:'피부가 지쳐 보이거나 톤이 고르지 않은 상태로, 건조함과 함께 이야기되는 경우가 많습니다.'},
+ {id:'I6',type:'concern',slug:'hair-loss',status:'숨김',pub:ALL4,n:'탈모',d:'모발이 얇아지는 고민입니다.'},
+ {id:'B1',type:'body',slug:'face',status:'공개',pub:ALL4,n:'얼굴 전체',d:'얼굴 전체를 하나의 시술 부위로 봅니다.'},
+ {id:'B2',type:'body',slug:'jawline',status:'공개',pub:ALL4,n:'턱선',d:'아래 얼굴과 턱 라인입니다.'},
+ {id:'B3',type:'body',slug:'neck',status:'공개',pub:['en','ja'],n:'목',d:'얼굴 시술에 덧붙이는 경우가 많은 부위입니다.'},
+ {id:'B4',type:'body',slug:'body',status:'공개',pub:['en','ja'],n:'몸',d:'목 아래 부위입니다.'}
+],
+places:[
+ {id:'PK',type:'country',slug:'korea',parent:null,status:'공개',pub:ALL4,n:'한국',d:'한국입니다.'},
+ {id:'PS',type:'region',slug:'seoul',parent:'PK',status:'공개',pub:ALL4,n:'서울',d:'서울입니다.'},
+ {id:'PB',type:'region',slug:'busan',parent:'PK',status:'공개',pub:['en','ja'],n:'부산',d:'부산입니다.'},
+ {id:'PJ',type:'region',slug:'jeju',parent:'PK',status:'공개',pub:ALL4,n:'제주',d:'제주도입니다. 병원 수가 적고 대부분 제주시 근처에 모여 있습니다.'},
+ {id:'PG',type:'area',slug:'gangnam',parent:'PS',status:'공개',pub:ALL4,n:'강남',
+  d:'서울에서 피부과와 성형외과가 가장 많이 모인 지역입니다. 대부분 강남역 근처나 테헤란로를 따라 있고, 평일에는 영어나 중국어로 응대하는 곳이 많습니다.',
+  stations:['TG','TN']},
+ {id:'PA',type:'area',slug:'apgujeong-rodeo',parent:'PS',status:'공개',pub:ALL4,n:'압구정로데오',
+  d:'강북 쪽에 좁게 모여 있는 병원 밀집 지역으로, 상담 시간을 길게 잡는 곳이 많습니다.',stations:['TA']},
+ {id:'PM',type:'area',slug:'myeongdong',parent:'PS',status:'공개',pub:ALL4,n:'명동',
+  d:'짧은 일정으로 방문하는 고객을 주로 받는 병원이 모여 있는 상권입니다.',stations:[]},
+ {id:'PH',type:'area',slug:'hongdae',parent:'PS',status:'숨김',pub:ALL4,n:'홍대',d:'홍대입니다.',stations:[]},
+ {id:'PSM',type:'area',slug:'seomyeon',parent:'PB',status:'공개',pub:['en','ja'],n:'서면',d:'부산의 주요 병원 밀집 지역입니다.',stations:[]},
+ {id:'TG',type:'station',slug:'gangnam-station',parent:'PG',status:'공개',pub:ALL4,n:'강남역',d:'강남역입니다.',lines:['L2','LSB']},
+ {id:'TN',type:'station',slug:'sinnonhyeon-station',parent:'PG',status:'공개',pub:ALL4,n:'신논현역',d:'신논현역입니다.',lines:['L9']},
+ {id:'TA',type:'station',slug:'apgujeong-rodeo-station',parent:'PA',status:'공개',pub:ALL4,n:'압구정로데오역',d:'압구정로데오역입니다.',lines:['LSB']},
+ {id:'L2',type:'line',slug:'line-2',parent:null,status:'공개',pub:ALL4,n:'2호선',d:'2호선입니다.'},
+ {id:'L9',type:'line',slug:'line-9',parent:null,status:'공개',pub:ALL4,n:'9호선',d:'9호선입니다.'},
+ {id:'LSB',type:'line',slug:'sinbundang',parent:null,status:'공개',pub:ALL4,n:'신분당선',d:'신분당선입니다.'}
+],
+stores:[
+ {id:'ST1',name:'시엘의원',place:'PG',status:'공개',rating:4.9,rev:2341,walk:'강남역 도보 5분',reviewed:true},
+ {id:'ST2',name:'블룸피부과',place:'PA',status:'공개',rating:4.8,rev:1120,walk:'압구정로데오역 도보 2분',reviewed:true},
+ {id:'ST3',name:'서울라인의원',place:'PG',status:'공개',rating:4.7,rev:864,walk:'신논현역 도보 3분',reviewed:true},
+ {id:'ST4',name:'루미에르의원',place:'PA',status:'공개',rating:4.6,rev:512,walk:'압구정로데오역 도보 6분',reviewed:true},
+ {id:'ST5',name:'오로라스킨의원',place:'PG',status:'공개',rating:4.6,rev:498,walk:'강남역 도보 8분',reviewed:true},
+ {id:'ST6',name:'하늘의원',place:'PM',status:'비공개',rating:4.5,rev:210,walk:'',reviewed:true},
+ {id:'ST7',name:'제주글로우의원',place:'PJ',status:'공개',rating:4.4,rev:96,walk:'',reviewed:false}
+],
+products:[
+ {id:'PR1',store:'ST1',status:'공개',price:390000,views:1400,pop:1300,n:'슈링크 유니버스 300샷 (얼굴 전체)',links:[{s:'S1',r:'승인'}]},
+ {id:'PR2',store:'ST2',status:'공개',price:1250000,views:900,pop:840,n:'울쎄라피 400샷 (얼굴+목)',links:[{s:'S2',r:'승인'}]},
+ {id:'PR3',store:'ST4',status:'공개',price:260000,views:640,pop:600,n:'온다 리프팅 바디 1회',links:[{s:'S3',r:'승인'}]},
+ {id:'PR4',store:'ST3',status:'공개',price:880000,views:700,pop:720,n:'민트실 리프팅 10줄',links:[{s:'S7',r:'승인'}]},
+ {id:'PR5',store:'ST2',status:'공개',price:320000,views:1200,pop:1250,n:'리쥬란 힐러 2cc + 진정관리',links:[{s:'S4',r:'승인'}]},
+ {id:'PR6',store:'ST2',status:'공개',price:280000,views:560,pop:540,n:'프락셔널 CO2 1회 (얼굴 전체)',links:[{s:'S5',r:'승인'}]},
+ {id:'PR7',store:'ST5',status:'공개',price:240000,views:380,pop:340,n:'니들 고주파 1회',links:[{s:'S6',r:'승인'}]},
+ {id:'PR8',store:'ST3',status:'공개',price:690000,views:820,pop:700,n:'슈링크 유니버스 600샷 + 쿨링관리',links:[{s:'S1',r:'승인'}]},
+ {id:'PR9',store:'ST1',status:'공개',price:150000,views:1100,pop:1050,n:'스킨 보톡스 50유닛',links:[{s:'S9',r:'승인'}]},
+ {id:'PR10',store:'ST1',status:'공개',price:null,views:300,pop:280,n:'프리미엄 리프팅 프로그램 (상담 후 결정)',links:[{s:'S1',r:'승인'},{s:'S7',r:'승인'}]},
+ {id:'PR11',store:'ST6',status:'공개',price:900000,views:200,pop:180,n:'울쎄라피 목 집중 200샷',links:[{s:'S2',r:'승인'}]},
+ {id:'PR12',store:'ST1',status:'공개',price:99000,views:150,pop:120,n:'리프팅 체험 1회',links:[{s:'S1',r:'보류'}]},
+ {id:'PR13',store:'ST7',status:'공개',price:180000,views:90,pop:70,n:'제주 글로우 베이직',links:[{s:'S4',r:'반려'}]},
+ {id:'PR14',store:'ST5',status:'비공개',price:210000,views:80,pop:60,n:'오로라 레이저토닝 3회',links:[{s:'S5',r:'승인'}]}
+],
+contents:[
+ {id:'CT1',kind:'magazine',status:'공개',lang:'en',date:'2026-09-02',author:'K-Beauty Station',
+  title:'초음파 리프팅의 샷 수는 무엇을 뜻하는가',svc:['S1','S2'],itr:['I3']},
+ {id:'CT2',kind:'column',status:'공개',lang:'en',date:'2026-08-21',author:'시엘의원',
+  title:'처음 오신 분의 리프팅 일정을 잡는 방법',svc:['S1'],itr:[]},
+ {id:'CT3',kind:'magazine',status:'공개',lang:'en',date:'2026-08-14',author:'K-Beauty Station',
+  title:'여드름 흉터, 병원은 어떤 순서로 회차를 정하나',svc:['S5'],itr:['I4']},
+ {id:'CT4',kind:'column',status:'검수대기',lang:'en',date:'2026-07-30',author:'블룸피부과',
+  title:'흉터 상담에서 가장 먼저 여쭙는 것',svc:['S5'],itr:['I4']},
+ {id:'CT5',kind:'magazine',status:'공개',lang:'ja',date:'2026-08-08',author:'K-Beauty Station',
+  title:'슈링크 샷 수를 정하는 기준 (일본어 공개본)',svc:['S1'],itr:['I3']},
+ {id:'CT6',kind:'column',status:'숨김',lang:'en',date:'2026-07-03',author:'서울라인의원',
+  title:'실 리프팅 후 안내문',svc:['S7'],itr:['I1']},
+ {id:'CT7',kind:'magazine',status:'공개',lang:'en',date:'2026-06-18',author:'K-Beauty Station',
+  title:'턱선에는 실과 초음파 중 무엇을 고를까',svc:['S1','S7'],itr:['I1']}
+]
+};
+}
+
+/* ═══ 상태 ═══ */
+var DB, VIEW;
+function resetDB(){
+  DB = buildSeed();
+  VIEW = {
+    route:'explore', id:null, lang:'en', backRoute:null,
+    q:'', qSubmitted:'', stype:'all',
+    conds:[], tab:'product', sort:'views', page:1,
+    pickAxis:null, pickSel:[],
+    loggedIn:false, saved:[], pending:null, ret:null,
+    fail:{reco:false, content:false, more:false},
+    sheet:null, toast:'', altLangs:[], lastLanding:null
+  };
+  if (typeof render === 'function') render();
+}
+
+/* ═══ 조회 ═══ */
+function byId(a,id){ for(var i=0;i<a.length;i++) if(a[i].id===id) return a[i]; return null; }
+function C(id){ return byId(DB.categories,id); }
+function S(id){ return byId(DB.services,id); }
+function I(id){ return byId(DB.interests,id); }
+function P(id){ return byId(DB.places,id); }
+function ST(id){ return byId(DB.stores,id); }
+function PR(id){ return byId(DB.products,id); }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function langLabel(c){ for(var i=0;i<LANGS.length;i++) if(LANGS[i][0]===c) return LANGS[i][1]; return c; }
+
+/* 현재 언어에 공개된 정본만 명칭을 돌려준다 */
+function pubOK(e){ return !!(e && e.pub && e.pub.indexOf(VIEW.lang)>=0); }
+function nm(e){ return pubOK(e) ? e.n : null; }
+function dsc(e){ return pubOK(e) ? e.d : null; }
+
+/* ═══ 판정 로직 (순수 함수) ═══ */
+function judgeEntity(e, parentGetter){
+  if(!e) return {ok:false, why:'notfound'};
+  if(e.status!=='공개') return {ok:false, why:'notfound'};
+  if(!pubOK(e)) return {ok:false, why:'lang', langs:e.pub.slice()};
+  if(e.parent){
+    var p = parentGetter(e.parent);
+    if(!p || p.status!=='공개') return {ok:false, why:'notfound'};
+    if(!pubOK(p)) return {ok:false, why:'lang', langs:e.pub.filter(function(l){ return p.pub.indexOf(l)>=0; })};
+  }
+  return {ok:true};
+}
+function judgeCat(c){ return judgeEntity(c, C); }
+function judgePlace(p){ return judgeEntity(p, P); }
+function judgeInterest(x){ return judgeEntity(x, function(){ return null; }); }
+function judgeService(s){
+  if(!s) return {ok:false, why:'notfound'};
+  if(s.status!=='공개') return {ok:false, why:'notfound'};
+  if(!pubOK(s)) return {ok:false, why:'lang', langs:s.pub.slice()};
+  var rep = C(s.rep), j = judgeCat(rep);
+  if(!j.ok) return j.why==='lang'
+    ? {ok:false, why:'lang', langs:s.pub.filter(function(l){ return rep.pub.indexOf(l)>=0; })}
+    : {ok:false, why:'notfound'};
+  return {ok:true};
+}
+function visibleServices(){ return DB.services.filter(function(s){ return judgeService(s).ok; }); }
+function visibleCats(){ return DB.categories.filter(function(c){ return judgeCat(c).ok; }); }
+function visibleInterests(t){ return DB.interests.filter(function(x){ return x.type===t && judgeInterest(x).ok; }); }
+
+function approvedIds(p){ return p.links.filter(function(l){ return l.r==='승인'; }).map(function(l){ return l.s; }); }
+function productVisible(p){
+  if(p.status!=='공개') return false;
+  var st = ST(p.store);
+  if(!st || st.status!=='공개' || !st.reviewed) return false;
+  return approvedIds(p).some(function(id){ return judgeService(S(id)).ok; });
+}
+function storeVisible(st){
+  if(st.status!=='공개' || !st.reviewed) return false;
+  return DB.products.some(function(p){ return p.store===st.id && productVisible(p); });
+}
+function productsOfService(sid){ return DB.products.filter(function(p){ return productVisible(p) && approvedIds(p).indexOf(sid)>=0; }); }
+function storesOfService(sid){
+  var out=[], seen={};
+  productsOfService(sid).forEach(function(p){ if(!seen[p.store]){ seen[p.store]=1; var s=ST(p.store); if(storeVisible(s)) out.push(s); } });
+  return out;
+}
+function servicesOfCat(cid){ return visibleServices().filter(function(s){ return catMatches(s.cats, cid); }); }
+function servicesOfInterest(iid){ return visibleServices().filter(function(s){ return s.itr.indexOf(iid)>=0 || s.body.indexOf(iid)>=0; }); }
+function servicesOfPlace(pid){
+  var out=[], seen={};
+  DB.products.forEach(function(p){
+    if(!productVisible(p) || !placeMatches(ST(p.store).place, pid)) return;
+    approvedIds(p).forEach(function(sid){ if(judgeService(S(sid)).ok && !seen[sid]){ seen[sid]=1; out.push(S(sid)); } });
+  });
+  return out;
+}
+function placeMatches(storePlaceId, condId){
+  var cur = P(storePlaceId);
+  while(cur){ if(cur.id===condId) return true; cur = cur.parent?P(cur.parent):null; }
+  return false;
+}
+function catMatches(cats, condId){
+  for(var i=0;i<cats.length;i++){
+    var cur = C(cats[i]);
+    while(cur){ if(cur.id===condId) return true; cur = cur.parent?C(cur.parent):null; }
+  }
+  return false;
+}
+
+/* 관련 콘텐츠: 원문 승인·공개 + 현재 언어 공개 + 연결 대상 공개. 중복은 1회 */
+function contentsFor(kind, id){
+  var out=[], seen={};
+  DB.contents.forEach(function(c){
+    if(seen[c.id]) return;
+    if(c.status!=='공개') return;
+    if(c.lang!==VIEW.lang) return;
+    var linked = kind==='svc' ? c.svc.indexOf(id)>=0 : c.itr.indexOf(id)>=0;
+    if(!linked) return;
+    var t = kind==='svc' ? judgeService(S(id)) : judgeInterest(I(id));
+    if(!t.ok) return;
+    seen[c.id]=1; out.push(c);
+  });
+  return out;
+}
+
+/* 조건 결과. 같은 축 OR, 다른 축 AND */
+function byAxis(conds){ var g={}; conds.forEach(function(c){ (g[c.axis]=g[c.axis]||[]).push(c.id); }); return g; }
+function serviceMatches(s, conds){
+  var g = byAxis(conds);
+  if(g.cat && !g.cat.some(function(id){ return catMatches(s.cats,id); })) return false;
+  if(g.itr && !g.itr.some(function(id){ return s.itr.indexOf(id)>=0; })) return false;
+  if(g.body && !g.body.some(function(id){ return s.body.indexOf(id)>=0; })) return false;
+  if(g.svc && g.svc.indexOf(s.id)<0) return false;
+  if(g.plc && !g.plc.some(function(id){
+      return productsOfService(s.id).some(function(p){ return placeMatches(ST(p.store).place,id); }); })) return false;
+  return true;
+}
+function resultServices(conds){ return visibleServices().filter(function(s){ return serviceMatches(s,conds); }); }
+function resultProducts(conds){
+  var g = byAxis(conds);
+  var rest = conds.filter(function(c){ return c.axis!=='plc'; });
+  return DB.products.filter(function(p){
+    if(!productVisible(p)) return false;
+    if(g.plc && !g.plc.some(function(id){ return placeMatches(ST(p.store).place,id); })) return false;
+    if(!rest.length) return true;
+    return approvedIds(p).map(S).filter(function(s){ return judgeService(s).ok; })
+      .some(function(s){ return serviceMatches(s, rest); });
+  });
+}
+function resultStores(conds){
+  var g = byAxis(conds);
+  var rest = conds.filter(function(c){ return c.axis!=='plc'; });
+  return DB.stores.filter(function(st){
+    if(!storeVisible(st)) return false;
+    if(g.plc && !g.plc.some(function(id){ return placeMatches(st.place,id); })) return false;
+    if(!rest.length) return true;
+    return DB.products.some(function(p){
+      if(p.store!==st.id || !productVisible(p)) return false;
+      return approvedIds(p).map(S).filter(function(s){ return judgeService(s).ok; })
+        .some(function(s){ return serviceMatches(s, rest); });
+    });
+  });
+}
+function countTab(conds, tab){
+  return tab==='service' ? resultServices(conds).length
+       : tab==='store'   ? resultStores(conds).length
+       : resultProducts(conds).length;
+}
+function sortProducts(list, sort){
+  var a = list.slice();
+  if(sort==='views') a.sort(function(x,y){ return y.views-x.views; });
+  else if(sort==='pop') a.sort(function(x,y){ return y.pop-x.pop; });
+  else {
+    var priced = a.filter(function(p){ return p.price!=null; });
+    var none = a.filter(function(p){ return p.price==null; });
+    priced.sort(function(x,y){ return sort==='asc' ? x.price-y.price : y.price-x.price; });
+    a = priced.concat(none);
+  }
+  return a;
+}
+
+/* 정본 검색. 동의어는 별도 결과를 만들지 않고 연결된 서비스 행에 표시 */
+function searchCanonical(q){
+  var s = String(q||'').trim().toLowerCase();
+  var out = {service:[], concern:[], category:[], place:[]};
+  if(!s) return out;
+  visibleServices().forEach(function(sv){
+    if(sv.n.toLowerCase().indexOf(s)>=0){ out.service.push({e:sv, by:'name'}); return; }
+    var hit = sv.syn.filter(function(t){ return t.toLowerCase().indexOf(s)>=0; })[0];
+    if(hit) out.service.push({e:sv, by:'syn', syn:hit});
+  });
+  visibleInterests('concern').concat(visibleInterests('body')).forEach(function(x){
+    if(x.n.toLowerCase().indexOf(s)>=0) out.concern.push({e:x, by:'name'});
+  });
+  visibleCats().forEach(function(c){ if(c.n.toLowerCase().indexOf(s)>=0) out.category.push({e:c, by:'name'}); });
+  DB.places.filter(function(p){ return p.type!=='line' && judgePlace(p).ok; })
+    .forEach(function(p){ if(p.n.toLowerCase().indexOf(s)>=0) out.place.push({e:p, by:'name'}); });
+  return out;
+}
+
+function catPath(cid){ var a=[],c=C(cid); while(c){ a.unshift(nm(c)||c.n); c=c.parent?C(c.parent):null; } return a.join(' > '); }
+function placePath(pid){ var a=[],p=P(pid); while(p){ a.unshift(nm(p)||p.n); p=p.parent?P(p.parent):null; } return a.join(' > '); }
+function won(v){ return v==null ? null : v.toLocaleString('ko-KR')+'원'; }
+
+/* URL */
+function urlOf(){
+  var b='k-beautystation.com/'+VIEW.lang;
+  switch(VIEW.route){
+    case 'home': return b;
+    case 'explore': return b+'/explore';
+    case 'pick': return b+'/explore';
+    case 'search': return b+'/explore/search'+(VIEW.qSubmitted?'?q='+encodeURIComponent(VIEW.qSubmitted):'');
+    case 'results': return b+'/explore/results';
+    case 'cat': return b+'/categories/'+(C(VIEW.id)?C(VIEW.id).slug:'');
+    case 'svc': return b+'/services/'+(S(VIEW.id)?S(VIEW.id).slug:'');
+    case 'itr': return b+'/interests/'+(I(VIEW.id)?I(VIEW.id).slug:'');
+    case 'plc': return b+'/places/'+(P(VIEW.id)?P(VIEW.id).slug:'');
+    case 'products': return b+'/products';
+    case 'stores': return b+'/stores';
+    case 'pdetail': return b+'/products/'+VIEW.id;
+    case 'sdetail': return b+'/stores/'+VIEW.id;
+    case 'saved': return b+'/saved';
+    case 'my': return b+'/my';
+    case 'login': return b+'/login';
+    case 'unavailable': case 'notfound':
+      var L = VIEW.lastLanding;
+      if(!L) return b+'/explore';
+      var seg = {cat:'categories',svc:'services',itr:'interests',plc:'places'}[L.route];
+      var e = L.route==='cat'?C(L.id):L.route==='svc'?S(L.id):L.route==='itr'?I(L.id):P(L.id);
+      return b+'/'+seg+'/'+(e?e.slug:'');
+    default: return b+'/explore';
+  }
+}
+
+/* ═══ 이동 ═══ */
+function go(route, id){
+  VIEW.sheet=null; VIEW.toast='';
+  if(route==='cat'||route==='svc'||route==='itr'||route==='plc'){
+    VIEW.lastLanding = {route:route, id:id};
+    var e = route==='cat'?C(id) : route==='svc'?S(id) : route==='itr'?I(id) : P(id);
+    var j = route==='cat'?judgeCat(e) : route==='svc'?judgeService(e) : route==='itr'?judgeInterest(e) : judgePlace(e);
+    if(!j.ok){
+      VIEW.route = j.why==='lang' ? 'unavailable' : 'notfound';
+      VIEW.altLangs = j.langs || [];
+      render(); return;
+    }
+  }
+  if(route==='results') VIEW.page=1;
+  VIEW.route = route; VIEW.id = (id==null?null:id);
+  render();
+}
+function setLang(c){ VIEW.lang=c; VIEW.sheet=null;
+  if(VIEW.route==='unavailable' && VIEW.lastLanding){ go(VIEW.lastLanding.route, VIEW.lastLanding.id); return; }
+  if(['cat','svc','itr','plc'].indexOf(VIEW.route)>=0){ go(VIEW.route, VIEW.id); return; }
+  VIEW.conds = VIEW.conds.filter(function(cd){
+    var e = cd.axis==='cat'?C(cd.id) : cd.axis==='plc'?P(cd.id) : cd.axis==='svc'?S(cd.id) : I(cd.id);
+    return pubOK(e);
+  });
+  render();
+}
+function addCond(axis,id){ if(!VIEW.conds.some(function(c){return c.axis===axis&&c.id===id;})) VIEW.conds.push({axis:axis,id:id}); }
+function removeCond(axis,id){
+  VIEW.conds = VIEW.conds.filter(function(c){ return !(c.axis===axis&&c.id===id); });
+  if(!VIEW.conds.length){ go('explore'); return; }
+  VIEW.page=1; render();
+}
+function condName(c){
+  var e = c.axis==='cat'?C(c.id) : c.axis==='plc'?P(c.id) : c.axis==='svc'?S(c.id) : I(c.id);
+  return (e && e.n) || c.id;
+}
+function setTab(t){ VIEW.tab=t; VIEW.page=1; if(t!=='product'&&(VIEW.sort==='asc'||VIEW.sort==='desc')) VIEW.sort='views'; render(); }
+function setSort(s){ VIEW.sort=s; VIEW.page=1; VIEW.sheet=null; render(); }
+function openSearch(q){ VIEW.route='search'; VIEW.q=q||''; VIEW.qSubmitted=q||''; VIEW.stype='all'; render(); }
+function submitSearch(){
+  var v = String(VIEW.q||'').trim();
+  if(!v){ VIEW.toast='검색어를 입력해 주세요.'; render(); return; }
+  VIEW.qSubmitted=v; VIEW.stype='all'; render();
+}
+function applyConds(conds, tab){ VIEW.conds=conds; VIEW.tab=tab||'product'; go('results'); }
+function isSaved(k,id){ return VIEW.saved.some(function(s){ return s.kind===k&&s.id===id; }); }
+function toggleSave(k,id){
+  if(!VIEW.loggedIn){
+    VIEW.pending={kind:k,id:id}; VIEW.ret={route:VIEW.route,id:VIEW.id};
+    VIEW.route='login'; render(); return;
+  }
+  if(isSaved(k,id)) VIEW.saved = VIEW.saved.filter(function(s){ return !(s.kind===k&&s.id===id); });
+  else { VIEW.saved.push({kind:k,id:id}); VIEW.toast='저장했습니다.'; }
+  render();
+}
+function doLogin(){
+  VIEW.loggedIn=true;
+  if(VIEW.ret){ VIEW.route=VIEW.ret.route; VIEW.id=VIEW.ret.id; VIEW.ret=null; }
+  if(VIEW.pending){
+    if(!isSaved(VIEW.pending.kind,VIEW.pending.id)) VIEW.saved.push(VIEW.pending);
+    VIEW.toast='저장했습니다.'; VIEW.pending=null;
+  }
+  render();
+}
+function cancelLogin(){
+  if(VIEW.ret){ VIEW.route=VIEW.ret.route; VIEW.id=VIEW.ret.id; VIEW.ret=null; } else VIEW.route='explore';
+  VIEW.pending=null; render();
+}
+function navTo(r){
+  if((r==='saved'||r==='my') && !VIEW.loggedIn){ VIEW.ret={route:r,id:null}; VIEW.pending=null; VIEW.route='login'; render(); return; }
+  go(r);
+}
+function setFail(a,on){ VIEW.fail[a]=!!on; render(); }
+function back(){
+  if(VIEW.route==='pick' && VIEW.conds.length) { go('results'); return; }
+  go('explore');
+}
+
+/* ═══ 렌더 ═══ */
+var vp = document.getElementById('vp');
+
+function navBar(active){
+  var items=[['home','홈'],['explore','탐색'],['saved','저장'],['my','마이페이지']];
+  return '<nav class="nav">'+items.map(function(it){
+    return '<button class="nav-i'+(it[0]===active?' on':'')+'" onclick="navTo(\''+it[0]+'\')"><span class="sq"></span>'+it[1]+'</button>';
+  }).join('')+'</nav>';
+}
+function hdrBack(title){
+  return '<header class="hdr"><button class="hdr-ico hdr-back" onclick="back()">&lt;</button>'+
+    '<div class="hdr-title">'+esc(title)+'</div>'+
+    '<button class="lang-btn" onclick="VIEW.sheet=\'lang\';render()">'+langLabel(VIEW.lang)+'</button></header>';
+}
+function hdrTop(title, isLogo){
+  return '<header class="hdr">'+(isLogo?'<div class="hdr-logo">K-BEAUTY STATION</div>':'<div class="hdr-big">'+esc(title)+'</div>')+
+    '<button class="lang-btn" onclick="VIEW.sheet=\'lang\';render()">'+langLabel(VIEW.lang)+'</button></header>';
+}
+
+function render(){
+  var body;
+  switch(VIEW.route){
+    case 'home': body=viewHome(); break;
+    case 'explore': body=viewExplore(); break;
+    case 'pick': body=viewPick(); break;
+    case 'search': body=viewSearch(); break;
+    case 'results': body=viewResults(); break;
+    case 'cat': body=viewCat(); break;
+    case 'svc': body=viewSvc(); break;
+    case 'itr': body=viewItr(); break;
+    case 'plc': body=viewPlc(); break;
+    case 'products': body=viewList('products'); break;
+    case 'stores': body=viewList('stores'); break;
+    case 'pdetail': body=viewPdetail(); break;
+    case 'sdetail': body=viewSdetail(); break;
+    case 'saved': body=viewSaved(); break;
+    case 'my': body=viewMy(); break;
+    case 'login': body=viewLogin(); break;
+    case 'unavailable': body=viewUnavailable(); break;
+    default: body=viewNotFound();
+  }
+  vp.innerHTML = body + (VIEW.sheet?sheet():'') + (VIEW.toast?'<div class="toast">'+esc(VIEW.toast)+'</div>':'');
+  document.getElementById('urlText').textContent = urlOf();
+  if(VIEW.toast){ setTimeout(function(){ VIEW.toast=''; var t=vp.querySelector('.toast'); if(t) t.remove(); },2200); }
+}
+function sheet(){
+  if(VIEW.sheet==='lang'){
+    return '<div class="sheet-bg" onclick="VIEW.sheet=null;render()"><div class="sheet" onclick="event.stopPropagation()">'+
+      '<div class="sheet-h">화면 언어</div>'+
+      LANGS.map(function(l){ return '<button class="sheet-i'+(l[0]===VIEW.lang?' on':'')+'" onclick="setLang(\''+l[0]+'\')">'+l[1]+(l[0]===VIEW.lang?'<span>선택됨</span>':'')+'</button>'; }).join('')+
+      '</div></div>';
+  }
+  if(VIEW.sheet==='sort'){
+    var o=[['views','조회순'],['pop','인기순']];
+    if(VIEW.tab==='product') o=o.concat([['asc','낮은 가격순'],['desc','높은 가격순']]);
+    return '<div class="sheet-bg" onclick="VIEW.sheet=null;render()"><div class="sheet" onclick="event.stopPropagation()">'+
+      '<div class="sheet-h">정렬</div>'+
+      o.map(function(x){ return '<button class="sheet-i'+(x[0]===VIEW.sort?' on':'')+'" onclick="setSort(\''+x[0]+'\')">'+x[1]+(x[0]===VIEW.sort?'<span>선택됨</span>':'')+'</button>'; }).join('')+
+      '</div></div>';
+  }
+  return '';
+}
+
+/* ── 홈 (기존 화면) ── */
+function viewHome(){
+  return '<div class="scroll pad-nav">'+hdrTop('',true)+
+    '<div class="hero-home"><div class="t">한국에서 받을 시술을<br>도착 전에 정하세요</div>'+
+    '<div class="s">검수된 병원과 상품을 휴대폰에서 바로 확인합니다.</div></div>'+
+    '<div class="sec"><div class="sec-row"><div class="sec-t">인기 상품</div>'+
+    '<button class="more" onclick="go(\'products\')">전체 보기</button></div>'+
+    DB.products.filter(productVisible).slice(0,3).map(productCard).join('')+'</div>'+
+    '</div>'+navBar('home');
+}
+
+/* ── 탐색 홈 ── */
+function viewExplore(){
+  var mains = visibleCats().filter(function(c){ return !c.parent; });
+  var subs = visibleCats().filter(function(c){ return c.parent; });
+  var concerns = visibleInterests('concern');
+  var bodies = visibleInterests('body');
+  var areas = DB.places.filter(function(p){ return p.type==='area' && judgePlace(p).ok; });
+  var top = visibleServices().slice().sort(function(a,b){ return b.views-a.views; }).slice(0,3);
+
+  var recoSvc = VIEW.fail.reco
+    ? '<div class="retry"><div class="t">추천을 불러오지 못했습니다.<br>검색과 네 가지 시작점은 그대로 쓸 수 있습니다.</div>'+
+      '<div class="b"><button class="mini on" onclick="setFail(\'reco\',false)">다시 시도</button></div></div>'
+    : (top.length ? top.map(serviceRow).join('')
+       : '<div class="zero"><div class="t">이 언어로 공개된 서비스가 없습니다</div>'+
+         '<div class="d">다른 언어를 고르거나 전체 목록에서 찾아보세요.</div></div>');
+
+  var recoPlace = VIEW.fail.reco ? '' :
+    '<div class="sec"><div class="sec-row"><div class="sec-t">인기 지역</div>'+
+    '<button class="more" onclick="openPick(\'plc\')">전체 보기</button></div>'+
+    (areas.length
+      ? '<div class="chips">'+areas.map(function(p){ return '<button class="chip" onclick="go(\'plc\',\''+p.id+'\')">'+esc(p.n)+'</button>'; }).join('')+'</div>'
+      : '<div class="zero"><div class="t">이 언어로 공개된 지역이 없습니다</div></div>')+
+    '</div>';
+
+  return '<div class="scroll pad-nav">'+hdrTop('',true)+
+    '<div style="padding:18px 16px 16px"><div style="font-size:18px;font-weight:700;line-height:1.45">'+
+    '시술 이름을 몰라도<br>찾을 수 있습니다</div>'+
+    '<div style="font-size:12px;color:var(--ink3);margin-top:7px;line-height:1.6">분류, 고민, 부위, 지역 중 아무 데서나 시작하세요.</div></div>'+
+    '<div style="padding:0 16px 18px"><div class="searchbar" onclick="openSearch(\'\')">시술·고민·지역 검색</div></div>'+
+    '<div class="sec" style="border-top:6px solid var(--fill)">'+
+    '<div class="sec-t">무엇부터 고를까요</div><div class="sec-s">하나를 고른 뒤 다른 조건을 더할 수 있습니다.</div>'+
+    '<div class="axis-grid">'+
+      axisCard('cat','분류', mains.length+'개 대분류 · '+subs.length+'개 중분류')+
+      axisCard('itr','고민', concerns.length+'개')+
+      axisCard('body','부위', bodies.length+'개')+
+      axisCard('plc','지역', areas.length+'개')+
+    '</div></div>'+
+    '<div class="sec"><div class="sec-row"><div class="sec-t">인기 서비스</div>'+
+    (VIEW.fail.reco?'':'<button class="more" onclick="openPick(\'svc\')">전체 보기</button>')+'</div>'+recoSvc+'</div>'+
+    recoPlace+
+    '<div class="sec"><div class="sec-t">전체에서 찾기</div>'+
+    '<div class="sec-s">상품 목록과 스토어 목록은 여기서 계속 들어갈 수 있습니다.</div>'+
+    '<div class="btn-pair"><button class="btn sm" onclick="go(\'products\')">전체 상품</button>'+
+    '<button class="btn sm" onclick="go(\'stores\')">전체 스토어</button></div></div>'+
+    '</div>'+navBar('explore');
+}
+function axisCard(axis,label,sub){
+  return '<button class="axis" onclick="openPick(\''+axis+'\')"><div class="nm">'+label+'</div><div class="ct">'+sub+'</div></button>';
+}
+function serviceRow(s){
+  return '<button class="row" onclick="go(\'svc\',\''+s.id+'\')"><div class="ph ph-52"></div>'+
+    '<div class="row-b"><div class="row-nm">'+esc(s.n)+'</div>'+
+    '<div class="row-path">'+esc(catPath(s.rep))+'</div></div><div class="row-arrow">&gt;</div></button>';
+}
+
+/* ── 조건 선택 ── */
+function openPick(axis){
+  VIEW.pickAxis=axis;
+  VIEW.pickSel = VIEW.conds.filter(function(c){ return c.axis===axis; }).map(function(c){ return c.id; });
+  VIEW.route='pick'; render();
+}
+function pickToggle(id){ var i=VIEW.pickSel.indexOf(id); if(i>=0) VIEW.pickSel.splice(i,1); else VIEW.pickSel.push(id); render(); }
+function pickDirty(){
+  var cur = VIEW.conds.filter(function(c){ return c.axis===VIEW.pickAxis; }).map(function(c){ return c.id; }).sort().join(',');
+  return cur !== VIEW.pickSel.slice().sort().join(',');
+}
+function pickApply(){
+  var ax=VIEW.pickAxis;
+  VIEW.conds = VIEW.conds.filter(function(c){ return c.axis!==ax; });
+  VIEW.pickSel.forEach(function(id){ VIEW.conds.push({axis:ax,id:id}); });
+  if(!VIEW.conds.length){ go('explore'); return; }
+  VIEW.page=1; go('results');
+}
+function viewPick(){
+  var ax=VIEW.pickAxis, title='', items=[];
+  if(ax==='cat'){
+    title='분류';
+    visibleCats().filter(function(c){ return !c.parent; }).forEach(function(c){
+      items.push({grp:c.n, id:c.id, nm:c.n+' 전체', sub:''});
+      visibleCats().filter(function(x){ return x.parent===c.id; }).forEach(function(x){ items.push({grp:c.n, id:x.id, nm:x.n, sub:''}); });
+    });
+  } else if(ax==='itr'){ title='고민'; visibleInterests('concern').forEach(function(x){ items.push({grp:'고민', id:x.id, nm:x.n, sub:''}); });
+  } else if(ax==='body'){ title='부위'; visibleInterests('body').forEach(function(x){ items.push({grp:'부위', id:x.id, nm:x.n, sub:''}); });
+  } else if(ax==='plc'){
+    title='지역';
+    DB.places.filter(function(p){ return p.type==='region' && judgePlace(p).ok; }).forEach(function(r){
+      items.push({grp:r.n, id:r.id, nm:r.n+' 전체', sub:''});
+      DB.places.filter(function(p){ return p.parent===r.id && p.type==='area' && judgePlace(p).ok; })
+        .forEach(function(a){ items.push({grp:r.n, id:a.id, nm:a.n, sub:''}); });
+    });
+  } else {
+    title='서비스';
+    visibleServices().forEach(function(s){ items.push({grp:'서비스', id:s.id, nm:s.n, sub:catPath(s.rep), link:true}); });
+  }
+
+  var html='', last=null;
+  if(!items.length){
+    html = '<div class="empty" style="padding-top:60px"><div class="t">이 언어로 공개된 항목이 없습니다</div>'+
+      '<div class="d">다른 언어를 고르거나 전체 목록에서 찾아보세요.</div>'+
+      '<div class="empty-acts">'+act('화면 언어 바꾸기','현재 언어에 공개된 정본만 보여 줍니다','VIEW.sheet=\'lang\';render()',true)+
+      act('전체 상품 보기','조건 없이 전체 목록으로 이동','go(\'products\')')+'</div></div>';
+  } else {
+    items.forEach(function(it){
+      if(it.grp!==last){ html += '<div class="pick-grp">'+esc(it.grp)+'</div>'; last=it.grp; }
+      if(it.link){
+        html += '<button class="pick-l" onclick="go(\'svc\',\''+it.id+'\')"><div class="row-b">'+
+          '<div class="pick-nm">'+esc(it.nm)+'</div><div class="pick-sub">'+esc(it.sub)+'</div></div>'+
+          '<div class="row-arrow">&gt;</div></button>';
+      } else {
+        var on = VIEW.pickSel.indexOf(it.id)>=0;
+        html += '<button class="pick-l'+(on?' on':'')+'" onclick="pickToggle(\''+it.id+'\')">'+
+          '<div class="box">V</div><div class="row-b"><div class="pick-nm">'+esc(it.nm)+'</div></div></button>';
+      }
+    });
+  }
+
+  var isSvc = ax==='svc';
+  return '<div class="scroll" style="'+(isSvc?'padding-bottom:60px':'padding-bottom:76px')+'">'+hdrBack(title)+html+'</div>'+
+    (isSvc ? navBar('explore')
+      : '<div class="pick-foot"><button class="btn fill" '+(pickDirty()?'':'disabled')+' onclick="pickApply()">'+
+        (VIEW.pickSel.length ? VIEW.pickSel.length+'개 조건 적용' : (VIEW.conds.some(function(c){return c.axis===VIEW.pickAxis}) ? '이 조건 해제' : '항목을 선택하세요'))+'</button></div>');
+}
+
+/* ── 정본 검색 ── */
+function viewSearch(){
+  var r = searchCanonical(VIEW.qSubmitted);
+  var cnt = {all:r.service.length+r.concern.length+r.category.length+r.place.length,
+             service:r.service.length, concern:r.concern.length, category:r.category.length, place:r.place.length};
+  var types=[['all','전체'],['service','서비스'],['concern','고민·부위'],['category','분류'],['place','지역']];
+  var pills = '<div class="tabs-pill">'+types.map(function(t){
+    return '<button class="chip'+(VIEW.stype===t[0]?' on':'')+'" onclick="VIEW.stype=\''+t[0]+'\';render()">'+t[1]+' '+cnt[t[0]]+'</button>';
+  }).join('')+'</div>';
+
+  if(!VIEW.qSubmitted){
+    return '<div class="scroll pad-nav">'+hdrBack('검색')+searchField()+
+      '<div class="empty" style="padding-top:50px"><div class="t">무엇을 찾으시나요</div>'+
+      '<div class="d">서비스, 고민, 부위, 분류, 지역을 찾습니다.<br>상품명과 스토어명은 각 목록 화면에서 찾습니다.</div></div>'+
+      '</div>'+navBar('explore');
+  }
+  if(cnt.all===0){
+    return '<div class="scroll pad-nav">'+hdrBack('검색')+searchField()+pills+
+      '<div class="empty"><div class="t">&lsquo;'+esc(VIEW.qSubmitted)+'&rsquo; 검색 결과가 없습니다</div>'+
+      '<div class="d">서비스, 고민, 부위, 분류, 지역만 찾습니다.<br>다른 표현으로 다시 찾아보세요.</div>'+
+      '<div class="empty-acts">'+
+      act('검색어 고치기','입력한 검색어는 그대로 남아 있습니다','focusSearch()',true)+
+      act('고민에서 고르기','공개된 고민 목록에서 선택','openPick(\'itr\')')+
+      act('분류에서 고르기','공개된 분류 목록에서 선택','openPick(\'cat\')')+
+      act('전체 상품 보기','조건 없이 상품 목록으로 이동','go(\'products\')')+
+      act('전체 스토어 보기','조건 없이 스토어 목록으로 이동','go(\'stores\')')+
+      '</div></div></div>'+navBar('explore');
+  }
+
+  function grp(label, arr, kind){
+    if(!arr.length) return '';
+    if(VIEW.stype!=='all' && VIEW.stype!==kind) return '';
+    return '<div class="grp">'+label+'</div>'+arr.map(function(x){
+      var e=x.e, route = kind==='service'?'svc' : kind==='concern'?'itr' : kind==='category'?'cat':'plc';
+      var path = kind==='service' ? catPath(e.rep)
+               : kind==='category' ? catPath(e.id)
+               : kind==='place' ? placePath(e.id)
+               : (e.type==='body' ? '부위' : '고민');
+      var badge = x.by==='syn' ? '<span class="match">&lsquo;'+esc(x.syn)+'&rsquo;로도 불립니다</span>'
+                : (kind==='service' ? '<span class="match">이름 일치</span>' : '');
+      return '<button class="row" onclick="go(\''+route+'\',\''+e.id+'\')"><div class="ph ph-52"></div>'+
+        '<div class="row-b"><div class="row-nm">'+esc(e.n)+'</div>'+
+        '<div class="row-path">'+esc(path)+'</div>'+badge+'</div><div class="row-arrow">&gt;</div></button>';
+    }).join('');
+  }
+  return '<div class="scroll pad-nav">'+hdrBack('검색')+searchField()+pills+
+    '<div style="padding:0 16px 20px">'+
+    grp('서비스', r.service,'service')+grp('고민·부위', r.concern,'concern')+
+    grp('분류', r.category,'category')+grp('지역', r.place,'place')+'</div></div>'+navBar('explore');
+}
+function searchField(){
+  return '<div style="padding:12px 16px"><div class="searchfield">'+
+    '<input id="qin" value="'+esc(VIEW.q)+'" placeholder="시술·고민·지역 검색" '+
+    'oninput="VIEW.q=this.value" onkeydown="if(event.key===\'Enter\')submitSearch()">'+
+    (VIEW.q?'<button class="clear-x" onclick="VIEW.q=\'\';render();focusSearch()">X</button>':'')+
+    '<button class="go-s" onclick="submitSearch()">검색</button></div></div>';
+}
+function focusSearch(){ var el=document.getElementById('qin'); if(el){ el.focus(); el.setSelectionRange(el.value.length,el.value.length); } }
+function act(label,sub,fn,primary){
+  return '<button class="act'+(primary?' primary':'')+'" onclick="'+fn+'">'+
+    '<div><div class="l">'+label+'</div><div class="s">'+sub+'</div></div><div class="a">&gt;</div></button>';
+}
+
+/* ── 조건 결과 ── */
+function viewResults(){
+  var conds=VIEW.conds;
+  var cS=countTab(conds,'service'), cP=countTab(conds,'product'), cT=countTab(conds,'store');
+  var cur = VIEW.tab==='service'?cS : VIEW.tab==='store'?cT : cP;
+
+  var bar = '<div class="condbar" style="top:50px"><div class="condbar-in">'+
+    conds.map(function(c){
+      return '<button class="chip on" onclick="removeCond(\''+c.axis+'\',\''+c.id+'\')">'+esc(condName(c))+' X</button>'; }).join('')+
+    '<button class="chip add" onclick="openPick(\'cat\')">+ 조건 추가</button>'+
+    '</div><div class="condbar-fade"><button class="reset" onclick="VIEW.conds=[];go(\'explore\')">모두 해제</button></div></div>';
+
+  var tabs = '<div class="tabs" style="top:99px">'+
+    tabBtn('service','서비스',cS)+tabBtn('product','상품',cP)+tabBtn('store','스토어',cT)+'</div>';
+
+  if(cur===0){
+    var rows = conds.map(function(c){
+      var rest = conds.filter(function(x){ return !(x.axis===c.axis&&x.id===c.id); });
+      return {c:c, n:countTab(rest, VIEW.tab)};
+    }).sort(function(a,b){ return b.n-a.n; });
+    return '<div class="scroll pad-nav">'+hdrBack('결과')+bar+tabs+
+      '<div class="empty" style="padding-top:26px">'+
+      '<div class="t">이 조건에 맞는 결과가 없습니다</div>'+
+      '<div class="d">종류가 다른 조건은 모두 맞아야 결과에 나옵니다.<br>하나를 해제하면 대개 결과가 생깁니다.</div>'+
+      '<div class="unblock"><div class="unblock-h">조건 해제하기</div>'+
+      rows.map(function(r,i){
+        return '<div class="unblock-r"><div class="nm">'+esc(condName(r.c))+
+          '<i>해제하면 '+r.n+'건</i></div>'+
+          '<button class="mini'+(i===0&&r.n>0?' on':'')+'" onclick="removeCond(\''+r.c.axis+'\',\''+r.c.id+'\')">해제</button></div>';
+      }).join('')+'</div>'+
+      '<div class="empty-acts">'+
+      act('조건 모두 지우기','탐색 홈으로 돌아갑니다','VIEW.conds=[];go(\'explore\')')+
+      act('전체 상품 보기','조건 없이 상품 목록으로 이동','go(\'products\')')+
+      '</div></div></div>'+navBar('explore');
+  }
+
+  var sortLabel = {views:'조회순',pop:'인기순',asc:'낮은 가격순',desc:'높은 가격순'}[VIEW.sort];
+  var unit = VIEW.tab==='service'?'개 서비스' : VIEW.tab==='store'?'개 스토어' : '개 상품';
+  var sortRow = '<div class="sortbar"><div class="count"><b>'+cur+'</b>'+unit+'</div>'+
+    '<button class="sortbtn" onclick="VIEW.sheet=\'sort\';render()">'+sortLabel+' v</button></div>';
+
+  var all, shown, list;
+  if(VIEW.tab==='service'){
+    all = resultServices(conds).slice().sort(function(a,b){ return VIEW.sort==='pop'?b.pop-a.pop:b.views-a.views; });
+    shown = all.slice(0, VIEW.page*5); list = shown.map(serviceResultRow).join('');
+  } else if(VIEW.tab==='store'){
+    all = resultStores(conds).slice().sort(function(a,b){ return b.rev-a.rev; });
+    shown = all.slice(0, VIEW.page*5); list = shown.map(storeCard).join('');
+  } else {
+    all = sortProducts(resultProducts(conds), VIEW.sort);
+    shown = all.slice(0, VIEW.page*5); list = shown.map(productCard).join('');
+  }
+  var more='';
+  if(shown.length < all.length){
+    more = VIEW.fail.more
+      ? '<div class="retry" style="margin-top:14px"><div class="t">결과를 더 불러오지 못했습니다.<br>이미 본 결과는 그대로 남아 있습니다.</div>'+
+        '<div class="b"><button class="mini on" onclick="setFail(\'more\',false)">다시 시도</button></div></div>'
+      : '<div style="padding-top:14px"><button class="btn sm" onclick="VIEW.page++;render()">더 보기 ('+(all.length-shown.length)+'건 남음)</button></div>';
+  }
+  return '<div class="scroll pad-nav">'+hdrBack('결과')+bar+tabs+sortRow+
+    '<div style="padding:0 16px 16px">'+list+more+'</div></div>'+navBar('explore');
+}
+function tabBtn(k,label,n){
+  return '<button class="tab'+(VIEW.tab===k?' on':'')+'" onclick="setTab(\''+k+'\')">'+label+' <span class="n">'+n+'</span></button>';
+}
+function serviceResultRow(s){
+  return '<button class="row" onclick="go(\'svc\',\''+s.id+'\')"><div class="ph ph-52"></div>'+
+    '<div class="row-b"><div class="row-nm">'+esc(s.n)+'</div>'+
+    '<div class="row-path">'+esc(catPath(s.rep))+'</div>'+
+    '<div class="row-desc">'+esc(s.d)+'</div></div><div class="row-arrow">&gt;</div></button>';
+}
+function productCard(p){
+  var st=ST(p.store), pl=P(st.place);
+  return '<button class="pcard" onclick="go(\'pdetail\',\''+p.id+'\')"><div class="ph ph-84"></div>'+
+    '<div class="pbody"><div class="pstore">'+esc(st.name)+' · '+esc(pl.n)+'</div>'+
+    '<div class="pname">'+esc(p.n)+'</div>'+
+    '<div class="ptags">'+approvedIds(p).filter(function(id){ return judgeService(S(id)).ok; })
+      .map(function(id){ return '<span class="ptag">'+esc(S(id).n)+'</span>'; }).join('')+'</div>'+
+    (p.price==null ? '<div class="pprice none">상담 후 결정</div>' : '<div class="pprice">'+won(p.price)+'</div>')+
+    '</div></button>';
+}
+function storeCard(st){
+  var pl=P(st.place);
+  return '<button class="scard" onclick="go(\'sdetail\',\''+st.id+'\')"><div class="ph ph-72"></div>'+
+    '<div class="row-b"><div class="sname">'+esc(st.name)+'</div>'+
+    '<div class="smeta"><span>평점 '+st.rating+'</span><span>리뷰 '+st.rev.toLocaleString('ko-KR')+'</span></div>'+
+    '<div class="smeta">'+esc(st.walk||pl.n)+'</div></div></button>';
+}
+function contentCard(c){
+  return '<button class="ccard" onclick="VIEW.toast=\'기존 원문 상세로 이동합니다.\';render()"><div class="ph ph-76"></div>'+
+    '<div class="row-b"><div class="ckind">'+(c.kind==='magazine'?'매거진':'스토어 칼럼')+'</div>'+
+    '<div class="ctitle">'+esc(c.title)+'</div>'+
+    '<div class="cmeta">'+esc(c.author)+' · '+esc(c.date)+'</div></div></button>';
+}
+
+/* ── 카테고리 랜딩 ── */
+function viewCat(){
+  var c=C(VIEW.id);
+  var subs = visibleCats().filter(function(x){ return x.parent===c.id; });
+  var svcs = servicesOfCat(c.id);
+  var prods=[], seen={};
+  svcs.forEach(function(s){ productsOfService(s.id).forEach(function(p){ if(!seen[p.id]){seen[p.id]=1;prods.push(p);} }); });
+  var strs=[], seenS={};
+  prods.forEach(function(p){ if(!seenS[p.store]){ seenS[p.store]=1; var st=ST(p.store); if(storeVisible(st)) strs.push(st); } });
+
+  var chain=[], cu=c;
+  while(cu){ chain.unshift(cu); cu = cu.parent?C(cu.parent):null; }
+  var crumb = '<a onclick="go(\'explore\')">탐색</a> &gt; <a onclick="openPick(\'cat\')">분류</a> &gt; '+
+    chain.map(function(x,i){ return i===chain.length-1 ? '<span class="cur">'+esc(x.n)+'</span>' : '<a onclick="go(\'cat\',\''+x.id+'\')">'+esc(x.n)+'</a>'; }).join(' &gt; ');
+
+  return '<div class="scroll pad-nav">'+hdrBack(c.n)+
+    '<div class="crumb">'+crumb+'</div>'+
+    '<div class="land-head"><div class="land-h1">'+esc(c.n)+'</div>'+
+    '<div class="land-sub">서비스 '+svcs.length+' · 상품 '+prods.length+' · 스토어 '+strs.length+'</div>'+
+    '<div class="land-body">'+esc(c.d)+'</div></div>'+
+    (subs.length ? '<div class="sec" style="border-top:6px solid var(--fill)"><div class="sec-t" style="margin-bottom:12px">하위 분류</div>'+
+      '<div class="chips">'+subs.map(function(s){ return '<button class="chip" onclick="go(\'cat\',\''+s.id+'\')">'+esc(s.n)+'</button>'; }).join('')+'</div></div>' : '')+
+    (svcs.length ? '<div class="sec"><div class="sec-row"><div class="sec-t">이 분류의 서비스</div>'+
+      '<button class="more" onclick="applyConds([{axis:\'cat\',id:\''+c.id+'\'}],\'service\')">전체 '+svcs.length+'건</button></div>'+
+      svcs.slice(0,3).map(serviceResultRow).join('')+'</div>' : '')+
+    secProducts(prods,'cat',c.id)+secStores(strs,'cat',c.id)+
+    '</div>'+navBar('explore');
+}
+function secProducts(prods, axis, id){
+  if(!prods.length){
+    return '<div class="sec"><div class="sec-t" style="margin-bottom:12px">상품</div>'+
+      '<div class="zero"><div class="t">아직 등록된 상품이 없습니다</div>'+
+      '<div class="d">현재 이 조건으로 판매 중인 상품이 없습니다.<br>조건을 넓혀서 다시 찾아보세요.</div>'+
+      '<div class="b"><button class="mini" onclick="go(\'explore\')">탐색 홈으로</button></div></div></div>';
+  }
+  return '<div class="sec"><div class="sec-row"><div class="sec-t">상품</div>'+
+    '<button class="more" onclick="applyConds([{axis:\''+axis+'\',id:\''+id+'\'}],\'product\')">전체 '+prods.length+'건</button></div>'+
+    prods.slice(0,2).map(productCard).join('')+'</div>';
+}
+function secStores(strs, axis, id){
+  if(!strs.length){
+    return '<div class="sec"><div class="sec-t" style="margin-bottom:12px">스토어</div>'+
+      '<div class="zero"><div class="t">아직 등록된 스토어가 없습니다</div>'+
+      '<div class="d">검수를 마친 스토어만 결과에 넣습니다.</div>'+
+      '<div class="b"><button class="mini" onclick="go(\'explore\')">탐색 홈으로</button></div></div></div>';
+  }
+  return '<div class="sec"><div class="sec-row"><div class="sec-t">스토어</div>'+
+    '<button class="more" onclick="applyConds([{axis:\''+axis+'\',id:\''+id+'\'}],\'store\')">전체 '+strs.length+'건</button></div>'+
+    strs.slice(0,2).map(storeCard).join('')+'</div>';
+}
+
+/* ── 서비스 랜딩 ── */
+function viewSvc(){
+  var s=S(VIEW.id);
+  var prods = productsOfService(s.id);
+  var strs = storesOfService(s.id);
+  var cts = contentsFor('svc', s.id);
+  var itrs = s.itr.map(I).filter(function(x){ return x && judgeInterest(x).ok; });
+  var bodies = s.body.map(I).filter(function(x){ return x && judgeInterest(x).ok; });
+  var similar = visibleServices().filter(function(x){ return x.id!==s.id && x.rep===s.rep; });
+  visibleServices().forEach(function(x){
+    if(similar.length>=3) return;
+    if(x.id!==s.id && similar.indexOf(x)<0 && x.cats.some(function(cc){ return s.cats.indexOf(cc)>=0; })) similar.push(x);
+  });
+  similar = similar.slice(0,3);
+  var places=[], seenPl={};
+  prods.forEach(function(p){ var pl=P(ST(p.store).place); if(pl && judgePlace(pl).ok && !seenPl[pl.id]){ seenPl[pl.id]=1; places.push(pl); } });
+
+  var rep = C(s.rep);
+  var chain=[], cu=rep;
+  while(cu){ chain.unshift(cu); cu = cu.parent?C(cu.parent):null; }
+  var crumb = '<a onclick="go(\'explore\')">탐색</a> &gt; '+
+    chain.map(function(x){ return '<a onclick="go(\'cat\',\''+x.id+'\')">'+esc(x.n)+'</a>'; }).join(' &gt; ')+
+    ' &gt; <span class="cur">'+esc(s.n)+'</span>';
+
+  var rel='';
+  if(itrs.length) rel += relBlock('관련 고민', itrs, 'itr');
+  if(bodies.length) rel += relBlock('관련 부위', bodies, 'itr');
+  if(similar.length) rel += relBlock('비슷한 서비스', similar, 'svc');
+  if(places.length) rel += relBlock('제공 지역', places, 'plc');
+
+  var content='';
+  if(VIEW.fail.content){
+    content = '<div class="sec"><div class="sec-t" style="margin-bottom:12px">관련 글</div>'+
+      '<div class="retry"><div class="t">관련 글을 불러오지 못했습니다.</div>'+
+      '<div class="b"><button class="mini on" onclick="setFail(\'content\',false)">다시 시도</button></div></div></div>';
+  } else if(cts.length){
+    content = '<div class="sec"><div class="sec-t" style="margin-bottom:12px">관련 글</div>'+cts.map(contentCard).join('')+'</div>';
+  }
+
+  var saved = isSaved('svc', s.id);
+  var cta = '<div class="cta"><button class="cta-fav'+(saved?' on':'')+'" onclick="toggleSave(\'svc\',\''+s.id+'\')">'+(saved?'저장됨':'저장')+'</button>'+
+    (prods.length
+      ? '<button class="btn fill" onclick="applyConds([{axis:\'svc\',id:\''+s.id+'\'}],\'product\')">상품 '+prods.length+'건 보기</button>'
+      : '<button class="btn" onclick="go(\'cat\',\''+s.rep+'\')">'+esc(rep.n)+' 분류로</button>')+'</div>';
+
+  return '<div class="scroll pad-nav pad-cta">'+hdrBack(s.n)+
+    '<div class="crumb">'+crumb+'</div>'+
+    '<div class="land-head"><div class="land-h1">'+esc(s.n)+'</div>'+
+    '<div class="land-sub">'+esc(rep.n)+(s.syn.length?' · 다른 이름: '+esc(s.syn.join(', ')):'')+'</div>'+
+    '<div class="land-body">'+esc(s.d)+'</div>'+
+    (s.crit.length ? '<div class="critbox"><div class="t">고르기 전에 확인할 것</div>'+
+      s.crit.map(function(x){ return '<div class="critline"><span class="b">·</span><span>'+esc(x)+'</span></div>'; }).join('')+'</div>' : '')+
+    '</div>'+
+    (rel ? '<div class="sec" style="border-top:6px solid var(--fill)"><div class="sec-t" style="margin-bottom:14px">관련 정보</div>'+rel+'</div>' : '')+
+    (prods.length
+      ? '<div class="sec"><div class="sec-row"><div class="sec-t">이 서비스가 포함된 상품</div>'+
+        '<button class="more" onclick="applyConds([{axis:\'svc\',id:\''+s.id+'\'}],\'product\')">전체 '+prods.length+'건</button></div>'+
+        prods.slice(0,2).map(productCard).join('')+'</div>'
+      : '<div class="sec"><div class="sec-t" style="margin-bottom:12px">이 서비스가 포함된 상품</div>'+
+        '<div class="zero"><div class="t">아직 등록된 상품이 없습니다</div>'+
+        '<div class="d">이 서비스를 파는 스토어가 아직 없습니다.<br>비슷한 서비스에는 상품이 있습니다.</div>'+
+        (similar.length?'<div class="b"><button class="mini on" onclick="go(\'svc\',\''+similar[0].id+'\')">'+esc(similar[0].n)+' 보기</button></div>':'')+
+        '</div></div>')+
+    (strs.length
+      ? '<div class="sec"><div class="sec-row"><div class="sec-t">제공 스토어</div>'+
+        '<button class="more" onclick="applyConds([{axis:\'svc\',id:\''+s.id+'\'}],\'store\')">전체 '+strs.length+'건</button></div>'+
+        strs.slice(0,2).map(storeCard).join('')+'</div>'
+      : '<div class="sec"><div class="sec-t" style="margin-bottom:12px">제공 스토어</div>'+
+        '<div class="zero"><div class="t">아직 등록된 스토어가 없습니다</div>'+
+        '<div class="d">이 서비스를 제공하는 스토어가 아직 없습니다.<br>아래에서 같은 분류로 이동할 수 있습니다.</div>'+
+        '</div></div>')+
+    content+'</div>'+cta+navBar('explore');
+}
+function relBlock(label, arr, route){
+  return '<div class="rel-b"><div class="rel-l">'+label+'</div><div class="chips">'+
+    arr.map(function(x){ return '<button class="chip" onclick="go(\''+route+'\',\''+x.id+'\')">'+esc(x.n)+'</button>'; }).join('')+
+    '</div></div>';
+}
+
+/* ── 관심사 랜딩 ── */
+function viewItr(){
+  var x=I(VIEW.id);
+  var svcs = servicesOfInterest(x.id);
+  var prods=[], seen={};
+  svcs.forEach(function(s){ productsOfService(s.id).forEach(function(p){ if(!seen[p.id]){seen[p.id]=1;prods.push(p);} }); });
+  var strs=[], seenS={};
+  prods.forEach(function(p){ if(!seenS[p.store]){ seenS[p.store]=1; var st=ST(p.store); if(storeVisible(st)) strs.push(st); } });
+  var cts = contentsFor('itr', x.id);
+  var axis = x.type==='body'?'body':'itr';
+  var label = x.type==='body'?'부위':'고민';
+
+  return '<div class="scroll pad-nav">'+hdrBack(x.n)+
+    '<div class="crumb"><a onclick="go(\'explore\')">탐색</a> &gt; <a onclick="openPick(\''+axis+'\')">'+label+'</a> &gt; <span class="cur">'+esc(x.n)+'</span></div>'+
+    '<div class="land-head"><div class="land-h1">'+esc(x.n)+'</div>'+
+    '<div class="land-sub">서비스 '+svcs.length+' · 상품 '+prods.length+' · 스토어 '+strs.length+'</div>'+
+    '<div class="land-body">'+esc(x.d)+'</div></div>'+
+    (svcs.length ? '<div class="sec" style="border-top:6px solid var(--fill)"><div class="sec-row"><div class="sec-t">이 '+label+'에 해당하는 서비스</div>'+
+      '<button class="more" onclick="applyConds([{axis:\''+axis+'\',id:\''+x.id+'\'}],\'service\')">전체 '+svcs.length+'건</button></div>'+
+      svcs.slice(0,3).map(serviceResultRow).join('')+'</div>' : '')+
+    secProducts(prods, axis, x.id)+secStores(strs, axis, x.id)+
+    (cts.length ? '<div class="sec"><div class="sec-t" style="margin-bottom:12px">관련 글</div>'+cts.map(contentCard).join('')+'</div>' : '')+
+    '</div>'+navBar('explore');
+}
+
+/* ── 장소 랜딩 ── */
+function viewPlc(){
+  var p=P(VIEW.id);
+  var svcs = servicesOfPlace(p.id);
+  var strs = DB.stores.filter(function(st){ return storeVisible(st) && placeMatches(st.place,p.id); });
+  var prods = DB.products.filter(function(x){ return productVisible(x) && placeMatches(ST(x.store).place,p.id); });
+  var stations = (p.stations||[]).map(P).filter(function(t){ return t && judgePlace(t).ok; });
+  var nearby = DB.places.filter(function(x){ return x.type==='area' && x.parent===p.parent && x.id!==p.id && judgePlace(x).ok; });
+
+  var chain=[], cu=p;
+  while(cu){ chain.unshift(cu); cu = cu.parent?P(cu.parent):null; }
+  var crumb = '<a onclick="go(\'explore\')">탐색</a> &gt; <a onclick="openPick(\'plc\')">지역</a> &gt; '+
+    chain.map(function(x,i){ return i===chain.length-1 ? '<span class="cur">'+esc(x.n)+'</span>' : '<a onclick="go(\'plc\',\''+x.id+'\')">'+esc(x.n)+'</a>'; }).join(' &gt; ');
+
+  var cta = strs.length
+    ? '<div class="cta"><button class="btn fill" onclick="applyConds([{axis:\'plc\',id:\''+p.id+'\'}],\'product\')">'+esc(p.n)+' 조건으로 결과 보기</button></div>' : '';
+
+  return '<div class="scroll pad-nav'+(cta?' pad-cta':'')+'">'+hdrBack(p.n)+
+    '<div class="crumb">'+crumb+'</div>'+
+    '<div class="land-head"><div class="land-h1">'+esc(p.n)+'</div>'+
+    '<div class="land-sub">'+esc(placePath(p.id))+' · 스토어 '+strs.length+' · 상품 '+prods.length+'</div>'+
+    '<div class="land-body">'+esc(p.d)+'</div></div>'+
+    ((stations.length||nearby.length) ? '<div class="sec" style="border-top:6px solid var(--fill)">'+
+      (stations.length ? '<div class="sec-t" style="margin-bottom:12px">오는 길</div><div class="stn">'+
+        stations.map(function(t){
+          return '<div class="stn-r"><div class="row-b"><div class="stn-nm">'+esc(t.n)+'</div>'+
+            '</div>'+
+            (t.lines||[]).map(function(l){ return '<span class="line-b">'+esc(P(l).n)+'</span>'; }).join('')+'</div>';
+        }).join('')+'</div>' : '')+
+      (nearby.length ? '<div style="margin-top:'+(stations.length?'14px':'0')+'"><div class="rel-l">가까운 지역</div><div class="chips">'+
+        nearby.map(function(x){ return '<button class="chip" onclick="go(\'plc\',\''+x.id+'\')">'+esc(x.n)+'</button>'; }).join('')+'</div></div>' : '')+
+      '</div>' : '')+
+    (svcs.length ? '<div class="sec"><div class="sec-row"><div class="sec-t">이 지역에서 많이 찾는 서비스</div>'+
+      '<button class="more" onclick="applyConds([{axis:\'plc\',id:\''+p.id+'\'}],\'service\')">전체 '+svcs.length+'건</button></div>'+
+      '<div class="chips">'+svcs.slice(0,6).map(function(s){ return '<button class="chip" onclick="go(\'svc\',\''+s.id+'\')">'+esc(s.n)+'</button>'; }).join('')+'</div></div>' : '')+
+    (strs.length
+      ? '<div class="sec"><div class="sec-row"><div class="sec-t">'+esc(p.n)+' 스토어</div>'+
+        '<button class="more" onclick="applyConds([{axis:\'plc\',id:\''+p.id+'\'}],\'store\')">전체 '+strs.length+'건</button></div>'+
+        strs.slice(0,3).map(storeCard).join('')+'</div>'
+      : '<div class="sec"><div class="sec-t" style="margin-bottom:12px">스토어</div>'+
+        '<div class="zero"><div class="t">아직 등록된 스토어가 없습니다</div>'+
+        '<div class="d">이 지역에는 검수를 마친 스토어가 아직 없습니다.</div>'+
+        '<div class="b"><button class="mini" onclick="openPick(\'plc\')">다른 지역 고르기</button></div></div></div>')+
+    '</div>'+cta+navBar('explore');
+}
+
+/* ── 기존 목록·상세 ── */
+function viewList(kind){
+  var title = kind==='products'?'상품':'스토어';
+  var items = kind==='products' ? DB.products.filter(productVisible) : DB.stores.filter(storeVisible);
+  return '<div class="scroll pad-nav">'+hdrBack(title)+
+    '<div class="sortbar"><div class="count"><b>'+items.length+'</b>'+(kind==='products'?'개 상품':'개 스토어')+'</div>'+
+    '<button class="sortbtn">조회순 v</button></div>'+
+    '<div style="padding:0 16px 16px">'+items.map(kind==='products'?productCard:storeCard).join('')+'</div>'+
+    '</div>'+navBar('explore');
+}
+function viewPdetail(){
+  var p=PR(VIEW.id); if(!p) return viewNotFound();
+  var st=ST(p.store), saved=isSaved('product',p.id);
+  return '<div class="scroll pad-nav pad-cta">'+hdrBack(p.n)+
+    '<div class="ph" style="height:180px;border-left:0;border-right:0"></div>'+
+    '<div class="land-head"><div class="pstore" style="font-size:12px">'+esc(st.name)+'</div>'+
+    '<div class="land-h1" style="font-size:17px;margin-top:6px">'+esc(p.n)+'</div>'+
+    '<div class="pprice" style="margin-top:14px;font-size:19px">'+(p.price==null?'상담 후 결정':won(p.price))+'</div></div>'+
+    '<div class="sec" style="border-top:6px solid var(--fill)"><div class="sec-t" style="margin-bottom:12px">포함 서비스</div>'+
+    '<div class="chips">'+approvedIds(p).filter(function(id){ return judgeService(S(id)).ok; })
+      .map(function(id){ return '<button class="chip" onclick="go(\'svc\',\''+id+'\')">'+esc(S(id).n)+'</button>'; }).join('')+'</div></div>'+
+    '</div><div class="cta"><button class="cta-fav'+(saved?' on':'')+'" onclick="toggleSave(\'product\',\''+p.id+'\')">'+(saved?'저장됨':'저장')+'</button>'+
+    '<button class="btn fill" onclick="VIEW.toast=\'기존 문의 흐름으로 이동합니다.\';render()">문의하기</button></div>'+navBar('explore');
+}
+function viewSdetail(){
+  var st=ST(VIEW.id); if(!st) return viewNotFound();
+  var saved=isSaved('store',st.id);
+  var prods = DB.products.filter(function(p){ return p.store===st.id && productVisible(p); });
+  return '<div class="scroll pad-nav pad-cta">'+hdrBack(st.name)+
+    '<div class="ph" style="height:180px;border-left:0;border-right:0"></div>'+
+    '<div class="land-head"><div class="land-h1" style="font-size:18px">'+esc(st.name)+'</div>'+
+    '<div class="smeta"><span>평점 '+st.rating+'</span><span>리뷰 '+st.rev.toLocaleString('ko-KR')+'</span><span>'+esc(st.walk)+'</span></div></div>'+
+    '<div class="sec" style="border-top:6px solid var(--fill)"><div class="sec-t" style="margin-bottom:12px">상품</div>'+
+    prods.map(productCard).join('')+'</div></div>'+
+    '<div class="cta"><button class="cta-fav'+(saved?' on':'')+'" onclick="toggleSave(\'store\',\''+st.id+'\')">'+(saved?'저장됨':'저장')+'</button>'+
+    '<button class="btn fill" onclick="VIEW.toast=\'기존 예약 흐름으로 이동합니다.\';render()">예약하기</button></div>'+navBar('explore');
+}
+
+/* ── 저장 ── */
+function viewSaved(){
+  var svc = VIEW.saved.filter(function(s){ return s.kind==='svc'; }).map(function(s){ return S(s.id); }).filter(Boolean);
+  var prd = VIEW.saved.filter(function(s){ return s.kind==='product'; }).map(function(s){ return PR(s.id); }).filter(Boolean);
+  var strs = VIEW.saved.filter(function(s){ return s.kind==='store'; }).map(function(s){ return ST(s.id); }).filter(Boolean);
+  var okS = svc.filter(function(s){ return judgeService(s).ok; });
+  var okP = prd.filter(productVisible);
+  var okT = strs.filter(storeVisible);
+  var gone = [].concat(
+    svc.filter(function(s){ return !judgeService(s).ok; }).map(function(s){ return {k:'svc',e:s}; }),
+    prd.filter(function(p){ return !productVisible(p); }).map(function(p){ return {k:'product',e:p}; }),
+    strs.filter(function(s){ return !storeVisible(s); }).map(function(s){ return {k:'store',e:s}; })
+  );
+  var total = okS.length+okP.length+okT.length+gone.length;
+
+  if(!total){
+    return '<div class="scroll pad-nav">'+hdrTop('저장')+
+      '<div class="empty" style="padding-top:64px"><div class="t">저장한 항목이 없습니다</div>'+
+      '<div class="d">서비스, 상품, 스토어 화면의 저장 버튼을 누르면<br>여기에 모입니다.</div>'+
+      '<div class="empty-acts">'+act('탐색으로 가기','분류나 고민에서 시작합니다','go(\'explore\')',true)+'</div></div>'+
+      '</div>'+navBar('saved');
+  }
+  var out = '<div class="scroll pad-nav">'+hdrTop('저장')+
+    '<div class="tabs-pill"><button class="chip on">전체 '+total+'</button>'+
+    '<button class="chip">서비스 '+okS.length+'</button><button class="chip">상품 '+okP.length+'</button>'+
+    '<button class="chip">스토어 '+okT.length+'</button></div><div style="padding:0 16px 16px">';
+  if(okS.length) out += '<div class="grp">서비스</div>'+okS.map(function(s){
+    return '<div class="row"><div class="ph ph-52"></div>'+
+      '<div class="row-b" onclick="go(\'svc\',\''+s.id+'\')"><div class="row-nm">'+esc(s.n)+'</div>'+
+      '<div class="row-path">'+esc(catPath(s.rep))+'</div></div>'+
+      '<button class="mini" style="align-self:center" onclick="toggleSave(\'svc\',\''+s.id+'\')">해제</button></div>';
+  }).join('');
+  if(okP.length) out += '<div class="grp">상품</div>'+okP.map(productCard).join('');
+  if(okT.length) out += '<div class="grp">스토어</div>'+okT.map(storeCard).join('');
+  if(gone.length) out += '<div class="grp">지금은 볼 수 없는 항목</div>'+gone.map(function(g){
+    return '<div class="pcard" style="cursor:default"><div class="ph ph-84"></div>'+
+      '<div class="pbody"><div class="pstore">이전에 저장함</div>'+
+      '<div class="pname">'+esc(g.e.n||g.e.name)+'</div>'+
+      '<div class="ptags"><span class="ptag">현재 공개되지 않음</span></div></div>'+
+      '<button class="mini" style="align-self:center" onclick="toggleSave(\''+g.k+'\',\''+g.e.id+'\')">삭제</button></div>';
+  }).join('');
+  return out+'</div></div>'+navBar('saved');
+}
+function viewMy(){
+  return '<div class="scroll pad-nav">'+hdrTop('마이페이지')+
+    '<div class="sec"><div class="sec-t">로그인 중</div><div class="sec-s">guest@example.com</div></div>'+
+    '<div class="sec"><button class="btn sm" onclick="VIEW.loggedIn=false;VIEW.saved=[];go(\'explore\')">로그아웃</button></div>'+
+    '</div>'+navBar('my');
+}
+function viewLogin(){
+  return '<div class="scroll">'+
+    '<header class="hdr"><button class="hdr-ico hdr-back" onclick="cancelLogin()">&lt;</button>'+
+    '<div class="hdr-title">로그인</div><div class="hdr-sp"></div></header>'+
+    '<div class="login-wrap"><div class="t">로그인이 필요합니다</div>'+
+    '<div class="d">'+(VIEW.pending?'로그인하면 보던 화면으로 돌아가 저장까지 마칩니다.':'저장과 마이페이지는 로그인 후 이용할 수 있습니다.')+'</div>'+
+    '<div class="fld"><label>이메일</label><div class="inp">guest@example.com</div></div>'+
+    '<div class="fld"><label>비밀번호</label><div class="inp">••••••••</div></div>'+
+    '<div style="margin-top:20px"><button class="btn fill" onclick="doLogin()">로그인</button></div>'+
+    '<div style="margin-top:8px"><button class="btn" onclick="cancelLogin()">나중에 하기</button></div>'+
+    '</div></div>';
+}
+
+/* ── 상태 화면 ── */
+function viewUnavailable(){
+  var others = (VIEW.altLangs||[]).filter(function(l){ return l!==VIEW.lang; });
+  var L = VIEW.lastLanding;
+  return '<div class="scroll pad-nav">'+hdrBack('찾을 수 없음')+
+    '<div class="empty" style="padding-top:60px">'+
+    '<div class="t">이 화면은 '+langLabel(VIEW.lang)+'로 공개되지 않았습니다</div>'+
+    '<div class="d">주소는 있지만 지금 보고 있는 언어로는<br>아직 공개되지 않았습니다.</div>'+
+    (others.length ? '<div class="lang-list">'+others.map(function(l){
+      return '<button class="lang-r" onclick="setLang(\''+l+'\')"><div class="nm">'+langLabel(l)+'로 보기</div><div class="a">&gt;</div></button>';
+    }).join('')+'</div>' : '')+
+    '<div class="empty-acts">'+act('탐색 홈으로','현재 언어로 공개된 것만 보여 줍니다','go(\'explore\')',true)+'</div>'+
+    '</div></div>'+navBar('explore');
+}
+function viewNotFound(){
+  return '<div class="scroll pad-nav">'+hdrBack('찾을 수 없음')+
+    '<div class="empty" style="padding-top:60px"><div class="t">이 화면을 찾을 수 없습니다</div>'+
+    '<div class="d">내려갔거나 주소가 잘못되었을 수 있습니다.</div>'+
+    '<div class="empty-acts">'+act('탐색 홈으로','분류나 고민에서 시작합니다','go(\'explore\')',true)+
+    act('전체 상품 보기','조건 없이 상품 목록으로 이동','go(\'products\')')+'</div>'+
+    '</div></div>'+navBar('explore');
+}
+
+resetDB();
+</script>
 </body>
 </html>
