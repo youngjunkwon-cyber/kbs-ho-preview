@@ -187,27 +187,27 @@ const DB = {
   stores: [
     { id: 'S1', no: 226, code: '준오헤어명동', name: '준오헤어 명동점', biz: '준오헤어(주)', cat: '헤어/메이크업',
       langs: '중국어(간체), 영어, 일본어', tel: '02-000-0000', bizno: '123-45-67890', email: 'a@a.com',
-      zip: '04533', area: '중구', reg: '2026-09-03 18:33', aliVisible: '노출', active: true, prodCount: 12, baseCount: 9, bookingEnabled: true,
+      zip: '04533', area: '중구', reg: '2026-09-03 18:33', aliVisible: '노출', active: true, bookingEnabled: true,
       btns: { consult: btn({ web: true, ali: true }), inquiry: btn(), chat: btn(), extlink: btn(), messenger: btn(), booking: btn({ web: true, ali: true }) },
       messenger: [{ lang: '중국어(간체)', type: '🐉 WeChat', url: 'https://weixin.qq.com/r/xxx', base: '사용' }], history: [] },
     { id: 'S2', no: 225, code: '리엔장', name: '리엔장 피부과', biz: '리엔장의원', cat: '피부과',
       langs: '중국어(간체), 중국어(번체)', tel: '02-111-1111', bizno: '223-45-67890', email: 'b@b.com',
-      zip: '06236', area: '강남구', reg: '2026-09-02 17:12', aliVisible: '노출', active: true, prodCount: 6, baseCount: 4, bookingEnabled: false,
+      zip: '06236', area: '강남구', reg: '2026-09-02 17:12', aliVisible: '노출', active: true, bookingEnabled: false,
       btns: { consult: btn({ web: true, ali: true }), inquiry: btn(), chat: btn({ web: true, ali: true }), extlink: btn(), messenger: btn(), booking: btn() },
       messenger: [], history: [] },
     { id: 'S3', no: 224, code: '뷰티랩강남', name: '뷰티랩 강남', biz: '뷰티랩(주)', cat: '스킨케어',
       langs: '중국어(간체), 영어, 인도네시아어', tel: '02-222-2222', bizno: '323-45-67890', email: 'c@c.com',
-      zip: '06120', area: '강남구', reg: '2026-09-01 15:03', aliVisible: '노출', active: true, prodCount: 3, baseCount: 2, bookingEnabled: true,
+      zip: '06120', area: '강남구', reg: '2026-09-01 15:03', aliVisible: '노출', active: true, bookingEnabled: true,
       btns: { consult: btn(), inquiry: btn(), chat: btn({ web: true }), extlink: btn(), messenger: btn(), booking: btn({ web: true, ali: true }) },
       messenger: [], history: [] },
     { id: 'S4', no: 223, code: '모모클리닉', name: '모모클리닉', biz: '모모의원', cat: '성형외과',
       langs: '중국어(번체), 일본어', tel: '02-333-3333', bizno: '423-45-67890', email: 'd@d.com',
-      zip: '06010', area: '강남구', reg: '2026-08-31 18:16', aliVisible: '미노출', active: true, prodCount: 7, baseCount: 5, bookingEnabled: false,
+      zip: '06010', area: '강남구', reg: '2026-08-31 18:16', aliVisible: '미노출', active: true, bookingEnabled: false,
       btns: { consult: btn({ web: true, ali: true }), inquiry: btn(), chat: btn({ web: true, ali: true }), extlink: btn(), messenger: btn(), booking: btn() },
       messenger: [], history: [] },
     { id: 'S5', no: 222, code: '글로우스킨홍대', name: '글로우스킨 홍대', biz: '글로우스킨', cat: '스킨케어',
       langs: '중국어(간체)', tel: '02-444-4444', bizno: '523-45-67890', email: 'e@e.com',
-      zip: '04039', area: '마포구', reg: '2026-08-27 15:58', aliVisible: '노출', active: true, prodCount: 2, baseCount: 1, bookingEnabled: false,
+      zip: '04039', area: '마포구', reg: '2026-08-27 15:58', aliVisible: '노출', active: true, bookingEnabled: false,
       btns: { consult: btn({ web: true }), inquiry: btn(), chat: btn(), extlink: btn({ web: true }), messenger: btn(), booking: btn() },
       messenger: [], history: [] }
   ],
@@ -350,6 +350,9 @@ function effBtns(p) {
   if (p.mode === '기본 설정' && ctaList(out, ROWS_PRODUCT, 'ali').length === 0) { out.chat.ali = true; chatAuto = true; }
   return { btns: out, chatAuto };
 }
+/* 스토어의 상품 수와 기본 설정 상품 수는 항상 데이터에서 센다 */
+function storeProdCount(st) { return DB.products.filter(p => p.store === st.id).length; }
+function storeBaseCount(st) { return DB.products.filter(p => p.store === st.id && p.mode === '기본 설정').length; }
 function effStoreBtns(st) {
   const out = {};
   ROWS_STORE.forEach(r => { out[r.k] = { web: !!st.btns[r.k].web, ali: !!st.btns[r.k].ali }; });
@@ -402,7 +405,12 @@ function liveNow(o) {
 // 배너와 대상의 언어가 다르면 눌렀을 때 다른 언어 화면으로 가므로 통과시키지 않는다. 스토어는 언어가 없어 제외한다.
 function innerTargetOk(inner, lang) {
   if (!inner) return { ok: true, label: '대상 없음', skip: true };
-  if (inner.kind === '병원') { const st = S(inner.id); if (!st) return { ok: false, label: '병원 · 대상 없음' }; const j = judgeStore(st); return { ok: j.visible, label: '병원 · ' + st.name, j }; }
+  if (inner.kind === '병원') {
+    const st = S(inner.id); if (!st) return { ok: false, label: '병원 · 대상 없음' };
+    /* 기존 노출 조건에서 이미 빠진 스토어는 연결 대상으로 치지 않는다 */
+    if (st.active === false) return { ok: false, label: '병원 · ' + st.name, j: { visible: false, reason: '비활성' } };
+    const j = judgeStore(st); return { ok: j.visible, label: '병원 · ' + st.name, j };
+  }
   if (inner.kind === '기획전') {
     /* 배너가 고르는 것은 기획전 한 건이 아니라 그 언어의 유형 레코드다 */
     const t = CT(inner.id); if (!t) return { ok: false, label: '기획전 · 대상 없음' };
@@ -562,7 +570,7 @@ function btnTable(kind, obj) {
       else if (offAli) note = '알리페이 앱 ' + MSG.needConsult;
     }
     if (r.needBooking && !obj.bookingEnabled) { webDis = true; aliDis = true; note = MSG.needBooking; }
-    if (r.k === 'chat' && !isStore && eff.chatAuto) note = '스토어 버튼이 없어 채팅이 자동 적용됩니다.';
+    if (r.k === 'chat' && !isStore && eff.chatAuto) note = '알리페이 앱 버튼이 없어 채팅이 자동 적용됩니다.';
     html += '<tr><td>' + r.label + '</td>' +
       '<td>' + onoff('w_' + kind + '_' + r.k, e.web, "setBtn('" + kind + "','" + r.k + "','web',%V%)", webDis) + '</td>' +
       '<td' + (aliDis ? ' class="lock"' : '') + '>' + onoff('a_' + kind + '_' + r.k, e.ali, "setBtn('" + kind + "','" + r.k + "','ali',%V%)", aliDis) + '</td>' +
@@ -601,7 +609,6 @@ window.setBtn = function (kind, k, ch, on) {
   obj.btns[k][ch] = !!on;
   const cascade = k === 'consult' && !on && obj.btns.inquiry[ch];
   if (k === 'consult' && !on) obj.btns.inquiry[ch] = false;
-  const note = [kind === 'store' ? '기본 설정으로 따라가는 상품 ' + obj.baseCount + '건' : '', cascade ? '문의하기 통합도 OFF' : ''].filter(Boolean).join(' · ');
   render();
 };
 window.setVis = function (kind, v) {
@@ -768,7 +775,7 @@ function screen_sEdit() {
       fld('알리페이 노출', false, '<span class="rg">' +
         radio('sv', '노출', st.aliVisible, "setVis('store','노출')") + radio('sv', '미노출', st.aliVisible, "setVis('store','미노출')") + '</span>' +
         '<div class="hint">지원언어와 무관하게 이 설정 하나가 모든 언어에 적용됩니다.</div>' +
-        (st.aliVisible === '미노출' ? '<div class="notice">' + MSG.storeHide(st.prodCount) + '</div>' : '') +
+        (st.aliVisible === '미노출' ? '<div class="notice">' + MSG.storeHide(storeProdCount(st)) + '</div>' : '') +
         (st.aliVisible === '노출' && onCount(effStoreBtns(st).btns, ROWS_STORE, 'ali') === 0 ? '<div class="notice">' + MSG.noAliBtn('버튼 및 메신저 설정') + '</div>' : '')) +
       fld('대표번호', true, fbox(st.tel)) +
       fld('사업자명', true, fbox(st.biz)) +
@@ -780,7 +787,6 @@ function screen_sEdit() {
       onoff('sbk', st.bookingEnabled, 'setBooking(%V%)', false, ['사용', '미사용']) +
       '<div class="hint">예약을 사용해야 버튼 및 메신저 설정에서 예약 버튼을 켤 수 있습니다.</div>' +
       (!st.bookingEnabled && (st.btns.booking.web || st.btns.booking.ali) ? '<div class="notice">예약 미사용 상태입니다. 예약 버튼은 웹·알리페이 앱 모두 꺼집니다. 설정값은 유지됩니다.</div>' : '') +
-      (st.aliVisible === '노출' && onCount(effStoreBtns(st).btns, ROWS_STORE, 'ali') === 0 ? '<div class="notice">' + MSG.noAliBtn('버튼 및 메신저 설정') + '</div>' : '') +
       '</div></div></div>';
   } else if (i === 11) {
     bd = '<div class="bd">' + btnTable('store', st) +
@@ -852,7 +858,7 @@ window.setAdInnerKind = function (k) { const b = A(VIEW.id); const o = innerOpts
 window.setAdInnerId = function (id) { const b = A(VIEW.id); b.inner = { kind: b.inner.kind, id }; render(); };
 window.setBtnLinkKind = function (v) { const b = A(VIEW.id); const before = b.btn.linkKind; b.btn.linkKind = v;
   if (v === '내부링크' && !b.btn.inner) b.btn.inner = { kind: '병원', id: DB.stores[0].id };
-  if (v === '외부링크') { if (b.btn.ali) { } b.btn.ali = false; }
+  if (v === '외부링크') b.btn.ali = false;
   render(); };
 window.setBtnInnerKind = function (k) { const b = A(VIEW.id); const o = innerOpts(k)[0]; b.btn.inner = { kind: k, id: o ? o[0] : '' }; render(); };
 window.setBtnInnerId = function (id) { const b = A(VIEW.id); b.btn.inner = { kind: b.btn.inner.kind, id }; render(); };
@@ -1153,7 +1159,9 @@ window.saveColl = function () {
   const lines = (byStore ? c.stores : c.products).map(id => {
     const o = byStore ? S(id) : P(id); if (!o) return '';
     const oj = byStore ? judgeStore(o) : judgeProduct(o);
-    const why = oj.na ? '대상 언어 아님' : (oj.visible ? '노출' : oj.reason);
+    /* 기존 노출 조건에서 빠진 항목은 알리페이 판정과 무관하게 세지 않는다 */
+    const off = byStore ? o.active === false : !liveProduct(o);
+    const why = off ? '비활성' : oj.na ? '대상 언어 아님' : (oj.visible ? '노출' : oj.reason);
     return '<p class="hint" style="margin:2px 0">' + esc(o.name) + ' → ' + why + '</p>';
   }).join('');
   confirmBox('저장 확인',
@@ -1176,10 +1184,10 @@ window.save = function (kind) {
   }
   // 스토어를 이번 편집에서 미노출로 바꿨고 영향받는 상품·배너·기획전이 있으면 저장 시 확인한다
   const im0 = kind === 'store' ? impactOfHiding(obj) : null;
-  if (kind === 'store' && obj.aliVisible === '미노출' && VIEW.savedVis === '노출' && (obj.prodCount > 0 || im0.M || im0.K)) {
+  if (kind === 'store' && obj.aliVisible === '미노출' && VIEW.savedVis === '노출' && (storeProdCount(obj) > 0 || im0.M || im0.K)) {
     const im = im0;
     confirmBox('알리페이 미노출로 저장',
-      '<p><b>' + esc(obj.name) + '</b></p><p>이 스토어를 알리페이 앱에서 숨기면 이 스토어 상품 ' + obj.prodCount + '건도 함께 보이지 않습니다.</p>' +
+      '<p><b>' + esc(obj.name) + '</b></p><p>이 스토어를 알리페이 앱에서 숨기면 이 스토어 상품 ' + storeProdCount(obj) + '건도 함께 보이지 않습니다.</p>' +
       ((im.M || im.K) ? '<p>이 스토어가 빠지면서 알리페이 앱에 보이지 않게 되는 ' + [im.M ? '배너 ' + im.M + '건' : '', im.K ? '기획전 ' + im.K + '건' : ''].filter(Boolean).join('과 ') + '도 있습니다.</p>' : '') +
       '<p>지워지는 것은 없습니다.</p>' +
       '<p class="hint">웹 노출에는 영향이 없습니다.</p>',
