@@ -69,7 +69,7 @@ th.newcol{background:#fff4e6}
 .fld{margin-top:12px}
 .fld .l{font-size:12px;color:#8c8c8c;margin-bottom:6px}
 .fld .in{border:1px solid #e0e0e0;border-radius:8px;padding:10px 12px;font-size:13px;color:#262626;background:#fff}
-.fld .in.ph{color:#b0b0b0}
+.fld .in.plc{color:#b0b0b0}
 .fld .in.auto{background:#fafafa}
 .autotag{display:inline-block;margin-left:6px;font-size:11px;color:#c9376a;background:#fff0f4;border:1px solid #f7c3d2;border-radius:3px;padding:0 5px}
 .note{padding:0 16px 6px;font-size:12px;color:#8c8c8c;line-height:1.7}
@@ -179,15 +179,17 @@ function fo09() {
       '<div class="cta ghost" onclick="go(\'fo11\')">마이페이지 보기</div>'
     : '';
 
-  return phone('K-Beauty Station', inner,
+  /* 동의를 마치면 모달은 닫힌다 */
+  var overlay = S.joined ? '' :
     '<div class="dim"><div class="mdl">' +
-      '<h3>시작하기 전에 동의가 필요합니다</h3>' +
-      '<p class="d">알리페이 계정으로 바로 이용하실 수 있습니다. 따로 가입하실 필요는 없습니다.</p>' +
+      '<h3>이용약관 동의</h3>' +
       body +
       (S.permit ? '' : '<p class="d" style="margin-top:12px">프로필 제공 항목은 조회 권한이 열리기 전까지 표시하지 않습니다.</p>') +
       '<div class="cta ' + (ready ? '' : 'dis') + '" ' + (ready ? 'onclick="S.joined=true;render()"' : '') + '>동의하고 시작하기</div>' +
-      '<div class="esc" onclick="S.joined=false;go(\'fo10\')">닫기 (회원을 만들지 않고 둘러보기)</div>' +
-    '</div></div>', 'K-Beauty Station', true);
+      '<div class="esc" onclick="S.joined=false;go(\'fo10\')">닫기</div>' +
+    '</div></div>';
+
+  return phone('K-Beauty Station', inner, overlay, '', true);
 }
 
 /* ────────────────────────────────────────────────
@@ -217,7 +219,7 @@ function fo11() {
       '<div class="cta ghost" style="margin:12px 0 0" onclick="S.agProf=true;render()">알리페이에서 불러오기</div>';
 
   var mail = '<div class="fld"><div class="l">이메일</div>' +
-    '<div class="in ' + (S.email ? '' : 'ph') + '">' + (S.email || '예약 확인을 받을 이메일') + '</div></div>';
+    '<div class="in ' + (S.email ? '' : 'plc') + '">' + (S.email || '예약 확인을 받을 이메일') + '</div></div>';
 
   var rows = ['예약 내역', '채팅', '언어 설정', '이용 약관', '개인정보 처리방침']
     .map(function (t) { return '<div class="mrow"><span>' + t + '</span><span class="a">›</span></div>'; }).join('') +
@@ -253,7 +255,7 @@ function fo12() {
 function fo13() {
   function fld(label, val, opt) {
     opt = opt || {};
-    var cls = opt.auto ? 'in auto' : (val ? 'in' : 'in ph');
+    var cls = opt.auto ? 'in auto' : (val ? 'in' : 'in plc');
     return '<div class="fld"><div class="l">' + label +
       (opt.auto ? '<span class="autotag">회원 정보에서 채움</span>' : '') + '</div>' +
       '<div class="' + cls + '">' + (val || opt.ph) + '</div></div>';
