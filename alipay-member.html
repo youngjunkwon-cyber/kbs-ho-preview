@@ -96,6 +96,11 @@ th.newcol{background:#fff4e6}
 .ck .vw{font-size:12px;color:#b0b0b0;text-decoration:underline}
 .mdl .cta{margin:16px 0 0}
 .mdl .esc{text-align:center;margin-top:10px;font-size:12px;color:#a0a0a0;cursor:pointer}
+.full{margin:0 0 10px 26px;padding:10px 12px;border:1px solid #eee;border-radius:6px;background:#fafafa;font-size:11.5px;color:#8c8c8c;line-height:1.7;max-height:120px;overflow:auto}
+.vrow{display:flex;gap:8px;align-items:stretch}
+.vrow .in{flex:1;min-width:0}
+.vbtn{flex:0 0 auto;padding:10px 12px;border:1px solid #d9d9d9;border-radius:8px;font-size:12.5px;color:#434343;background:#fff;cursor:pointer;white-space:nowrap;display:flex;align-items:center}
+.vbtn.done{border-color:#b7eb8f;background:#f6ffed;color:#389e0d;cursor:default}
 </style>
 </head>
 <body>
@@ -117,7 +122,8 @@ function resetDB() {
     agTerms:  false,   // 이용약관
     agPriv:   false,   // 개인정보처리방침
     agProf:   false,   // 알리페이 프로필 제공 (선택)
-    agAd:     false,   // 광고성 정보 수신 (선택)
+    open:     {},      // 동의 창에서 펼쳐 놓은 전문
+    mailOk:   false,   // 예약에서 입력한 이메일의 인증 여부
     permit:   true,    // 알리페이 회원정보 조회 권한 개통 여부
     wallet:   'CN',    // CN 중국 / HK 홍콩
     email:    '',      // 예약에서 입력하면 채워진다
@@ -143,7 +149,7 @@ var CAPS = {
   fo10: '알리페이 채널에서는 자체 로그인 경로를 숨깁니다. 점선 박스가 웹 채널에는 있고 알리페이 채널에는 없는 자리입니다.',
   fo11: '프로필 제공 동의 여부에 따라 내 정보가 달라집니다. 비밀번호가 없는 계정이라 비밀번호 변경이 없고, 웹 계정과 따로 관리된다는 안내를 예약 내역 위에 둡니다.',
   fo12: '마이페이지의 기존 탈퇴 경로를 그대로 씁니다. 알리페이 연결도 함께 끊기고 다시 들어오면 새 회원이 됩니다.',
-  fo13: '이메일은 예약 필수 항목인데 알리페이 회원은 회원 정보에 값이 없어 입력칸이 뜹니다. 프로필 제공에 동의했으면 국적·성별·생년월일이 채워집니다. 여권 영문명은 채우지 않습니다.',
+  fo13: '이메일은 예약 필수 항목인데 알리페이 회원은 회원 정보에 값이 없어 입력칸이 뜹니다. 인증을 마쳐야 예약을 넘길 수 있습니다. 프로필 제공에 동의했으면 국적·성별·생년월일이 채워집니다. 여권 영문명은 채우지 않습니다.',
   bo11: '어드민 회원 메뉴의 정보조회 화면입니다. 회원 상세 화면은 없습니다. 주황색이 이번에 늘어나는 자리입니다. 가입 경로 필터와 알리페이 정보 칼럼 그룹이 신설입니다.'
 };
 
@@ -158,19 +164,20 @@ function go(v) { S.view = v; render(); }
 function fo09() {
   var ready = S.agTerms && S.agPriv;
   var rows = [
-    ['agTerms', '이용 약관', true],
-    ['agPriv', '개인정보 처리방침', true]
+    ['agTerms', '이용 약관', true, '제1조(목적) 이 약관은 K-Beauty Station이 제공하는 서비스의 이용 조건과 절차, 회사와 이용자의 권리·의무를 정합니다. 제2조(정의) ... 전문이 이 자리에 들어갑니다.'],
+    ['agPriv', '개인정보 처리방침', true, '제1조(처리 목적) 회사는 회원 식별, 예약 중개, 고객 문의 응대를 위하여 개인정보를 처리합니다. 제2조(처리하는 항목) ... 전문이 이 자리에 들어갑니다.']
   ];
-  if (S.permit) rows.push(['agProf', '알리페이 프로필 제공', false, '이름, 성별, 생년월일, 국적을 가져옵니다.']);
-  rows.push(['agAd', '광고성 정보 수신', false]);
+  if (S.permit) rows.push(['agProf', '알리페이 프로필 제공', false, '알리페이 계정의 이름, 성별, 생년월일, 국적을 받아 회원 정보에 채웁니다. 예약할 때 다시 입력하지 않아도 됩니다.']);
 
   var body = rows.map(function (r) {
+    var open = !!S.open[r[0]];
     return '<label class="ck">' +
       '<input type="checkbox" ' + (S[r[0]] ? 'checked' : '') + ' onchange="S.' + r[0] + '=this.checked;render()">' +
       '<span class="tt">' + r[1] + ' ' +
-      (r[2] ? '<span class="rq">필수</span>' : '<span class="op">선택</span>') +
-      (r[3] ? '<div class="sub">' + r[3] + '</div>' : '') + '</span>' +
-      '<span class="vw">보기</span></label>';
+      (r[2] ? '<span class="rq">필수</span>' : '<span class="op">선택</span>') + '</span>' +
+      '<span class="vw" onclick="event.preventDefault();event.stopPropagation();S.open[\'' + r[0] + '\']=!S.open[\'' + r[0] + '\'];render()">' +
+      (open ? '접기' : '보기') + '</span></label>' +
+      (open ? '<div class="full">' + r[3] + '</div>' : '');
   }).join('');
 
   var inner = S.joined
@@ -214,13 +221,15 @@ function fo10() {
    FO-CH-11 마이페이지
    ──────────────────────────────────────────────── */
 function fo11() {
+  /* 이름이 없으면 무엇으로도 부르지 않는다 */
   var prof = S.agProf
     ? '<div class="nm">' + ALI.name + '</div><div class="sub">' + ALI.sex + '<br>' + ALI.birth + '<br>' + ALI.nation + '</div>'
-    : '<div class="nm">회원 10241</div><div class="sub">프로필 제공에 동의하지 않아 이름과 국적이 비어 있습니다.</div>' +
+    : '<div class="sub" style="margin-top:0">알리페이 계정의 이름, 성별, 생년월일, 국적을 가져올 수 있습니다.</div>' +
       '<div class="cta ghost" style="margin:12px 0 0" onclick="S.agProf=true;render()">알리페이에서 불러오기</div>';
 
   var mail = '<div class="fld"><div class="l">이메일</div>' +
-    '<div class="in ' + (S.email ? '' : 'plc') + '">' + (S.email || '예약 확인을 받을 이메일') + '</div></div>';
+    '<div class="in ' + (S.email ? '' : 'plc') + '">' + (S.email || '예약 확인을 받을 이메일') + '</div>' +
+    (S.email && S.mailOk ? '<div class="sub">인증된 주소입니다.</div>' : '') + '</div>';
 
   var rows = ['예약 내역', '채팅', '언어 설정', '이용 약관', '개인정보 처리방침']
     .map(function (t) { return '<div class="mrow"><span>' + t + '</span><span class="a">›</span></div>'; }).join('') +
@@ -261,6 +270,15 @@ function fo13() {
       (opt.auto ? '<span class="autotag">회원 정보에서 채움</span>' : '') + '</div>' +
       '<div class="' + cls + '">' + (val || opt.ph) + '</div></div>';
   }
+  /* 이메일은 인증까지 받아야 예약을 넘길 수 있다 */
+  function mailField() {
+    var btn = S.mailOk
+      ? '<div class="vbtn done">인증됨</div>'
+      : '<div class="vbtn" onclick="S.email=S.email||\'xiaomei.w@qq.com\';S.mailOk=true;render()">인증메일 보내기</div>';
+    return '<div class="fld"><div class="l">이메일</div><div class="vrow">' +
+      '<div class="in ' + (S.email ? '' : 'plc') + '">' + (S.email || '예약 확인을 받을 이메일') + '</div>' + btn +
+      '</div>' + (S.mailOk ? '' : '<div class="sub">인증을 마쳐야 예약을 넘길 수 있습니다.</div>') + '</div>';
+  }
   var auto = S.agProf;
   return phone('예약하기',
     '<div class="sec"><div class="h">예약자 정보</div><div class="box">' +
@@ -268,7 +286,7 @@ function fo13() {
     fld('국적', auto ? ALI.nation : '', { auto: auto, ph: '국적 선택' }) +
     fld('성별', auto ? ALI.sex : '', { auto: auto, ph: '성별 선택' }) +
     fld('생년월일', auto ? ALI.birth : '', { auto: auto, ph: '생년월일 선택' }) +
-    fld('이메일', S.email, { ph: '예약 확인을 받을 이메일' }) +
+    mailField() +
     fld('휴대폰 번호', '', { ph: '문자 인증이 필요합니다' }) +
     fld('연락 메신저', '', { ph: '위챗 아이디' }) +
     '</div></div>' +
@@ -276,7 +294,7 @@ function fo13() {
       ? '프로필 제공에 동의해 국적·성별·생년월일이 채워졌습니다. 이용자가 고칠 수 있습니다.'
       : '프로필 제공을 거부해 전부 직접 입력합니다.') +
     '<br>여권 영문명은 채우지 않습니다. 알리페이가 주는 이름은 여권 표기가 보장되지 않습니다.</div>' +
-    '<div class="cta" onclick="S.email=\'xiaomei.w@qq.com\';render()">예약 요청 (이메일 입력 후)</div>', '', '‹');
+    '<div class="cta ' + (S.mailOk ? '' : 'dis') + '" ' + (S.mailOk ? 'onclick="go(\'fo11\')"' : '') + '>예약 요청</div>', '', '‹');
 }
 
 /* ────────────────────────────────────────────────
@@ -304,7 +322,7 @@ function bo11() {
   me.lang = LANG[S.wallet];
   me.wallet = S.wallet;
   me.prof = S.agProf ? '동의' : '거부';
-  me.mkt = S.agAd ? '동의' : '거부';
+
 
   var list = MEM.filter(function (m) { return BOF === 'all' || m.path === BOF; });
 
@@ -403,8 +421,7 @@ function render() {
     '<span class="kv">회원 <em>' + (S.joined ? '생성됨' : '아직 아님') + '</em></span>' +
     '<span class="kv">약관·처리방침 <em>' + (S.agTerms && S.agPriv ? '동의' : '미동의') + '</em></span>' +
     '<span class="kv">프로필 제공 <em>' + (S.agProf ? '동의' : '거부') + '</em></span>' +
-    '<span class="kv">광고 수신 <em>' + (S.agAd ? '동의' : '거부') + '</em></span>' +
-    '<span class="kv">이메일 <em>' + (S.email || '없음') + '</em></span>' +
+    '<span class="kv">이메일 <em>' + (S.email || '없음') + (S.email ? (S.mailOk ? ' (인증됨)' : ' (미인증)') : '') + '</em></span>' +
     '<span class="kv">월렛 <em>' + (S.wallet === 'CN' ? '중국' : '홍콩') + '</em></span>' +
     '<button onclick="S.wallet=(S.wallet===\'CN\'?\'HK\':\'CN\');render()">월렛 바꾸기</button>' +
     '<button onclick="S.permit=!S.permit;render()">조회 권한 ' + (S.permit ? '끄기' : '켜기') + '</button>' +
