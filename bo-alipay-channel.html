@@ -155,6 +155,7 @@ const MSG = {
   inquiryHint: '상담접수가 켜져 있을 때만 적용됩니다. 채팅 상태와는 무관합니다. 상담접수가 꺼져 있으면 이 설정은 쓰이지 않습니다.',
   needBooking: '예약설정에서 예약을 사용하면 켤 수 있습니다.',
   cap:         '웹·알리페이 앱 각 2개까지 켤 수 있습니다.',
+  capUnmerge:  (chName, after) => '통합 표시를 끄면 상담접수와 채팅이 각각 한 자리를 차지합니다. ' + chName + '은 ' + after.join(', ') + '으로 ' + after.length + '개가 됩니다. 웹·알리페이 앱 각 2개까지 켤 수 있습니다. 다른 항목을 먼저 끄면 통합 표시를 끌 수 있습니다.',
   exhEmpty:    s => '노출 가능한 ' + s + ' 없습니다. 기획전이 알리페이에 노출되지 않습니다.',
   exhNone:     s => '담은 ' + s + ' 없습니다. 1개 이상 담아야 저장할 수 있습니다.',
   collEmpty:   s => s + ' 1개 이상 담아야 저장할 수 있습니다.',
@@ -624,21 +625,23 @@ function btnTable(kind, obj) {
   return html;
 }
 
+/* 상한 검사는 켜는 동작만이 아니라 자리 수가 늘어나는 모든 동작에 건다.
+   통합 표시를 끄면 합쳐져 있던 상담접수·채팅이 각각 자리를 차지해 자리 수가 늘어난다. */
 window.setBtn = function (kind, k, ch, on) {
   const obj = kind === 'store' ? S(VIEW.id) : P(VIEW.id);
   const rows = kind === 'store' ? ROWS_STORE : ROWS_PRODUCT;
-  const label = rows.filter(r => r.k === k)[0].label;
-  if (on) {
-    const keep = obj.btns[k][ch];
-    const e0 = kind === 'store' ? effStoreBtns(obj) : effBtns(obj);
-    const already = ctaList(e0.btns, rows, ch);
-    obj.btns[k][ch] = true;
-    const e1 = kind === 'store' ? effStoreBtns(obj) : effBtns(obj);
-    const after = onCount(e1.btns, rows, ch);
-    obj.btns[k][ch] = keep;
-    if (after > CAP) { alertBox('켤 수 없습니다', MSG.cap + ' 지금 ' + (ch === 'web' ? '웹' : '알리페이 앱') + '은 ' + already.join(', ') + '으로 2개입니다.'); render(); return; }
-  }
+  const eff = () => (kind === 'store' ? effStoreBtns(obj) : effBtns(obj)).btns;
+  const chName = ch === 'web' ? '웹' : '알리페이 앱';
+  const keep = obj.btns[k][ch];
+  const before = ctaList(eff(), rows, ch);
   obj.btns[k][ch] = !!on;
+  const after = ctaList(eff(), rows, ch);
+  if (after.length > CAP && after.length > before.length) {
+    obj.btns[k][ch] = keep;
+    if (on) alertBox('켤 수 없습니다', MSG.cap + ' 지금 ' + chName + '은 ' + before.join(', ') + '으로 ' + before.length + '개입니다.');
+    else alertBox('끌 수 없습니다', MSG.capUnmerge(chName, after));
+    render(); return;
+  }
   render();
 };
 window.setVis = function (kind, v) {
@@ -1115,7 +1118,7 @@ function screen_btnSpec() {
     '<tbody>' + rows + '</tbody></table></div>' + '</div></div>' +
     '<div class="card"><div class="hd">버튼 개수 세는 법</div><div class="bd">' +
     '<div class="row"><div class="lbl">세는 법</div><div class="val">상담접수와 채팅은 각각 독립된 버튼입니다. 상담접수가 켜져 있고 통합 표시도 켜져 있으면 문의하기 버튼 하나로 셉니다(자리 1개). 이때 채팅이 켜져 있어도 따로 자리를 차지하지 않습니다. 상담접수가 꺼져 있으면 통합 표시 값과 무관하게 채팅은 켜진 경우에만 그 하나가 버튼 하나로 셉니다. 외부링크, 메신저, 예약은 각각 버튼 하나입니다.</div></div>' +
-    '<div class="row"><div class="lbl">최대 개수</div><div class="val">웹 2개, 알리페이 앱 2개까지입니다. 두 곳을 각각 2개씩 켤 수 있고, 세 번째를 켜려 하면 막습니다.</div></div>' +
+    '<div class="row"><div class="lbl">최대 개수</div><div class="val">웹 2개, 알리페이 앱 2개까지입니다. 두 곳을 각각 2개씩 켤 수 있고, 세 번째를 켜려 하면 막습니다. 끄는 동작도 자리가 늘어나면 막습니다. 문의하기로 합쳐져 2개인 상태에서 통합 표시를 끄면 상담접수와 채팅이 각각 자리를 차지해 3개가 되므로, 다른 항목을 먼저 꺼야 끌 수 있습니다.</div></div>' +
     '<div class="row"><div class="lbl">지금 예시</div><div class="val">웹 2개(문의하기, 예약), 알리페이 앱 2개(문의하기, 예약)입니다. 상담접수가 켜져 있고 통합 표시도 켜져 있어 문의하기 하나로 합쳐진 상태입니다.</div></div>' +
     '</div></div>' +
     '<div class="card"><div class="hd">알리페이 앱에서 켠 버튼이 없을 때</div><div class="bd">' +
