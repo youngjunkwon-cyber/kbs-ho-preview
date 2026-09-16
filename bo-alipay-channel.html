@@ -140,8 +140,8 @@ const CAP = 2;
 // 실측 버튼 항목. 채팅은 이번에 신설, 예약은 스토어에만 있다.
 const ROWS_PRODUCT = [
   { k: 'consult',   label: '상담접수' },
-  { k: 'inquiry',   label: '문의하기(상담+채팅)로 통합 노출', needConsult: true },
   { k: 'chat',      label: '채팅' },
+  { k: 'inquiry',   label: '상담접수·채팅 통합 표시' },
   { k: 'extlink',   label: '외부링크 설정', aliHardOff: true },
   { k: 'messenger', label: '메신저 설정',   aliHardOff: true }
 ];
@@ -152,7 +152,8 @@ const eul = w => ((w.charCodeAt(w.length - 1) - 0xAC00) % 28 ? '을' : '를');
 const MSG = {
   noAliBtn:    where => '알리페이 앱 버튼이 없어 알리페이에 노출되지 않습니다.' + (where ? ' ' + where + '에서 1개 이상 켜면 노출됩니다.' : ''),
   hardOff:     '알리페이 앱 미지원 항목입니다.',
-  needConsult: '상담접수를 켜면 사용할 수 있습니다.',
+  inquiryHint: '상담접수와 채팅이 둘 다 켜져 있을 때만 적용됩니다. 하나만 켜져 있으면 이 설정은 쓰이지 않습니다.',
+  chatLocked:  '상담접수·채팅 통합 표시로 문의하기 안에 포함됩니다. 자리는 1개로 셉니다.',
   needBooking: '예약설정에서 예약을 사용하면 켤 수 있습니다.',
   cap:         '웹·알리페이 앱 각 2개까지 켤 수 있습니다.',
   exhEmpty:    s => '노출 가능한 ' + s + ' 없습니다. 기획전이 알리페이에 노출되지 않습니다.',
@@ -264,6 +265,9 @@ const DB = {
       adNotice: '활성화', aliVisible: '노출', btn: null, history: [] },
     { id: 'B6', reg: '2026-08-27 10:00', from: '2026-09-01', to: '2026-10-31', lang: '중국어(간체)', pos: '메인하단배너',
       linkType: '내부링크', inner: { kind: '인플루언서', id: 'IF1' }, url: '', biz: '글로픽스', title: '인플루언서 협업전',
+      adNotice: '활성화', aliVisible: '노출', btn: null, history: [] },
+    { id: 'B7', reg: '2026-08-26 09:30', from: '2026-09-01', to: '2026-10-31', lang: '중국어(번체)', pos: '메인중단배너',
+      linkType: '내부링크', inner: { kind: '직접입력', path: '/products/P4' }, url: '', biz: '모모클리닉', title: '눈매교정 직접입력 배너',
       adNotice: '활성화', aliVisible: '노출', btn: null, history: [] }
   ],
   // 기획전 유형 레코드. 유형 값 네 가지가 언어별로 하나씩 있고, 배너 내부링크는 이 레코드를 고른다
@@ -298,7 +302,7 @@ const DB = {
     { id: 'IF2', name: '디올레스페셜_중국', show: 'Diore 추천 플랜', lang: '중국어(간체)', active: true, from: '2026-09-01', to: '2026-10-31', products: ['P4', 'P8'] }
   ],
   magazines: [{ id: 'M1', title: '가을 두피 관리 가이드', lang: '중국어(간체)', status: '게시', reg: '2026-09-02 11:20',
-    body: '가을에는 두피가 건조해집니다. 자세한 코스는 <a href="https://k-beautystation.com/products/P1">상품 페이지</a>에서 확인하세요. 후기 영상은 https://www.instagram.com/p/abc/ 에서 볼 수 있습니다. <iframe src="https://www.youtube.com/embed/xyz"></iframe>' }],
+    body: '가을에는 두피가 건조해집니다. 자세한 코스는 <a href="https://k-beautystation.com/products/P1">상품 페이지</a>에서 확인하세요. 후기 영상은 https://www.instagram.com/p/abc/ 에서 볼 수 있습니다. <iframe src="https://www.youtube.com/embed/xyz"></iframe> [상품 카드:P1:두피 스케일링 케어] [상품 카드:P5:헤어 클리닉 4주]' }],
 };
 /* 에디터 링크 판정 (BO-CH-07). 본문 에디터는 매거진과 스토어 칼럼에만 있다. */
 const INTERNAL_HOSTS = ['k-beautystation.com', 'www.k-beautystation.com', 'host.kbstations.com', 'admin.k-beautystation.com'];
@@ -345,8 +349,6 @@ function effBtns(p) {
   const src = p.mode === '기본 설정' ? st : p;
   ROWS_PRODUCT.forEach(r => { out[r.k] = { web: !!src.btns[r.k].web, ali: !!src.btns[r.k].ali }; });
   ROWS_PRODUCT.filter(r => r.aliHardOff).forEach(r => { out[r.k].ali = false; });
-  if (!out.consult.ali) out.inquiry.ali = false;
-  if (!out.consult.web) out.inquiry.web = false;
   if (p.mode === '기본 설정' && ctaList(out, ROWS_PRODUCT, 'ali').length === 0) { out.chat.ali = true; chatAuto = true; }
   return { btns: out, chatAuto };
 }
@@ -357,17 +359,21 @@ function effStoreBtns(st) {
   const out = {};
   ROWS_STORE.forEach(r => { out[r.k] = { web: !!st.btns[r.k].web, ali: !!st.btns[r.k].ali }; });
   ROWS_STORE.filter(r => r.aliHardOff).forEach(r => { out[r.k].ali = false; });
-  if (!out.consult.ali) out.inquiry.ali = false;
-  if (!out.consult.web) out.inquiry.web = false;
   if (!st.bookingEnabled) { out.booking.web = false; out.booking.ali = false; }
   return { btns: out };
 }
-// FO 하단 CTA 로 렌더되는 자리 수. 상담접수와 문의하기 통합은 한 자리를 쓴다.
+// FO 하단 CTA 로 렌더되는 자리 수. 상담접수·채팅이 둘 다 켜져 있고 통합 표시도 켜져 있을 때만
+// "문의하기" 한 자리로 합친다. 상담접수·채팅은 그 밖에는 완전히 독립된 토글이라 서로의 상태로
+// 강제 보정하지 않는다. 통합 표시는 그 조건이 아니면 그냥 쓰이지 않는 값일 뿐이다.
 function ctaList(b, rows, ch) {
   const out = [];
-  if (b.inquiry && b.inquiry[ch]) out.push('문의하기');
-  else if (b.consult && b.consult[ch]) out.push('상담접수');
-  ['chat', 'extlink', 'messenger', 'booking'].forEach(k => {
+  const integrated = b.consult && b.consult[ch] && b.chat && b.chat[ch] && b.inquiry && b.inquiry[ch];
+  if (integrated) out.push('문의하기');
+  else {
+    if (b.consult && b.consult[ch]) out.push('상담접수');
+    if (b.chat && b.chat[ch]) out.push('채팅');
+  }
+  ['extlink', 'messenger', 'booking'].forEach(k => {
     if (rows.some(r => r.k === k) && b[k] && b[k][ch]) out.push(rows.filter(r => r.k === k)[0].label.replace(' 설정', ''));
   });
   return out;
@@ -401,10 +407,40 @@ function liveNow(o) {
   const on = o.active === undefined ? true : (o.active === '활성' || o.active === true);
   return on && (!o.from || o.from <= TODAY) && (!o.to || o.to >= TODAY);
 }
-// 내부링크 대상 판정. 병원·기획전·인플루언서는 대상을 보고, 직접입력만 그대로 통과한다.
+// 직접입력 주소를 우리 경로 패턴으로 파싱한다. 맞는 패턴이 없으면(카테고리·검색·홈 등 목록 페이지) 대상 특정이 안 되어 통과시킨다.
+function parseInternalPath(raw) {
+  const v = String(raw || '').trim();
+  const m = v.match(/^\/(products|stores|collections|influencers)\/([^\/?#]+)\/?$/);
+  return m ? { type: m[1], id: m[2] } : null;
+}
+// 내부링크 대상 판정. 병원·기획전·인플루언서는 대상을 보고, 직접입력은 주소를 파싱해 대상을 특정할 수 있으면 같이 본다.
 // 배너와 대상의 언어가 다르면 눌렀을 때 다른 언어 화면으로 가므로 통과시키지 않는다. 스토어는 언어가 없어 제외한다.
 function innerTargetOk(inner, lang) {
   if (!inner) return { ok: true, label: '대상 없음', skip: true };
+  if (inner.kind === '직접입력') {
+    const parsed = parseInternalPath(inner.path);
+    if (!parsed) return { ok: true, label: inner.path ? '직접입력 · 목록 페이지' : '직접입력 · 주소 없음', skip: true };
+    if (parsed.type === 'products') {
+      const p = P(parsed.id); if (!p) return { ok: false, label: '직접입력 · 상품 대상 없음' };
+      const j = judgeProduct(p); return { ok: !j.na && j.visible, label: '직접입력 · ' + p.name, j };
+    }
+    if (parsed.type === 'stores') {
+      const st = S(parsed.id); if (!st) return { ok: false, label: '직접입력 · 스토어 대상 없음' };
+      const j = judgeStore(st); return { ok: j.visible, label: '직접입력 · ' + st.name, j };
+    }
+    if (parsed.type === 'collections') {
+      const c = C(parsed.id); if (!c) return { ok: false, label: '직접입력 · 기획전 대상 없음' };
+      const j = judgeCollection(c); return { ok: !j.na && j.visible, label: '직접입력 · ' + c.name, j };
+    }
+    if (parsed.type === 'influencers') {
+      const f = DB.influencers.filter(x => x.id === parsed.id)[0];
+      if (!f) return { ok: false, label: '직접입력 · 인플루언서 대상 없음' };
+      const live = (f.products || []).filter(id => { const p = P(id); if (!p || !liveProduct(p)) return false; const j = judgeProduct(p); return !j.na && j.visible; }).length;
+      const ok = live > 0 && liveNow(f);
+      return { ok, label: '직접입력 · ' + f.name, live };
+    }
+    return { ok: true, label: '직접입력', skip: true };
+  }
   if (inner.kind === '병원') {
     const st = S(inner.id); if (!st) return { ok: false, label: '병원 · 대상 없음' };
     /* 기존 노출 조건에서 이미 빠진 스토어는 연결 대상으로 치지 않는다 */
@@ -561,16 +597,16 @@ function btnTable(kind, obj) {
     const e = eff.btns[r.k];
     let webDis = locked, aliDis = aliOffAll || r.aliHardOff, note = '';
     if (r.aliHardOff) note = MSG.hardOff;
-    if (r.needConsult) {
-      const offWeb = !eff.btns.consult.web, offAli = !eff.btns.consult.ali;
-      if (offWeb) webDis = true;
-      if (offAli) aliDis = true;
-      if (offWeb && offAli) note = MSG.needConsult;
-      else if (offWeb) note = '웹 ' + MSG.needConsult;
-      else if (offAli) note = '알리페이 앱 ' + MSG.needConsult;
-    }
     if (r.needBooking && !obj.bookingEnabled) { webDis = true; aliDis = true; note = MSG.needBooking; }
     if (r.k === 'chat' && !isStore && eff.chatAuto) note = '알리페이 앱 버튼이 없어 채팅이 자동 적용됩니다.';
+    if (r.k === 'chat') {
+      const lockWeb = eff.btns.consult.web && eff.btns.chat.web && eff.btns.inquiry.web;
+      const lockAli = eff.btns.consult.ali && eff.btns.chat.ali && eff.btns.inquiry.ali;
+      if (lockWeb) webDis = true;
+      if (lockAli) aliDis = true;
+      if (lockWeb || lockAli) note = MSG.chatLocked;
+    }
+    if (r.k === 'inquiry' && !note) note = MSG.inquiryHint;
     html += '<tr><td>' + r.label + '</td>' +
       '<td>' + onoff('w_' + kind + '_' + r.k, e.web, "setBtn('" + kind + "','" + r.k + "','web',%V%)", webDis) + '</td>' +
       '<td' + (aliDis ? ' class="lock"' : '') + '>' + onoff('a_' + kind + '_' + r.k, e.ali, "setBtn('" + kind + "','" + r.k + "','ali',%V%)", aliDis) + '</td>' +
@@ -605,10 +641,7 @@ window.setBtn = function (kind, k, ch, on) {
     obj.btns[k][ch] = keep;
     if (after > CAP) { alertBox('켤 수 없습니다', MSG.cap + ' 지금 ' + (ch === 'web' ? '웹' : '알리페이 앱') + '은 ' + already.join(', ') + '으로 2개입니다.'); render(); return; }
   }
-  const before = obj.btns[k][ch] ? 'ON' : 'OFF';
   obj.btns[k][ch] = !!on;
-  const cascade = k === 'consult' && !on && obj.btns.inquiry[ch];
-  if (k === 'consult' && !on) obj.btns.inquiry[ch] = false;
   render();
 };
 window.setVis = function (kind, v) {
@@ -812,8 +845,8 @@ function screen_aList() {
   const body = rows.map(b => { const j = judgeAd(b); if (!passFilter(j)) return '';
     const link = b.linkType === '외부링크' ? b.url
       : b.linkType === '내부이미지랜딩페이지' ? '랜딩페이지'
-      : !b.inner || b.inner.kind === '직접입력' ? '직접입력'
-      : innerTargetOk(b.inner).label;
+      : !b.inner ? '직접입력'
+      : innerTargetOk(b.inner, b.lang).label;
     return '<tr><td>' + b.reg + '</td><td>' + b.from + '</td><td>' + b.to + '</td><td>' + b.lang + '</td><td>' + b.pos + '</td>' +
       '<td class="c">' + visCell(j) + '</td><td>' + rsnCell(j) + '</td>' +
       '<td>' + b.linkType + '</td>' +
@@ -842,26 +875,34 @@ function innerOpts(kind, keepId) {
   if (kind === '인플루언서') return DB.influencers.filter(same).map(f => [f.id, f.name]);
   return [];
 }
-function innerPicker(kindH, idH, cur) {
+function innerPicker(kindH, idH, cur, pathH, lang) {
   const kind = (cur && cur.kind) || '직접입력';
   const opts = innerOpts(kind, cur && cur.id);
-  return '<select onchange="' + kindH + '">' + INNER_KINDS.map(k => '<option' + (k === kind ? ' selected' : '') + '>' + k + '</option>').join('') + '</select> ' +
-    (kind === '직접입력' ? '<input type="text" placeholder="/stores/226" style="width:220px" readonly> <span class="tblnote">직접입력은 알리페이 노출 확인 대상이 아닙니다.</span>'
-      : '<select onchange="' + idH + '">' + opts.map(o => '<option value="' + o[0] + '"' + (cur && cur.id === o[0] ? ' selected' : '') + '>' + esc(o[1]) + '</option>').join('') + '</select>');
+  let tail;
+  if (kind === '직접입력') {
+    const tv = innerTargetOk(cur, lang);
+    tail = '<input type="text" placeholder="/products/P1" style="width:220px" value="' + esc((cur && cur.path) || '') + '" onchange="' + pathH + '"> ' +
+      '<span class="tblnote">' + (tv.skip ? tv.label : (tv.ok ? '노출 · ' : '미노출 · ') + tv.label) + '</span>';
+  } else {
+    tail = '<select onchange="' + idH + '">' + opts.map(o => '<option value="' + o[0] + '"' + (cur && cur.id === o[0] ? ' selected' : '') + '>' + esc(o[1]) + '</option>').join('') + '</select>';
+  }
+  return '<select onchange="' + kindH + '">' + INNER_KINDS.map(k => '<option' + (k === kind ? ' selected' : '') + '>' + k + '</option>').join('') + '</select> ' + tail;
 }
 window.openAd = function (id) { VIEW.id = id; MODAL = 'ad'; render(); };
 window.setAdLinkType = function (v) { const b = A(VIEW.id); const before = b.linkType; b.linkType = v;
   if (v === '내부링크' && !b.inner) b.inner = { kind: '병원', id: DB.stores[0].id };
   if (v === '내부이미지랜딩페이지' && !b.btn) b.btn = { label: '자세히 보기', linkKind: '링크없음', web: true, ali: true };
    render(); };
-window.setAdInnerKind = function (k) { const b = A(VIEW.id); const o = innerOpts(k)[0]; b.inner = { kind: k, id: o ? o[0] : '' }; render(); };
+window.setAdInnerKind = function (k) { const b = A(VIEW.id); const o = innerOpts(k)[0]; b.inner = k === '직접입력' ? { kind: k, path: '' } : { kind: k, id: o ? o[0] : '' }; render(); };
 window.setAdInnerId = function (id) { const b = A(VIEW.id); b.inner = { kind: b.inner.kind, id }; render(); };
+window.setAdInnerPath = function (path) { const b = A(VIEW.id); b.inner = { kind: '직접입력', path }; render(); };
 window.setBtnLinkKind = function (v) { const b = A(VIEW.id); const before = b.btn.linkKind; b.btn.linkKind = v;
   if (v === '내부링크' && !b.btn.inner) b.btn.inner = { kind: '병원', id: DB.stores[0].id };
   if (v === '외부링크') b.btn.ali = false;
   render(); };
-window.setBtnInnerKind = function (k) { const b = A(VIEW.id); const o = innerOpts(k)[0]; b.btn.inner = { kind: k, id: o ? o[0] : '' }; render(); };
+window.setBtnInnerKind = function (k) { const b = A(VIEW.id); const o = innerOpts(k)[0]; b.btn.inner = k === '직접입력' ? { kind: k, path: '' } : { kind: k, id: o ? o[0] : '' }; render(); };
 window.setBtnInnerId = function (id) { const b = A(VIEW.id); b.btn.inner = { kind: b.btn.inner.kind, id }; render(); };
+window.setBtnInnerPath = function (path) { const b = A(VIEW.id); b.btn.inner = { kind: '직접입력', path }; render(); };
 window.setAdBtnShow = function (ch, v) { const b = A(VIEW.id); const before = b.btn[ch] ? '활성화' : '비활성화'; b.btn[ch] = !!v;
    render(); };
 
@@ -886,7 +927,7 @@ function modal_ad() {
     '<select onchange="setAdLinkType(this.value)">' + ['외부링크', '내부링크', '내부이미지랜딩페이지'].map(v => '<option' + (v === b.linkType ? ' selected' : '') + '>' + v + '</option>').join('') + '</select></div></div>';
   if (isExt) h += '<div class="row"><div class="lbl"><span class="req">*</span>외부링크</div><div class="val"><input type="text" style="width:100%" value="' + esc(b.url) + '"></div></div>';
   if (b.linkType === '내부링크') h += '<div class="row"><div class="lbl"><span class="req">*</span>내부링크</div><div class="val">' +
-    innerPicker('setAdInnerKind(this.value)', 'setAdInnerId(this.value)', b.inner) + '</div></div>';
+    innerPicker('setAdInnerKind(this.value)', 'setAdInnerId(this.value)', b.inner, 'setAdInnerPath(this.value)', b.lang) + '</div></div>';
   h += '<div class="row"><div class="lbl"><span class="req">*</span>대표 이미지</div><div class="val"><span class="tblnote">banner_' + b.id + '.jpg</span></div></div>';
   if (isLanding) h += '<div class="row"><div class="lbl"><span class="req">*</span>상세 이미지</div><div class="val"><span class="tblnote">landing_' + b.id + '.jpg</span></div></div>';
   let tail = '';
@@ -908,7 +949,7 @@ function modal_ad() {
       '<select onchange="setBtnLinkKind(this.value)">' + ['링크없음', '외부링크', '내부링크'].map(v => '<option' + (v === b.btn.linkKind ? ' selected' : '') + '>' + v + '</option>').join('') + '</select></div></div>' +
       (b.btn.linkKind === '외부링크' ? '<div class="row"><div class="lbl">버튼 링크</div><div class="val"><input type="text" style="width:100%" value="' + esc(b.btn.url || '') + '"></div></div>' : '') +
       (b.btn.linkKind === '내부링크' ? '<div class="row"><div class="lbl">버튼 링크</div><div class="val">' +
-        innerPicker('setBtnInnerKind(this.value)', 'setBtnInnerId(this.value)', b.btn.inner) + '</div></div>' : '');
+        innerPicker('setBtnInnerKind(this.value)', 'setBtnInnerId(this.value)', b.btn.inner, 'setBtnInnerPath(this.value)', b.lang) + '</div></div>' : '');
   }
   h += tail;
   return '<div class="mask"><div class="modal" style="max-width:720px"><div class="hd">수정<button class="x" onclick="closeMD()">✕</button></div>' +
@@ -1050,15 +1091,15 @@ function screen_hEdit() {
 
 /* --------------------- BO-CH-10 · 버튼 설정 공통 구조 --------------------- */
 const SPEC_ROWS = [
-  ['상담접수', 0, '웹·알리페이 앱 모두 지원.'],
-  ['문의하기(상담+채팅)로 통합 노출', 0, '같은 채널의 상담접수 ON일 때만 사용. 상담접수와 버튼 1개 공유.'],
-  ['채팅', 1, '웹·알리페이 앱 모두 지원. 앱 내에서 열립니다.'],
+  ['상담접수', 0, '웹·알리페이 앱 모두 지원. 채팅과 완전히 독립된 토글.'],
+  ['채팅', 1, '웹·알리페이 앱 모두 지원. 앱 내에서 열립니다. 상담접수와 완전히 독립된 토글.'],
+  ['상담접수·채팅 통합 표시', 0, '상담접수와 채팅이 같은 채널에서 둘 다 켜져 있을 때만 적용. 그 조건이 아니면 값은 저장돼 있어도 쓰이지 않습니다.'],
   ['외부링크 설정', 0, '알리페이 앱 미지원.'],
   ['메신저 설정', 0, '알리페이 앱 미지원.'],
   ['예약', 0, '웹·알리페이 앱 모두 지원. 예약설정에서 예약 사용 필요.']
 ];
 function screen_btnSpec() {
-  const ON = { '상담접수': 1, '문의하기(상담+채팅)로 통합 노출': 1, '예약': 1 };
+  const ON = { '상담접수': 1, '채팅': 1, '상담접수·채팅 통합 표시': 1, '예약': 1 };
   let rows = '';
   SPEC_ROWS.forEach(r => {
     const on = !!ON[r[0]];
@@ -1075,9 +1116,9 @@ function screen_btnSpec() {
     '<th style="width:220px">알리페이</th><th style="min-width:320px"></th></tr></thead>' +
     '<tbody>' + rows + '</tbody></table></div>' + '</div></div>' +
     '<div class="card"><div class="hd">버튼 개수 세는 법</div><div class="bd">' +
-    '<div class="row"><div class="lbl">세는 법</div><div class="val">문의하기 통합을 켜면 문의하기 버튼 하나로 셉니다(상담접수 포함). 통합을 끄고 상담접수만 켜면 상담접수 버튼 하나입니다. 채팅, 외부링크, 메신저, 예약은 각각 버튼 하나입니다.</div></div>' +
+    '<div class="row"><div class="lbl">세는 법</div><div class="val">상담접수와 채팅은 각각 독립된 버튼입니다. 둘 다 켜져 있고 통합 표시도 켜져 있으면 그때만 문의하기 버튼 하나로 합쳐 셉니다(자리 1개). 상담접수·채팅 중 하나만 켜져 있으면 통합 표시 값과 무관하게 그 하나만 버튼 하나로 셉니다. 외부링크, 메신저, 예약은 각각 버튼 하나입니다.</div></div>' +
     '<div class="row"><div class="lbl">최대 개수</div><div class="val">웹 2개, 알리페이 앱 2개까지입니다. 두 곳을 각각 2개씩 켤 수 있고, 세 번째를 켜려 하면 막습니다.</div></div>' +
-    '<div class="row"><div class="lbl">지금 예시</div><div class="val">웹 2개(문의하기, 예약), 알리페이 앱 2개(문의하기, 예약)입니다. 최대 개수에 딱 맞습니다.</div></div>' +
+    '<div class="row"><div class="lbl">지금 예시</div><div class="val">웹 2개(문의하기, 예약), 알리페이 앱 2개(문의하기, 예약)입니다. 상담접수·채팅이 둘 다 켜져 있고 통합 표시도 켜져 있어 문의하기 하나로 합쳐진 상태입니다.</div></div>' +
     '</div></div>' +
     '<div class="card"><div class="hd">알리페이 앱에서 켠 버튼이 없을 때</div><div class="bd">' +
     '<div class="notice">' + MSG.noAliBtn() + '</div>' + '</div></div>';
@@ -1121,9 +1162,19 @@ window.mInsert = function (kind, id) {
   const m = M('M1'), cur = window.EDBUF != null ? window.EDBUF : m.body;
   const o = kind === 'p' ? DB.products.find(x => x.id === id) : DB.stores.find(x => x.id === id);
   if (!o) return;
-  window.EDBUF = cur + ' [' + (kind === 'p' ? '상품' : '스토어') + ' 카드: ' + o.name + ']';
+  window.EDBUF = cur + ' [' + (kind === 'p' ? '상품' : '스토어') + ' 카드:' + id + ':' + o.name + ']';
   MPICK = null; render();
 };
+/* 알리페이 채널 렌더 시점 필터. 상품·스토어 카드는 그 대상이 지금 알리페이에 노출돼야 남는다.
+   대상 노출 상태는 카드를 넣은 뒤에도 운영 중 계속 바뀔 수 있어, 저장 시가 아니라 보여줄 때마다 다시 본다. */
+function renderForAlipay(text) {
+  return String(text).replace(/\[(상품|스토어) 카드:([^:\]]+):([^\]]*)\]/g, (m, kind, id, name) => {
+    const j = kind === '상품' ? (P(id) ? judgeProduct(P(id)) : { na: true, visible: false }) : (S(id) ? judgeStore(S(id)) : { na: true, visible: false });
+    return (!j.na && j.visible) ? m : '';
+  });
+}
+let MPREVIEW = false;
+window.mTogglePreview = function () { MPREVIEW = !MPREVIEW; render(); };
 function screen_mEdit() {
   const m = M('M1');
   const cur = window.EDBUF != null ? window.EDBUF : m.body;
@@ -1131,6 +1182,8 @@ function screen_mEdit() {
   const pickRow = (kind, list) => '<div class="pickrow"><div class="frow">' +
     '<select id="mpk_' + kind + '">' + list.map(x => '<option value="' + x.id + '">' + esc(x.name) + '</option>').join('') + '</select>' +
     '<button class="btn blue sm" onclick="mInsert(\'' + kind + '\', el(\'#mpk_' + kind + '\').value)">추가</button></div></div>';
+  const filtered = renderForAlipay(cur);
+  const removedCount = (cur.match(/\[(상품|스토어) 카드:[^\]]+\]/g) || []).length - (filtered.match(/\[(상품|스토어) 카드:[^\]]+\]/g) || []).length;
   return '<div class="phd"><div><h2 class="page">매거진 등록·수정</h2>' +
     '<div class="pdesc">매거진 글을 등록, 수정, 삭제할 수 있습니다.</div></div>' +
     '<div><button class="btn">목록</button></div></div>' +
@@ -1143,12 +1196,17 @@ function screen_mEdit() {
     '<button class="btn dash" onclick="mPick(\'p\')">상품 추가</button>' +
     '<button class="btn dash" onclick="mPick(\'s\')">스토어 추가</button>' +
     '<button class="btn" onclick="openLinkModal()">링크 넣기</button>' +
+    '<button class="btn" onclick="mTogglePreview()">미리보기 · 알리페이 채널</button>' +
     '<span class="tblnote" style="align-self:center">' + MSG.edBlock + '</span></div>' +
     (MPICK === 'p' ? pickRow('p', DB.products) : '') +
     (MPICK === 's' ? pickRow('s', DB.stores) : '') +
     '<textarea oninput="EDBUF=this.value">' + esc(cur) + '</textarea>' +
     (sc.ext.length || sc.emb.length ? '<div class="notice">본문에 외부 사이트 주소 ' + sc.ext.length + '개, 외부 영상·SNS ' + sc.emb.length + '개가 있습니다. 저장 시 삭제됩니다.</div>' : '') +
-    '<div class="hint">상품·스토어 추가로 넣은 카드는 내부 참조라 이 차단·변환 대상이 아닙니다. 이미 있는 기능이라 이번 범위에서 손대지 않습니다.<br>링크 넣기로 직접 입력한 K-Beauty Station 주소만 저장 시 내부 주소 형식으로 변환됩니다.</div>' + '</div><div class="ft"><button class="btn" onclick="EDBUF=null;MPICK=null;render()">취소</button>' +
+    (MPREVIEW ? '<div class="compcard"><div class="chd"><b>알리페이 채널에서 보이는 본문</b></div><div class="tblwrap" style="padding:0 16px 16px">' +
+      '<div class="tblnote" style="white-space:pre-wrap">' + esc(filtered) + '</div>' +
+      (removedCount ? '<div class="notice" style="margin-top:8px">상품·스토어 카드 ' + removedCount + '개가 알리페이 미노출이라 이 채널에서는 빠집니다.</div>' : '<div class="hint">지금 담긴 상품·스토어 카드는 모두 알리페이에도 노출됩니다.</div>') +
+      '</div></div>' : '') +
+    '<div class="hint">상품·스토어 추가로 넣은 카드는 내부 참조라 에디터 입력 단계의 차단·변환 대상은 아닙니다. 다만 그 카드가 가리키는 상품·스토어가 나중에 알리페이 미노출로 바뀌면, 알리페이 채널 화면에서는 그 카드만 빠지고 웹에는 그대로 보입니다.<br>링크 넣기로 직접 입력한 K-Beauty Station 주소만 저장 시 내부 주소 형식으로 변환됩니다.</div>' + '</div><div class="ft"><button class="btn" onclick="EDBUF=null;MPICK=null;render()">취소</button>' +
     '<button class="btn blue" onclick="saveMagazine()">저장</button></div></div>';
 }
 function modal_link() {
