@@ -94,6 +94,8 @@ select.dim{color:#8c8c8c}
 .x{cursor:pointer;color:#8c8c8c;font-size:18px;line-height:1;border:0;background:none}
 .mono{font-family:Consolas,monospace;font-size:12px;color:#8c8c8c}
 .lock{opacity:.45}
+.merged{background:#f6ffed}
+.mergedtag{display:inline-block;margin-left:8px;font-size:11px;color:#389e0d;background:#fff;border:1px solid #b7eb8f;border-radius:3px;padding:0 5px;line-height:18px;vertical-align:middle}
 .fld{padding:8px 0}
 .flbl{font-size:12px;color:#595959;font-weight:500;margin-bottom:6px}
 .fbox{width:100%;box-sizing:border-box;height:32px;border:1px solid #d9d9d9;border-radius:4px;padding:0 10px;font-size:12px;color:#222;background:#fff;display:flex;align-items:center;justify-content:space-between}
@@ -599,17 +601,21 @@ function btnTable(kind, obj) {
     if (r.aliHardOff) note = MSG.hardOff;
     if (r.needBooking && !obj.bookingEnabled) { webDis = true; aliDis = true; note = MSG.needBooking; }
     if (r.k === 'chat' && !isStore && eff.chatAuto) note = '알리페이 앱 버튼이 없어 채팅이 자동 적용됩니다.';
+    let webMerged = false, aliMerged = false;
     if (r.k === 'chat') {
       const lockWeb = eff.btns.consult.web && eff.btns.chat.web && eff.btns.inquiry.web;
       const lockAli = eff.btns.consult.ali && eff.btns.chat.ali && eff.btns.inquiry.ali;
-      if (lockWeb) webDis = true;
-      if (lockAli) aliDis = true;
+      if (lockWeb) { webDis = true; webMerged = true; }
+      if (lockAli) { aliDis = true; aliMerged = true; }
       if (lockWeb || lockAli) note = MSG.chatLocked;
     }
     if (r.k === 'inquiry' && !note) note = MSG.inquiryHint;
+    const webCellCls = webMerged ? ' class="merged"' : '';
+    const aliCellCls = aliMerged ? ' class="merged"' : (aliDis ? ' class="lock"' : '');
+    const tag = '<span class="mergedtag">포함됨</span>';
     html += '<tr><td>' + r.label + '</td>' +
-      '<td>' + onoff('w_' + kind + '_' + r.k, e.web, "setBtn('" + kind + "','" + r.k + "','web',%V%)", webDis) + '</td>' +
-      '<td' + (aliDis ? ' class="lock"' : '') + '>' + onoff('a_' + kind + '_' + r.k, e.ali, "setBtn('" + kind + "','" + r.k + "','ali',%V%)", aliDis) + '</td>' +
+      '<td' + webCellCls + '>' + onoff('w_' + kind + '_' + r.k, e.web, "setBtn('" + kind + "','" + r.k + "','web',%V%)", webDis) + (webMerged ? tag : '') + '</td>' +
+      '<td' + aliCellCls + '>' + onoff('a_' + kind + '_' + r.k, e.ali, "setBtn('" + kind + "','" + r.k + "','ali',%V%)", aliDis) + (aliMerged ? tag : '') + '</td>' +
       '<td class="tblnote">' + note + '</td></tr>';
   });
   html += '</tbody></table></div>';
