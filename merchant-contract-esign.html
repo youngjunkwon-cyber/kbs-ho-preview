@@ -86,20 +86,48 @@
     outline:none;
     border-bottom:1px solid var(--accent);
   }
-  .hours-row{
+  .hours-block{
     display:flex;
-    gap:6px;
+    flex-direction:column;
+    gap:8px;
+  }
+  .hours-day-row{
+    display:flex;
     align-items:center;
+    gap:8px;
     flex-wrap:wrap;
   }
-  .hours-row label{
+  .hours-day-row .day-label{
+    width:44px;
+    flex:none;
+    font-size:13px;
+    color:var(--ink);
+    font-weight:500;
+  }
+  .hours-day-row input[type=time]{
+    border:none;
+    border-bottom:1px solid var(--line);
+    padding:4px 2px;
+    font-family:inherit;
+    font-size:13px;
+    background:transparent;
+    width:110px;
+  }
+  .hours-day-row input[type=time]:disabled{
+    color:var(--sub);
+    border-bottom-color:transparent;
+  }
+  .hours-day-row .tilde{
+    color:var(--sub);
+  }
+  .hours-day-row .off-label{
+    display:flex;
+    align-items:center;
+    gap:4px;
     font-size:12px;
     color:var(--sub);
-    white-space:nowrap;
-  }
-  .hours-row input{
-    flex:1;
-    min-width:80px;
+    cursor:pointer;
+    margin-left:auto;
   }
   .radio-group{
     display:flex;
@@ -246,7 +274,24 @@
   #statusMsg.ok{ color:#1b6e3c; }
   @media (max-width:600px){
     .page{ padding:28px 16px 60px; }
-    table.form-table th{ width:110px; font-size:12.5px; }
+  }
+  @media (max-width:480px){
+    h1{ font-size:18px; letter-spacing:1px; }
+    table.form-table, table.form-table tbody, table.form-table tr, table.form-table th, table.form-table td{
+      display:block;
+      width:100%;
+    }
+    table.form-table th{
+      border-bottom:none;
+      padding:10px 12px 4px;
+    }
+    table.form-table td{
+      border-top:none;
+      padding:4px 12px 12px;
+    }
+    .hours-day-row input[type=time]{ width:88px; }
+    .sign-row .fill-name{ min-width:120px; }
+    #submitBtn{ width:100%; padding:16px 0; }
   }
 </style>
 </head>
@@ -282,23 +327,25 @@
     <tr>
       <th>사업장 운영 시간</th>
       <td>
-        <div class="hours-row">
-          <label>월~금</label><input type="text" id="hoursWeekday" placeholder="예: 10:00~20:00">
-          <label>토</label><input type="text" id="hoursSat" placeholder="예: 10:00~18:00">
-          <label>일(공휴일)</label><input type="text" id="hoursSun" placeholder="예: 휴무">
-        </div>
+        <div class="hours-block" id="hoursBlock"></div>
       </td>
     </tr>
     <tr><th class="required">담당자명</th><td><input type="text" id="managerName" required></td></tr>
     <tr><th class="required">담당자 연락처</th><td><input type="tel" id="managerPhone" required></td></tr>
-    <tr><th>Alipay 결제 VAN사명</th><td><input type="text" id="alipayVan" placeholder="이미 알리페이 가맹점인 경우 입력"></td></tr>
+    <tr>
+      <th>Alipay 결제 VAN사명</th>
+      <td>
+        <input type="text" id="alipayVan" placeholder="예: 나이스페이먼츠, KG이니시스">
+        <span class="hint">이미 알리페이 가맹점으로 등록되어 있다면, 결제를 대행하는 VAN사 이름을 적어주세요. 알리페이 가맹점이 처음이시면 비워두셔도 됩니다.</span>
+      </td>
+    </tr>
   </table>
 
   <div class="notice-box" style="margin-top:24px; font-weight:500; color:var(--ink);">서비스 사용을 위한 필요사항</div>
   <table class="form-table">
+    <tr><th class="required">업체명 (영어)</th><td><input type="text" id="nameEn" required></td></tr>
     <tr><th>업체명 (중국어 간체)</th><td><input type="text" id="nameZhCN"></td></tr>
     <tr><th>업체명 (중국어 번체)</th><td><input type="text" id="nameZhTW"></td></tr>
-    <tr><th class="required">업체명 (영어)</th><td><input type="text" id="nameEn" required></td></tr>
     <tr><th>업체명 (일본어)</th><td><input type="text" id="nameJa"></td></tr>
     <tr>
       <th class="required">관리 계정 ID</th>
@@ -429,6 +476,48 @@
   const pad1 = setupPad("sigPad1");
   const pad2 = setupPad("sigPad2");
 
+  const DAYS = [
+    { code: "mon", label: "월" },
+    { code: "tue", label: "화" },
+    { code: "wed", label: "수" },
+    { code: "thu", label: "목" },
+    { code: "fri", label: "금" },
+    { code: "sat", label: "토" },
+    { code: "sun", label: "일" },
+    { code: "hol", label: "공휴일" }
+  ];
+
+  (function buildHoursBlock(){
+    const block = document.getElementById("hoursBlock");
+    for (const day of DAYS){
+      const row = document.createElement("div");
+      row.className = "hours-day-row";
+      row.innerHTML =
+        '<span class="day-label">' + day.label + '</span>' +
+        '<input type="time" id="hstart-' + day.code + '">' +
+        '<span class="tilde">~</span>' +
+        '<input type="time" id="hend-' + day.code + '">' +
+        '<label class="off-label"><input type="checkbox" id="hoff-' + day.code + '"> 휴무</label>';
+      block.appendChild(row);
+      const offCb = row.querySelector('#hoff-' + day.code);
+      const startEl = row.querySelector('#hstart-' + day.code);
+      const endEl = row.querySelector('#hend-' + day.code);
+      offCb.addEventListener("change", () => {
+        startEl.disabled = offCb.checked;
+        endEl.disabled = offCb.checked;
+      });
+    }
+  })();
+
+  function getDayValue(code){
+    const off = document.getElementById('hoff-' + code).checked;
+    if (off) return "휴무";
+    const start = document.getElementById('hstart-' + code).value;
+    const end = document.getElementById('hend-' + code).value;
+    if (!start || !end) return "";
+    return start + "~" + end;
+  }
+
   function clearPad(n){
     (n === 1 ? pad1 : pad2).clear();
   }
@@ -506,9 +595,14 @@
       phone: document.getElementById("phone").value.trim(),
       email: document.getElementById("email").value.trim(),
       address: document.getElementById("address").value.trim(),
-      hoursWeekday: document.getElementById("hoursWeekday").value.trim(),
-      hoursSat: document.getElementById("hoursSat").value.trim(),
-      hoursSun: document.getElementById("hoursSun").value.trim(),
+      hoursMon: getDayValue("mon"),
+      hoursTue: getDayValue("tue"),
+      hoursWed: getDayValue("wed"),
+      hoursThu: getDayValue("thu"),
+      hoursFri: getDayValue("fri"),
+      hoursSat: getDayValue("sat"),
+      hoursSun: getDayValue("sun"),
+      hoursHol: getDayValue("hol"),
       managerName: document.getElementById("managerName").value.trim(),
       managerPhone: document.getElementById("managerPhone").value.trim(),
       alipayVan: document.getElementById("alipayVan").value.trim(),
