@@ -92,6 +92,10 @@ select.dim{color:#8c8c8c}
 .modal>.bd{padding:20px 24px}
 .modal>.ft{padding:12px 24px;border-top:1px solid #f0f0f0;display:flex;justify-content:flex-end;gap:8px}
 .x{cursor:pointer;color:#8c8c8c;font-size:18px;line-height:1;border:0;background:none}
+/* 켜거나 끄는 순간 막을 때 쓰는 알림. 모달이 아니라 위쪽에 잠깐 떴다 사라진다(라이브 방식) */
+.toastwrap{position:fixed;top:16px;left:0;right:0;display:flex;justify-content:center;z-index:120;pointer-events:none}
+.toast{background:#fff;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.16);padding:12px 20px;display:flex;align-items:flex-start;gap:10px;max-width:660px;font-size:14px;line-height:1.5}
+.toast .ic{flex:0 0 auto;width:18px;height:18px;border-radius:50%;background:#ff4d4f;color:#fff;font-size:12px;line-height:18px;text-align:center;font-weight:700}
 .mono{font-family:Consolas,monospace;font-size:12px;color:#8c8c8c}
 .lock{opacity:.45}
 .fld{padding:8px 0}
@@ -123,6 +127,7 @@ select.dim{color:#8c8c8c}
   </div>
 </div>
 <div id="modals"></div>
+<div id="toasts"></div>
 
 <script>
 /* =========================================================================
@@ -149,13 +154,18 @@ const ROWS_STORE = [...ROWS_PRODUCT, { k: 'booking', label: '예약', needBookin
 
 /* 받침이 있으면 을, 없으면 를 */
 const eul = w => ((w.charCodeAt(w.length - 1) - 0xAC00) % 28 ? '을' : '를');
+/* 받침이 없거나 ㄹ이면 로, 그 밖에는 으로 */
+const euro = w => { const j = (w.charCodeAt(w.length - 1) - 0xAC00) % 28; return (j === 0 || j === 8) ? '로' : '으로'; };
 const MSG = {
   noAliBtn:    where => '알리페이 앱 버튼이 없어 알리페이에 노출되지 않습니다.' + (where ? ' ' + where + '에서 1개 이상 켜면 노출됩니다.' : ''),
   hardOff:     '알리페이 앱 미지원 항목입니다.',
   inquiryHint: '상담접수가 켜져 있을 때만 적용됩니다. 채팅 상태와는 무관합니다. 상담접수가 꺼져 있으면 이 설정은 쓰이지 않습니다.',
   needBooking: '예약설정에서 예약을 사용하면 켤 수 있습니다.',
   cap:         '웹·알리페이 앱 각 2개까지 켤 수 있습니다.',
-  capUnmerge:  (chName, after) => '통합 표시를 끄면 상담접수와 채팅이 각각 한 자리를 차지합니다. ' + chName + '은 ' + after.join(', ') + '으로 ' + after.length + '개가 됩니다. 웹·알리페이 앱 각 2개까지 켤 수 있습니다. 다른 항목을 먼저 끄면 통합 표시를 끌 수 있습니다.',
+  capHead:     '버튼은 웹·알리페이 앱 각 2개까지 선택할 수 있습니다.',
+  capOn:       (chName, list) => MSG.capHead + ' 지금 ' + chName + '은 ' + list.join(', ') + euro(list[list.length - 1]) + ' ' + list.length + '개입니다.',
+  capUnmerge:  (chName, after) => MSG.capHead + ' 통합 표시를 끄면 상담접수와 채팅이 각각 1개로 계산되어 ' + chName + '이 ' + after.join(', ') + euro(after[after.length - 1]) + ' ' + after.length + '개가 됩니다.',
+  capBooking:  (chName, after) => MSG.capHead + ' 예약을 사용하면 켜 둔 예약 버튼이 다시 계산되어 ' + chName + '이 ' + after.join(', ') + euro(after[after.length - 1]) + ' ' + after.length + '개가 됩니다.',
   exhEmpty:    s => '노출 가능한 ' + s + ' 없습니다. 기획전이 알리페이에 노출되지 않습니다.',
   exhNone:     s => '담은 ' + s + ' 없습니다. 1개 이상 담아야 저장할 수 있습니다.',
   collEmpty:   s => s + ' 1개 이상 담아야 저장할 수 있습니다.',
@@ -638,8 +648,7 @@ window.setBtn = function (kind, k, ch, on) {
   const after = ctaList(eff(), rows, ch);
   if (after.length > CAP && after.length > before.length) {
     obj.btns[k][ch] = keep;
-    if (on) alertBox('켤 수 없습니다', MSG.cap + ' 지금 ' + chName + '은 ' + before.join(', ') + '으로 ' + before.length + '개입니다.');
-    else alertBox('끌 수 없습니다', MSG.capUnmerge(chName, after));
+    toast(on ? MSG.capOn(chName, before) : MSG.capUnmerge(chName, after));
     render(); return;
   }
   render();
@@ -667,9 +676,24 @@ window.setMode = function (v) {
   if (fromDefault) ROWS_PRODUCT.forEach(r => { p.btns[r.k].web = !!st.btns[r.k].web; p.btns[r.k].ali = false; });
   p.mode = v; render();
 };
+/* 예약을 다시 사용으로 바꾸면 꺼져 있던 예약 버튼이 살아나 자리 수가 늘 수 있다. 같은 상한을 건다. */
 window.setBooking = function (on) {
   const st = S(VIEW.id);
-  st.bookingEnabled = !!on; render();
+  const keep = st.bookingEnabled;
+  st.bookingEnabled = !!on;
+  const over = ['web', 'ali'].filter(ch => {
+    const before = ctaList(effStoreBtns({ ...st, bookingEnabled: keep }).btns, ROWS_STORE, ch);
+    const after = ctaList(effStoreBtns(st).btns, ROWS_STORE, ch);
+    return after.length > CAP && after.length > before.length;
+  });
+  if (over.length) {
+    st.bookingEnabled = keep;
+    const ch = over[0];
+    const after = ctaList(effStoreBtns({ ...st, bookingEnabled: !!on }).btns, ROWS_STORE, ch);
+    toast(MSG.capBooking(ch === 'web' ? '웹' : '알리페이 앱', after));
+    render(); return;
+  }
+  render();
 };
 
 /* ------------------------------ 목록 공통 ------------------------------ */
@@ -1118,7 +1142,8 @@ function screen_btnSpec() {
     '<tbody>' + rows + '</tbody></table></div>' + '</div></div>' +
     '<div class="card"><div class="hd">버튼 개수 세는 법</div><div class="bd">' +
     '<div class="row"><div class="lbl">세는 법</div><div class="val">상담접수와 채팅은 각각 독립된 버튼입니다. 상담접수가 켜져 있고 통합 표시도 켜져 있으면 문의하기 버튼 하나로 셉니다(자리 1개). 이때 채팅이 켜져 있어도 따로 자리를 차지하지 않습니다. 상담접수가 꺼져 있으면 통합 표시 값과 무관하게 채팅은 켜진 경우에만 그 하나가 버튼 하나로 셉니다. 외부링크, 메신저, 예약은 각각 버튼 하나입니다.</div></div>' +
-    '<div class="row"><div class="lbl">최대 개수</div><div class="val">웹 2개, 알리페이 앱 2개까지입니다. 두 곳을 각각 2개씩 켤 수 있고, 세 번째를 켜려 하면 막습니다. 끄는 동작도 자리가 늘어나면 막습니다. 문의하기로 합쳐져 2개인 상태에서 통합 표시를 끄면 상담접수와 채팅이 각각 자리를 차지해 3개가 되므로, 다른 항목을 먼저 꺼야 끌 수 있습니다.</div></div>' +
+    '<div class="row"><div class="lbl">최대 개수</div><div class="val">웹 2개, 알리페이 앱 2개까지입니다. 어떤 경우에도 이 수를 넘길 수 없습니다. 세 번째를 켜려 할 때만이 아니라, 끄거나 다른 설정을 바꿔서 자리 수가 늘어나는 경우도 똑같이 막습니다. 문의하기로 합쳐져 2개인 상태에서 통합 표시를 끄면 상담접수와 채팅이 각각 자리를 차지해 3개가 되므로 막습니다. 예약설정에서 예약을 다시 사용으로 바꿀 때 켜 둔 예약 버튼이 살아나 3개가 되는 경우도 막습니다.</div></div>' +
+    '<div class="row"><div class="lbl">막는 방식</div><div class="val">모달이 아니라 화면 위쪽에 알림이 잠깐 떴다 사라지고, 누른 토글은 원래 값으로 돌아갑니다. 저장 시점에 이미 상한을 넘은 데이터는 표 아래 빨간 안내로 알리고 저장을 막습니다.</div></div>' +
     '<div class="row"><div class="lbl">지금 예시</div><div class="val">웹 2개(문의하기, 예약), 알리페이 앱 2개(문의하기, 예약)입니다. 상담접수가 켜져 있고 통합 표시도 켜져 있어 문의하기 하나로 합쳐진 상태입니다.</div></div>' +
     '</div></div>' +
     '<div class="card"><div class="hd">알리페이 앱에서 켠 버튼이 없을 때</div><div class="bd">' +
@@ -1285,6 +1310,12 @@ window.closeMD = function () {
   if (MODAL === 'coll' && COLLSNAP) { const c = C(VIEW.id); if (c) Object.assign(c, JSON.parse(COLLSNAP)); }
   COLLSNAP = null; MODAL = null; render();
 };
+let TOAST_T = null;
+function toast(msg) {
+  el('#toasts').innerHTML = '<div class="toastwrap"><div class="toast"><span class="ic">✕</span><span>' + msg + '</span></div></div>';
+  if (TOAST_T) clearTimeout(TOAST_T);
+  TOAST_T = setTimeout(() => { el('#toasts').innerHTML = ''; }, 4000);
+}
 function alertBox(title, body) {
   el('#modals').innerHTML = '<div class="mask" style="z-index:80"><div class="modal" style="max-width:620px"><div class="hd">' + title + '<button class="x" onclick="closeModal()">✕</button></div><div class="bd">' + body + '</div><div class="ft"><button class="btn blue" onclick="closeModal()">확인</button></div></div></div>';
 }
