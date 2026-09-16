@@ -104,16 +104,21 @@
     color:var(--ink);
     font-weight:500;
   }
-  .hours-day-row input[type=time]{
+  .time-select-group{
+    display:inline-flex;
+    align-items:center;
+    gap:2px;
+  }
+  .time-select-group select{
     border:none;
     border-bottom:1px solid var(--line);
     padding:4px 2px;
     font-family:inherit;
     font-size:13px;
     background:transparent;
-    width:110px;
+    color:var(--ink);
   }
-  .hours-day-row input[type=time]:disabled{
+  .time-select-group select:disabled{
     color:var(--sub);
     border-bottom-color:transparent;
   }
@@ -128,17 +133,6 @@
     color:var(--sub);
     cursor:pointer;
     margin-left:auto;
-  }
-  .radio-group{
-    display:flex;
-    gap:20px;
-  }
-  .radio-group label{
-    display:flex;
-    align-items:center;
-    gap:6px;
-    font-size:14px;
-    cursor:pointer;
   }
   .hint{
     display:block;
@@ -289,7 +283,7 @@
       border-top:none;
       padding:4px 12px 12px;
     }
-    .hours-day-row input[type=time]{ width:88px; }
+    .time-select-group select{ font-size:12px; }
     .sign-row .fill-name{ min-width:120px; }
     #submitBtn{ width:100%; padding:16px 0; }
   }
@@ -347,16 +341,6 @@
         <span class="hint">계정으로 사용할 메일 주소를 입력해주세요.</span>
       </td>
     </tr>
-    <tr>
-      <th class="required">이미지 사용 동의</th>
-      <td>
-        <div class="radio-group">
-          <label><input type="radio" name="imageConsent" value="동의" required> 동의</label>
-          <label><input type="radio" name="imageConsent" value="미동의" required> 미동의</label>
-        </div>
-        <span class="hint">입점 등록을 위한 이미지 사용에 동의하시는지 선택해주세요. 미동의 시 로고, 매장 내부 등 이미지 파일을 별도로 전달해주셔야 합니다.</span>
-      </td>
-    </tr>
   </table>
 
   <div class="notice-box">
@@ -389,7 +373,7 @@
       <th>로고 이미지</th>
       <td>
         <input class="file-input" type="file" id="logoFile" accept="image/*">
-        <span class="hint">배경이 투명한 PNG 파일을 권장합니다. 위 "이미지 사용 동의"에 동의하신 경우 첨부해주세요.</span>
+        <span class="hint">배경이 투명한 PNG 파일을 권장합니다.</span>
       </td>
     </tr>
   </table>
@@ -528,6 +512,19 @@
     { code: "hol", label: "공휴일" }
   ];
 
+  function zeroPad(n){ return String(n).padStart(2, "0"); }
+
+  function hourOptions(){
+    let html = '<option value="">--</option>';
+    for (let h = 0; h < 24; h++) html += '<option value="' + zeroPad(h) + '">' + zeroPad(h) + '</option>';
+    return html;
+  }
+  function minuteOptions(){
+    let html = '<option value="">--</option>';
+    for (let m = 0; m < 60; m += 10) html += '<option value="' + zeroPad(m) + '">' + zeroPad(m) + '</option>';
+    return html;
+  }
+
   (function buildHoursBlock(){
     const block = document.getElementById("hoursBlock");
     for (const day of DAYS){
@@ -535,17 +532,21 @@
       row.className = "hours-day-row";
       row.innerHTML =
         '<span class="day-label">' + day.label + '</span>' +
-        '<input type="time" id="hstart-' + day.code + '">' +
+        '<span class="time-select-group">' +
+          '<select id="hstart-h-' + day.code + '">' + hourOptions() + '</select>:' +
+          '<select id="hstart-m-' + day.code + '">' + minuteOptions() + '</select>' +
+        '</span>' +
         '<span class="tilde">~</span>' +
-        '<input type="time" id="hend-' + day.code + '">' +
+        '<span class="time-select-group">' +
+          '<select id="hend-h-' + day.code + '">' + hourOptions() + '</select>:' +
+          '<select id="hend-m-' + day.code + '">' + minuteOptions() + '</select>' +
+        '</span>' +
         '<label class="off-label"><input type="checkbox" id="hoff-' + day.code + '"> 휴무</label>';
       block.appendChild(row);
       const offCb = row.querySelector('#hoff-' + day.code);
-      const startEl = row.querySelector('#hstart-' + day.code);
-      const endEl = row.querySelector('#hend-' + day.code);
+      const selects = row.querySelectorAll('select');
       offCb.addEventListener("change", () => {
-        startEl.disabled = offCb.checked;
-        endEl.disabled = offCb.checked;
+        selects.forEach(s => { s.disabled = offCb.checked; });
       });
     }
   })();
@@ -553,10 +554,12 @@
   function getDayValue(code){
     const off = document.getElementById('hoff-' + code).checked;
     if (off) return "휴무";
-    const start = document.getElementById('hstart-' + code).value;
-    const end = document.getElementById('hend-' + code).value;
-    if (!start || !end) return "";
-    return start + "~" + end;
+    const sh = document.getElementById('hstart-h-' + code).value;
+    const sm = document.getElementById('hstart-m-' + code).value;
+    const eh = document.getElementById('hend-h-' + code).value;
+    const em = document.getElementById('hend-m-' + code).value;
+    if (!sh || !sm || !eh || !em) return "";
+    return sh + ":" + sm + "~" + eh + ":" + em;
   }
 
   function clearPad(n){
@@ -645,7 +648,6 @@
     submitBtn.disabled = true;
     statusEl.textContent = "제출 중입니다...";
 
-    const imageConsent = document.querySelector('input[name="imageConsent"]:checked');
     const bizRegFile = document.getElementById("bizRegFile").files[0];
     const bizRegData = await fileToBase64(bizRegFile);
     const fpRegData = await fileToBase64(document.getElementById("fpRegFile").files[0]);
@@ -673,7 +675,6 @@
       nameEn: document.getElementById("nameEn").value.trim(),
       nameJa: document.getElementById("nameJa").value.trim(),
       accountId: document.getElementById("accountId").value.trim(),
-      imageConsent: imageConsent.value,
       msgEnWhatsapp: document.getElementById("msgEnWhatsapp").value.trim(),
       msgJaLine: document.getElementById("msgJaLine").value.trim(),
       msgZhTwLine: document.getElementById("msgZhTwLine").value.trim(),
