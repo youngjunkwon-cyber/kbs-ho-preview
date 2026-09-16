@@ -152,7 +152,7 @@ const eul = w => ((w.charCodeAt(w.length - 1) - 0xAC00) % 28 ? '을' : '를');
 const MSG = {
   noAliBtn:    where => '알리페이 앱 버튼이 없어 알리페이에 노출되지 않습니다.' + (where ? ' ' + where + '에서 1개 이상 켜면 노출됩니다.' : ''),
   hardOff:     '알리페이 앱 미지원 항목입니다.',
-  inquiryHint: '상담접수와 채팅이 둘 다 켜져 있을 때만 적용됩니다. 하나만 켜져 있으면 이 설정은 쓰이지 않습니다.',
+  inquiryHint: '상담접수가 켜져 있을 때만 적용됩니다. 채팅 상태와는 무관합니다. 상담접수가 꺼져 있으면 이 설정은 쓰이지 않습니다.',
   needBooking: '예약설정에서 예약을 사용하면 켤 수 있습니다.',
   cap:         '웹·알리페이 앱 각 2개까지 켤 수 있습니다.',
   exhEmpty:    s => '노출 가능한 ' + s + ' 없습니다. 기획전이 알리페이에 노출되지 않습니다.',
@@ -361,12 +361,13 @@ function effStoreBtns(st) {
   if (!st.bookingEnabled) { out.booking.web = false; out.booking.ali = false; }
   return { btns: out };
 }
-// FO 하단 CTA 로 렌더되는 자리 수. 상담접수·채팅이 둘 다 켜져 있고 통합 표시도 켜져 있을 때만
-// "문의하기" 한 자리로 합친다. 상담접수·채팅은 그 밖에는 완전히 독립된 토글이라 서로의 상태로
-// 강제 보정하지 않는다. 통합 표시는 그 조건이 아니면 그냥 쓰이지 않는 값일 뿐이다.
+// FO 하단 CTA 로 렌더되는 자리 수. 상담접수가 켜져 있고 통합 표시도 켜져 있을 때만
+// "문의하기" 한 자리로 합친다. 채팅 자체 토글 값은 이 판정에 영향을 주지 않는다(켜져 있어도
+// 별도 자리를 차지하지 않는다). 상담접수·채팅·통합 표시는 화면상 서로 잠그거나 강제 보정하지
+// 않는 완전히 독립된 토글이다. 상담접수가 꺼져 있으면 통합 표시 값은 켜져 있어도 쓰이지 않는다.
 function ctaList(b, rows, ch) {
   const out = [];
-  const integrated = b.consult && b.consult[ch] && b.chat && b.chat[ch] && b.inquiry && b.inquiry[ch];
+  const integrated = b.consult && b.consult[ch] && b.inquiry && b.inquiry[ch];
   if (integrated) out.push('문의하기');
   else {
     if (b.consult && b.consult[ch]) out.push('상담접수');
@@ -1085,7 +1086,7 @@ function screen_hEdit() {
 const SPEC_ROWS = [
   ['상담접수', 0, '웹·알리페이 앱 모두 지원. 채팅과 완전히 독립된 토글.'],
   ['채팅', 1, '웹·알리페이 앱 모두 지원. 앱 내에서 열립니다. 상담접수와 완전히 독립된 토글.'],
-  ['상담접수·채팅 통합 표시', 0, '상담접수와 채팅이 같은 채널에서 둘 다 켜져 있을 때만 적용. 그 조건이 아니면 값은 저장돼 있어도 쓰이지 않습니다.'],
+  ['상담접수·채팅 통합 표시', 0, '같은 채널의 상담접수가 켜져 있을 때만 적용. 채팅 상태와는 무관합니다. 상담접수가 꺼져 있으면 값은 저장돼 있어도 쓰이지 않습니다.'],
   ['외부링크 설정', 0, '알리페이 앱 미지원.'],
   ['메신저 설정', 0, '알리페이 앱 미지원.'],
   ['예약', 0, '웹·알리페이 앱 모두 지원. 예약설정에서 예약 사용 필요.']
@@ -1108,9 +1109,9 @@ function screen_btnSpec() {
     '<th style="width:220px">알리페이</th><th style="min-width:320px"></th></tr></thead>' +
     '<tbody>' + rows + '</tbody></table></div>' + '</div></div>' +
     '<div class="card"><div class="hd">버튼 개수 세는 법</div><div class="bd">' +
-    '<div class="row"><div class="lbl">세는 법</div><div class="val">상담접수와 채팅은 각각 독립된 버튼입니다. 둘 다 켜져 있고 통합 표시도 켜져 있으면 그때만 문의하기 버튼 하나로 합쳐 셉니다(자리 1개). 상담접수·채팅 중 하나만 켜져 있으면 통합 표시 값과 무관하게 그 하나만 버튼 하나로 셉니다. 외부링크, 메신저, 예약은 각각 버튼 하나입니다.</div></div>' +
+    '<div class="row"><div class="lbl">세는 법</div><div class="val">상담접수와 채팅은 각각 독립된 버튼입니다. 상담접수가 켜져 있고 통합 표시도 켜져 있으면 문의하기 버튼 하나로 셉니다(자리 1개). 이때 채팅이 켜져 있어도 따로 자리를 차지하지 않습니다. 상담접수가 꺼져 있으면 통합 표시 값과 무관하게 채팅은 켜진 경우에만 그 하나가 버튼 하나로 셉니다. 외부링크, 메신저, 예약은 각각 버튼 하나입니다.</div></div>' +
     '<div class="row"><div class="lbl">최대 개수</div><div class="val">웹 2개, 알리페이 앱 2개까지입니다. 두 곳을 각각 2개씩 켤 수 있고, 세 번째를 켜려 하면 막습니다.</div></div>' +
-    '<div class="row"><div class="lbl">지금 예시</div><div class="val">웹 2개(문의하기, 예약), 알리페이 앱 2개(문의하기, 예약)입니다. 상담접수·채팅이 둘 다 켜져 있고 통합 표시도 켜져 있어 문의하기 하나로 합쳐진 상태입니다.</div></div>' +
+    '<div class="row"><div class="lbl">지금 예시</div><div class="val">웹 2개(문의하기, 예약), 알리페이 앱 2개(문의하기, 예약)입니다. 상담접수가 켜져 있고 통합 표시도 켜져 있어 문의하기 하나로 합쳐진 상태입니다.</div></div>' +
     '</div></div>' +
     '<div class="card"><div class="hd">알리페이 앱에서 켠 버튼이 없을 때</div><div class="bd">' +
     '<div class="notice">' + MSG.noAliBtn() + '</div>' + '</div></div>';
