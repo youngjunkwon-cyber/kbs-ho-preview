@@ -312,7 +312,7 @@
     <tr><th class="required">이메일 (세금계산서용)</th><td><input type="email" id="email" required></td></tr>
     <tr><th class="required">사업장 주소</th><td><input type="text" id="address" required></td></tr>
     <tr>
-      <th>사업장 운영 시간</th>
+      <th>운영 시간</th>
       <td>
         <div class="hours-block" id="hoursBlock"></div>
       </td>
@@ -359,21 +359,21 @@
       <th class="required">사업자 등록증</th>
       <td>
         <input class="file-input" type="file" id="bizRegFile" accept="image/*,.pdf" required>
-        <span class="hint">사업자 등록증 사진 또는 파일을 첨부해주세요.</span>
+        <span class="hint">사업자 등록증 사진 또는 파일을 첨부해주세요. (10MB 이하)</span>
       </td>
     </tr>
     <tr>
       <th class="required">해외환자유치업 등록증</th>
       <td>
         <input class="file-input" type="file" id="fpRegFile" accept="image/*,.pdf" required>
-        <span class="hint">해외환자유치업 등록증 사진 또는 파일을 첨부해주세요.</span>
+        <span class="hint">해외환자유치업 등록증 사진 또는 파일을 첨부해주세요. (10MB 이하)</span>
       </td>
     </tr>
     <tr>
       <th>로고 이미지</th>
       <td>
-        <input class="file-input" type="file" id="logoFile" accept="image/*">
-        <span class="hint">배경이 투명한 PNG 파일을 권장합니다.</span>
+        <input class="file-input" type="file" id="logoFile" accept="image/*,.zip">
+        <span class="hint">배경이 투명한 PNG 파일을 권장합니다. ZIP 파일로도 첨부 가능합니다. (10MB 이하)</span>
       </td>
     </tr>
   </table>
@@ -484,6 +484,7 @@
 <script>
   // 배포 후 Apps Script 웹앱 URL로 교체
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz1AjNbq6uCBdI1aK7kM1DQPcRDht0cimbGrHCiIDiue2hc4o83w_qb03rsJxgWw8yGFQ/exec";
+  const MAX_FILE_SIZE_MB = 10;
 
   function setupPad(canvasId){
     const canvas = document.getElementById(canvasId);
@@ -605,6 +606,15 @@
       if (!el.files || el.files.length === 0){
         const label = el.closest('tr')?.querySelector('th')?.textContent.replace('*','').trim() || "필수 첨부파일";
         return { el, msg: label + "을(를) 첨부해주세요." };
+      }
+    }
+
+    const allFileInputs = document.querySelectorAll('input[type=file]');
+    for (const el of allFileInputs){
+      const file = el.files && el.files[0];
+      if (file && file.size > MAX_FILE_SIZE_MB * 1024 * 1024){
+        const label = el.closest('tr')?.querySelector('th')?.textContent.replace('*','').trim() || "첨부파일";
+        return { el, msg: label + " 파일 용량은 " + MAX_FILE_SIZE_MB + "MB 이하여야 합니다." };
       }
     }
 
