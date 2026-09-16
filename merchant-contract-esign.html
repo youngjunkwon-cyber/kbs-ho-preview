@@ -183,12 +183,16 @@
     font-size:15px;
     margin-bottom:14px;
   }
-  .sign-row .fill-name{
+  .sign-row input.fill-name{
     display:inline-block;
-    min-width:180px;
+    width:180px;
+    border:none;
     border-bottom:1px solid var(--line-strong);
     padding:0 6px 4px;
     text-align:center;
+    font-family:inherit;
+    font-size:15px;
+    background:transparent;
   }
   .sign-date{
     font-size:13px;
@@ -294,7 +298,7 @@
       padding:4px 12px 12px;
     }
     .time-select-group select{ font-size:12px; }
-    .sign-row .fill-name{ min-width:120px; }
+    .sign-row input.fill-name{ width:120px; }
     #submitBtn{ width:100%; padding:16px 0; }
   }
 </style>
@@ -423,7 +427,7 @@
   <!-- 서명 1 -->
   <div class="sign-block">
     <div class="sign-date"><input type="date" id="signDate1"></div>
-    <div class="sign-row">신청인 : <span class="fill-name" id="nameEcho1">-</span> (서명)</div>
+    <div class="sign-row">신청인 : <input type="text" class="fill-name" id="signerName1" required> (서명)</div>
     <div class="pad-wrap">
       <canvas class="sigpad" id="sigPad1"></canvas>
       <div class="pad-tools"><button type="button" onclick="clearPad(1)">다시 서명</button></div>
@@ -479,7 +483,7 @@
   <!-- 서명 2 -->
   <div class="sign-block">
     <div class="sign-date"><input type="date" id="signDate2"></div>
-    <div class="sign-row">신청인 : <span class="fill-name" id="nameEcho2">-</span> (서명)</div>
+    <div class="sign-row">신청인 : <input type="text" class="fill-name" id="signerName2" required> (서명)</div>
     <div class="pad-wrap">
       <canvas class="sigpad" id="sigPad2"></canvas>
       <div class="pad-tools"><button type="button" onclick="clearPad(2)">다시 서명</button></div>
@@ -586,13 +590,6 @@
   }
   document.getElementById("signDate1").value = todayIso();
   document.getElementById("signDate2").value = todayIso();
-
-  const ceoInput = document.getElementById("ceoName");
-  ceoInput.addEventListener("input", () => {
-    const v = ceoInput.value.trim() || "-";
-    document.getElementById("nameEcho1").textContent = v;
-    document.getElementById("nameEcho2").textContent = v;
-  });
 
   function fileToBase64(file){
     return new Promise((resolve, reject) => {
@@ -706,6 +703,8 @@
       wechatQrFile: wechatQrData,
       signDate1: document.getElementById("signDate1").value,
       signDate2: document.getElementById("signDate2").value,
+      signerName1: document.getElementById("signerName1").value.trim(),
+      signerName2: document.getElementById("signerName2").value.trim(),
       submittedAt: new Date().toISOString(),
       bizRegFile: bizRegData,
       fpRegFile: fpRegData,
