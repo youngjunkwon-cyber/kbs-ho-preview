@@ -401,6 +401,10 @@ function judgeStore(st) {
   else if (!c2) reason = '알리페이 버튼 미설정';
   return { na: false, visible: !reason, reason };
 }
+// 상품 상세에 붙는 스토어 카드(참조 정리 9-①). 상품 자신은 조건③에서 스토어의 노출 설정값만
+// 보므로 노출로 나올 수 있지만, 그 스토어가 버튼 미설정으로 스토어 자체는 미노출일 수 있다.
+// 그 경우 스토어 카드 영역은 숨긴다.
+function storeCardOk(st) { return judgeStore(st).visible; }
 /* 기존 노출 조건. 웹에서 이미 빠진 건은 알리페이에서도 연결 대상으로 치지 않는다 */
 const liveProduct = p => p.status === '승인' && p.active !== false && !p.hidden;
 function liveNow(o) {
@@ -745,6 +749,7 @@ function screen_pEdit() {
       '<div class="row"><div class="lbl">알리페이 노출</div><div class="val"><span class="rg">' +
       radio('pv', '노출', langOk ? p.aliVisible : '노출', "setVis('product','노출')", visDis) + radio('pv', '미노출', langOk ? p.aliVisible : '노출', "setVis('product','미노출')", visDis) + '</span>' +
       (langOk && st.aliVisible === '미노출' ? '<div class="hint">' + MSG.lockStore + '</div>' : '') +
+      (langOk && !judgeProduct(p).na && judgeProduct(p).visible && !storeCardOk(st) ? '<div class="hint">이 상품 상세에 붙는 스토어 카드는 그 스토어가 알리페이 버튼 미설정으로 자체 미노출이라 영역째 숨깁니다. 상품 자체는 그대로 노출됩니다.</div>' : '') +
       '</div></div>' +
       '<div class="blk">버튼 설정</div>' +
       '<div class="row"><div class="lbl">스토어 설정 적용</div><div class="val"><span class="rg">' +
