@@ -73,7 +73,7 @@
   table.form-table td.static-val{
     color:var(--ink);
   }
-  input[type=text], input[type=email], input[type=tel]{
+  input[type=text], input[type=email], input[type=tel], input[type=url]{
     width:100%;
     border:none;
     border-bottom:1px solid var(--line);
@@ -82,7 +82,7 @@
     font-size:14px;
     background:transparent;
   }
-  input[type=text]:focus, input[type=email]:focus, input[type=tel]:focus{
+  input[type=text]:focus, input[type=email]:focus, input[type=tel]:focus, input[type=url]:focus{
     outline:none;
     border-bottom:1px solid var(--accent);
   }
@@ -194,6 +194,16 @@
     font-size:13px;
     color:var(--sub);
     margin-bottom:10px;
+  }
+  .sign-date input[type=date]{
+    border:none;
+    border-bottom:1px solid var(--line);
+    padding:4px 2px;
+    font-family:inherit;
+    font-size:13px;
+    color:var(--sub);
+    background:transparent;
+    text-align:center;
   }
   .pad-wrap{
     width:100%;
@@ -338,10 +348,6 @@
 
   <div class="notice-box" style="margin-top:24px; font-weight:500; color:var(--ink);">서비스 사용을 위한 필요사항</div>
   <table class="form-table">
-    <tr><th class="required">업체명 (영어)</th><td><input type="text" id="nameEn" required></td></tr>
-    <tr><th>업체명 (중국어 간체)</th><td><input type="text" id="nameZhCN"></td></tr>
-    <tr><th>업체명 (중국어 번체)</th><td><input type="text" id="nameZhTW"></td></tr>
-    <tr><th>업체명 (일본어)</th><td><input type="text" id="nameJa"></td></tr>
     <tr>
       <th class="required">관리 계정 ID</th>
       <td>
@@ -349,6 +355,10 @@
         <span class="hint">계정으로 사용할 메일 주소를 입력해주세요.</span>
       </td>
     </tr>
+    <tr><th class="required">업체명 (영어)</th><td><input type="text" id="nameEn" required></td></tr>
+    <tr><th>업체명 (중국어 간체)</th><td><input type="text" id="nameZhCN"></td></tr>
+    <tr><th>업체명 (중국어 번체)</th><td><input type="text" id="nameZhTW"></td></tr>
+    <tr><th>업체명 (일본어)</th><td><input type="text" id="nameJa"></td></tr>
   </table>
 
   <!-- 3. 첨부파일 -->
@@ -412,7 +422,7 @@
 
   <!-- 서명 1 -->
   <div class="sign-block">
-    <div class="sign-date" id="dateDisplay1"></div>
+    <div class="sign-date"><input type="date" id="signDate1"></div>
     <div class="sign-row">신청인 : <span class="fill-name" id="nameEcho1">-</span> (서명)</div>
     <div class="pad-wrap">
       <canvas class="sigpad" id="sigPad1"></canvas>
@@ -468,7 +478,7 @@
 
   <!-- 서명 2 -->
   <div class="sign-block">
-    <div class="sign-date" id="dateDisplay2"></div>
+    <div class="sign-date"><input type="date" id="signDate2"></div>
     <div class="sign-row">신청인 : <span class="fill-name" id="nameEcho2">-</span> (서명)</div>
     <div class="pad-wrap">
       <canvas class="sigpad" id="sigPad2"></canvas>
@@ -570,12 +580,12 @@
     (n === 1 ? pad1 : pad2).clear();
   }
 
-  function todayStr(){
+  function todayIso(){
     const d = new Date();
-    return d.getFullYear() + "년 " + (d.getMonth()+1) + "월 " + d.getDate() + "일";
+    return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
   }
-  document.getElementById("dateDisplay1").textContent = todayStr();
-  document.getElementById("dateDisplay2").textContent = todayStr();
+  document.getElementById("signDate1").value = todayIso();
+  document.getElementById("signDate2").value = todayIso();
 
   const ceoInput = document.getElementById("ceoName");
   ceoInput.addEventListener("input", () => {
@@ -694,6 +704,8 @@
       msgZhTwLine: document.getElementById("msgZhTwLine").value.trim(),
       msgZhCnWechat: document.getElementById("msgZhCnWechat").value.trim(),
       wechatQrFile: wechatQrData,
+      signDate1: document.getElementById("signDate1").value,
+      signDate2: document.getElementById("signDate2").value,
       submittedAt: new Date().toISOString(),
       bizRegFile: bizRegData,
       fpRegFile: fpRegData,
