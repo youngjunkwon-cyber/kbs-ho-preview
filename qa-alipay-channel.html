@@ -265,12 +265,11 @@ var DATA = [
 ["U-16","프로필 동의 회원의 예약 폼","프로필 동의 상태에서 예약 입력","국적·성별·생년월일에 회원 정보에서 채움 표시가 붙고 값이 들어가 있다","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.view='fo13';render()"],
 ["U-17","여권 영문명은 채우지 않는다","같은 화면","여권 영문명이 비어 있다. 알리페이 이름은 여권 표기가 보장되지 않기 때문","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.view='fo13';render()"],
 ["U-18","프로필 거부 회원의 예약 폼","프로필 거부 상태에서 예약 입력","국적·성별·생년월일이 모두 빈 칸이고 자동 채움 표시가 없다","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=false;S.view='fo13';render()"],
-["U-19","이메일 입력칸과 인증번호 보내기 버튼","동의·거부 두 경우 모두","이메일 칸이 빈 상태로 노출되고 옆에 인증번호 보내기 버튼이 있다. 링크를 보내는 방식이 아니라 번호를 보내는 방식이다","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.view='fo13';render()"],
-["U-22","인증 전에는 예약을 넘길 수 없다","이메일 인증을 하지 않은 상태","예약 요청 버튼이 회색 비활성이다. 휴대폰 번호·연락 메신저도 현행 그대로 필수라 이것까지 채워야 활성된다는 안내가 있다","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.view='fo13';render()"],
-["U-22b","휴대폰·메신저를 채워도 이메일 인증 전이면 막힌다","이메일만 미인증인 상태","이메일 칸을 뺀 나머지를 다 채워도 예약 요청은 비활성이다","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.tel='13900001111';S.msg='위챗 wxid_alipay01';S.view='fo13';render()"],
-["U-23","이메일 인증은 번호를 받아 입력해야 끝난다","인증번호 보내기 클릭 → 발송된 인증번호(시안 값 482910)를 입력칸에 입력 → 확인 클릭","보내기를 누르면 발송됨으로 바뀌고 인증번호 입력칸이 나타난다. 맞는 번호를 넣고 확인을 눌러야 인증됨으로 바뀐다. 클릭 한 번(링크 방식)으로는 끝나지 않는다. 휴대폰·메신저도 채워지면 그제서야 예약 요청이 활성된다","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.tel='13900001111';S.msg='위챗 wxid_alipay01';S.view='fo13';render()"],
-["U-23b","틀린 인증번호는 통과되지 않는다","인증번호 보내기 후 잘못된 번호를 입력한 상태","인증번호가 맞지 않습니다 안내가 뜨고 확인을 눌러도 인증됨으로 바뀌지 않는다. 예약 요청은 계속 비활성","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.tel='13900001111';S.msg='위챗 wxid_alipay01';S.email='xiaomei.w@qq.com';S.mailCodeSent=true;S.mailCode='000000';S.view='fo13';render()"],
-["U-20","인증한 이메일이 회원 정보에 남는다","예약을 넘긴 뒤 마이페이지","마이페이지 이메일 칸에 그 값이 보이고 인증된 주소라고 적힌다","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.email='xiaomei.w@qq.com';S.mailOk=true;S.view='fo11';render()"]
+["U-19","이메일 입력칸","동의·거부 두 경우 모두","이메일 칸이 빈 상태로 노출된다. 인증번호 보내기 같은 인증 버튼은 없다. 안내: 입력만 받습니다. 인증 절차는 없습니다.","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.view='fo13';render()"],
+["U-22","이메일이 비면 예약을 넘길 수 없다","이메일을 입력하지 않은 상태","예약 요청 버튼이 회색 비활성이다. 휴대폰 번호·연락 메신저도 현행 그대로 필수","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.view='fo13';render()"],
+["U-22b","휴대폰·메신저를 채워도 이메일이 비면 막힌다","이메일만 비운 상태","이메일 칸을 뺀 나머지를 다 채워도 예약 요청은 비활성이다","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.tel='13900001111';S.msg='위챗 wxid_alipay01';S.view='fo13';render()"],
+["U-23","이메일은 입력만 받고 인증은 없다","이메일 칸을 눌러 입력","입력 즉시 채워지고 별도 인증 단계 없이 예약 요청 활성 조건에 들어간다","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.tel='13900001111';S.msg='위챗 wxid_alipay01';S.view='fo13';render()"],
+["U-20","입력한 이메일이 회원 정보에 남는다","예약을 넘긴 뒤 마이페이지","마이페이지 이메일 칸에 그 값이 보인다. 인증 표시는 없다","resetDB();S.joined=true;S.agTerms=true;S.agPriv=true;S.agProf=true;S.email='xiaomei.w@qq.com';S.mailOk=true;S.view='fo11';render()"]
 ]],
 
 ["알리페이 회원 (어드민)", [

@@ -125,9 +125,6 @@ function resetDB() {
     agProf:   false,   // 알리페이 프로필 제공 (선택)
     agMkt:    false,   // 마케팅 정보 수신 동의 (선택). 기존 회원과 같은 정책
     open:     {},      // 동의 창에서 펼쳐 놓은 전문
-    mailOk:   false,   // 예약에서 입력한 이메일의 인증 여부
-    mailCodeSent: false, // 인증번호 보내기를 눌렀는가
-    mailCode: '',      // 이메일 인증번호 입력값 (인증번호 보내기 후 채움)
     permit:   true,    // 알리페이 회원정보 조회 권한 개통 여부
     wallet:   'CN',    // CN 중국 / HK 홍콩
     email:    '',      // 예약에서 입력하면 채워진다
@@ -183,7 +180,7 @@ var CAPS = {
   fo10: '알리페이 채널에서는 자체 로그인 경로를 숨깁니다. 점선 박스가 웹 채널에는 있고 알리페이 채널에는 없는 자리입니다.',
   fo11: '프로필 제공 동의 여부에 따라 내 정보가 달라집니다. 비밀번호가 없는 계정이라 비밀번호 변경이 없고, 알리페이로 로그인된 상태라는 안내를 예약 내역 위에 둡니다.',
   fo12: '마이페이지의 기존 탈퇴 경로를 그대로 씁니다. 알리페이 연결도 함께 끊기고 다시 들어오면 새 회원이 됩니다.',
-  fo13: '이메일은 예약 필수 항목인데 알리페이 회원은 회원 정보에 값이 없어 입력칸이 뜹니다. 인증번호를 보내 받은 번호를 입력해야 예약을 넘길 수 있습니다(링크 방식이 아닙니다). 프로필 제공에 동의했으면 국적·성별·생년월일이 채워집니다. 여권 영문명은 채우지 않습니다.',
+  fo13: '이메일은 예약 필수 항목인데 알리페이 회원은 회원 정보에 값이 없어 입력칸이 뜹니다. 입력만 받고 인증 절차는 없습니다. 프로필 제공에 동의했으면 국적·성별·생년월일이 채워집니다. 여권 영문명은 채우지 않습니다.',
   bo11: '회원 메뉴 아래에 새로 두는 화면입니다. 알리페이 회원만 모여 있어 가입 경로 필터가 필요 없습니다. 기존 회원 관리 정보조회 화면은 손대지 않습니다. 상세 화면은 두지 않습니다. 마케팅 정보 수신 동의는 기존 회원 화면과 같은 방식으로 칼럼을 둡니다.'
 };
 
@@ -263,7 +260,7 @@ function fo11() {
 
   var mail = '<div class="fld"><div class="l">이메일</div>' +
     '<div class="in ' + (S.email ? '' : 'plc') + '">' + (S.email || '예약 확인을 받을 이메일') + '</div>' +
-    (S.email && S.mailOk ? '<div class="sub">인증된 주소입니다.</div>' : '') + '</div>';
+    '</div>';
 
   var rows = ['예약 내역', '채팅', '언어 설정', '이용 약관', '개인정보 처리방침']
     .map(function (t) { return '<div class="mrow"><span>' + t + '</span><span class="a">›</span></div>'; }).join('') +
@@ -314,26 +311,11 @@ function fo13() {
       (opt.auto ? '<span class="autotag">회원 정보에서 채움</span>' : '') + '</div>' +
       '<div class="' + cls + '">' + (val || opt.ph) + '</div></div>';
   }
-  /* 이메일은 인증번호를 받아 입력해야 예약을 넘길 수 있다 (링크 방식이 아니라 번호 입력 방식) */
+  /* 이메일은 입력만 받는다. 인증번호나 링크로 확인하는 절차는 없다 */
   function mailField() {
-    if (S.mailOk) {
-      return '<div class="fld"><div class="l">이메일</div><div class="vrow">' +
-        '<div class="in">' + S.email + '</div><div class="vbtn done">인증됨</div></div></div>';
-    }
-    if (S.mailCodeSent) {
-      var ok = S.mailCode === '482910';
-      return '<div class="fld"><div class="l">이메일</div><div class="vrow">' +
-        '<div class="in">' + S.email + '</div><div class="vbtn done">발송됨</div></div>' +
-        '<div class="sub">xiaomei.w@qq.com 로 받은 인증번호 6자리를 입력하세요. (시안 값 482910)</div></div>' +
-        '<div class="fld"><div class="l">인증번호</div><div class="vrow">' +
-        '<div class="in ' + (S.mailCode ? '' : 'plc') + '" onclick="S.mailCode=S.mailCode||\'482910\';render()">' + (S.mailCode || '6자리 입력') + '</div>' +
-        '<div class="vbtn' + (ok ? ' done' : '') + '" onclick="S.mailOk=(S.mailCode===\'482910\');render()">확인</div>' +
-        '</div>' + (S.mailCode && !ok ? '<div class="sub">인증번호가 맞지 않습니다.</div>' : '') + '</div>';
-    }
-    return '<div class="fld"><div class="l">이메일</div><div class="vrow">' +
+    return '<div class="fld"><div class="l">이메일</div>' +
       '<div class="in ' + (S.email ? '' : 'plc') + '" onclick="S.email=S.email||\'xiaomei.w@qq.com\';render()">' + (S.email || '예약 확인을 받을 이메일') + '</div>' +
-      '<div class="vbtn" onclick="S.email=S.email||\'xiaomei.w@qq.com\';S.mailCodeSent=true;render()">인증번호 보내기</div>' +
-      '</div><div class="sub">인증번호를 받아 입력해야 예약을 넘길 수 있습니다.</div></div>';
+      '<div class="sub">입력만 받습니다. 인증 절차는 없습니다.</div></div>';
   }
   /* 휴대폰 번호·메신저 연락처는 현행 그대로 필수다. 클릭하면 입력한 것으로 본다 */
   function tapField(label, stateKey, ph, example) {
@@ -343,7 +325,7 @@ function fo13() {
       (v || ph) + '</div></div>';
   }
   var auto = S.agProf;
-  var ready = S.mailOk && S.tel && S.msg;
+  var ready = S.email && S.tel && S.msg;
   return phone('예약하기',
     '<div class="sec"><div class="h">예약자 정보</div><div class="box">' +
     fld('여권 영문명', '', { ph: '여권에 적힌 영문 이름' }) +
@@ -476,7 +458,7 @@ function render() {
     '<span class="kv">약관·처리방침 <em>' + (S.agTerms && S.agPriv ? '동의' : '미동의') + '</em></span>' +
     '<span class="kv">프로필 제공 <em>' + (S.agProf ? '동의' : '거부') + '</em></span>' +
     '<span class="kv">마케팅 수신 <em>' + (S.agMkt ? '동의' : '거부') + '</em></span>' +
-    '<span class="kv">이메일 <em>' + (S.email || '없음') + (S.email ? (S.mailOk ? ' (인증됨)' : ' (미인증)') : '') + '</em></span>' +
+    '<span class="kv">이메일 <em>' + (S.email || '없음') + '' + '</em></span>' +
     '<span class="kv">월렛 <em>' + (S.wallet === 'CN' ? '중국' : '홍콩') + '</em></span>' +
     '<button onclick="S.wallet=(S.wallet===\'CN\'?\'HK\':\'CN\');render()">월렛 바꾸기</button>' +
     '<button onclick="S.permit=!S.permit;render()">조회 권한 ' + (S.permit ? '끄기' : '켜기') + '</button>' +
