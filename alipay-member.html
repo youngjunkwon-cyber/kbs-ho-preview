@@ -255,8 +255,9 @@ function fo11() {
   /* 이름이 없으면 무엇으로도 부르지 않는다 */
   var prof = S.agProf
     ? '<div class="nm">' + ALI.name + '</div><div class="sub">' + ALI.sex + '<br>' + ALI.birth + '<br>' + ALI.nation + '</div>'
-    : '<div class="sub" style="margin-top:0">알리페이 계정의 이름, 성별, 생년월일, 국적을 가져올 수 있습니다.</div>' +
-      '<div class="cta ghost" style="margin:12px 0 0" onclick="S.reAsk=true;render()">알리페이에서 불러오기</div>';
+    : '<div class="sub" style="margin-top:0">이름, 성별, 생년월일, 국적이 아직 없습니다.</div>' +
+      '<div class="cta ghost" style="margin:12px 0 0" onclick="S.reAsk=true;render()">알리페이 계정에서 불러오기</div>' +
+      '<div class="sub">알리페이 계정의 이름, 성별, 생년월일, 국적을 가져옵니다. 이메일과 전화번호는 가져오지 않습니다.</div>';
 
   var mail = '<div class="fld"><div class="l">이메일</div>' +
     '<div class="in ' + (S.email ? '' : 'plc') + '">' + (S.email || '예약 확인을 받을 이메일') + '</div>' +
