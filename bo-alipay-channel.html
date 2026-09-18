@@ -164,6 +164,7 @@ const MSG = {
   cap:         '웹·알리페이 앱 각 2개까지 켤 수 있습니다.',
   capHead:     '버튼은 웹·알리페이 앱 각 2개까지 선택할 수 있습니다.',
   capOn:       (chName, list) => MSG.capHead + ' 지금 ' + chName + '은 ' + list.join(', ') + euro(list[list.length - 1]) + ' ' + list.length + '개입니다.',
+  noAliBtnLocked: '알리페이 앱 버튼이 없어 알리페이에 노출되지 않습니다. 개별 설정으로 바꾸거나 스토어의 버튼 및 메신저 설정에서 1개 이상 켜면 노출됩니다.',
   storeNoBtn:  '스토어에 알리페이 앱 버튼이 없어 이 상품도 알리페이에 노출되지 않습니다. 스토어 정보 관리 > 버튼 및 메신저 설정에서 1개 이상 켜면 노출됩니다.',
   storeNoBtnAll: n => '알리페이 앱 버튼이 없어 이 스토어와 스토어 상품 ' + n + '건이 알리페이에 노출되지 않습니다. 버튼 및 메신저 설정에서 1개 이상 켜면 노출됩니다.',
   exhEmpty:    s => '노출 가능한 ' + s + ' 없습니다. 기획전이 알리페이에 노출되지 않습니다.',
@@ -355,12 +356,11 @@ const M = id => DB.magazines.filter(x => x.id === id)[0];
 
 /* ---------------------------- 유효 버튼 ---------------------------- */
 function effBtns(p) {
-  const st = S(p.store); const out = {}; let chatAuto = false;
+  const st = S(p.store); const out = {};
   const src = p.mode === '기본 설정' ? st : p;
   ROWS_PRODUCT.forEach(r => { out[r.k] = { web: !!src.btns[r.k].web, ali: !!src.btns[r.k].ali }; });
   ROWS_PRODUCT.filter(r => r.aliHardOff).forEach(r => { out[r.k].ali = false; });
-  if (p.mode === '기본 설정' && ctaList(out, ROWS_PRODUCT, 'ali').length === 0) { out.chat.ali = true; chatAuto = true; }
-  return { btns: out, chatAuto };
+  return { btns: out };   // 기본 설정 상품은 스토어 값(예약 제외)을 그대로 읽는다. 비면 알리페이 버튼 미설정으로 미노출
 }
 /* 스토어의 상품 수와 기본 설정 상품 수는 항상 데이터에서 센다 */
 /* 스토어 미노출 안내의 N은 알리페이 대상 언어 상품만 센다. 그 외 언어는 원래 알리페이에 나가지 않는다 */
@@ -623,7 +623,6 @@ function btnTable(kind, obj) {
     let webDis = locked, aliDis = aliOffAll || r.aliHardOff, note = '';
     if (r.aliHardOff) note = MSG.hardOff;
     if (r.needBooking && !obj.bookingEnabled) { webDis = true; aliDis = true; note = MSG.needBooking; }
-    if (r.k === 'chat' && !isStore && eff.chatAuto) note = '알리페이 앱 버튼이 없어 채팅이 자동 적용됩니다.';
     if (r.k === 'inquiry' && !note) note = MSG.inquiryHint;
     html += '<tr><td>' + r.label + '</td>' +
       '<td>' + onoff('w_' + kind + '_' + r.k, e.web, "setBtn('" + kind + "','" + r.k + "','web',%V%)", webDis) + '</td>' +
@@ -641,7 +640,7 @@ function btnTable(kind, obj) {
   }
   if (locked) html += '<div class="hint">기본 설정 적용 중입니다. 개별 설정을 선택하면 수정할 수 있습니다.</div>';
   else if (selfHidden && langOk) html += '<div class="hint">' + MSG.lockSelf + '</div>';
-  if (langOk && !selfHidden && !storeHidden && aliCnt === 0 && (isStore || judgeStore(S(obj.store)).visible)) html += '<div class="notice">' + MSG.noAliBtn(isStore ? '' : '버튼 설정') + '</div>';
+  if (langOk && !selfHidden && !storeHidden && aliCnt === 0 && (isStore || judgeStore(S(obj.store)).visible)) html += '<div class="notice">' + (locked ? MSG.noAliBtnLocked : MSG.noAliBtn(isStore ? '' : '버튼 설정')) + '</div>';
   return html;
 }
 
