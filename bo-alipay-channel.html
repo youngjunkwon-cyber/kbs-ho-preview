@@ -362,7 +362,8 @@ function effBtns(p) {
   return { btns: out, chatAuto };
 }
 /* 스토어의 상품 수와 기본 설정 상품 수는 항상 데이터에서 센다 */
-function storeProdCount(st) { return DB.products.filter(p => p.store === st.id).length; }
+/* 스토어 미노출 안내의 N은 알리페이 대상 언어 상품만 센다. 그 외 언어는 원래 알리페이에 나가지 않는다 */
+function storeProdCount(st) { return DB.products.filter(p => p.store === st.id && ALI_LANGS.indexOf(p.lang) !== -1).length; }
 function storeBaseCount(st) { return DB.products.filter(p => p.store === st.id && p.mode === '기본 설정').length; }
 function effStoreBtns(st) {
   const out = {};
@@ -405,7 +406,7 @@ function judgeStore(st) {
   else if (!c2) reason = '알리페이 버튼 미설정';
   return { na: false, visible: !reason, reason };
 }
-// 상품 상세에 붙는 스토어 카드(참조 정리 9-①). 상품 자신은 조건③에서 스토어의 노출 설정값만
+// 상품 상세에 붙는 스토어 카드. 상품 자신은 조건③에서 스토어의 노출 설정값만
 // 보므로 노출로 나올 수 있지만, 그 스토어가 버튼 미설정으로 스토어 자체는 미노출일 수 있다.
 // 그 경우 스토어 카드 영역은 숨긴다.
 function storeCardOk(st) { return judgeStore(st).visible; }
