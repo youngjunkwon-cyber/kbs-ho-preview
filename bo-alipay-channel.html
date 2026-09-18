@@ -417,8 +417,19 @@ function liveNow(o) {
   return on && (!o.from || o.from <= TODAY) && (!o.to || o.to >= TODAY);
 }
 // 직접입력 주소를 우리 경로 패턴으로 파싱한다. 맞는 패턴이 없으면(카테고리·검색·홈 등 목록 페이지) 대상 특정이 안 되어 통과시킨다.
-function parseInternalPath(raw) {
+// 다른 사이트의 절대 주소(다른 도메인, javascript: 등)는 외부 사이트 연결로 본다. 우리 도메인의 절대 주소는 경로만 읽는다.
+const OUR_HOST = /^https?:\/\/(?:www\.)?(?:k-beautystation\.com|kbstations\.com|[a-z0-9-]+\.kbstations\.com)(?=\/|$)/i;
+function isExternalDirectPath(raw) {
   const v = String(raw || '').trim();
+  if (!v) return false;
+  if (/^(javascript|data|vbscript):/i.test(v)) return true;
+  if (/^\/\//.test(v)) return true;
+  if (/^https?:\/\//i.test(v)) return !OUR_HOST.test(v);
+  return false;
+}
+function parseInternalPath(raw) {
+  let v = String(raw || '').trim();
+  if (OUR_HOST.test(v)) v = v.replace(OUR_HOST, '') || '/';
   // 언어 프리픽스(/en, /zh-CN 등)와 ?·# 이후는 무시한다
   const m = v.match(/^(?:\/[a-z]{2}(?:-[A-Za-z]{2,4})?)?\/(products|stores|collections|influencers)\/([^\/?#]+)\/?(?:[?#].*)?$/);
   return m ? { type: m[1], id: m[2] } : null;
@@ -428,6 +439,7 @@ function parseInternalPath(raw) {
 function innerTargetOk(inner, lang) {
   if (!inner) return { ok: true, label: '대상 없음', skip: true };
   if (inner.kind === '직접입력') {
+    if (isExternalDirectPath(inner.path)) return { ok: false, label: '직접입력 · 외부 사이트', ext: true };
     const parsed = parseInternalPath(inner.path);
     if (!parsed) return { ok: true, label: inner.path ? '직접입력 · 목록 페이지' : '직접입력 · 주소 없음', skip: true };
     if (parsed.type === 'products') {
@@ -480,10 +492,10 @@ function judgeAd(b) {
   if (ALI_LANGS.indexOf(b.lang) === -1) return { na: true, visible: false, reason: '' };
   const c1 = b.aliVisible === '노출';
   const ext = b.linkType === '외부링크';
-  let noBtn = false, targetOut = null;
+  let noBtn = false, targetOut = null, innerExt = false;
   if (!ext && b.linkType === '내부링크') {
     const tv = innerTargetOk(b.inner, b.lang);
-    if (!tv.ok) targetOut = tv.label;
+    if (tv.ext) innerExt = true; else if (!tv.ok) targetOut = tv.label;
   } else if (!ext) {
     const bt = b.btn;
     /* 버튼 링크 종류가 외부링크면 저장된 값과 무관하게 알리페이에서 꺼진 것으로 본다 */
@@ -491,13 +503,13 @@ function judgeAd(b) {
     noBtn = !bt || !bt.ali || btExt;
     if (!noBtn && bt.linkKind === '내부링크') {
       const tv = innerTargetOk(bt.inner, b.lang);
-      if (!tv.ok) targetOut = tv.label;
+      if (tv.ext) innerExt = true; else if (!tv.ok) targetOut = tv.label;
     }
   }
   /* 미노출과 외부링크가 겹쳐도 사유는 우선순위대로 하나만 쓴다 */
   let reason = '';
   if (!c1) reason = '미노출 설정';
-  else if (ext) reason = '외부 사이트 연결';
+  else if (ext || innerExt) reason = '외부 사이트 연결';
   else if (noBtn) reason = '알리페이 버튼 미설정';
   else if (targetOut) reason = '노출 대상 없음';
   return { na: false, visible: !reason, reason, targetLabel: targetOut || '' };
