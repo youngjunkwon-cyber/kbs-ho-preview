@@ -688,9 +688,14 @@ window.setBooking = function (on) {
 };
 
 /* ------------------------------ 목록 공통 ------------------------------ */
-const langFree = () => VIEW.name === 's-list';   /* 스토어는 언어를 나누지 않는다 */
+/* 스토어 목록은 실측대로 원본 탭 + 언어 탭. 스토어의 알리페이 값은 언어와 무관한 한 건이라 어느 탭에서나 같다.
+   두 칼럼은 원본 탭과 알리페이 대상 언어 탭에만 두고, 그 외 언어 탭에서는 필터도 전체로 돌려 잠근다(상품 목록과 같은 방식). */
+const S_LIST_TABS = ['원본', '중국어(간체)', '영어', '중국어(번체)', '일본어', '인도네시아어', '몽골어'];
+const storeTabOk = () => !VIEW.stab || VIEW.stab === '원본' || ALI_LANGS.indexOf(VIEW.stab) !== -1;
+const filterOn = () => VIEW.name === 's-list' ? storeTabOk() : aliLangOk();
+window.setStab = function (v) { VIEW.stab = v; if (!storeTabOk()) { F().ali = '전체'; F().rsn = '전체'; } render(); };
 function aliFilterRow(opts) {
-  const dis = (langFree() || aliLangOk()) ? '' : ' disabled';
+  const dis = filterOn() ? '' : ' disabled';
   return '<div class="fl"><span>알리페이 노출</span><select' + dis + ' onchange="F().ali=this.value;render()">' +
     ['전체', '노출', '미노출'].map(l => '<option' + (l === F().ali ? ' selected' : '') + '>' + l + '</option>').join('') + '</select></div>' +
     '<div class="fl"><span>사유</span><select' + dis + ' onchange="F().rsn=this.value;render()">' +
@@ -698,7 +703,7 @@ function aliFilterRow(opts) {
 }
 function passFilter(j) {
   const f = F();
-  if (!langFree() && !aliLangOk()) return true;
+  if (!filterOn()) return true;
   if (f.ali !== '전체') { if (j.na) return false; if ((f.ali === '노출') !== j.visible) return false; }
   if (f.rsn !== '전체') { if (j.na || j.reason !== f.rsn) return false; }
   return true;
@@ -786,24 +791,36 @@ function screen_pEdit() {
 
 /* --------------------------- 스토어 목록 (실측) --------------------------- */
 function screen_sList() {
-  const body = DB.stores.map(st => { const j = judgeStore(st); if (!passFilter(j)) return '';
-    return '<tr><td>' + st.no + '</td><td>' + st.reg + '</td><td>' + esc(st.biz) + '</td><td>' + esc(st.name) + '</td>' +
-      '<td class="c">' + visCell(j) + '</td><td>' + rsnCell(j) + '</td>' +
-      '<td>' + st.cat + '</td><td class="tblnote">' + st.langs + '</td><td>' + st.tel + '</td><td>' + st.bizno + '</td><td>' + st.email + '</td><td>' + st.zip + '</td><td>' + st.area + '</td><td class="tblnote">-</td><td class="tblnote">-</td><td class="tblnote">-</td>' +
-      '<td><button class="btn sm" onclick="go(\'s-edit\',\'' + st.id + '\')">수정</button> <button class="btn sm red">삭제</button></td></tr>'; }).join('');
+  if (!VIEW.stab) VIEW.stab = '원본';
+  const tab = VIEW.stab, orig = tab === '원본', aliCols = storeTabOk();
+  const tabs = '<div class="mtabs">' + S_LIST_TABS.map(t => '<div class="mtab ' + (t === tab ? 'on' : '') + '" onclick="setStab(\'' + t + '\')">' + t + '</div>').join('') + '</div>';
+  let head, body, ncol;
+  if (orig) {
+    head = '<tr><th>No.</th><th>공개여부</th><th>등록일</th><th>스토어명</th><th>알리페이 노출</th><th>사유</th><th>카테고리</th><th>지원언어</th>' +
+      '<th>노출수</th><th>클릭수</th><th>조회수</th><th>채팅수</th><th>상담수</th><th>버튼 클릭수</th><th>예약 설정</th><th>관리</th></tr>'; ncol = 16;
+    body = DB.stores.map(st => { const j = judgeStore(st); if (!passFilter(j)) return '';
+      return '<tr><td>' + st.no + '</td><td>' + (st.active === false ? '비공개' : '공개') + '</td><td>' + st.reg + '</td><td>' + esc(st.name) + '</td>' +
+        '<td class="c">' + visCell(j) + '</td><td>' + rsnCell(j) + '</td>' +
+        '<td>' + st.cat + '</td><td class="tblnote">' + st.langs + '</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>' +
+        '<td>' + (st.bookingEnabled ? '사용' : '미사용') + '</td>' +
+        '<td><button class="btn sm">위치</button> <button class="btn sm" onclick="go(\'s-edit\',\'' + st.id + '\')">수정</button> <button class="btn sm red">삭제</button></td></tr>'; }).join('');
+  } else {
+    head = '<tr><th>스토어명</th><th>카테고리</th><th>언어</th>' + (aliCols ? '<th>알리페이 노출</th><th>사유</th>' : '') + '<th>노출</th><th>상품 수</th></tr>'; ncol = aliCols ? 7 : 5;
+    body = DB.stores.filter(st => st.langs.split(',').map(x => x.trim()).indexOf(tab) !== -1).map(st => { const j = judgeStore(st); if (!passFilter(j)) return '';
+      const cnt = DB.products.filter(p => p.store === st.id && p.lang === tab).length;
+      return '<tr><td>' + esc(st.name) + '</td><td>' + st.cat + '</td><td>' + tab + '</td>' +
+        (aliCols ? '<td class="c">' + visCell(j) + '</td><td>' + rsnCell(j) + '</td>' : '') + '<td>활성</td><td>' + cnt + '</td></tr>'; }).join('');
+  }
   return '<div class="phd"><div><h2 class="page">스토어 정보 관리</h2>' +
     '<div class="pdesc">입점사 스토어 정보를 조회하고 등록, 수정, 삭제할 수 있습니다.</div></div>' +
     '<div style="display:flex;gap:8px"><button class="btn">칼럼설정</button><button class="btn">신규 스토어등록</button><button class="btn">엑셀 다운로드</button></div></div>' +
     '<div class="card"><div class="filters">' +
-    '<div class="frow">' + dimSel('언어', ['언어']) + dimSel('카테고리 선택', ['카테고리 선택']) + dimSel('스토어 선택', ['스토어 선택']) + dimSel('지하철정보', ['지하철정보']) + dimSel('지역', ['지역']) + '</div>' +
-    '<div class="frow">' + aliFilterRow(['전체', '미노출 설정', '알리페이 버튼 미설정']) + '</div>' +
-    '<div class="frow"><input type="text" placeholder="검색어" style="width:220px"><button class="btn blue">검색</button></div>' +
+    '<div class="frow">' + dimSel('카테고리 선택', ['카테고리 선택']) + dimSel('스토어 선택', ['스토어 선택']) + dimSel('공개여부 선택', ['공개여부 선택']) + aliFilterRow(['전체', '미노출 설정', '알리페이 버튼 미설정']) + '</div>' +
+    '<div class="frow"><button class="btn">오늘</button><button class="btn">어제</button><button class="btn">이번주</button><button class="btn">이번달</button>' +
+    '<input type="text" placeholder="Start date" style="width:120px"> ~ <input type="text" placeholder="End date" style="width:120px">' +
+    '<input type="text" placeholder="검색어" style="width:220px"><button class="btn blue">검색</button></div>' +
     '</div></div>' +
-    '<div class="card"><div class="hd">스토어 목록</div><div class="tblwrap"><table><thead><tr>' +
-    '<th>No.</th><th>등록일</th><th>사업자명</th><th>스토어명</th>' +
-    '<th>알리페이 노출</th><th>사유</th>' +
-    '<th>카테고리</th><th>지원언어</th><th>대표번호</th><th>사업자번호</th><th>이메일</th><th>우편번호</th><th>지역</th><th>위도</th><th>경도</th><th>지하철 정보</th><th>Actions</th>' +
-    '</tr></thead><tbody>' + (body || empty(17)) + '</tbody></table></div></div>';
+    '<div class="card"><div class="hd">스토어 목록</div>' + tabs + '<div class="tblwrap"><table><thead>' + head + '</thead><tbody>' + (body || empty(ncol)) + '</tbody></table></div></div>';
 }
 
 /* ------------------- 스토어 정보 수정 (실측: 섹션 앵커 페이지) ------------------- */
