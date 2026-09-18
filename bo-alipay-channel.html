@@ -253,7 +253,10 @@ const DB = {
       btns: { consult: btn({ web: true, ali: true }), inquiry: btn(), chat: btn(), extlink: btn(), messenger: btn({ web: true }) }, history: [] },
     { id: 'P10', name: '속눈썹 연장', lang: '중국어(간체)', store: 'S2', status: '승인', active: true, hidden: false,
       cat: '뷰티', sub: '아이래시', price: '60,000', vat: '포함', ext: '', aliVisible: '노출', mode: '개별 설정', insta: 'OFF',
-      btns: { consult: btn({ web: true, ali: true }), inquiry: btn(), chat: btn({ web: true, ali: true }), extlink: btn(), messenger: btn() }, history: [] }
+      btns: { consult: btn({ web: true, ali: true }), inquiry: btn(), chat: btn({ web: true, ali: true }), extlink: btn(), messenger: btn() }, history: [] },
+    { id: 'P11', name: 'Glow Facial', lang: '영어', store: 'S3', status: '승인', active: true, hidden: false,
+      cat: '피부', sub: '스킨케어', price: '110,000', vat: '포함', ext: '', aliVisible: '노출', mode: '개별 설정', insta: 'OFF',
+      btns: { consult: btn({ web: true, ali: true }), inquiry: btn(), chat: btn(), extlink: btn(), messenger: btn() }, history: [] }
   ],
   // 광고(배너). 내부링크 종류 = 직접입력 / 병원 / 기획전 / 인플루언서
   ads: [
@@ -306,7 +309,7 @@ const DB = {
       products: [], stores: [], history: [] },
     { id: 'E5', name: '영어 PICK 2차', inner: 'pick2_EN', lang: '영어', type: '추천상품', typeId: 'CT3',
       from: '2026-09-01', to: '2026-10-31', active: '활성', aliVisible: '노출',
-      products: ['P3'], stores: [], history: [] }
+      products: ['P3', 'P11'], stores: [], history: [] }
   ],
   influencers: [
     { id: 'IF1', name: '카인드스페셜_중국', show: 'KIND 한정 플랜 3종', lang: '중국어(간체)', active: true, from: '2026-09-01', to: '2026-10-31', products: ['P1', 'P8', 'P10'] },
@@ -989,7 +992,7 @@ function modal_ad() {
         innerPicker('setBtnInnerKind(this.value)', 'setBtnInnerId(this.value)', b.btn.inner, 'setBtnInnerPath(this.value)', b.lang) + '</div></div>' : '');
   }
   h += tail;
-  return '<div class="mask"><div class="modal" style="max-width:720px"><div class="hd">수정<button class="x" onclick="closeMD()">✕</button></div>' +
+  return '<div class="mask"><div class="modal" style="max-width:700px"><div class="hd">수정<button class="x" onclick="closeMD()">✕</button></div>' +
     '<div class="bd">' + h + '</div><div class="ft"><button class="btn" onclick="closeMD()">취소</button><button class="btn blue" onclick="saveAd()">수정</button></div></div></div>';
 }
 
