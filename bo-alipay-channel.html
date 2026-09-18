@@ -464,7 +464,7 @@ function innerTargetOk(inner, lang) {
   if (inner.kind === '병원') {
     const st = S(inner.id); if (!st) return { ok: false, label: '병원 · 대상 없음' };
     /* 기존 노출 조건에서 이미 빠진 스토어는 연결 대상으로 치지 않는다 */
-    if (st.active === false) return { ok: false, label: '병원 · ' + st.name, j: { visible: false, reason: '비활성' } };
+    if (st.active === false) return { ok: false, label: '병원 · ' + st.name, j: { visible: false, reason: '비공개' } };
     const j = judgeStore(st); return { ok: j.visible, label: '병원 · ' + st.name, j };
   }
   if (inner.kind === '기획전') {
