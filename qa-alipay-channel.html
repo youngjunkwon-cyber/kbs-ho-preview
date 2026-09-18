@@ -95,6 +95,7 @@ dialog textarea{width:100%;height:320px;font-family:ui-monospace,Menlo,monospace
         <span style="flex:1"></span>
         <button class="btn pri" id="copy">결과 복사</button>
         <button class="btn" id="resetKeep">통과 외 초기화</button>
+        <button class="btn" id="restore">기록 불러오기</button>
         <button class="btn" id="reset">기록 초기화</button>
       </div>
       <div class="stat">
@@ -409,8 +410,11 @@ function buildReport() {
     });
     if (rows.length) { lines.push('[' + g[0] + ']'); lines.push(rows.join('\n')); lines.push(''); }
   });
+  var passed = Object.keys(state).filter(function (k) { return state[k].v === 'p'; });
   return '알리페이 채널 분기 시안 검수 결과\n통과 ' + pass + ' / 실패 ' + fail + ' / 미확인 ' + todo + '\n\n' +
-    (lines.length ? '실패 건\n\n' + lines.join('\n') : '실패 건 없음');
+    (lines.length ? '실패 건\n\n' + lines.join('\n') : '실패 건 없음') +
+    '\n\n통과 ID: ' + (passed.length ? passed.join(', ') : '없음') +
+    '\n(이 줄을 기록 불러오기에 붙이면 통과 표시가 복원됩니다)';
 }
 
 document.querySelectorAll('[data-f]').forEach(function (b) {
@@ -449,6 +453,22 @@ document.getElementById('doCopy').addEventListener('click', function () {
   ta.setAttribute('readonly', '');
   var b = this; b.textContent = '복사했습니다';
   setTimeout(function () { b.textContent = '클립보드로 복사'; }, 1500);
+});
+/* 결과 복사 텍스트의 "통과 ID:" 줄이나 기록 JSON을 붙여 넣어 복원한다. 기록은 이 브라우저에만 저장되므로 브라우저가 바뀌면 이걸로 옮긴다 */
+document.getElementById('restore').addEventListener('click', function () {
+  var txt = prompt('결과 복사로 받은 텍스트(통과 ID: 줄 포함)나 기록 JSON을 붙여 넣으세요.');
+  if (!txt) return;
+  var ids = {}; DATA.forEach(function (g) { g[1].forEach(function (c) { ids[c[0]] = true; }); });
+  var n = 0;
+  try {
+    var obj = JSON.parse(txt);
+    if (obj && typeof obj === 'object') { Object.keys(obj).forEach(function (k) { if (ids[k] && obj[k] && obj[k].v) { state[k] = { v: obj[k].v, m: obj[k].m || '' }; n++; } }); }
+  } catch (e) {
+    var m = txt.match(/통과 ID:\s*([^\n]+)/);
+    if (m) { m[1].split(/[,\s]+/).forEach(function (k) { k = k.trim(); if (ids[k] && get(k).v !== 'f') { state[k] = { v: 'p', m: get(k).m || '' }; n++; } }); }
+  }
+  save(); render();
+  alert(n ? n + '건을 복원했습니다.' : '복원할 항목을 찾지 못했습니다. 통과 ID: 줄이 있는 텍스트를 붙여 주세요.');
 });
 document.getElementById('reset').addEventListener('click', function () {
   if (!confirm('기록한 통과·실패와 메모를 모두 지웁니다. 계속할까요?')) return;
