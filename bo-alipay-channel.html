@@ -365,7 +365,7 @@ function effBtns(p) {
 /* 스토어의 상품 수와 기본 설정 상품 수는 항상 데이터에서 센다 */
 /* 스토어 미노출 안내의 N은 알리페이 대상 언어 상품만 센다. 그 외 언어는 원래 알리페이에 나가지 않는다 */
 function storeProdCount(st) { return DB.products.filter(p => p.store === st.id && ALI_LANGS.indexOf(p.lang) !== -1).length; }
-function storeBaseCount(st) { return DB.products.filter(p => p.store === st.id && p.mode === '기본 설정').length; }
+function storeBaseCount(st) { return DB.products.filter(p => p.store === st.id && p.mode === '기본 설정' && ALI_LANGS.indexOf(p.lang) !== -1).length; }
 function effStoreBtns(st) {
   const out = {};
   ROWS_STORE.forEach(r => { out[r.k] = { web: !!st.btns[r.k].web, ali: !!st.btns[r.k].ali }; });
@@ -442,21 +442,27 @@ function innerTargetOk(inner, lang) {
     if (!parsed) return { ok: true, label: inner.path ? '직접입력 · 목록 페이지' : '직접입력 · 주소 없음', skip: true };
     if (parsed.type === 'products') {
       const p = P(parsed.id); if (!p) return { ok: false, label: '직접입력 · 상품 대상 없음' };
+      /* 기존 노출 조건에서 빠진 상품, 배너와 언어가 다른 상품은 연결 대상으로 치지 않는다 */
+      if (!liveProduct(p)) return { ok: false, label: '직접입력 · ' + p.name, j: { visible: false, reason: '비활성' } };
+      if (lang && p.lang !== lang) return { ok: false, label: '직접입력 · ' + p.name, j: { visible: false, reason: '언어 불일치' } };
       const j = judgeProduct(p); return { ok: !j.na && j.visible, label: '직접입력 · ' + p.name, j };
     }
     if (parsed.type === 'stores') {
       const st = S(parsed.id); if (!st) return { ok: false, label: '직접입력 · 스토어 대상 없음' };
+      if (st.active === false) return { ok: false, label: '직접입력 · ' + st.name, j: { visible: false, reason: '비공개' } };
       const j = judgeStore(st); return { ok: j.visible, label: '직접입력 · ' + st.name, j };
     }
     if (parsed.type === 'collections') {
       const c = C(parsed.id); if (!c) return { ok: false, label: '직접입력 · 기획전 대상 없음' };
+      if (!liveNow(c)) return { ok: false, label: '직접입력 · ' + c.name, j: { visible: false, reason: '비활성' } };
+      if (lang && c.lang !== lang) return { ok: false, label: '직접입력 · ' + c.name, j: { visible: false, reason: '언어 불일치' } };
       const j = judgeCollection(c); return { ok: !j.na && j.visible, label: '직접입력 · ' + c.name, j };
     }
     if (parsed.type === 'influencers') {
       const f = DB.influencers.filter(x => x.id === parsed.id)[0];
       if (!f) return { ok: false, label: '직접입력 · 인플루언서 대상 없음' };
       const live = (f.products || []).filter(id => { const p = P(id); if (!p || !liveProduct(p)) return false; const j = judgeProduct(p); return !j.na && j.visible; }).length;
-      const ok = live > 0 && liveNow(f);
+      const ok = live > 0 && liveNow(f) && (!lang || !f.lang || f.lang === lang);
       return { ok, label: '직접입력 · ' + f.name, live };
     }
     return { ok: true, label: '직접입력', skip: true };
@@ -1103,8 +1109,10 @@ function modal_coll() {
     COLL_TYPES.map(T => radio('ct', T, c.type, "setCollType('" + T + "')")).join('') + '</span></div></div>' +
     '<div class="row"><div class="lbl"><span class="req">*</span>알리페이 노출</div><div class="val"><span class="rg">' +
     radio('cv', '노출', langOk ? c.aliVisible : '노출', "setVis('coll','노출')", !langOk) + radio('cv', '미노출', langOk ? c.aliVisible : '노출', "setVis('coll','미노출')", !langOk) + '</span>' +
-    (langOk && c.aliVisible === '노출' && j.liveCount === 0
-      ? '<div class="notice">' + ((byStore ? c.stores.length : c.products.length) ? MSG.exhEmpty(byStore ? '스토어가' : '상품이') : MSG.exhNone(byStore ? '스토어가' : '상품이')) + '</div>' : '') + '</div></div>' +
+    /* 구성 항목 0건 안내는 언어·알리페이 노출 값과 무관하게 항상. 노출 가능 항목 0건 안내는 알리페이 노출인 대상 언어 건에만 */
+    ((byStore ? c.stores.length : c.products.length) === 0
+      ? '<div class="notice">' + MSG.exhNone(byStore ? '스토어가' : '상품이') + '</div>'
+      : (langOk && c.aliVisible === '노출' && j.liveCount === 0 ? '<div class="notice">' + MSG.exhEmpty(byStore ? '스토어가' : '상품이') + '</div>' : '')) + '</div></div>' +
     comp +
     '<div class="row"><div class="lbl"><span class="req">*</span>기획전 노출 기간</div><div class="val"><input type="text" value="' + c.from + ' → ' + c.to + '" style="width:280px" readonly></div></div>' +
     '<div class="row"><div class="lbl">기획전 활성화 여부</div><div class="val"><span class="rg">' +

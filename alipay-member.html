@@ -271,7 +271,7 @@ function fo11() {
   var overlay = S.reAsk
     ? '<div class="dim"><div class="mdl">' +
         '<h3>알리페이 프로필 제공</h3>' +
-        '<p class="d">이름, 성별, 생년월일, 국적을 가져옵니다.</p>' +
+        '<p class="d">이름, 성별, 생년월일, 국적을 가져옵니다.<br>이메일과 전화번호는 가져오지 않습니다.</p>' +
         '<div class="cta" onclick="S.agProf=true;S.reAsk=false;render()">동의</div>' +
         '<div class="cta ghost" onclick="S.reAsk=false;render()">거부</div>' +
       '</div></div>'
@@ -393,7 +393,7 @@ function bo11() {
       (BOQ ? '<td>' + dash(m.quit) + '</td>' : '') +
       '<td>' + dash(m.last) + '</td>' +
       '<td class="mono">' + m.aid + '</td>' +
-      '<td class="c">' + (m.wallet === 'CN' ? '중국' : '홍콩') + '</td>' +
+      '<td class="c">' + (m.wallet === 'CN' ? '알리페이 중국' : '알리페이 홍콩') + '</td>' +
       '<td>' + dash(m.name) + '</td><td>' + dash(m.nat) + '</td><td>' + dash(m.lang) + '</td>' +
       '<td>' + dash(m.mail) + '</td><td>' + dash(m.pp) + '</td><td>' + dash(m.tel) + '</td>' +
       '<td class="c">' + m.bk + '</td><td class="c">' + m.ns + '</td>' +
