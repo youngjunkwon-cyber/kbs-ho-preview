@@ -365,7 +365,6 @@ function effBtns(p) {
 /* 스토어의 상품 수와 기본 설정 상품 수는 항상 데이터에서 센다 */
 /* 스토어 미노출 안내의 N은 알리페이 대상 언어 상품만 센다. 그 외 언어는 원래 알리페이에 나가지 않는다 */
 function storeProdCount(st) { return DB.products.filter(p => p.store === st.id && ALI_LANGS.indexOf(p.lang) !== -1).length; }
-function storeBaseCount(st) { return DB.products.filter(p => p.store === st.id && p.mode === '기본 설정' && ALI_LANGS.indexOf(p.lang) !== -1).length; }
 function effStoreBtns(st) {
   const out = {};
   ROWS_STORE.forEach(r => { out[r.k] = { web: !!st.btns[r.k].web, ali: !!st.btns[r.k].ali }; });
@@ -612,7 +611,7 @@ function btnTable(kind, obj) {
   const eff = isStore ? effStoreBtns(obj) : effBtns(obj);
   const langOk = isStore ? true : ALI_LANGS.indexOf(obj.lang) !== -1;
   const selfHidden = obj.aliVisible === '미노출';
-  const storeHidden = !isStore && S(obj.store).aliVisible === '미노출';
+  const storeHidden = !isStore && !judgeStore(S(obj.store)).visible;   // 스토어 판정(설정·버튼)이 미노출이면 알리페이 열 잠금
   const locked = !isStore && obj.mode === '기본 설정';
   const aliOffAll = !langOk || selfHidden || storeHidden || locked;
 
@@ -755,7 +754,7 @@ function screen_pList() {
 /* ---- 상품정보 수정 (라이브: /products/{id}/edit 페이지, 탭 2개, 우상단 취소/수정) ---- */
 function screen_pEdit() {
   const p = P(VIEW.id), st = S(p.store), langOk = ALI_LANGS.indexOf(p.lang) !== -1;
-  const visDis = !langOk || st.aliVisible === '미노출';
+  const visDis = !langOk || !judgeStore(st).visible;   // 스토어가 설정이든 버튼 미설정이든 미노출이면 라디오 잠금
   const tabs = ['상품정보', '관리자설정'];
   let bd = '';
   if (VIEW.tab === 0) {
@@ -848,7 +847,6 @@ function screen_sEdit() {
         radio('sv', '노출', st.aliVisible, "setVis('store','노출')") + radio('sv', '미노출', st.aliVisible, "setVis('store','미노출')") + '</span>' +
         '<div class="hint">지원언어와 무관하게 이 설정 하나가 모든 언어에 적용됩니다.</div>' +
         (st.aliVisible === '미노출' ? '<div class="notice">' + MSG.storeHide(storeProdCount(st)) + '</div>' : '') +
-        (storeBaseCount(st) && judgeStore(st).visible && ctaList(effStoreBtns(st).btns, ROWS_STORE, 'ali').filter(x => x !== '예약').length === 0 ? '<div class="hint">기본 설정을 쓰는 상품 ' + storeBaseCount(st) + '건은 알리페이 앱에서 채팅이 자동으로 켜져 노출됩니다. 예약을 뺀 알리페이 앱 버튼이 없어서입니다.</div>' : '') +
         (st.aliVisible === '노출' && onCount(effStoreBtns(st).btns, ROWS_STORE, 'ali') === 0 ? '<div class="notice">' + MSG.storeNoBtnAll(storeProdCount(st)) + '</div>' : '')) +
       fld('대표번호', true, fbox(st.tel)) +
       fld('사업자명', true, fbox(st.biz)) +
