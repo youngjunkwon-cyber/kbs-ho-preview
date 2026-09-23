@@ -203,7 +203,7 @@ function fo09() {
   var rows = [
     ['agTerms', '이용 약관', true, TERMS_FULL, ''],
     ['agPriv', '개인정보 처리방침', true, PRIV_FULL, ''],
-    ['agProf', '알리페이 프로필 제공', true, '', '이름, 닉네임, 성별, 생년월일, 국적, 주소, 휴대폰 번호를 가져옵니다.'],
+    ['agProf', '알리페이 프로필 제공', true, '', '이름, 닉네임, 프로필 사진, 성별, 생년월일, 국적, 주소, 휴대폰 번호, 알리페이 로그인 ID를 가져옵니다.'],
     ['agNotif', '알림 수신', false, '', '예약 확인과 변경 안내를 알리페이 앱 알림으로 받습니다.'],
     ['agMkt', '마케팅 정보 수신', false, '', 'K-Beauty Station의 혜택·이벤트 정보를 휴대폰 번호로 받습니다.']
   ];
@@ -221,7 +221,7 @@ function fo09() {
     overlay = '<div class="dim" style="align-items:flex-end;padding:0"><div class="alisheet">' +
       '<div class="brand"><i></i>Alipay</div>' +
       '<h4>K-Beauty Station이 다음 정보를 요청합니다</h4>' +
-      '<ul class="lst"><li>이름, 닉네임, 프로필 사진</li><li>성별, 생년월일, 국적, 주소</li><li>연락처' + (S.plaintext ? ' (휴대폰 번호 원본)' : '') + '</li></ul>' +
+      '<ul class="lst"><li>이름, 닉네임, 프로필 사진</li><li>성별, 생년월일, 국적, 주소</li><li>연락처' + (S.plaintext ? ' (휴대폰 번호 원본)' : '') + '</li><li>알리페이 로그인 ID</li></ul>' +
       (S.agNotif ? '<div class="tg"><span>K-Beauty Station의 알림 받기</span><span class="sw ' + (S.notifGranted ? 'on' : '') + '" onclick="S.notifGranted=!S.notifGranted;render()"><i></i></span></div>' : '') +
       '<div class="row2" style="margin-top:14px"><div class="ab" onclick="S.step=\'blocked\';S.blocked=\'prof\';S.view=\'fo08\';render()">거부</div><div class="ab pri" onclick="joinNow();render()">허용</div></div>' +
       '<div class="note" style="padding:10px 0 0;text-align:center">이 창은 알리페이 앱이 그립니다. 우리 화면에 합칠 수 없습니다.</div>' +
@@ -317,7 +317,7 @@ function fo13() {
     '<div class="sec"><div class="h">예약자 정보</div><div class="box">' +
     tap('여권 영문명', 'passport', '여권에 적힌 영문 이름', 'WANG XIAOMEI') +
     auto('이름', 'name', '이름') + auto('국적', 'nation', '국적 선택') + auto('성별', 'sex', '성별 선택') + auto('생년월일', 'birth', '생년월일 선택') +
-    tel + tap('연락 메신저', 'msg', '눌러서 입력', '위챗 wxid_alipay01') +
+    tel + tap('연락 메신저', 'msg', '메신저 아이디를 직접 입력해 주세요', '위챗 wxid_alipay01') +
     '<div class="gone" style="margin:12px 0 0">알리페이 채널에서는 이 자리가 없습니다<br>이메일</div>' +
     '</div></div>' +
     '<div class="note">회원 정보에서 채운 값은 고칠 수 있고, 고친 값은 회원 정보에 저장됩니다. 여권 영문명은 채우지 않습니다. 알리페이가 주는 이름은 여권 표기가 보장되지 않습니다.</div>' +
@@ -325,7 +325,7 @@ function fo13() {
 }
 
 /* ─────────── BO-CH-11 알리페이 회원 ─────────── */
-var BOW = 'all', BOQ = false;
+var BOW = 'all', BOQ = false, BOQF = 'in';
 var MEM = [
   { no: 'A-1041', join: '2026-09-15 09:02', quit: '', last: '2026-09-15 09:02', self: true },
   { no: 'A-1040', join: '2026-09-15 08:41', quit: '', last: '2026-09-15 08:41', aid: '2088041663827450', wallet: 'HK', nick: 'meiling_c', name: '천메이링', sex: '여성', birth: '1993-11-02', nat: '홍콩', addr: '홍콩 완차이', lang: '중국어 번체', tel: '+852 9123 4567', pp: '', bk: 0, ns: 0, profd: '2026-09-15 08:41', mkt: '동의', mktd: '2026-09-15 08:41' },
@@ -338,7 +338,7 @@ function bo11() {
   me.aid = S.wallet === 'CN' ? '2088712034559781' : '2088558801247390'; me.wallet = S.wallet; me.lang = LANG[S.wallet];
   me.nick = S.joined ? p.nick : ''; me.name = S.joined ? p.name : ''; me.sex = S.joined ? p.sex : ''; me.birth = S.joined ? p.birth : ''; me.nat = S.joined ? p.nation : ''; me.addr = S.joined ? p.addr : '';
   me.tel = S.tel; me.pp = S.passport; me.bk = 0; me.ns = 0; me.profd = S.joined ? '2026-09-15 09:02' : ''; me.mkt = S.agMkt ? '동의' : '거부'; me.mktd = S.joined ? '2026-09-15 09:02' : '';
-  var list = MEM.filter(function (m) { if (!S.joined && m.self) return false; if (BOW !== 'all' && m.wallet !== BOW) return false; return true; });
+  var list = MEM.filter(function (m) { if (!S.joined && m.self) return false; if (BOW !== 'all' && m.wallet !== BOW) return false; if (BOQF === 'out' ? !m.quit : BOQF === 'in' ? !!m.quit : false) return false; return true; });
   var head = '<tr><th>회원번호</th><th>가입일</th>' + (BOQ ? '<th>탈퇴일</th>' : '') + '<th>마지막 로그인</th><th>알리페이 식별자</th><th class="c">월렛</th>' +
     '<th>닉네임</th><th>이름</th><th>성별</th><th>생년월일</th><th>국적</th><th>주소</th><th>언어</th><th>연락처</th><th>여권명</th><th class="c">예약</th><th class="c">노쇼</th><th>프로필 동의 일자</th><th class="c">마케팅 수신 동의</th><th>마케팅 동의 일자</th></tr>';
   var rows = list.map(function (m) {
@@ -349,7 +349,7 @@ function bo11() {
   }).join('');
   var sel = function (cur, opts, fn) { return '<select class="sel new" onchange="' + fn + '=this.value;render()">' + opts.map(function (o) { return '<option value="' + o[0] + '"' + (cur === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>'; };
   return '<div class="adm"><div class="phd"><h2>알리페이 회원</h2><div class="pdesc">알리페이 계정으로 만들어진 회원입니다. 기존 회원과 별개로 관리합니다.</div></div>' +
-    '<div class="filt"><select class="sel"><option>가입 기간</option></select><input class="inp" placeholder="가입 시작일" style="width:110px"><input class="inp" placeholder="가입 종료일" style="width:110px"><select class="sel"><option>미탈퇴</option></select>' +
+    '<div class="filt"><select class="sel"><option>가입 기간</option></select><input class="inp" placeholder="가입 시작일" style="width:110px"><input class="inp" placeholder="가입 종료일" style="width:110px">' + sel(BOQF, [['in', '미탈퇴'], ['out', '탈퇴'], ['all', '탈퇴 여부 (전체)']], 'BOQF') +
     sel(BOW, [['all', '월렛 (전체)'], ['CN', '알리페이 중국'], ['HK', '알리페이 홍콩']], 'BOW') + '<input class="inp" placeholder="검색어" style="width:150px"><button class="btn blue">검색</button></div>' +
     '<div class="card"><div class="hd"><span>회원 목록</span><span class="grpbtn"><span class="g' + (BOQ ? ' on' : '') + '" onclick="BOQ=!BOQ;render()">탈퇴정보</span></span></div>' +
     '<div class="tblwrap"><table><thead>' + head + '</thead><tbody>' + rows + '</tbody></table></div>' +
