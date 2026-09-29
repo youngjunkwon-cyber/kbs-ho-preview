@@ -562,7 +562,7 @@ window.setBtn = function (kind, k, ch, on) {
   render();
 };
 window.setCh = function (kind, v) {
-  const obj = kind === 'store' ? S(VIEW.id) : kind === 'product' ? P(VIEW.id) : kind === 'ad' ? A(VIEW.id) : kind === 'coll' ? C(VIEW.id) : kind === 'mag' ? M('M1') : CL(VIEW.id);
+  const obj = kind === 'store' ? S(VIEW.id) : kind === 'product' ? P(VIEW.id) : kind === 'ad' ? A(VIEW.id) : kind === 'coll' ? C(VIEW.id) : kind === 'mag' ? M('M1') : CL(VIEW.cid || 'CL1');
   if (kind === 'col' && v === ALI && String(obj.langs || '').split(',').some(x => !langOk(x.trim()))) { alertBox('바꿀 수 없습니다', MSG.colAliBlock); render(); return; }
   if (kind === 'store' && v === ALI) {
     const n = DB.products.filter(p => p.store === obj.id && !langOk(p.lang)).length;
