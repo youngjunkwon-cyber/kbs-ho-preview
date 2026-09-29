@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>알리페이 채널 분기 · 시안 검수 (v3.1)</title>
+<title>알리페이 채널 분기 · 시안 검수 (v3.2)</title>
 <style>
 *{box-sizing:border-box}
 html,body{height:100%}
@@ -205,13 +205,16 @@ var DATA = [
 ["S-02","웹 선택 안내","S1 기본정보에서 웹 선택","안내 박스: 웹으로 저장하면 이 스토어 상품 3건과 칼럼 1건도 알리페이 앱에 노출되지 않습니다. 이 시점에는 확인 창이 뜨지 않음","go('s-edit','S1');VIEW.sect=0;setCh('store','웹')"],
 ["S-03","웹 저장 확인 모달","S-02에서 저장","확인 창 제목 웹으로 저장. 본문: 이 스토어를 알리페이 앱에서 숨기면 이 스토어 상품 3건과 칼럼 1건도 함께 보이지 않습니다. 이 스토어가 빠지면서 알리페이 앱에 보이지 않게 되는 배너 2건과 기획전 2건도 있습니다. 지워지는 것은 없습니다. 보조: 웹 노출에는 영향이 없습니다.","go('s-edit','S1');VIEW.sect=0;setCh('store','웹')"],
 ["S-04","전체로 되돌리면 모달 없음","S4 모모클리닉(웹)을 전체로 바꾸고 저장","확인 창 없이 저장 알림만","go('s-edit','S4');VIEW.sect=0;setCh('store','전체')"],
-["S-05","알리페이 앱 선택 안내","S1 기본정보에서 알리페이 앱 선택","안내 박스: 알리페이 앱으로 저장하면 이 스토어 상품 4건과 칼럼 1건도 웹에 노출되지 않습니다. 전 언어 상품을 센다(일본어 포함)","go('s-edit','S1');VIEW.sect=0;setCh('store','알리페이 앱')"],
+["S-05","알리페이 앱 전용 전환 차단","S1 준오헤어 명동점 기본정보에서 알리페이 앱 선택 (일본어 상품 1건 보유)","알림 바꿀 수 없습니다: 일본어·인도네시아어·몽골어 상품 1건이 있어 알리페이 앱 전용으로 바꿀 수 없습니다. 해당 상품·칼럼을 정리한 뒤 바꿔 주세요. 라디오는 전체에 그대로","go('s-edit','S1');VIEW.sect=0;setCh('store','알리페이 앱')"],
+["S-05c","알리페이 앱 선택 안내","S2 리엔장 피부과 기본정보에서 알리페이 앱 선택 (대상 외 언어 상품 없음)","안내 박스: 알리페이 앱으로 저장하면 이 스토어 상품 2건과 칼럼 0건도 웹에 노출되지 않습니다. 차단 알림 없음","go('s-edit','S2');VIEW.sect=0;setCh('store','알리페이 앱')"],
 ["S-05b","웹에서 알리페이 앱으로 바꾸면 두 채널을 각각 적는다","S4 모모클리닉(웹)을 알리페이 앱으로 바꾸고 저장","확인 창 제목 알리페이 앱으로 저장. 웹에서 빠지는 상품·칼럼·배너·기획전 수를 적은 줄과, 알리페이 앱에는 이 스토어와 상품·칼럼이 새로 보입니다. 줄이 따로 있다","go('s-edit','S4');VIEW.sect=0;setCh('store','알리페이 앱')"],
 ["S-06","알리페이 버튼이 없어도 노출","S5 글로우스킨 홍대 · 기본정보와 버튼 및 메신저 설정","버튼이 없다는 안내가 어디에도 없다. 스토어 목록 노출 채널 = 전체. 표 아래 알리페이 앱 0개","go('s-edit','S5');VIEW.sect=11;render()"],
 ["S-07","예약 미사용 전환","S1 · 예약설정 · 미사용","예약 버튼이 웹·알리페이 모두 꺼짐. 안내: 예약 미사용 상태입니다. 예약 버튼은 웹·알리페이 앱 모두 꺼집니다. 설정값은 유지됩니다. 노출에는 영향 없음","go('s-edit','S1');VIEW.sect=8;render()"],
 ["S-07b","예약을 다시 사용으로 바꾸는 것은 막지 않고 저장에서 막힌다","S1 예약 미사용 + 예약 버튼 값은 ON으로 남은 상태에서 웹을 상담접수·채팅 2개로 채운 뒤 예약설정을 사용으로 전환, 버튼 및 메신저 설정으로 이동해 저장 클릭","예약설정은 그대로 사용으로 바뀐다(알림 없음). 표 아래 빨간 안내: 웹 버튼 3개입니다. 채널당 2개 이하여야 저장할 수 있습니다. 저장을 누르면 모달 저장할 수 없습니다","go('s-edit','S1');S('S1').bookingEnabled=false;S('S1').btns.consult.web=true;S('S1').btns.chat.web=true;S('S1').btns.inquiry.web=false;S('S1').btns.extlink.web=false;S('S1').btns.messenger.web=false;S('S1').btns.booking.web=true;VIEW.sect=8;render()"],
 ["S-08","웹 스토어의 버튼 표","S4 모모클리닉 · 버튼 및 메신저 설정","알리페이 열 전체 회색 잠금. 표 아래: 웹에만 노출되는 상태에서는 알리페이 앱 버튼을 수정할 수 없습니다. 설정값은 유지됩니다.","go('s-edit','S4');VIEW.sect=11;render()"],
 ["S-09","스토어 종속이 상품에 번진다","S1을 웹으로 바꾼 뒤 상품 목록(간체)","P1·P5·P12 노출 채널 칼럼이 모두 웹. P12(원래 알리페이 앱 전용) 수정 화면에서 라디오가 웹으로 잠기고 스토어 문구가 보임. S1을 전체로 되돌리면 P12는 알리페이 앱으로 돌아온다","S('S1').channel='웹';VIEW.lang='중국어(간체)';go('p-list')"],
+["S-12","지원언어에 대상 언어가 없으면 웹 고정","S5 글로우스킨 홍대 지원언어를 일본어만으로 두고 기본정보","노출 채널 라디오가 웹으로 잠긴다. 안내 문구 없음. 스토어 목록 노출 채널 = 웹","S('S5').langs='일본어';go('s-edit','S5');VIEW.sect=0;render()"],
+["S-13","잠긴 열은 상한 검사에서 뺀다","S4 모모클리닉(웹)의 알리페이 열에 3개가 켜진 상태로 버튼 및 메신저 설정 저장","알리페이 열은 잠겨 있고 표 아래 알리페이 앱 0개. 저장 차단 없이 저장 알림","S('S4').bookingEnabled=true;S('S4').btns.booking.ali=true;go('s-edit','S4');VIEW.sect=11;render()"],
 ["S-10","스토어 목록은 원본 탭 + 언어 탭","스토어 > 정보관리, 원본 탭","탭 7개. 원본 탭 칼럼: No. 공개여부 등록일 스토어명 노출 채널 카테고리 지원언어 노출수 클릭수 조회수 채팅수 상담수 버튼 클릭수 예약 설정 관리. 사유 칼럼 없음. 필터는 공개여부 선택 뒤에 노출 채널","go('s-list');setStab('원본')"],
 ["S-10b","모든 언어 탭에 노출 채널 칼럼","일본어 탭","칼럼: 스토어명 카테고리 언어 노출 채널 노출 상품 수. 값은 원본 탭과 같다. 필터는 노출 채널 (전체)로 돌아가 잠긴다","go('s-list');setStab('원본');F().ch='웹';setStab('일본어')"],
 ["S-11","버튼 설정 표 폭","S1 버튼 및 메신저 설정과 상품정보 수정 비교","두 화면 모두 항목 300px · 웹 220px · 알리페이 220px","go('s-edit','S1');VIEW.sect=11;render()"]
@@ -233,8 +236,9 @@ var DATA = [
 ["B-10","보이는 배너는 확인 없음","B1 수정 → 수정","확인 없이 저장 알림","VIEW.lang='중국어(간체)';go('a-list');openAd('B1')"],
 ["B-11","인플루언서 기획전에 알리페이 노출 상품이 없을 때","B6에서 대상을 디올레스페셜_중국으로 바꿈 (담은 상품이 웹 전용뿐)","안내: 연결 대상(인플루언서 · 디올레스페셜_중국)이 알리페이 앱에 노출되지 않습니다. 목록 사유 = 알리페이 앱에 노출 대상 없음. 웹은 노출","VIEW.lang='중국어(간체)';go('a-list');openAd('B6');A('B6').inner={kind:'인플루언서',id:'IF2'};render()"],
 ["B-12","인플루언서 기획전이 비활성","카인드스페셜_중국을 비활성으로 두고 B6 확인","두 채널 모두 노출 대상 없음. 사유 두 줄","DB.influencers.filter(function(x){return x.id==='IF1'})[0].active=false;VIEW.lang='중국어(간체)';go('a-list')"],
-["B-13","배너와 연결 대상의 언어가 다름","영어 배너 B3의 하단 버튼이 간체 기획전 유형을 가리키게 바꿈","눌러도 다른 언어 화면으로 가므로 두 채널 모두 노출 대상 없음","A('B3').btn.inner.id='CT1';VIEW.lang='영어';go('a-list')"],
-["B-14","연결 대상의 노출 기간이 끝남","B3 대상 유형에 붙은 기획전 두 건의 종료일을 어제로","기간이 끝난 것은 연결 대상으로 치지 않는다. 두 채널 모두 노출 대상 없음","C('E3').to='2026-09-12';C('E5').to='2026-09-12';VIEW.lang='영어';go('a-list')"],
+["B-13","하단 버튼 연결 대상의 언어가 다름","영어 배너 B3의 하단 버튼이 간체 기획전 유형을 가리키게 바꿈","배너는 두 채널 모두 노출되고 목록 사유가 없다. 하단 버튼만 두 채널에서 숨김. 수정 창 안내: 연결 대상(…)이 웹에 노출되지 않습니다. 웹에서는 하단 버튼이 보이지 않습니다. 알리페이 앱도 같은 안내","A('B3').btn.inner.id='CT1';VIEW.lang='영어';go('a-list');openAd('B3')"],
+["B-14","하단 버튼 연결 대상의 노출 기간이 끝남","B3 하단 버튼 대상 유형에 붙은 기획전 두 건의 종료일을 어제로","기간이 끝난 것은 연결 대상으로 치지 않는다. 배너는 노출, 사유 없음. 하단 버튼만 두 채널에서 숨김","C('E3').to='2026-09-12';C('E5').to='2026-09-12';VIEW.lang='영어';go('a-list');openAd('B3')"],
+["B-18","직접입력 외부 사이트 주소는 웹 고정","B1 내부링크 종류 직접입력에 다른 사이트 주소 입력","노출 채널 라디오가 웹으로 잠긴다. 안내: 외부 사이트 주소라 웹에만 노출됩니다. 이 설정은 수정할 수 없습니다","VIEW.lang='중국어(간체)';go('a-list');openAd('B1');A('B1').linkType='내부링크';A('B1').inner={kind:'직접입력',path:'https://www.instagram.com/junohair'};render()"],
 ["B-15","연결한 뒤 대상의 언어가 바뀐 경우","B6 대상 카인드스페셜_중국의 언어를 일본어로 바꾼 상태","등록 시 막을 수 없는 사후 변경. 배너는 두 채널에서 빠지고 사유 두 줄","DB.influencers.filter(function(x){return x.id==='IF1'})[0].lang='일본어';VIEW.lang='중국어(간체)';go('a-list')"],
 ["B-16","유형에 붙은 기획전이 여러 건","B3 대상 영어 유형. 붙은 기획전은 웹 전용 영어권 스킨케어전과 전체인 영어 PICK 2차","하나라도 그 채널에 노출되면 통과. 배너는 두 채널 모두 노출","VIEW.lang='영어';go('a-list')"],
 ["B-17","하단 버튼 알리페이 열을 직접 꺼도 배너는 노출","B3 하단 버튼 알리페이 비활성화","안내 없음. 목록 전체, 사유 없음. 알리페이 앱에서 버튼 없는 랜딩페이지가 열린다","VIEW.lang='영어';go('a-list');openAd('B3');setAdBtnShow('ali',false)"]
@@ -259,10 +263,8 @@ var DATA = [
 ["M-02","내부 연결은 상품·스토어 추가로 한다","상품 추가를 눌러 상품 하나를 골라 추가","본문에 상품 카드가 들어간다. 링크 넣기 창을 거치지 않는다","go('m-edit')"],
 ["M-02b","링크 넣기로 직접 입력한 내부 주소는 통과","링크 넣기에 K-Beauty Station 주소 입력 · 넣기","본문에 삽입. 안내: 입력한 주소는 저장 시 내부 주소 형식으로 변환됩니다.","go('m-edit')"],
 ["M-03","지울 것이 없으면 기본 저장 안내","외부 주소가 없는 본문으로 저장","저장 알림: 저장했습니다 / 목록과 고객 화면에 즉시 반영됩니다. 삭제 안내가 없다","go('m-edit');M('M1').body='여름철 두피 관리 가이드 본문';render()"],
-["M-04","저장 결과 개수 일치","저장","알림 개수가 M-03과 같음","go('m-edit')"],
+["M-04","저장 결과 개수","외부 사이트 주소 1개와 영상 임베드 1개가 섞인 본문으로 저장","알림: 외부 사이트 주소 1개, 외부 영상·SNS 1개를 삭제했습니다. 저장된 본문에 그 주소가 없다","go('m-edit');window.EDBUF='가을 두피 관리 https://example.com/tips <iframe src=\"https://www.youtube.com/embed/abc\"></iframe>';saveMagazine()"],
 ["M-05","임시 입력 정리","본문 입력 → 다른 화면 → 매거진 재진입","입력한 내용이 남아 있지 않음","go('m-edit')"],
-["M-06","알리페이 앱 미리보기에서 웹 전용 카드가 빠진다","미리보기 · 알리페이 앱","헤어 클리닉 4주(P5, 웹) 카드가 빠지고 안내: 상품·스토어 카드 1개가 알리페이 앱에 노출되지 않아 이 채널에서는 빠집니다. 저장되는 본문에는 그대로 남는다","go('m-edit');mTogglePreview('알리페이 앱')"],
-["M-07","웹 미리보기에서 알리페이 앱 전용 카드가 빠진다","미리보기 · 웹","알리페이 전용 두피 패키지(P12) 카드가 빠지고 안내 1개. 양방향으로 같은 규칙","go('m-edit');mTogglePreview('웹')"],
 ["M-08","매거진에도 노출 채널","기본 정보 영역","노출 채널 라디오(전체 / 웹 / 알리페이 앱)가 있다. 기본 전체","go('m-edit')"]
 ]],
 ["스토어 칼럼", [
@@ -274,7 +276,8 @@ var DATA = [
 ["H-01","웹 전용 상품 안내","헤어 클리닉 4주(P5, 웹) 호스트 화면","상단 안내: 이 상품은 알리페이 앱에서는 보이지 않아요. + 담당자 문의 안내","go('h-edit');VIEW.hid='P5';render()"],
 ["H-02","스토어가 웹이라 안 보일 때도 같은 안내","뷰티랩 강남을 웹으로 바꾼 뒤 모공 타이트닝(P8) 호스트 화면","같은 안내가 그대로 뜸","S('S3').channel='웹';go('h-edit');VIEW.hid='P8';render()"],
 ["H-03","호스트에는 설정이 없다","호스트 상품 수정","노출 채널·버튼 설정 항목 없음. 쉬운 말 문체 유지","go('h-edit')"],
-["H-04","알리페이 앱 전용 상품에는 안내 없음","알리페이 전용 두피 패키지(P12) 호스트 화면","웹에 안 보인다는 안내를 두지 않는다. 운영자와 협의된 상품","go('h-edit');VIEW.hid='P12';render()"]
+["H-04","알리페이 앱 전용 상품에는 안내 없음","알리페이 전용 두피 패키지(P12) 호스트 화면","웹에 안 보인다는 안내를 두지 않는다. 운영자와 협의된 상품","go('h-edit');VIEW.hid='P12';render()"],
+["H-05","알리페이 앱 전용 매장은 언어가 제한된다","뷰티랩 강남을 알리페이 앱으로 바꾼 뒤 모공 타이트닝(P8) 호스트 화면","언어 줄 아래 안내: 이 매장은 알리페이 앱 전용이라 중국어(간체), 중국어(번체), 영어만 등록할 수 있어요. 알리페이 앱에 안 보인다는 안내는 없음","S('S3').channel='알리페이 앱';go('h-edit');VIEW.hid='P8';render()"]
 ]],
 ["공통 · 회귀", [
 ["G-03","초기화","값을 바꾼 뒤 상단 시드 초기화","시드 상태로 복귀","go('p-list')"],
@@ -300,7 +303,7 @@ var DATA = [
 ["U-12","마이페이지 프로필","동의를 마친 상태","이름·닉네임·성별·생년월일·국적·주소가 채워져 있고 눌러서 고칠 수 있다. 불러오기 버튼이 없다","resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.view='fo11';render()"],
 ["U-13","비밀번호·이메일 항목이 없다","마이페이지","비밀번호 변경과 이메일 자리가 점선으로만 표시되고 실제 메뉴에 없다","resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.view='fo11';render()"],
 ["U-14","별개 계정 안내","마이페이지 내 정보 아래","알리페이로 로그인된 상태입니다. K-Beauty Station 로그인 정보와는 다른 계정이며, 이용 기록은 계정별로 따로 관리됩니다.","resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.view='fo11';render()"],
-["U-15","로그인 경로가 없다","로그인 영역 정리 화면","로그인·회원가입, 소셜 로그인, 비밀번호 찾기, 로그인 유도 네 자리가 모두 없다","resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.view='fo10';render()"],
+["U-15","로그인 경로가 없다","로그인 영역 정리 화면","로그인·회원가입, 소셜 로그인, 비밀번호 찾기, 예약·채팅 전 로그인 유도 네 자리가 모두 알리페이 채널에서는 이 자리가 없습니다로 표시","resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.view='fo10';render()"],
 ["U-16","탈퇴 안내","마이페이지에서 회원 탈퇴","연결 끊김, 내역 못 봄, 재진입 시 새 회원, 알리페이 계정 무영향 네 줄","resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.view='fo12';render()"],
 ["U-17","탈퇴하면 관문부터 다시","탈퇴하기","회원 = 아직 아님으로 초기화되고 동의 창이 다시 뜬다","resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.view='fo12';render()"],
 ["U-18","마이페이지 휴대폰 번호","원본 권한 승인 상태의 마이페이지","휴대폰 번호가 알리페이 계정에서 채움 표시와 함께 있다. 누르면 번호를 고치고 문자 인증을 다시 한다는 안내","resetDB();S.plaintext=true;S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.view='fo11';render()"]
@@ -309,24 +312,29 @@ var DATA = [
 ["U-19","프로필이 채워지고 고칠 수 있다","예약 입력","이름·국적·성별·생년월일에 회원 정보에서 채움 표시. 누르면 고칠 수 있다","resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.view='fo13';render()"],
 ["U-20","여권 영문명은 채우지 않는다","같은 화면","여권 영문명이 비어 있다","resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.view='fo13';render()"],
 ["U-21","이메일 칸이 없다","같은 화면","이메일 자리가 점선으로만 표시되고 입력칸이 없다. 예약 요청 활성 조건에도 없다","resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.view='fo13';render()"],
-["U-22","원본 번호가 오면 문자 인증을 건너뛴다","원본 권한 승인 상태","휴대폰 번호가 채워져 있고 인증 완료 표시. 문자 인증 버튼이 없다. 안내: 알리페이가 인증한 번호라 문자 인증을 건너뜁니다","resetDB();S.plaintext=true;S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.view='fo13';render()"],
+["U-22","원본 번호가 오면 문자 인증을 건너뛴다","원본 권한 승인 상태","휴대폰 번호가 채워져 있고 인증 완료 표시. 문자 인증 버튼이 없다. 안내: 알리페이 계정에서 채움. 고치면 문자 인증을 다시 합니다","resetDB();S.plaintext=true;S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.view='fo13';render()"],
 ["U-23","번호를 고치면 다시 인증","채워진 번호를 눌러 고침","인증 완료가 사라지고 문자 인증 버튼이 나타난다. 인증 전에는 예약 요청이 비활성","resetDB();S.plaintext=true;S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.tel='+86 139 2222 3333';S.telEdited=true;S.telVerified=false;S.view='fo13';render()"],
 ["U-24","원본 권한이 없으면 지금처럼 입력하고 인증","원본 권한 미승인 상태","휴대폰 번호가 비어 있고 눌러서 입력 → 문자 인증 버튼. 안내: 원본 번호가 오지 않아 지금처럼 입력하고 인증합니다","resetDB();S.plaintext=false;S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.view='fo13';render()"],
-["U-25","여권명·인증된 번호·메신저가 채워지면 예약 요청 활성","전부 채운 상태","예약 요청 버튼이 검게 활성화된다","resetDB();S.plaintext=true;S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.passport='WANG XIAOMEI';S.msg='위챗 wxid_alipay01';S.view='fo13';render()"]
+["U-25","여권명·인증된 번호·메신저가 채워지면 예약 요청 활성","전부 채운 상태","예약 요청 버튼이 검게 활성화된다","resetDB();S.plaintext=true;S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.passport='WANG XIAOMEI';S.msg='위챗 wxid_alipay01';S.view='fo13';render()"],
+["U-26","마이페이지에서 번호를 고치면 문자 인증","마이페이지 휴대폰 번호를 눌러 고침","알리페이 계정에서 채움 표시가 사라지고 문자 인증 버튼과 안내 번호를 고치면 문자 인증을 다시 합니다가 보인다","resetDB();S.plaintext=true;S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.tel='+86 139 2222 3333';S.telEdited=true;S.telVerified=false;S.view='fo11';render()"],
+["U-27","알림·마케팅 수신 설정 메뉴","마이페이지 메뉴","예약 내역·채팅 아래 알림·마케팅 수신 설정 줄이 있다. 동의 창에서 고른 선택 항목을 여기서 바꾼다","resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.view='fo11';render()"],
+["U-28","두 번째 예약부터 저장된 번호로 인증 생략","원본 권한 없이 첫 예약에서 인증한 뒤 다시 예약 입력","휴대폰 번호가 채워져 있고 인증 완료. 안내: 지난 예약에서 인증한 번호입니다. 고치면 문자 인증을 다시 합니다","resetDB();S.plaintext=false;S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.tel='+86 139 2222 3333';S.telEdited=false;S.telVerified=true;S.view='fo13';render()"]
 ]],
 ["알리페이 회원 (어드민)", [
 ["UB-01","화면 위치","회원 메뉴 아래 알리페이 회원","알리페이 계정으로 만들어진 회원만 모여 있다. 기존 회원 관리 정보조회 화면은 손대지 않는다","resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();BOW='all';BOQ=false;S.view='bo11';render()"],
-["UB-02","필터","필터 줄","가입 기간 / 시작일·종료일 / 미탈퇴 / 월렛 / 검색어. 가입 경로 필터와 프로필 동의 필터가 없다","resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();BOW='all';BOQ=false;S.view='bo11';render()"],
+["UB-02","필터","필터 줄","가입 기간 / 시작일·종료일 / 탈퇴 여부(기본 미탈퇴) / 월렛 / 마케팅 수신 여부 / 검색어. 가입 경로 필터와 프로필 동의 필터가 없다. 월렛 외에는 기존 회원 화면과 같다","resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();BOW='all';BOQ=false;S.view='bo11';render()"],
 ["UB-03","월렛으로 거르기","월렛 = 알리페이 홍콩","홍콩 월렛 회원만 남는다","resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();BOW='HK';BOQ=false;S.view='bo11';render()"],
-["UB-04","칼럼 19개","목록 칼럼","회원번호 가입일 마지막 로그인 알리페이 식별자 월렛 닉네임 이름 성별 생년월일 국적 주소 언어 연락처 여권명 예약 노쇼 프로필 동의 일자 마케팅 수신 동의 마케팅 동의 일자. 이메일·프로필 동의 칼럼이 없다","resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();BOW='all';BOQ=false;S.view='bo11';render()"],
+["UB-04","칼럼 19개","목록 칼럼","회원번호 가입일 마지막 로그인 알리페이 식별자 월렛 닉네임 이름 성별 생년월일 국적 주소 언어 연락처 여권명 예약 노쇼 프로필 동의 일자 마케팅 활용 정보(동의 여부 / 동의 일자). 이메일·프로필 동의 칼럼 없음","resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();BOW='all';BOQ=false;S.view='bo11';render()"],
 ["UB-05","알리페이 식별자 칼럼","목록 칼럼","식별자가 전체 자리로 보인다","resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();BOW='all';BOQ=false;S.view='bo11';render()"],
 ["UB-06","알리페이 계정에 값이 없던 항목은 하이픈","A-1036 행","성별·생년월일·주소·연락처가 하이픈. 이름·국적은 있다","resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();BOW='all';BOQ=false;BOQF='all';S.view='bo11';render()"],
 ["UB-07","보는 중 행이 따라간다","동의를 마친 뒤 목록","보는 중 행에 닉네임·이름·성별·생년월일·국적·주소·연락처(원본 권한 승인 시)가 채워진다","resetDB();S.plaintext=true;S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();BOW='all';BOQ=false;S.view='bo11';render()"],
 ["UB-08","월렛을 바꾸면 따라 바뀐다","상단 월렛 바꾸기 후 목록","보는 중 행의 월렛과 식별자가 바뀌고 언어도 간체에서 번체로 따라 바뀐다","resetDB();S.wallet='HK';S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();BOW='all';BOQ=false;S.view='bo11';render()"],
 ["UB-09","탈퇴정보 칼럼","우상단 탈퇴정보 켜기","탈퇴일 칼럼이 나타난다","resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();BOW='all';BOQ=true;S.view='bo11';render()"],
 ["UB-10","상세 화면이 없다","목록에서 행 눌러 보기","상세로 넘어가는 동작이 없다","resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();BOW='all';BOQ=false;S.view='bo11';render()"],
-["UB-11","마케팅 수신 동의 칼럼","마케팅에 동의한 상태로 목록","보는 중 행이 동의로 보이고 마케팅 동의 일자가 있다","resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;S.agMkt=true;joinNow();BOW='all';BOQ=false;S.view='bo11';render()"],
-["UB-12","탈퇴 필터","탈퇴 여부 셀렉트를 탈퇴로","기본값 미탈퇴에서는 A-1036 행이 없고, 탈퇴로 바꾸면 A-1036만 남는다","resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();BOW='all';BOQ=false;BOQF='out';S.view='bo11';render()"]
+["UB-11","마케팅 활용 정보 칼럼","마케팅에 동의한 상태로 목록","보는 중 행의 동의 여부가 동의로 보이고 동의 일자가 있다. 미동의 행은 동의 일자가 하이픈","resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;S.agMkt=true;joinNow();BOW='all';BOQ=false;S.view='bo11';render()"],
+["UB-12","탈퇴 필터","탈퇴 여부 셀렉트를 탈퇴로","기본값 미탈퇴에서는 A-1036 행이 없고, 탈퇴로 바꾸면 A-1036만 남는다","resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();BOW='all';BOQ=false;BOQF='out';S.view='bo11';render()"],
+["UB-13","마케팅 활용 정보 토글","우상단 마케팅 활용 정보 끄기","동의 여부·동의 일자 칼럼이 사라진다. 탈퇴정보 토글과 나란히 있다","resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();BOW='all';BOQ=false;BOM=false;S.view='bo11';render()"],
+["UB-14","마케팅 수신 여부 필터","마케팅 수신 여부 = 미동의","미동의 회원만 남는다","resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();BOW='all';BOQ=false;BOMF='미동의';S.view='bo11';render()"]
 ]]
 ];
 
