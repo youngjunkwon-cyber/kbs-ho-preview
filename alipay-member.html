@@ -374,7 +374,7 @@ function render() {
     '<span class="kv">마케팅 <em>' + (S.agMkt ? '동의' : '거부') + '</em></span>' +
     '<span class="kv">원본 휴대폰 권한 <em>' + (S.plaintext ? '승인' : '미승인') + '</em></span>' +
     '<span class="kv">월렛 <em>' + (S.wallet === 'CN' ? '중국' : '홍콩') + '</em></span>' +
-    '<button onclick="S.plaintext=!S.plaintext;if(S.joined){S.tel=S.plaintext?ALI.phone:\'\';S.telVerified=S.plaintext;S.telEdited=false;S.telSrc=S.plaintext?\'ali\':\'\';S.mtel=S.tel;S.mtelSrc=S.telSrc;S.mtelDraft=\'\';}render()">원본 권한 ' + (S.plaintext ? '미승인으로' : '승인으로') + '</button>' +
+    '<button onclick="S.plaintext=!S.plaintext;if(S.joined){S.tel=S.plaintext?ALI.phone:\'\';S.telVerified=S.plaintext;S.telEdited=false;S.telSrc=S.plaintext?\'ali\':\'\';S.mtel=S.tel;S.mtelSrc=S.telSrc;S.mtelDraft=\'\';S.mtelSaved=false;S.telSaved=false;}render()">원본 권한 ' + (S.plaintext ? '미승인으로' : '승인으로') + '</button>' +
     '<button onclick="S.wallet=(S.wallet===\'CN\'?\'HK\':\'CN\');render()">월렛 바꾸기</button>' +
     '<button onclick="S.blocked=\'fail\';S.step=\'blocked\';S.view=\'fo08\';render()">식별 실패</button>' +
     '<button onclick="S.blocked=\'prof\';S.step=\'blocked\';S.view=\'fo08\';render()">프로필 거부</button>' +

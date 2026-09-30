@@ -461,7 +461,12 @@ const F = () => FILTERS[VIEW.name] || { ch: CHF, rsn: '전체' };
 const el = s => document.querySelector(s);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-function go(name, id) { if (VIEW.name === 'm-edit' && name !== 'm-edit') window.EDBUF = null; VIEW.name = name; if (id !== undefined) VIEW.id = id;
+let EDITSNAP = null;
+function editObj(sn) { return sn.kind === 'store' ? S(sn.id) : P(sn.id); }
+function go(name, id) { if (VIEW.name === 'm-edit' && name !== 'm-edit') window.EDBUF = null;
+  if (EDITSNAP && VIEW.name === EDITSNAP.view && (name !== EDITSNAP.view || (id !== undefined && id !== EDITSNAP.id))) { const o = editObj(EDITSNAP); if (o) { Object.keys(o).forEach(k => delete o[k]); Object.assign(o, JSON.parse(EDITSNAP.json)); } EDITSNAP = null; }
+  VIEW.name = name; if (id !== undefined) VIEW.id = id;
+  if ((name === 's-edit' || name === 'p-edit') && !EDITSNAP) { const kind = name === 's-edit' ? 'store' : 'product'; const o = kind === 'store' ? S(VIEW.id) : P(VIEW.id); if (o) EDITSNAP = { view: name, kind, id: VIEW.id, json: JSON.stringify(o) }; }
   if (name === 's-edit') { VIEW.sect = 0; VIEW.savedCh = S(VIEW.id).channel; VIEW.savedLangs = S(VIEW.id).langs; }
   if (name === 'p-edit') { VIEW.tab = 1; } render(); window.scrollTo(0, 0); }
 window.go = go;
@@ -988,7 +993,7 @@ window.tryInsertLink = function () {
 };
 window.saveAd = function () {
   const b = A(VIEW.id);
-  const done = () => { closeMD(); alertBox('저장했습니다', MSG.saveDone); };
+  const done = () => { ADFULL = null; closeMD(); alertBox('저장했습니다', MSG.saveDone); };
   /* 신규이거나 이번 수정에서 대상·노출 채널을 바꿔 연결 대상이 배너 채널에 없으면 저장을 막는다. 대상 쪽 사후 변경만으로 어긋난 배너는 그대로 저장된다 */
   const touched = !VIEW.adSnap || VIEW.adSnap !== adSnapOf(b);
   if (touched && langOk(b.lang)) {
@@ -1054,7 +1059,7 @@ window.saveColl = function () {
 };
 window.save = function (kind) {
   const obj = kind === 'store' ? S(VIEW.id) : P(VIEW.id);
-  const done = () => { if (kind === 'store') { VIEW.savedCh = obj.channel; VIEW.savedLangs = obj.langs; } else go('p-list'); alertBox('저장했습니다', MSG.saveDone); };
+  const done = () => { if (kind === 'store') { VIEW.savedCh = obj.channel; VIEW.savedLangs = obj.langs; if (EDITSNAP) EDITSNAP.json = JSON.stringify(obj); } else { EDITSNAP = null; go('p-list'); } alertBox('저장했습니다', MSG.saveDone); };
   const rows = kind === 'store' ? ROWS_STORE : ROWS_PRODUCT;
   const eff = kind === 'store' ? effStoreBtns(obj) : effBtns(obj);
   const effCh = kind === 'store' ? effChStore(obj) : effChProduct(obj);
@@ -1098,7 +1103,7 @@ window.alertBox = alertBox; window.MSG = MSG;
 const BASE = JSON.stringify({ products: DB.products, stores: DB.stores, ads: DB.ads, collections: DB.collections, magazines: DB.magazines, influencers: DB.influencers, collTypes: DB.collTypes, columns: DB.columns });
 function applyBase() { const b = JSON.parse(BASE); Object.keys(b).forEach(k => { DB[k].length = 0; b[k].forEach(x => DB[k].push(x)); }); window.EDBUF = null; }
 function clearFilters() { Object.keys(FILTERS).forEach(k => { FILTERS[k].ch = CHF; FILTERS[k].rsn = '전체'; }); }
-window.resetDB = function () { applyBase(); MODAL = null; MPICK = null; el('#modals').innerHTML = ''; el('#toasts').innerHTML = ''; VIEW.lang = '중국어(간체)'; VIEW.hid = null; VIEW.cid = null; clearFilters(); go('p-list'); };
+window.resetDB = function () { EDITSNAP = null; ADFULL = null; VIEW.stab = '원본'; applyBase(); MODAL = null; MPICK = null; el('#modals').innerHTML = ''; el('#toasts').innerHTML = ''; VIEW.lang = '중국어(간체)'; VIEW.hid = null; VIEW.cid = null; clearFilters(); go('p-list'); };
 
 /* ------------------------------- 렌더 ------------------------------- */
 function render() {
