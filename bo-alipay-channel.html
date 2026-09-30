@@ -791,7 +791,8 @@ function innerPicker(kindH, idH, cur, pathH, b) {
   return '<select onchange="' + kindH + '">' + INNER_KINDS.map(k => '<option' + (k === kind ? ' selected' : '') + '>' + k + '</option>').join('') + '</select> ' + tail;
 }
 const adSnapOf = b => JSON.stringify([b.channel, b.linkType, b.inner || null, b.btn ? [b.btn.linkKind, b.btn.inner || null] : null]);
-window.openAd = function (id) { VIEW.id = id; VIEW.adSnap = A(id) ? adSnapOf(A(id)) : null; MODAL = 'ad'; render(); };
+let ADFULL = null;
+window.openAd = function (id) { VIEW.id = id; VIEW.adSnap = A(id) ? adSnapOf(A(id)) : null; ADFULL = A(id) ? JSON.stringify(A(id)) : null; MODAL = 'ad'; render(); };
 window.setAdLinkType = function (v) { const b = A(VIEW.id); b.linkType = v;
   if (v === '내부링크' && !b.inner) b.inner = { kind: '병원', id: DB.stores[0].id };
   if (v === '내부이미지랜딩페이지' && !b.btn) b.btn = { label: '자세히 보기', linkKind: '링크없음', web: true, ali: true }; render(); };
@@ -1072,7 +1073,7 @@ window.save = function (kind) {
       confirmBox(ch + euro(ch) + ' 저장',
         '<p><b>' + esc(obj.name) + '</b></p>' + ((im.N || im.M) ? '<p>이 스토어를 ' + lost + '에서 숨기면 이 스토어 ' + [im.N ? '상품 ' + im.N + '건' : '', im.M ? '칼럼 ' + im.M + '건' : ''].filter(Boolean).join('과 ') + '도 함께 보이지 않습니다.</p>' : '<p>이 스토어를 ' + lost + '에서 숨깁니다.</p>') +
         ((im.A || im.K) ? '<p>이 스토어가 빠지면서 ' + lost + '에 보이지 않게 되는 ' + [im.A ? '배너 ' + im.A + '건' : '', im.K ? '기획전 ' + im.K + '건' : ''].filter(Boolean).join('과 ') + '도 있습니다.</p>' : '') +
-        (effPrev !== ALLCH ? (function () { const g = gainOfStoreCh(obj, ch); return '<p>' + ch + '에는 이 스토어' + ((g.P || g.Q) ? '와 ' + [g.P ? '상품 ' + g.P + '건' : '', g.Q ? '칼럼 ' + g.Q + '건' : ''].filter(Boolean).join('과 ') + '이' : '가') + ' 새로 보입니다.</p><p>지워지는 것은 없습니다.</p>'; })() : '<p>지워지는 것은 없습니다.</p>' + (function () { const g = gainOfStoreCh(obj, ch), gp = g.P, gc = g.Q; return (gp || gc) ? '<p>' + ch + '에는 ' + lost + ' 전용이던 ' + [gp ? '상품 ' + gp + '건' : '', gc ? '칼럼 ' + gc + '건' : ''].filter(Boolean).join('과 ') + '이 새로 보입니다.</p>' : '<p class="hint">' + ch + ' 노출에는 영향이 없습니다.</p>'; })()),
+        (effPrev !== ALLCH ? (function () { const g = gainOfStoreCh(obj, ch); return '<p>지워지는 것은 없습니다.</p><p>' + ch + '에는 이 스토어' + ((g.P || g.Q) ? '와 ' + [g.P ? '상품 ' + g.P + '건' : '', g.Q ? '칼럼 ' + g.Q + '건' : ''].filter(Boolean).join('과 ') + '이' : '가') + ' 새로 보입니다.</p>'; })() : '<p>지워지는 것은 없습니다.</p>' + (function () { const g = gainOfStoreCh(obj, ch), gp = g.P, gc = g.Q; return (gp || gc) ? '<p>' + ch + '에는 ' + lost + ' 전용이던 ' + [gp ? '상품 ' + gp + '건' : '', gc ? '칼럼 ' + gc + '건' : ''].filter(Boolean).join('과 ') + '이 새로 보입니다.</p>' : '<p class="hint">' + ch + ' 노출에는 영향이 없습니다.</p>'; })()),
         done, function () {}, ch + euro(ch) + ' 저장');
       return;
     }
@@ -1082,7 +1083,7 @@ window.save = function (kind) {
 
 /* ------------------------------- 모달 ------------------------------- */
 let MODAL = null;
-window.closeMD = function () { if (MODAL === 'coll' && COLLSNAP) { const c = C(VIEW.id); if (c) Object.assign(c, JSON.parse(COLLSNAP)); } COLLSNAP = null; MODAL = null; render(); };
+window.closeMD = function () { if (MODAL === 'coll' && COLLSNAP) { const c = C(VIEW.id); if (c) Object.assign(c, JSON.parse(COLLSNAP)); } COLLSNAP = null; if (MODAL === 'ad' && ADFULL) { const b = A(VIEW.id); if (b) { Object.keys(b).forEach(k => delete b[k]); Object.assign(b, JSON.parse(ADFULL)); } } ADFULL = null; MODAL = null; render(); };
 let TOAST_T = null;
 function toast(msg) { el('#toasts').innerHTML = '<div class="toastwrap"><div class="toast"><span class="ic">✕</span><span>' + msg + '</span></div></div>'; if (TOAST_T) clearTimeout(TOAST_T); TOAST_T = setTimeout(() => { el('#toasts').innerHTML = ''; }, 4000); }
 function alertBox(title, body) { el('#modals').innerHTML = '<div class="mask" style="z-index:80"><div class="modal" style="max-width:620px"><div class="hd">' + title + '<button class="x" onclick="closeModal()">✕</button></div><div class="bd">' + body + '</div><div class="ft"><button class="btn blue" onclick="closeModal()">확인</button></div></div></div>'; }

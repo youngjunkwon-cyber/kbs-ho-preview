@@ -136,6 +136,7 @@ function resetDB() {
     plaintext: true,      // 알리페이가 원본 휴대폰 권한을 승인해 준 상태인가 (담당 확인 결과에 따라 갈린다)
     wallet: 'CN',
     tel: '', telVerified: false, telEdited: false, telSrc: '',
+    mtel: '', mtelSrc: '', mtelSaved: false, mtelDraft: '',   // 회원 정보에 저장된 인증 번호와 마이페이지 수정 중 번호
     passport: '', msg: '',
     prof: null,           // 회원 정보에 저장된 프로필 (수정 가능)
     view: 'fo09'
@@ -190,11 +191,11 @@ var CAPS = {
 
 function h(s) { return s == null ? '' : String(s); }
 function dash(v) { return v ? h(v) : '<span class="dash">-</span>'; }
-function go(v) { S.view = v; render(); }
+function go(v) { if (v === 'fo13' && S.view !== 'fo13') { S.tel = S.mtel; S.telVerified = !!S.mtel; S.telSrc = S.mtelSrc; S.telEdited = false; S.telSaved = S.mtelSaved; } S.view = v; render(); }
 function joinNow() {
   S.joined = true; S.step = 'done'; S.blocked = '';
   S.prof = { name: ALI.name, nick: ALI.nick, sex: ALI.sex, birth: ALI.birth, nation: ALI.nation, addr: ALI.addr };
-  if (S.plaintext) { S.tel = ALI.phone; S.telVerified = true; S.telEdited = false; S.telSrc = 'ali'; }
+  if (S.plaintext) { S.tel = ALI.phone; S.telVerified = true; S.telEdited = false; S.telSrc = 'ali'; S.mtel = ALI.phone; S.mtelSrc = 'ali'; }
   S.view = 'fo11';
 }
 
@@ -270,9 +271,10 @@ function fo11() {
   if (!S.joined || !S.prof) return phone('마이페이지', '<div class="sec"><div class="box"><div class="sub">진입 관문을 통과한 뒤에 볼 수 있는 화면입니다. 상단 처음으로 → 진입 동의 창에서 동의를 마쳐 주세요.</div></div></div>');
   var p = S.prof;
   function f(label, key, ph) { var v = p[key]; return '<div class="fld"><div class="l">' + label + '</div><div class="in ' + (v ? '' : 'plc') + '" onclick="edit(\'' + key + '\',\'' + ph + '\')">' + (v || '아직 없어요. 눌러서 입력해 주세요.') + '</div></div>'; }
-  var tel = '<div class="fld"><div class="l">휴대폰 번호' + (S.telSrc === 'ali' && S.tel && !S.telEdited ? '<span class="autotag">알리페이 계정에서 채웠습니다</span>' : '') + '</div>' +
-    '<div class="in ' + (S.tel ? '' : 'plc') + '" onclick="S.tel=\'+86 139 2222 3333\';S.telEdited=true;S.telVerified=false;S.telSrc=\'user\';render()">' + (S.tel || '눌러서 입력해 주세요.') + '</div>' +
-    (S.tel && !S.telVerified ? '<div class="vrow" style="margin-top:6px"><div class="vbtn" onclick="S.telVerified=true;S.telEdited=false;S.telSaved=true;render()">문자 인증</div></div><div class="sub">입력한 번호로 문자 인증을 합니다.</div>' : (S.tel && S.telVerified && !S.telEdited ? '<div class="sub">고치면 문자 인증을 다시 합니다.</div>' : '')) + '</div>';
+  var mv = S.mtelDraft || S.mtel;
+  var tel = '<div class="fld"><div class="l">휴대폰 번호' + (S.mtelSrc === 'ali' && S.mtel && !S.mtelDraft ? '<span class="autotag">알리페이 계정에서 채웠습니다</span>' : '') + '</div>' +
+    '<div class="in ' + (mv ? '' : 'plc') + '" onclick="S.mtelDraft=\'+86 139 2222 3333\';render()">' + (mv || '눌러서 입력해 주세요.') + '</div>' +
+    (S.mtelDraft ? '<div class="vrow" style="margin-top:6px"><div class="vbtn" onclick="S.mtel=S.mtelDraft;S.mtelDraft=\'\';S.mtelSrc=\'user\';S.mtelSaved=true;render()">문자 인증</div></div><div class="sub">입력한 번호로 문자 인증을 합니다.</div>' : (S.mtel ? '<div class="sub">고치면 문자 인증을 다시 합니다.</div>' : '')) + '</div>';
   var rows = ['예약 내역', '채팅', '알림·마케팅 수신 설정', '언어 설정', '이용 약관', '개인정보 처리방침'].map(function (t) { return '<div class="mrow"><span>' + t + '</span><span class="a">›</span></div>'; }).join('') +
     '<div class="mrow" onclick="go(\'fo12\')" style="cursor:pointer"><span>회원 탈퇴</span><span class="a">›</span></div>';
   return phone('마이페이지',
@@ -321,7 +323,7 @@ function fo13() {
     '<div class="fld"><div class="l">요청사항 (선택)</div><div class="in plc">매장에 전할 말이 있으면 적어 주세요.</div></div>' +
     '<div class="gone" style="margin:12px 0 0">알리페이 채널에서는 이 자리가 없습니다<br>이메일</div>' +
     '</div></div>' +
-    '<div class="cta ' + (ready ? '' : 'dis') + '" ' + (ready ? 'onclick="S.telSaved=true;S.telEdited=false;go(\'fo11\')"' : '') + '>예약 요청</div>', '', '‹');
+    '<div class="cta ' + (ready ? '' : 'dis') + '" ' + (ready ? 'onclick="S.telSaved=true;S.telEdited=false;S.mtel=S.tel;S.mtelSrc=S.telSrc;S.mtelSaved=true;S.mtelDraft=\'\';go(\'fo11\')"' : '') + '>예약 요청</div>', '', '‹');
 }
 
 /* ─────────── BO-CH-11 알리페이 회원 ─────────── */
@@ -337,7 +339,7 @@ function bo11() {
   var me = MEM[0]; var p = S.prof || {};
   me.aid = S.wallet === 'CN' ? '2088712034559781' : '2088558801247390'; me.wallet = S.wallet; me.lang = LANG[S.wallet];
   me.nick = S.joined ? p.nick : ''; me.name = S.joined ? p.name : ''; me.sex = S.joined ? p.sex : ''; me.birth = S.joined ? p.birth : ''; me.nat = S.joined ? p.nation : ''; me.addr = S.joined ? p.addr : '';
-  me.tel = S.tel; me.pp = S.passport; me.bk = 0; me.ns = 0; me.profd = S.joined ? '2026-09-15 09:02' : ''; me.mkt = S.agMkt ? '동의' : '미동의'; me.mktd = (S.joined && S.agMkt) ? '2026-09-15 09:02' : '';
+  me.tel = S.mtel; me.pp = S.passport; me.bk = 0; me.ns = 0; me.profd = S.joined ? '2026-09-15 09:02' : ''; me.mkt = S.agMkt ? '동의' : '미동의'; me.mktd = (S.joined && S.agMkt) ? '2026-09-15 09:02' : '';
   var list = MEM.filter(function (m) { if (!S.joined && m.self) return false; if (BOW !== 'all' && m.wallet !== BOW) return false; if (BOQF === 'out' ? !m.quit : BOQF === 'in' ? !!m.quit : false) return false; if (BOMF !== 'all' && m.mkt !== BOMF) return false; return true; });
   var head = '<tr><th rowspan="2">회원번호</th><th rowspan="2">가입일</th>' + (BOQ ? '<th rowspan="2">탈퇴일</th>' : '') + '<th rowspan="2">마지막 로그인</th><th rowspan="2">알리페이 식별자</th><th class="c" rowspan="2">월렛</th>' +
     '<th rowspan="2">닉네임</th><th rowspan="2">이름</th><th rowspan="2">성별</th><th rowspan="2">생년월일</th><th rowspan="2">국적</th><th rowspan="2">주소</th><th rowspan="2">언어</th><th rowspan="2">연락처</th><th rowspan="2">여권명</th><th class="c" rowspan="2">예약</th><th class="c" rowspan="2">노쇼</th><th rowspan="2">프로필 동의 일자</th>' + (BOM ? '<th class="c" colspan="2">마케팅 활용 정보</th>' : '') + '</tr><tr>' + (BOM ? '<th class="c">동의 여부</th><th>동의 일자</th>' : '') + '</tr>';
@@ -372,7 +374,7 @@ function render() {
     '<span class="kv">마케팅 <em>' + (S.agMkt ? '동의' : '거부') + '</em></span>' +
     '<span class="kv">원본 휴대폰 권한 <em>' + (S.plaintext ? '승인' : '미승인') + '</em></span>' +
     '<span class="kv">월렛 <em>' + (S.wallet === 'CN' ? '중국' : '홍콩') + '</em></span>' +
-    '<button onclick="S.plaintext=!S.plaintext;if(S.joined){S.tel=S.plaintext?ALI.phone:\'\';S.telVerified=S.plaintext;S.telEdited=false;S.telSrc=S.plaintext?\'ali\':\'\';}render()">원본 권한 ' + (S.plaintext ? '미승인으로' : '승인으로') + '</button>' +
+    '<button onclick="S.plaintext=!S.plaintext;if(S.joined){S.tel=S.plaintext?ALI.phone:\'\';S.telVerified=S.plaintext;S.telEdited=false;S.telSrc=S.plaintext?\'ali\':\'\';S.mtel=S.tel;S.mtelSrc=S.telSrc;S.mtelDraft=\'\';}render()">원본 권한 ' + (S.plaintext ? '미승인으로' : '승인으로') + '</button>' +
     '<button onclick="S.wallet=(S.wallet===\'CN\'?\'HK\':\'CN\');render()">월렛 바꾸기</button>' +
     '<button onclick="S.blocked=\'fail\';S.step=\'blocked\';S.view=\'fo08\';render()">식별 실패</button>' +
     '<button onclick="S.blocked=\'prof\';S.step=\'blocked\';S.view=\'fo08\';render()">프로필 거부</button>' +

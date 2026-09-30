@@ -222,7 +222,7 @@ var DATA = [
 ["S-14","반대 채널 전용 건이 없으면 영향 없음 문구","S2 리엔장 피부과를 알리페이 앱으로 바꾸고 저장","확인 창 본문: 이 스토어를 웹에서 숨기면 이 스토어 상품 2건도 함께 보이지 않습니다. 보조: 알리페이 앱 노출에는 영향이 없습니다","go('s-edit','S2');VIEW.sect=0;setCh('store','알리페이 앱');save('store')"],
 ["S-15","알리페이 앱 전용 스토어는 지원언어를 셋 모두 뺄 수 없다","S2 리엔장 피부과를 알리페이 앱으로 둔 상태에서 지원언어의 간체·번체를 끄고 저장","저장할 수 없습니다: 알리페이 앱 전용 스토어는 중국어(간체), 중국어(번체), 영어 중 하나 이상을 지원해야 합니다","S('S2').channel='알리페이 앱';go('s-edit','S2');VIEW.sect=0;toggleLang('중국어(간체)');toggleLang('중국어(번체)');save('store')"],
 ["S-16","지원언어 저장으로 웹 고정되면 확인 창","S1 준오헤어 명동점의 지원언어를 일본어만 남기고 저장","확인 창 제목 웹으로 저장. 알리페이 앱에서 빠지는 상품·칼럼·배너·기획전 수가 적혀 있다","go('s-edit','S1');VIEW.sect=0;toggleLang('중국어(간체)');toggleLang('영어');save('store')"],
-["S-17","새로 보이는 상품·칼럼이 없으면 스토어만 적는다","S4 모모클리닉(상품 비활성, 칼럼 비공개·번체)을 알리페이 앱으로 바꾸고 저장","확인 창: 이 스토어를 웹에서 숨깁니다. / 이 스토어가 빠지면서 웹에 보이지 않게 되는 배너 1건과 기획전 1건도 있습니다. / 알리페이 앱에는 이 스토어가 새로 보입니다. / 지워지는 것은 없습니다.","CL('CL2').langs='중국어(번체)';CL('CL2').status='비공개';DB.products.filter(p=>p.store==='S4').forEach(p=>p.active=false);go('s-edit','S4');VIEW.sect=0;setCh('store','알리페이 앱');save('store')"],
+["S-17","새로 보이는 상품·칼럼이 없으면 스토어만 적는다","S4 모모클리닉(상품 비활성, 칼럼 비공개·번체)을 알리페이 앱으로 바꾸고 저장","확인 창: 이 스토어를 웹에서 숨깁니다. / 이 스토어가 빠지면서 웹에 보이지 않게 되는 배너 1건과 기획전 1건도 있습니다. / 지워지는 것은 없습니다. / 알리페이 앱에는 이 스토어가 새로 보입니다.","CL('CL2').langs='중국어(번체)';CL('CL2').status='비공개';DB.products.filter(p=>p.store==='S4').forEach(p=>p.active=false);go('s-edit','S4');VIEW.sect=0;setCh('store','알리페이 앱');save('store')"],
 ["S-18","칼럼만 걸리면 칼럼만 적는다","S4 모모클리닉(일본어를 켠 칼럼 1건) 노출 채널에서 알리페이 앱 선택","알림 바꿀 수 없습니다: 일본어·인도네시아어·몽골어 칼럼 1건이 있어 알리페이 앱 전용으로 바꿀 수 없습니다. 해당 칼럼을 정리한 뒤 바꿔 주세요. 라디오는 웹에 그대로","go('s-edit','S4');VIEW.sect=0;setCh('store','알리페이 앱')"]
 ]],
 ["배너 (광고정보관리)", [
@@ -315,7 +315,7 @@ var DATA = [
 ["U-16","탈퇴 안내","마이페이지에서 회원 탈퇴","연결 끊김, 내역 못 봄, 재진입 시 새 회원, 알리페이 계정 무영향 네 줄","resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.view='fo12';render()"],
 ["U-17","탈퇴하면 관문부터 다시","탈퇴하기","회원 = 아직 아님으로 초기화되고 동의 창이 다시 뜬다","resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.view='fo12';render()"],
 ["U-18","마이페이지 휴대폰 번호","원본 권한 승인 상태의 마이페이지","휴대폰 번호가 알리페이 계정에서 채웠습니다 표시와 함께 있고 아래 고치면 문자 인증을 다시 합니다 안내가 있다. 누르면 문자 인증 버튼이 나타난다","resetDB();S.plaintext=true;S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.view='fo11';render()"],
-["U-26","마이페이지에서 번호를 고치면 문자 인증","마이페이지 휴대폰 번호를 눌러 고침","알리페이 계정에서 채웠습니다 표시가 사라지고 문자 인증 버튼과 입력한 번호로 문자 인증을 합니다 안내가 보인다. 인증하면 안내가 사라진다","resetDB();S.plaintext=true;S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.tel='+86 139 2222 3333';S.telEdited=true;S.telVerified=false;S.view='fo11';render()"],
+["U-26","마이페이지에서 번호를 고치면 문자 인증","마이페이지 휴대폰 번호를 눌러 고침","알리페이 계정에서 채웠습니다 표시가 사라지고 문자 인증 버튼과 입력한 번호로 문자 인증을 합니다 안내가 보인다. 인증하면 버튼이 사라지고 안내가 고치면 문자 인증을 다시 합니다로 돌아온다","resetDB();S.plaintext=true;S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.mtelDraft='+86 139 2222 3333';S.view='fo11';render()"],
 ["U-27","알림·마케팅 수신 설정 메뉴","마이페이지 메뉴","예약 내역·채팅 아래 알림·마케팅 수신 설정 메뉴 줄이 있다","resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.view='fo11';render()"]
 ]],
 ["예약 입력", [
@@ -326,8 +326,9 @@ var DATA = [
 ["U-23","번호를 고치면 다시 인증","채워진 번호를 눌러 고침","인증 완료가 사라지고 문자 인증 버튼과 입력한 번호로 문자 인증을 합니다 안내가 나타난다. 인증 전에는 예약 요청이 비활성. 인증하면 안내가 사라진다","resetDB();S.plaintext=true;S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.tel='+86 139 2222 3333';S.telEdited=true;S.telVerified=false;S.view='fo13';render()"],
 ["U-24","원본 권한이 없으면 직접 입력하고 인증","원본 권한 미승인 상태","휴대폰 번호가 비어 있고 눌러서 입력해 주세요 → 문자 인증 버튼. 안내: 입력한 번호로 문자 인증을 합니다","resetDB();S.plaintext=false;S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.view='fo13';render()"],
 ["U-25","여권명·인증된 번호·메신저가 채워지면 예약 요청 활성","전부 채운 상태","예약 요청 버튼이 검게 활성화된다","resetDB();S.plaintext=true;S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.passport='WANG XIAOMEI';S.msg='위챗 wxid_alipay01';S.view='fo13';render()"],
-["U-28","두 번째 예약부터 저장된 번호로 인증 생략","원본 권한 없이 첫 예약에서 인증한 뒤 다시 예약 입력","휴대폰 번호가 채워져 있고 인증 완료. 안내: 인증을 마친 번호입니다. 고치면 문자 인증을 다시 합니다","resetDB();S.plaintext=false;S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.tel='+86 139 2222 3333';S.telEdited=false;S.telVerified=true;S.telSaved=true;S.view='fo13';render()"],
-["U-29","원본 번호를 고쳐 예약한 뒤 다음 예약","원본 권한 회원이 번호를 고쳐 인증하고 예약한 뒤 다시 예약 입력","고친 번호가 채워지고 알리페이 계정에서 채웠습니다 표시가 없다. 안내: 인증을 마친 번호입니다. 고치면 문자 인증을 다시 합니다. 마이페이지에도 알리페이 계정 표시가 없다","resetDB();S.plaintext=true;S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.tel='+86 139 2222 3333';S.telEdited=false;S.telVerified=true;S.telSrc='user';S.telSaved=true;S.view='fo13';render()"]
+["U-28","두 번째 예약부터 저장된 번호로 인증 생략","원본 권한 없이 첫 예약에서 인증한 뒤 다시 예약 입력","휴대폰 번호가 채워져 있고 인증 완료. 안내: 인증을 마친 번호입니다. 고치면 문자 인증을 다시 합니다","resetDB();S.plaintext=false;S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.tel='+86 139 2222 3333';S.telEdited=false;S.telVerified=true;S.telSaved=true;S.mtel='+86 139 2222 3333';S.mtelSaved=true;S.view='fo13';render()"],
+["U-29","원본 번호를 고쳐 예약한 뒤 다음 예약","원본 권한 회원이 번호를 고쳐 인증하고 예약한 뒤 다시 예약 입력","고친 번호가 채워지고 알리페이 계정에서 채웠습니다 표시가 없다. 안내: 인증을 마친 번호입니다. 고치면 문자 인증을 다시 합니다. 마이페이지에도 알리페이 계정 표시가 없다","resetDB();S.plaintext=true;S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.tel='+86 139 2222 3333';S.telEdited=false;S.telVerified=true;S.telSrc='user';S.telSaved=true;S.mtel='+86 139 2222 3333';S.mtelSrc='user';S.mtelSaved=true;S.view='fo13';render()"],
+["U-30","예약 요청 전에는 회원 정보에 저장하지 않는다","원본 권한 없이 예약 입력에서 번호를 넣고 인증만 한 뒤 마이페이지로 이동","마이페이지 휴대폰 번호가 비어 있고 눌러서 입력해 주세요가 보인다. 예약 요청을 보낸 뒤에만 회원 정보에 저장된다","resetDB();S.plaintext=false;S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();go('fo13');S.tel='+86 139 2222 3333';S.telVerified=true;S.telSrc='user';go('fo11')"]
 ]],
 ["알리페이 회원 (어드민)", [
 ["UB-01","화면 위치","회원 메뉴 아래 알리페이 회원 (시안은 제목·부제로 확인)","알리페이 계정으로 만들어진 회원만 모여 있다. 기존 회원 관리 정보조회 화면은 손대지 않는다","resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();BOW='all';BOQ=false;S.view='bo11';render()"],
