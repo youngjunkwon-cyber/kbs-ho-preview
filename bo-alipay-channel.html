@@ -576,6 +576,15 @@ window.setCh = function (kind, v) {
 /* 스토어 채널을 좁힐 때 같이 빠지는 것. 상품(대상 언어 기준)·칼럼·배너·기획전 */
 function storeProdCount(st, ch) { return DB.products.filter(p => p.store === st.id && (ch === ALI ? langOk(p.lang) : true)).length; }
 function storeColCount(st) { return DB.columns.filter(c => c.store === st.id && c.status === '게시중').length; }
+function gainOfStoreCh(st, ch) {
+  const cur = { c: st.channel, l: st.langs };
+  const colVis = c => c.store === st.id && c.status === '게시중' && colLangOk(c) && chIncludes(effChColumn(c), ch) && S(c.store).active !== false;
+  const snap = () => ({ p: DB.products.filter(p => p.store === st.id && visProduct(p, ch)).map(p => p.id), c: DB.columns.filter(colVis).map(c => c.id) });
+  st.channel = VIEW.savedCh != null ? VIEW.savedCh : ALLCH; if (VIEW.savedLangs != null) st.langs = VIEW.savedLangs;
+  const before = snap(); st.channel = cur.c; st.langs = cur.l; const after = snap();
+  const d = (x, y) => x.filter(i => y.indexOf(i) === -1).length;
+  return { P: d(after.p, before.p), Q: d(after.c, before.c) };
+}
 function impactOfStoreCh(st, ch) {
   const cur = { c: st.channel, l: st.langs }; const lost = other(ch);
   const colVis = c => c.store === st.id && c.status === '게시중' && colLangOk(c) && chIncludes(effChColumn(c), lost) && S(c.store).active !== false;
@@ -1063,7 +1072,7 @@ window.save = function (kind) {
       confirmBox(ch + euro(ch) + ' 저장',
         '<p><b>' + esc(obj.name) + '</b></p>' + ((im.N || im.M) ? '<p>이 스토어를 ' + lost + '에서 숨기면 이 스토어 ' + [im.N ? '상품 ' + im.N + '건' : '', im.M ? '칼럼 ' + im.M + '건' : ''].filter(Boolean).join('과 ') + '도 함께 보이지 않습니다.</p>' : '<p>이 스토어를 ' + lost + '에서 숨깁니다.</p>') +
         ((im.A || im.K) ? '<p>이 스토어가 빠지면서 ' + lost + '에 보이지 않게 되는 ' + [im.A ? '배너 ' + im.A + '건' : '', im.K ? '기획전 ' + im.K + '건' : ''].filter(Boolean).join('과 ') + '도 있습니다.</p>' : '') +
-        (effPrev !== ALLCH ? '<p>' + ch + '에는 이 스토어와 상품·칼럼이 새로 보입니다.</p><p>지워지는 것은 없습니다.</p>' : '<p>지워지는 것은 없습니다.</p>' + (function () { const gp = DB.products.filter(p => p.store === obj.id && langOk(p.lang) && p.channel === lost).length, gc = DB.columns.filter(c => c.store === obj.id && colLangOk(c) && c.channel === lost).length; return (gp || gc) ? '<p>' + ch + '에는 ' + lost + ' 전용이던 ' + [gp ? '상품 ' + gp + '건' : '', gc ? '칼럼 ' + gc + '건' : ''].filter(Boolean).join('과 ') + '이 새로 보입니다.</p>' : '<p class="hint">' + ch + ' 노출에는 영향이 없습니다.</p>'; })()),
+        (effPrev !== ALLCH ? (function () { const g = gainOfStoreCh(obj, ch); return '<p>' + ch + '에는 이 스토어' + ((g.P || g.Q) ? '와 ' + [g.P ? '상품 ' + g.P + '건' : '', g.Q ? '칼럼 ' + g.Q + '건' : ''].filter(Boolean).join('과 ') + '이' : '가') + ' 새로 보입니다.</p><p>지워지는 것은 없습니다.</p>'; })() : '<p>지워지는 것은 없습니다.</p>' + (function () { const gp = DB.products.filter(p => p.store === obj.id && langOk(p.lang) && p.channel === lost).length, gc = DB.columns.filter(c => c.store === obj.id && colLangOk(c) && c.channel === lost).length; return (gp || gc) ? '<p>' + ch + '에는 ' + lost + ' 전용이던 ' + [gp ? '상품 ' + gp + '건' : '', gc ? '칼럼 ' + gc + '건' : ''].filter(Boolean).join('과 ') + '이 새로 보입니다.</p>' : '<p class="hint">' + ch + ' 노출에는 영향이 없습니다.</p>'; })()),
         done, function () {}, ch + euro(ch) + ' 저장');
       return;
     }
