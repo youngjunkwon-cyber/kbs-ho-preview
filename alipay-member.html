@@ -312,7 +312,7 @@ function fo13() {
     tel = '<div class="fld"><div class="l">휴대폰 번호</div>' +
       '<div class="vrow"><div class="in ' + (S.tel ? '' : 'plc') + '" onclick="if(S.tel){S.tel=\'+86 139 2222 3333\';S.telEdited=true;S.telVerified=false}else{S.tel=\'+86 139 2222 3333\'}S.telSrc=\'user\';render()">' + (S.tel || '눌러서 입력해 주세요.') + '</div>' +
       (S.tel ? '<div class="vbtn ' + (S.telVerified ? 'done' : '') + '" onclick="S.telVerified=true;render()">' + (S.telVerified ? '인증 완료' : '문자 인증') + '</div>' : '') + '</div>' +
-      ((S.telSaved && S.tel && S.telVerified && !S.telEdited) ? '<div class="sub">인증을 마친 번호입니다. 고치면 문자 인증을 다시 합니다.</div>' : (S.telVerified ? '' : '<div class="sub">입력한 번호로 문자 인증을 합니다.</div>')) + '</div>';
+      ((S.telSaved && S.tel && S.telVerified && !S.telEdited) ? '<div class="sub">인증을 마친 번호입니다. 고치면 문자 인증을 다시 합니다.</div>' : (S.telVerified ? '<div class="sub">고치면 문자 인증을 다시 합니다.</div>' : '<div class="sub">입력한 번호로 문자 인증을 합니다.</div>')) + '</div>';
   }
   var ready = S.passport && S.tel && S.telVerified && S.msg;
   return phone('예약하기',
