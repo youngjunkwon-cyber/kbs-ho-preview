@@ -272,7 +272,7 @@ function fo11() {
   function f(label, key, ph) { var v = p[key]; return '<div class="fld"><div class="l">' + label + '</div><div class="in ' + (v ? '' : 'plc') + '" onclick="edit(\'' + key + '\',\'' + ph + '\')">' + (v || '아직 없어요. 눌러서 입력해 주세요.') + '</div></div>'; }
   var tel = '<div class="fld"><div class="l">휴대폰 번호' + (S.telSrc === 'ali' && S.tel && !S.telEdited ? '<span class="autotag">알리페이 계정에서 채웠습니다</span>' : '') + '</div>' +
     '<div class="in ' + (S.tel ? '' : 'plc') + '" onclick="S.tel=\'+86 139 2222 3333\';S.telEdited=true;S.telVerified=false;S.telSrc=\'user\';render()">' + (S.tel || '눌러서 입력해 주세요.') + '</div>' +
-    (S.telEdited && !S.telVerified ? '<div class="vrow" style="margin-top:6px"><div class="vbtn" onclick="S.telVerified=true;render()">문자 인증</div></div><div class="sub">입력한 번호로 문자 인증을 합니다.</div>' : (S.tel && !S.telEdited ? '<div class="sub">고치면 문자 인증을 다시 합니다.</div>' : '')) + '</div>';
+    (S.tel && !S.telVerified ? '<div class="vrow" style="margin-top:6px"><div class="vbtn" onclick="S.telVerified=true;S.telEdited=false;S.telSaved=true;render()">문자 인증</div></div><div class="sub">입력한 번호로 문자 인증을 합니다.</div>' : (S.tel && S.telVerified && !S.telEdited ? '<div class="sub">고치면 문자 인증을 다시 합니다.</div>' : '')) + '</div>';
   var rows = ['예약 내역', '채팅', '알림·마케팅 수신 설정', '언어 설정', '이용 약관', '개인정보 처리방침'].map(function (t) { return '<div class="mrow"><span>' + t + '</span><span class="a">›</span></div>'; }).join('') +
     '<div class="mrow" onclick="go(\'fo12\')" style="cursor:pointer"><span>회원 탈퇴</span><span class="a">›</span></div>';
   return phone('마이페이지',
@@ -310,7 +310,7 @@ function fo13() {
     tel = '<div class="fld"><div class="l">휴대폰 번호</div>' +
       '<div class="vrow"><div class="in ' + (S.tel ? '' : 'plc') + '" onclick="if(S.tel){S.tel=\'+86 139 2222 3333\';S.telEdited=true;S.telVerified=false}else{S.tel=\'+86 139 2222 3333\'}S.telSrc=\'user\';render()">' + (S.tel || '눌러서 입력해 주세요.') + '</div>' +
       (S.tel ? '<div class="vbtn ' + (S.telVerified ? 'done' : '') + '" onclick="S.telVerified=true;render()">' + (S.telVerified ? '인증 완료' : '문자 인증') + '</div>' : '') + '</div>' +
-      ((S.telSaved && S.tel && S.telVerified && !S.telEdited) ? '<div class="sub">지난 예약에서 인증한 번호입니다. 고치면 문자 인증을 다시 합니다.</div>' : (S.telVerified ? '' : '<div class="sub">입력한 번호로 문자 인증을 합니다.</div>')) + '</div>';
+      ((S.telSaved && S.tel && S.telVerified && !S.telEdited) ? '<div class="sub">인증을 마친 번호입니다. 고치면 문자 인증을 다시 합니다.</div>' : (S.telVerified ? '' : '<div class="sub">입력한 번호로 문자 인증을 합니다.</div>')) + '</div>';
   }
   var ready = S.passport && S.tel && S.telVerified && S.msg;
   return phone('예약하기',
