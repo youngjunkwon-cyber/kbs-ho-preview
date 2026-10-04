@@ -1067,7 +1067,7 @@ window.saveColl = function () {
     const cond = byStore ? (o.active === false ? '비공개' : '') : (o.status === '반려' ? '심사 반려' : o.status !== '승인' ? o.status : o.active === false ? '비활성' : o.hidden ? '히든' : S(o.store).active === false ? '스토어 비공개' : '');
     const why = cond || (byStore ? effChStore(o) : effChProduct(o));
     return '<p class="hint" style="margin:2px 0">' + esc(o.name) + ' → ' + why + '</p>'; }).join('');
-  confirmBox('저장할까요?', '<p>' + emptyChs.map(ch => MSG.saveColl(word, ch)).join(' ') + ' 저장할까요?</p>' + lines, done, function () {});
+  confirmBox('저장할까요?', '<p>' + emptyChs.map(ch => MSG.saveColl(word, ch)).join(' ') + '</p>' + lines, done, function () {});
 };
 window.save = function (kind) {
   const obj = kind === 'store' ? S(VIEW.id) : P(VIEW.id);
