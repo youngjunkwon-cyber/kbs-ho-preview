@@ -390,7 +390,7 @@ function innerTargetOk(inner, lang, ch) {
   if (inner.kind === '직접입력') {
     if (isExternalDirectPath(inner.path)) return { ok: false, label: '외부 사이트 주소입니다', ext: true };
     const parsed = parseInternalPath(inner.path);
-    if (!parsed) return { ok: true, label: inner.path ? '직접입력 (목록 페이지, 판정 없음)' : '직접입력 (주소 없음)', skip: true };
+    if (!parsed) return { ok: true, label: inner.path ? '직접입력 (목록 페이지)' : '직접입력 (주소 없음)', skip: true };
     if (parsed.type === 'products') { const p = P(parsed.id); if (!p) return { ok: false, label: MSG.bnNotFound, notFound: true };
       return { ok: byLang(p.lang) && visProduct(p, ch), label: '직접입력 · ' + p.name, eff: effChProduct(p) }; }
     if (parsed.type === 'stores') { const st = S(parsed.id); if (!st) return { ok: false, label: MSG.bnNotFound, notFound: true };
