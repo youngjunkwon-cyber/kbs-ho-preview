@@ -172,7 +172,7 @@ const MSG = {
   storeFixed:  (ch, what) => '스토어의 노출 채널이 ' + ch + '이라 이 ' + what + '도 같은 채널에만 노출됩니다. 스토어 > 정보관리의 기본정보에서 바꿀 수 있습니다.',
   storeChange: (ch, n, m) => (n || m) ? ch + euro(ch) + ' 저장하면 이 스토어 ' + [n ? '상품 ' + n + '건' : '', m ? '칼럼 ' + m + '건' : ''].filter(Boolean).join('과 ') + '도 ' + other(ch) + '에 노출되지 않습니다.' : '',
   aliNeedLang: '알리페이 앱 전용 스토어는 중국어(간체), 중국어(번체), 영어 중 하나 이상을 지원해야 합니다.',
-  storeAll:    '지원언어와 무관하게 이 설정 하나가 모든 언어에 적용됩니다. 이 스토어의 상품과 칼럼도 같은 채널을 따릅니다.',
+  storeAll:    '지원언어와 무관하게 이 설정 하나가 모든 언어에 적용됩니다. 웹이나 알리페이 앱으로 정하면 이 스토어의 상품과 칼럼도 그 채널에만 노출됩니다.',
   bnExtLock:   '외부링크 배너는 웹에만 노출됩니다. 이 설정은 수정할 수 없습니다.',
   bnBtnExtLock:'하단 버튼이 외부링크입니다. 알리페이 앱에서는 이 버튼이 보이지 않습니다.',
   bnTarget:    (t, ch) => '연결 대상(' + t + ')이 ' + ch + '에 노출되지 않습니다. 배너도 ' + ch + '에 노출되지 않습니다.',
@@ -182,7 +182,7 @@ const MSG = {
   bnNotFound:  '입력한 주소의 대상을 찾을 수 없습니다. 주소를 확인해 주세요.',
   storeNoLang: what => '스토어의 지원언어에 중국어(간체)·중국어(번체)·영어가 없어 이 ' + what + '도 웹에만 노출됩니다. 스토어 > 정보관리의 기본정보에서 지원언어를 추가하면 바꿀 수 있습니다.',
   saveColl:    (s, ch) => ch + '에 노출 가능한 ' + s + ' 없습니다. 저장하면 ' + ch + '에서는 기획전이 보이지 않습니다.',
-  typeSwitch:  (was, n, now, inactive) => '유형을 변경하면 담은 ' + was + ' ' + n + '건이 삭제되고 ' + now + '만 담을 수 있습니다. ' + (inactive ? '' : now + eul(now) + ' 1건 이상 담아야 저장할 수 있습니다. ') + '변경할까요?',
+  typeSwitch:  (was, n, now, inactive) => '유형을 바꾸면 담은 ' + was + ' ' + n + '건이 지워지고 ' + now + '만 담을 수 있습니다.' + (inactive ? '' : ' ' + now + eul(now) + ' 1건 이상 담아야 저장할 수 있습니다.'),
   hostHidden:  '이 상품은 알리페이 앱에서는 보이지 않아요.',
   hostLangLimit: '이 매장은 알리페이 앱 전용이라 중국어(간체), 중국어(번체), 영어만 등록할 수 있어요.',
   storeDefault:'기본 설정은 스토어 버튼 구성을 그대로 적용합니다.',
@@ -401,7 +401,7 @@ function innerTargetOk(inner, lang, ch) {
     if (parsed.type === 'products') { const p = P(parsed.id); if (!p) return { ok: false, label: MSG.bnNotFound, notFound: true };
       return { ok: byLang(p.lang) && visProduct(p, ch), label: '상품 ' + p.name, eff: effChProduct(p) }; }
     if (parsed.type === 'stores') { const st = S(parsed.id); if (!st) return { ok: false, label: MSG.bnNotFound, notFound: true };
-      return { ok: visStore(st, ch), label: '스토어 ' + st.name, eff: effChStore(st) }; }
+      return { ok: visStore(st, ch), label: '병원 ' + st.name, eff: effChStore(st) }; }
     if (parsed.type === 'collections') { const c = C(parsed.id); if (!c) return { ok: false, label: MSG.bnNotFound, notFound: true };
       return { ok: byLang(c.lang) && liveNow(c) && judgeCollection(c, ch).visible, label: '기획전 ' + c.name, eff: effChColl(c) }; }
     if (parsed.type === 'influencers') { const f = DB.influencers.filter(x => x.id === parsed.id)[0]; if (!f) return { ok: false, label: MSG.bnNotFound, notFound: true };
@@ -861,12 +861,13 @@ function modal_ad() {
       if (nf.length) tail += '<div class="notice">' + (nf.length === 2 ? '웹과 알리페이 앱' : nf.join('과 ')) + '에서는 하단 버튼이 보이지 않습니다.</div>'; }
   }
   if (isLanding && b.btn) {
-    const aliLockBtn = extBtn || eff === WEB || !lOk, webLockBtn = eff === ALI;
+    const directExtBtn = b.btn.linkKind === '내부링크' && b.btn.inner && b.btn.inner.kind === '직접입력' && isExternalDirectPath(b.btn.inner.path);
+    const aliLockBtn = extBtn || directExtBtn || eff === WEB || !lOk, webLockBtn = eff === ALI;
     h += '<div class="blk">하단 버튼</div>' +
       '<div class="row"><div class="lbl"><span class="req">*</span>버튼 표시여부</div><div class="val"><div style="display:flex;gap:36px;flex-wrap:wrap;align-items:center">' +
       '<span class="' + (webLockBtn ? 'lock' : '') + '"><span class="tblnote" style="margin-right:8px">웹</span>' + onoff('bshw', b.btn.web, "setAdBtnShow('web',%V%)", webLockBtn, ['활성화', '비활성화']) + '</span>' +
-      '<span class="' + (aliLockBtn ? 'lock' : '') + '"><span class="tblnote" style="margin-right:8px">알리페이 앱</span>' + onoff('bsha', extBtn ? false : b.btn.ali, "setAdBtnShow('ali',%V%)", aliLockBtn, ['활성화', '비활성화']) + '</span></div>' +
-      (!lOk ? '' : extBtn ? '<div class="hint">' + MSG.bnBtnExtLock + '</div>' : eff !== ALLCH ? '<div class="hint">' + MSG.lockCol(eff) + '</div>' : '') + '</div></div>' +
+      '<span class="' + (aliLockBtn ? 'lock' : '') + '"><span class="tblnote" style="margin-right:8px">알리페이 앱</span>' + onoff('bsha', (extBtn || directExtBtn) ? false : b.btn.ali, "setAdBtnShow('ali',%V%)", aliLockBtn, ['활성화', '비활성화']) + '</span></div>' +
+      (!lOk ? '' : eff !== ALLCH ? '<div class="hint">' + MSG.lockCol(eff) + '</div>' : extBtn ? '<div class="hint">' + MSG.bnBtnExtLock + '</div>' : directExtBtn ? '<div class="hint">하단 버튼이 외부 사이트 주소입니다. 알리페이 앱에서는 이 버튼이 보이지 않습니다.</div>' : '') + '</div></div>' +
       '<div class="row"><div class="lbl"><span class="req">*</span>버튼 텍스트</div><div class="val"><input type="text" class="fin" value="' + esc(b.btn.label) + '" style="width:260px" readonly></div></div>' +
       '<div class="row"><div class="lbl"><span class="req">*</span>버튼 링크 종류</div><div class="val"><select onchange="setBtnLinkKind(this.value)">' + ['링크없음', '외부링크', '내부링크'].map(v => '<option' + (v === b.btn.linkKind ? ' selected' : '') + '>' + v + '</option>').join('') + '</select></div></div>' +
       (b.btn.linkKind === '외부링크' ? '<div class="row"><div class="lbl">버튼 링크</div><div class="val"><input type="text" class="fin" style="width:100%" value="' + esc(b.btn.url || '') + '" readonly></div></div>' : '') +
@@ -1061,7 +1062,7 @@ function screen_mEdit() {
 function modal_link() {
   return '<div class="mask"><div class="modal" style="max-width:560px"><div class="hd">링크 넣기<button class="x" onclick="closeMD()">✕</button></div><div class="bd">' +
     '<div style="font-size:12px;font-weight:500;color:#595959;margin-bottom:6px">주소</div><input type="text" id="linkurl" value="' + esc(LINKVAL) + '" style="width:100%" placeholder="https://k-beautystation.com/products/P1 또는 /products/P1">' +
-    (LINKERR ? '<div class="notice">' + LINKERR + '</div>' : '<div class="hint">입력한 주소는 저장 시 내부 주소 형식으로 변환됩니다.</div>') +
+    (LINKERR ? '<div class="notice">' + LINKERR + '</div>' : '<div class="hint">입력한 주소는 저장할 때 사이트 안 주소로 바꿔 저장됩니다.</div>') +
     '</div><div class="ft"><button class="btn" onclick="closeMD()">취소</button><button class="btn blue" onclick="tryInsertLink()">넣기</button></div></div></div>';
 }
 
@@ -1075,12 +1076,15 @@ window.saveColl = function () {
   const emptyChs = lOk ? collEmptyChannels(c) : [];
   if (!emptyChs.length) { done(); return; }
   const word = byStore ? '스토어가' : '상품이';
-  const lines = (byStore ? c.stores : c.products).map(id => { const o = byStore ? S(id) : P(id); if (!o) return '';
+  const linesFor = ch => { const ls = (byStore ? c.stores : c.products).map(id => { const o = byStore ? S(id) : P(id); if (!o) return '';
+    const vis = byStore ? visStore(o, ch) : visProduct(o, ch); if (vis) return '';
     const cond = byStore ? (o.active === false ? '비공개' : '') : (o.status === '반려' ? '심사 반려' : o.status !== '승인' ? o.status : o.active === false ? '비활성' : o.hidden ? '히든' : S(o.store).active === false ? '스토어 비공개' : '');
-    const why = cond || (byStore ? effChStore(o) : effChProduct(o));
+    const eff = byStore ? effChStore(o) : effChProduct(o);
+    const why = cond || (eff === ALLCH ? '' : eff + ' 전용');
     return '<p class="hint" style="margin:2px 0">' + esc(o.name) + ' → ' + why + '</p>'; }).filter(Boolean);
-  const shown = lines.length > 10 ? lines.slice(0, 10).join('') + '<p class="hint" style="margin:2px 0">외 ' + (lines.length - 10) + '건</p>' : lines.join('');
-  confirmBox('저장할까요?', '<p>' + emptyChs.map(ch => MSG.saveColl(word, ch)).join(' ') + '</p>' + shown, done, function () {});
+    return ls.length > 10 ? ls.slice(0, 10).join('') + '<p class="hint" style="margin:2px 0">외 ' + (ls.length - 10) + '건</p>' : ls.join(''); };
+  const shown = emptyChs.map(ch => '<p>' + MSG.saveColl(word, ch) + '</p>' + linesFor(ch)).join('');
+  confirmBox('저장할까요?', shown, done, function () {});
 };
 window.save = function (kind) {
   const obj = kind === 'store' ? S(VIEW.id) : P(VIEW.id);
