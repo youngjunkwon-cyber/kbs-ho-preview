@@ -809,7 +809,7 @@ function innerPicker(kindH, idH, cur, pathH, b) {
     const miss = targetMiss(cur, b);
     const fid = /^setBtn/.test(kindH) ? 'dp_btn' : 'dp_ad';
     tail = '<input type="text" id="' + fid + '" placeholder="/products/P1" style="width:220px" value="' + esc((cur && cur.path) || '') + '" oninput="var k=this.selectionStart;' + pathH + ';refocus(\'' + fid + '\',k)"> ' +
-      '<span class="tblnote">' + (tv.skip ? tv.label : tv.ext ? tv.label : tv.notFound ? tv.label : (miss.length === 2 ? '노출되지 않음, ' : tv.eff ? '노출 채널 ' + tv.eff + ', ' : '') + tv.label + (miss.length ? '. ' + (miss.length === 2 ? '웹과 알리페이 앱' : miss[0]) + '에 노출되지 않습니다.' : '')) + '</span>';
+      '<span class="tblnote">' + (tv.skip ? tv.label : tv.ext ? tv.label : tv.notFound ? tv.label : (miss.length === 2 ? '노출되지 않음, ' : tv.eff ? '노출 채널 ' + tv.eff + ', ' : '') + tv.label + (miss.length === 1 ? '. ' + miss[0] + '에 노출되지 않습니다.' : '')) + '</span>';
   } else tail = '<select onchange="' + idH + '">' + opts.map(o => '<option value="' + o[0] + '"' + (cur && cur.id === o[0] ? ' selected' : '') + '>' + esc(o[1]) + '</option>').join('') + '</select>';
   return '<select onchange="' + kindH + '">' + INNER_KINDS.map(k => '<option' + (k === kind ? ' selected' : '') + '>' + k + '</option>').join('') + '</select> ' + tail;
 }
@@ -959,7 +959,7 @@ function screen_hEdit() {
     '<div class="card"><div class="hd">상품 정보</div><div class="bd">' +
     '<div class="row"><div class="lbl">상품명</div><div class="val">' + esc(p.name) + '</div></div>' +
     '<div class="row"><div class="lbl">언어</div><div class="val">' + p.lang + (effChStore(S(p.store)) === ALI ? '<div class="hint">' + MSG.hostLangLimit + '</div>' : '') + '</div></div>' +
-    '<div class="row"><div class="lbl">상품 설명</div><div class="val"><span class="tblnote">간략 설명과 사진 올리기</span></div></div></div></div>';
+    '<div class="row"><div class="lbl">상품 설명</div><div class="val"><span class="tblnote">(시안 주석) 간략 설명·사진 입력 영역은 라이브 그대로라 그리지 않았습니다.</span></div></div></div></div>';
 }
 
 /* --------------------- BO-CH-13 · 스토어 칼럼 상세 --------------------- */
@@ -973,7 +973,7 @@ function screen_colEdit() {
     '<div class="row"><div class="lbl">게시 상태</div><div class="val"><span class="tag all">' + c.status + '</span></div></div>' +
     '<div class="row"><div class="lbl">노출 채널</div><div class="val">' + chRadio('clch', eff, 'col', fixed) +
     (byStore && colLangOk(c) ? '<div class="hint">' + (storeHasTargetLang(st) ? MSG.storeFixed(effChStore(st), '칼럼') : MSG.storeNoLang('칼럼')) + '</div>' : '') + '</div></div>' +
-    '<div class="row"><div class="lbl">본문</div><div class="val"><span class="tblnote">본문 (호스트 작성)</span></div></div>' +
+    '<div class="row"><div class="lbl">본문</div><div class="val"><span class="tblnote">(시안 주석) 호스트가 작성한 본문이 라이브 그대로 보이는 자리입니다. 그리지 않았습니다.</span></div></div>' +
     '</div></div>' +
     '<div class="card"><div class="hd">저장</div><div class="bd"><button class="btn blue" onclick="saveCol()">저장</button></div></div>';
 }

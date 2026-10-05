@@ -153,6 +153,7 @@ function resetDB() {
     agAge: false,         // 만 14세 확인 창의 만 14세 이상입니다 (생년월일 없는 회원만)
     contactGranted: true, // 알리페이 권한 창의 연락처 (필수 권한)
     toast: '',
+    booked: 0,            // 이 시안에서 보낸 예약 요청 수 (알리페이 회원 목록의 예약 칸)
     prof: null,           // 회원 정보에 저장된 프로필 (수정 가능)
     view: 'fo09'
   };
@@ -183,7 +184,7 @@ var PRIV_FULL = [
 
 /* 알리페이가 주는 값. 권한 창에서 허용하면 온다. 계정에 값이 없는 항목은 빈다 */
 var ALI = { name: '왕샤오메이', nick: 'xiaomei_w', sex: '여성', birth: '1996-03-12', nation: '중국', addr: '상하이시 징안구', phone: '+86 139 0000 1111', id: '2088_9f31c07a' };
-var LANG = { CN: '중국어 간체', HK: '중국어 번체' };
+var LANG = { CN: '중국어(간체)', HK: '중국어(번체)' };
 /* 프로필 칸을 누르면 들어가는 예시 값. 값이 있으면 다른 예시 값으로 바꾼다 */
 var EX = { name: ['왕샤오메이', '왕메이'], nick: ['xiaomei_w', 'xiaomei_02'], sex: ['여성', '남성'], birth: ['1996-03-12', '1996-03-21'], nation: ['중국', '홍콩'], addr: ['상하이시 징안구', '상하이시 푸둥신구'] };
 var LOGIN_ID = 'xiaomei_w@163.com';
@@ -206,7 +207,7 @@ var VIEWS = [
 ];
 var CAPS = {
   fo09: '권한 창은 알리페이 앱이 그립니다. 우리 화면에 합칠 수 없습니다. 알리페이에서 식별자를 받은 직후 한 번 뜹니다. 회원을 만들기 전이라 뒤 화면은 비어 있고 어둡게만 깔립니다. 이용 약관, 개인정보 처리방침, 알리페이 프로필 제공 셋이 필수라 셋을 다 체크해야 동의 버튼이 켜집니다. 권한 창의 연락처는 필수 권한이라 끄고 허용하면 진입 차단 화면으로 갑니다. 휴대폰 번호 원본과 알리페이 로그인 ID 원본은 알리페이가 승인한 경우에만 요청하고, 끄고 허용해도 들어옵니다(원본 없음 갈래). 알림 수신과 마케팅 정보 수신은 선택입니다. 동의를 누르면 알리페이가 권한 창을 한 번 더 띄웁니다. 권한 창에서 허용한 뒤 회원을 만들기 전에 생년월일을 봅니다. 생년월일이 없는 회원에게는 만 14세 확인 창이 뜨고, 만 14세 이상입니다를 체크해야 확인하고 시작하기 버튼이 켜지고 회원이 만들어집니다. 확인 창을 닫으면 진입 차단 화면으로 가고, 다시 동의하기를 누르면 확인 창이 다시 뜹니다. 생년월일로 만 14세 미만이 확인되면 진입 차단 화면으로 갑니다(상단 생년월일 바꾸기로 확인).',
-  fo08: '상단 상태의 차단 이유 버튼으로 네 가지(동의 거부 / 프로필 거부 / 식별 실패 / 만 14세 미만)를 바꿔 볼 수 있습니다. 헤더, 메뉴, 검색이 없습니다. 필수를 거부하거나 닫았을 때, 알리페이 권한 창에서 프로필을 거부했을 때, 식별에 실패했을 때, 생년월일로 만 14세 미만이 확인됐을 때 머무는 화면입니다. 둘러보기는 없습니다. 버튼은 하나이고, 만 14세 미만 화면에는 버튼이 없습니다.',
+  fo08: '상단 상태의 차단 이유 버튼으로 네 가지(동의 창 닫기 / 프로필 거부 / 식별 실패 / 만 14세 미만)를 바꿔 볼 수 있습니다. 헤더, 메뉴, 검색이 없습니다. 필수를 거부하거나 닫았을 때, 알리페이 권한 창에서 프로필을 거부했을 때, 식별에 실패했을 때, 생년월일로 만 14세 미만이 확인됐을 때 머무는 화면입니다. 둘러보기는 없습니다. 버튼은 하나이고, 만 14세 미만 화면에는 버튼이 없습니다.',
   fo10: '알리페이 식별이 로그인을 대신합니다. 로그인 주소로 직접 들어오면 마이페이지로 보냅니다. 알리페이 채널에서는 자체 로그인 경로를 숨깁니다. 점선 박스가 웹 채널에는 있고 알리페이 채널에는 없는 자리입니다. 진입 관문을 통과해야 들어오므로 비로그인 상태 자체가 없습니다.',
   fo11: '알리페이에서 받은 프로필이 채워져 있고 이용자가 고칠 수 있습니다. 시안에서는 칸을 누르면 다른 예시 값으로 바뀌고, 칸을 벗어나는 즉시 회원 정보에 저장된 것으로 봅니다(알리페이 회원 탭에서 확인). 예약 입력에서 넣은 번호는 예약 요청 때, 마이페이지에서 넣은 번호는 인증 즉시 저장됩니다. 비밀번호와 이메일 항목이 없습니다. 휴대폰 번호는 원본 권한이 승인되면 채워지고, 안 왔으면 예약에서 입력한 값이 보입니다.',
   fo12: '마이페이지의 기존 탈퇴 경로를 그대로 씁니다. 알리페이 연결과 권한이 끊기고 다시 들어오면 새 회원이 되어 진입 관문을 다시 거칩니다.',
@@ -288,7 +289,7 @@ function fo09() {
 
 /* ─────────── FO-CH-08 진입 차단 화면 ─────────── */
 function fo08() {
-  if (S.joined) return phoneNote('진입 차단 화면', '회원이 만들어진 뒤에는 이 화면이 뜨지 않습니다. 차단 화면은 위쪽 처음으로를 누른 뒤 상태 버튼으로 볼 수 있습니다.');
+  if (S.joined) return phoneNote('진입 차단 화면', '회원이 만들어진 뒤에는 이 화면이 뜨지 않습니다. 차단 화면은 위쪽 처음으로를 누른 뒤 상태 버튼으로 볼 수 있습니다.', true);
   return '<div class="phones"><div class="ph"><div class="st"><span>9:41</span><span>●●●</span></div>' + blockPage(S.blocked || 'consent') + '</div></div>';
 }
 function blockPage(b) {
@@ -383,23 +384,23 @@ function fo13() {
     '<div class="fld"><div class="l">요청사항 (선택)</div><div class="in plc">매장에 전할 말이 있으면 적어 주세요.</div></div>' +
     '<div class="gone" style="margin:12px 0 0">(시안 주석) 알리페이 채널에서는 이 자리가 없습니다<br>이메일</div>' +
     '</div></div>' +
-    '<div class="cta ' + (ready ? '' : 'dis') + '" ' + (ready ? 'onclick="S.passportSaved=S.passport;S.telSaved=true;S.telEdited=false;S.mtel=S.tel;S.mtelSrc=S.telSrc;S.mtelSaved=true;S.mtelDraft=\'\';toastFo(\'예약을 요청했습니다.\');go(\'fo11\')"' : '') + '>예약 요청</div>', '', '‹');
+    '<div class="cta ' + (ready ? '' : 'dis') + '" ' + (ready ? 'onclick="S.passportSaved=S.passport;S.passport=\'\';S.booked=(S.booked||0)+1;S.telSaved=true;S.telEdited=false;S.mtel=S.tel;S.mtelSrc=S.telSrc;S.mtelSaved=true;S.mtelDraft=\'\';toastFo(\'예약을 요청했습니다.\');go(\'fo11\')"' : '') + '>예약 요청</div>', '', '‹');
 }
 
 /* ─────────── BO-CH-11 알리페이 회원 ─────────── */
 var BOW = 'all', BOQ = false, BOQF = 'in', BOM = true, BOMF = 'all';
 var MEM = [
   { no: 'A-1041', join: '2026-09-15 09:02', quit: '', last: '2026-09-15 09:02', self: true },
-  { no: 'A-1040', join: '2026-09-15 08:41', quit: '', last: '2026-09-15 08:41', aid: '2088041663827450', lid: 'meiling.chan@gmail.com', wallet: 'HK', nick: 'meiling_c', name: '천메이링', sex: '여성', birth: '1993-11-02', nat: '홍콩', addr: '홍콩 완차이', lang: '중국어 번체', tel: '+852 9123 4567', pp: '', bk: 0, ns: 0, profd: '2026-09-15 08:41', mkt: '동의', mktd: '2026-09-15 08:41' },
-  { no: 'A-1039', join: '2026-09-15 07:55', quit: '', last: '2026-09-15 08:10', aid: '2088926610334872', lid: '13755556666', wallet: 'CN', nick: 'liuting88', name: '리우팅', sex: '여성', birth: '1990-05-21', nat: '중국', addr: '베이징시 차오양구', lang: '중국어 간체', tel: '+86 137 5555 6666', pp: 'LIU TING', bk: 1, ns: 0, profd: '2026-09-15 07:55', mkt: '미동의', mktd: '2026-09-15 07:55' },
-  { no: 'A-1036', join: '2026-09-14 21:12', quit: '2026-09-15 10:40', last: '2026-09-14 21:20', aid: '2088350417726693', lid: 'zz_lee@qq.com', wallet: 'CN', nick: 'zz_lee', name: '리쯔치', sex: '', birth: '', nat: '중국', addr: '', lang: '중국어 간체', tel: '', pp: '', bk: 0, ns: 0, profd: '2026-09-14 21:12', mkt: '미동의', mktd: '2026-09-14 21:12' },
+  { no: 'A-1040', join: '2026-09-15 08:41', quit: '', last: '2026-09-15 08:41', aid: '2088041663827450', lid: 'meiling.chan@gmail.com', wallet: 'HK', nick: 'meiling_c', name: '천메이링', sex: '여성', birth: '1993-11-02', nat: '홍콩', addr: '홍콩 완차이', lang: '중국어(번체)', tel: '+852 9123 4567', pp: '', bk: 0, ns: 0, profd: '2026-09-15 08:41', mkt: '동의', mktd: '2026-09-15 08:41' },
+  { no: 'A-1039', join: '2026-09-15 07:55', quit: '', last: '2026-09-15 08:10', aid: '2088926610334872', lid: '13755556666', wallet: 'CN', nick: 'liuting88', name: '리우팅', sex: '여성', birth: '1990-05-21', nat: '중국', addr: '베이징시 차오양구', lang: '중국어(간체)', tel: '+86 137 5555 6666', pp: 'LIU TING', bk: 1, ns: 0, profd: '2026-09-15 07:55', mkt: '미동의', mktd: '2026-09-15 07:55' },
+  { no: 'A-1036', join: '2026-09-14 21:12', quit: '2026-09-15 10:40', last: '2026-09-14 21:20', aid: '2088350417726693', lid: 'zz_lee@qq.com', wallet: 'CN', nick: 'zz_lee', name: '리쯔치', sex: '', birth: '', nat: '중국', addr: '', lang: '중국어(간체)', tel: '', pp: '', bk: 0, ns: 0, profd: '2026-09-14 21:12', mkt: '미동의', mktd: '2026-09-14 21:12' },
   { no: 'A-1033', join: '2026-09-13 18:27', quit: '', last: '2026-09-14 09:05', aid: '2088174902265318', lid: 'zw.huang@163.com', wallet: 'HK', nick: 'zw.huang', name: '황즈웨이', sex: '남성', birth: '1988-02-14', nat: '중국', addr: '광저우시 톈허구', lang: '영어', tel: '+86 136 1234 7788', pp: 'HUANG ZHIWEI', bk: 2, ns: 1, profd: '2026-09-13 18:27', mkt: '동의', mktd: '2026-09-13 18:27' }
 ];
 function bo11() {
   var me = MEM[0]; var p = S.prof || {};
   me.aid = S.wallet === 'CN' ? '2088712034559781' : '2088558801247390'; me.wallet = S.wallet; me.lang = LANG[S.wallet]; me.lid = S.joined && S.lidOk ? LOGIN_ID : '';
   me.nick = S.joined ? p.nick : ''; me.name = S.joined ? p.name : ''; me.sex = S.joined ? p.sex : ''; me.birth = S.joined ? p.birth : ''; me.nat = S.joined ? p.nation : ''; me.addr = S.joined ? p.addr : '';
-  me.tel = S.mtel; me.pp = S.passportSaved || ''; me.bk = 0; me.ns = 0; me.profd = S.joined ? '2026-09-15 09:02' : ''; me.mkt = S.agMkt ? '동의' : '미동의'; me.mktd = (S.joined && S.agMkt) ? '2026-09-15 09:02' : '';
+  me.tel = S.mtel; me.pp = S.passportSaved || ''; me.bk = S.booked || 0; me.ns = 0; me.profd = S.joined ? '2026-09-15 09:02' : ''; me.mkt = S.agMkt ? '동의' : '미동의'; me.mktd = (S.joined && S.agMkt) ? '2026-09-15 09:02' : '';
   var list = MEM.filter(function (m) { if (!S.joined && m.self) return false; if (BOW !== 'all' && m.wallet !== BOW) return false; if (BOQF === 'out' ? !m.quit : BOQF === 'in' ? !!m.quit : false) return false; if (BOMF !== 'all' && m.mkt !== BOMF) return false; return true; });
   var head = '<tr><th rowspan="2">회원번호</th><th rowspan="2">가입일</th>' + (BOQ ? '<th rowspan="2">탈퇴일</th>' : '') + '<th rowspan="2">마지막 로그인</th><th rowspan="2">알리페이 식별자</th><th rowspan="2">알리페이 로그인 ID</th><th class="c" rowspan="2">월렛</th>' +
     '<th rowspan="2">닉네임</th><th rowspan="2">이름</th><th rowspan="2">성별</th><th rowspan="2">생년월일</th><th rowspan="2">국적</th><th rowspan="2">주소</th><th rowspan="2">언어</th><th rowspan="2">연락처</th><th rowspan="2">여권명</th><th class="c" rowspan="2">예약</th><th class="c" rowspan="2">노쇼</th><th rowspan="2">프로필 동의 일자</th>' + (BOM ? '<th class="c" colspan="2">마케팅 활용 정보</th>' : '') + '</tr><tr>' + (BOM ? '<th class="c">동의 여부</th><th>동의 일자</th>' : '') + '</tr>';
@@ -419,10 +420,10 @@ function bo11() {
 }
 
 var ANNO_FORCE = '';
-function phoneNote(title, note) { ANNO_FORCE = note; var h = phone(title, ''); ANNO_FORCE = ''; return h; }
-function phone(title, body, overlay, leftIcon, noMenu) {
+function phoneNote(title, note, noHead) { ANNO_FORCE = note; var h = phone(title, '', '', '', false, noHead); ANNO_FORCE = ''; return h; }
+function phone(title, body, overlay, leftIcon, noMenu, noHead) {
   return '<div class="phones"><div class="ph"><div class="st"><span>9:41</span><span>●●●</span></div>' +
-    '<div class="hd">' + (leftIcon === '‹' ? '<span class="i" style="cursor:pointer" onclick="go(\'fo11\')">‹</span>' : '<span class="i">☰</span>') + '<span class="t">' + title + '</span><span class="i">' + (noMenu ? '' : '⚙') + '</span></div>' +
+    (noHead ? '' : '<div class="hd">' + (leftIcon === '‹' ? '<span class="i" style="cursor:pointer" onclick="go(\'fo11\')">‹</span>' : '<span class="i">☰</span>') + '<span class="t">' + title + '</span><span class="i">' + (noMenu ? '' : '⚙') + '</span></div>') +
     '<div class="bd">' + (body || '') + '</div>' + (overlay || '') + (S.toast ? '<div class="ftoast">' + S.toast + '</div>' : '') + '</div>' +
     (ANNO_FORCE ? '<div class="anno">(시안 주석) ' + ANNO_FORCE + '</div>' : ANNO[S.view] && S.joined ? '<div class="anno">(시안 주석) ' + ANNO[S.view] + '</div>' : '') + '</div>';
 }
@@ -445,8 +446,8 @@ function render() {
     '<button onclick="if(!S.joined){S.birthMode=({adult:\'none\',none:\'minor\',minor:\'adult\'})[S.birthMode];S.agAge=false;if(S.step===\'age\')S.step=\'perm\';}render()"' + (S.joined ? ' disabled' : '') + '>생년월일 바꾸기</button>' +
     '<button onclick="S.blocked=\'fail\';S.step=\'blocked\';S.view=\'fo08\';render()"' + (S.joined ? ' disabled' : '') + '>식별 실패</button>' +
     '<button onclick="S.agTerms=true;S.agPriv=true;S.agProf=true;S.blocked=\'prof\';S.step=\'blocked\';S.view=\'fo08\';render()"' + (S.joined ? ' disabled' : '') + '>프로필 거부</button>' +
-    '<button onclick="S.blocked=\'consent\';S.step=\'blocked\';S.view=\'fo08\';render()"' + (S.joined ? ' disabled' : '') + '>동의 거부</button>' +
-    '<button onclick="S.blocked=\'minor\';S.step=\'blocked\';S.view=\'fo08\';render()"' + (S.joined ? ' disabled' : '') + '>만 14세 미만</button>' +
+    '<button onclick="S.agTerms=false;S.agPriv=false;S.agProf=false;S.blocked=\'consent\';S.step=\'blocked\';S.view=\'fo08\';render()"' + (S.joined ? ' disabled' : '') + '>동의 창 닫기</button>' +
+    '<button onclick="S.birthMode=\'minor\';S.agAge=false;S.blocked=\'minor\';S.step=\'blocked\';S.view=\'fo08\';render()"' + (S.joined ? ' disabled' : '') + '>만 14세 미만</button>' +
     '<button onclick="var pt=S.plaintext;var pl=S.plainLid;var bm=S.birthMode;var w=S.wallet;resetDB();S.plaintext=pt;S.plainLid=pl;S.birthMode=bm;S.wallet=w;render()">처음으로</button>';
   document.getElementById('cap').textContent = CAPS[S.view] || '';
   var m = { fo09: fo09, fo08: fo08, fo10: fo10, fo11: fo11, fo12: fo12, fo13: fo13, bo11: bo11 };
