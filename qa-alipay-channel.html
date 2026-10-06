@@ -72,6 +72,18 @@ dialog textarea{width:100%;height:320px;font-family:ui-monospace,Menlo,monospace
 .out{font-size:11px;color:#8c8c8c;line-height:1.6;margin:0 0 12px}
 .out summary{cursor:pointer;color:#595959}
 .out ul{margin:4px 0 0;padding-left:18px}
+.gtabs{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px}
+.gt{border:1px solid #d9d9d9;background:#fff;border-radius:4px;padding:4px 8px 5px;cursor:pointer;font-family:inherit;font-size:11px;color:#434343;text-align:left;min-width:64px}
+.gt:hover{border-color:#e8537a}
+.gt .gl{display:flex;gap:6px;justify-content:space-between;white-space:nowrap}
+.gt .gc{color:#8c8c8c;font-variant-numeric:tabular-nums}
+.gt .gb{height:3px;background:#f0f0f0;border-radius:2px;margin-top:4px;overflow:hidden;display:flex}
+.gt .gb i{display:block;height:100%}
+.gt .gb .p{background:#52c41a}.gt .gb .f{background:#ff4d4f}
+.gt.done .gc{color:#389e0d}
+.gt.on{border-color:#1f1f1f;background:#1f1f1f;color:#fff}
+.gt.on .gc{color:#d9d9d9}
+.gt.on .gb{background:#595959}
 </style>
 </head>
 <body>
@@ -113,6 +125,7 @@ dialog textarea{width:100%;height:320px;font-family:ui-monospace,Menlo,monospace
         <div class="bar"><i class="p" id="barP"></i><i class="f" id="barF"></i></div>
         <span id="pct">진행 0%</span>
       </div>
+      <div class="gtabs" id="gtabs"></div>
     </div>
     <div class="scroll">
       <p class="scope">이 콘솔은 어드민·호스트 화면과 고객 회원 화면만 다룹니다. 고객 화면 노출, 주소 경로, 알림 발송, 알림 발송 권한(SEND_MESSAGE)과 원본 권한의 승인 상태, 마이그레이션은 이 콘솔의 범위가 아니며 STG 시나리오(PRD 부록 A 기준)로 따로 봅니다.</p>
@@ -439,6 +452,27 @@ var DEPLOY = 'https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-alipay-chan
 var state = {};
 try { state = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { state = {}; }
 var filter = 'all';
+var GTKEY = KEY + '_tab';
+var gsel = 'all';
+try { gsel = localStorage.getItem(GTKEY) || 'all'; } catch (e) { gsel = 'all'; }
+function gshort(name) { var i = name.indexOf(' ('); return i > 0 ? name.slice(0, i) : name; }
+function gcount(g) { var t = 0, p = 0, f = 0; g[1].forEach(function (c) { t++; var v = get(c[0]).v; if (v === 'p') p++; else if (v === 'f') f++; }); return { t: t, p: p, f: f }; }
+function renderTabs(total, pass, fail) {
+  var box = document.getElementById('gtabs'); box.innerHTML = '';
+  var groups = DATA.filter(function (g) { return inArea(g[0]); });
+  if (gsel !== 'all' && !groups.some(function (g) { return g[0] === gsel; })) gsel = 'all';
+  function tab(key, label, title, c) {
+    var b = document.createElement('button');
+    b.className = 'gt' + (gsel === key ? ' on' : '') + (c.t && c.p + c.f === c.t ? ' done' : '');
+    b.title = title;
+    b.innerHTML = '<span class="gl"><span>' + esc(label) + '</span><span class="gc">' + (c.p + c.f) + '/' + c.t + '</span></span>' +
+      '<span class="gb"><i class="p" style="width:' + (c.t ? c.p / c.t * 100 : 0) + '%"></i><i class="f" style="width:' + (c.t ? c.f / c.t * 100 : 0) + '%"></i></span>';
+    b.addEventListener('click', function () { gsel = key; try { localStorage.setItem(GTKEY, gsel); } catch (e) {} render(); document.querySelector('.scroll').scrollTop = 0; });
+    box.appendChild(b);
+  }
+  tab('all', '전체', '모든 묶음', { t: total, p: pass, f: fail });
+  groups.forEach(function (g) { tab(g[0], gshort(g[0]), g[0], gcount(g)); });
+}
 var list = document.getElementById('list');
 var frame = document.getElementById('prev');
 
@@ -485,10 +519,12 @@ function render() {
   document.getElementById('barF').style.width = (fail / total * 100) + '%';
   document.getElementById('pct').textContent = '진행 ' + Math.round((pass + fail) / total * 100) + '%';
   document.getElementById('cnt').textContent = total + '건';
+  renderTabs(total, pass, fail);
 
   var any = false;
   DATA.forEach(function (g) {
     if (!inArea(g[0])) return;
+    if (gsel !== 'all' && g[0] !== gsel) return;
     var cards = [];
     g[1].forEach(function (c) {
       var st = get(c[0]);
@@ -539,7 +575,7 @@ function render() {
   if (!any) {
     var e = document.createElement('div');
     e.className = 'empty';
-    e.textContent = filter === 'fail' ? '실패로 표시한 케이스가 없습니다.' : '미확인 케이스가 없습니다.';
+    e.textContent = (gsel !== 'all' ? gshort(gsel) + ' 묶음에 ' : '') + (filter === 'fail' ? '실패로 표시한 케이스가 없습니다.' : '미확인 케이스가 없습니다.');
     list.appendChild(e);
   }
 }
