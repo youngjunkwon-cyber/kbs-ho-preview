@@ -180,7 +180,6 @@ const MSG = {
   exhEmpty:    (s, ch) => ch + '에 노출 가능한 ' + s + ' 없습니다. ' + ch + '에서는 기획전이 보이지 않습니다.',
   exhNone:     s => '담은 ' + s + ' 없습니다. 1건 이상 담아야 저장할 수 있습니다.',
   bnNotFound:  '입력한 주소의 대상을 찾을 수 없습니다. 주소를 확인해 주세요.',
-  storeNoLang: what => '스토어의 지원언어에 중국어(간체)·중국어(번체)·영어가 없어 이 ' + what + '도 웹에만 노출됩니다. 스토어 > 정보관리의 기본정보에서 지원언어를 추가하면 바꿀 수 있습니다.',
   saveColl:    (s, ch) => ch + '에 노출 가능한 ' + s + ' 없습니다. 저장하면 ' + ch + '에서는 기획전이 보이지 않습니다.',
   typeSwitch:  (was, n, now, inactive) => '유형을 바꾸면 담은 ' + was + ' ' + n + '건이 지워지고 ' + now + '만 담을 수 있습니다.' + (inactive ? '' : ' ' + now + eul(now) + ' 1건 이상 담아야 저장할 수 있습니다.'),
   hostHidden:  '이 상품은 알리페이 앱에서는 보이지 않아요.',
@@ -690,11 +689,11 @@ function screen_pEdit() {
       '<div class="row"><div class="lbl">활성화</div><div class="val">' + onoff('pact', p.active, 'void(%V%)', true) + '</div></div>' +
       '<div class="row"><div class="lbl">히든 여부</div><div class="val">' + onoff('phid', p.hidden, 'void(%V%)', true) + '</div></div>' +
       '<div class="row"><div class="lbl">노출 채널</div><div class="val">' + chRadio('pch', eff, 'product', !lOk || fixed) +
-      (lOk && fixed ? '<div class="hint">' + (storeHasTargetLang(st) ? MSG.storeFixed(effChStore(st), '상품') : MSG.storeNoLang('상품')) + '</div>' : '') + '</div></div>' +
+      (lOk && fixed ? '<div class="hint">' + (storeHasTargetLang(st) ? MSG.storeFixed(effChStore(st), '상품') : '') + '</div>' : '') + '</div></div>' +
       '<div class="blk">버튼 설정</div>' +
       '<div class="row"><div class="lbl">스토어 설정 적용</div><div class="val"><span class="rg">' +
       radio('pm', '개별 설정', p.mode, "setMode('개별 설정')") + radio('pm', '기본 설정', p.mode, "setMode('기본 설정')") + '</span>' +
-      (p.mode === '기본 설정' ? '' : '<div class="hint">' + MSG.storeDefault + '</div>') + '</div></div>' +
+      '<div class="hint">' + MSG.storeDefault + '</div>' + '</div></div>' +
       btnTable('product', p) +
       '<div class="row" style="margin-top:14px"><div class="lbl">메신저</div><div class="val"><span class="tblnote">인스타그램</span></div></div>' +
       '<div class="row"><div class="lbl">인스타그램 임베디드 노출 여부</div><div class="val">' + onoff('pins', p.insta === 'ON', 'void(%V%)', true) + '</div></div>';
@@ -972,7 +971,7 @@ function screen_colEdit() {
     '<div class="row"><div class="lbl">노출 언어</div><div class="val">' + c.langs + '</div></div>' +
     '<div class="row"><div class="lbl">게시 상태</div><div class="val"><span class="tag all">' + c.status + '</span></div></div>' +
     '<div class="row"><div class="lbl">노출 채널</div><div class="val">' + chRadio('clch', eff, 'col', fixed) +
-    (byStore && colLangOk(c) ? '<div class="hint">' + (storeHasTargetLang(st) ? MSG.storeFixed(effChStore(st), '칼럼') : MSG.storeNoLang('칼럼')) + '</div>' : '') + '</div></div>' +
+    (byStore && colLangOk(c) ? '<div class="hint">' + (storeHasTargetLang(st) ? MSG.storeFixed(effChStore(st), '칼럼') : '') + '</div>' : '') + '</div></div>' +
     '<div class="row"><div class="lbl">본문</div><div class="val"><span class="tblnote">(시안 주석) 호스트가 작성한 본문이 라이브 그대로 보이는 자리입니다. 그리지 않았습니다.</span></div></div>' +
     '</div></div>' +
     '<div class="card"><div class="hd">저장</div><div class="bd"><button class="btn blue" onclick="saveCol()">저장</button></div></div>';
