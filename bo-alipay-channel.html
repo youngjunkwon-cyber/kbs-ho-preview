@@ -471,7 +471,7 @@ window.go = go;
 
 const aliLangOk = () => langOk(VIEW.lang);
 const chCell = eff => '<span class="tag ch">' + eff + '</span>';
-const rsnCell = arr => arr.length ? arr.map(r => '<span class="tag rsn">' + r + '</span>').join('<br>') : '';
+const rsnCell = arr => arr.length === 2 ? '<span class="tag rsn">' + MSG.noTarget('웹과 알리페이 앱') + '</span>' : arr.length ? '<span class="tag rsn">' + arr[0] + '</span>' : '';
 
 function fld(label, req, ctrl) { return '<div class="fld"><div class="flbl">' + (req ? '<span class="req">*</span>' : '') + label + '</div>' + ctrl + '</div>'; }
 function fbox(v, caret) { return '<div class="fbox"><span>' + esc(v) + '</span>' + (caret ? '<span class="cv">⌄</span>' : '') + '</div>'; }
@@ -768,8 +768,8 @@ const INNER_KINDS = ['직접입력', '병원', '기획전', '인플루언서'];
 function innerOpts(kind, keepId, all) {
   const b = A(VIEW.id), lang = b && b.lang, bch = b ? effChAd(b) : ALLCH;
   const chs = all ? [] : (bch === ALLCH ? [WEB, ALI] : [bch]);
-  const same = x => all || !lang || x.lang === lang || x.id === keepId;
-  const langOkSt = s => all || !lang || s.id === keepId || String(s.langs || '').split(',').map(x => x.trim()).includes(lang);
+  const same = x => !lang || x.lang === lang || x.id === keepId;
+  const langOkSt = s => !lang || s.id === keepId || String(s.langs || '').split(',').map(x => x.trim()).includes(lang);
   const inCh = fn => x => x.id === keepId || chs.every(ch => fn(x, ch));
   if (kind === '병원') return DB.stores.filter(langOkSt).filter(inCh((s, ch) => visStore(s, ch))).map(s => [s.id, s.name + ' (' + effChStore(s) + ')']);
   if (kind === '기획전') return DB.collTypes.filter(same).filter(inCh((t, ch) => innerTargetOk({ kind: '기획전', id: t.id }, lang, ch).ok)).map(t => [t.id, t.name + ' (' + t.type + ', ' + t.lang + ')']);
