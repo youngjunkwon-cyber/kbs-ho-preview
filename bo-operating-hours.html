@@ -341,7 +341,7 @@ function nearestNotice(){
  if(hr&&(!near||hr.from<near.from)) near=hr;
  if(!near) return null;
  var d=parseD(near.from);
- if(near.to){ var e=parseD(near.to); return (d.getMonth()+1)+'월 '+d.getDate()+'일부터 '+(e.getMonth()===d.getMonth()?'':(e.getMonth()+1)+'월 ')+e.getDate()+'일까지 쉽니다'; }
+ if(near.to){ var e=parseD(near.to); return (d.getMonth()+1)+'월 '+d.getDate()+'일부터 '+(e.getMonth()+1)+'월 '+e.getDate()+'일까지 쉽니다'; }
  return (d.getMonth()+1)+'월 '+d.getDate()+'일은 '+(near.closed?'쉽니다':near.open+'부터 '+near.close+'까지 엽니다');
 }
 window.save=function(){
