@@ -189,8 +189,8 @@ var EX = { name: ['왕샤오메이', '왕메이'], nick: ['xiaomei_w', 'xiaomei_
 var LOGIN_ID = 'xiaomei_w@163.com';
 /* 시안 조작 힌트. 휴대폰 화면 밖 점선 상자로 둔다 (화면 문구가 아님) */
 var ANNO = {
-  fo11: '이름부터 주소까지와 휴대폰 번호 칸을 누르면 예시 값이 들어갑니다.',
-  fo13: '여권 영문명, 이름부터 생년월일까지, 휴대폰 번호, 연락 메신저 칸을 누르면 예시 값이 들어갑니다.'
+  fo11: '닉네임부터 국적까지와 휴대폰 번호 칸을 누르면 예시 값이 들어갑니다.',
+  fo13: '여권 영문명, 국적부터 생년월일까지, 휴대폰 번호, 연락 메신저 칸을 누르면 예시 값이 들어갑니다.'
 };
 var TOAST_T = null;
 function toastFo(msg) { S.toast = msg; if (TOAST_T) clearTimeout(TOAST_T); TOAST_T = setTimeout(function () { S.toast = ''; render(); }, 3000); }
@@ -308,7 +308,7 @@ function fo10() {
     '<div class="gone">(시안 주석) 알리페이 채널에서는 이 자리가 없습니다<br>비밀번호를 잊으셨나요?</div>' +
     '<div class="gone">(시안 주석) 알리페이 채널에서는 이 자리가 없습니다<br>예약·문의 전 로그인 유도</div>' +
     '<div class="gone">(시안 주석) 알리페이 채널에서는 이 자리가 없습니다<br>채팅 로그인 유도</div>' +
-    '<div class="sec"><div class="box"><div class="nm">' + (S.joined && S.prof ? S.prof.name : '왕샤오메이') + '</div><div class="sub">알리페이 계정으로 이용 중입니다.</div></div></div>');
+    '<div class="sec"><div class="box"><div class="nm">' + ((S.joined && S.prof ? S.prof.nick : ALI.nick) || '알리페이 회원') + '</div><div class="sub">알리페이 계정으로 이용 중입니다.</div></div></div>');
 }
 
 /* ─────────── FO-CH-11 마이페이지 ─────────── */
@@ -333,9 +333,9 @@ function fo11() {
   var rows = ['예약 내역', '채팅', '알림·마케팅 수신 설정', '언어 설정', '이용 약관', '개인정보 처리방침'].map(function (t) { return '<div class="mrow off"><span>' + t + '</span><span class="a">›</span></div>'; }).join('') +
     '<div class="mrow" onclick="go(\'fo12\')" style="cursor:pointer"><span>회원 탈퇴</span><span class="a">›</span></div>';
   return phone('마이페이지',
-    '<div class="sec"><div class="box"><div class="nm">' + h(p.name) + '</div><div class="sub">알리페이 계정으로 이용 중입니다.</div></div></div>' +
+    '<div class="sec"><div class="box"><div class="nm">' + (h(p.nick) || '알리페이 회원') + '</div><div class="sub">알리페이 계정으로 이용 중입니다.</div></div></div>' +
     '<div class="sec"><div class="h">내 정보</div><div class="box">' +
-    f('이름', 'name') + f('닉네임', 'nick') + f('성별', 'sex') + f('생년월일', 'birth') + f('국적', 'nation') + f('주소', 'addr') + tel + '</div></div>' +
+    f('닉네임', 'nick') + f('성별', 'sex') + f('생년월일', 'birth') + f('국적', 'nation') + tel + '</div></div>' +
     '<div class="note">알리페이로 로그인된 상태입니다. K-Beauty Station 로그인 정보와는 다른 계정이며, 이용 기록은 계정별로 따로 관리됩니다.</div>' +
     '<div class="gone">(시안 주석) 알리페이 채널에서는 이 자리가 없습니다<br>비밀번호 변경</div>' +
     '<div class="gone">(시안 주석) 알리페이 채널에서는 이 자리가 없습니다<br>이메일</div>' +
@@ -372,11 +372,11 @@ function fo13() {
       (S.telVerified ? '<div class="sub">고치면 문자 인증을 다시 합니다.</div>' : '<div class="sub">입력한 번호로 문자 인증을 합니다.</div>') + '</div>';
   }
   /* 웹 예약과 같은 필수값. 이메일만 뺀다 */
-  var ready = S.passport && p.name && p.nation && p.sex && p.birth && S.tel && S.telVerified && S.msg;
+  var ready = S.passport && p.nation && p.sex && p.birth && S.tel && S.telVerified && S.msg;
   return phone('예약하기',
     '<div class="sec"><div class="h">예약자 정보</div><div class="box">' +
     tap('여권 영문명', 'passport', '여권에 적힌 영문 이름', 'WANG XIAOMEI') +
-    auto('이름', 'name', '이름') + auto('국적', 'nation', '국적 선택') + auto('성별', 'sex', '성별 선택') + auto('생년월일', 'birth', '생년월일 선택') +
+    auto('국적', 'nation', '국적 선택') + auto('성별', 'sex', '성별 선택') + auto('생년월일', 'birth', '생년월일 선택') +
     tel + tap('연락 메신저', 'msg', '메신저 아이디를 직접 입력해 주세요', '위챗 wxid_alipay01') +
     '<div class="fld"><div class="l">요청사항 (선택)</div><div class="in plc">매장에 전할 말이 있으면 적어 주세요.</div></div>' +
     '<div class="gone" style="margin:12px 0 0">(시안 주석) 알리페이 채널에서는 이 자리가 없습니다<br>이메일</div>' +
