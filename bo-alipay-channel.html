@@ -358,7 +358,8 @@ function liveNow(o) {
   return on && (!o.from || o.from <= TODAY) && (!o.to || o.to >= TODAY);
 }
 /* 그 채널에 실제로 보이는가 */
-function visProduct(p, ch) { return liveProduct(p) && S(p.store).active !== false && chIncludes(effChProduct(p), ch); }
+const inStoreLangs = p => String(S(p.store).langs || '').split(',').map(x => x.trim()).indexOf(p.lang) !== -1; /* 스토어 지원언어에서 뺀 언어의 상품은 현행대로 미노출 */
+function visProduct(p, ch) { return liveProduct(p) && inStoreLangs(p) && S(p.store).active !== false && chIncludes(effChProduct(p), ch); }
 function visStore(st, ch) { return st.active !== false && chIncludes(effChStore(st), ch); }
 function visColumn(c, ch) { return c.status === '게시중' && S(c.store).active !== false && chIncludes(effChColumn(c), ch); }
 function visMag(m, ch) { return m.status === '게시' && chIncludes(effChMag(m), ch); }
@@ -1101,7 +1102,7 @@ window.save = function (kind) {
   const effPrev = kind === 'store' ? (storeHasTargetLang({ langs: VIEW.savedLangs }) ? VIEW.savedCh : WEB) : null, effNow = kind === 'store' ? effChStore(obj) : null;
   if (kind === 'store' && effNow !== ALLCH && effPrev !== effNow) {
     const ch = effNow, lost = other(ch), im = impactOfStoreCh(obj, ch);
-    const langOnly = obj.channel === VIEW.savedCh; /* 지원언어 저장은 현행처럼 확인 창 없이 바로 저장 */
+    const langOnly = obj.channel === VIEW.savedCh || !storeHasTargetLang(obj); /* 지원언어 저장, 또는 같은 저장에서 대상 언어를 모두 뺀 경우는 현행처럼 확인 창 없이 바로 저장 */
     if ((im.N || im.M || im.A || im.K) && !langOnly) {
       confirmBox(ch + euro(ch) + ' 저장할까요?',
         '<p><b>' + esc(obj.name) + '</b></p>' + ((im.N || im.M) ? '<p>이 스토어를 ' + lost + '에 보이지 않게 하면 이 스토어 ' + [im.N ? '상품 ' + im.N + '건' : '', im.M ? '칼럼 ' + im.M + '건' : ''].filter(Boolean).join('과 ') + '도 함께 보이지 않습니다.</p>' : '<p>이 스토어가 ' + lost + '에 보이지 않게 됩니다.</p>') +
