@@ -1101,7 +1101,8 @@ window.save = function (kind) {
   const effPrev = kind === 'store' ? (storeHasTargetLang({ langs: VIEW.savedLangs }) ? VIEW.savedCh : WEB) : null, effNow = kind === 'store' ? effChStore(obj) : null;
   if (kind === 'store' && effNow !== ALLCH && effPrev !== effNow) {
     const ch = effNow, lost = other(ch), im = impactOfStoreCh(obj, ch);
-    if (im.N || im.M || im.A || im.K) {
+    const noLangAtAll = obj.channel === VIEW.savedCh && !String(obj.langs || '').trim(); /* 지원언어를 하나도 고르지 않은 저장은 현행처럼 확인 창 없이 저장 */
+    if ((im.N || im.M || im.A || im.K) && !noLangAtAll) {
       const byLang = obj.channel === VIEW.savedCh; /* 노출 채널은 그대로인데 지원언어 저장으로 웹이 되는 경우 */
       confirmBox(byLang ? '지원언어를 저장할까요?' : ch + euro(ch) + ' 저장할까요?',
         '<p><b>' + esc(obj.name) + '</b></p>' + (byLang ? '<p class="hint" style="margin:2px 0 8px">중국어(간체)·중국어(번체)·영어가 없어 이 스토어는 웹에만 노출됩니다.</p>' : '') + ((im.N || im.M) ? '<p>이 스토어를 ' + lost + '에 보이지 않게 하면 이 스토어 ' + [im.N ? '상품 ' + im.N + '건' : '', im.M ? '칼럼 ' + im.M + '건' : ''].filter(Boolean).join('과 ') + '도 함께 보이지 않습니다.</p>' : '<p>이 스토어가 ' + lost + '에 보이지 않게 됩니다.</p>') +
