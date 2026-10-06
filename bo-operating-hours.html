@@ -138,16 +138,41 @@ h1{font-size:18px;margin:0 0 2px}
 
 <script>
 /* ===================== 공휴일 (샘플 달력. 실제 서비스는 공공데이터포털 특일정보) ===================== */
+/* 공휴일 칩 정의(네이버 구조 차용). 대체공휴일은 원 공휴일 칩을 따라간다. 임시공휴일은 달력에 지정되면 칩이 생긴다 */
+var HOLIDEF = [['newyear','새해 첫날'],['seol-1','설날 전날'],['seol','설날'],['seol+1','설날 다음날'],['samil','삼일절'],['child','어린이날'],
+ ['buddha','부처님 오신 날'],['memorial','현충일'],['liberation','광복절'],['chu-1','추석 전날'],['chu','추석'],['chu+1','추석 다음날'],
+ ['foundation','개천절'],['hangul','한글날'],['xmas','성탄절']];
 var HOLI = {
- '2026-01-01':'새해','2026-02-16':'설날','2026-02-17':'설날','2026-02-18':'설날','2026-03-01':'삼일절','2026-03-02':'대체공휴일',
- '2026-05-05':'어린이날','2026-05-24':'부처님오신날','2026-05-25':'대체공휴일','2026-06-03':'지방선거일','2026-06-06':'현충일',
- '2026-08-15':'광복절','2026-08-17':'대체공휴일','2026-09-24':'추석','2026-09-25':'추석','2026-09-26':'추석','2026-10-03':'개천절',
- '2026-10-05':'대체공휴일','2026-10-09':'한글날','2026-12-25':'크리스마스',
- '2027-01-01':'새해','2027-02-06':'설날','2027-02-07':'설날','2027-02-08':'설날','2027-02-09':'대체공휴일','2027-03-01':'삼일절',
- '2027-05-05':'어린이날','2027-05-13':'부처님오신날','2027-06-06':'현충일','2027-08-15':'광복절','2027-08-16':'대체공휴일',
- '2027-09-14':'추석','2027-09-15':'추석','2027-09-16':'추석','2027-10-03':'개천절','2027-10-04':'대체공휴일','2027-10-09':'한글날',
- '2027-10-11':'대체공휴일','2027-12-25':'크리스마스'
+ '2026-01-01':'newyear','2026-02-16':'seol-1','2026-02-17':'seol','2026-02-18':'seol+1','2026-03-01':'samil','2026-03-02':'samil',
+ '2026-05-05':'child','2026-05-24':'buddha','2026-05-25':'buddha','2026-06-03':'temp:지방선거일','2026-06-06':'memorial',
+ '2026-08-15':'liberation','2026-08-17':'liberation','2026-09-24':'chu-1','2026-09-25':'chu','2026-09-26':'chu+1','2026-10-03':'foundation',
+ '2026-10-05':'foundation','2026-10-09':'hangul','2026-12-25':'xmas',
+ '2027-01-01':'newyear','2027-02-06':'seol-1','2027-02-07':'seol','2027-02-08':'seol+1','2027-02-09':'seol+1','2027-03-01':'samil',
+ '2027-05-05':'child','2027-05-13':'buddha','2027-06-06':'memorial','2027-08-15':'liberation','2027-08-16':'liberation',
+ '2027-09-14':'chu-1','2027-09-15':'chu','2027-09-16':'chu+1','2027-10-03':'foundation','2027-10-04':'foundation','2027-10-09':'hangul',
+ '2027-10-11':'hangul','2027-12-25':'xmas'
 };
+function holiLabel(key){ if(key.indexOf('temp:')===0) return key.slice(5); var d=HOLIDEF.find(function(x){return x[0]===key;}); return d?d[1]:key; }
+function tempKeys(){ var s={}; Object.keys(HOLI).forEach(function(ds){ if(HOLI[ds].indexOf('temp:')===0) s[HOLI[ds]]=1; }); return Object.keys(s); }
+function allHoliKeys(){ return HOLIDEF.map(function(x){return x[0];}).concat(tempKeys()); }
+function holiClosed(ds){ var k=HOLI[ds]; if(!k) return false; return S.holi.keys.indexOf(k)>=0; }
+function holiGroupLabel(){ /* FO 규칙 문장용: 설날 전날/당일/다음날 → 설날 연휴 */
+ var ks=S.holi.keys, out=[];
+ var seol=['seol-1','seol','seol+1'].filter(function(k){return ks.indexOf(k)>=0;}), chu=['chu-1','chu','chu+1'].filter(function(k){return ks.indexOf(k)>=0;});
+ HOLIDEF.forEach(function(x){ var k=x[0]; if(ks.indexOf(k)<0) return;
+  if(k.indexOf('seol')===0){ if(k==='seol'||seol.length===1) out.push(seol.length>=2?'설날 연휴':x[1]); return; }
+  if(k.indexOf('chu')===0){ if(k==='chu'||chu.length===1) out.push(chu.length>=2?'추석 연휴':x[1]); return; }
+  out.push(x[1]); });
+ tempKeys().forEach(function(k){ if(ks.indexOf(k)>=0) out.push(holiLabel(k)); });
+ return out.filter(function(v,i,a){return a.indexOf(v)===i;});
+}
+function upcomingHoliRange(){ /* 14일 이내 가장 가까운 공휴일 휴무. 연속된 날은 묶는다 */
+ var n=nowDate(), t=todayStr(), lim=ymd(addDays(n,14));
+ var days=Object.keys(HOLI).filter(function(ds){return ds>=t&&ds<=lim&&holiClosed(ds);}).sort();
+ if(!days.length) return null;
+ var a=days[0], b=a; for(var i=1;i<days.length;i++){ if(days[i]===ymd(addDays(parseD(b),1))) b=days[i]; else break; }
+ return {from:a,to:b===a?null:b,closed:true};
+}
 var WD = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
 var WDS = ['일','월','화','수','목','금','토'];
 var NTH = {1:'첫 번째',2:'두 번째',3:'세 번째',4:'네 번째',last:'마지막'};
@@ -161,7 +186,7 @@ var S, UI;
 function blankRow(){ return {open:'',close:'',closed:false,period:'weekly',week:'1,3',breaks:[],_keep:null}; }
 function base(){
  return { mode:null, rows:{same:blankRow(),wd:blankRow(),we:blankRow(),d0:blankRow(),d1:blankRow(),d2:blankRow(),d3:blankRow(),d4:blankRow(),d5:blankRow(),d6:blankRow()},
-  rules:[], holiday:'regular', monthly:[], specials:[], saved:null, synced:true, now:'2026-09-10T12:00', chrome:'BO' };
+  rules:[], holi:{keys:[]}, monthly:[], specials:[], saved:null, synced:true, now:'2026-09-10T12:00', chrome:'BO' };
 }
 function seed(name){
  var s=base();
@@ -182,8 +207,10 @@ function seed(name){
   s.rows.d4=R('10:00','19:00',{closed:true,period:'monthly',week:'last'});
   s.rows.d5=R('10:00','19:00'); s.rows.d6=R('11:00','18:00');
   s.rows.d0=R('','',{closed:true,period:'weekly'});
-  s.monthly=[1]; s.specials=[{from:'2026-09-15',to:null,closed:true},{from:'2026-10-03',to:'2026-10-05',closed:true},{from:'2026-12-24',to:null,closed:false,open:'12:00',close:'15:00'}]; }
- s.saved=JSON.parse(JSON.stringify({mode:s.mode,rows:s.rows,rules:s.rules,holiday:s.holiday,monthly:s.monthly,specials:s.specials}));
+  s.monthly=[1]; s.specials=[{from:'2026-09-15',to:null,closed:true},{from:'2026-10-03',to:'2026-10-05',closed:true},{from:'2026-12-24',to:null,closed:false,open:'12:00',close:'15:00'}];
+  s.holi={keys:allHoliKeys()}; }
+ if(name==='wk'){ s.holi={keys:['seol','chu']}; }
+ s.saved=JSON.parse(JSON.stringify({mode:s.mode,rows:s.rows,rules:s.rules,holi:s.holi,monthly:s.monthly,specials:s.specials}));
  return s;
 }
 window.resetDB=function(name){ S=seed(name||'day'); UI={expandFO:false,sform:null,mform:false,rform:null,errors:{},modal:null,toastT:null}; render(); };
@@ -217,7 +244,7 @@ function effective(d){
  var ds=ymd(d), w=d.getDay();
  var sp=specialOn(ds);
  if(sp){ return sp.closed?{closed:true,why:'특정 날짜'}:{closed:false,open:sp.open,close:sp.close,breaks:[],why:'특정 날짜'}; }
- if(S.holiday==='closed'&&HOLI[ds]) return {closed:true,why:'공휴일'};
+ if(holiClosed(ds)) return {closed:true,why:'공휴일'};
  if(S.monthly.indexOf(d.getDate())>=0) return {closed:true,why:'매달 같은 날짜'};
  var k=keyFor(d); if(!k) return {closed:false,open:'',close:'',breaks:[]};
  var r=S.rows[k];
@@ -298,13 +325,30 @@ function pushedCount(){
  BOOKINGS.forEach(function(b){ var d=new Date(b.at); if(d<n) return; if(!openAt(d)) c++; });
  return c;
 }
+window.setHoliPreset=function(kind,on){
+ if(kind==='all') S.holi.keys= on? allHoliKeys().slice() : [];
+ else S.holi.keys= on? ['seol','chu'] : [];
+ render();
+};
+window.toggleHoli=function(k){ var i=S.holi.keys.indexOf(k); if(i>=0) S.holi.keys.splice(i,1); else S.holi.keys.push(k); render(); };
+/* 공휴일 안내 문장. FO·챗봇 공용. 특정 날짜 안내와 합쳐 가까운 것 하나만 */
+function nearestNotice(){
+ var n=nowDate(), t=todayStr(), lim=ymd(addDays(n,14));
+ var near=S.specials.filter(function(sp){return sp.from>=t&&sp.from<=lim;}).sort(function(a,b){return a.from<b.from?-1:1;})[0];
+ var hr=upcomingHoliRange();
+ if(hr&&(!near||hr.from<near.from)) near=hr;
+ if(!near) return null;
+ var d=parseD(near.from);
+ if(near.to){ var e=parseD(near.to); return (d.getMonth()+1)+'월 '+d.getDate()+'일부터 '+(e.getMonth()===d.getMonth()?'':(e.getMonth()+1)+'월 ')+e.getDate()+'일까지 쉽니다'; }
+ return (d.getMonth()+1)+'월 '+d.getDate()+'일은 '+(near.closed?'쉽니다':near.open+'부터 '+near.close+'까지 엽니다');
+}
 window.save=function(){
  var errs=validate(); UI.errors=errs;
  if(Object.keys(errs).length){ render(); return false; }
  /* 저장: 보이는 줄만 남긴다 */
  var keep={}; visibleKeys().forEach(function(k){ keep[k]=S.rows[k]; });
  Object.keys(S.rows).forEach(function(k){ if(!keep[k]) S.rows[k]=blankRow(); });
- S.saved=JSON.parse(JSON.stringify({mode:S.mode,rows:S.rows,rules:S.rules,holiday:S.holiday,monthly:S.monthly,specials:S.specials}));
+ S.saved=JSON.parse(JSON.stringify({mode:S.mode,rows:S.rows,rules:S.rules,holi:S.holi,monthly:S.monthly,specials:S.specials}));
  S.synced=false;
  UI.modal={kind:'save',count:pushedCount()};
  document.getElementById('savedAt').textContent='저장 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
@@ -400,7 +444,13 @@ window.render=function(){
    if(ru.days.length) h+='<div class="ex">'+exampleSentence(ru,ru.days.slice().sort(function(a,b){return (a||7)-(b||7);}))+'</div>';
    h+='</div>'; });
   h+='<button class="add" onclick="addRule()">+  규칙 추가</button>'; }
- h+='<h4>공휴일</h4><div class="radio"><label><input type="radio" name="holi" '+(S.holiday==='regular'?'checked':'')+' onchange="S.holiday=\'regular\';render()"> 평소 요일대로 엽니다</label><label><input type="radio" name="holi" '+(S.holiday==='closed'?'checked':'')+' onchange="S.holiday=\'closed\';render()"> 쉽니다</label></div>';
+ /* 공휴일: 네이버 구조. 프리셋 2개 + 개별 칩 + 임시공휴일 */
+ var ALLK=allHoliKeys(), isAll=ALLK.length>0&&ALLK.every(function(k){return S.holi.keys.indexOf(k)>=0;});
+ var isLunar=S.holi.keys.length===2&&S.holi.keys.indexOf('seol')>=0&&S.holi.keys.indexOf('chu')>=0;
+ h+='<h4>공휴일 중 휴무일이 있나요?</h4><div class="line" style="margin-bottom:8px"><label class="chk"><input type="checkbox" '+(isLunar?'checked':'')+' onchange="setHoliPreset(\'lunar\',this.checked)"> 설·추석 당일만 휴무</label><label class="chk"><input type="checkbox" '+(isAll?'checked':'')+' onchange="setHoliPreset(\'all\',this.checked)"> 전체 휴무</label></div>';
+ h+='<span class="chips">'+HOLIDEF.map(function(x){ var on=S.holi.keys.indexOf(x[0])>=0; return '<span class="chip'+(on?' on':'')+'" onclick="toggleHoli(\''+x[0]+'\')">'+x[1]+'</span>'; }).join('')+'</span>';
+ var tks=tempKeys(); if(tks.length){ h+='<div class="ex" style="margin-top:8px">임시공휴일</div><span class="chips">'+tks.map(function(k){ var on=S.holi.keys.indexOf(k)>=0; return '<span class="chip'+(on?' on':'')+'" onclick="toggleHoli(\''+k+'\')">'+holiLabel(k)+'</span>'; }).join('')+'</span>'; }
+ h+='<div class="ex">대체공휴일은 원래 공휴일을 따릅니다. 임시공휴일은 정부가 지정하면 칩이 생깁니다.</div>';
  h+='<h4>매달 같은 날짜</h4>';
  if(!S.monthly.length&&!UI.mform) h+='<div class="empty">아직 없습니다.</div>';
  S.monthly.forEach(function(d,i){ h+='<span class="tag">매달 '+d+'일 <button class="x" onclick="S.monthly.splice('+i+',1);render()">✕</button></span>'; });
@@ -447,24 +497,21 @@ function renderFO(){
  var st=statusNow(); h+='<div class="ttl">운영시간</div><div class="stat">'+st.st+'</div>';
  var aux=''; if(st.st==='운영 중') aux=st.closeAt+'에 닫습니다'; else if(st.st==='휴게 중') aux=st.reopen+'에 다시 엽니다'; else aux=nextOpenText();
  h+='<div class="aux">'+aux+'</div>';
- /* 특정 날짜 안내: 14일 이내 가장 가까운 하나 */
- var n=nowDate(), t=todayStr(), lim=ymd(addDays(n,14));
- var near=S.specials.filter(function(sp){return sp.from>=t&&sp.from<=lim;}).sort(function(a,b){return a.from<b.from?-1:1;})[0];
- if(near){ var d=parseD(near.from); var txt;
-  if(near.to){ var e=parseD(near.to); txt=(d.getMonth()+1)+'월 '+d.getDate()+'일부터 '+(e.getMonth()+1)+'월 '+e.getDate()+'일까지 쉽니다'; }
-  else txt=(d.getMonth()+1)+'월 '+d.getDate()+'일은 '+(near.closed?'쉽니다':near.open+'부터 '+near.close+'까지 엽니다');
-  h+='<div class="spc">'+txt+'</div>'; }
+ /* 안내: 특정 날짜·공휴일 휴무 중 14일 이내 가장 가까운 하나 */
+ var ntc=nearestNotice(); if(ntc) h+='<div class="spc">'+ntc+'</div>';
  h+='<button class="tg" onclick="toggleFO()">'+(UI.expandFO?'요일별 시간 접기 ⌃':'요일별 시간 보기 ⌄')+'</button>';
  if(UI.expandFO){ h+='<table>';
   [1,2,3,4,5,6,0].forEach(function(w){ var k=keyFor(new Date(2026,8,6+w)); var r=S.rows[k]; var closedWeekly=(S.mode==='day'&&r.closed&&r.period==='weekly')||(S.mode==='wk'&&r.closed)||(S.mode!=='day'&&S.rules.some(function(ru){return ru.period==='weekly'&&ru.days.indexOf(w)>=0;}));
    var v= closedWeekly?'휴무':(r.open&&r.close? r.open+' - '+(badgeNext(r)?'다음날 ':'')+r.close : '-');
    h+='<tr><td>'+WD[w]+'</td><td>'+v+(!closedWeekly?(r.breaks||[]).filter(function(b){return b.s&&b.e;}).map(function(b){return '<div class="bk">휴게 '+b.s+' - '+b.e+'</div>';}).join(''):'')+'</td></tr>'; });
-  if(S.holiday==='closed') h+='<tr><td>공휴일</td><td>휴무</td></tr>';
+  var AK=allHoliKeys(), allOff=AK.length>0&&AK.every(function(k){return S.holi.keys.indexOf(k)>=0;});
+  if(allOff) h+='<tr><td>공휴일</td><td>휴무</td></tr>';
   h+='</table>';
   var rs=[];
   if(S.mode==='day'){ [1,2,3,4,5,6,0].forEach(function(w){ var r=S.rows['d'+w]; if(r.closed&&r.period!=='weekly') rs.push(ruleText(r,[w])); }); }
   else S.rules.forEach(function(ru){ if(ru.days.length){ var tx=ruleText(ru,ru.days.slice().sort(function(a,b){return (a||7)-(b||7);})); if(tx) rs.push(tx); } });
   S.monthly.forEach(function(d){ rs.push('매달 '+d+'일 휴무'); });
+  if(!allOff&&S.holi.keys.length) rs.push(holiGroupLabel().join(', ')+' 휴무');
   if(rs.length) h+='<div class="rs">'+rs.join('<br>')+'</div>'; }
  h+='</div></div>'; return h;
 }
@@ -479,9 +526,7 @@ function renderBot(){
  if(!e.closed&&e.open) lines.push('오늘 운영시간은 '+e.open+'부터 '+(crosses(e)?'다음날 ':'')+e.close+'까지'+((e.breaks||[]).filter(function(b){return b.s&&b.e;}).length?' (휴게 '+(e.breaks||[]).filter(function(b){return b.s&&b.e;}).map(function(b){return b.s+'~'+b.e;}).join(', ')+')':'')+'입니다.');
  else if(tail) lines.push('오늘('+WD[n0.getDay()]+')은 쉽니다.');
  if(st.st!=='운영 중'&&st.st!=='휴게 중'){ var nx=nextOpenText(); if(nx) lines.push(nx+'.'); }
- var n=nowDate(), t=todayStr(), lim=ymd(addDays(n,14));
- var near=S.specials.filter(function(sp){return sp.from>=t&&sp.from<=lim;}).sort(function(a,b){return a.from<b.from?-1:1;})[0];
- if(near){ var d=parseD(near.from); lines.push((d.getMonth()+1)+'월 '+d.getDate()+'일'+(near.to?'부터 '+(parseD(near.to).getMonth()+1)+'월 '+parseD(near.to).getDate()+'일까지':'은')+(near.closed?' 쉽니다.':' '+near.open+'부터 '+near.close+'까지 엽니다.')); }
+ var ntc=nearestNotice(); if(ntc) lines.push(ntc+'.');
  return h+lines.join('\n')+'</div></div>';
 }
 function renderBooking(){
@@ -505,7 +550,7 @@ document.getElementById('nowIn').addEventListener('change',function(){ setNow(th
 document.querySelectorAll('[data-seed]').forEach(function(b){ b.addEventListener('click',function(){ document.querySelectorAll('[data-seed]').forEach(function(x){x.classList.remove('on');}); b.classList.add('on'); resetDB(b.dataset.seed); }); });
 document.querySelectorAll('[data-chrome]').forEach(function(b){ b.addEventListener('click',function(){ setChrome(b.dataset.chrome); }); });
 /* 취소(앵커 탭): 저장 전 값으로 */
-var _resetDB=window.resetDB; window.resetDB=function(name){ if(name==='__cancel'&&S&&S.saved){ var sv=JSON.parse(JSON.stringify(S.saved)); S.mode=sv.mode;S.rows=sv.rows;S.rules=sv.rules;S.holiday=sv.holiday;S.monthly=sv.monthly;S.specials=sv.specials; UI.errors={}; render(); return; } _resetDB(name); };
+var _resetDB=window.resetDB; window.resetDB=function(name){ if(name==='__cancel'&&S&&S.saved){ var sv=JSON.parse(JSON.stringify(S.saved)); S.mode=sv.mode;S.rows=sv.rows;S.rules=sv.rules;S.holi=sv.holi;S.monthly=sv.monthly;S.specials=sv.specials; UI.errors={}; render(); return; } _resetDB(name); };
 resetDB('day');
 </script>
 </body>
