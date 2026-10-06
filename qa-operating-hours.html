@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>운영시간 설정 시안 검수</title>
+<style>
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:"Noto Sans KR","Malgun Gothic",sans-serif;font-size:14px;color:#262626;background:#f5f6f8;overflow:hidden}
+.app{display:flex;height:100vh}
+.left{flex:1;min-width:0;display:flex;flex-direction:column;border-right:1px solid #e0e0e0}
+.left iframe{flex:1;width:100%;border:0;background:#fff}
+.lbar{height:44px;flex:0 0 44px;background:#fff;border-bottom:1px solid #e8e8e8;display:flex;align-items:center;gap:8px;padding:0 12px}
+.lbar .t{font-size:13px;font-weight:600}
+.lbar .sp{flex:1}
+.right{flex:0 0 460px;display:flex;flex-direction:column;background:#fff;min-width:0}
+.right.wide{flex-basis:680px}
+.top{flex:0 0 auto;border-bottom:1px solid #e8e8e8;padding:12px 16px}
+.top h1{margin:0 0 8px;font-size:15px;font-weight:700}
+.top h1 .sub{font-size:11px;color:#8c8c8c;font-weight:400;margin-left:6px}
+.btn{padding:5px 10px;border:1px solid #d9d9d9;background:#fff;border-radius:4px;cursor:pointer;color:#434343;font-size:12px;font-family:inherit;white-space:nowrap}
+.btn:hover{border-color:#e8537a;color:#e8537a}
+.btn.pri{background:#e8537a;border-color:#e8537a;color:#fff}
+.btn.on{background:#1f1f1f;border-color:#1f1f1f;color:#fff}
+.row1{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+.stat{display:flex;gap:12px;align-items:center;font-size:12px;color:#595959}
+.stat b{color:#262626;font-size:14px}
+.bar{height:5px;border-radius:3px;background:#f0f0f0;overflow:hidden;flex:1;min-width:80px;display:flex}
+.bar i{display:block;height:100%}
+.bar .p{background:#52c41a}.bar .f{background:#ff4d4f}
+.scroll{flex:1;overflow-y:auto;padding:12px 16px 60px}
+.scope,.hint{font-size:12px;color:#595959;line-height:1.7;background:#fafafa;border:1px solid #f0f0f0;border-radius:6px;padding:8px 10px;margin:0 0 10px}
+.warn{display:none;font-size:12px;color:#d46b08;background:#fff7e6;border:1px solid #ffe7b8;border-radius:6px;padding:8px 10px;margin:0 0 10px;line-height:1.7}
+.out{font-size:12px;color:#595959;margin:0 0 12px}
+.out summary{cursor:pointer;color:#8c8c8c}
+.out ul{margin:6px 0 0;padding-left:18px;line-height:1.7}
+.grp{margin-bottom:16px}
+.grp h2{font-size:12px;margin:0 0 6px;color:#8c8c8c;font-weight:600;display:flex;gap:6px;align-items:center}
+.grp h2 .n{font-weight:400;color:#bfbfbf}
+.tc{border:1px solid #f0f0f0;border-radius:6px;padding:10px 12px;margin-bottom:6px;background:#fff}
+.tc.pass{border-color:#b7eb8f;background:#fcfffa}
+.tc.fail{border-color:#ffa39e;background:#fffafa}
+.tc .hd{display:flex;gap:8px;align-items:flex-start}
+.tc .id{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#8c8c8c;flex:0 0 52px;padding-top:2px}
+.tc .ti{font-weight:600;flex:1;line-height:1.45;font-size:13px}
+.tc .acts{display:flex;gap:4px;flex:0 0 auto}
+.tc .acts .btn{padding:3px 8px;font-size:11px}
+.tc .acts .btn.p.on{background:#52c41a;border-color:#52c41a;color:#fff}
+.tc .acts .btn.f.on{background:#ff4d4f;border-color:#ff4d4f;color:#fff}
+.tc dl{margin:8px 0 0 60px;display:grid;grid-template-columns:36px 1fr;gap:3px 8px;font-size:12px;line-height:1.55}
+.tc dt{color:#8c8c8c}.tc dd{margin:0;color:#434343}
+.tc .go{margin:8px 0 0 60px}
+.tc textarea{width:100%;margin:8px 0 0;height:56px;border:1px solid #d9d9d9;border-radius:4px;padding:6px;font-family:inherit;font-size:12px}
+dialog{border:0;border-radius:8px;padding:0;width:560px;max-width:92vw}
+dialog::backdrop{background:rgba(0,0,0,.35)}
+.dh{display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid #f0f0f0;font-weight:600}
+.dh .x{margin-left:auto;border:0;background:none;cursor:pointer;color:#8c8c8c;font-size:14px}
+.db{padding:12px 16px}
+.db textarea{width:100%;height:320px;border:1px solid #d9d9d9;border-radius:4px;padding:8px;font-family:ui-monospace,Menlo,monospace;font-size:12px}
+.df{display:flex;justify-content:flex-end;gap:6px;padding:10px 16px;border-top:1px solid #f0f0f0}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="left">
+    <div class="lbar">
+      <span class="t">시안</span>
+      <button class="btn" id="reload">새로고침</button>
+      <button class="btn" id="resetPrev">시드 초기화</button>
+      <span class="sp"></span>
+      <button class="btn" id="widen">체크리스트 넓게</button>
+      <button class="btn" id="newwin">새 창</button>
+    </div>
+    <iframe id="prev" src="bo-operating-hours.html"></iframe>
+  </div>
+  <div class="right" id="right">
+    <div class="top">
+      <h1>운영시간 설정 검수<span class="sub" id="cnt"></span></h1>
+      <div class="row1">
+        <button class="btn on" data-f="all">전체</button>
+        <button class="btn" data-f="todo">미확인</button>
+        <button class="btn" data-f="fail">실패만</button>
+        <span style="flex:1"></span>
+        <button class="btn pri" id="copy">결과 복사</button>
+        <button class="btn" id="resetKeep">통과 외 초기화</button>
+        <button class="btn" id="export">기록 내보내기</button>
+        <button class="btn" id="restore">기록 불러오기</button>
+        <button class="btn" id="reset">기록 초기화</button>
+      </div>
+      <div class="stat">
+        <span>통과 <b id="nPass">0</b></span>
+        <span>실패 <b id="nFail">0</b></span>
+        <span>미확인 <b id="nTodo">0</b></span>
+        <div class="bar"><i class="p" id="barP"></i><i class="f" id="barF"></i></div>
+        <span id="pct">진행 0%</span>
+      </div>
+    </div>
+    <div class="scroll">
+      <p class="warn" id="fileWarn">파일을 직접 열어서 왼쪽 시안을 제어할 수 없습니다. 아래 배포 주소로 다시 열어 주세요.<br><a href="https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-operating-hours.html" target="_blank">https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-operating-hours.html</a></p>
+      <p class="hint">배포 주소: <a href="https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-operating-hours.html" target="_blank">https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-operating-hours.html</a><br>
+      케이스마다 세 줄을 봅니다. <b>열면</b>: 이 화면 열기를 누르면 왼쪽 시안이 그 상태로 맞춰집니다. 직접 바꾼 값은 지워집니다. <b>조작</b>: 그다음 직접 할 일입니다. <b>기대</b>: 화면이 이와 같으면 통과입니다.<br>
+      시안 위쪽 검은 줄에서 <b>지금 시각</b>을 바꾸면 고객 화면 상태가 그 시각 기준으로 다시 계산됩니다. 시드 다섯 개는 Figma 626:2의 n_oh01~05와 같은 데이터입니다. 공휴일 달력은 2026·2027 샘플이고 실제 서비스는 공공데이터포털 특일정보를 씁니다.</p>
+      <details class="out"><summary>이 시안에서 확인하지 않는 것</summary><ul>
+        <li>저장 충돌(뒤에 누른 쪽 실패)의 화면과 문구. 아직 미정</li>
+        <li>스토어 목록의 운영시간 유무 필터와 요일별 컬럼 값</li>
+        <li>고객 화면 다국어(영어·중국어·일본어·인도네시아어·몽골어). 한국어 틀만 있음</li>
+        <li>기존 데이터 옮기기(여는 방식 자동 판정, 공휴일 54곳, 35곳 확인)</li>
+        <li>챗봇 설정 화면에서 언어별 운영시간 8행을 뺀 모습</li>
+        <li>실제 예약 슬롯 격자. 예약설정 영역은 미반영 알림과 불러오기 버튼까지만</li>
+        <li>운영시간이 빈 매장에서 불러오기 버튼의 상태(비활성 vs 눌러도 무변화). 시안은 눌리고 아무것도 안 바뀜</li>
+        <li>특정 날짜 중복 안내 문구와 시간 누락 문구는 시안용 임시 문구</li>
+      </ul></details>
+      <div id="list"></div>
+    </div>
+  </div>
+</div>
+
+<dialog id="ask">
+  <div class="dh"><span id="askTitle">확인</span><button class="x" onclick="document.getElementById('ask').close()">✕</button></div>
+  <div class="db"><div id="askMsg" style="font-size:13px;line-height:1.7;color:#222"></div><textarea id="askIn" style="height:120px;margin-top:10px;display:none"></textarea></div>
+  <div class="df"><button class="btn" id="askNo">취소</button><button class="btn pri" id="askYes">확인</button></div>
+</dialog>
+<dialog id="dlg">
+  <div class="dh"><span id="dlgTitle">결과</span><button class="x" onclick="document.getElementById('dlg').close()">✕</button></div>
+  <div class="db"><textarea id="out" readonly></textarea></div>
+  <div class="df"><button class="btn" onclick="document.getElementById('dlg').close()">닫기</button><button class="btn pri" id="doCopy">클립보드로 복사</button></div>
+</dialog>
+
+<script>
+function askBox(opt, done) {
+  var d = document.getElementById('ask');
+  document.getElementById('askTitle').textContent = opt.title || '확인';
+  document.getElementById('askMsg').textContent = opt.message || '';
+  var ta = document.getElementById('askIn'); ta.style.display = opt.input ? 'block' : 'none'; ta.value = '';
+  var yes = document.getElementById('askYes'), no = document.getElementById('askNo');
+  yes.textContent = opt.okText || '확인'; no.style.display = opt.alert ? 'none' : '';
+  function cleanup() { yes.onclick = null; no.onclick = null; d.onclose = null; }
+  yes.onclick = function () { var v = opt.input ? ta.value : true; cleanup(); d.close(); if (done) done(v); };
+  no.onclick = function () { cleanup(); d.close(); if (done) done(null); };
+  d.onclose = function () { cleanup(); };
+  d.showModal(); if (opt.input) setTimeout(function () { ta.focus(); }, 0);
+}
+function tellBox(msg, title) { askBox({ title: title || '알림', message: msg, alert: true, okText: '닫기' }); }
+
+/* [id, 제목, 조작, 기대, 열면 실행할 코드, 열면 설명, 참고] */
+var NOW = "setNow('2026-09-10T10:30');";
+var GROUPS = [
+['여는 방식', [
+ ['M-01','최초 진입은 아무것도 고르지 않은 상태','없음. 화면만 확인합니다.','세그먼트 셋이 모두 꺼져 있고 그 아래에 "먼저 여는 방식을 골라 주세요." 요일 줄이 없다. 쉬는 날에 요일마다 쉬는 날 목록·공휴일 2택(평소 요일대로 엽니다 선택)·매달 같은 날짜가 있고 특정 날짜 아래에 "여는 방식을 고르지 않으면 특정 날짜도 고객 화면에 보이지 않습니다." 오른쪽 고객 화면 미리보기는 "영역이 통째로 감춰집니다"',"resetDB('empty')",'최초 진입(n_oh01)',''],
+ ['M-02','모든 요일 같아요는 한 줄','없음. 화면만 확인합니다.','매일 한 줄. 휴무 체크가 없다. 쉬는 날에 요일마다 쉬는 날 목록이 보인다',"resetDB('same')",'모든 요일 같아요(n_oh02)',''],
+ ['M-03','평일과 주말이 달라요는 두 줄','없음. 화면만 확인합니다.','평일 / 주말 두 줄. 공휴일 줄이 없다. 각 줄에 휴무 체크가 있고 주기는 없다',"resetDB('wk')",'평일과 주말(n_oh03)',''],
+ ['M-04','요일마다 달라요는 일곱 줄','없음. 화면만 확인합니다.','월요일부터 일요일까지 일곱 줄. 공휴일 줄이 없다. 쉬는 날 구역에 요일마다 쉬는 날 목록이 없다(공휴일·매달 같은 날짜만)',"resetDB('day')",'요일마다(n_oh04)',''],
+ ['M-05','방식을 바꾸면 줄이 늘고 첫 줄 값이 채워진다','요일마다 달라요를 누릅니다.','일곱 줄이 모두 10:00 → 19:00 로 채워져 있다(매일 한 줄 값을 복사)',"resetDB('same')",'모든 요일 같아요 10:00~19:00',''],
+ ['M-06','저장 전에는 되돌리면 값이 다시 나온다','요일마다 달라요 → 화요일을 09:00 → 18:00 로 바꿈 → 모든 요일 같아요 → 다시 요일마다 달라요.','화요일이 09:00 → 18:00 로 남아 있다(저장 전이라 값을 들고 있음). 매일 줄은 10:00 → 19:00 그대로',"resetDB('same')",'모든 요일 같아요',''],
+ ['M-07','저장하면 보이는 줄만 남는다','요일마다 달라요 → 화요일을 09:00 → 18:00 → 모든 요일 같아요 → 저장 → 모달 나중에 → 다시 요일마다 달라요.','화요일이 09:00 → 18:00 가 아니라 매일 줄 값(10:00 → 19:00)으로 채워진다. 저장 때 안 보이던 줄은 버려졌다',"resetDB('same')",'모든 요일 같아요','']
+]],
+['줄 · 휴무 · 주기', [
+ ['R-01','휴무를 켜면 주기가 붙고 시간이 비워진다','화요일 휴무를 켭니다.','시간 칸이 플레이스홀더(시작 시간 / 종료 시간)로 비고 회색이 된다. 요일 라벨이 회색. 오른쪽에 주기 매주가 붙는다. 휴게시간 줄과 추가 버튼이 사라진다',"resetDB('day')",'요일마다(n_oh04)',''],
+ ['R-02','휴무를 다시 끄면 시간이 돌아온다','화요일 휴무를 켰다가 다시 끕니다.','11:00 → 20:00 과 휴게 14:00 → 15:00 이 그대로 돌아온다',"resetDB('day')",'요일마다(n_oh04)',''],
+ ['R-03','격주면 시간을 그대로 두고 라벨이 검정','없음. 화면만 확인합니다.','목요일: 휴무 체크됨, 주기 격주, 주차 첫 번째와 세 번째, 시간 11:00 → 20:00 이 살아 있고 요일 라벨이 검정. 아래 예시 문장 "9월은 3일과 17일, 10월은 1일과 15일입니다."',"resetDB('day')",'요일마다(n_oh04)',''],
+ ['R-04','매주 휴무 줄만 라벨이 회색','없음. 화면만 확인합니다.','월요일·일요일(매주 휴무)만 회색. 목요일(격주)은 검정',"resetDB('day')",'요일마다(n_oh04)',''],
+ ['R-05','매월 마지막 예시 문장','없음. 화면만 확인합니다.','목요일: 매월 / 마지막, 시간 10:00 → 19:00, 예시 "9월은 24일, 10월은 29일입니다."',"resetDB('monthly')",'매월·특정 날짜(n_oh05)',''],
+ ['R-06','주차는 달마다 다시 센다','목요일 주차를 첫 번째로 바꿉니다.','예시 "9월은 3일, 10월은 1일입니다." (10월 1일이 목요일이라 첫 번째)',"resetDB('monthly')",'매월·특정 날짜',''],
+ ['R-07','네 번째가 없는 달은 건너뛴다','목요일을 매월 / 네 번째로 바꾸고 지금 시각을 2026-01-10 10:00 으로.','예시에서 1월은 22일, 2월은 26일처럼 둘 다 있다. 지금 시각을 2026-11-10 으로 바꾸면 11월은 26일, 12월은 24일. (네 번째 목요일이 없는 달은 2026년에 없어 "없음"은 안 나옴. 격주 2·4 주차는 달마다 간격이 2주가 아닐 수 있음을 1월 → 2월에서 본다)',"resetDB('monthly')",'매월·특정 날짜',''],
+ ['R-08','격주로 바꾸면 주차 칸이 붙는다','목요일 주기를 격주로 바꿉니다.','주차 칸(첫 번째와 세 번째 / 두 번째와 네 번째)이 붙고 시간이 그대로 남는다',"resetDB('monthly')",'매월·특정 날짜',''],
+ ['R-09','매주로 바꾸면 시간이 비워진다','목요일 주기를 매주로 바꿉니다.','시간 칸이 비워지고 라벨 회색. 다시 격주로 바꾸면 10:00 → 19:00 복원',"resetDB('monthly')",'매월·특정 날짜',''],
+ ['R-10','자정 넘김 배지','없음. 화면만 확인합니다.','금요일 18:00 → 02:00 오른쪽에 "다음날" 배지',"resetDB('day')",'요일마다(n_oh04)',''],
+ ['R-11','평일과 주말이 달라요의 휴무는 묶음 전체','주말 휴무를 켭니다.','주말 줄의 시간이 비고 주기는 붙지 않는다. 고객 화면 펼치면 토요일·일요일 둘 다 휴무',"resetDB('wk')",'평일과 주말(n_oh03)','']
+]],
+['휴게시간', [
+ ['B-01','휴게시간 여러 구간','수요일에 휴게시간 추가를 두 번 누르고 13:00 → 14:00, 17:00 → 17:30 을 넣고 저장.','두 구간이 휴게 라벨과 함께 줄 안에 붙는다. 저장이 막히지 않고 모달이 뜬다',"resetDB('day')",'요일마다(n_oh04)',''],
+ ['B-02','휴게가 운영시간 밖이면 막힌다','수요일에 휴게시간 21:00 → 22:00 을 넣고 저장.','휴게 칸 빨간 테두리, 줄 아래 "휴게시간은 여는 시간 안에 있어야 합니다." 저장 모달이 안 뜬다',"resetDB('day')",'요일마다(n_oh04)',''],
+ ['B-03','휴게끼리 겹치면 막힌다','수요일에 휴게 13:00 → 15:00, 14:00 → 16:00 을 넣고 저장.','"휴게시간끼리 겹칩니다." 저장이 안 된다',"resetDB('day')",'요일마다(n_oh04)',''],
+ ['B-04','자정 넘긴 운영 안의 휴게','금요일에 휴게 23:30 → 00:30 을 넣고 저장.','막히지 않는다(18:00~다음날 02:00 을 하나의 연속 구간으로 봄). 고객 화면 펼치면 금요일 아래 휴게 23:30 - 00:30',"resetDB('day')",'요일마다(n_oh04)',''],
+ ['B-05','휴게 X 로 삭제','화요일 휴게 오른쪽 ✕ 를 누릅니다.','휴게 구간이 사라지고 추가 버튼만 남는다',"resetDB('day')",'요일마다(n_oh04)','']
+]],
+['검증 · 저장', [
+ ['V-01','종료만 비우면 막힌다','수요일 종료 시간을 지우고(칸을 비움) 저장.','시간 칸 빨간 테두리, "종료 시간을 넣어 주세요." 모달 없음',"resetDB('day')",'요일마다(n_oh04)','브라우저 time 입력에서 지우기는 칸을 클릭한 뒤 Backspace 또는 Delete'],
+ ['V-02','시작만 비워도 막힌다','수요일 시작 시간을 지우고 저장.','"시작 시간을 넣어 주세요."',"resetDB('day')",'요일마다(n_oh04)',''],
+ ['V-03','둘 다 비우면 저장된다','수요일 시작·종료를 모두 지우고 저장.','막히지 않고 모달이 뜬다. 고객 화면 펼침에서 수요일은 "-" 로 비어 보인다',"resetDB('day')",'요일마다(n_oh04)','운영시간은 필수값이 아니다'],
+ ['V-04','운영시간이 전부 비면 고객 화면이 감춰진다','없음. 화면만 확인합니다.','미리보기에 "(운영시간 영역이 통째로 감춰집니다...)" 챗봇 답변은 "운영시간은 매장에 직접 확인해 주세요."',"resetDB('empty');setMode('same')",'여는 방식만 고르고 시간은 빈 상태',''],
+ ['V-05','저장하면 예약 반영을 묻는다','저장을 누릅니다.','모달: 제목 "예약 받는 시간에도 반영할까요?" 부제 "운영시간은 저장했습니다" 본문 "바뀐 시간 밖에 예약 N건이 있습니다." + "이미 받은 예약은 그대로 유지됩니다. 새 예약만 바뀐 시간에 맞춰 받습니다." 버튼 나중에 / 반영하기. 위쪽 저장 시각이 찍힌다',"resetDB('day')",'요일마다(n_oh04)',''],
+ ['V-06','나중에를 고르면 미반영 알림','저장 → 나중에.','오른쪽 예약설정 패널에 주황 "운영시간이 바뀌었습니다" 와 "아직 반영하지 않았습니다" 문구',"resetDB('day')",'요일마다(n_oh04)',''],
+ ['V-07','반영하기를 고르면 알림 없음','저장 → 반영하기.','예약설정 패널에 주황 알림이 없고 "예약 받는 시간이 운영시간과 맞습니다."',"resetDB('day')",'요일마다(n_oh04)',''],
+ ['V-08','불러오기 모달','예약설정 패널의 운영시간 불러오기를 누릅니다.','모달: 제목 "운영시간을 불러옵니다" 부제 "예약 받는 시간을 운영시간에 맞춰 다시 만듭니다" 본문은 저장 모달과 같음. 버튼 취소 / 불러오기. 불러오기를 누르면 주황 알림이 사라진다',"resetDB('day');save();closeModal()",'저장하고 나중에를 고른 상태(미반영 알림이 켜져 있음)',''],
+ ['V-09','ESC·바깥 클릭·✕ 는 나중에와 같다','저장 → ESC. 저장 → 모달 바깥 클릭. 저장 → ✕.','세 번 모두 모달이 닫히고 미반영 알림이 남아 있다',"resetDB('day')",'요일마다(n_oh04)',''],
+ ['V-10','밀려나는 예약 건수','없음. 화면만 확인합니다.','예약설정 패널 "바뀐 시간 밖 예약: N건" 과 저장 모달의 건수가 같다. 요일마다 시드에서는 9/12 19:30(토 18시 마감 뒤)·9/15 11:00(화 휴게 아님, 안 걸림)·9/17 12:00(목 격주 셋째 → 휴무) 등으로 계산된다',"resetDB('day')",'요일마다(n_oh04)','확정 예약 샘플 5건 중 지금 시각 이전 건은 세지 않는다'],
+ ['V-11','건수가 0이면 건수 줄만 빠진다','저장을 누릅니다.','모달 본문에 굵은 건수 줄이 없고 "이미 받은 예약은..." 문장만 있다',"resetDB('same');setNow('2026-12-01T10:00')",'모든 요일 같아요, 지금 시각 12월 1일(샘플 예약이 모두 과거)','Q4 미정: 0건일 때 본문을 통째로 뺄지'],
+ ['V-12','앵커 탭 취소는 저장 전 값으로','수요일을 09:00 → 18:00 으로 바꾼 뒤 앵커 탭 줄의 취소를 누릅니다.','수요일이 11:00 → 20:00 으로 돌아온다',"resetDB('day')",'요일마다(n_oh04)','HOST 화면에는 앵커 탭이 없다']
+]],
+['쉬는 날', [
+ ['H-01','요일 규칙 추가','규칙 추가 → 격주 → 첫 번째와 세 번째 → 화 칩.','예시 "9월은 1일과 15일, 10월은 6일과 20일입니다." 고객 화면 펼침 아래 "격주 화요일 휴무"',"resetDB('same')",'모든 요일 같아요',''],
+ ['H-02','규칙 하나에 여러 요일','규칙 추가 → 매주 → 월·화 칩.','예시 "매주 월요일, 화요일에 쉽니다." 고객 화면 펼침에서 월요일·화요일이 휴무',"resetDB('same')",'모든 요일 같아요',''],
+ ['H-03','매주 규칙은 FO 규칙 문장에 안 나온다','없음. 화면만 확인합니다.','고객 화면 펼침: 월요일 휴무. 아래 규칙 문장 없음(요일 표에서 이미 보임)',"resetDB('wk');toggleFO()",'평일·주말, 매주 월요일 규칙',''],
+ ['H-04','격주 규칙은 FO 요일 표에 시간을 그대로 쓴다','없음. 화면만 확인합니다.','고객 화면 펼침: 목요일 11:00 - 20:00 (휴무가 아님). 아래 "격주 목요일 휴무"',"resetDB('day');toggleFO()",'요일마다(n_oh04)',''],
+ ['H-05','공휴일 쉽니다','공휴일을 쉽니다로 바꾸고 지금 시각을 2026-10-09 12:00 (한글날).','고객 화면 상태 휴무. 펼치면 맨 아래 공휴일 휴무 줄이 생긴다',"resetDB('day')",'요일마다(n_oh04)',''],
+ ['H-06','공휴일 평소 요일대로','지금 시각을 2026-10-09 12:00 으로.','금요일 시간(18:00 ~ 다음날 02:00)대로 운영 종료, "오늘 18:00에 엽니다". 펼쳐도 공휴일 줄이 없다',"resetDB('day')",'요일마다(n_oh04), 공휴일 평소 요일대로',''],
+ ['H-07','대체공휴일도 공휴일','공휴일 쉽니다, 지금 시각 2026-10-05 12:00 (개천절 대체공휴일).','상태 휴무',"resetDB('day')",'요일마다(n_oh04)','샘플 달력 기준'],
+ ['H-08','매달 같은 날짜 추가','날짜 추가 → 15 → 추가.','칩 "매달 15일" 이 생긴다. 지금 시각을 2026-10-15 로 바꾸면 상태 휴무',"resetDB('same')",'모든 요일 같아요',''],
+ ['H-09','31일은 없는 달을 건너뛴다','날짜 추가 → 31 → 추가 → 지금 시각 2026-09-30 10:00 / 2026-10-31 10:00.','9월 30일은 운영 중, 10월 31일은 휴무',"resetDB('same')",'모든 요일 같아요','']
+]],
+['특정 날짜', [
+ ['D-01','하루 쉬는 날 추가','날짜 추가 → 2026-09-20 → 쉽니다 → 추가.','목록에 월 헤더 "9월" 아래 "20일 (일) | 쉽니다". 고객 화면에 "9월 20일은 쉽니다" 안내(14일 이내)',"resetDB('same')",'모든 요일 같아요, 지금 9월 10일',''],
+ ['D-02','기간 추가','날짜 추가 → 여러 날 → 2026-10-03 ~ 2026-10-05 → 쉽니다 → 추가.','"10월" 아래 "3일 (토) ~ 5일 (월) | 쉽니다". 고객 화면 안내는 14일 밖이라 안 뜬다. 지금 시각을 9월 25일로 바꾸면 "10월 3일부터 10월 5일까지 쉽니다"',"resetDB('same')",'모든 요일 같아요',''],
+ ['D-03','그날만 다른 시간','날짜 추가 → 2026-09-12 → 이 시간에 엽니다 → 12:00 → 15:00 → 추가.','"12일 (토) | 12:00 → 15:00". 지금 시각 9월 12일 13:00 이면 운영 중, 15:00에 닫습니다',"resetDB('same')",'모든 요일 같아요',''],
+ ['D-04','다음 해는 연도와 월을 붙인다','날짜 추가 → 2027-01-05 → 쉽니다 → 추가.','월 헤더 "2027년 1월" 아래 "5일 (화)"',"resetDB('same')",'모든 요일 같아요',''],
+ ['D-05','범위 밖 날짜는 못 고른다','날짜 추가 → 달력에서 2026-09-05(과거)와 2028-01-01 을 골라 봅니다.','달력이 오늘 이전과 내년 12월 31일 이후를 막는다',"resetDB('same')",'모든 요일 같아요','브라우저 달력의 min·max'],
+ ['D-06','같은 날짜 두 번 불가','날짜 추가 → 2026-09-15 → 쉽니다 → 추가.','"같은 날짜가 이미 있습니다. 기존 줄을 고쳐 주세요." (기간과 겹쳐도 막힘)',"resetDB('monthly')",'매월·특정 날짜(9/15, 10/3~5, 12/24 있음)','문구는 시안용'],
+ ['D-07','지난 날짜는 감춘다','지금 시각을 2026-09-16 10:00 으로.','9월 15일 줄이 목록에서 사라진다. 10월·12월 줄은 남는다',"resetDB('monthly')",'매월·특정 날짜',''],
+ ['D-08','특정 날짜가 요일 규칙을 이긴다','지금 시각 2026-12-24 13:00.','목요일(매월 마지막 휴무)이지만 특정 날짜 12:00 → 15:00 이 이겨 운영 중, 15:00에 닫습니다',"resetDB('monthly')",'매월·특정 날짜','우선순위 1층'],
+ ['D-09','특정 날짜가 공휴일을 이긴다','공휴일 쉽니다 → 날짜 추가 2026-10-09 → 이 시간에 엽니다 10:00 → 14:00 → 지금 시각 2026-10-09 11:00.','상태 운영 중 (공휴일 쉽니다보다 특정 날짜 우선)',"resetDB('same')",'모든 요일 같아요',''],
+ ['D-10','목록이 길면 300px 안에서 스크롤','날짜 추가로 10개쯤 넣습니다.','목록 영역이 더 길어지지 않고 안에서 스크롤. 접기나 더 보기 없음',"resetDB('same')",'모든 요일 같아요',''],
+ ['D-11','여는 방식 없이 특정 날짜만','날짜 추가 → 2026-09-20 → 쉽니다 → 추가 → 저장.','저장이 막히지 않는다. 고객 화면은 여전히 감춰진다. 특정 날짜 아래 안내 한 줄이 있다',"resetDB('empty')",'최초 진입','']
+]],
+['고객 화면 · 챗봇', [
+ ['F-01','운영 중','없음. 화면만 확인합니다.','상태 운영 중(19 굵게), 보조 "20:00에 닫습니다". 챗봇: "지금은 운영 중입니다. 오늘 운영시간은 11:00부터 20:00까지입니다."',"resetDB('day');setNow('2026-09-10T12:00')",'요일마다, 목요일 12:00(9월 둘째 목요일이라 격주 휴무에 안 걸림)','같은 날 10:30 으로 바꾸면 11시 개점 전이라 운영 종료 / 오늘 11:00에 엽니다'],
+ ['F-02','휴게 중','없음. 화면만 확인합니다.','상태 휴게 중, "15:00에 다시 엽니다". 챗봇 첫 줄 "지금은 휴게 중입니다." 오늘 시간 줄에 (휴게 14:00~15:00)',"resetDB('day');setNow('2026-09-08T14:20')",'화요일 14:20',''],
+ ['F-03','운영 종료 · 내일','없음. 화면만 확인합니다.','상태 운영 종료, "내일 11:00에 엽니다"',"resetDB('day');setNow('2026-09-08T21:00')",'화요일 21:00',''],
+ ['F-04','휴무 · 요일로 다음 여는 때','없음. 화면만 확인합니다.','상태 휴무, "화요일 11:00에 엽니다" (일·월 매주 휴무라 다음 여는 날이 이틀 뒤. 7일 이내라 요일로 쓴다)',"resetDB('day');setNow('2026-09-13T12:00')",'일요일 12:00','하루 뒤면 "내일 11:00에 엽니다". 월요일 12:00 으로 바꿔 확인'],
+ ['F-05','다음 여는 때가 7일 넘으면 날짜','없음. 화면만 확인합니다.','"10월 6일 10:00에 엽니다"처럼 월·일로 쓴다',"resetDB('same');addSpecial({from:'2026-09-11',to:'2026-10-05',closed:true});setNow('2026-09-11T12:00')",'9/11~10/5 특정 날짜 휴무, 지금 9월 11일','Q5 미정: 내일/요일/날짜 경계'],
+ ['F-06','자정 넘김은 전날 구간이 살아 있으면 운영 중','없음. 화면만 확인합니다.','토요일 새벽 01:00 인데 상태 운영 중, "02:00에 닫습니다" (금요일 18:00~02:00 구간)',"resetDB('day');setNow('2026-09-12T01:00')",'토요일 01:00',''],
+ ['F-07','자정 넘김 전 토요일 02:30','없음. 화면만 확인합니다.','금요일 구간이 끝났고 토요일 10:00 전이라 운영 종료, "오늘 10:00에 엽니다"',"resetDB('day');setNow('2026-09-12T02:30')",'토요일 02:30',''],
+ ['F-08','요일별 시간 펼침','요일별 시간 보기를 누릅니다.','월요일 휴무 / 화요일 11:00 - 20:00 + 휴게 14:00 - 15:00 / 수요일 11:00 - 20:00 / 목요일 11:00 - 20:00 / 금요일 18:00 - 다음날 02:00 / 토요일 10:00 - 18:00 / 일요일 휴무. 공휴일 줄 없음. 아래 "격주 목요일 휴무". 버튼이 "요일별 시간 접기"로',"resetDB('day')",'요일마다(n_oh04)',''],
+ ['F-09','특정 날짜 안내는 가장 가까운 하나','없음. 화면만 확인합니다.','9/15·10/3~5·12/24 중 14일 이내인 "9월 15일은 쉽니다" 하나만',"resetDB('monthly');setNow('2026-09-10T10:30')",'매월·특정 날짜',''],
+ ['F-10','매달 같은 날짜 규칙 문장','요일별 시간 보기.','아래 규칙 문장에 "매월 마지막 목요일 휴무" 와 "매달 1일 휴무"',"resetDB('monthly')",'매월·특정 날짜',''],
+ ['F-11','챗봇 운영시간 없음','없음. 화면만 확인합니다.','챗봇 답변 "운영시간은 매장에 직접 확인해 주세요."',"resetDB('empty')",'최초 진입','']
+]],
+['HOST 화면', [
+ ['O-01','HOST 는 카드가 같고 껍데기만 다르다','위쪽 화면을 HOST 로.','사이드바가 220px 흰색, 제목 "운영시간" + 부제 "매장 문 여는 시간과 쉬는 날을 설정합니다." 앵커 탭 없음. 카드 내용은 BO 와 같고 저장 버튼만 핑크',"resetDB('day');setChrome('HOST')",'HOST(ho_oh01)',''],
+ ['O-02','HOST 에서도 저장하면 같은 모달','저장을 누릅니다.','같은 모달. 반영하기 버튼이 핑크',"resetDB('day');setChrome('HOST')",'HOST','']
+]]
+];
+
+/* ===== 콘솔 동작 ===== */
+var KEY='qa-operating-hours-v1';
+var REC=JSON.parse(localStorage.getItem(KEY)||'{}');
+var FILTER='all';
+var frame=document.getElementById('prev');
+function saveRec(){ localStorage.setItem(KEY,JSON.stringify(REC)); }
+function allCases(){ var a=[]; GROUPS.forEach(function(g){ g[1].forEach(function(c){ a.push(c); }); }); return a; }
+function openCase(code){ runInPreview(code,true); }
+function runInPreview(code,alsoReset){ var w=frame.contentWindow;
+ try{ if(alsoReset&&w.resetDB) w.resetDB(); if(code) w.eval(code); if(typeof w.render==='function') w.render(); frame.contentWindow.focus(); return true; }
+ catch(e){ document.getElementById('fileWarn').style.display='block'; tellBox('왼쪽 시안을 제어하지 못했습니다. 배포 주소로 열어 주세요.\n'+e.message); return false; } }
+function render(){
+ var list=document.getElementById('list'); var h=''; var nP=0,nF=0,nT=0,total=0;
+ GROUPS.forEach(function(g){ var cs=g[1].filter(function(c){ var r=REC[c[0]]||{}; if(FILTER==='todo') return !r.s; if(FILTER==='fail') return r.s==='fail'; return true; });
+  if(!cs.length) return;
+  h+='<div class="grp"><h2>'+g[0]+'<span class="n">'+g[1].length+'</span></h2>';
+  cs.forEach(function(c){ var r=REC[c[0]]||{}; total++; if(r.s==='pass')nP++; else if(r.s==='fail')nF++; else nT++;
+   h+='<div class="tc '+(r.s||'')+'" data-id="'+c[0]+'"><div class="hd"><span class="id">'+c[0]+'</span><span class="ti">'+c[1]+'</span><span class="acts"><button class="btn p '+(r.s==='pass'?'on':'')+'" data-s="pass">통과</button><button class="btn f '+(r.s==='fail'?'on':'')+'" data-s="fail">실패</button><button class="btn memo">메모</button></span></div>';
+   h+='<dl><dt>열면</dt><dd>'+c[5]+'</dd><dt>조작</dt><dd>'+c[2]+'</dd><dt>기대</dt><dd>'+c[3]+'</dd>'+(c[6]?'<dt>참고</dt><dd>'+c[6]+'</dd>':'')+'</dl>';
+   h+='<div class="go"><button class="btn goBtn">이 화면 열기</button></div>';
+   if(r.m!==undefined) h+='<textarea class="memoIn" placeholder="관찰·실패 사유">'+(r.m||'')+'</textarea>';
+   h+='</div>'; });
+  h+='</div>'; });
+ list.innerHTML=h;
+ GROUPS.forEach(function(g){ g[1].forEach(function(c){ var r=REC[c[0]]||{}; }); });
+ var all=allCases(); var P=0,F=0; all.forEach(function(c){ var r=REC[c[0]]||{}; if(r.s==='pass')P++; else if(r.s==='fail')F++; });
+ var T=all.length-P-F;
+ document.getElementById('nPass').textContent=P; document.getElementById('nFail').textContent=F; document.getElementById('nTodo').textContent=T;
+ document.getElementById('barP').style.width=(P/all.length*100)+'%'; document.getElementById('barF').style.width=(F/all.length*100)+'%';
+ document.getElementById('pct').textContent='진행 '+Math.round((P+F)/all.length*100)+'%';
+ document.getElementById('cnt').textContent=all.length+'건';
+ list.querySelectorAll('.tc').forEach(function(el){ var id=el.dataset.id; var c=all.find(function(x){return x[0]===id;});
+  el.querySelectorAll('[data-s]').forEach(function(b){ b.addEventListener('click',function(){ var r=REC[id]||{}; r.s=(r.s===b.dataset.s)?null:b.dataset.s; if(r.s==='fail'&&r.m===undefined) r.m=''; REC[id]=r; saveRec(); render(); }); });
+  el.querySelector('.memo').addEventListener('click',function(){ var r=REC[id]||{}; r.m=(r.m===undefined)?'':undefined; REC[id]=r; saveRec(); render(); });
+  var ta=el.querySelector('.memoIn'); if(ta) ta.addEventListener('input',function(){ REC[id].m=ta.value; saveRec(); });
+  el.querySelector('.goBtn').addEventListener('click',function(){ openCase(c[4]); }); });
+}
+document.querySelectorAll('[data-f]').forEach(function(b){ b.addEventListener('click',function(){ document.querySelectorAll('[data-f]').forEach(function(x){x.classList.remove('on');}); b.classList.add('on'); FILTER=b.dataset.f; render(); }); });
+document.getElementById('reload').addEventListener('click',function(){ frame.contentWindow.location.reload(); });
+document.getElementById('resetPrev').addEventListener('click',function(){ runInPreview('',true); });
+document.getElementById('widen').addEventListener('click',function(){ document.getElementById('right').classList.toggle('wide'); });
+document.getElementById('newwin').addEventListener('click',function(){ window.open('bo-operating-hours.html','_blank'); });
+function resultText(){ var out=[]; var all=allCases(); var P=0,F=0;
+ out.push('운영시간 설정 시안 검수 결과 ('+new Date().toLocaleString('ko-KR')+')');
+ GROUPS.forEach(function(g){ var lines=[]; g[1].forEach(function(c){ var r=REC[c[0]]||{}; if(r.s==='pass')P++; if(r.s==='fail')F++; if(r.s||r.m){ lines.push('  '+c[0]+' '+(r.s==='pass'?'통과':r.s==='fail'?'실패':'미확인')+' '+c[1]+(r.m?'\n     메모: '+r.m.replace(/\n/g,'\n     '):'')); } });
+  if(lines.length){ out.push('['+g[0]+']'); out=out.concat(lines); } });
+ out.unshift('통과 '+P+' / 실패 '+F+' / 미확인 '+(all.length-P-F)+' (전체 '+all.length+')'); return out.join('\n'); }
+document.getElementById('copy').addEventListener('click',function(){ document.getElementById('out').value=resultText(); document.getElementById('dlgTitle').textContent='결과'; document.getElementById('dlg').showModal(); });
+document.getElementById('doCopy').addEventListener('click',function(){ var ta=document.getElementById('out'); ta.select(); try{ navigator.clipboard.writeText(ta.value); }catch(e){ document.execCommand('copy'); } });
+document.getElementById('export').addEventListener('click',function(){ document.getElementById('out').value=JSON.stringify(REC); document.getElementById('dlgTitle').textContent='기록 내보내기 (이 글을 복사해 두세요)'; document.getElementById('dlg').showModal(); });
+document.getElementById('restore').addEventListener('click',function(){ askBox({title:'기록 불러오기',message:'내보낸 글을 붙여 넣으세요.',input:true,okText:'불러오기'},function(v){ if(!v) return; try{ REC=JSON.parse(v); saveRec(); render(); }catch(e){ tellBox('형식이 맞지 않습니다.'); } }); });
+document.getElementById('reset').addEventListener('click',function(){ askBox({title:'기록 초기화',message:'통과·실패·메모를 모두 지웁니다.',okText:'지우기'},function(v){ if(!v) return; REC={}; saveRec(); render(); }); });
+document.getElementById('resetKeep').addEventListener('click',function(){ askBox({title:'통과 외 초기화',message:'통과 건은 두고 실패·미확인·메모를 지웁니다.',okText:'지우기'},function(v){ if(!v) return; Object.keys(REC).forEach(function(k){ if(REC[k].s!=='pass') delete REC[k]; }); saveRec(); render(); }); });
+if(location.protocol==='file:') document.getElementById('fileWarn').style.display='block';
+render();
+</script>
+</body>
+</html>
