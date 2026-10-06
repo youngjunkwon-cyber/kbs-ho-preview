@@ -153,7 +153,7 @@ var WDS = ['일','월','화','수','목','금','토'];
 var NTH = {1:'첫 번째',2:'두 번째',3:'세 번째',4:'네 번째',last:'마지막'};
 /* 예약 샘플(확정 예약). 밀려나는 건수 계산용 */
 var BOOKINGS = [
- {at:'2026-09-12T19:30'}, {at:'2026-09-15T11:00'}, {at:'2026-09-17T12:00'}, {at:'2026-09-22T15:00'}, {at:'2026-09-08T11:00'}
+ {at:'2026-09-12T01:00'}, {at:'2026-09-12T19:30'}, {at:'2026-09-15T11:00'}, {at:'2026-09-17T12:00'}, {at:'2026-09-22T15:00'}, {at:'2026-09-08T11:00'}
 ];
 
 /* ===================== 상태 ===================== */
@@ -263,18 +263,21 @@ function nextOpenText(){
  return when+' '+x.open+'에 엽니다';
 }
 function badgeNext(r){ return (r.open&&r.close&&tmin(r.close)<=tmin(r.open)); }
-/* 자정을 넘긴 줄의 다음 요일은 휴무로 둘 수 없다 */
-function prevKey(k){ if(S.mode==='day') return 'd'+((+k[1]+6)%7); if(S.mode==='wk') return k==='wd'?'we':'wd'; return null; }
-function rowCrosses(r){ var weeklyOff=r.closed&&(S.mode!=='day'||r.period==='weekly'); return !weeklyOff&&badgeNext(r); }
-function lockedByPrev(k){ var p=prevKey(k); if(!p) return null; return rowCrosses(S.rows[p])?p:null; }
-function lockMsg(p,k){ return labelFor(p)+' 운영이 '+labelFor(k)+' 새벽까지 이어져 휴무로 둘 수 없습니다.'; }
-function chipLocked(w){ /* 쉬는 날 규칙 칩: 전날 줄이 자정을 넘기면 잠근다 */ var pd=new Date(2026,8,6+((w+6)%7)); var pk=keyFor(pd); if(!pk) return false; return rowCrosses(S.rows[pk]); }
+/* 영업일 기준: 자정을 넘긴 줄의 꼬리는 앞 요일에 속한다. 다음 요일이 휴무여도 꼬리는 그대로 연다 */
+function openAt(dt){ /* 특정 시각에 문이 열려 있는지(휴게 제외). 오늘 구간 또는 전날의 자정 넘김 꼬리 */
+ var m=dt.getHours()*60+dt.getMinutes();
+ var y=addDays(dt,-1), ey=effective(y);
+ if(!ey.closed&&ey.open&&ey.close&&crosses(ey)&&m<tmin(ey.close)) return inRange(ey,m+1440,true).st==='운영 중';
+ var e=effective(dt); if(e.closed||!e.open||!e.close) return false;
+ var o=tmin(e.open), c=tmin(e.close); if(c<=o) c+=1440;
+ if(m<o||m>=c) return false;
+ return inRange(e,m,false).st==='운영 중';
+}
 
 /* ===================== 검증 ===================== */
 function validate(){
  var errs={};
- visibleKeys().forEach(function(k){ var r=S.rows[k]; var p=lockedByPrev(k); if(p&&r.closed){ errs[k]=lockMsg(p,k); } });
- visibleKeys().forEach(function(k){ var r=S.rows[k]; if(errs[k]) return; if(S.mode==='day'&&r.closed&&r.period==='weekly') return; if(S.mode==='wk'&&r.closed) return;
+ visibleKeys().forEach(function(k){ var r=S.rows[k]; if(S.mode==='day'&&r.closed&&r.period==='weekly') return; if(S.mode==='wk'&&r.closed) return;
   var o=r.open, c=r.close;
   if((o&&!c)) { errs[k]='종료 시간을 넣어 주세요.'; return; }
   if((!o&&c)) { errs[k]='시작 시간을 넣어 주세요.'; return; }
@@ -292,12 +295,7 @@ function validate(){
 }
 function pushedCount(){
  var n=nowDate(); var c=0;
- BOOKINGS.forEach(function(b){ var d=new Date(b.at); if(d<n) return; var e=effective(d);
-  if(e.closed||!e.open||!e.close){ c++; return; }
-  var m=d.getHours()*60+d.getMinutes(), o=tmin(e.open), cl=tmin(e.close); if(cl<=o) cl+=1440;
-  if(m<o||m>=cl){ c++; return; }
-  for(var i=0;i<(e.breaks||[]).length;i++){ var bs=tmin(e.breaks[i].s), be=tmin(e.breaks[i].e); if(bs<o) bs+=1440; if(be<=bs) be+=1440; if(m>=bs&&m<be){c++;return;} }
- });
+ BOOKINGS.forEach(function(b){ var d=new Date(b.at); if(d<n) return; if(!openAt(d)) c++; });
  return c;
 }
 window.save=function(){
@@ -379,8 +377,7 @@ window.render=function(){
   h+='<div class="row"><div class="lb'+(weeklyOff?' off':'')+'">'+labelFor(k)+'</div><div class="body"><div class="line">';
   h+='<span class="pk'+(err&&/시간을 넣어/.test(err)?' err':'')+'"><input type="time" step="300" value="'+r.open+'" placeholder="시작 시간"'+dis+' onchange="S.rows[\''+k+'\'].open=this.value;render()"><span class="ar">→</span><input type="time" step="300" value="'+r.close+'"'+dis+' onchange="S.rows[\''+k+'\'].close=this.value;render()"><span class="ar">◷</span></span>';
   if(badgeNext(r)) h+='<span class="badge">다음날</span>';
-  var lockP=lockedByPrev(k);
-  if(k!=='same'){ h+='<label class="chk"'+(lockP&&!r.closed?' style="color:#bfbfbf" title="'+lockMsg(lockP,k)+'"':'')+'><input type="checkbox" '+(r.closed?'checked':'')+(lockP&&!r.closed?' disabled':'')+' onchange="toggleClosed(\''+k+'\')"> 휴무</label>'; }
+  if(k!=='same'){ h+='<label class="chk"><input type="checkbox" '+(r.closed?'checked':'')+' onchange="toggleClosed(\''+k+'\')"> 휴무</label>'; }
   if(S.mode==='day'&&r.closed){ h+='<select class="sel" onchange="setPeriod(\''+k+'\',this.value)"><option value="weekly"'+(r.period==='weekly'?' selected':'')+'>매주</option><option value="biweekly"'+(r.period==='biweekly'?' selected':'')+'>격주</option><option value="monthly"'+(r.period==='monthly'?' selected':'')+'>매월</option></select>';
    if(r.period==='biweekly') h+='<select class="sel" onchange="S.rows[\''+k+'\'].week=this.value;render()"><option value="1,3"'+(r.week==='1,3'?' selected':'')+'>첫 번째와 세 번째</option><option value="2,4"'+(r.week==='2,4'?' selected':'')+'>두 번째와 네 번째</option></select>';
    if(r.period==='monthly') h+='<select class="sel" onchange="S.rows[\''+k+'\'].week=this.value;render()">'+['1','2','3','4','last'].map(function(w){return '<option value="'+w+'"'+(r.week===w?' selected':'')+'>'+NTH[w]+'</option>';}).join('')+'</select>'; }
@@ -388,8 +385,6 @@ window.render=function(){
    h+='<button class="add" onclick="S.rows[\''+k+'\'].breaks.push({s:\'\',e:\'\'});render()">+ 휴게시간 추가</button>'; }
   h+='</div>';
   if(err) h+='<div class="msg">'+err+'</div>';
-  else if(lockP&&r.closed) h+='<div class="msg">'+lockMsg(lockP,k)+'</div>';
-  else if(lockP) h+='<div class="ex">'+labelFor(lockP)+' 운영이 '+labelFor(k)+' 새벽까지 이어져 휴무를 켤 수 없습니다.</div>';
   if(S.mode==='day'&&r.closed&&r.period!=='weekly'){ var day=+k[1]; h+='<div class="ex">'+exampleSentence(r,[day])+'</div>'; }
   h+='</div></div>';
  });
@@ -400,7 +395,7 @@ window.render=function(){
   S.rules.forEach(function(ru,i){ h+='<div class="rule"><div class="line"><select class="sel" onchange="S.rules['+i+'].period=this.value;if(this.value===\'biweekly\'&&!/,/.test(S.rules['+i+'].week))S.rules['+i+'].week=\'1,3\';if(this.value===\'monthly\'&&/,/.test(S.rules['+i+'].week))S.rules['+i+'].week=\'1\';render()"><option value="weekly"'+(ru.period==='weekly'?' selected':'')+'>매주</option><option value="biweekly"'+(ru.period==='biweekly'?' selected':'')+'>격주</option><option value="monthly"'+(ru.period==='monthly'?' selected':'')+'>매월</option></select>';
    if(ru.period==='biweekly') h+='<select class="sel" onchange="S.rules['+i+'].week=this.value;render()"><option value="1,3"'+(ru.week==='1,3'?' selected':'')+'>첫 번째와 세 번째</option><option value="2,4"'+(ru.week==='2,4'?' selected':'')+'>두 번째와 네 번째</option></select>';
    if(ru.period==='monthly') h+='<select class="sel" onchange="S.rules['+i+'].week=this.value;render()">'+['1','2','3','4','last'].map(function(w){return '<option value="'+w+'"'+(ru.week===w?' selected':'')+'>'+NTH[w]+'</option>';}).join('')+'</select>';
-   h+='<span class="chips">'+[1,2,3,4,5,6,0].map(function(d){ var lk=chipLocked(d)&&ru.days.indexOf(d)<0; return '<span class="chip'+(ru.days.indexOf(d)>=0?' on':'')+'"'+(lk?' style="color:#bfbfbf;border-style:dashed;cursor:not-allowed" title="전날 운영이 이 요일 새벽까지 이어져 휴무로 둘 수 없습니다."':' onclick="var a=S.rules['+i+'].days;var j=a.indexOf('+d+');j>=0?a.splice(j,1):a.push('+d+');render()"')+'>'+WDS[d]+'</span>';}).join('')+'</span>';
+   h+='<span class="chips">'+[1,2,3,4,5,6,0].map(function(d){return '<span class="chip'+(ru.days.indexOf(d)>=0?' on':'')+'" onclick="var a=S.rules['+i+'].days;var j=a.indexOf('+d+');j>=0?a.splice(j,1):a.push('+d+');render()">'+WDS[d]+'</span>';}).join('')+'</span>';
    h+='<button class="x" onclick="S.rules.splice('+i+',1);render()">✕</button></div>';
    if(ru.days.length) h+='<div class="ex">'+exampleSentence(ru,ru.days.slice().sort(function(a,b){return (a||7)-(b||7);}))+'</div>';
    h+='</div>'; });
@@ -478,7 +473,11 @@ function renderBot(){
  if(!hasHours()){ h+='운영시간은 매장에 직접 확인해 주세요.'; return h+'</div></div>'; }
  var st=statusNow(), e=effective(nowDate());
  var lines=['지금은 '+st.st+'입니다.'];
+ var n0=nowDate(), ey=effective(addDays(n0,-1)), m0=n0.getHours()*60+n0.getMinutes();
+ var tail=!ey.closed&&ey.open&&ey.close&&crosses(ey)&&m0<tmin(ey.close);
+ if(tail) lines.push(WD[addDays(n0,-1).getDay()]+' 운영이 '+ey.close+'까지 이어집니다.');
  if(!e.closed&&e.open) lines.push('오늘 운영시간은 '+e.open+'부터 '+(crosses(e)?'다음날 ':'')+e.close+'까지'+((e.breaks||[]).filter(function(b){return b.s&&b.e;}).length?' (휴게 '+(e.breaks||[]).filter(function(b){return b.s&&b.e;}).map(function(b){return b.s+'~'+b.e;}).join(', ')+')':'')+'입니다.');
+ else if(tail) lines.push('오늘('+WD[n0.getDay()]+')은 쉽니다.');
  if(st.st!=='운영 중'&&st.st!=='휴게 중'){ var nx=nextOpenText(); if(nx) lines.push(nx+'.'); }
  var n=nowDate(), t=todayStr(), lim=ymd(addDays(n,14));
  var near=S.specials.filter(function(sp){return sp.from>=t&&sp.from<=lim;}).sort(function(a,b){return a.from<b.from?-1:1;})[0];
