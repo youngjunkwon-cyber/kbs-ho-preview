@@ -171,7 +171,6 @@ const MSG = {
   lockCol:     ch => (ch === WEB ? '웹에만 노출되는 상태에서는 알리페이 앱 버튼을' : '알리페이 앱에만 노출되는 상태에서는 웹 버튼을') + ' 수정할 수 없습니다. 설정값은 유지됩니다.',
   storeFixed:  (ch, what) => '스토어의 노출 채널이 ' + ch + '이라 이 ' + what + '도 같은 채널에만 노출됩니다. 스토어 > 정보관리의 기본정보에서 바꿀 수 있습니다.',
   storeChange: (ch, n, m) => (n || m) ? ch + euro(ch) + ' 저장하면 이 스토어 ' + [n ? '상품 ' + n + '건' : '', m ? '칼럼 ' + m + '건' : ''].filter(Boolean).join('과 ') + '도 ' + other(ch) + '에 노출되지 않습니다.' : '',
-  aliNeedLang: '알리페이 앱 전용 스토어는 중국어(간체), 중국어(번체), 영어 중 하나 이상을 지원해야 합니다.',
   storeAll:    '지원언어와 무관하게 이 설정 하나가 모든 언어에 적용됩니다. 웹이나 알리페이 앱으로 정하면 이 스토어의 상품과 칼럼도 그 채널에만 노출됩니다.',
   bnExtLock:   '외부링크 배너는 웹에만 노출됩니다. 이 설정은 수정할 수 없습니다.',
   bnBtnExtLock:'하단 버튼이 외부링크입니다. 알리페이 앱에서는 이 버튼이 보이지 않습니다.',
@@ -1099,7 +1098,6 @@ window.save = function (kind) {
     return;
   }
   /* 스토어 채널을 전체에서 좁혀 저장하면 영향 범위를 확인한다 */
-  if (kind === 'store' && obj.channel === ALI && !storeHasTargetLang(obj)) { alertBox('저장할 수 없습니다', MSG.aliNeedLang); return; }
   const effPrev = kind === 'store' ? (storeHasTargetLang({ langs: VIEW.savedLangs }) ? VIEW.savedCh : WEB) : null, effNow = kind === 'store' ? effChStore(obj) : null;
   if (kind === 'store' && effNow !== ALLCH && effPrev !== effNow) {
     const ch = effNow, lost = other(ch), im = impactOfStoreCh(obj, ch);
