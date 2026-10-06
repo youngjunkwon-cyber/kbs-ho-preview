@@ -140,7 +140,7 @@ function resetDB() {
     blocked: '',          // '' | consent | prof | fail
     plaintext: true,      // 알리페이가 원본 휴대폰 권한을 승인해 준 상태인가 (담당 확인 결과에 따라 갈린다)
     plainLid: true,       // 알리페이가 원본 로그인 ID 권한을 승인해 준 상태인가
-    phoneGranted: true,   // 알리페이 권한 창의 휴대폰 번호 원본 (거부해도 통과, 원본 없음 갈래)
+    phoneGranted: true,   // 알리페이 권한 창의 휴대폰 번호 원본 (승인된 동안 필수, 거부하면 차단)
     lidGranted: true,     // 알리페이 권한 창의 알리페이 로그인 ID 원본 (거부해도 통과)
     lidOk: false,         // 회원 정보에 로그인 ID 원본이 저장됐는가
     wallet: 'CN',
@@ -205,7 +205,7 @@ var VIEWS = [
   ['bo11', 'BO-CH-11 알리페이 회원']
 ];
 var CAPS = {
-  fo09: '권한 창은 알리페이 앱이 그립니다. 우리 화면에 합칠 수 없습니다. 알리페이에서 식별자를 받은 직후 한 번 뜹니다. 회원을 만들기 전이라 뒤 화면은 비어 있고 어둡게만 깔립니다. 이용 약관, 개인정보 처리방침, 알리페이 프로필 제공 셋이 필수라 셋을 다 체크해야 동의 버튼이 켜집니다. 권한 창의 연락처는 필수 권한이라 끄고 허용하면 진입 차단 화면으로 갑니다. 휴대폰 번호 원본과 알리페이 로그인 ID 원본은 알리페이가 승인한 경우에만 요청하고, 끄고 허용해도 들어옵니다(원본 없음 갈래). 마케팅 정보 수신은 선택입니다. 동의를 누르면 알리페이가 권한 창을 한 번 더 띄웁니다. 권한 창에서 허용한 뒤 회원을 만들기 전에 생년월일을 봅니다. 생년월일이 없는 회원에게는 만 14세 확인 창이 뜨고, 만 14세 이상입니다를 체크해야 확인하고 시작하기 버튼이 켜지고 회원이 만들어집니다. 확인 창을 닫으면 진입 차단 화면으로 가고, 다시 동의하기를 누르면 확인 창이 다시 뜹니다. 생년월일로 만 14세 미만이 확인되면 진입 차단 화면으로 갑니다(상단 생년월일 바꾸기로 확인).',
+  fo09: '권한 창은 알리페이 앱이 그립니다. 우리 화면에 합칠 수 없습니다. 알리페이에서 식별자를 받은 직후 한 번 뜹니다. 회원을 만들기 전이라 뒤 화면은 비어 있고 어둡게만 깔립니다. 이용 약관, 개인정보 처리방침, 알리페이 프로필 제공 셋이 필수라 셋을 다 체크해야 동의 버튼이 켜집니다. 권한 창의 연락처는 필수 권한이라 끄고 허용하면 진입 차단 화면으로 갑니다. 휴대폰 번호 원본은 알리페이가 승인한 경우에만 요청하고 필수라 끄고 허용하면 진입 차단 화면으로 갑니다. 알리페이 로그인 ID 원본은 승인한 경우에만 요청하고 끄고 허용해도 들어옵니다(원본 없음 갈래). 마케팅 정보 수신은 선택입니다. 동의를 누르면 알리페이가 권한 창을 한 번 더 띄웁니다. 권한 창에서 허용한 뒤 회원을 만들기 전에 생년월일을 봅니다. 생년월일이 없는 회원에게는 만 14세 확인 창이 뜨고, 만 14세 이상입니다를 체크해야 확인하고 시작하기 버튼이 켜지고 회원이 만들어집니다. 확인 창을 닫으면 진입 차단 화면으로 가고, 다시 동의하기를 누르면 확인 창이 다시 뜹니다. 생년월일로 만 14세 미만이 확인되면 진입 차단 화면으로 갑니다(상단 생년월일 바꾸기로 확인).',
   fo08: '상단 상태의 차단 이유 버튼으로 네 가지(동의 창 닫기 / 프로필 거부 / 식별 실패 / 만 14세 미만)를 바꿔 볼 수 있습니다. 헤더, 메뉴, 검색이 없습니다. 필수를 거부하거나 닫았을 때, 알리페이 권한 창에서 프로필을 거부했을 때, 식별에 실패했을 때, 생년월일로 만 14세 미만이 확인됐을 때 머무는 화면입니다. 둘러보기는 없습니다. 버튼은 하나이고, 만 14세 미만 화면에는 버튼이 없습니다.',
   fo10: '알리페이 식별이 로그인을 대신합니다. 로그인 주소로 직접 들어오면 마이페이지로 보냅니다. 알리페이 채널에서는 자체 로그인 경로를 숨깁니다. 점선 박스가 웹 채널에는 있고 알리페이 채널에는 없는 자리입니다. 진입 관문을 통과해야 들어오므로 비로그인 상태 자체가 없습니다.',
   fo11: '알리페이에서 받은 프로필이 채워져 있고 이용자가 고칠 수 있습니다. 시안에서는 칸을 누르면 다른 예시 값으로 바뀌고, 칸을 벗어나는 즉시 회원 정보에 저장된 것으로 봅니다(알리페이 회원 탭에서 확인). 예약 입력에서 넣은 번호는 예약 요청 때, 마이페이지에서 넣은 번호는 인증 즉시 저장됩니다. 비밀번호와 이메일 항목이 없습니다. 휴대폰 번호는 원본 권한이 승인되면 채워지고, 안 왔으면 예약에서 입력한 값이 보입니다.',
@@ -217,9 +217,9 @@ var CAPS = {
 function h(s) { return s == null ? '' : String(s); }
 function dash(v) { return v ? h(v) : '<span class="dash">-</span>'; }
 function go(v) { if (S.view === 'fo13' && v !== 'fo13') S.userSet = {}; if (v === 'fo13' && S.view !== 'fo13') { S.tel = S.mtel; S.telVerified = !!S.mtel; S.telSrc = S.mtelSrc; S.telEdited = false; S.telSaved = S.mtelSaved; } S.view = v; render(); }
-/* 권한 창에서 허용. 연락처를 끄면 차단, 생년월일로 만 14세 미만이면 차단, 생년월일이 없으면 만 14세 확인 창 */
+/* 권한 창에서 허용. 연락처를 끄거나 승인된 휴대폰 번호 원본을 끄면 차단, 생년월일로 만 14세 미만이면 차단, 생년월일이 없으면 만 14세 확인 창 */
 function allowPerm() {
-  if (!S.contactGranted) { S.step = 'blocked'; S.blocked = 'prof'; S.view = 'fo08'; return; }
+  if (!S.contactGranted || (S.plaintext && !S.phoneGranted)) { S.step = 'blocked'; S.blocked = 'prof'; S.view = 'fo08'; return; }
   if (S.birthMode === 'minor') { S.step = 'blocked'; S.blocked = 'minor'; S.view = 'fo08'; return; }
   if (S.birthMode === 'none') { S.step = 'age'; S.agAge = false; return; }
   joinNow();
@@ -257,7 +257,7 @@ function fo09() {
       '<h4>K-Beauty Station이 다음 정보를 요청합니다</h4>' +
       '<ul class="lst"><li>이름, 닉네임, 프로필 사진</li><li>성별, 생년월일, 국적, 주소</li><li>연락처</li>' + (S.plaintext ? '<li>휴대폰 번호 원본</li>' : '') + (S.plainLid ? '<li>알리페이 로그인 ID 원본</li>' : '') + '</ul>' +
       '<div class="tg"><span>연락처 (필수)</span><span class="sw ' + (S.contactGranted ? 'on' : '') + '" onclick="S.contactGranted=!S.contactGranted;render()"><i></i></span></div>' +
-      (S.plaintext ? '<div class="tg"><span>휴대폰 번호 원본</span><span class="sw ' + (S.phoneGranted ? 'on' : '') + '" onclick="S.phoneGranted=!S.phoneGranted;render()"><i></i></span></div>' : '') +
+      (S.plaintext ? '<div class="tg"><span>휴대폰 번호 원본 (필수)</span><span class="sw ' + (S.phoneGranted ? 'on' : '') + '" onclick="S.phoneGranted=!S.phoneGranted;render()"><i></i></span></div>' : '') +
       (S.plainLid ? '<div class="tg"><span>알리페이 로그인 ID 원본</span><span class="sw ' + (S.lidGranted ? 'on' : '') + '" onclick="S.lidGranted=!S.lidGranted;render()"><i></i></span></div>' : '') +
       '<div class="row2" style="margin-top:14px"><div class="ab" onclick="S.step=\'blocked\';S.blocked=\'prof\';S.view=\'fo08\';render()">거부</div><div class="ab pri" onclick="allowPerm();render()">허용</div></div>' +
       '</div></div>';
