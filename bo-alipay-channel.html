@@ -161,7 +161,6 @@ const MSG = {
   hardOff:     '알리페이 앱 미지원 항목입니다.',
   inquiryHint: '기존 문의하기 버튼입니다. 다른 항목처럼 독립된 버튼이라 켜면 1개로 셉니다.',
   bnBtnTarget: (label, ch) => '연결 대상(' + label + ')이 ' + ch + '에 노출되지 않습니다. ' + ch + '에서는 하단 버튼이 보이지 않습니다.',
-  bnDirectExt: '외부 사이트 주소라 웹에만 노출됩니다. 이 설정은 수정할 수 없습니다.',
   storeAliBlock: (n, m) => '일본어·인도네시아어·몽골어 ' + [n ? '상품 ' + n + '건' : '', m ? '칼럼 ' + m + '건' : ''].filter(Boolean).join('과 ') + '이 있어 알리페이 앱 전용으로 바꿀 수 없습니다. 해당 ' + [n ? '상품' : '', m ? '칼럼' : ''].filter(Boolean).join('·') + '을 정리한 뒤 바꿔 주세요.',
   colAliBlock: '일본어·인도네시아어·몽골어를 켠 칼럼은 알리페이 앱 전용으로 바꿀 수 없습니다. 해당 언어를 끈 뒤 바꿔 주세요.',
   needBooking: '예약설정에서 예약을 사용하면 켤 수 있습니다.',
@@ -343,8 +342,7 @@ function effChStore(st) { return storeHasTargetLang(st) ? st.channel : WEB; }
 function effChProduct(p) { if (!langOk(p.lang)) return WEB; const s = effChStore(S(p.store)); return s !== ALLCH ? s : p.channel; }
 const colLangOk = c => String(c.langs || '').split(',').some(x => langOk(x.trim()));
 function effChColumn(c) { if (!colLangOk(c)) return WEB; const s = effChStore(S(c.store)); return s === ALLCH ? c.channel : s; }
-function effChAd(b) { if (!langOk(b.lang)) return WEB; if (b.linkType === '외부링크') return WEB;
-  if (b.linkType === '내부링크' && b.inner && b.inner.kind === '직접입력' && isExternalDirectPath(b.inner.path)) return WEB; return b.channel; }
+function effChAd(b) { if (!langOk(b.lang)) return WEB; if (b.linkType === '외부링크') return WEB; return b.channel; }
 function effChColl(c) { return langOk(c.lang) ? c.channel : WEB; }
 function effChMag(m) { return langOk(m.lang) ? m.channel : WEB; }
 const chIncludes = (eff, ch) => eff === ALLCH || eff === ch;
@@ -364,28 +362,10 @@ function visStore(st, ch) { return st.active !== false && chIncludes(effChStore(
 function visColumn(c, ch) { return c.status === '게시중' && S(c.store).active !== false && chIncludes(effChColumn(c), ch); }
 function visMag(m, ch) { return m.status === '게시' && chIncludes(effChMag(m), ch); }
 
-const OUR_HOST = /^https?:\/\/(?:www\.k-beautystation\.com|k-beautystation\.com|alipay-app\.kbstations\.com)(?::\d+)?(?=\/|$|[?#])/i;
-/* 스킴 없이 적은 우리 도메인 (k-beautystation.com/products/P1) */
-const OUR_HOST_BARE = /^(?:www\.k-beautystation\.com|k-beautystation\.com|alipay-app\.kbstations\.com)(?::\d+)?(?=\/|$|[?#])/i;
 /* 인플루언서 기획전의 노출 채널 = 담은 상품이 노출되는 채널 */
 function effChInfl(f) { const chs = [WEB, ALI].filter(ch => (f.products || []).some(id => P(id) && visProduct(P(id), ch))); return chs.length === 2 ? ALLCH : chs.length ? chs[0] : '없음'; }
-function isExternalDirectPath(raw) {
-  const v = String(raw || '').trim(); if (!v) return false;
-  if (/^(javascript|data|vbscript):/i.test(v)) return true;
-  if (/^\/\//.test(v)) return true;
-  if (/^https?:\/\//i.test(v)) return !OUR_HOST.test(v);
-  /* 허용 스킴(http·https·상대 경로) 밖의 스킴은 전부 외부 */
-  if (/^[a-z][a-z0-9+.-]*:/i.test(v)) return true;
-  if (/^\//.test(v)) return false;
-  if (OUR_HOST_BARE.test(v)) return false;
-  /* 스킴 없이 적은 주소는 첫 구간을 호스트로 읽는다. 내부 호스트 셋이 아니면 외부 */
-  if (/^[a-z0-9-]+(?:\.[a-z0-9-]+)+(?=\/|$|[?#])/i.test(v)) return true;
-  return false;
-}
 function parseInternalPath(raw) {
   let v = String(raw || '').trim();
-  if (OUR_HOST.test(v)) v = v.replace(OUR_HOST, '') || '/';
-  else if (OUR_HOST_BARE.test(v)) v = v.replace(OUR_HOST_BARE, '') || '/';
   const m = v.match(/^(?:\/[a-z]{2}(?:-[A-Za-z]{2,4})?)?\/(products|stores|collections|influencers)\/([^\/?#]+)\/?(?:[?#].*)?$/);
   return m ? { type: m[1], id: m[2] } : null;
 }
@@ -394,7 +374,6 @@ function innerTargetOk(inner, lang, ch) {
   if (!inner) return { ok: true, label: '대상 없음', skip: true };
   const byLang = (l) => !lang || !l || l === lang;
   if (inner.kind === '직접입력') {
-    if (isExternalDirectPath(inner.path)) return { ok: false, label: '외부 사이트 주소입니다', ext: true };
     const parsed = parseInternalPath(inner.path);
     if (!parsed) return { ok: true, label: inner.path ? '직접입력 (목록 페이지)' : '직접입력 (주소 없음)', skip: true };
     if (parsed.type === 'products') { const p = P(parsed.id); if (!p) return { ok: false, label: MSG.bnNotFound, notFound: true };
@@ -426,7 +405,7 @@ function judgeAd(b, ch) {
   if (!liveNow({ active: b.adNotice === '활성화', from: b.from, to: b.to })) return { visible: false, reason: '', off: true };
   let tv = null;
   if (b.linkType === '내부링크') tv = innerTargetOk(b.inner, b.lang, ch);
-  if (tv && !tv.skip && !tv.ok && !tv.ext) return { visible: false, reason: MSG.noTarget(ch), targetLabel: tv.label };
+  if (tv && !tv.skip && !tv.ok) return { visible: false, reason: MSG.noTarget(ch), targetLabel: tv.label };
   return { visible: true, reason: '' };
 }
 /* 랜딩페이지 하단 버튼이 그 채널에 나가는가. 버튼은 배너 노출과 무관 */
@@ -435,7 +414,7 @@ function judgeAdBtn(b, ch) {
   const key = ch === WEB ? 'web' : 'ali';
   if (!b.btn[key]) return { show: false };
   if (b.btn.linkKind === '외부링크') return { show: ch === WEB, why: ch === WEB ? '' : '외부링크' };
-  if (b.btn.linkKind === '내부링크' && b.btn.inner) { const tv = innerTargetOk(b.btn.inner, b.lang, ch); if (tv.ext) return { show: ch === WEB, why: ch === WEB ? '' : '외부 사이트' }; if (!tv.skip && !tv.ok) return { show: false, why: tv.label }; }
+  if (b.btn.linkKind === '내부링크' && b.btn.inner) { const tv = innerTargetOk(b.btn.inner, b.lang, ch); if (!tv.skip && !tv.ok) return { show: false, why: tv.label }; }
   return { show: true };
 }
 const COLL_TYPES = ['병원', '추천상품', '특가', 'TOP10'];
@@ -797,7 +776,7 @@ function innerOpts(kind, keepId, all) {
 /* 배너 채널에서 대상이 빠지는 채널 목록 */
 function targetMiss(inner, b) {
   const bch = effChAd(b); const chs = bch === ALLCH ? [WEB, ALI] : [bch];
-  return chs.filter(ch => { const tv = innerTargetOk(inner, b.lang, ch); return !tv.skip && !tv.ok && !tv.ext; });
+  return chs.filter(ch => { const tv = innerTargetOk(inner, b.lang, ch); return !tv.skip && !tv.ok; });
 }
 function innerPicker(kindH, idH, cur, pathH, b) {
   const kind = (cur && cur.kind) || '직접입력';
@@ -808,7 +787,7 @@ function innerPicker(kindH, idH, cur, pathH, b) {
     const miss = targetMiss(cur, b);
     const fid = /^setBtn/.test(kindH) ? 'dp_btn' : 'dp_ad';
     tail = '<input type="text" id="' + fid + '" placeholder="/products/P1" style="width:220px" value="' + esc((cur && cur.path) || '') + '" oninput="var k=this.selectionStart;' + pathH + ';refocus(\'' + fid + '\',k)"> ' +
-      '<span class="tblnote">' + (tv.skip ? tv.label : tv.ext ? tv.label : tv.notFound ? tv.label : (miss.length === 2 ? '노출되지 않음, ' : tv.eff ? '노출 채널 ' + tv.eff + ', ' : '') + tv.label + (miss.length === 1 ? '. ' + miss[0] + '에 노출되지 않습니다.' : '')) + '</span>';
+      '<span class="tblnote">' + (tv.skip ? tv.label : tv.notFound ? tv.label : (miss.length === 2 ? '노출되지 않음, ' : tv.eff ? '노출 채널 ' + tv.eff + ', ' : '') + tv.label + (miss.length === 1 ? '. ' + miss[0] + '에 노출되지 않습니다.' : '')) + '</span>';
   } else tail = '<select onchange="' + idH + '">' + opts.map(o => '<option value="' + o[0] + '"' + (cur && cur.id === o[0] ? ' selected' : '') + '>' + esc(o[1]) + '</option>').join('') + '</select>';
   return '<select onchange="' + kindH + '">' + INNER_KINDS.map(k => '<option' + (k === kind ? ' selected' : '') + '>' + k + '</option>').join('') + '</select> ' + tail;
 }
@@ -833,7 +812,6 @@ window.setAdBtnShow = function (ch, v) { const b = A(VIEW.id); b.btn[ch] = !!v; 
 function modal_ad() {
   const b = A(VIEW.id), lOk = langOk(b.lang);
   const isExt = b.linkType === '외부링크', isLanding = b.linkType === '내부이미지랜딩페이지';
-  const directExt = b.linkType === '내부링크' && b.inner && b.inner.kind === '직접입력' && isExternalDirectPath(b.inner.path);
   const eff = effChAd(b);
   const extBtn = isLanding && b.btn && b.btn.linkKind === '외부링크';
   let h = '<div class="row"><div class="lbl"><span class="req">*</span>언어</div><div class="val">' + b.lang + '</div></div>' +
@@ -842,8 +820,8 @@ function modal_ad() {
     '<div class="row"><div class="lbl"><span class="req">*</span>배너위치</div><div class="val">' + b.pos + '</div></div>' +
     '<div class="row"><div class="lbl"><span class="req">*</span>광고진행일정</div><div class="val">' + b.from + ' ~ ' + b.to + '</div></div>' +
     '<div class="row"><div class="lbl"><span class="req">*</span>광고표기여부</div><div class="val"><span class="rg">' + radio('adn', '활성화', b.adNotice, 'void(0)', true) + radio('adn', '비활성화', b.adNotice, 'void(0)', true) + '</span></div></div>' +
-    '<div class="row"><div class="lbl"><span class="req">*</span>노출 채널</div><div class="val">' + chRadio('bch', eff, 'ad', !lOk || isExt || directExt) +
-    (lOk && isExt ? '<div class="hint">' + MSG.bnExtLock + '</div>' : lOk && directExt ? '<div class="hint">' + MSG.bnDirectExt + '</div>' : '') + '</div></div>' +
+    '<div class="row"><div class="lbl"><span class="req">*</span>노출 채널</div><div class="val">' + chRadio('bch', eff, 'ad', !lOk || isExt) +
+    (lOk && isExt ? '<div class="hint">' + MSG.bnExtLock + '</div>' : '') + '</div></div>' +
     '<div class="row"><div class="lbl"><span class="req">*</span>링크종류</div><div class="val"><select onchange="setAdLinkType(this.value)">' + ['외부링크', '내부링크', '내부이미지랜딩페이지'].map(v => '<option' + (v === b.linkType ? ' selected' : '') + '>' + v + '</option>').join('') + '</select></div></div>';
   if (isExt) h += '<div class="row"><div class="lbl"><span class="req">*</span>외부링크</div><div class="val"><input type="text" class="fin" style="width:100%" value="' + esc(b.url) + '" readonly></div></div>';
   if (b.linkType === '내부링크') h += '<div class="row"><div class="lbl"><span class="req">*</span>내부링크</div><div class="val">' + innerPicker('setAdInnerKind(this.value)', 'setAdInnerId(this.value)', b.inner, 'setAdInnerPath(this.value)', b) + '</div></div>';
@@ -853,20 +831,19 @@ function modal_ad() {
   let tail = '';
   if (lOk) {
     if (b.linkType === '내부링크' && b.inner) { const miss = targetMiss(b.inner, b); const tv = innerTargetOk(b.inner, b.lang, WEB);
-      if (miss.length && !tv.skip && !tv.ext && !tv.notFound) tail = '<div class="notice">' + MSG.bnTarget(tv.label, miss.length === 2 ? '웹과 알리페이 앱' : miss[0]) + '</div>'; }
+      if (miss.length && !tv.skip && !tv.notFound) tail = '<div class="notice">' + MSG.bnTarget(tv.label, miss.length === 2 ? '웹과 알리페이 앱' : miss[0]) + '</div>'; }
     if (isLanding && b.btn && b.btn.linkKind === '내부링크' && b.btn.inner) { const chs = [WEB, ALI].filter(ch => chIncludes(eff, ch) && b.btn[ch === WEB ? 'web' : 'ali']);
-      const nf = [], bad = []; for (const ch of chs) { const tv = innerTargetOk(b.btn.inner, b.lang, ch); if (!tv.skip && !tv.ok && !tv.ext) { if (tv.notFound) nf.push(ch); else bad.push([tv.label, ch]); } }
+      const nf = [], bad = []; for (const ch of chs) { const tv = innerTargetOk(b.btn.inner, b.lang, ch); if (!tv.skip && !tv.ok) { if (tv.notFound) nf.push(ch); else bad.push([tv.label, ch]); } }
       if (bad.length === 2 && bad[0][0] === bad[1][0]) tail += '<div class="notice">' + MSG.bnBtnTarget(bad[0][0], '웹과 알리페이 앱') + '</div>'; else bad.forEach(x => { tail += '<div class="notice">' + MSG.bnBtnTarget(x[0], x[1]) + '</div>'; });
       if (nf.length) tail += '<div class="notice">' + (nf.length === 2 ? '웹과 알리페이 앱' : nf.join('과 ')) + '에서는 하단 버튼이 보이지 않습니다.</div>'; }
   }
   if (isLanding && b.btn) {
-    const directExtBtn = b.btn.linkKind === '내부링크' && b.btn.inner && b.btn.inner.kind === '직접입력' && isExternalDirectPath(b.btn.inner.path);
-    const aliLockBtn = extBtn || directExtBtn || eff === WEB || !lOk, webLockBtn = eff === ALI;
+    const aliLockBtn = extBtn || eff === WEB || !lOk, webLockBtn = eff === ALI;
     h += '<div class="blk">하단 버튼</div>' +
       '<div class="row"><div class="lbl"><span class="req">*</span>버튼 표시여부</div><div class="val"><div style="display:flex;gap:36px;flex-wrap:wrap;align-items:center">' +
       '<span class="' + (webLockBtn ? 'lock' : '') + '"><span class="tblnote" style="margin-right:8px">웹</span>' + onoff('bshw', b.btn.web, "setAdBtnShow('web',%V%)", webLockBtn, ['활성화', '비활성화']) + '</span>' +
-      '<span class="' + (aliLockBtn ? 'lock' : '') + '"><span class="tblnote" style="margin-right:8px">알리페이 앱</span>' + onoff('bsha', (extBtn || directExtBtn) ? false : b.btn.ali, "setAdBtnShow('ali',%V%)", aliLockBtn, ['활성화', '비활성화']) + '</span></div>' +
-      (!lOk ? '' : eff !== ALLCH ? '<div class="hint">' + MSG.lockCol(eff) + '</div>' : extBtn ? '<div class="hint">' + MSG.bnBtnExtLock + '</div>' : directExtBtn ? '<div class="hint">하단 버튼이 외부 사이트 주소입니다. 알리페이 앱에서는 이 버튼이 보이지 않습니다.</div>' : '') + '</div></div>' +
+      '<span class="' + (aliLockBtn ? 'lock' : '') + '"><span class="tblnote" style="margin-right:8px">알리페이 앱</span>' + onoff('bsha', extBtn ? false : b.btn.ali, "setAdBtnShow('ali',%V%)", aliLockBtn, ['활성화', '비활성화']) + '</span></div>' +
+      (!lOk ? '' : eff !== ALLCH ? '<div class="hint">' + MSG.lockCol(eff) + '</div>' : extBtn ? '<div class="hint">' + MSG.bnBtnExtLock + '</div>' : '') + '</div></div>' +
       '<div class="row"><div class="lbl"><span class="req">*</span>버튼 텍스트</div><div class="val"><input type="text" class="fin" value="' + esc(b.btn.label) + '" style="width:260px" readonly></div></div>' +
       '<div class="row"><div class="lbl"><span class="req">*</span>버튼 링크 종류</div><div class="val"><select onchange="setBtnLinkKind(this.value)">' + ['링크없음', '외부링크', '내부링크'].map(v => '<option' + (v === b.btn.linkKind ? ' selected' : '') + '>' + v + '</option>').join('') + '</select></div></div>' +
       (b.btn.linkKind === '외부링크' ? '<div class="row"><div class="lbl">버튼 링크</div><div class="val"><input type="text" class="fin" style="width:100%" value="' + esc(b.btn.url || '') + '" readonly></div></div>' : '') +
@@ -1023,7 +1000,7 @@ window.saveAd = function () {
     const inner = b.linkType === '내부링크' ? b.inner : null;
     if (inner) { const miss = targetMiss(inner, b); const tv = innerTargetOk(inner, b.lang, WEB);
       if (inner.kind === '직접입력' && tv.notFound) { alertBox('저장할 수 없습니다', MSG.bnNotFound); return; }
-      if (miss.length && !tv.skip && !tv.ext) { alertBox('저장할 수 없습니다', MSG.bnBlock(miss.join('과 '))); return; } }
+      if (miss.length && !tv.skip) { alertBox('저장할 수 없습니다', MSG.bnBlock(miss.join('과 '))); return; } }
   }
   done();
 };
