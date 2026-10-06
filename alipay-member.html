@@ -71,7 +71,7 @@ td.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;letter-
 .mrow{display:flex;justify-content:space-between;align-items:center;padding:15px 0;border-bottom:1px solid #f4f4f4;font-size:14px}
 .mrow:last-child{border-bottom:0}
 .mrow .a{color:#c0c0c0}
-.mrow.dim{color:#bfbfbf}
+.mrow.off{color:#bfbfbf}
 .cta{margin:16px;padding:14px;border-radius:8px;background:#222;color:#fff;text-align:center;font-size:14px;font-weight:500;cursor:pointer}
 .cta.ghost{background:#fff;color:#262626;border:1px solid #d9d9d9}
 .cta.dis{background:#e8e8e8;color:#aaa;cursor:not-allowed}
@@ -330,7 +330,7 @@ function fo11() {
   var tel = '<div class="fld"><div class="l">휴대폰 번호' + (S.mtelSrc === 'ali' && S.mtel && !S.mtelDraft ? '<span class="autotag">알리페이 계정에서 채웠습니다</span>' : '') + '</div>' +
     '<div class="in ' + (mv ? '' : 'plc') + '" onclick="S.mtelDraft=nextTel(S.mtelDraft||S.mtel,S.mtelSrc===\'ali\');if(S.mtelDraft===S.mtel)S.mtelDraft=\'\';render()">' + (mv || '눌러서 입력해 주세요.') + '</div>' +
     (S.mtelDraft ? '<div class="vrow" style="margin-top:6px"><div class="vbtn" onclick="S.mtel=S.mtelDraft;S.mtelDraft=\'\';S.mtelSrc=\'user\';S.mtelSaved=true;render()">문자 인증</div></div><div class="sub">입력한 번호로 문자 인증을 합니다.</div>' : (S.mtel ? '<div class="sub">고치면 문자 인증을 다시 합니다.</div>' : '')) + '</div>';
-  var rows = ['예약 내역', '채팅', '알림·마케팅 수신 설정', '언어 설정', '이용 약관', '개인정보 처리방침'].map(function (t) { return '<div class="mrow dim"><span>' + t + '</span><span class="a">›</span></div>'; }).join('') +
+  var rows = ['예약 내역', '채팅', '알림·마케팅 수신 설정', '언어 설정', '이용 약관', '개인정보 처리방침'].map(function (t) { return '<div class="mrow off"><span>' + t + '</span><span class="a">›</span></div>'; }).join('') +
     '<div class="mrow" onclick="go(\'fo12\')" style="cursor:pointer"><span>회원 탈퇴</span><span class="a">›</span></div>';
   return phone('마이페이지',
     '<div class="sec"><div class="box"><div class="nm">' + h(p.name) + '</div><div class="sub">알리페이 계정으로 이용 중입니다.</div></div></div>' +
