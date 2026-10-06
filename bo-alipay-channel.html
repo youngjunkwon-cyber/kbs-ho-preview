@@ -183,6 +183,7 @@ const MSG = {
   saveColl:    (s, ch) => ch + '에 노출 가능한 ' + s + ' 없습니다. 저장하면 ' + ch + '에서는 기획전이 보이지 않습니다.',
   typeSwitch:  (was, n, now, inactive) => '유형을 바꾸면 담은 ' + was + ' ' + n + '건이 지워지고 ' + now + '만 담을 수 있습니다.' + (inactive ? '' : ' ' + now + eul(now) + ' 1건 이상 담아야 저장할 수 있습니다.'),
   hostHidden:  '이 상품은 알리페이 앱에서는 보이지 않아요.',
+  hostHiddenWeb: '이 상품은 웹에서는 보이지 않아요.',
   hostLangLimit: '이 매장은 알리페이 앱 전용이라 중국어(간체), 중국어(번체), 영어만 등록할 수 있어요.',
   storeDefault:'기본 설정은 스토어 버튼 구성을 그대로 적용합니다.',
   msgLang:     '메신저 설정을 켜면 언어별로 1개씩 등록할 수 있습니다.',
@@ -931,10 +932,10 @@ function modal_coll() {
 /* --------------------------- 호스트 상품 수정 --------------------------- */
 function screen_hEdit() {
   const p = P(VIEW.hid || 'P8'), eff = effChProduct(p);
-  const hiddenInAli = langOk(p.lang) && eff === WEB;
+  const hiddenInAli = langOk(p.lang) && eff === WEB, hiddenInWeb = langOk(p.lang) && eff === ALI;
   return '<div class="phd"><div><h2 class="page">상품 수정</h2><div class="pdesc">내 상품 &gt; ' + esc(p.name) + '</div></div>' +
     '<div class="fl"><span>시안 전환</span><select onchange="VIEW.hid=this.value;render()">' + DB.products.filter(x => langOk(x.lang)).map(x => '<option value="' + x.id + '"' + (x.id === p.id ? ' selected' : '') + '>' + esc(x.name) + '</option>').join('') + '</select></div></div>' +
-    (hiddenInAli ? '<div class="card"><div class="bd"><div class="notice">' + MSG.hostHidden + '</div><div class="hint">알리페이 앱 노출은 K-Beauty Station 담당자에게 문의해 주세요.</div></div></div>' : '') +
+    (hiddenInAli ? '<div class="card"><div class="bd"><div class="notice">' + MSG.hostHidden + '</div><div class="hint">알리페이 앱 노출은 K-Beauty Station 담당자에게 문의해 주세요.</div></div></div>' : hiddenInWeb ? '<div class="card"><div class="bd"><div class="notice">' + MSG.hostHiddenWeb + '</div><div class="hint">웹 노출은 K-Beauty Station 담당자에게 문의해 주세요.</div></div></div>' : '') +
     '<div class="card"><div class="hd">상품 정보</div><div class="bd">' +
     '<div class="row"><div class="lbl">상품명</div><div class="val">' + esc(p.name) + '</div></div>' +
     '<div class="row"><div class="lbl">언어</div><div class="val">' + p.lang + (effChStore(S(p.store)) === ALI ? '<div class="hint">' + MSG.hostLangLimit + '</div>' : '') + '</div></div>' +
