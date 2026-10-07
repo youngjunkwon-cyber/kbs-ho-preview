@@ -118,13 +118,40 @@ select.dim{color:#8c8c8c}
 .btn.dash{border-style:dashed;border-color:#1677ff;color:#1677ff}
 .btn.dash:hover{border-color:#1677ff;color:#1677ff}
 .pickrow{margin:0 16px 14px;padding:10px 12px;border:1px dashed #d9d9d9;border-radius:4px;background:#fafafa}
+
+/* 호스트 화면 셸 (실제 호스트: 상단바 + 흰 사이드바 + 핑크 활성 메뉴) */
+body.host{background:#f5f5f5;font-family:Inter,"Noto Sans KR","Malgun Gothic",sans-serif}
+.host .app{display:grid;grid-template-columns:188px minmax(0,1fr);grid-template-rows:56px 1fr;min-height:100vh}
+.host .main{display:contents}
+.host .top{grid-column:1/3;grid-row:1;height:56px;padding:0 20px 0 12px;justify-content:space-between;border-bottom:1px solid #ececec}
+.host .side{grid-column:1;grid-row:2;flex:none;width:auto;border-right:1px solid #ececec;display:flex;flex-direction:column;padding-top:8px}
+.host .body{grid-column:2;grid-row:2;padding:0;display:block}
+.host .col-main{padding:0}
+.host .phd{background:#fff;margin:0;padding:12px 20px 10px;border-bottom:1px solid #ececec}
+.host h2.page{font-size:16px;margin:0 0 2px}
+.host .pdesc{font-size:11px}
+.host .card{margin:16px 20px;border-radius:4px;box-shadow:none;border:1px solid #efefef}
+.host .card>.hd{font-size:14px}
+.hbrand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:#222}
+.hk{width:24px;height:24px;border-radius:6px;background:#e8537a;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+.hright{display:flex;align-items:center;gap:12px}
+.hchip{display:inline-flex;align-items:center;gap:6px;border:1px solid #ececec;border-radius:16px;padding:4px 12px 4px 4px;font-size:12px;color:#222}
+.hchip i{width:22px;height:22px;border-radius:11px;background:#fdecf1;border:1.5px solid #e8537a;display:inline-block}
+.hn{display:flex;align-items:center;gap:8px;height:36px;margin:0 4px;padding:0 12px;font-size:12.5px;color:#222;border-radius:8px}
+.hn svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.4;flex:none}
+.hn.sec{color:#e8537a}
+.hn.on{background:#e8537a;color:#fff}
+.hn .caret{margin-left:auto}
+.hsubs{background:#f7f7f7;padding:6px 0;margin:2px 0}
+.hs{height:32px;display:flex;align-items:center;padding-left:36px;font-size:12.5px;color:#222}
+.hcopy{margin-top:auto;padding:14px 12px;font-size:10px;color:#8c8c8c;line-height:1.4}
 </style>
 </head>
 <body>
 <div class="app">
   <nav class="side" id="side"></nav>
   <div class="main">
-    <div class="top"><div class="who">관리자</div></div>
+    <div class="top" id="top"><div class="who">관리자</div></div>
     <div class="body"><div class="col-main" id="screen"></div></div>
   </div>
 </div>
@@ -514,6 +541,32 @@ function renderSide() {
     else h += '<div class="nav dim">' + name + '</div>';
   });
   return h;
+}
+
+
+/* ------------------------------ 호스트 셸 ------------------------------ */
+const HOSTMENU = [
+  ['대시보드', 'home'], ['채팅 관리', 'chat', ['실시간 채팅', '채팅내역조회']], ['상품 관리', 'grid', 'on'],
+  ['상담 관리', 'card', ['메신저상담', '상담접수']], ['예약 관리', 'cal', ['예약 현황', '예약 시간 설정']], ['리뷰 관리', 'star'],
+  ['스토어 칼럼 관리', 'book'], ['갤러리 관리', 'img', ['전/후 사진', '일반 사진']], ['마이페이지', 'user'], ['공지사항', 'mega']
+];
+const HICON = {
+  home: '<path d="M2 7l6-5 6 5v7H2z"/>', chat: '<circle cx="8" cy="8" r="6"/>', grid: '<rect x="2" y="2" width="5" height="5"/><rect x="9" y="2" width="5" height="5"/><rect x="2" y="9" width="5" height="5"/><rect x="9" y="9" width="5" height="5"/>',
+  card: '<rect x="2" y="3" width="12" height="10"/><path d="M5 7h6M5 10h4"/>', cal: '<rect x="2" y="3" width="12" height="11"/><path d="M2 7h12M5 1v3M11 1v3"/>', star: '<path d="M8 2l1.8 4 4.2.4-3.2 2.8 1 4.2L8 11.2 4.2 13.4l1-4.2L2 6.4 6.2 6z"/>',
+  book: '<rect x="2" y="3" width="12" height="10"/><path d="M8 3v10M2 8h6"/>', img: '<rect x="2" y="3" width="12" height="10"/><circle cx="6" cy="7" r="1.2"/><path d="M3 12l4-3 3 2 3-3"/>', user: '<circle cx="8" cy="5" r="2.6"/><path d="M3 14c0-3 2-4.5 5-4.5s5 1.5 5 4.5"/>', mega: '<path d="M2 6v4h3l6 3V3L5 6z"/>'
+};
+function renderHostSide() {
+  let h = '';
+  HOSTMENU.forEach(m => {
+    const kids = Array.isArray(m[2]) ? m[2] : null, on = m[2] === 'on', open = kids && m[0] !== '예약 관리';
+    h += '<div class="hn' + (on ? ' on' : '') + (kids ? ' sec' : '') + '"><svg viewBox="0 0 16 16">' + HICON[m[1]] + '</svg><span>' + m[0] + '</span>' + (kids ? '<span class="caret">' + (open ? '▲' : '▼') + '</span>' : '') + '</div>';
+    if (open) h += '<div class="hsubs">' + kids.map(k => '<div class="hs">' + k + '</div>').join('') + '</div>';
+  });
+  return h + '<div class="hcopy">Copyright © 2026 Eight International All rights reserved.</div>';
+}
+function renderHostTop() {
+  const nm = esc(S(P(VIEW.hid || 'P8').store).name);
+  return '<div class="hbrand"><span class="hk">K</span>Beauty Station</div><div class="hright"><button class="btn sm" onclick="go(\'p-list\')">시안: 어드민 화면 보기</button><span class="hchip"><i></i>' + nm + '</span></div>';
 }
 
 /* -------------------- 버튼 설정 표 (BO-CH-10) -------------------- */
@@ -1129,7 +1182,10 @@ window.resetDB = function () { EDITSNAP = null; PAGESNAP = null; ADFULL = null; 
 /* ------------------------------- 렌더 ------------------------------- */
 function render() {
   const map = { 'p-list': screen_pList, 'p-edit': screen_pEdit, 's-list': screen_sList, 's-edit': screen_sEdit, 'a-list': screen_aList, 'c-list': screen_cList, 'm-edit': screen_mEdit, 'col-list': screen_colList, 'col-edit': screen_colEdit, 'btn-spec': screen_btnSpec, 'h-edit': screen_hEdit };
-  el('#side').innerHTML = renderSide();
+  const isHost = VIEW.name === 'h-edit';
+  document.body.classList.toggle('host', isHost);
+  el('#side').innerHTML = isHost ? renderHostSide() : renderSide();
+  el('#top').innerHTML = isHost ? renderHostTop() : '<div class="who">관리자</div>';
   /* 수정 창이 열린 동안 뒤 목록은 저장된 값(스냅샷)으로 그린다 */
   let swapObj = null, swapLive = null;
   if (MODAL === 'ad' && ADFULL && A(VIEW.id)) { swapObj = A(VIEW.id); swapLive = JSON.stringify(swapObj); Object.keys(swapObj).forEach(k => delete swapObj[k]); Object.assign(swapObj, JSON.parse(ADFULL)); }
