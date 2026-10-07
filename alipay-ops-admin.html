@@ -178,15 +178,31 @@ select.stsel option{color:#222}
 #note{position:fixed;left:50%;transform:translateX(-50%);top:11px;z-index:40;background:#fff;border:1px solid var(--pink);color:#c2185b;border-radius:6px;padding:4px 10px;font-size:11.5px}
 #note i{display:inline-block;width:10px;height:10px;border:1.5px solid var(--pink);border-radius:2px;margin-right:6px;vertical-align:-1px}
 
-.dov{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:60}
-.dwr{position:fixed;top:0;right:0;bottom:0;width:340px;background:#fff;z-index:61;padding:18px 20px;overflow-y:auto;box-shadow:-2px 0 8px rgba(0,0,0,.08);font-size:12.5px}
-.dhd{font-size:14px;font-weight:700;margin-bottom:14px}.dx{cursor:pointer;margin-right:8px;font-size:18px;vertical-align:-2px}
+.dov{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:60}
+.dwr{position:fixed;top:0;right:0;bottom:0;width:336px;background:#fff;z-index:61;display:flex;flex-direction:column;font-size:12px}
+.dhd{display:flex;justify-content:space-between;align-items:center;padding:0 18px;height:46px;border-bottom:1px solid #eee;font-size:13px;font-weight:700;flex:none}
+.dx{cursor:pointer;color:#8c8c8c;font-size:22px;font-weight:300;line-height:1}
+.dscroll{flex:1;overflow-y:auto;padding:16px 18px}
 .dst{display:flex;align-items:center;gap:6px;margin-bottom:10px}
-.dstp{display:inline-flex;align-items:center;gap:4px;border:1px solid #e5e5e5;border-radius:12px;font-size:11px;line-height:14px;padding:2px 9px}.dstp i{width:6px;height:6px;border-radius:3px;background:#e8537a;display:inline-block}
-.dchb{display:inline-flex;align-items:center;border:1px dashed var(--pink);border-radius:12px;font-size:11px;line-height:14px;padding:2px 9px;color:#666;background:#fff;font-weight:500}
-.dti{font-size:20px;font-weight:700;margin:6px 0 14px}.dkv{display:flex;justify-content:space-between;padding:4px 0;color:#666}.dkv b{color:#222}
-.dlb{margin-top:16px;color:#888;font-size:11px}.dbx{border:1px solid #e5e5e5;border-radius:4px;padding:8px 10px;margin-top:6px}.dhis{margin-top:6px}.dhis small{display:block;color:#999}
-.dnote{margin-top:22px;font-size:11px;color:#999;background:#fafafa;padding:8px 10px;border-radius:4px}
+.dstp{display:inline-flex;align-items:center;gap:5px;border:1px solid #e0e0e0;border-radius:12px;font-size:11px;line-height:14px;padding:3px 10px;color:#555;background:#f5f5f5;font-weight:600}
+.dstp i{width:6px;height:6px;border-radius:3px;background:#999;display:inline-block}
+.dstp.b{background:#eaf1ff;border-color:#c9dbff;color:#2f5fd0}.dstp.b i{background:#3b78f6}
+.dstp.ok{background:#eefaf0;border-color:#cdebd3;color:#2a8c3e}.dstp.ok i{background:#33b259}
+.dstp.r{background:#fff1f0;border-color:#ffd0cc;color:#c23b34}.dstp.r i{background:#e5493f}
+.dchb{display:inline-flex;align-items:center;border:1px dashed var(--pink);border-radius:12px;font-size:11px;line-height:14px;padding:3px 10px;color:#666;background:#fff;font-weight:500}
+.dti{font-size:19px;font-weight:700;margin:4px 0 14px}
+.dkv{display:flex;justify-content:space-between;gap:12px;padding:6px 0;color:#8a8a8a;font-size:12px}.dkv b{color:#222;text-align:right;font-weight:700}
+.dsec{margin:14px 0 6px;font-size:11px;font-weight:700;color:#555}
+.dtb{border:1px solid #eceef2;background:#f7f8fa;border-radius:8px;padding:10px 12px;font-size:12px;color:#222;line-height:1.6;min-height:40px}
+.dta{border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;min-height:84px;color:#bbb;font-size:12px}
+.dcnt{display:flex;justify-content:space-between;align-items:center;margin-top:6px;color:#999;font-size:11px}
+.dsave{border:1px solid #e5e5e5;border-radius:6px;padding:6px 18px;color:#aaa;cursor:pointer}
+.dhis{display:flex;justify-content:space-between;align-items:flex-start;padding:5px 0}.dhis b{display:block;font-size:12px}.dhis small{display:block;color:#999;font-size:11px}.dhis em{font-style:normal;color:#888;font-size:11px}
+.dfoot{flex:none;padding:12px 18px 16px;border-top:1px solid #f0f0f0}
+.dinfo{background:#f3f4f6;border-radius:8px;padding:10px 12px;color:#777;font-size:11.5px;line-height:1.6;margin-bottom:10px}
+.dfoot .dinfo:last-child{margin-bottom:0}
+.dbtn{border:1px solid #222;border-radius:8px;text-align:center;padding:11px 0;font-size:13px;font-weight:500;cursor:pointer;margin-top:8px}
+.dbtn.red{border-color:#e5493f;color:#e5493f}
 </style>
 </head>
 <body>
@@ -451,13 +467,18 @@ const MSGR={'일본어':'LINE','영어':'WhatsApp','중국어(간체)':'WeChat',
 function resDrawer(){
   const no=S.res.open;if(no==null)return '';const r=RES.find(x=>String(x.no)===String(no));if(!r)return '';
   const num=parseInt(String(r.no).replace(/\D/g,'').slice(-6),10)||7;
-  const ph=r.phone;                                   /* 목록 데이터의 전화번호 그대로 */
-  const local=ph.replace(/^\+\d+\s*/,'').replace(/\D/g,'');   /* 메신저 번호: 국가번호 없이 */
+  const ph=r.phone;
+  const local=ph.replace(/^\+\d+\s*/,'').replace(/\D/g,'');
   const hm=t=>{const m=+t.slice(11,13)*60+(+t.slice(14,16));return m};
   const hh=m=>pad(Math.floor(m/60))+':'+pad(m%60);
-  const H=[['접수 ('+(r.reg==='관리자'?'관리자 등록':'고객 직접 예약')+')',r.recv]];
-  if(r.status==='방문완료')H.push(['방문 완료',r.visit]);
-  else if(r.status==='노쇼')H.push(['미방문',r.visit.slice(0,10)+' '+hh(Math.min(hm(r.visit)+60,1439))]);
+  const WD=['일','월','화','수','목','금','토'];
+  const wd=WD[new Date(r.visit.slice(0,10)+'T00:00:00Z').getUTCDay()];
+  const title=r.visit.slice(0,10)+' ('+wd+') '+r.visit.slice(11);
+  const actor=r.reg==='관리자'?'관리자':'고객';
+  const H=[['접수 ('+(r.reg==='관리자'?'관리자 등록':'고객 직접 예약')+')',r.recv,actor]];
+  let cancelAt='';
+  if(r.status==='방문완료')H.unshift(['방문 완료',r.visit,'매장']);
+  else if(r.status==='노쇼')H.unshift(['미방문',r.visit.slice(0,10)+' '+hh(Math.min(hm(r.visit)+60,1439)),'매장']);
   else if(r.status==='고객취소'){
     const rd=r.recv.slice(0,10),last=add(r.visit.slice(0,10),-1),end=last<T?last:T;
     const span=Math.max(0,Math.round((new Date(end)-new Date(rd))/864e5));
@@ -465,14 +486,22 @@ function resDrawer(){
     if(d===rd)tm=hh(Math.min(hm(r.recv)+90,1439));
     else if(d===T)tm=pad(9+num%6)+':'+pad((num*7)%60);
     else tm=pad(9+num%12)+':'+pad((num*7)%60);
-    H.push(['고객 취소',d+' '+tm]);
+    cancelAt=d+' '+tm+':'+pad((num*13)%60);
+    H.unshift(['예약 취소',cancelAt,'고객']);
   }
   const kv=(a,b)=>'<div class="dkv"><span>'+a+'</span><b>'+b+'</b></div>';
-  return '<div class="dov" data-act="rclose"></div><aside class="dwr"><div class="dhd"><span class="dx" data-act="rclose">&times;</span>예약 상세</div>'
-   +'<div class="dst"><span class="dstp"><i></i>'+r.status+'</span><span class="dchb new" title="유입 채널">'+r.cv+'</span></div>'
-   +'<div class="dti">'+r.visit+'</div>'+kv('여권명',esc(r.name))+kv('국적',r.nat)+kv('언어',r.lang)+kv('전화번호',esc(ph))+kv('메신저',(MSGR[r.lang]||'WhatsApp')+' '+local)+kv('예약 번호',r.no)+kv('접수 시각',r.recv)+kv('등록 방식',r.reg)
-   +'<div class="dlb">매장</div><div class="dbx">'+esc(r.store)+' ('+r.cat+')</div><div class="dlb">처리 이력</div>'+H.map(h=>'<div class="dhis"><b>'+h[0]+'</b><small>'+h[1]+'</small></div>').join('')
-   +'<div class="dnote">시안 주석: 호스트 예약 상세 화면을 기준으로 그린 상세입니다. 어드민 라이브 상세의 나머지 구성은 이 시안에 그리지 않았습니다.</div></aside>';
+  const cancelled=r.status==='고객취소';
+  const pillCls=r.status==='예약'?'b':r.status==='방문완료'?'ok':r.status==='노쇼'?'r':'g';
+  const body=kv('매장',esc(r.store))+kv('여권명',esc(r.name))+kv('국적',r.nat)+kv('언어',r.lang)+kv('전화번호',esc(ph))+kv('메신저',(MSGR[r.lang]||'WhatsApp')+' '+local)+kv('예약 번호',r.no)
+    +(cancelled?kv('취소 시각',cancelAt)+kv('취소한 사람','고객')+kv('취소 사유','고객 직접 취소'):kv('접수 시각',r.recv)+kv('등록 방식',r.reg));
+  const notes=cancelled?'':'<div class="dsec">매장 메모</div><div class="dtb">작성된 메모 없음</div><div class="dsec">관리자 메모</div><div class="dta">고객에게 노출되지 않는 관리자 전용 메모를 입력하세요.</div><div class="dcnt"><span>0/255</span><span class="dsave" data-act="nop">저장</span></div>';
+  const foot=cancelled?'<div class="dfoot"><div class="dinfo">취소된 예약이에요. 이 시간은 다시 예약받을 수 있어요.</div></div>'
+    :(r.status==='예약'?'<div class="dfoot"><div class="dinfo">매장 대신 취소할 수 있어요. 취소하면 고객에게 취소 사유가 함께 안내돼요.</div><div class="dbtn" data-act="nop">예약 변경</div><div class="dbtn red" data-act="nop">강제 취소</div></div>':'');
+  return '<div class="dov" data-act="rclose"></div><aside class="dwr"><div class="dhd"><span>예약 상세</span><span class="dx" data-act="rclose">&times;</span></div><div class="dscroll">'
+   +'<div class="dst"><span class="dstp '+pillCls+'"><i></i>'+r.status+'</span><span class="dchb new" title="유입 채널">'+r.cv+'</span></div>'
+   +'<div class="dti">'+title+'</div>'+body
+   +'<div class="dsec">고객 요청사항</div><div class="dtb">'+(r.req?esc(r.req):'남긴 내용 없음')+'</div>'+notes
+   +'<div class="dsec">처리 이력</div>'+H.map(h=>'<div class="dhis"><div><b>'+h[0]+'</b><small>'+h[1]+(h[1].length<=16?':'+pad((num*3)%60):'')+'</small></div><em>'+h[2]+'</em></div>').join('')+'</div>'+foot+'</aside>';
 }
 function pager(total,withSize){
   const s=S[_v];const pages=Math.max(1,Math.ceil(total/s.size));if(s.page>pages)s.page=pages;const c=s.page;
