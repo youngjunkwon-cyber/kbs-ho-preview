@@ -173,6 +173,16 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
 .img-ph{display:inline-block;width:38px;height:24px;border-radius:2px;background:linear-gradient(135deg,#c8b8a8,#8a7a6e);vertical-align:middle}
 #note{position:fixed;left:50%;transform:translateX(-50%);top:11px;z-index:40;background:#fff;border:1px solid var(--pink);color:#c2185b;border-radius:6px;padding:4px 10px;font-size:11.5px}
 #note i{display:inline-block;width:10px;height:10px;border:1.5px solid var(--pink);border-radius:2px;margin-right:6px;vertical-align:-1px}
+
+.dov{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:60}
+.dwr{position:fixed;top:0;right:0;bottom:0;width:340px;background:#fff;z-index:61;padding:18px 20px;overflow-y:auto;box-shadow:-2px 0 8px rgba(0,0,0,.08);font-size:12.5px}
+.dhd{font-size:14px;font-weight:700;margin-bottom:14px}.dx{cursor:pointer;margin-right:8px;font-size:18px;vertical-align:-2px}
+.dst{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.dstp{display:inline-flex;align-items:center;gap:4px;border:1px solid #e5e5e5;border-radius:12px;font-size:11px;line-height:14px;padding:2px 9px}.dstp i{width:6px;height:6px;border-radius:3px;background:#e8537a;display:inline-block}
+.dchb{display:inline-flex;align-items:center;border:1px dashed var(--pink);border-radius:12px;font-size:11px;line-height:14px;padding:2px 9px;color:#666;background:#fff;font-weight:500}
+.dti{font-size:20px;font-weight:700;margin:6px 0 14px}.dkv{display:flex;justify-content:space-between;padding:4px 0;color:#666}.dkv b{color:#222}
+.dlb{margin-top:16px;color:#888;font-size:11px}.dbx{border:1px solid #e5e5e5;border-radius:4px;padding:8px 10px;margin-top:6px}.dhis{margin-top:6px}.dhis small{display:block;color:#999}
+.dnote{margin-top:22px;font-size:11px;color:#999;background:#fafafa;padding:8px 10px;border-radius:4px}
 </style>
 </head>
 <body>
@@ -316,7 +326,7 @@ function mkChat(n,w,c,h,isProd){
     const guest=ch==='웹'&&ri(5)<3;
     let cust;
     if(ch==='웹')cust=guest?(isProd?'c30d'+dg(4)+'-'+dg(4)+'-447b-bb2d-d1aeb2a'+dg(4):'게스트'):p.name;
-    else cust=ri(2)?p.nick:'알리페이 회원';
+    else cust=ri(2)?p.nick:('2088'+String(100000000000+((n*2654435761)%899999999999))).slice(0,16);
     const o={no:n-i,first:f,last:l,room,resp,lw,ch,store:st.ko,cat:st.cat,staff:st.staff,sname:snm(st,p.lang),cust,lang:p.lang,email:ch==='웹'&&!guest?p.email:'',
       route:ch==='웹'&&ri(12)===0?'외부(스토어)':'스토어',prod:isProd?prodOf(st,p.lang):'',hay:(cust+' '+st.ko+' '+p.email).toLowerCase()};
     (isProd?PCHATS:CHATS).push(o);
@@ -389,7 +399,7 @@ const ageB=a=>a<20?'10대':a<30?'20대':a<40?'30대':a<50?'40대':'50대 이상'
 /* ========= 상태 ========= */
 let _v='res',S,OPEN={};
 const D=()=>({
- res:{ch:'전체',store:'',cat:'',status:'',lang:'',reg:'',q:'',qd:'',per:'all',from:'',to:'',base:'visit',sort:'visit',page:1,size:10},
+ res:{open:null,ch:'전체',store:'',cat:'',status:'',lang:'',reg:'',q:'',qd:'',per:'all',from:'',to:'',base:'visit',sort:'visit',page:1,size:10},
  cons:{per:'',from:'',to:'',member:'',status:'',lang:'',route:'',ch:'전체',cat:'',store:'',q:'',qd:'',page:1,size:10},
  chats:{base:'first',per:'week',from:'2026-10-01',to:T,room:'',route:'',ch:'전체',resp:'',lang:'',store:'',q:'',qd:'',page:1,size:10},
  prodchats:{base:'first',per:'week',from:'2026-10-01',to:T,room:'',resp:'',lang:'',ch:'전체',cat:'',store:'',q:'',qd:'',page:1,size:10},
@@ -432,6 +442,19 @@ function rng(){
 function txt(ph,w){return `<input class="ctl" data-q placeholder="${esc(ph)}" value="${esc(S[_v].qd)}" style="width:${w}px">`}
 const srch='<button class="btnp" data-act="search">검색</button>';
 function page(title,sub,inner){return `<div class="ph"><h1>${title}</h1><p>${sub}</p></div>${inner}`}
+const MSGR={'일본어':'LINE','영어':'WhatsApp','중국어(간체)':'WeChat','중국어(번체)':'WhatsApp'};
+const DIAL={'일본':'+81','중국':'+86','홍콩(중국 특별행정구)':'+852','캐나다':'+1','미국':'+1','필리핀':'+63'};
+function resDrawer(){
+  const no=S.res.open;if(no==null)return '';const r=RES.find(x=>String(x.no)===String(no));if(!r)return '';
+  const num=parseInt(String(r.no).replace(/\D/g,'').slice(-6),10)||7;
+  const ph=(DIAL[r.nat]||'+82')+' '+String(1000000000+(num*2654435761)%8999999999).slice(0,10);
+  const kv=(a,b)=>'<div class="dkv"><span>'+a+'</span><b>'+b+'</b></div>';
+  return '<div class="dov" data-act="rclose"></div><aside class="dwr"><div class="dhd"><span class="dx" data-act="rclose">&times;</span>예약 상세</div>'
+   +'<div class="dst"><span class="dstp"><i></i>'+r.status+'</span><span class="dchb new" title="유입 채널">'+r.cv+'</span></div>'
+   +'<div class="dti">'+r.visit+'</div>'+kv('여권명',esc(r.name))+kv('국적',r.nat)+kv('언어',r.lang)+kv('전화번호',ph)+kv('메신저',(MSGR[r.lang]||'WhatsApp')+' '+ph.replace(/\D/g,''))+kv('예약 번호',r.no)+kv('접수 시각',r.recv)+kv('등록 방식','고객')
+   +'<div class="dlb">매장</div><div class="dbx">'+esc(r.store)+' ('+r.cat+')</div><div class="dlb">처리 이력</div><div class="dhis"><b>접수 (고객 직접 예약)</b><small>'+r.recv+'</small></div>'
+   +'<div class="dnote">시안 주석: 호스트 예약 상세 화면을 기준으로 그린 상세입니다. 어드민 라이브 상세의 나머지 구성은 이 시안에 그리지 않았습니다.</div></aside>';
+}
 function pager(total,withSize){
   const s=S[_v];const pages=Math.max(1,Math.ceil(total/s.size));if(s.page>pages)s.page=pages;const c=s.page;
   let nums;
@@ -470,7 +493,7 @@ function vRes(){
    <div class="r">${perBtns([['전체','all'],['1주일','1w'],['1개월','1m'],['3개월','3m'],['6개월','6m'],['1년','1y']],true)}
    ${sel('base',null,[['visit','방문일 기준'],['recv','접수일 기준']],{w:118})}${sel('sort',null,[['visit','방문일순'],['recv','접수일순']],{w:104})}${rng()}${srch}</div></div></div>`;
   const body=sliceP(rows).map(r=>`<tr><td><b>${esc(r.store)}</b><small>${r.cat}</small></td><td>${r.visit}<small>접수 ${r.recv}</small></td><td>${esc(r.name)}</td><td class="new">${r.cv}</td><td>${r.no}</td><td>${r.nat}</td><td>${r.lang}</td>
-   <td><span class="dot ${r.status==='예약'?'b':r.status==='방문완료'?'ok':r.status==='노쇼'?'r':'g'}">${r.status}</span></td><td><span class="mb">상세</span>${r.status==='예약'?'<span class="mb red">강제취소</span>':''}</td></tr>`).join('');
+   <td><span class="dot ${r.status==='예약'?'b':r.status==='방문완료'?'ok':r.status==='노쇼'?'r':'g'}">${r.status}</span></td><td><span class="mb" data-act="rdet" data-v="${r.no}">상세</span>${r.status==='예약'?'<span class="mb red">강제취소</span>':''}</td></tr>`).join('');
   const tbl=`<div class="blk"><div class="tw"><table class="tbl"><thead><tr>${thc('매장명')}${thc('방문일시')}${thc('고객(여권명)')}${thc('유입 채널','new')}${thc('예약번호')}${thc('국적')}${thc('언어')}${thc('상태')}${thc('관리')}</tr></thead><tbody>${body||EMPTY(9)}</tbody></table></div>${pager(rows.length,false)}</div>`;
   return page('예약 관리','우리 경유 전 매장 예약을 모니터링·처리합니다.',cards+f+tbl);
 }
@@ -562,7 +585,7 @@ function dCard(title,items,cls,extra){
 function niceMax(m){return [5,10,15,20,25,30,40,50,60,80,100,150,200,300,500].find(x=>x>=m)||Math.ceil(m/5)*5}
 function chartSvg(rows){
   const s=S.stat;let keys=[];
-  if(s.mode==='day'){let d=s.from||'2026-10-01';const e=s.to||T;while(d<=e&&keys.length<62){keys.push(d);d=add(d,1)}}
+  if(s.mode==='day'){let d=s.from||(rows.length?rows.reduce((m,r)=>r.date<m?r.date:m,rows[0].date):'2026-10-01');const e=s.to||T;while(d<=e&&keys.length<62){keys.push(d);d=add(d,1)}}
   else{let m=(s.from||'2026-05-01').slice(0,7);const e=(s.to||T).slice(0,7);while(m<=e&&keys.length<24){keys.push(m);let y=+m.slice(0,4),mo=+m.slice(5);mo++;if(mo>12){mo=1;y++}m=y+'-'+pad(mo)}}
   const kf=s.mode==='day'?r=>r.date:r=>r.date.slice(0,7);const cm=count(rows,kf);
   const vals=keys.map(k=>cm[k]||0);const mx=niceMax(Math.max(0,...vals));
@@ -681,7 +704,7 @@ const VIEWS={res:vRes,cons:vCons,chats:vChats,prodchats:vProdChats,rev:vRev,stat
 function render(){
   const y=window.scrollY;
   $('#side').innerHTML=sideHTML();
-  $('#main').innerHTML=VIEWS[_v]();
+  $('#main').innerHTML=VIEWS[_v]()+(_v==='res'?resDrawer():'');
   window.scrollTo(0,y);
 }
 function go(name){
@@ -716,6 +739,8 @@ document.addEventListener('click',e=>{
     if(a.dataset.k==='mode'){if(v==='day'){s.per='week';s.from='2026-10-01';s.to=T}else{s.per='';s.from='2026-05-01';s.to=T}}
     render();
   }
+  else if(act==='rdet'){S.res.open=v;render()}
+  else if(act==='rclose'){S.res.open=null;render()}
   else if(act==='sort'){if(s.sortK===v)s.sortD=-s.sortD;else{s.sortK=v;s.sortD=v==='name'?1:-1}render()}
 });
 OPEN['예약']=true;

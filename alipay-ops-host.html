@@ -244,6 +244,7 @@ td small{display:block;color:var(--tx3);font-size:9.5px;margin-top:3px}
 .rt .chb,.rt .bd{margin:0;font-size:8px;line-height:12px;padding:0 5px;font-weight:600;box-sizing:border-box;height:14px;display:inline-flex;align-items:center}
 .ci .a .chb{font-size:9.5px;line-height:normal;padding:0 6px;margin:0;font-weight:600;height:16px;box-sizing:border-box;display:inline-flex;align-items:center}
 .rv .a .chb{font-size:9px;line-height:normal;padding:0 6px;margin:0;font-weight:600;height:15px;box-sizing:border-box;display:inline-flex;align-items:center}
+.nb{border:1px dashed var(--pk);border-radius:14px;padding:3px 12px;font-size:11px;color:var(--pk);background:#fff;margin:0 auto;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -484,7 +485,7 @@ function shell(){
   h+='<div class="mi grp'+(op?' open':'')+'" data-act="tg" data-v="'+n.g+'">'+ic(n.ic)+n.t+'<span class="chev">'+ic(op?'up':'down')+'</span></div>';
   if(op){h+='<div class="subs">'+n.sub.map(function(s){return '<div class="mi'+(s.go?(S.view===s.go?' act':''):' dis')+'"'+(s.go?' data-act="go" data-v="'+s.go+'"':'')+'>'+s.t+'</div>';}).join('')+'</div>';}
  });
- return '<div class="top"><div class="logo"><i>K</i>Beauty Station</div><div class="user"><i></i>리버스클리닉 홍대점</div></div>'
+ return '<div class="top"><div class="logo"><i>K</i>Beauty Station</div><div class="nb">시안 표시: 분홍 점선은 이번에 새로 더한 요소입니다 (라이브 화면에는 없고, 실제 배지는 중립 회색 윤곽선)</div><div class="user"><i></i>리버스클리닉 홍대점</div></div>'
   +'<div class="body"><aside class="side"><div class="nav">'+h+'</div><div class="copy">Copyright &copy; 2026 Eight International All rights reserved.</div></aside><main id="main"></main></div>'+bsPanel();
 }
 /* ===== 화면: 대시보드 ===== */
@@ -504,7 +505,11 @@ function statsOf(chs){
  chs.forEach(function(c){KPI[d.period][c].forEach(function(v,i){a[i]+=v;});});
  var rg=PRANGE[d.period];
  var m=DB.msg.filter(function(x){return chs.indexOf(x.ch)>=0&&inRange(x.at,rg[0],rg[1]);});
- return {store:a[0],prod:a[1],msg:m.length,chat:a[2],conf:a[3],done:a[4],rows:m,wa:m.filter(function(x){return x.app==='WhatsApp';}).length,li:m.filter(function(x){return x.app==='LINE';}).length,wc:m.filter(function(x){return x.app==='WeChat';}).length};
+ var inCh=function(x){return chs.indexOf(x.ch)>=0;};
+ var chat=DB.chatlog.filter(function(x){return inCh(x)&&inRange(x.last,rg[0],rg[1]);}).length;
+ var conf=DB.res.filter(function(x){return inCh(x)&&inRange(x.recv,rg[0],rg[1]);}).length;
+ var done=DB.res.filter(function(x){return inCh(x)&&x.status==='방문완료'&&inRange(x.visit,rg[0],rg[1]);}).length;
+ return {store:a[0],prod:a[1],msg:m.length,chat:chat,conf:conf,done:done,rows:m,wa:m.filter(function(x){return x.app==='WhatsApp';}).length,li:m.filter(function(x){return x.app==='LINE';}).length,wc:m.filter(function(x){return x.app==='WeChat';}).length};
 }
 function stats(){
  var d=S.dash;
