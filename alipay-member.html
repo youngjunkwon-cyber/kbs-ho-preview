@@ -498,11 +498,11 @@ function render() {
     '<span class="kv">마케팅 <em>' + (S.agMkt ? '동의' : '미동의') + '</em></span>' +
     '<span class="kv">원본 휴대폰 권한 <em>' + (S.plaintext ? '승인' : '미승인') + '</em></span>' +
     '<span class="kv">원본 로그인 ID 권한 <em>' + (S.plainLid ? '승인' : '미승인') + '</em></span>' +
-    '<span class="kv">월렛 <em>' + (S.wallet === 'CN' ? '중국' : '홍콩') + '</em></span>' +
+    '<span class="kv">들어온 앱 <em>' + (S.wallet === 'CN' ? '알리페이 중국' : '알리페이 홍콩') + '</em></span>' +
     '<span class="kv">생년월일 <em>' + ({ adult: '있음', none: '없음', minor: '만 14세 미만' })[S.birthMode] + '</em></span>' +
     '<button' + (S.joined ? ' disabled' : '') + ' onclick="S.plaintext=!S.plaintext;if(S.joined){S.tel=S.plaintext?ALI.phone:\'\';S.telVerified=S.plaintext;S.telEdited=false;S.telSrc=S.plaintext?\'ali\':\'\';S.mtel=S.tel;S.mtelSrc=S.telSrc;S.mtelDraft=\'\';S.mtelSaved=false;S.telSaved=false;}render()">원본 휴대폰 ' + (S.plaintext ? '미승인으로' : '승인으로') + '</button>' +
     '<button' + (S.joined ? ' disabled' : '') + ' onclick="S.plainLid=!S.plainLid;if(S.joined){S.lidOk=S.plainLid&&S.lidGranted;}render()">원본 로그인 ID ' + (S.plainLid ? '미승인으로' : '승인으로') + '</button>' +
-    '<button' + (S.joined ? ' disabled' : '') + ' onclick="S.wallet=(S.wallet===\'CN\'?\'HK\':\'CN\');render()">월렛 바꾸기</button>' +
+    '<button' + (S.joined ? ' disabled' : '') + ' onclick="S.wallet=(S.wallet===\'CN\'?\'HK\':\'CN\');render()">' + (S.wallet === 'CN' ? '홍콩 앱으로 들어온 경우 보기' : '중국 앱으로 들어온 경우 보기') + '</button>' +
     '<button onclick="if(!S.joined){S.birthMode=({adult:\'none\',none:\'minor\',minor:\'adult\'})[S.birthMode];S.agAge=false;if(S.step===\'age\')S.step=\'perm\';}render()"' + (S.joined ? ' disabled' : '') + '>생년월일 바꾸기</button>' +
     '<button onclick="S.blocked=\'fail\';S.step=\'blocked\';S.view=\'fo08\';render()"' + (S.joined ? ' disabled' : '') + '>식별 실패</button>' +
     '<button onclick="S.agTerms=true;S.agPriv=true;S.agProf=true;S.blocked=\'prof\';S.step=\'blocked\';S.view=\'fo08\';render()"' + (S.joined ? ' disabled' : '') + '>프로필 거부</button>' +
