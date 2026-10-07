@@ -153,6 +153,15 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
 .big{font-size:26px;font-weight:700;margin-top:4px}
 .big.blue{color:var(--blue)}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 12px 0}
+.svline{display:flex;gap:56px;align-items:baseline;margin:14px 0 16px;font-size:12px;color:#666}
+.svline .big{margin-left:6px}
+.svboxes{display:grid;grid-template-columns:minmax(300px,1fr) 2.4fr;gap:18px}
+.sbox{background:#fafafa;border:1px solid #f0f0f0;border-radius:6px;padding:14px 16px}
+.sbox .sec-t{font-size:13px;margin-bottom:10px}
+.sitems{display:flex;flex-wrap:wrap;gap:8px 26px}
+.sbox1 .sitems{flex-wrap:nowrap}
+.si{display:flex;justify-content:space-between;gap:18px;min-width:150px;font-size:12px;color:#555}
+.si b{color:#222}
 .two .blk{margin:0}
 .kv{display:flex;align-items:center;padding:6px 0;font-size:12.5px}
 .kv span{width:120px;color:#444}
@@ -383,7 +392,7 @@ const D=()=>({
  chats:{base:'first',per:'week',from:'2026-09-30',to:T,room:'',route:'',ch:'전체',resp:'',lang:'',store:'',q:'',qd:'',page:1,size:10},
  prodchats:{base:'first',per:'week',from:'2026-09-30',to:T,room:'',resp:'',lang:'',ch:'전체',cat:'',store:'',q:'',qd:'',page:1,size:10},
  rev:{base:'reg',per:'',from:'',to:'',lang:'',store:'',img:'',ch:'전체',q:'',qd:'',page:1,size:10},
- stat:{mode:'day',lang:'',ch:'전체',active:'',store:'',has:'has',per:'week',from:'2026-09-30',to:T,chart:'bar',tab:'agg',mtype:'all',sortK:'total',sortD:-1},
+ stat:{mode:'day',lang:'',ch:'전체',active:'',store:'',has:'has',per:'today',from:T,to:T,chart:'bar',tab:'agg',mtype:'all',sortK:'total',sortD:-1},
  survey:{from:'',to:'',nat:'',gender:'',age:'',exp:'',interest:'',ch:'전체',page:1,size:20}
 });
 S=D();
@@ -576,7 +585,7 @@ function detLabel(r){return r.way==='메신저상담'?(r.mg==='K-뷰티 메신�
 function vStat(){
   const s=S.stat,rows=statRows();
   const f=`<div class="blk"><div class="fl"><span class="tog"><button class="${s.mode==='day'?'on':''}" data-act="set" data-k="mode" data-v="day">일별</button><button class="${s.mode==='month'?'on':''}" data-act="set" data-k="mode" data-v="month">월별</button></span>
-   ${sel('lang','언어',LANGS,{w:104})}${chSel()}${sel('active','활성',[['y','활성'],['n','비활성']],{w:84})}${sel('store','스토어 선택',STORES.map(x=>x.ko),{w:136})}${sel('has',null,[['has','데이터 있음'],['all','전체'],['none','데이터 없음']],{w:116})}
+   ${sel('lang','언어',LANGS,{w:104})}${chSel()}${sel('active','활성',[['y','활성'],['n','비활성']],{w:84})}${sel('store','스토어 선택',STORES.map(x=>x.ko),{w:136})}${sel('has',null,[['has','데이터 존재'],['all','전체'],['none','데이터 없음']],{w:116})}
    ${perBtns([['오늘','today'],['어제','yest'],['이번주','week'],['이번달','month'],['직접 선택','']])}${rng()}${srch.replace('data-act="search"','data-act="search"')}</div></div>`;
   const chart=`<div class="blk"><div class="sec-h"><span class="sec-t" style="margin:0">${s.mode==='day'?'일별':'월별'} 문의 건수 추이</span><span class="tog small"><button class="${s.chart==='bar'?'on':''}" data-act="set" data-k="chart" data-v="bar">막대</button><button class="${s.chart==='line'?'on':''}" data-act="set" data-k="chart" data-v="line">라인</button></span><span class="sp"></span><span style="font-size:12px;color:#555">전체 문의 건수 <b style="font-size:16px;color:#222" id="stTotal">${rows.length}</b></span></div>${chartSvg(rows)}</div>`;
   /* (b) */
@@ -632,12 +641,12 @@ function vSurvey(){
   const nats=Array.from(new Set(SURVEY.map(r=>r.nat)));
   const f=`<div class="blk"><div class="sv-f"><label>응답시간: ${rng()}</label><label>국적: ${o('nat','전체',nats,124)}</label><label>성별: ${o('gender','전체',['FEMALE','MALE'],92)}</label><label>연령대: ${o('age','전체',['10대','20대','30대','40대','50대 이상'],98)}</label>
    <label>방문경험: ${o('exp','전체',SV_EXP,120)}</label><label>관심항목: ${o('interest','전체',SV_INT,136)}</label><label class="new"><span>유입 채널:</span><select class="ctl" style="height:28px" data-k="ch">${['전체'].concat(CHS).map(c=>`<option ${c===s.ch?'selected':''}>${c}</option>`).join('')}</select></label><button class="btnp" data-act="search">검색</button></div></div>`;
-  const sum=`<div class="blk"><div style="display:flex;justify-content:space-between;align-items:center"><span class="sec-t" style="margin:0">응답 요약</span><button class="btnd" disabled>엑셀다운로드</button></div>
-   <div style="display:flex;gap:90px;margin-top:10px"><div><div style="color:#666;font-size:12px">총 응답</div><div class="big" id="svTotal">${rows.length}건</div></div><div><div style="color:#666;font-size:12px">응답률</div><div class="big blue" id="svRate">${rate}%</div></div></div></div>`;
   const ec=SV_EXP.map(x=>[x,rows.filter(r=>r.exp===x).length]),ic=SV_INT.map(x=>[x,rows.filter(r=>r.ints.indexOf(x)>=0).length]);
-  const mxe=Math.max(1,...ec.map(a=>a[1])),mxi=Math.max(1,...ic.map(a=>a[1]));
-  const two=`<div class="two"><div class="blk"><div class="sec-t">한국 방문 경험</div>${ec.map(a=>`<div class="kv"><span>${a[0]}</span><div class="bar"><i style="width:${a[1]/mxe*100}%"></i></div><b>${a[1]}</b></div>`).join('')}</div>
-   <div class="blk"><div class="sec-t">관심항목</div>${ic.map(a=>`<div class="kv"><span>${a[0]}</span><div class="bar"><i style="width:${a[1]/mxi*100}%"></i></div><b>${a[1]}</b></div>`).join('')}</div></div>`;
+  const sum=`<div class="blk"><div style="display:flex;justify-content:space-between;align-items:center"><span class="sec-t" style="margin:0">응답 요약</span><button class="btnd" disabled>엑셀다운로드</button></div>
+   <div class="svline"><span>총 응답 <b class="big" id="svTotal">${rows.length}건</b></span><span>응답률 <b class="big blue" id="svRate">${rate}%</b></span></div>
+   <div class="svboxes"><div class="sbox sbox1"><div class="sec-t">한국 방문 경험</div><div class="sitems">${ec.map(a=>`<div class="si"><span>${a[0]}</span><b>${a[1]}</b></div>`).join('')}</div></div>
+   <div class="sbox"><div class="sec-t">관심항목</div><div class="sitems">${ic.map(a=>`<div class="si"><span>${a[0]}</span><b>${a[1]}</b></div>`).join('')}</div></div></div></div>`;
+  const two='';
   const body=rows.map(r=>`<tr><td>${r.t}</td><td class="new">${r.ch}</td><td>${r.email}</td><td>${r.nat}</td><td>${r.gender}</td><td>${r.birth}</td><td>${r.exp}</td><td>${r.ints.map(t=>`<span class="tag">${t}</span>`).join('')}</td></tr>`).join('');
   const tbl=`<div class="blk"><div class="sec-t" style="margin-bottom:10px">답변목록</div><div class="tw"><table class="tbl"><thead><tr>${thc('응답일시')}${thc('유입 채널','new')}${thc('이메일')}${thc('국적')}${thc('성별')}${thc('생년월일')}${thc('방문 경험')}${thc('관심 항목')}</tr></thead><tbody>${body||EMPTY(8)}</tbody></table></div>
    <div style="display:flex;justify-content:space-between;align-items:center;padding-top:14px;font-size:12px;color:#666"><span>총 ${rows.length}건</span><select class="ctl" data-k="size" style="height:28px"><option value="20">20 / 페이지</option></select></div></div>`;
