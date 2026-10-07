@@ -462,7 +462,8 @@ var NAV=[
  {t:'마이페이지',ic:'user'},
  {t:'공지사항',ic:'mega'}
 ];
-function bsPanel(){
+function bsPanel(){return '';}
+function bsPanelOld(){
  return '<div class="bsp"'+((S.view==='res'&&S.res.open!=null)?' style="right:320px"':'')+'><b>시안 전환 &middot; 유입 채널 표시(카드)</b>'+[['line','줄'],['badge','배지'],['name','이름 옆']].map(function(x){return '<label><input type="radio" name="bs" data-act="bs" data-v="'+x[0]+'"'+(S.bs===x[0]?' checked':'')+'>'+x[1]+'</label>';}).join('')+'</div>';
 }
 function shell(){
@@ -726,7 +727,7 @@ window.setCh=function(v){
  var m={dash:'dash.ch',res:'res.ch',chatlog:'chatlog.ch',live:'live.ch',consult:'consult.ch',rev:'rev.ch'};
  setP(m[S.view],v);if(S[S.view].page!=null)S[S.view].page=1;render();
 };
-window.setBadgeStyle=function(v){if(['line','badge','name'].indexOf(v)<0)return;S.bs=v;render();};
+window.setBadgeStyle=function(v){S.bs='badge';render();};
 window.setPeriod=function(p){if(PERIODS.indexOf(p)<0)return;S.dash.period=p;render();};
 window.openRes=function(n){S.view='res';S.open.res=1;S.res.open=n;render();};
 window.openChat=function(n){S.view='live';S.live.sel=n;render();};
