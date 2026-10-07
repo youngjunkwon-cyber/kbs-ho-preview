@@ -162,7 +162,6 @@ const MSG = {
   inquiryHint: '기존 문의하기 버튼입니다. 다른 항목처럼 독립된 버튼이라 켜면 1개로 셉니다.',
   bnBtnTarget: (label, ch) => '연결 대상(' + label + ')이 ' + ch + '에 노출되지 않습니다. ' + ch + '에서는 하단 버튼이 보이지 않습니다.',
   storeAliBlock: (n, m) => '일본어·인도네시아어·몽골어 ' + [n ? '상품 ' + n + '건' : '', m ? '칼럼 ' + m + '건' : ''].filter(Boolean).join('과 ') + '이 있어 알리페이 앱 전용으로 바꿀 수 없습니다. 해당 ' + [n ? '상품' : '', m ? '칼럼' : ''].filter(Boolean).join('·') + '을 정리한 뒤 바꿔 주세요.',
-  colAliBlock: '일본어·인도네시아어·몽골어를 켠 칼럼은 알리페이 앱 전용으로 바꿀 수 없습니다. 해당 언어를 끈 뒤 바꿔 주세요.',
   needBooking: '예약설정에서 예약을 사용하면 켤 수 있습니다.',
   cap:         '웹과 알리페이 앱 각각 2개까지 켤 수 있습니다.',
   capHead:     '버튼은 웹과 알리페이 앱 각각 2개까지 켤 수 있습니다.',
@@ -278,8 +277,8 @@ const DB = {
   magazines: [{ id: 'M1', title: '가을 두피 관리 가이드', lang: '중국어(간체)', status: '게시', reg: '2026-09-02 11:20', channel: ALLCH,
     body: '가을에는 두피가 건조해집니다. 자세한 코스는 <a href="https://k-beautystation.com/products/P1">상품 페이지</a>에서 확인하세요. 후기 영상은 https://www.instagram.com/p/abc/ 에서 볼 수 있습니다. <iframe src="https://www.youtube.com/embed/xyz"></iframe> [상품 카드:P1:두피 스케일링 케어] [상품 카드:P5:헤어 클리닉 4주] [상품 카드:P12:알리페이 전용 두피 패키지]' }],
   columns: [
-    { id: 'CL1', title: '여름철 모공 관리 가이드', store: 'S1', status: '게시중', langs: '영어, 중국어(간체), 일본어', reg: '2026-06-10', channel: ALLCH },
-    { id: 'CL2', title: '눈매교정 전 알아둘 것', store: 'S4', status: '게시중', langs: '중국어(번체), 일본어', reg: '2026-07-02', channel: ALLCH }
+    { id: 'CL1', title: '여름철 모공 관리 가이드', store: 'S1', status: '게시중', langs: '영어, 중국어(간체), 일본어', reg: '2026-06-10' },
+    { id: 'CL2', title: '눈매교정 전 알아둘 것', store: 'S4', status: '게시중', langs: '중국어(번체), 일본어', reg: '2026-07-02' }
   ]
 };
 
@@ -344,7 +343,7 @@ function effChStore(st) { return storeHasTargetLang(st) ? st.channel : WEB; }
 /* 상품·칼럼 유효값 = 대상 외 언어면 웹, 스토어가 고정이면 스토어 값, 아니면 자기 값 */
 function effChProduct(p) { if (!langOk(p.lang)) return WEB; const s = effChStore(S(p.store)); return s !== ALLCH ? s : p.channel; }
 const colLangOk = c => String(c.langs || '').split(',').some(x => langOk(x.trim()));
-function effChColumn(c) { if (!colLangOk(c)) return WEB; const s = effChStore(S(c.store)); return s === ALLCH ? c.channel : s; }
+function effChColumn(c) { if (!colLangOk(c)) return WEB; return effChStore(S(c.store)); }
 function effChAd(b) { if (!langOk(b.lang)) return WEB; if (b.linkType === '외부링크') return WEB; return b.channel; }
 function effChColl(c) { return langOk(c.lang) ? c.channel : WEB; }
 function effChMag(m) { return langOk(m.lang) ? m.channel : WEB; }
@@ -568,8 +567,7 @@ window.setBtn = function (kind, k, ch, on) {
 };
 window.toggleLang = function (L) { const st = S(VIEW.id); const arr = String(st.langs || '').split(',').map(x => x.trim()).filter(Boolean); const i = arr.indexOf(L); if (i >= 0) arr.splice(i, 1); else arr.push(L); st.langs = arr.join(', '); render(); };
 window.setCh = function (kind, v) {
-  const obj = kind === 'store' ? S(VIEW.id) : kind === 'product' ? P(VIEW.id) : kind === 'ad' ? A(VIEW.id) : kind === 'coll' ? C(VIEW.id) : kind === 'mag' ? M('M1') : CL(VIEW.cid || 'CL1');
-  if (kind === 'col' && v === ALI && String(obj.langs || '').split(',').some(x => !langOk(x.trim()))) { alertBox('바꿀 수 없습니다', MSG.colAliBlock); render(); return; }
+  const obj = kind === 'store' ? S(VIEW.id) : kind === 'product' ? P(VIEW.id) : kind === 'ad' ? A(VIEW.id) : kind === 'coll' ? C(VIEW.id) : kind === 'mag' ? M('M1') : null;
   if (kind === 'store' && v === ALI) {
     const n = DB.products.filter(p => p.store === obj.id && !langOk(p.lang)).length;
     const m = DB.columns.filter(c => c.store === obj.id && String(c.langs || '').split(',').some(x => !langOk(x.trim()))).length;
@@ -944,22 +942,18 @@ function screen_hEdit() {
 
 /* --------------------- BO-CH-13 · 스토어 칼럼 상세 --------------------- */
 function screen_colEdit() {
-  const c = CL(VIEW.cid || 'CL1'), st = S(c.store), byStore = storeFixes(st), fixed = byStore || !colLangOk(c), eff = effChColumn(c);
+  const c = CL(VIEW.cid || 'CL1'), st = S(c.store);
   return '<div class="phd"><div><h2 class="page">스토어 칼럼 상세</h2><div class="pdesc">' + esc(c.title) + '</div></div>' +
     '<div class="fl"><span>시안 전환</span><select onchange="pickCol(this.value)">' + DB.columns.map(x => '<option value="' + x.id + '"' + (x.id === c.id ? ' selected' : '') + '>' + esc(x.title) + ' (' + esc(S(x.store).name) + ')</option>').join('') + '</select></div></div>' +
     '<div class="card"><div class="hd">글 정보</div><div class="bd">' +
     '<div class="row"><div class="lbl">스토어</div><div class="val">' + esc(st.name) + ' <span class="tblnote">(노출 채널 ' + effChStore(st) + ')</span></div></div>' +
     '<div class="row"><div class="lbl">노출 언어</div><div class="val">' + c.langs + '</div></div>' +
     '<div class="row"><div class="lbl">게시 상태</div><div class="val"><span class="tag all">' + c.status + '</span></div></div>' +
-    '<div class="row"><div class="lbl">노출 채널</div><div class="val">' + chRadio('clch', eff, 'col', fixed) +
-    (byStore && colLangOk(c) && storeHasTargetLang(st) ? '<div class="hint">' + MSG.storeFixed(effChStore(st), '칼럼') + '</div>' : '') + '</div></div>' +
     '<div class="row"><div class="lbl">본문</div><div class="val"><span class="tblnote">(시안 주석) 호스트가 작성한 본문이 라이브 그대로 보이는 자리입니다. 그리지 않았습니다.</span></div></div>' +
-    '</div></div>' +
-    '<div class="card"><div class="hd">저장</div><div class="bd"><button class="btn blue" onclick="saveCol()">저장</button></div></div>';
+    '</div></div>';
 }
 window.CL = CL;
 window.pickCol = function (id) { pageSnapRestore(); pageSnapTake('col-edit'); VIEW.cid = id; render(); };
-window.saveCol = function () { pageSnapCommit(); alertBox('저장했습니다', MSG.saveDone); };
 
 /* --------------------- BO-CH-10 · 버튼 설정 공통 구조 --------------------- */
 const SPEC_ROWS = [
