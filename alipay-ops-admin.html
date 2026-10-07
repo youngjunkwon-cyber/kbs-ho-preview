@@ -1,0 +1,714 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>어드민 유입 채널 동작 시안</title>
+<style>
+*{box-sizing:border-box}
+:root{--pink:#ff4f8b;--blue:#3b78f6;--line:#f0f0f0;--bd:#d9d9d9;--g:#8c8c8c}
+html,body{margin:0}
+body{font:13px/1.5 "Pretendard","Noto Sans KR","Malgun Gothic","Apple SD Gothic Neo",sans-serif;color:#222;background:#f4f4f5}
+button{font:inherit;cursor:pointer}
+#hdr{position:fixed;top:0;left:0;right:0;height:50px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 22px 0 20px;z-index:30}
+.logo{font-weight:800;color:#e5707c;font-size:17px;letter-spacing:.4px}
+.adm{display:flex;align-items:center;gap:7px;font-size:12px}
+.av{width:20px;height:20px;border-radius:50%;background:#d9d9d9;position:relative;overflow:hidden}
+.av:before{content:"";position:absolute;left:6px;top:4px;width:8px;height:8px;border-radius:50%;background:#fff}
+.av:after{content:"";position:absolute;left:3px;top:13px;width:14px;height:10px;border-radius:50%;background:#fff}
+#side{position:fixed;top:50px;left:0;bottom:0;width:185px;background:#fff;overflow-y:auto;border-right:1px solid var(--line);padding:6px 0 30px;z-index:20}
+.mi{display:flex;align-items:center;justify-content:space-between;padding:9px 12px 9px 22px;font-size:13px;color:#222;cursor:pointer;user-select:none}
+.mi.dis{color:#b5b5b5;cursor:default}
+.mi.open{color:#1668dc}
+.mi .cv{width:7px;height:7px;border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:rotate(45deg);margin-top:-3px}
+.mi.open .cv{transform:rotate(-135deg);margin-top:3px}
+.alpha{font-size:9px;background:#e6f0ff;color:#3b78f6;padding:0 5px;border-radius:3px;margin-left:6px;line-height:15px;display:inline-block}
+.sub{padding:5px 0;background:#fafafa}
+.sub .mi{padding:7px 12px 7px 40px;font-size:12.5px}
+.sub .mi.on{background:#e6f0ff;color:#1668dc;margin:2px 6px;padding-left:34px;border-radius:5px;box-shadow:inset 0 0 0 1.5px #b9d3ff}
+#main{margin:50px 0 0 185px;min-height:calc(100vh - 50px);padding-bottom:50px}
+.ph{background:#fff;padding:14px 20px 12px;border-bottom:1px solid var(--line)}
+.ph h1{margin:0;font-size:17px;font-weight:700}
+.ph p{margin:2px 0 0;font-size:11px;color:var(--g)}
+.blk{background:#fff;margin:10px 12px 0;padding:14px 16px;border-radius:2px}
+.blk.flat{margin:0;border-top:1px solid var(--line)}
+.fl{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.fl.col{display:block}
+.fl .r{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.fl .r+.r{margin-top:8px}
+.ctl{height:32px;border:1px solid var(--bd);border-radius:4px;background:#fff;padding:0 10px;font:inherit;font-size:12.5px;color:#222;outline:none}
+select.ctl{appearance:none;-webkit-appearance:none;padding-right:26px;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238c8c8c' stroke-width='1.4'/%3E%3C/svg%3E") no-repeat right 9px center}
+select.ctl.empty{color:#bfbfbf}
+select.ctl option{color:#222}
+input.ctl::placeholder{color:#bfbfbf}
+.ctl:focus{border-color:var(--blue)}
+.fld{display:inline-flex;align-items:center;gap:6px;padding-left:10px}
+.fld span{font-size:12px;color:#555;white-space:nowrap}
+.fld select{border:0;height:30px;background-color:transparent;padding-left:0;font-size:12.5px;outline:none}
+.ctl.new,label.new{border-color:var(--pink)!important;box-shadow:0 0 0 1px rgba(255,79,139,.28)}
+.fld.new span{color:var(--pink);font-weight:600}
+.seg{display:inline-flex}
+.seg button{height:32px;border:1px solid var(--bd);background:#fff;padding:0 13px;font-size:12.5px;margin-left:-1px;color:#222}
+.seg button:first-child{border-radius:4px 0 0 4px;margin-left:0}
+.seg button:last-child{border-radius:0 4px 4px 0}
+.seg button.on{border-color:var(--blue);color:var(--blue);position:relative;z-index:1}
+.seg.fill button.on{background:var(--blue);color:#fff}
+.rng{display:inline-flex;align-items:center;gap:4px;height:32px;border:1px solid var(--bd);border-radius:4px;padding:0 8px;background:#fff}
+.rng input{border:0;outline:none;font:inherit;font-size:12.5px;width:118px;color:#222;background:transparent}
+.rng i{font-style:normal;color:#bfbfbf;font-size:11px}
+.btnp{height:32px;background:var(--blue);color:#fff;border:0;border-radius:4px;padding:0 15px;font-size:12.5px;font-weight:500}
+.btnd{height:30px;border:1px solid var(--bd);background:#f5f5f5;color:#bfbfbf;border-radius:4px;padding:0 14px;font-size:12px;cursor:not-allowed}
+.tw{overflow-x:auto}
+table.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.tbl th{background:#fafafa;font-weight:600;text-align:left;padding:13px 8px;white-space:nowrap;color:#222}
+.tbl td{padding:13px 8px;border-bottom:1px solid var(--line);vertical-align:middle;white-space:nowrap}
+.tbl.dense{font-size:12px}.tbl.dense th,.tbl.dense td{padding:12px 5px}.tbl.dense th.st{white-space:normal;min-width:58px;line-height:1.3}
+.tbl td.c,.tbl th.c{text-align:center}
+.tbl th.new{border-bottom:2px solid var(--pink);background:#fff0f5;color:var(--pink);box-shadow:none;border-radius:0}
+.tbl td.new{background:#fffafc}
+.tbl td small{display:block;font-size:10.5px;color:#a6a6a6;line-height:1.5}
+.tbl td b{font-weight:600}
+.lnk{color:#2f6df0}
+.empty-row td{text-align:center;color:#a6a6a6;padding:46px 0}
+.dot:before{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;margin-right:5px;vertical-align:middle;background:#999}
+.dot.b:before{background:#3b5bdb}.dot.b{color:#2a49c9;font-weight:600}
+.dot.g:before{background:#999}.dot.g{color:#666}
+.dot.ok:before{background:#22b07d}.dot.ok{color:#222}
+.dot.r:before{background:#ff4d4f}.dot.r{color:#d9363e}
+.mb{display:inline-block;height:22px;line-height:20px;border:1px solid #ccc;border-radius:3px;padding:0 7px;font-size:11px;background:#fff;color:#222;margin-right:4px}
+.mb.red{border-color:#ff7875;color:#e5484d}
+.pg{display:flex;justify-content:center;align-items:center;gap:6px;padding:20px 0 4px;position:relative}
+.pg button{min-width:26px;height:26px;border:1px solid transparent;background:transparent;border-radius:4px;font-size:12px;color:#444}
+.pg button.on{border-color:var(--blue);color:var(--blue)}
+.pg button:disabled{color:#ccc;cursor:default}
+.pg .el{color:#bbb;font-size:11px;letter-spacing:1px}
+.pg.sz{justify-content:flex-end}
+.pg.sz select{height:28px;font-size:12px}
+.cards{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:10px 12px 0}
+.cards .cd{background:#fff;border:1px solid var(--line);padding:12px 14px;border-radius:2px}
+.cards .cd i{font-style:normal;font-size:11px;color:var(--g);display:block}
+.cards .cd b{font-size:20px;font-weight:700;display:block;margin-top:6px}
+.cards .cd b u{text-decoration:none;font-size:15px;margin-left:3px}
+.chips{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;padding:12px 14px}
+.grp{display:inline-flex;align-items:center;gap:4px;flex-wrap:wrap;padding:2px 0}
+.grp>strong{font-size:14px;font-weight:700;margin-right:5px}
+.grp.new{padding:3px 8px;border:1px solid var(--pink);border-radius:5px;background:#fffafc}
+.grp.new>strong{color:var(--pink)}
+.chip{background:#f3f3f3;border-radius:3px;padding:1px 7px;font-size:11px;color:#333;line-height:20px;white-space:nowrap}
+.grp.new .chip{background:#ffeef4;color:#a31d4b}
+.chip.tot{background:#f3f3f3;margin-left:2px;color:#222}
+.stsel{color:#222}
+.stsel i{display:inline-block;width:6px;height:6px;border-right:1.3px solid #aaa;border-bottom:1.3px solid #aaa;transform:rotate(45deg);margin:0 0 3px 6px}
+.sec-t{font-size:14px;font-weight:700;margin:0 0 4px}
+.sec-h{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+.sec-h .sp{flex:1}
+.tog{display:inline-flex}
+.tog button{height:28px;border:1px solid var(--bd);background:#fff;padding:0 12px;font-size:12px;margin-left:-1px}
+.tog button:first-child{border-radius:4px 0 0 4px;margin-left:0}.tog button:last-child{border-radius:0 4px 4px 0}
+.tog button.on{background:var(--blue);border-color:var(--blue);color:#fff;position:relative;z-index:1}
+.tog.small button{height:24px;font-size:11px;padding:0 9px}
+.row2{display:flex;gap:12px;margin:10px 12px 0}
+.row2 .blk{margin:0}
+.donuts{display:flex;gap:10px;margin:10px 12px 0;overflow-x:auto}
+.dc{flex:1 1 0;min-width:226px;background:#fff;border:1px solid #e9e9e9;border-radius:4px;padding:12px;min-height:196px}
+.dc.new{border:1px solid var(--pink)}
+.dc h4{margin:0 0 8px;font-size:12.5px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+.dc.new h4{color:var(--pink)}
+.dbody{display:flex;align-items:center;gap:8px;padding-top:8px}
+.dbody svg{flex:none}
+.leg{flex:1;font-size:11.5px}
+.leg div{display:flex;align-items:center;padding:3px 0}
+.leg div i{width:7px;height:7px;border-radius:50%;margin-right:6px;flex:none}
+.leg div span{flex:1;color:#555;white-space:nowrap}
+.leg div b{width:24px;text-align:right}
+.leg div em{font-style:normal;width:32px;text-align:right;color:#aaa;font-size:10.5px}
+.tabs{display:flex;gap:22px;border-bottom:1px solid var(--line);margin:-4px 0 14px}
+.tabs button{border:0;background:none;padding:10px 2px;font-size:12.5px;color:#222;border-bottom:2px solid transparent}
+.tabs button.on{color:var(--blue);border-color:var(--blue)}
+.tbl.g th,.tbl.g td{text-align:center;border:1px solid #f0f0f0;padding:8px 10px}
+.tbl.g td:first-child{text-align:left}
+.tbl.g thead th{background:#fafafa}
+.tbl.g th .ar{display:inline-block;margin-left:6px;color:#bbb;font-size:9px;cursor:pointer}
+.tbl.g tbody td{border-top:0;border-bottom:1px solid #f4f4f4}
+.tbl.g tr:hover td{background:#fafcff}
+.bars{display:flex;flex-direction:column;gap:7px}
+.sbr{display:flex;align-items:center;font-size:12px}
+.sbr .n{width:150px;flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#444}
+.sbr .t{flex:1;display:flex;height:16px}
+.sbr .t span{display:block;height:100%;color:#fff;font-size:10px;line-height:16px;text-align:center;overflow:hidden}
+.sbr .v{width:34px;text-align:right;font-weight:600}
+.lgd{display:flex;gap:12px;font-size:11.5px;color:#555}
+.lgd i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px}
+.top li{list-style:none;display:flex;align-items:center;font-size:12px;padding:5px 0}
+.top ol,.top ul{margin:0;padding:0}
+.top .rk{width:22px;color:#999;font-weight:600}
+.top .nm{width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.top .bar{flex:1;height:5px;background:#f0f0f0;border-radius:3px;margin:0 8px}
+.top .bar i{display:block;height:100%;background:#3b78f6;border-radius:3px}
+.top .ct{width:28px;text-align:right;font-weight:600}
+.sv-f{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
+.sv-f label{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:#444}
+.sv-f label.new{padding:2px 8px;border:1px solid var(--pink);border-radius:5px}
+.sv-f label.new>span{color:var(--pink);font-weight:600}
+.big{font-size:26px;font-weight:700;margin-top:4px}
+.big.blue{color:var(--blue)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 12px 0}
+.two .blk{margin:0}
+.kv{display:flex;align-items:center;padding:6px 0;font-size:12.5px}
+.kv span{width:120px;color:#444}
+.kv .bar{flex:1;height:8px;background:#f0f0f0;border-radius:4px;margin:0 12px}
+.kv .bar i{display:block;height:100%;background:#8fb1fb;border-radius:4px}
+.kv b{width:30px;text-align:right}
+.tag{display:inline-block;background:#f0f0f0;border-radius:3px;padding:1px 8px;font-size:11px;margin:1px 4px 1px 0;color:#444}
+.img-ph{display:inline-block;width:38px;height:24px;border-radius:2px;background:linear-gradient(135deg,#c8b8a8,#8a7a6e);vertical-align:middle}
+#note{position:fixed;left:50%;transform:translateX(-50%);top:11px;z-index:40;background:#fff;border:1px solid var(--pink);color:#c2185b;border-radius:6px;padding:4px 10px;font-size:11.5px}
+#note i{display:inline-block;width:10px;height:10px;border:1.5px solid var(--pink);border-radius:2px;margin-right:6px;vertical-align:-1px}
+</style>
+</head>
+<body>
+<div id="hdr"><div class="logo">ADMIN</div><div class="adm"><div class="av"></div>관리자</div></div>
+<div id="side"></div>
+<div id="main"></div>
+<div id="note"><i></i>시안 표시: 분홍 테두리는 이번에 새로 더한 요소입니다 (라이브 화면에는 없음)</div>
+<script>
+'use strict';
+/* ========= 공통 유틸 ========= */
+const T='2026-10-07';
+const $=(s,r=document)=>r.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pad=(n,l=2)=>String(n).padStart(l,'0');
+const add=(s,n)=>{const d=new Date(s+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10)};
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const R=mulberry32(20261007);
+const ri=n=>Math.floor(R()*n);
+const pick=a=>a[ri(a.length)];
+function wpick(pairs){let tot=0;pairs.forEach(p=>tot+=p[1]);let x=R()*tot;for(const p of pairs){x-=p[1];if(x<0)return p[0]}return pairs[0][0]}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=ri(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
+const dg=n=>{let s='';for(let i=0;i<n;i++)s+=ri(10);return s};
+const tmOf=(date,lo=8,hi=21)=>{let h=lo+ri(hi-lo);if(date===T)h=Math.min(h,14);return pad(h)+':'+pad(ri(60))};
+const tsOf=(date,sec,lo,hi)=>date+' '+tmOf(date,lo,hi)+(sec?':'+pad(ri(60)):'');
+const CHS=['웹','알리페이 중국','알리페이 홍콩'];
+const LANGS=['중국어(간체)','중국어(번체)','영어','일본어','인도네시아어','몽골어'];
+const CATS=['피부과','성형외과','에스테틱','헤어/메이크업'];
+const inRange=(d,f,t)=>{d=d.slice(0,10);return (!f||d>=f)&&(!t||d<=t)};
+
+/* ========= 마스터 ========= */
+const STORES=[
+['카인드글로벌의원','피부과','175',1,'Kind Global Clinic','金德全球医院','カインドグローバル医院'],
+['제로클리닉','피부과','090',1,'Zero Clinic','ZERO诊所','ゼロクリニック'],
+['디오레의원','피부과','112',1,'Diore Clinic','Diore医院','ディオレ医院'],
+['설린의원 명동','피부과','120',1,'Selin Clinic Myeongdong','塞林医院明洞','セリン医院明洞'],
+['셀파바이청담','에스테틱','173',1,'Selpa by Cheongdam','赛尔帕清潭','セルパバイ清潭'],
+['닥터에버스 강남','피부과','131',1,'Dr.Evers Gangnam','艾弗斯医生江南','ドクターエバース江南'],
+['도이준성형외과','성형외과','142',0,'Doijun Plastic Surgery','都伊俊整形外科','ドイジュン整形外科'],
+['로렐의원','피부과','155',1,'Laurel Clinic','月桂医院','ローレル医院'],
+['리버스클리닉 명동점','피부과','166',1,'Reverse Clinic Myeongdong','逆龄诊所明洞店','リバースクリニック明洞店'],
+['바이서울','헤어/메이크업','171',1,'BY SEOUL','BY SEOUL','バイソウル'],
+['박준뷰티랩 성수퍼품점','헤어/메이크업','181',0,'Parkjun Beauty Lab Seongsu','朴俊美容实验室圣水店','パクジュンビューティーラボ聖水店'],
+['시크릿의원','피부과','188',1,'Secret Clinic','Secret医院','シークレット医院'],
+['정샘물101','헤어/메이크업','101',1,'Jung Saem Mool 101','JUNG SAEM MOOL 101','チョンセムル101'],
+['준오헤어 명동예술극장점','헤어/메이크업','168',1,'Juno Hair Myeongdong Theater','准儿发廊明洞艺术剧场店','ジュノヘア明洞芸術劇場店'],
+['준오헤어 명동스트리트점','헤어/메이크업','169',1,'Juno Hair Myeongdong Street','准儿发廊明洞街店','ジュノヘア明洞ストリート店'],
+['희올헤어','헤어/메이크업','068',1,'Hee-All Hair Gangnam Main Branch','希奥尔发廊江南本店','ヒオールヘア江南本店'],
+['디디유','헤어/메이크업','170',1,'DDU','DDU','ディーディーユー'],
+['지유 일산점','성형외과','160',1,'GU clinic Ilsan Branch','GU整形医院','GUクリニック一山店'],
+['올리팅 성형외과','성형외과','145',1,'Ollieting Plastic Surgery','奥利亭整形外科','オリーティング整形外科'],
+['AB성형외과','성형외과','146',1,'AB Plastic Surgery','AB皮肤科','AB形成外科'],
+].map((a,i)=>({ko:a[0],cat:a[1],id:a[2],act:a[3]===1,en:a[4],zh:a[5],ja:a[6],
+  staff:i%3===0?[]:i%3===1?[['왕광환','010-2472-0026']]:[['조현아 팀장','010-9671-1298'],['김지수','010-5521-7783']]}));
+const STORE_BY=Object.fromEntries(STORES.map(s=>[s.ko,s]));
+const snm=(st,lang)=>(lang==='영어'||lang==='인도네시아어'||lang==='몽골어')?st.en:lang==='일본어'?st.ja:st.zh;
+const PRODS={
+'피부과':[['리쥬란 힐러 4cc','[EXCLUSIVE] Rejuran Healer 4cc','嫩肤针 4cc','リジュラン 4cc'],['울쎄라 100샷','Ulthera 100 shots','超声刀100发','ウルセラ100ショット'],['물광 주사','Skin Booster Glow Shot','水光针','水光注射']],
+'성형외과':[['눈 성형 상담','Eye Surgery Consultation','双眼皮咨询','目の整形相談'],['코 성형 상담','Nose Surgery Consultation','鼻整形咨询','鼻整形相談']],
+'에스테틱':[['어깨 마사지 60분','[Monthly Event] Square Shoulder Massage (60 min)','方肩按摩60分钟','スクエアショルダーマッサージ60分'],['페이셜 케어 90분','Facial Care (90 min)','面部护理90分钟','フェイシャルケア90分']],
+'헤어/메이크업':[['디자인 컷','Design Cut','设计剪发','デザインカット'],['퍼스널 컬러 메이크업','Personal Color Makeup','个人色彩彩妆','パーソナルカラーメイク']]};
+const prodOf=(st,lang)=>{const p=pick(PRODS[st.cat]);return (lang==='영어'||lang==='인도네시아어'||lang==='몽골어')?p[1]:lang==='일본어'?p[3]:p[2]};
+const NAT_LANG={'미국':['영어',()=>'+1 '+dg(10)],'캐나다':['영어',()=>'+1 '+dg(10)],'호주':['영어',()=>'+61 4'+dg(8)],'필리핀':['영어',()=>'+63 9'+dg(9)],'베트남':['영어',()=>'+84 9'+dg(8)],
+'일본':['일본어',()=>'+81 90 '+dg(4)+' '+dg(4)],'중국':['중국어(간체)',()=>'+86 1'+pick(['3','5','8'])+dg(9)],'대만':['중국어(번체)',()=>'+886 9'+dg(2)+' '+dg(3)+' '+dg(3)],
+'인도네시아':['인도네시아어',()=>'+62 8'+dg(2)+' '+dg(4)+' '+dg(4)],'몽골':['몽골어',()=>'+976 '+dg(4)+' '+dg(4)]};
+const WEBP=[['Susan H Pak','미국'],['Isabella Samek','미국'],['Eunice Choi','미국'],['Rassul Ismailov','미국'],['Kaitlyn Chan','캐나다'],['Evelyn Lee','캐나다'],['shiyi Chen','캐나다'],['Karla Torres','미국'],
+['Yukina Morita','일본'],['MAEDA MIYU','일본'],['YUMA HASEGAWA','일본'],['MARI HAYASHI','일본'],['TAKARA OKANO','일본'],['Sakura Ito','일본'],['zhangyue','중국'],['liangmeiying','중국'],['Hemeiwen','중국'],
+['Lin Yu Ting','대만'],['Chen Mei Hua','대만'],['Wu Chia Hui','대만'],['Putri Ayu','인도네시아'],['Dewi Lestari','인도네시아'],['Bayarmaa Dorj','몽골'],['Nguyen Thao','베트남'],['Emma Watson K','호주'],['Maria Santos','필리핀']];
+const CNP=[['王小明','WANG XIAOMING'],['李雪','LI XUE'],['Chen Wei','CHEN WEI'],['张雨桐','ZHANG YUTONG'],['Liu Yang','LIU YANG'],['赵一诺','ZHAO YINUO'],['Zhou Mei','ZHOU MEI'],['陈思雨','CHEN SIYU'],['Sun Yi Fei','SUN YIFEI'],['吴佳琪','WU JIAQI'],['Xu Ting','XU TING'],['Gao Yuan','GAO YUAN']];
+const HKP=[['陳大文','CHAN TAI MAN'],['Wong Ka Ming','WONG KA MING'],['Chan Siu Ling','CHAN SIU LING'],['李嘉欣','LEE KA YAN'],['Lau Tsz Hin','LAU TSZ HIN'],['Cheung Mei Yee','CHEUNG MEI YEE'],['Ho Man Kit','HO MAN KIT']];
+const HKNAT='홍콩(중국 특별행정구)';
+function person(ch){
+  if(ch==='웹'){const w=pick(WEBP),nl=NAT_LANG[w[1]];const nm=w[0];
+    return {name:nm,pass:nm.toUpperCase(),nat:w[1],lang:nl[0],phone:nl[1](),email:nm.toLowerCase().replace(/[^a-z]/g,'')+ri(99)+'@'+pick(['gmail.com','gmail.com','outlook.com','yahoo.com','naver.com']),nick:nm,sns:'',snsId:''}}
+  if(ch==='알리페이 중국'){const p=pick(CNP);
+    return {name:p[0],pass:p[1],nat:'중국',lang:'중국어(간체)',phone:'+86 1'+pick(['3','5','8'])+dg(9),email:'-',nick:p[0],sns:'WECHAT',snsId:'wxid_'+dg(8)}}
+  const p=pick(HKP);
+  return {name:p[0],pass:p[1],nat:HKNAT,lang:'중국어(번체)',phone:'+852 '+pick(['5','6','9'])+dg(3)+' '+dg(4),email:'-',nick:p[0],sns:'WHATSAPP',snsId:'+852'+dg(8)};
+}
+const chList=(w,c,h)=>shuffle([].concat(Array(w).fill('웹'),Array(c).fill('알리페이 중국'),Array(h).fill('알리페이 홍콩')));
+const descTs=(n,from,to,sec)=>{const a=[];for(let i=0;i<n;i++){const span=Math.round((new Date(to)-new Date(from))/864e5);const d=add(from,ri(span+1));a.push(tsOf(d,sec,6,23))}return a.sort().reverse()};
+const sdesc=(ds)=>ds;
+
+/* ========= 1) 예약 ========= */
+const RES=[];
+(function(){
+  const spec=[];
+  const mk=(ch,st,n)=>{for(let i=0;i<n;i++)spec.push([ch,st])};
+  mk('웹','예약',6);mk('웹','방문완료',36);mk('웹','노쇼',2);mk('웹','고객취소',16);
+  mk('알리페이 중국','예약',1);mk('알리페이 중국','방문완료',8);mk('알리페이 중국','노쇼',1);mk('알리페이 중국','고객취소',2);
+  mk('알리페이 홍콩','예약',1);mk('알리페이 홍콩','방문완료',3);mk('알리페이 홍콩','고객취소',3);
+  const code={'중국어(간체)':'ZH','중국어(번체)':'ZT','영어':'EN','일본어':'JA','인도네시아어':'ID','몽골어':'MN'};
+  shuffle(spec).forEach(sp=>{
+    const p=person(sp[0]);const st=STORES[wpick(STORES.map((s,i)=>[i,i<10?3:1]))];
+    let visit;
+    if(sp[1]==='예약')visit=add(T,1+ri(54));
+    else if(sp[1]==='방문완료'||sp[1]==='노쇼')visit=add(T,-ri(58)-(sp[1]==='노쇼'?1:0));
+    else visit=add(T,ri(80)-30);
+    const vt=pad(10+ri(10))+':'+pick(['00','30']);
+    let rd=add(visit,-(2+ri(40)));if(rd>T)rd=add(T,-ri(5));
+    const recv=tsOf(rd,0,7,23);
+    const seq=pad(1+ri(2));
+    RES.push({ch:sp[0],status:sp[1],store:st.ko,cat:st.cat,visit:visit+' '+vt,recv,name:p.pass,phone:p.phone,
+      no:rd.slice(2).replace(/-/g,'')+st.id+code[p.lang]+seq,nat:p.nat,lang:p.lang,reg:ri(12)===0?'관리자':'고객',
+      hay:(p.pass+' '+p.phone+' '+st.ko+' '+rd).toLowerCase()});
+  });
+  RES.forEach(r=>r.hay+=' '+r.no.toLowerCase());
+})();
+
+/* ========= 2) 상담 ========= */
+const CONS_ST=['방문예정','예약중','상품예약','방문완료','고객취소','고객부재','스토어취소','연락실패'];
+const CONS=[];
+(function(){
+  const chs=chList(26,6,4),tss=descTs(36,'2026-09-11',T,true);
+  chs.forEach((ch,i)=>{
+    const p=person(ch),st=pick(STORES);
+    const route=ch==='웹'?wpick([['스토어',48],['상품',38],['외부(스토어)',4],['외부(상품)',10]]):wpick([['스토어',50],['상품',50]]);
+    const prod=route.indexOf('상품')>=0?prodOf(st,p.lang):'';
+    const member=ch!=='웹'||ri(7)===0?'회원':'비회원';
+    const sns=ch!=='웹'||(ri(6)===0);
+    const sn=ch!=='웹'?p.sns:pick(['WHATSAPP','LINE','WHATSAPP']);
+    CONS.push({no:36-i,recv:tss[i],member,ch,status:pick(CONS_ST),store:st.ko,cat:st.cat,prod,route,memo:ri(5)<3,
+      way:sns?'SNS':'PHONE',phone:p.phone,sns:sns?sn:'',snsId:sns?(ch!=='웹'?p.snsId:'ac'+dg(7)):'',lang:p.lang,name:p.name,nick:member==='회원'?p.nick:'',
+      hay:(p.name+' '+p.phone+' '+st.ko+' '+prod).toLowerCase()});
+  });
+})();
+
+/* ========= 3) 스토어 채팅 / 4) 상품 채팅 ========= */
+const CHATS=[],PCHATS=[];
+function mkChat(n,w,c,h,isProd){
+  const chs=chList(w,c,h),weekN=Math.round(n*0.55);
+  const firsts=[];
+  for(let i=0;i<n;i++){const d=i<weekN?add('2026-09-30',ri(8)):add('2026-09-01',ri(29));firsts.push(tsOf(d,true,6,23))}
+  firsts.sort().reverse();
+  chs.forEach((ch,i)=>{
+    const p=person(ch),st=pick(STORES);
+    const f=firsts[i];const fd=f.slice(0,10);let ld=add(fd,ri(3));if(ld>T)ld=T;
+    const last=tsOf(ld,true,6,23);const l=last<f?f:last;
+    const room=ri(100)<35?'챗봇':'상담';
+    const lw=room==='챗봇'?'고객센터':pick(['csm','csm','고객센터','고객']);
+    const resp=(room==='상담'&&lw==='고객')?'미응답':'응답';
+    const guest=ch==='웹'&&ri(5)<3;
+    let cust;
+    if(ch==='웹')cust=guest?(isProd?'c30d'+dg(4)+'-'+dg(4)+'-447b-bb2d-d1aeb2a'+dg(4):'게스트'):p.name;
+    else cust=ri(2)?p.nick:'알리페이 회원';
+    const o={no:n-i,first:f,last:l,room,resp,lw,ch,store:st.ko,cat:st.cat,staff:st.staff,sname:snm(st,p.lang),cust,lang:p.lang,email:ch==='웹'&&!guest?p.email:'',
+      route:ch==='웹'&&ri(12)===0?'외부(스토어)':'스토어',prod:isProd?prodOf(st,p.lang):'',hay:(cust+' '+st.ko+' '+p.email).toLowerCase()};
+    (isProd?PCHATS:CHATS).push(o);
+  });
+}
+mkChat(30,21,5,4,false);
+mkChat(24,16,5,3,true);
+
+/* ========= 5) 리뷰 ========= */
+const REV=[];
+(function(){
+  const TXT={'영어':['Very good Service and beautiful result, I will come back again.','It was a very good and relaxing experience.','I\'m visiting the US, and I wanted to try a Korean salon.','Got a haircut here and I\'m really happy with it.','Very satisfied experience! The staff were kind.','A traditional and trendy hair style, loved it.','Good','very good!'],
+  '일본어':['スタッフの方がとても親切で、仕上がりも大満足でした。','日本語対応があって安心して受けられました。','また絶対に来たいです。ありがとうございました。','丁寧なカウンセリングでした。'],
+  '중국어(간체)':['服务非常好,效果也很满意,下次还会再来。','医生很专业,环境干净,推荐给大家。','预约很方便,工作人员很热情。','第一次来韩国做护理,体验很棒。'],
+  '중국어(번체)':['服務非常好,效果也很滿意,下次還會再來。','醫生很專業,環境乾淨,推薦給大家。','預約很方便,工作人員很熱情。','第一次來韓國做護理,體驗很棒。'],
+  '인도네시아어':['Pelayanan sangat baik dan hasilnya memuaskan.','Stafnya ramah, saya pasti akan kembali.'],
+  '몽골어':['Үйлчилгээ маш сайн байсан, баярлалаа.','Үр дүн сэтгэл ханамжтай байлаа.']};
+  const chs=chList(21,5,4),n=30;
+  const ds=[];for(let i=0;i<n;i++)ds.push(tsOf(add('2026-02-01',ri(248)),false,8,22));ds.sort().reverse();
+  chs.forEach((ch,i)=>{
+    const p=person(ch),st=pick(STORES);
+    const type=ch==='웹'?wpick([['스토어',70],['상품',18],['스토어 메신저',12]]):wpick([['스토어',75],['상품',25]]);
+    const created=ds[i];const upd=ri(6)===0?add(created.slice(0,10),ri(40))+' '+tmOf('x'):created;
+    REV.push({no:187-i,store:st.ko,lang:p.lang,sname:snm(st,p.lang),type,author:ch==='웹'?p.name:p.nick,ch,rating:wpick([[5,70],[4,18],[3,8],[2,4]]),
+      text:pick(TXT[p.lang]||TXT['영어']),img:ri(10)<3,created,updated:upd<created?created:upd,hay:''});
+    const r=REV[REV.length-1];r.hay=(r.author+' '+r.text+' '+r.store+' '+r.sname).toLowerCase();
+  });
+})();
+
+/* ========= 6) 문의 통계 ========= */
+const STAT=[];
+(function(){
+  const WAY=['채팅문의','상담문의','메신저상담'];
+  const spec=[];
+  const mk=(ch,way,n,inR)=>{for(let i=0;i<n;i++)spec.push({ch,way,inR})};
+  mk('웹','메신저상담',34,1);mk('웹','채팅문의',2,1);mk('웹','상담문의',2,1);
+  mk('알리페이 중국','채팅문의',4,1);mk('알리페이 중국','상담문의',4,1);mk('알리페이 홍콩','채팅문의',3,1);mk('알리페이 홍콩','상담문의',3,1);
+  mk('웹','메신저상담',5,0);mk('웹','상담문의',1,0);mk('알리페이 중국','채팅문의',1,0);mk('알리페이 홍콩','상담문의',1,0);
+  shuffle(spec).forEach(sp=>{
+    const st=STORES[Math.floor(Math.pow(R(),1.7)*STORES.length)];
+    const date=sp.inR?add(T,-Math.floor(Math.pow(R(),1.5)*7)):add('2026-09-10',ri(18));
+    let lang;
+    if(sp.ch==='알리페이 중국')lang='중국어(간체)';else if(sp.ch==='알리페이 홍콩')lang='중국어(번체)';
+    else lang=wpick([['영어',55],['일본어',20],['중국어(번체)',10],['중국어(간체)',8],['인도네시아어',4],['몽골어',3]]);
+    const o={date,store:st.ko,kind:ri(100)<30?'스토어':'상품',lang,way:sp.way,mg:'',mt:'',ch:sp.ch};
+    if(sp.way==='메신저상담'){o.mg=ri(100)<39?'K-뷰티 메신저':'입점사 메신저';o.mt=wpick([['왓츠앱',61],['라인',32],['위챗',7]])}
+    STAT.push(o);
+  });
+})();
+
+/* ========= 7) 설문 ========= */
+const SV_RES={'웹':60,'알리페이 중국':12,'알리페이 홍콩':7};
+const SV_EXP=['처음이에요','와본 적 있어요','살고 있어요'];
+const SV_INT=['화장품 쇼핑','K-pop 팬 활동','뷰티 팝업스토어','한복 체험','피부 진단','굿즈 쇼핑','뷰티 디바이스 쇼핑','영양제 쇼핑','향수 만들기','안경 맞추기'];
+const SURVEY=[
+['2026-10-05 21:12:44','알리페이 중국','-','중국','FEMALE','2001-11-02','와본 적 있어요',['화장품 쇼핑','피부 진단','향수 만들기']],
+['2026-10-03 14:05:31','웹','meiling.t@gmail.com','대만','FEMALE','1998-06-19','와본 적 있어요',['K-pop 팬 활동','굿즈 쇼핑']],
+['2026-10-02 09:48:10','알리페이 홍콩','-',HKNAT,'FEMALE','1992-12-24','처음이에요',['화장품 쇼핑','한복 체험','영양제 쇼핑']],
+['2026-09-30 22:31:57','웹','sarah.k.lee@outlook.com','캐나다','FEMALE','1989-04-15','와본 적 있어요',['뷰티 팝업스토어','피부 진단','화장품 쇼핑']],
+['2026-09-29 18:20:03','알리페이 중국','-','중국','MALE','1996-08-30','와본 적 있어요',['뷰티 디바이스 쇼핑','굿즈 쇼핑']],
+['2026-09-28 11:07:26','웹','haruka_m@yahoo.co.jp','일본','FEMALE','1994-01-09','살고 있어요',['화장품 쇼핑','안경 맞추기']],
+['2026-09-26 20:55:48','웹','emma.w1990@gmail.com','미국','FEMALE','1990-09-21','처음이에요',['K-pop 팬 활동','한복 체험','화장품 쇼핑']],
+['2026-09-24 08:16:39','웹','nguyen.thao@gmail.com','필리핀','FEMALE','2003-02-14','와본 적 있어요',['K-pop 팬 활동','뷰티 팝업스토어','굿즈 쇼핑']],
+['2026-09-23 17:40:05','웹','yanlynx973@gmail.com','베트남','FEMALE','1995-03-07','처음이에요',['뷰티 디바이스 쇼핑','화장품 쇼핑','뷰티 팝업스토어']]
+].map(a=>({t:a[0],ch:a[1],email:a[2],nat:a[3],gender:a[4],birth:a[5],exp:a[6],ints:a[7]}));
+const ageOf=b=>{const y=+b.slice(0,4);let a=2026-y;if(b.slice(5)>T.slice(5))a--;return a};
+const ageB=a=>a<20?'10대':a<30?'20대':a<40?'30대':a<50?'40대':'50대 이상';
+
+/* ========= 상태 ========= */
+let _v='res',S,OPEN={};
+const D=()=>({
+ res:{ch:'전체',store:'',cat:'',status:'',lang:'',reg:'',q:'',qd:'',per:'all',from:'',to:'',base:'visit',sort:'visit',page:1,size:10},
+ cons:{per:'',from:'',to:'',member:'',status:'',lang:'',route:'',ch:'전체',cat:'',store:'',q:'',qd:'',page:1,size:10},
+ chats:{base:'first',per:'week',from:'2026-09-30',to:T,room:'',route:'',ch:'전체',resp:'',lang:'',store:'',q:'',qd:'',page:1,size:10},
+ prodchats:{base:'first',per:'week',from:'2026-09-30',to:T,room:'',resp:'',lang:'',ch:'전체',cat:'',store:'',q:'',qd:'',page:1,size:10},
+ rev:{base:'reg',per:'',from:'',to:'',lang:'',store:'',img:'',ch:'전체',q:'',qd:'',page:1,size:10},
+ stat:{mode:'day',lang:'',ch:'전체',active:'',store:'',has:'has',per:'week',from:'2026-09-30',to:T,chart:'bar',tab:'agg',mtype:'all',sortK:'total',sortD:-1},
+ survey:{from:'',to:'',nat:'',gender:'',age:'',exp:'',interest:'',ch:'전체',page:1,size:20}
+});
+S=D();
+function perRange(k){
+  switch(k){
+    case 'all':return ['',''];
+    case 'today':return [T,T];
+    case 'yest':return [add(T,-1),add(T,-1)];
+    case 'week':return [add(T,-7),T];
+    case 'month':return ['2026-10-01',T];
+    case 'year':return ['2026-01-01',T];
+    case '1w':return [add(T,-7),''];case '1m':return [add(T,-30),''];case '3m':return [add(T,-90),''];case '6m':return [add(T,-182),''];case '1y':return [add(T,-365),''];
+  }
+  return ['',''];
+}
+
+/* ========= 컴포넌트 ========= */
+function sel(k,ph,opts,o={}){
+  const v=S[_v][k];
+  const os=opts.map(x=>Array.isArray(x)?x:[x,x]);
+  return `<select class="ctl ${ph!=null&&v===''?'empty':''} ${o.cls||''}" data-k="${k}" style="${o.w?'width:'+o.w+'px':''}">${ph!=null?`<option value="">${esc(ph)}</option>`:''}${os.map(a=>`<option value="${esc(a[0])}" ${String(v)===String(a[0])?'selected':''}>${esc(a[1])}</option>`).join('')}</select>`;
+}
+function chSel(){
+  const v=S[_v].ch;
+  return `<label class="ctl fld new"><span>유입 채널</span><select data-k="ch">${['전체'].concat(CHS).map(c=>`<option ${c===v?'selected':''}>${c}</option>`).join('')}</select></label>`;
+}
+function perBtns(list,fill){
+  const v=S[_v].per;
+  return `<span class="seg ${fill?'fill':''}">${list.map(a=>`<button data-act="per" data-v="${a[1]}" class="${v===a[1]?'on':''}">${a[0]}</button>`).join('')}</span>`;
+}
+function rng(){
+  const s=S[_v];
+  return `<span class="rng"><input type="date" data-k="from" value="${s.from}"><i>→</i><input type="date" data-k="to" value="${s.to}"></span>`;
+}
+function txt(ph,w){return `<input class="ctl" data-q placeholder="${esc(ph)}" value="${esc(S[_v].qd)}" style="width:${w}px">`}
+const srch='<button class="btnp" data-act="search">검색</button>';
+function page(title,sub,inner){return `<div class="ph"><h1>${title}</h1><p>${sub}</p></div>${inner}`}
+function pager(total,withSize){
+  const s=S[_v];const pages=Math.max(1,Math.ceil(total/s.size));if(s.page>pages)s.page=pages;const c=s.page;
+  let nums;
+  if(pages<=7)nums=Array.from({length:pages},(_,i)=>i+1);
+  else if(c<=4)nums=[1,2,3,4,5,'…',pages];
+  else if(c>=pages-3)nums=[1,'…',pages-4,pages-3,pages-2,pages-1,pages];
+  else nums=[1,'…',c-1,c,c+1,'…',pages];
+  return `<div class="pg ${withSize?'sz':''}" style="${withSize?'':''}"><div style="display:flex;gap:6px;align-items:center;${withSize?'margin:0 auto':''}">
+  <button data-act="page" data-v="${c-1}" ${c<=1?'disabled':''}>‹</button>${nums.map(n=>n==='…'?'<span class="el">···</span>':`<button data-act="page" data-v="${n}" class="${n===c?'on':''}">${n}</button>`).join('')}<button data-act="page" data-v="${c+1}" ${c>=pages?'disabled':''}>›</button></div>
+  ${withSize?`<select class="ctl" data-k="size" style="position:absolute;right:0;top:18px">${[10,20,50].map(n=>`<option value="${n}" ${s.size===n?'selected':''}>${n} / 페이지</option>`).join('')}</select>`:''}</div>`;
+}
+const sliceP=(rows)=>{const s=S[_v];const pages=Math.max(1,Math.ceil(rows.length/s.size));if(s.page>pages)s.page=pages;return rows.slice((s.page-1)*s.size,s.page*s.size)};
+const count=(rows,fn)=>{const m={};rows.forEach(r=>{const k=fn(r);m[k]=(m[k]||0)+1});return m};
+function chipGrp(title,items,cls){return `<span class="grp ${cls||''}"><strong>${title}</strong>${items.map(a=>`<span class="chip">${a[0]} ${a[1]}</span>`).join('')}</span>`}
+function chipsBar(total,groups){return `<div class="blk flat" style="margin-top:10px"><div class="chips"><span class="grp"><strong>총</strong><span class="chip tot">${total}</span></span>${groups}</div></div>`}
+const chGrp=rows=>{const m=count(rows,r=>r.ch);return chipGrp('유입 채널',CHS.map(c=>[c,m[c]||0]),'new')};
+const EMPTY=n=>`<tr class="empty-row"><td colspan="${n}">데이터가 없습니다</td></tr>`;
+const thc=(l,cls)=>`<th class="${cls||''}">${l}</th>`;
+
+/* ========= 화면: 예약 ========= */
+function resRows(){
+  const s=S.res;
+  const rows=RES.filter(r=>(s.ch==='전체'||r.ch===s.ch)&&(!s.store||r.store===s.store)&&(!s.cat||r.cat===s.cat)&&(!s.status||r.status===s.status)&&(!s.lang||r.lang===s.lang)&&(!s.reg||r.reg===s.reg)
+    &&inRange(s.base==='visit'?r.visit:r.recv,s.from,s.to)&&(!s.q||r.hay.indexOf(s.q.toLowerCase())>=0));
+  const k=s.sort==='visit'?'visit':'recv';
+  return rows.sort((a,b)=>a[k]<b[k]?1:a[k]>b[k]?-1:0);
+}
+function vRes(){
+  const s=S.res,rows=resRows();
+  const up=rows.filter(r=>r.status==='예약').length,dn=rows.filter(r=>r.status==='방문완료').length,ns=rows.filter(r=>r.status==='노쇼').length;
+  const rate=(dn+ns)?Math.round(ns/(dn+ns)*1000)/10:0;
+  const cards=`<div class="cards">${[['전 매장 예약',rows.length,''],['방문 예정',up,''],['방문 완료',dn,''],['노쇼',ns,''],['노쇼율',rate,'%']].map(a=>`<div class="cd"><i>${a[0]}</i><b>${a[1]}${a[2]?`<u>${a[2]}</u>`:''}</b></div>`).join('')}</div>`;
+  const f=`<div class="blk"><div class="fl col"><div class="r">
+   ${sel('store','스토어 선택',STORES.map(x=>x.ko),{w:130})}${sel('cat','카테고리 선택',CATS,{w:130})}${sel('status','상태 선택',['예약','방문완료','노쇼','고객취소'],{w:110})}${sel('lang','언어 선택',LANGS,{w:116})}
+   ${chSel()}${sel('reg','등록 주체',['고객','관리자'],{w:110})}${txt('여권명, 연락처, 예약번호, 요청사항, 매장메모',290)}</div>
+   <div class="r">${perBtns([['전체','all'],['1주일','1w'],['1개월','1m'],['3개월','3m'],['6개월','6m'],['1년','1y']],true)}
+   ${sel('base',null,[['visit','방문일 기준'],['recv','접수일 기준']],{w:118})}${sel('sort',null,[['visit','방문일순'],['recv','접수일순']],{w:104})}${rng()}${srch}</div></div></div>`;
+  const body=sliceP(rows).map(r=>`<tr><td><b>${esc(r.store)}</b><small>${r.cat}</small></td><td>${r.visit}<small>접수 ${r.recv}</small></td><td>${esc(r.name)}</td><td class="new">${r.ch}</td><td>${r.no}</td><td>${r.nat}</td><td>${r.lang}</td>
+   <td><span class="dot ${r.status==='예약'?'b':r.status==='방문완료'?'ok':r.status==='노쇼'?'r':'g'}">${r.status}</span></td><td><span class="mb">상세</span>${r.status==='예약'?'<span class="mb red">강제취소</span>':''}</td></tr>`).join('');
+  const tbl=`<div class="blk"><div class="tw"><table class="tbl"><thead><tr>${thc('매장명')}${thc('방문일시')}${thc('고객(여권명)')}${thc('유입 채널','new')}${thc('예약번호')}${thc('국적')}${thc('언어')}${thc('상태')}${thc('관리')}</tr></thead><tbody>${body||EMPTY(9)}</tbody></table></div>${pager(rows.length,false)}</div>`;
+  return page('예약 관리','우리 경유 전 매장 예약을 모니터링·처리합니다.',cards+f+tbl);
+}
+
+/* ========= 화면: 상담 ========= */
+function consRows(){
+  const s=S.cons;
+  return CONS.filter(r=>(s.ch==='전체'||r.ch===s.ch)&&(!s.member||r.member===s.member)&&(!s.status||r.status===s.status)&&(!s.lang||r.lang===s.lang)&&(!s.route||r.route===s.route)&&(!s.cat||r.cat===s.cat)&&(!s.store||r.store===s.store)
+   &&inRange(r.recv,s.from,s.to)&&(!s.q||r.hay.indexOf(s.q.toLowerCase())>=0));
+}
+function vCons(){
+  const rows=consRows();
+  const f=`<div class="blk"><div class="fl">${perBtns([['오늘','today'],['어제','yest'],['이번주','week'],['이번달','month']])}${rng()}
+   ${sel('member','회원 여부',['회원','비회원'],{w:96})}${sel('status','접수상태',CONS_ST,{w:104})}${sel('lang','언어',LANGS,{w:100})}${sel('route','유입 경로',['스토어','상품','외부(스토어)','외부(상품)'],{w:108})}${chSel()}
+   ${sel('cat','카테고리 선택',CATS,{w:128})}${sel('store','스토어 선택',STORES.map(x=>x.ko),{w:128})}${txt('검색어',150)}${srch}</div></div>`;
+  const ms=count(rows,r=>r.status),ml=count(rows,r=>r.lang),mr=count(rows,r=>r.route);
+  const chips=chipsBar(rows.length,chipGrp('접수상태',CONS_ST.map(x=>[x,ms[x]||0]))+chipGrp('언어',LANGS.map(x=>[x,ml[x]||0]))+chipGrp('유입 경로',['스토어','상품','외부(스토어)','외부(상품)'].map(x=>[x,mr[x]||0]))+chGrp(rows));
+  const body=sliceP(rows).map(r=>`<tr><td class="c">${r.no}</td><td>${r.recv.slice(0,16)}</td><td>${r.member}</td><td class="new">${r.ch}</td><td><span class="stsel">${r.status}<i></i></span></td><td class="lnk">${esc(r.store)}</td><td class="lnk">${esc(r.prod)}</td><td>${r.route}</td><td>${r.memo?'<span class="lnk">미리보기</span>':'-'}</td><td>${r.way}</td><td>${r.phone}</td><td>${r.sns}</td><td>${esc(r.snsId)}</td><td>${r.lang}</td><td>${esc(r.name)}</td><td>${esc(r.nick)}</td><td></td><td>-</td></tr>`).join('');
+  const heads=[['No.','c'],['접수일시'],['회원구분'],['유입 채널','new'],['접수상태'],['스토어코드'],['상품명'],['유입경로'],['고객메모'],['연락수단'],['휴대폰번호'],['SNS'],['SNS ID'],['언어'],['이름'],['닉네임'],['QR'],['상담일시']];
+  const tbl=`<div class="blk"><div class="tw"><table class="tbl dense"><thead><tr>${heads.map(h=>thc(h[0],h[1])).join('')}</tr></thead><tbody>${body||EMPTY(18)}</tbody></table></div>${pager(rows.length,true)}</div>`;
+  return page('상담 관리','상품과 스토어에서 접수된 상담 내역을 조회하고 상태를 관리합니다.',f+chips+tbl);
+}
+
+/* ========= 화면: 채팅 공통 ========= */
+function chatRows(src,s){
+  const k=s.base==='first'?'first':'last';
+  return src.filter(r=>(s.ch==='전체'||r.ch===s.ch)&&(!s.room||r.room===s.room)&&(!s.resp||r.resp===s.resp)&&(!s.lang||r.lang===s.lang)&&(!s.store||r.store===s.store)&&(!s.cat||r.cat===s.cat)&&(!s.route||r.route===s.route)
+   &&inRange(r[k],s.from,s.to)&&(!s.q||r.hay.indexOf(s.q.toLowerCase())>=0));
+}
+function chatChips(rows){
+  const mr=count(rows,r=>r.room),mp=count(rows,r=>r.resp),ml=count(rows,r=>r.lang);
+  return chipsBar(rows.length,chipGrp('채팅방상태',[['챗봇',mr['챗봇']||0],['상담',mr['상담']||0]])+chipGrp('상담상태',[['응답',mp['응답']||0],['미응답',mp['미응답']||0]])+chipGrp('언어별',LANGS.map(x=>[x,ml[x]||0]))+chGrp(rows));
+}
+const staffTds=st=>[0,1,2].map(i=>`<td>${st[i]?esc(st[i][0]):''}</td><td>${st[i]?st[i][1]:''}</td>`).join('');
+function vChats(){
+  const s=S.chats,rows=chatRows(CHATS,s).sort((a,b)=>a[s.base==='first'?'first':'last']<b[s.base==='first'?'first':'last']?1:-1);
+  const f=`<div class="blk"><div class="fl">${sel('base',null,[['first','첫대화날짜기준'],['last','마지막대화날짜기준']],{w:130})}${perBtns([['오늘','today'],['어제','yest'],['이번주','week'],['이번달','month']])}${rng()}
+   ${sel('room','채팅방상태',['챗봇','상담'],{w:112})}${sel('route','유입경로',['스토어','외부(스토어)'],{w:108})}${chSel()}${sel('resp','응답여부',['응답','미응답'],{w:104})}${sel('lang','언어',LANGS,{w:100})}${sel('store','스토어 선택',STORES.map(x=>x.ko),{w:128})}${txt('검색어',150)}${srch}</div></div>`;
+  const body=sliceP(rows).map(r=>`<tr><td class="c">${r.no}</td><td>${r.first}</td><td>${r.last}</td><td>${r.route}</td><td class="new">${r.ch}</td><td>${r.room}</td><td>${r.resp}</td><td>${r.lw}</td><td>${esc(r.store)}</td>${staffTds(r.staff)}<td>${esc(r.sname)}</td><td>${esc(r.cust)}</td><td>${r.lang}</td><td>${r.email?esc(r.email):(r.ch==='웹'?'':'-')}</td></tr>`).join('');
+  const heads=[['No','c'],['첫대화날짜'],['마지막대화날짜'],['유입경로'],['유입 채널','new'],['채팅방상태'],['상담상태'],['마지막작성자'],['스토어코드'],['담당자 이름','st'],['담당자 연락처','st'],['담당자 이름','st'],['담당자 연락처','st'],['담당자 이름','st'],['담당자 연락처','st'],['스토어명'],['고객명'],['언어'],['이메일']];
+  const tbl=`<div class="blk"><div class="sec-t" style="font-size:13px;padding-bottom:10px;border-bottom:1px solid var(--line);margin:-4px -16px 10px;padding-left:16px">스토어 채팅 목록</div><div class="tw"><table class="tbl dense"><thead><tr>${heads.map(h=>thc(h[0],h[1])).join('')}</tr></thead><tbody>${body||EMPTY(19)}</tbody></table></div>${pager(rows.length,true)}</div>`;
+  return page('스토어 채팅 목록','스토어 채팅 목록을 확인할 수 있습니다.',f+chatChips(rows)+tbl);
+}
+function vProdChats(){
+  const s=S.prodchats,rows=chatRows(PCHATS,s).sort((a,b)=>a[s.base==='first'?'first':'last']<b[s.base==='first'?'first':'last']?1:-1);
+  const f=`<div class="blk"><div class="fl">${sel('base',null,[['first','첫대화날짜기준'],['last','마지막대화날짜기준']],{w:130})}${perBtns([['오늘','today'],['어제','yest'],['이번주','week'],['이번달','month']])}${rng()}
+   ${sel('room','채팅방상태',['챗봇','상담'],{w:112})}${sel('resp','응답여부',['응답','미응답'],{w:104})}${sel('lang','언어',LANGS,{w:100})}${chSel()}${sel('cat','카테고리 선택',CATS,{w:128})}${sel('store','스토어 선택',STORES.map(x=>x.ko),{w:128})}${txt('검색어',150)}${srch}</div></div>`;
+  const body=sliceP(rows).map(r=>`<tr><td class="c">${r.no}</td><td>${r.first}</td><td>${r.last}</td><td>${r.room}</td><td>${r.resp}</td><td>${r.lw}</td><td>${esc(r.store)}</td>${staffTds(r.staff)}<td>${esc(r.sname)}</td><td>${esc(r.prod)}</td><td>${esc(r.cust)}</td><td class="new">${r.ch}</td><td>${r.lang}</td></tr>`).join('');
+  const heads=[['No','c'],['첫대화날짜'],['마지막대화날짜'],['채팅방상태'],['상담상태'],['마지막작성자'],['스토어코드'],['담당자 이름','st'],['담당자 연락처','st'],['담당자 이름','st'],['담당자 연락처','st'],['담당자 이름','st'],['담당자 연락처','st'],['스토어명'],['상품명'],['고객명'],['유입 채널','new'],['언어']];
+  const tbl=`<div class="blk"><div class="tw"><table class="tbl dense"><thead><tr>${heads.map(h=>thc(h[0],h[1])).join('')}</tr></thead><tbody>${body||EMPTY(18)}</tbody></table></div>${pager(rows.length,true)}</div>`;
+  return page('상품별 채팅방 현황','상품별 채팅방 현황을 확인할 수 있습니다.',f+chatChips(rows)+tbl);
+}
+
+/* ========= 화면: 리뷰 ========= */
+function vRev(){
+  const s=S.rev;
+  const k=s.base==='reg'?'created':'updated';
+  const rows=REV.filter(r=>(s.ch==='전체'||r.ch===s.ch)&&(!s.lang||r.lang===s.lang)&&(!s.store||r.store===s.store)&&(!s.img||(s.img==='y')===r.img)&&inRange(r[k],s.from,s.to)&&(!s.q||r.hay.indexOf(s.q.toLowerCase())>=0)).sort((a,b)=>a[k]<b[k]?1:-1);
+  const f=`<div class="blk"><div class="fl">${sel('base',null,[['reg','등록일기준'],['upd','수정일기준']],{w:110})}${perBtns([['오늘','today'],['이번주','week'],['이번달','month'],['이번년','year']])}${rng()}
+   ${sel('lang','언어',LANGS,{w:100})}${sel('store','스토어 선택',STORES.map(x=>x.ko),{w:128})}${sel('img','이미지 여부',[['y','이미지 있음'],['n','이미지 없음']],{w:116})}${chSel()}${txt('검색어',150)}${srch}</div></div>`;
+  const trunc=t=>t.length>26?t.slice(0,26)+'...':t;
+  const body=sliceP(rows).map(r=>`<tr><td class="c">${r.no}</td><td>${esc(r.store)}</td><td>${r.lang}</td><td>${esc(r.sname)}</td><td>${r.type}</td><td>${esc(r.author)}</td><td class="new">${r.ch}</td><td>${r.rating}</td><td>${esc(trunc(r.text))}</td><td>${r.img?'<span class="img-ph"></span>':''}</td><td>${r.created}</td><td>${r.updated}</td></tr>`).join('');
+  const heads=[['No.','c'],['스토어 코드'],['언어'],['스토어 이름'],['리뷰 유형'],['작성자'],['유입 채널','new'],['평점'],['리뷰 내용'],['이미지'],['작성일'],['수정일']];
+  const tbl=`<div class="blk"><div class="tw"><table class="tbl dense"><thead><tr>${heads.map(h=>thc(h[0],h[1])).join('')}</tr></thead><tbody>${body||EMPTY(12)}</tbody></table></div>${pager(rows.length,true)}</div>`;
+  return page('스토어 리뷰 관리','스토어 리뷰를 기간, 언어, 이미지 여부별로 조회합니다.',f+tbl);
+}
+
+/* ========= 화면: 문의 통계 ========= */
+const COL={'스토어':'#4b7bf5','상품':'#52c8c8','중국어(간체)':'#4b7bf5','영어':'#52c8c8','중국어(번체)':'#c77dff','일본어':'#f0975c','인도네시아어':'#7bc94a','몽골어':'#f6c344',
+ '웹':'#52c8c8','알리페이 중국':'#4b7bf5','알리페이 홍콩':'#f0975c','채팅문의':'#4b7bf5','상담문의':'#f0975c','메신저상담':'#52c8c8','K-뷰티 메신저':'#4b7bf5','입점사 메신저':'#52c8c8',
+ '왓츠앱':'#52c8c8','라인':'#4b7bf5','위챗':'#f0975c','카카오':'#f6c344','샤오홍슈':'#c77dff','페이스북':'#7bc94a'};
+const WAYS=['채팅문의','상담문의','메신저상담'];
+const MTYPES=['왓츠앱','라인','위챗','카카오','샤오홍슈','페이스북'];
+function statRows(){
+  const s=S.stat;
+  return STAT.filter(r=>inRange(r.date,s.from,s.to)&&(!s.lang||r.lang===s.lang)&&(s.ch==='전체'||r.ch===s.ch)&&(!s.store||r.store===s.store)&&(!s.active||STORE_BY[r.store].act===(s.active==='y')));
+}
+function donut(items,total){
+  const R0=34,C=2*Math.PI*R0;let off=0;
+  let arcs='';
+  if(total>0)items.forEach(a=>{if(!a[1])return;const len=a[1]/total*C;arcs+=`<circle r="${R0}" cx="45" cy="45" fill="none" stroke="${COL[a[0]]||'#aaa'}" stroke-width="13" stroke-dasharray="${len} ${C-len}" stroke-dashoffset="${-off}" transform="rotate(-90 45 45)"/>`;off+=len});
+  else arcs=`<circle r="${R0}" cx="45" cy="45" fill="none" stroke="#eee" stroke-width="13"/>`;
+  return `<svg width="76" height="76" viewBox="0 0 90 90">${arcs}</svg>`;
+}
+function dCard(title,items,cls,extra){
+  const total=items.reduce((a,b)=>a+b[1],0);
+  return `<div class="dc ${cls||''}"><h4><span>${title}</span>${extra||''}</h4><div class="dbody">${donut(items,total)}<div class="leg">${items.map(a=>`<div><i style="background:${COL[a[0]]||'#aaa'}"></i><span>${a[0]}</span><b>${a[1]}</b><em>${total?Math.round(a[1]/total*100):0}%</em></div>`).join('')}</div></div></div>`;
+}
+function niceMax(m){return [5,10,15,20,25,30,40,50,60,80,100,150,200,300,500].find(x=>x>=m)||Math.ceil(m/5)*5}
+function chartSvg(rows){
+  const s=S.stat;let keys=[];
+  if(s.mode==='day'){let d=s.from||'2026-09-30';const e=s.to||T;while(d<=e&&keys.length<62){keys.push(d);d=add(d,1)}}
+  else{let m=(s.from||'2026-05-01').slice(0,7);const e=(s.to||T).slice(0,7);while(m<=e&&keys.length<24){keys.push(m);let y=+m.slice(0,4),mo=+m.slice(5);mo++;if(mo>12){mo=1;y++}m=y+'-'+pad(mo)}}
+  const kf=s.mode==='day'?r=>r.date:r=>r.date.slice(0,7);const cm=count(rows,kf);
+  const vals=keys.map(k=>cm[k]||0);const mx=niceMax(Math.max(0,...vals));
+  const W=1400,H=250,L=44,B=30,Tp=16,pw=W-L-10,ph=H-B-Tp;let g='';
+  for(let i=0;i<=5;i++){const y=Tp+ph-ph*i/5;g+=`<line x1="${L}" x2="${W-10}" y1="${y}" y2="${y}" stroke="#eee"/><text x="${L-8}" y="${y+4}" text-anchor="end" font-size="12" fill="#999">${Math.round(mx*i/5*10)/10}</text>`}
+  const n=keys.length,step=pw/n;let body='';
+  const px=i=>L+step*i+step/2,py=v=>Tp+ph-ph*v/mx;
+  if(s.chart==='bar'){const bw=Math.min(54,step*0.5);vals.forEach((v,i)=>{body+=`<rect x="${px(i)-bw/2}" y="${py(v)}" width="${bw}" height="${Tp+ph-py(v)}" fill="#6f9bf7" rx="2"/>`;if(v)body+=`<text x="${px(i)}" y="${py(v)-5}" text-anchor="middle" font-size="12" fill="#555">${v}</text>`})}
+  else{body+=`<polyline fill="none" stroke="#4b7bf5" stroke-width="2" points="${vals.map((v,i)=>px(i)+','+py(v)).join(' ')}"/>`;vals.forEach((v,i)=>{body+=`<circle cx="${px(i)}" cy="${py(v)}" r="3.5" fill="#4b7bf5"/><text x="${px(i)}" y="${py(v)-8}" text-anchor="middle" font-size="12" fill="#555">${v}</text>`})}
+  keys.forEach((k,i)=>{if(n<=31||i%2===0)body+=`<text x="${px(i)}" y="${H-10}" text-anchor="middle" font-size="12" fill="#888">${s.mode==='day'?k.slice(5):k}</text>`});
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">${g}${body}</svg>`;
+}
+function aggData(rows){
+  const s=S.stat;let list=STORES.filter(st=>(!s.store||st.ko===s.store)&&(!s.active||st.act===(s.active==='y')));
+  let out=list.map(st=>{const rr=rows.filter(r=>r.store===st.ko);const o={name:st.ko,total:rr.length};
+    ['스토어','상품'].forEach(k=>o['k:'+k]=rr.filter(r=>r.kind===k).length);LANGS.forEach(k=>o['l:'+k]=rr.filter(r=>r.lang===k).length);CHS.forEach(k=>o['c:'+k]=rr.filter(r=>r.ch===k).length);WAYS.forEach(k=>o['w:'+k]=rr.filter(r=>r.way===k).length);return o});
+  if(s.has==='has')out=out.filter(o=>o.total>0);else if(s.has==='none')out=out.filter(o=>o.total===0);
+  out.sort((a,b)=>{const x=a[s.sortK],y=b[s.sortK];const c=typeof x==='string'?x.localeCompare(y,'ko'):x-y;return (c||a.name.localeCompare(b.name,'ko'))*s.sortD*(typeof x==='string'?1:1)||0});
+  return out;
+}
+function detLabel(r){return r.way==='메신저상담'?(r.mg==='K-뷰티 메신저'?'K뷰티':'입점사')+r.mt:r.way}
+function vStat(){
+  const s=S.stat,rows=statRows();
+  const f=`<div class="blk"><div class="fl"><span class="tog"><button class="${s.mode==='day'?'on':''}" data-act="set" data-k="mode" data-v="day">일별</button><button class="${s.mode==='month'?'on':''}" data-act="set" data-k="mode" data-v="month">월별</button></span>
+   ${sel('lang','언어',LANGS,{w:104})}${chSel()}${sel('active','활성',[['y','활성'],['n','비활성']],{w:84})}${sel('store','스토어 선택',STORES.map(x=>x.ko),{w:136})}${sel('has',null,[['has','데이터 있음'],['all','전체'],['none','데이터 없음']],{w:116})}
+   ${perBtns([['오늘','today'],['어제','yest'],['이번주','week'],['이번달','month'],['직접 선택','']])}${rng()}${srch.replace('data-act="search"','data-act="search"')}</div></div>`;
+  const chart=`<div class="blk"><div class="sec-h"><span class="sec-t" style="margin:0">${s.mode==='day'?'일별':'월별'} 문의 건수 추이</span><span class="tog small"><button class="${s.chart==='bar'?'on':''}" data-act="set" data-k="chart" data-v="bar">막대</button><button class="${s.chart==='line'?'on':''}" data-act="set" data-k="chart" data-v="line">라인</button></span><span class="sp"></span><span style="font-size:12px;color:#555">전체 문의 건수 <b style="font-size:16px;color:#222" id="stTotal">${rows.length}</b></span></div>${chartSvg(rows)}</div>`;
+  /* (b) */
+  const byS=count(rows,r=>r.store);const top=Object.keys(byS).sort((a,b)=>byS[b]-byS[a]||a.localeCompare(b,'ko')).slice(0,10);const mx=top.length?byS[top[0]]:1;
+  const stk=top.map(n=>{const rr=rows.filter(r=>r.store===n);return `<div class="sbr"><span class="n">${esc(n)}</span><span class="t">${WAYS.map(w=>{const c=rr.filter(r=>r.way===w).length;return c?`<span style="width:${c/mx*100}%;background:${COL[w]}">${c}</span>`:''}).join('')}</span><span class="v">${rr.length}</span></div>`}).join('');
+  const dist=`<div class="row2"><div class="blk" style="flex:2"><div class="sec-h"><span class="sec-t" style="margin:0">스토어별 문의 방식 분포</span><span class="sp"></span><span class="lgd">${WAYS.map(w=>`<span><i style="background:${COL[w]}"></i>${w}</span>`).join('')}</span></div><div class="bars">${stk||'<div style="color:#a6a6a6;padding:30px 0;text-align:center">데이터가 없습니다</div>'}</div></div>
+   <div class="blk top" style="flex:1"><div class="sec-t">TOP 10 <span style="font-weight:400;font-size:11px;color:#999">스토어 건수 기준</span></div><ol>${top.map((n,i)=>`<li><span class="rk">${i+1}</span><span class="nm">${esc(n)}</span><span class="bar"><i style="width:${byS[n]/mx*100}%"></i></span><span class="ct">${byS[n]}</span></li>`).join('')||'<li style="color:#a6a6a6">데이터가 없습니다</li>'}</ol></div></div>`;
+  /* (c) */
+  const mrows=rows.filter(r=>r.way==='메신저상담'),mt2=s.mtype==='all'?mrows:mrows.filter(r=>(s.mtype==='k')===(r.mg==='K-뷰티 메신저'));
+  const cnt=(arr,key,list)=>list.map(x=>[x,arr.filter(r=>r[key]===x).length]);
+  const donuts=`<div class="donuts">${dCard('문의구분',cnt(rows,'kind',['스토어','상품']))}${dCard('언어구분',cnt(rows,'lang',['중국어(간체)','영어','중국어(번체)','일본어','인도네시아어','몽골어']))}${dCard('유입 채널',cnt(rows,'ch',CHS),'new')}${dCard('문의 방식',cnt(rows,'way',WAYS))}${dCard('메신저구분',cnt(mrows,'mg',['K-뷰티 메신저','입점사 메신저']))}
+   ${dCard('메신저종류',cnt(mt2,'mt',MTYPES),'',`<span class="tog small">${[['all','전체'],['k','K-뷰티'],['m','입점사']].map(a=>`<button class="${s.mtype===a[0]?'on':''}" data-act="set" data-k="mtype" data-v="${a[0]}">${a[1]}</button>`).join('')}</span>`)}</div>`;
+  /* (d) */
+  let tab;
+  if(s.tab==='agg'){
+    const ag=aggData(rows);
+    const ar=k=>`<span class="ar" data-act="sort" data-v="${k}">${s.sortK===k?(s.sortD>0?'▲':'▼'):'⇅'}</span>`;
+    const sh=(l,k,cls)=>`<th class="${cls||''}" rowspan="1">${l}${ar(k)}</th>`;
+    const hdr=`<tr><th rowspan="2" style="text-align:center">스토어명${ar('name')}</th><th rowspan="2">총 문의 건수${ar('total')}</th><th colspan="2">문의구분</th><th colspan="6">언어구분</th><th colspan="3" class="new">유입 채널</th><th colspan="3">문의 방식</th></tr>
+     <tr>${sh('스토어','k:스토어')}${sh('상품','k:상품')}${['중국어(간체)','중국어(번체)','영어','일본어','인니어','몽골어'].map((l,i)=>sh(l,'l:'+LANGS[i])).join('')}${CHS.map(c=>sh(c,'c:'+c,'new')).join('')}${WAYS.map(w=>sh(w,'w:'+w)).join('')}</tr>`;
+    const keys=['total','k:스토어','k:상품'].concat(LANGS.map(l=>'l:'+l),CHS.map(c=>'c:'+c),WAYS.map(w=>'w:'+w));
+    tab=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span class="sec-t" style="margin:0">스토어별 집계</span><button class="btnd" disabled>엑셀 다운로드</button></div>
+     <div class="tw"><table class="tbl g" id="aggT"><thead>${hdr}</thead><tbody>${ag.map(o=>`<tr><td>${esc(o.name)}</td>${keys.map(k=>`<td class="${k.indexOf('c:')===0?'new':''}">${o[k]}</td>`).join('')}</tr>`).join('')||EMPTY(15)}</tbody></table></div>`;
+  }else{
+    const mk=s.mode==='day'?(r=>r.date):(r=>r.date.slice(0,7));
+    const lv=[mk,r=>r.store,r=>r.kind,r=>r.lang,r=>r.ch,detLabel];
+    const pre=(r,d)=>lv.slice(0,d+1).map(f=>f(r)).join('|');
+    const cm=[];for(let d=0;d<6;d++)cm.push(count(rows,r=>pre(r,d)));
+    const sorted=rows.slice().sort((a,b)=>{for(let d=0;d<6;d++){const x=lv[d](a),y=lv[d](b);if(x!==y)return d===0?(x<y?1:-1):x.localeCompare(y,'ko')}return 0});
+    const leaves=[];sorted.forEach(r=>{const k=pre(r,5);if(!leaves.length||leaves[leaves.length-1].k!==k)leaves.push({k,r});});
+    const spanOf=(r,d)=>leaves.filter(l=>pre(l.r,d)===pre(r,d)).length;
+    let html='';
+    leaves.forEach((l,i)=>{const r=l.r,pv=i?leaves[i-1].r:null;const st=d=>!pv||pre(pv,d)!==pre(r,d);
+      html+='<tr>'+(st(0)?`<td rowspan="${spanOf(r,0)}">${mk(r)}</td>`:'')+(st(1)?`<td rowspan="${spanOf(r,1)}">${esc(r.store)}</td><td rowspan="${spanOf(r,1)}">${cm[1][pre(r,1)]}</td>`:'')
+       +(st(2)?`<td rowspan="${spanOf(r,2)}">${r.kind}문의</td><td rowspan="${spanOf(r,2)}">${cm[2][pre(r,2)]}</td>`:'')+(st(3)?`<td rowspan="${spanOf(r,3)}">${r.lang}</td><td rowspan="${spanOf(r,3)}">${cm[3][pre(r,3)]}</td>`:'')
+       +(st(4)?`<td class="new" rowspan="${spanOf(r,4)}">${r.ch}</td><td class="new" rowspan="${spanOf(r,4)}">${cm[4][pre(r,4)]}</td>`:'')+`<td>${detLabel(r)}</td><td>${cm[5][pre(r,5)]}</td></tr>`});
+    tab=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span class="sec-t" style="margin:0">${s.mode==='day'?'일별':'월별'} 스토어 문의 상세</span><button class="btnd" disabled>엑셀 다운로드</button></div>
+     <div class="tw"><table class="tbl g" id="detT" style="table-layout:auto"><thead><tr>${thc(s.mode==='day'?'일자':'월')}${thc('스토어')}${thc('총건수')}${thc('문의 구분')}${thc('구분 총건수')}${thc('언어')}${thc('언어 건수')}${thc('유입 채널','new')}${thc('유입 채널 건수','new')}${thc('문의 상세')}${thc('상세 건수')}</tr></thead><tbody>${html||EMPTY(11)}</tbody></table></div>`;
+  }
+  const tabs=`<div class="blk"><div class="tabs"><button class="${s.tab==='agg'?'on':''}" data-act="set" data-k="tab" data-v="agg">스토어별 집계</button><button class="${s.tab==='det'?'on':''}" data-act="set" data-k="tab" data-v="det">상세 보기</button></div>${tab}</div>`;
+  return page('스토어 문의 통계','스토어별 문의 방식과 일별, 월별 문의 추이를 조회합니다.',f+chart+dist+donuts+tabs);
+}
+
+/* ========= 화면: 설문 ========= */
+function svRows(){
+  const s=S.survey;
+  return SURVEY.filter(r=>(s.ch==='전체'||r.ch===s.ch)&&inRange(r.t,s.from,s.to)&&(!s.nat||r.nat===s.nat)&&(!s.gender||r.gender===s.gender)&&(!s.age||ageB(ageOf(r.birth))===s.age)&&(!s.exp||r.exp===s.exp)&&(!s.interest||r.ints.indexOf(s.interest)>=0));
+}
+function vSurvey(){
+  const s=S.survey,rows=svRows();
+  const den=s.ch==='전체'?79:SV_RES[s.ch];const rate=Math.round(rows.length/den*1000)/10;
+  const o=(k,ph,opts,w)=>`<select class="ctl ${s[k]===''?'empty':''}" data-k="${k}" style="width:${w}px"><option value="">${ph}</option>${opts.map(x=>`<option ${s[k]===x?'selected':''}>${x}</option>`).join('')}</select>`;
+  const nats=Array.from(new Set(SURVEY.map(r=>r.nat)));
+  const f=`<div class="blk"><div class="sv-f"><label>응답시간: ${rng()}</label><label>국적: ${o('nat','전체',nats,124)}</label><label>성별: ${o('gender','전체',['FEMALE','MALE'],92)}</label><label>연령대: ${o('age','전체',['10대','20대','30대','40대','50대 이상'],98)}</label>
+   <label>방문경험: ${o('exp','전체',SV_EXP,120)}</label><label>관심항목: ${o('interest','전체',SV_INT,136)}</label><label class="new"><span>유입 채널:</span><select class="ctl" style="height:28px" data-k="ch">${['전체'].concat(CHS).map(c=>`<option ${c===s.ch?'selected':''}>${c}</option>`).join('')}</select></label><button class="btnp" data-act="search">검색</button></div></div>`;
+  const sum=`<div class="blk"><div style="display:flex;justify-content:space-between;align-items:center"><span class="sec-t" style="margin:0">응답 요약</span><button class="btnd" disabled>엑셀다운로드</button></div>
+   <div style="display:flex;gap:90px;margin-top:10px"><div><div style="color:#666;font-size:12px">총 응답</div><div class="big" id="svTotal">${rows.length}건</div></div><div><div style="color:#666;font-size:12px">응답률</div><div class="big blue" id="svRate">${rate}%</div></div></div></div>`;
+  const ec=SV_EXP.map(x=>[x,rows.filter(r=>r.exp===x).length]),ic=SV_INT.map(x=>[x,rows.filter(r=>r.ints.indexOf(x)>=0).length]);
+  const mxe=Math.max(1,...ec.map(a=>a[1])),mxi=Math.max(1,...ic.map(a=>a[1]));
+  const two=`<div class="two"><div class="blk"><div class="sec-t">한국 방문 경험</div>${ec.map(a=>`<div class="kv"><span>${a[0]}</span><div class="bar"><i style="width:${a[1]/mxe*100}%"></i></div><b>${a[1]}</b></div>`).join('')}</div>
+   <div class="blk"><div class="sec-t">관심항목</div>${ic.map(a=>`<div class="kv"><span>${a[0]}</span><div class="bar"><i style="width:${a[1]/mxi*100}%"></i></div><b>${a[1]}</b></div>`).join('')}</div></div>`;
+  const body=rows.map(r=>`<tr><td>${r.t}</td><td class="new">${r.ch}</td><td>${r.email}</td><td>${r.nat}</td><td>${r.gender}</td><td>${r.birth}</td><td>${r.exp}</td><td>${r.ints.map(t=>`<span class="tag">${t}</span>`).join('')}</td></tr>`).join('');
+  const tbl=`<div class="blk"><div class="sec-t" style="margin-bottom:10px">답변목록</div><div class="tw"><table class="tbl"><thead><tr>${thc('응답일시')}${thc('유입 채널','new')}${thc('이메일')}${thc('국적')}${thc('성별')}${thc('생년월일')}${thc('방문 경험')}${thc('관심 항목')}</tr></thead><tbody>${body||EMPTY(8)}</tbody></table></div>
+   <div style="display:flex;justify-content:space-between;align-items:center;padding-top:14px;font-size:12px;color:#666"><span>총 ${rows.length}건</span><select class="ctl" data-k="size" style="height:28px"><option value="20">20 / 페이지</option></select></div></div>`;
+  return page('예약자 설문조사','예약자가 제출한 방문 경험과 관심 항목을 조회합니다.',f+sum+two+tbl);
+}
+
+/* ========= 사이드바 ========= */
+const MENU=[
+{t:'처음으로'},{t:'공지사항'},
+{t:'예약',kids:[['예약 관리','res']]},{t:'고객지원',kids:[]},{t:'회원',kids:[]},{t:'스토어',kids:[]},{t:'상품',kids:[]},{t:'옵션 관리',kids:[]},{t:'매거진',kids:[]},{t:'스토어 칼럼',kids:[]},{t:'SEO',kids:[]},{t:'AI 관리',kids:[]},
+{t:'채팅',kids:[['전체채팅조회',''],['고객1:1문의',''],['스토어채팅조회','chats'],['상품채팅조회','prodchats']]},
+{t:'상담',kids:[['상담조회','cons'],['메신저 상담조회','']]},
+{t:'리뷰',kids:[['리뷰조회','rev'],['외부 리뷰 관리','']]},
+{t:'계정',kids:[]},{t:'광고정보관리'},{t:'쿠폰',kids:[]},{t:'기획전',kids:[]},{t:'인플루언서',kids:[]},
+{t:'통계',kids:[['상담 · 채팅 통계',''],['스토어 문의 통계','stat'],['예약자 설문조사','survey']]},
+{t:'카탈로그 관리',kids:[],alpha:1},{t:'장소 관리',kids:[],alpha:1}];
+function sideHTML(){
+  return MENU.map(m=>{
+    const real=m.kids&&m.kids.some(k=>k[1]);
+    const cv=m.kids?'<i class="cv"></i>':'';
+    const lab=m.t+(m.alpha?'<span class="alpha">ALPHA</span>':'');
+    if(!real)return `<div class="mi dis"><span>${lab}</span>${cv}</div>`;
+    const open=!!OPEN[m.t];
+    return `<div class="mi ${open?'open':''}" data-act="grp" data-v="${m.t}"><span>${lab}</span>${cv}</div>`+(open?`<div class="sub">${m.kids.map(k=>k[1]?`<div class="mi ${k[1]===_v?'on':''}" data-act="go" data-v="${k[1]}"><span>${k[0]}</span></div>`:`<div class="mi dis"><span>${k[0]}</span></div>`).join('')}</div>`:'');
+  }).join('');
+}
+
+/* ========= 렌더·이벤트 ========= */
+const VIEWS={res:vRes,cons:vCons,chats:vChats,prodchats:vProdChats,rev:vRev,stat:vStat,survey:vSurvey};
+function render(){
+  const y=window.scrollY;
+  $('#side').innerHTML=sideHTML();
+  $('#main').innerHTML=VIEWS[_v]();
+  window.scrollTo(0,y);
+}
+function go(name){
+  if(!VIEWS[name])return;_v=name;
+  MENU.forEach(m=>{if(m.kids&&m.kids.some(k=>k[1]===name))OPEN[m.t]=true});
+  render();window.scrollTo(0,0);
+}
+function resetDB(){S=D();render()}
+function setCh(v){const s=S[_v];if(!('ch' in s))return;s.ch=v;if('qd' in s)s.q=s.qd;s.page=1;render()}
+window.go=go;window.resetDB=resetDB;window.render=render;window.setCh=setCh;
+Object.defineProperty(window,'VIEW',{get:()=>_v});
+Object.defineProperty(window,'STATE',{get:()=>S});
+document.addEventListener('change',e=>{
+  const t=e.target,k=t.dataset&&t.dataset.k;if(!k)return;const s=S[_v];
+  s[k]=k==='size'?+t.value:t.value;
+  if(k==='from'||k==='to')s.per='';
+  if(k!=='size'&&k!=='mtype')s.page=1;
+  if(k==='size')s.page=1;
+  render();
+});
+document.addEventListener('input',e=>{if(e.target.dataset&&e.target.dataset.q!==undefined)S[_v].qd=e.target.value});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset&&e.target.dataset.q!==undefined){const s=S[_v];s.qd=e.target.value;s.q=s.qd;s.page=1;render()}});
+document.addEventListener('click',e=>{
+  const a=e.target.closest('[data-act]');if(!a)return;const act=a.dataset.act,v=a.dataset.v,s=S[_v];
+  if(act==='go')go(v);
+  else if(act==='grp'){OPEN[v]=!OPEN[v];render()}
+  else if(act==='search'){s.q=s.qd;s.page=1;render()}
+  else if(act==='per'){s.per=v;const r=perRange(v);s.from=r[0];s.to=r[1];s.page=1;render()}
+  else if(act==='page'){s.page=+v;render()}
+  else if(act==='set'){
+    s[a.dataset.k]=v;
+    if(a.dataset.k==='mode'){if(v==='day'){s.per='week';s.from='2026-09-30';s.to=T}else{s.per='';s.from='2026-05-01';s.to=T}}
+    render();
+  }
+  else if(act==='sort'){if(s.sortK===v)s.sortD=-s.sortD;else{s.sortK=v;s.sortD=v==='name'?1:-1}render()}
+});
+OPEN['예약']=true;
+render();
+</script>
+</body>
+</html>

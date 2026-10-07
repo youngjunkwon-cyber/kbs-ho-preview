@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:,">
+<title>호스트 유입 채널 동작 시안 | K-Beauty Station</title>
+<style>
+:root{--pk:#e8537a;--pk-l:#fdeef2;--pk-b:#f6cdd8;--tx:#1a1a1a;--tx2:#4d4d4d;--tx3:#8a8a8a;--tx4:#b5b5b5;--ln:#e8e8e8;--ln2:#ddd;--bg:#f5f6f8;--gr:#1a8c33;--grb:#e8f7ec;--bl:#2f6fe0;--blb:#eaf2ff}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:Pretendard,Inter,'Noto Sans KR','Malgun Gothic','Apple SD Gothic Neo',sans-serif;font-size:12px;color:var(--tx);background:#fff;line-height:1.45;overflow:hidden}
+button,select,input,textarea{font-family:inherit;font-size:11px;color:var(--tx)}
+#root{height:100vh;display:flex;flex-direction:column}
+.top{height:56px;flex:none;background:#fff;border-bottom:1px solid var(--ln);display:flex;align-items:center;justify-content:space-between;padding:0 20px 0 12px}
+.logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:14px;letter-spacing:.2px}
+.logo i{width:24px;height:24px;border-radius:7px;background:var(--pk);color:#fff;font-style:normal;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800}
+.user{display:flex;align-items:center;gap:7px;border:1px solid var(--ln);border-radius:20px;padding:4px 12px 4px 4px;font-size:12px;font-weight:600}
+.user i{width:20px;height:20px;border-radius:50%;background:var(--pk-l);border:1.5px solid var(--pk);display:block;position:relative}
+.user i:after{content:"";position:absolute;left:5px;top:3px;width:6px;height:6px;border-radius:50%;border:1.3px solid var(--pk)}
+.body{flex:1;min-height:0;display:flex}
+.side{width:195px;flex:none;border-right:1px solid var(--ln);background:#fff;display:flex;flex-direction:column;overflow-y:auto}
+.nav{padding:9px 3px 12px;flex:1}
+.mi{display:flex;align-items:center;gap:8px;height:38px;padding:0 12px;margin-bottom:2px;border-radius:7px;font-size:11.5px;color:var(--tx);cursor:pointer;user-select:none}
+.mi svg{width:14px;height:14px;flex:none;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.mi .chev{margin-left:auto;width:12px;height:12px}
+.mi.dis{color:#a9a9a9;cursor:default}
+.mi.grp.open{color:var(--pk)}
+.mi.act{background:var(--pk);color:#fff;font-weight:600}
+.subs{background:#f8f8f8;margin:0 -3px 2px;padding:4px 3px}
+.subs .mi{padding-left:35px;height:34px;margin-bottom:0}
+.subs .mi.act{margin:2px 0}
+.copy{padding:14px 14px 18px;font-size:9px;color:var(--tx3);line-height:1.4;flex:none}
+#main{flex:1;min-width:0;background:var(--bg);overflow:auto;display:flex;flex-direction:column}
+.ph{background:#fff;padding:9px 20px 8px;border-bottom:1px solid var(--ln);display:flex;align-items:center;justify-content:space-between;flex:none}
+.ph h1{font-size:16px;font-weight:800;line-height:1.3}
+.ph p{font-size:10.5px;color:var(--tx3);margin-top:1px}
+.fb{background:#fff;padding:10px 20px 14px;border-bottom:1px solid var(--ln);display:flex;flex-direction:column;gap:8px;flex:none}
+.fr{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+select,input[type=text]{height:28px;border:1px solid var(--ln2);border-radius:3px;background:#fff;padding:0 8px;outline:none}
+select{appearance:none;-webkit-appearance:none;padding-right:22px;color:#444;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 7px center}
+select.ph0{color:var(--tx4)}
+input[type=text]::placeholder{color:var(--tx4)}
+.btn{height:28px;padding:0 12px;border:1px solid var(--ln2);background:#fff;border-radius:3px;cursor:pointer;font-size:11px}
+.btn.on{border-color:#111;font-weight:700}
+.btn.pk{background:var(--pk);border-color:var(--pk);color:#fff;font-weight:600}
+.btn.line{display:inline-flex;align-items:center;gap:5px}
+.dr{display:flex;align-items:center;gap:4px;border:1px solid var(--ln2);border-radius:3px;height:28px;padding:0 8px;background:#fff;color:var(--tx4)}
+.dr input{border:0;height:24px;width:92px;padding:0;background:transparent}
+.dr svg{width:12px;height:12px;stroke:var(--tx3);fill:none;stroke-width:1.5}
+/* 새 요소 강조 */
+select.new{border-color:var(--pk);box-shadow:0 0 0 1px var(--pk)}
+th.new{box-shadow:inset 0 -3px 0 var(--pk)}
+.new-line{display:inline-block;box-shadow:inset 0 -1px 0 var(--pk);color:var(--tx2);line-height:1.35}
+.pagecard{background:#fff;margin:14px 20px 20px;padding:0;border-radius:2px}
+.pc-h{padding:16px 20px 12px;font-size:13px;font-weight:800}
+.tw{overflow-x:auto;padding:0 18px}
+table{border-collapse:collapse;width:100%}
+th{background:#f7f7f7;font-size:11px;font-weight:800;text-align:left;padding:9px 8px;white-space:nowrap;border-bottom:1px solid var(--ln)}
+td{padding:11px 8px;font-size:11px;border-bottom:1px solid var(--ln);white-space:nowrap;vertical-align:middle}
+td small{display:block;color:var(--tx3);font-size:9.5px;margin-top:3px}
+.btn-s{height:22px;padding:0 7px;border:1px solid var(--ln2);background:#fff;border-radius:3px;font-size:10.5px;cursor:pointer}
+.lnk{color:var(--bl);cursor:default}
+.pager{display:flex;justify-content:flex-end;align-items:center;gap:10px;padding:18px 24px 22px;color:var(--tx3)}
+.pager b{display:inline-flex;min-width:24px;height:24px;align-items:center;justify-content:center;border:1px solid var(--pk);color:var(--pk);border-radius:2px;font-weight:600;font-size:10.5px}
+.pager span{cursor:pointer;font-size:11px;padding:0 4px}
+.pager span.d{color:#ccc;cursor:default}
+.empty{padding:50px 0;text-align:center;color:var(--tx3);font-size:11.5px}
+.tag{display:inline-block;padding:1px 6px;border-radius:3px;font-size:9.5px;font-weight:600}
+.tg-st{background:#f3eaff;color:#8a3fd1}.tg-pr{background:#e6f7ea;color:#1a8c33}
+.tg-ok{background:#e6f7ea;color:#1a8c33}.tg-wt{background:#fff4dd;color:#a56a00}.tg-ing{background:#eaf2ff;color:#2f6fe0}
+.ubadge{display:inline-flex;min-width:16px;height:16px;border-radius:3px;background:#fff4dd;color:#b36b00;font-size:9.5px;align-items:center;justify-content:center;padding:0 3px;font-weight:600}
+/* 대시보드 */
+.dash{width:914px;max-width:100%;margin:0 auto;padding:18px 0 40px}
+.ban{display:flex;align-items:center;gap:12px;background:var(--pk-l);border:1px solid var(--pk-b);border-radius:4px;height:38px;padding:0 14px;font-size:10.5px;font-weight:600}
+.ban .b1{background:var(--pk);color:#fff;border-radius:3px;font-size:9px;padding:2px 6px;font-weight:700}
+.ban .more{margin-left:auto;color:var(--pk);font-weight:400;font-size:10px}
+.ban .x{color:#999;cursor:pointer;font-size:13px;padding:0 4px}
+.dcard{background:#fff;border:1px solid var(--ln);border-radius:6px;padding:22px 20px;margin-top:18px}
+.dcard h2{font-size:14px;font-weight:800;line-height:1.3}
+.dcard .sub{font-size:10px;color:var(--tx3);margin-top:3px}
+.dh{display:flex;justify-content:space-between;align-items:flex-start}
+.gl{font-size:10.5px;color:var(--tx);display:flex;align-items:center;gap:6px;cursor:pointer}
+.tabs{display:flex;gap:6px;margin-top:14px}
+.tabs .t{height:26px;padding:0 10px;border:1px solid var(--ln);border-radius:3px;font-size:10px;color:var(--tx3);background:#fff;cursor:pointer}
+.tabs .t.on{border-color:#222;color:#111;font-weight:700}
+.rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.rc{border:1px solid var(--ln);border-radius:5px;padding:12px 13px;background:#fbfbfb;cursor:pointer}
+.rc:hover{border-color:var(--pk-b)}
+.rc .l1{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:10.5px}
+.rc .l2{font-weight:700;font-size:10.5px;margin-top:5px}
+.rc .l3,.rc .l4,.rc .l5{font-size:9px;color:var(--tx3);margin-top:3px}
+.rc .l4{color:var(--tx3)}
+.bd{font-size:8.5px;color:var(--pk);border:1px solid var(--pk-b);background:var(--pk-l);border-radius:3px;padding:0 5px;font-weight:500}
+.segw{display:flex;align-items:center;gap:8px}
+.seg{display:flex;background:#f3f3f3;border-radius:4px;padding:2px;gap:0}
+.seg span{height:24px;padding:0 10px;display:flex;align-items:center;font-size:10px;color:var(--tx2);cursor:pointer;border-radius:3px;border:1px solid transparent}
+.seg span.on{background:#fff;border-color:var(--ln2);color:#111;font-weight:600}
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:18px}
+.kp{background:#f6f6f7;border-radius:5px;padding:12px 14px;height:76px}
+.kp .kl{display:flex;align-items:center;gap:5px;font-size:9px;color:var(--tx2)}
+.kp .kl svg{width:11px;height:11px;stroke:var(--pk);fill:none;stroke-width:1.6}
+.kp .kv{font-size:20px;font-weight:800;margin-top:9px;letter-spacing:-.3px}
+.kp .kv small{font-size:9px;font-weight:700;margin-left:2px}
+.dline{height:1px;background:var(--ln);margin:16px 0 14px}
+.h3{font-size:10.5px;font-weight:800;margin-bottom:10px}
+.m3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.m3 div{background:#f6f6f7;border-radius:4px;height:31px;display:flex;align-items:center;justify-content:space-between;padding:0 11px;font-size:10px}
+.m3 b{font-weight:800}
+.note{font-size:8.5px;color:var(--tx3);margin:7px 0 10px}
+.mt th{background:#fff;font-weight:400;color:var(--tx3);font-size:9px;border-bottom:1px solid var(--ln);padding:7px 7px}
+.mt td{font-size:9.5px;padding:8px 7px}
+.mt .none{text-align:center;color:var(--tx3);font-size:9.5px;padding:10px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+.two .dcard{margin-top:0}
+.td{display:flex;align-items:center;border:1px solid var(--ln);border-radius:4px;height:36px;padding:0 10px;font-size:10px;margin-top:10px;gap:10px}
+.td .tg{font-size:8.5px;background:#f3f3f3;border-radius:2px;padding:1px 5px;color:var(--tx2)}
+.td .nm{font-weight:700;flex:1}
+.td .cn{font-weight:700;margin-right:2px}
+.td button{height:26px;padding:0 10px;border:1px solid var(--ln2);background:#fff;font-size:10px;border-radius:3px;cursor:default}
+.td button.p{background:var(--pk);border-color:var(--pk);color:#fff}
+.box3{border:1px solid var(--ln);border-radius:5px;padding:12px;margin-top:10px}
+.box3 h4{font-size:10px;font-weight:800;margin-bottom:8px}
+.t3{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.t3 div{background:#f3f3f4;border-radius:3px;text-align:center;padding:5px 0;font-size:8px;color:var(--tx3)}
+.t3 b{display:block;font-size:11px;color:#111;margin-top:3px}
+.t3 b.r{color:var(--pk)}
+/* 예약 */
+.resw{display:flex;flex:1;min-height:0}
+.resl{flex:1;min-width:0;display:flex;flex-direction:column}
+.resp{width:246px;flex:none;background:#fff;border-left:1px solid var(--ln);padding:14px 11px;overflow-y:auto}
+.resp h3{font-size:11.5px;font-weight:800;display:flex;align-items:center;gap:6px}
+.resp h3 em{font-style:normal;background:#c85a1d;color:#fff;border-radius:9px;font-size:9px;padding:1px 6px}
+.ptabs{display:flex;background:#f1f1f2;border-radius:4px;padding:2px;margin-top:10px}
+.ptabs span{flex:1;text-align:center;font-size:8.5px;padding:4px 0;border-radius:3px;color:var(--tx3);cursor:pointer;white-space:nowrap}
+.ptabs span.on{background:#fff;color:#111;font-weight:700;box-shadow:0 0 0 1px var(--ln)}
+.pdesc{font-size:8.5px;color:var(--tx2);margin:9px 0 6px;line-height:1.45}
+.pgl{font-size:8px;color:var(--tx3);margin:8px 0 5px}
+.pcard{background:#f3f3f4;border-radius:7px;padding:11px 12px;margin-bottom:7px;cursor:pointer}
+.pcard .l1{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:800}
+.pcard .l1 .bd{font-size:8px;font-weight:600}
+.pcard .l2{font-size:9.5px;font-weight:700;margin-top:6px}
+.pcard .l3,.pcard .l4,.pcard .l5{font-size:8px;color:var(--tx3);margin-top:3px}
+.pfoot{font-size:8px;color:var(--tx4);text-align:center;margin-top:12px;line-height:1.5}
+.cnt{margin:14px 20px 0}
+/* 드로어 */
+.ov{position:fixed;inset:0;background:rgba(20,20,20,.5);z-index:50}
+.dw{position:fixed;top:0;right:0;bottom:0;width:300px;background:#fff;z-index:51;display:flex;flex-direction:column;padding:16px 14px 14px;overflow-y:auto}
+.dw .hd{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;margin-bottom:12px}
+.dw .hd span{cursor:pointer;font-size:16px;line-height:1;color:#444}
+.dw .stp{align-self:flex-start;display:inline-flex;align-items:center;gap:4px;border:1px solid var(--ln);border-radius:12px;font-size:8.5px;padding:2px 8px;margin-bottom:9px}
+.dw .stp i{width:5px;height:5px;border-radius:50%;background:var(--pk);display:block}
+.dw .dt{font-size:16px;font-weight:800;margin-bottom:11px}
+.kv2{display:flex;justify-content:space-between;font-size:9px;line-height:1.35;margin-bottom:6px;gap:14px}
+.kv2 span{color:var(--tx3);white-space:nowrap}
+.kv2 b{font-weight:700;text-align:right}
+.kv2.nw b{box-shadow:inset 0 -1px 0 var(--pk)}
+.sec{font-size:8.5px;color:var(--tx3);margin:10px 0 4px}
+.bx{border:1px solid var(--ln);border-radius:4px;padding:7px 8px;font-size:9px;line-height:1.45;min-height:34px}
+.dw textarea{width:100%;height:42px;border:1px solid var(--ln);border-radius:4px;padding:6px 8px;font-size:9px;resize:vertical;outline:none}
+.sv{display:block;margin:4px 0 0 auto;height:22px;padding:0 12px;border:1px solid var(--ln);background:#fff;border-radius:3px;font-size:9px;cursor:pointer}
+.hi{display:flex;justify-content:space-between;font-size:9px;font-weight:700;margin-bottom:5px}
+.hi small{display:block;font-weight:400;color:var(--tx3);font-size:8px}
+.hi span{font-weight:400;color:var(--tx3);font-size:8px}
+.dw .sp{flex:1;min-height:14px}
+.hint{background:#f5f5f6;border-radius:3px;font-size:8px;color:var(--tx3);padding:7px 8px;margin-bottom:7px}
+.ab{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.ab div{height:32px;border-radius:4px;border:1px solid var(--ln);display:flex;align-items:center;justify-content:center;font-size:9px;cursor:default;color:var(--tx4)}
+.ab div.f{background:#bdbdbd;color:#fff;border-color:#bdbdbd;font-weight:700}
+.ab div.w{grid-column:1/3;border-color:#111;color:#111;font-weight:700;font-size:9.5px}
+.ab div.c{grid-column:1/3;color:var(--tx3)}
+/* 실시간 채팅 */
+.live{display:flex;flex-direction:column;flex:1;min-height:0}
+.chips{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.cg{display:flex;background:#f1f1f2;border:1px solid var(--ln);padding:2px;border-radius:3px;gap:0}
+.cg span{height:22px;padding:0 9px;display:flex;align-items:center;font-size:10.5px;color:var(--tx3);cursor:pointer;border:1px solid transparent;border-radius:2px}
+.cg span.on{background:#fff;border-color:var(--ln2);color:#111;font-weight:600}
+.conn{display:inline-flex;align-items:center;gap:5px;border:1px solid #bfe5c8;background:#f1fbf3;color:var(--gr);border-radius:12px;font-size:9px;padding:3px 10px;font-weight:700}
+.lw{flex:1;min-height:0;display:flex;gap:14px;padding:12px 20px 20px}
+.ll{width:292px;flex:none;background:#fff;border:1px solid var(--ln);border-radius:5px;display:flex;flex-direction:column;min-height:0}
+.ll .lh{padding:10px 12px;border-bottom:1px solid var(--ln)}
+.ll .lh b{font-size:11px;display:block}.ll .lh small{font-size:8.5px;color:var(--tx3)}
+.ll .li{flex:1;overflow-y:auto}
+.ci{padding:10px 12px;border-bottom:1px solid var(--ln);cursor:pointer}
+.ci:hover{background:#fafafa}.ci.on{background:var(--pk-l)}
+.ci .a{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700}
+.ci .a .tm{margin-left:auto;font-size:8.5px;color:var(--tx3);font-weight:400}
+.ci .b{font-size:10px;color:var(--tx2);margin:4px 0 3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ci .c{display:flex;align-items:center;gap:5px;font-size:8.5px;color:var(--tx3)}
+.ci .c .un{margin-left:auto;background:var(--pk);color:#fff;border-radius:9px;min-width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;padding:0 4px}
+.lr{flex:1;min-width:0;background:#f6f7f9;border:1px solid var(--ln);border-radius:5px;display:flex;flex-direction:column;min-height:0}
+.lr .none{margin:auto;background:#fff;border:1px solid var(--ln);border-radius:5px;padding:18px 28px;text-align:center;max-width:290px}
+.lr .none b{font-size:12.5px;display:block;margin-bottom:7px}
+.lr .none span{font-size:9px;color:var(--tx3);line-height:1.5;display:block}
+.lrh{background:#fff;border-bottom:1px solid var(--ln);padding:11px 16px;border-radius:5px 5px 0 0}
+.lrh .n{font-size:12.5px;font-weight:800;display:flex;align-items:center;gap:6px}
+.lrh .m{font-size:10px;color:var(--tx3);margin-top:4px;display:flex;gap:12px;flex-wrap:wrap}
+.msgs{flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.bub{align-self:flex-start;max-width:62%;padding:8px 11px;border-radius:9px;font-size:11px;line-height:1.5;background:#fff;border:1px solid var(--ln)}
+.bub.h{align-self:flex-end;background:var(--pk-l);border-color:var(--pk-b)}
+.bub small{display:block;font-size:8px;color:var(--tx3);margin-top:3px}
+.inp{background:#fff;border-top:1px solid var(--ln);padding:10px 14px;display:flex;gap:8px;border-radius:0 0 5px 5px}
+.inp div{flex:1;height:30px;border:1px solid var(--ln);border-radius:4px;background:#f6f6f6;color:var(--tx4);font-size:10px;display:flex;align-items:center;padding:0 10px;cursor:default}
+.inp b{height:30px;padding:0 14px;background:#d8d8d8;color:#fff;border-radius:4px;font-size:10px;display:flex;align-items:center;cursor:default}
+.lempty{margin:auto;text-align:center;color:var(--tx3);font-size:9px}
+.lempty b{display:block;font-size:12px;color:var(--tx);margin:6px 0 4px}
+/* 리뷰 */
+.sum{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:14px 14px 0}
+.sm{background:#fff;text-align:center;padding:20px 0;height:92px}
+.sm span{font-size:10px;color:var(--tx2)}
+.sm b{display:block;font-size:20px;color:var(--pk);margin-top:12px;font-weight:800}
+.rvg{display:grid;grid-template-columns:repeat(2,minmax(0,535px));justify-content:space-evenly;gap:14px 40px;background:#fff;padding:18px 14px 28px;margin:14px 14px 20px}
+.rv{border:1px solid var(--ln);border-radius:4px;padding:16px 18px;min-height:140px}
+.rv .a{display:flex;align-items:center;gap:8px;font-size:10px}
+.rv .a .tg1{background:#e6efff;color:#2f6fe0;font-weight:600;font-size:9px;padding:1px 6px;border-radius:2px}
+.rv .a .tg2{background:#e8f7ec;color:#1a8c33;font-weight:600;font-size:9px;padding:1px 6px;border-radius:2px}
+.rv .a .r{margin-left:auto;display:flex;align-items:center;gap:3px;font-weight:700;font-size:10px}
+.rv .a .r i{font-style:normal;color:#f5c000;font-size:12px;letter-spacing:1px}
+.rv .a .r em{font-style:normal;color:var(--tx3);font-weight:400;margin-left:2px}
+.rv .p{color:var(--pk);font-size:10px;margin-top:11px}
+.rv .w{font-size:10px;color:var(--tx2);margin-top:6px}
+.rv .t{font-size:10.5px;line-height:1.7;margin-top:9px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.rv .t.ex{display:block}
+.rv .mo{color:var(--pk);font-size:10px;margin-top:6px;cursor:pointer;display:inline-block}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+'use strict';
+/* ===== 기본 상수 ===== */
+var TODAY='2026-10-07';
+var CHS=['웹','알리페이 중국','알리페이 홍콩'];
+var CHOPT=[['전체','유입 채널 전체'],['웹','유입 채널 웹'],['알리페이 중국','유입 채널 알리페이 중국'],['알리페이 홍콩','유입 채널 알리페이 홍콩']];
+var PERIODS=['이번 주','지난주','1개월','3개월','전체'];
+var PRANGE={'이번 주':['2026-10-05','2026-10-11'],'지난주':['2026-09-28','2026-10-04'],'1개월':['2026-09-07','2026-10-07'],'3개월':['2026-07-07','2026-10-07'],'전체':['0000-00-00','9999-99-99']};
+/* 통계 숫자 [스토어 방문, 상품 방문, 채팅 문의, 예약 확정, 방문 완료] 기간 x 채널. 메신저 문의는 아래 MSG 시드에서 센다 */
+var KPI={
+ '이번 주':{'웹':[65,139,1,1,0],'알리페이 중국':[12,31,1,1,0],'알리페이 홍콩':[8,19,1,0,0]},
+ '지난주':{'웹':[88,171,3,2,1],'알리페이 중국':[15,40,2,1,1],'알리페이 홍콩':[9,22,1,0,0]},
+ '1개월':{'웹':[372,801,14,9,6],'알리페이 중국':[64,155,7,4,3],'알리페이 홍콩':[41,98,4,2,2]},
+ '3개월':{'웹':[1104,2417,41,27,19],'알리페이 중국':[188,432,19,11,8],'알리페이 홍콩':[120,287,11,7,5]},
+ '전체':{'웹':[2310,5120,96,61,44],'알리페이 중국':[380,902,38,22,16],'알리페이 홍콩':[241,590,22,13,9]}
+};
+var DIAL={'캐나다':'+1','미국':'+1','일본':'+81','중국':'+86','홍콩':'+852','홍콩(중국 특별행정구)':'+852','말레이시아':'+60','카자흐스탄':'+7','러시아':'+7','싱가포르':'+65'};
+function phone(n,i){return (DIAL[n]||'+82')+' '+String(1000000000+((i*2654435761)%8999999999)).slice(0,10);}
+
+/* ===== 시드 ===== */
+function seedRes(){
+ var A=[
+ // [방문, 접수, 이름, 예약번호, 국적, 언어, 연락, 상태, 등록주체, 채널, 요청사항, 메모, 처리필요]
+ ['2026-10-18 15:00','2026-10-01 08:24','Kaitlyn Chan','261001068EN01','캐나다','영어','WhatsApp','예약','고객','웹','Please use a gentle product for sensitive skin.','','신규'],
+ ['2026-10-18 14:00','2026-09-29 10:58','Evelyn Lee','260929068EN01','캐나다','영어','WhatsApp','예약','고객','웹','','','신규'],
+ ['2026-10-18 13:00','2026-10-01 08:28','shiyi Chen','261001068EN02','캐나다','영어','WeChat','예약','고객','웹','Two people, we would like to sit together.','','신규'],
+ ['2026-10-16 11:00','2026-10-06 21:14','王思雨','261006068ZH01','중국','중국어(간체)','WeChat','예약','고객','알리페이 중국','想做皮肤管理,第一次来韩国。','','신규'],
+ ['2026-10-15 17:30','2026-10-05 09:40','Chan Tai Man','261005068ZT01','홍콩','중국어(번체)','WhatsApp','예약','고객','알리페이 홍콩','想了解是否可以兩個人一起做。','','신규'],
+ ['2026-10-06 15:00','2026-10-02 13:05','Rina Takeda','261002068JA01','일본','일본어','LINE','예약','고객','웹','敏感肌なので優しい施術をお願いします。','','방문결과'],
+ ['2026-10-14 10:00','2026-10-04 01:08','Helen Lung','261004068EN01','홍콩(중국 특별행정구)','영어','WhatsApp','고객취소','고객','웹','','',''],
+ ['2026-10-12 16:00','2026-10-03 22:10','林佳怡','261003068ZH01','중국','중국어(간체)','WeChat','예약','고객','알리페이 중국','希望能提前一小时。','','변경'],
+ ['2026-09-22 10:00','2026-09-02 12:00','yuko hgmada','260902068JA01','일본','일본어','LINE','방문완료','고객','웹','','',''],
+ ['2026-09-12 12:00','2026-09-08 23:37','Yaya Robinson','260908068JA01','일본','일본어','LINE','방문완료','고객','웹','','',''],
+ ['2026-09-07 10:00','2026-09-06 18:24','KAJIKAWA HINANO','260906068JA01','일본','일본어','LINE','방문완료','고객','웹','','',''],
+ ['2026-09-01 12:00','2026-08-21 21:38','NISHIJIMA CHISAKI','260821068JA01','일본','일본어','LINE','방문완료','매장','웹','','전화로 접수한 건','' ],
+ ['2026-10-03 08:00','2026-09-28 20:35','Hui Ping Ho','260928171EN01','말레이시아','영어','WhatsApp','방문완료','고객','웹','','',''],
+ ['2026-10-01 10:00','2026-09-30 15:20','Altynbekova Kymbat','260930171EN01','카자흐스탄','영어','KakaoTalk','방문완료','고객','웹','','',''],
+ ['2026-09-28 06:00','2026-08-16 04:48','Madison Piao','260816171EN01','미국','영어','WeChat','고객취소','고객','웹','','',''],
+ ['2026-09-27 14:00','2026-09-25 05:14','Claire Wald','260925171EN01','미국','영어','WhatsApp','방문완료','고객','웹','Straight perm with maybe coloring hair.','',''],
+ ['2026-09-24 19:00','2026-09-24 02:56','Elina','260924171EN01','러시아','영어','WhatsApp','방문완료','고객','웹','','',''],
+ ['2026-09-30 13:00','2026-09-20 11:02','陈雨萱','260920068ZH01','중국','중국어(간체)','WeChat','방문완료','고객','알리페이 중국','','',''],
+ ['2026-09-26 15:30','2026-09-19 08:45','Leung Ka Yan','260919068ZT01','홍콩','중국어(번체)','WhatsApp','방문완료','고객','알리페이 홍콩','','',''],
+ ['2026-09-20 11:00','2026-09-15 16:20','刘梦琪','260915068ZH01','중국','중국어(간체)','WeChat','미방문','고객','알리페이 중국','','',''],
+ ['2026-09-18 14:30','2026-09-10 10:11','Wong Mei Ling','260910068ZT01','홍콩','중국어(번체)','WhatsApp','고객취소','고객','알리페이 홍콩','','',''],
+ ['2026-09-15 16:00','2026-09-09 14:30','张文静','260909068ZH01','중국','중국어(간체)','WeChat','방문완료','고객','알리페이 중국','','',''],
+ ['2026-09-10 10:30','2026-09-03 19:00','Patricia Farinas','260903171EN01','미국','영어','KakaoTalk','방문완료','고객','웹','','',''],
+ ['2026-09-05 12:00','2026-09-01 09:09','Chloe Tan','260901068EN01','싱가포르','영어','WhatsApp','미방문','매장','웹','','매장에서 직접 등록','' ],
+ ['2026-08-28 13:00','2026-08-20 15:12','Cheung Siu Wai','260820068ZT01','홍콩','중국어(번체)','WhatsApp','방문완료','고객','알리페이 홍콩','','','']
+ ];
+ return A.map(function(a,i){return {no:i+1,visit:a[0],recv:a[1],name:a[2],rno:a[3],nation:a[4],lang:a[5],contact:a[6],status:a[7],owner:a[8],ch:a[9],req:a[10],memo:a[11],need:a[12],phone:phone(a[4],i+3)};});
+}
+function seedChatlog(){
+ var Z='您好,感谢您的咨询。请问有什么可以帮您?';
+ var A=[
+ ['2026-10-06 18:20','스토어문의','상담대기','王思雨','중국어(간체)','알리페이 중국','-',0,2,2,'你好,请问这周六下午还有位置吗?'],
+ ['2026-10-06 15:02','스토어문의','상담대기','Chan Tai Man','중국어(번체)','알리페이 홍콩','-',0,1,1,'請問星期六下午還有空位嗎?'],
+ ['2026-10-05 11:40','상품문의','상담중','Sara Miller','영어','웹','Reverse Clinic Special Offer Event',1,1,3,'Is there any discount for two people?'],
+ ['2026-10-04 20:15','스토어문의','상담완료','게스트','중국어(간체)','웹','-',1,0,2,Z],
+ ['2026-10-03 13:48','상품문의','상담중','林佳怡','중국어(간체)','알리페이 중국','Titanium 80KJ',1,0,4,'我想改到下午,可以吗?'],
+ ['2026-10-02 09:30','스토어문의','상담완료','Yuki Tanaka','일본어','웹','-',1,0,3,'ありがとうございます。当日よろしくお願いします。'],
+ ['2026-10-01 17:05','상품문의','상담대기','Leung Ka Yan','중국어(번체)','알리페이 홍콩','Shurink Universe 600發',0,2,1,'請問這個項目大概需要多久?'],
+ ['2026-09-30 12:11','스토어문의','상담완료','게스트','영어','웹','-',0,0,1,'Hello, thank you for your inquiry. How can I help you?'],
+ ['2026-09-28 11:34','스토어문의','상담완료','게스트','중국어(간체)','웹','-',0,0,1,Z+' 由于在未登录状态下进行聊天咨询时,对话内容无法保存。'],
+ ['2026-09-27 16:22','상품문의','상담완료','陈雨萱','중국어(간체)','알리페이 중국','美版超声刀第二代 300发',1,0,2,'谢谢,我已经预约好了。'],
+ ['2026-09-25 10:03','스토어문의','상담중','Emma Johnson','영어','웹','-',1,1,5,'Can I bring my friend on the same day?'],
+ ['2026-09-21 15:39','스토어문의','상담완료','게스트','중국어(간체)','웹','-',1,1,1,'您好 请问您想预约27日上午几点呢?'],
+ ['2026-09-21 14:32','스토어문의','-','게스트','중국어(간체)','웹','-',0,0,0,'신속한 상담이 필요하신 경우, 고객센터 링크로 연결합니다.'],
+ ['2026-09-18 14:30','스토어문의','상담완료','Wong Mei Ling','중국어(번체)','알리페이 홍콩','-',1,0,2,'好的,我取消預約,謝謝。'],
+ ['2026-09-15 10:46','상품문의','상담완료','张文静','중국어(간체)','알리페이 중국','热玛吉FLX 600发',1,0,3,'好的,谢谢您的详细说明。'],
+ ['2026-09-09 10:33','스토어문의','상담완료','게스트','중국어(간체)','웹','-',1,0,2,Z+' 如需预约,可以回复上面的预约信息。'],
+ ['2026-09-08 14:23','상품문의','상담완료','Rina Takeda','일본어','웹','Titanium 80KJ',0,0,1,'こんにちは、施術時間を教えてください。'],
+ ['2026-09-07 10:45','스토어문의','상담완료','게스트','영어','웹','-',1,2,2,'Sorry for the late reply, is there another time you prefer?'],
+ ['2026-09-04 14:40','스토어문의','-','Cheung Siu Wai','중국어(번체)','알리페이 홍콩','-',0,0,1,'您好,請問可以預約嗎?'],
+ ['2026-09-03 18:16','스토어문의','상담완료','게스트','영어','웹','-',0,0,1,'Hello, I would like to book next week.'],
+ ['2026-08-27 09:58','상품문의','상담완료','刘梦琪','중국어(간체)','알리페이 중국','Shurink Universe 600发',1,0,2,'好的,我周日过去。'],
+ ['2026-08-24 10:21','스토어문의','상담완료','게스트','일본어','웹','-',0,0,1,'こんにちは、予約はできますか?']
+ ];
+ return A.map(function(a,i){return {no:i+1,last:a[0],type:a[1],status:a[2],cust:a[3],lang:a[4],ch:a[5],prod:a[6],reply:a[7],unread:a[8],cnt:a[9],msg:a[10]};});
+}
+function seedLive(){
+ var A=[
+ ['Sara Miller','상품','Reverse Clinic Special Offer Event (Hongdae Branch)','상담대기',1,0,1,'웹','영어','Is there any discount for two people?','10:42',[['c','Hello! Is there any discount for two people?','10:42']]],
+ ['게스트','스토어','','상담대기',2,0,0,'웹','중국어(간체)','请问这周末有位置吗?','10:15',[['c','您好,请问这周末有位置吗?','10:14'],['c','我们两个人。','10:15']]],
+ ['王思雨','상품','Titanium 80KJ','상담중',0,1,0,'알리페이 중국','중국어(간체)','好的,我会准时到店。','09:58',[['c','请问这个项目大概需要多久?','09:40'],['h','大约一个小时左右。','09:47'],['c','好的,我会准时到店。','09:58']]],
+ ['Chan Tai Man','스토어','','상담대기',1,0,1,'알리페이 홍콩','중국어(번체)','請問星期六下午還有空位嗎?','어제',[['c','您好,請問星期六下午還有空位嗎?','어제 18:02']]],
+ ['Yuki Tanaka','상품','Shurink Universe 600發','상담중',0,1,0,'웹','일본어','ありがとうございます。','09:20',[['c','当日はどこで受付すればいいですか?','09:05'],['h','1階の受付でお名前をお伝えください。','09:12'],['c','ありがとうございます。','09:20']]],
+ ['林佳怡','스토어','','상담대기',3,0,1,'알리페이 중국','중국어(간체)','我想把预约提前一小时。','어제',[['c','您好','어제 20:31'],['c','我想把预约提前一小时。','어제 20:31'],['c','可以吗?','어제 20:32']]],
+ ['Emma Johnson','스토어','','상담중',1,1,0,'웹','영어','Can I bring my friend on the same day?','08:51',[['c','Hi, I booked for Saturday.','08:30'],['h','Hello Emma, yes we are ready for you.','08:40'],['c','Can I bring my friend on the same day?','08:51']]],
+ ['陈雨萱','상품','美版超声刀第二代 300发','상담중',0,1,0,'알리페이 중국','중국어(간체)','谢谢!','어제',[['c','谢谢!','어제 17:10']]],
+ ['Hiro Sato','스토어','','상담대기',0,0,1,'웹','일본어','こんにちは。','어제',[['c','こんにちは。','어제 14:22']]],
+ ['Leung Ka Yan','상품','Shurink Universe 600發','상담중',2,1,0,'알리페이 홍콩','중국어(번체)','請問這個項目有注意事項嗎?','10:30',[['c','請問這個項目有注意事項嗎?','10:29'],['c','做完當天可以化妝嗎?','10:30']]],
+ ['Mia Tan','상품','Reverse Clinic Special Offer Event (Hongdae Branch)','상담대기',1,0,0,'웹','영어','Do you have English-speaking staff?','10:05',[['c','Do you have English-speaking staff?','10:05']]],
+ ['Wong Mei Ling','스토어','','상담중',0,1,0,'알리페이 홍콩','중국어(번체)','好的,謝謝。','09:12',[['c','請問店裡附近有地鐵站嗎?','09:01'],['h','從弘大入口站步行約五分鐘。','09:08'],['c','好的,謝謝。','09:12']]]
+ ];
+ return A.map(function(a,i){return {id:i+1,name:a[0],kind:a[1],prod:a[2],status:a[3],unread:a[4],replied:!!a[5],delayed:!!a[6],ch:a[7],lang:a[8],last:a[9],time:a[10],msgs:a[11]};});
+}
+function seedConsult(){
+ var P1='轮廓针 + 下巴肉毒 线条更纤细、更干净',P2='鼻雕注射 × 鼻翼肉毒 让鼻线更精致更纤细',P3='(首次访问价) 咬肌肉毒 × 腺体肉毒 轮廓Tox「小脸更立体」';
+ var A=[
+ // [회원구분,상태,언어,경로,채널,상품,메모,가격,연락수단,폰,SNS,SNSID,이름,닉네임,접수일시]
+ ['비회원','상담대기','중국어(간체)','스토어','웹','',0,'','전화','+86 15243235022','','','XU SHUANG','GUEST','2026-09-04 10:36'],
+ ['회원','상담대기','중국어(간체)','상품','알리페이 중국',P1,0,'55,000','전화','+86 13811220198','','','王思雨','雨落星河','2026-09-03 21:12'],
+ ['비회원','상담대기','중국어(간체)','스토어','웹','',0,'','전화','+86 15243225022','','','SHAN XUE','GUEST','2026-09-03 17:28'],
+ ['비회원','상담대기','중국어(간체)','스토어','웹','',0,'','전화','+86 15243225022','','','SHAN XUE','GUEST','2026-09-03 17:26'],
+ ['회원','상품예약','중국어(번체)','상품','알리페이 홍콩',P2,0,'66,000','전화','+852 91234567','','','Chan Tai Man','Tai Man C','2026-08-29 15:41'],
+ ['회원','상담대기','중국어(간체)','스토어','알리페이 중국','',1,'','전화','+86 13922334455','','','林佳怡','Jiayi_L','2026-08-12 09:18'],
+ ['비회원','고객부재중','중국어(간체)','스토어','웹','',0,'','전화','+86 15356877604','','','Yaodan','GUEST','2026-04-01 14:24'],
+ ['비회원','고객취소','영어','스토어','웹','',1,'','SNS','','wechat','SAUDALQ','Saud Faisal','GUEST','2026-03-17 19:29'],
+ ['회원','고객부재중','중국어(번체)','상품','알리페이 홍콩',P3,0,'60,500','전화','+852 60123456','','','Leung Ka Yan','KY Leung','2026-03-05 11:50'],
+ ['비회원','고객부재중','중국어(간체)','상품','웹',P1,1,'55,000','SNS','','wechat','July13_Cc','chenni','GUEST','2026-02-08 08:13'],
+ ['회원','상품예약','중국어(간체)','상품','알리페이 중국',P3,0,'60,500','전화','+86 18601234567','','','陈雨萱','Yuxuan_C','2026-02-01 16:02'],
+ ['비회원','상품예약','중국어(간체)','상품','웹',P2,0,'66,000','SNS','','','','LIYAJIAO','GUEST','2026-01-27 10:54'],
+ ['비회원','스토어취소','영어','스토어','웹','',1,'','SNS','','','','Yanran Jiang','GUEST','2026-01-14 20:20'],
+ ['회원','상담대기','중국어(번체)','스토어','알리페이 홍콩','',0,'','전화','+852 98765432','','','Wong Mei Ling','MeiMei W','2026-01-12 13:36'],
+ ['비회원','고객부재중','중국어(간체)','상품','웹',P3,0,'60,500','SNS','','','','sunyinghe','GUEST','2026-01-06 15:16'],
+ ['회원','고객취소','중국어(간체)','상품','알리페이 중국',P1,0,'55,000','전화','+86 13700112233','','','刘梦琪','Mengqi_L','2025-12-28 12:44'],
+ ['비회원','고객부재중','중국어(간체)','상품','웹',P1,0,'55,000','SNS','','','','bo zhi xin','GUEST','2026-01-02 12:26'],
+ ['회원','상담대기','영어','스토어','웹','',0,'','SNS','','line','mia_t92','Mia Tan','miatan','2025-12-20 18:05'],
+ ['비회원','상담대기','중국어(간체)','상품','웹',P3,0,'60,500','SNS','','','','','GUEST','2025-11-29 02:46'],
+ ['회원','상품예약','중국어(번체)','상품','알리페이 홍콩',P1,0,'55,000','전화','+852 55667788','','','Cheung Siu Wai','SW Cheung','2025-11-20 10:09'],
+ ['비회원','고객취소','일본어','스토어','웹','',0,'','SNS','','line','yuki_t','Yuki Tanaka','GUEST','2025-11-11 09:30'],
+ ['회원','상담대기','중국어(간체)','스토어','알리페이 중국','',0,'','전화','+86 13566778899','','','张文静','Wenjing_Z','2025-11-02 14:58']
+ ];
+ return A.map(function(a,i){return {member:a[0],status:a[1],lang:a[2],route:a[3],ch:a[4],prod:a[5],memo:!!a[6],price:a[7],contact:a[8],phone:a[9],sns:a[10],snsid:a[11],name:a[12],nick:a[13],at:a[14]};})
+  .sort(function(x,y){return x.at<y.at?1:-1;}).map(function(r,i,arr){r.no=arr.length-i;return r;});
+}
+function seedRev(){
+ var PA='Reverse Clinic Special Offer Event (Hongdae Branch)',PB='Reverse Clinic Hongdae ANTI-AGING Collection';
+ var A=[
+ // [타입,일시,상품,작성자,채널,평점,하트,본문,이미지]
+ ['상품','2026-01-30 18:40',PA,'Sona(空采)','웹',5,0,'I visited Hongdae branch a few days ago and got the botox for my forehead. It was so cheap and the procedure was not that painful. :) people in the branch were so kind and nice as well. It was such a great experience. Thank you! :) The clinic was clean and the result looks natural after a week. I will visit again when I come back to Korea next spring.',1],
+ ['상품','2026-01-30 11:34',PA,'みくちゃん','웹',5,0,'I got Botox treatment at a low price and I think I definitely saw the effect! The staff are very friendly too :)',0],
+ ['상품','2026-01-30 11:29',PA,'のぞみ','웹',5,0,'I had a laser toning treatment here and was very satisfied. The staff were kind and explained everything in detail, which made me feel comfortable throughout the procedure. My skin tone looks brighter and more even after the treatment. I would recommend it to my friends.',1],
+ ['상품','2026-01-30 11:18',PA,'ゆうせい','웹',5,0,'The service here is good. The staff is all friendly and the procedure is delicate. I\'m looking forward to the effect. I would like to visit again next time.',0],
+ ['상품','2026-01-30 11:16',PA,'佐藤健','웹',5,0,'I went in for a Botox treatment, and the staff were very kind and professional. The results are great, and I\'d love to visit often while I\'m in Korea.',0],
+ ['상품','2026-01-30 11:04',PA,'SANSI','웹',5,0,'I got Botox and it\'s so effective I\'m going to get it again next time Thank you.',0],
+ ['상품','2026-01-29 19:40',PB,'Kazu','웹',4,1,'The hospital interior was clean, and the consultation was friendly and professional. The treatment was a little longer than I expected but the result was worth it.',1],
+ ['상품','2026-01-29 16:14',PA,'ルビーちゃん','웹',5,0,'本当に効果が良いですね。割引イベントでお得に利用できた上に、施術効果もこんなに素晴らしくて大満足です。スタッフの方も親切で、また来たいです。次回は友達も連れて行きます。',0],
+ ['스토어','2026-01-28 12:10','','Emily Carter','웹',5,2,'Easy booking and a very welcoming team. The clinic is close to the station and the whole visit was smooth from start to finish.',0],
+ ['상품','2026-10-02 17:20',PA,'王思雨','알리페이 중국',5,1,'第一次来韩国做皮肤管理,医生和工作人员都很亲切,还有中文沟通,让我很安心。效果也比想象中自然,下次来首尔还会再来。',1],
+ ['상품','2026-09-30 15:40',PB,'陈雨萱','알리페이 중국',5,0,'预约很方便,到店后不用等太久。老师讲解得很详细,做完之后皮肤状态明显变好了,推荐给朋友们。',0],
+ ['스토어','2026-09-27 12:05','','刘梦琪','알리페이 중국',4,0,'店里环境干净,服务态度很好。因为临时有事改了一次时间,店家处理得很快。',0],
+ ['상품','2026-09-26 18:30',PA,'Leung Ka Yan','알리페이 홍콩',5,1,'店員態度很好,而且有繁體中文溝通,讓人很放心。價錢也比預期便宜,效果自然,下次來韓國還會再預約。',1],
+ ['상품','2026-09-15 20:12',PB,'Cheung Siu Wai','알리페이 홍콩',4,0,'整體體驗不錯,環境乾淨,醫師解說很清楚。等待時間稍微長了一點,但結果令人滿意。',0]
+ ];
+ return A.map(function(a,i){return {id:i+1,type:a[0],at:a[1],prod:a[2],author:a[3],ch:a[4],rate:a[5],likes:a[6],text:a[7],img:!!a[8]};})
+  .sort(function(x,y){return x.at<y.at?1:-1;});
+}
+function seedMsg(){
+ var A=[
+ ['2026-10-06 14:22','상품: Reverse Clinic Special Offer Event','WhatsApp','영어'],
+ ['2026-10-05 19:40','스토어 페이지','LINE','일본어'],
+ ['2026-10-03 11:15','상품: Titanium 80KJ','WeChat','중국어(간체)'],
+ ['2026-09-30 16:02','스토어 페이지','WhatsApp','영어'],
+ ['2026-09-29 09:48','상품: Shurink Universe 600發','LINE','일본어'],
+ ['2026-09-24 21:30','스토어 페이지','WhatsApp','영어'],
+ ['2026-09-18 13:12','상품: Reverse Clinic Special Offer Event','LINE','일본어'],
+ ['2026-09-10 10:05','스토어 페이지','WeChat','중국어(간체)'],
+ ['2026-08-30 15:44','상품: Titanium 80KJ','WhatsApp','영어'],
+ ['2026-08-02 12:20','스토어 페이지','WeChat','중국어(번체)'],
+ ['2026-07-15 18:09','상품: Reverse Clinic Hongdae ANTI-AGING','LINE','일본어'],
+ ['2026-06-21 11:30','스토어 페이지','WhatsApp','영어'],
+ ['2026-05-09 17:55','스토어 페이지','LINE','일본어'],
+ ['2026-04-12 10:10','상품: Titanium 80KJ','WeChat','중국어(간체)']
+ ];
+ /* 알리페이에는 메신저 버튼이 없어 메신저 문의의 유입 채널은 항상 웹 */
+ return A.map(function(a){return {at:a[0],place:a[1],app:a[2],lang:a[3],ch:'웹'};});
+}
+var DB;
+function freshDB(){DB={res:seedRes(),chatlog:seedChatlog(),live:seedLive(),consult:seedConsult(),rev:seedRev(),msg:seedMsg()};}
+function freshState(){
+ return {view:'dash',open:{chat:1,cons:1,res:0,gal:1},banner:true,
+  dash:{period:'이번 주',ch:'전체',tab:'전체'},
+  res:{st:'전체',lang:'전체',ch:'전체',owner:'전체',q:'',qd:'',per:'',from:'',to:'',fromd:'',tod:'',basis:'방문일',sort:'방문일',page:1,open:null,ptab:'전체'},
+  chatlog:{type:'전체',st:'전체',reply:'전체',unread:'전체',ch:'전체',name:'',named:'',msg:'',msgd:'',page:1,size:20},
+  live:{kind:'전체',st:'전체',reply:'전체',unread:'전체',delay:'전체',ch:'전체',sel:null},
+  consult:{st:'',lang:'',route:'',ch:'전체',member:'',sns:'',wait:'전체',per:'전체',from:'',to:'',fromd:'',tod:''},
+  rev:{img:'',type:'',ch:'전체',q:'',qd:'',from:'',to:'',fromd:'',tod:'',exp:{}}};
+}
+var S;
+/* ===== 유틸 ===== */
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function getP(path){var p=path.split('.'),o=S;for(var i=0;i<p.length;i++)o=o[p[i]];return o;}
+function setP(path,v){var p=path.split('.'),o=S;for(var i=0;i<p.length-1;i++)o=o[p[i]];o[p[p.length-1]]=v;}
+function ic(n){
+ var P={home:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',chat:'<circle cx="12" cy="12" r="9"/><path d="M8 12h.01M12 12h.01M16 12h.01"/>',grid:'<rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><path d="M14 17h6"/>',list:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 10h6M7 14h10"/>',cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',star:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',book:'<rect x="3" y="5" width="18" height="14" rx="1"/><path d="M12 5v14M6 9h3M6 13h3M15 9h3M15 13h3"/>',img:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 17l-5-5-9 8"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',mega:'<path d="M3 11v3l14 5V6L3 11z"/><path d="M7 14v5"/>',up:'<path d="M6 15l6-6 6 6"/>',down:'<path d="M6 9l6 6 6-6"/>',cl:'<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9h16"/>',pr:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6"/>',ms:'<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>',ck:'<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>'};
+ return '<svg viewBox="0 0 24 24">'+P[n]+'</svg>';
+}
+function sel(path,opts,cls,ph){
+ var cur=getP(path);
+ return '<select class="'+(cls||'')+(cur===''?' ph0':'')+'" data-b="'+path+'">'+opts.map(function(o){return '<option value="'+esc(o[0])+'"'+(o[0]===cur?' selected':'')+'>'+esc(o[1])+'</option>';}).join('')+'</select>';
+}
+function inp(path,ph,w){return '<input type="text" data-d="'+path+'" placeholder="'+ph+'" value="'+esc(getP(path))+'" style="width:'+w+'px">';}
+function drange(vp){
+ return '<div class="dr"><input type="text" data-d="'+vp+'.fromd" placeholder="시작일" value="'+esc(getP(vp+'.fromd'))+'"><span>→</span><input type="text" data-d="'+vp+'.tod" placeholder="종료일" value="'+esc(getP(vp+'.tod'))+'"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></div>';
+}
+function inRange(d,from,to){var x=String(d).slice(0,10);return (!from||x>=from)&&(!to||x<=to);}
+function validDate(s){return /^\d{4}-\d{2}-\d{2}$/.test(s)?s:'';}
+function addDays(d,n){var t=new Date(d+'T00:00:00Z');t.setUTCDate(t.getUTCDate()+n);return t.toISOString().slice(0,10);}
+function addMonths(d,n){var t=new Date(d+'T00:00:00Z');t.setUTCMonth(t.getUTCMonth()-n);return t.toISOString().slice(0,10);}
+function pager(page,total,size,path){
+ var n=Math.max(1,Math.ceil(total/size)),h='<div class="pager"><span class="'+(page<=1?'d':'')+'" data-act="pg" data-v="'+(page-1)+'" data-p="'+path+'">&lsaquo;</span>';
+ for(var i=1;i<=n;i++)h+=i===page?'<b>'+i+'</b>':'<span data-act="pg" data-v="'+i+'" data-p="'+path+'">'+i+'</span>';
+ return h+'<span class="'+(page>=n?'d':'')+'" data-act="pg" data-v="'+(page+1)+'" data-p="'+path+'">&rsaquo;</span></div>';
+}
+/* ===== 셸 ===== */
+var NAV=[
+ {t:'대시보드',ic:'home',go:'dash'},
+ {g:'chat',t:'채팅 관리',ic:'chat',sub:[{t:'실시간 채팅',go:'live'},{t:'채팅내역조회',go:'chatlog'}]},
+ {t:'상품 관리',ic:'grid'},
+ {g:'cons',t:'상담 관리',ic:'list',sub:[{t:'메신저상담'},{t:'상담접수',go:'consult'}]},
+ {g:'res',t:'예약 관리',ic:'cal',sub:[{t:'예약 현황',go:'res'},{t:'예약 시간 설정'}]},
+ {t:'리뷰 관리',ic:'star',go:'rev'},
+ {t:'스토어 칼럼 관리',ic:'book'},
+ {g:'gal',t:'갤러리 관리',ic:'img',sub:[{t:'전/후 사진'},{t:'일반 사진'}]},
+ {t:'마이페이지',ic:'user'},
+ {t:'공지사항',ic:'mega'}
+];
+function shell(){
+ var h='';
+ NAV.forEach(function(n){
+  if(!n.g){h+='<div class="mi'+(n.go?(S.view===n.go?' act':''):' dis')+'"'+(n.go?' data-act="go" data-v="'+n.go+'"':'')+'>'+ic(n.ic)+n.t+'</div>';return;}
+  var op=S.open[n.g];
+  h+='<div class="mi grp'+(op?' open':'')+'" data-act="tg" data-v="'+n.g+'">'+ic(n.ic)+n.t+'<span class="chev">'+ic(op?'up':'down')+'</span></div>';
+  if(op){h+='<div class="subs">'+n.sub.map(function(s){return '<div class="mi'+(s.go?(S.view===s.go?' act':''):' dis')+'"'+(s.go?' data-act="go" data-v="'+s.go+'"':'')+'>'+s.t+'</div>';}).join('')+'</div>';}
+ });
+ return '<div class="top"><div class="logo"><i>K</i>Beauty Station</div><div class="user"><i></i>리버스클리닉 홍대점</div></div>'
+  +'<div class="body"><aside class="side"><div class="nav">'+h+'</div><div class="copy">Copyright &copy; 2026 Eight International All rights reserved.</div></aside><main id="main"></main></div>';
+}
+/* ===== 화면: 대시보드 ===== */
+function resCard(r,click){
+ return '<div class="'+(click==='dash'?'rc':'pcard')+'" data-act="'+(click==='dash'?'dcard':'pcard')+'" data-v="'+r.no+'">'
+  +'<div class="l1"><span>'+r.visit.slice(0,10)+(click==='dash'?' ('+['일','월','화','수','목','금','토'][new Date(r.visit.slice(0,10)+'T00:00:00Z').getUTCDay()]+') ':' ')+r.visit.slice(11)+'</span><span class="bd">예약</span></div>'
+  +'<div class="l2">'+esc(r.name)+'</div><div class="l3">'+esc(r.nation)+'</div>'
+  +'<div class="l4"><span class="new new-line">유입 채널 '+esc(r.ch)+'</span></div>'
+  +'<div class="l5">'+r.rno+' &middot; 접수 '+r.recv+'</div></div>';
+}
+function needList(tab){
+ var a=DB.res.filter(function(r){return r.need&&(tab==='전체'||r.need===tab);});
+ return a.sort(function(x,y){return x.visit<y.visit?1:-1;});
+}
+function stats(){
+ var d=S.dash,chs=d.ch==='전체'?CHS:[d.ch],a=[0,0,0,0,0];
+ chs.forEach(function(c){KPI[d.period][c].forEach(function(v,i){a[i]+=v;});});
+ var rg=PRANGE[d.period];
+ var m=DB.msg.filter(function(x){return chs.indexOf(x.ch)>=0&&inRange(x.at,rg[0],rg[1]);});
+ return {store:a[0],prod:a[1],msg:m.length,chat:a[2],conf:a[3],done:a[4],rows:m,wa:m.filter(function(x){return x.app==='WhatsApp';}).length,li:m.filter(function(x){return x.app==='LINE';}).length,wc:m.filter(function(x){return x.app==='WeChat';}).length};
+}
+function viewDash(){
+ var d=S.dash,st=stats();
+ var tabs=['전체','신규','방문결과','변경'];
+ var cards=needList(d.tab);
+ var h='<div class="ph"><div><h1>대시보드</h1><p>오늘 처리할 일과 스토어 성과를 한눈에 확인해 보세요.</p></div></div><div style="overflow:auto"><div class="dash">';
+ if(S.banner)h+='<div class="ban"><span class="b1">공지</span><span>[안내] 이미지 등록 기능 개선 안내</span><span class="more">외 2건 공지 더보기</span><span class="x" data-act="ban">&times;</span></div>';
+ h+='<div class="dcard" id="dc-res"><div class="dh"><div><h2>예약 현황</h2><div class="sub">확인과 처리가 필요한 예약을 모아 보여드려요.</div></div><div class="gl" data-act="go" data-v="res">예약 관리 이동 &rarr;</div></div>'
+  +'<div class="tabs">'+tabs.map(function(t){return '<span class="t'+(d.tab===t?' on':'')+'" data-act="dtab" data-v="'+t+'">'+t+' '+needList(t).length+'</span>';}).join('')+'</div>';
+ h+=cards.length?'<div class="rgrid">'+cards.map(function(r){return resCard(r,'dash');}).join('')+'</div>':'<div class="empty" style="padding:40px 0 30px"><div style="font-size:26px;color:#ddd">&#9993;</div>현재 처리할 예약이 없습니다.</div>';
+ h+='</div>';
+ h+='<div class="dcard" id="dc-stat"><div class="dh"><div><h2>통계</h2><div class="sub">선택한 기간의 스토어 성과와 고객 문의를 확인해 보세요.</div></div>'
+  +'<div class="segw">'+sel('dash.ch',CHOPT,'new')+'<div class="seg">'+PERIODS.map(function(p){return '<span class="'+(d.period===p?'on':'')+'" data-act="per" data-v="'+p+'">'+p+'</span>';}).join('')+'</div></div></div>';
+ var K=[['pr','스토어 방문',st.store,'회'],['pr','상품 방문',st.prod,'회'],['ms','메신저 문의',st.msg,'건'],['ms','채팅 문의',st.chat,'건'],['cl','예약 확정',st.conf,'건'],['ck','방문 완료',st.done,'건']];
+ h+='<div class="kpis">'+K.map(function(k){return '<div class="kp"><div class="kl">'+ic(k[0])+k[1]+'</div><div class="kv">'+k[2].toLocaleString('en-US')+'<small>'+k[3]+'</small></div></div>';}).join('')+'</div>';
+ h+='<div class="dline"></div><div class="h3">메신저 문의 상세</div><div class="m3"><div>WhatsApp<b>'+st.wa+'건</b></div><div>LINE<b>'+st.li+'건</b></div><div>WeChat<b>'+st.wc+'건</b></div></div>'
+  +'<div class="note">선택한 기간에 접수된 메신저 문의예요. 실제 대화는 연결된 메신저 앱에서 확인하세요.</div>'
+  +'<table class="mt"><thead><tr><th>문의 위치</th><th>채널</th><th>언어</th><th>접수 일시</th></tr></thead><tbody>'
+  +(st.rows.length?st.rows.map(function(m){return '<tr><td>'+esc(m.place)+'</td><td>'+m.app+'</td><td>'+m.lang+'</td><td>'+m.at+'</td></tr>';}).join(''):'<tr><td colspan="4" class="none">해당 기간의 메신저 문의가 없습니다.</td></tr>')
+  +'</tbody></table></div>';
+ h+='<div class="two"><div class="dcard"><h2>할 일</h2>'
+  +'<div class="td" style="margin-top:20px"><span class="tg">채팅</span><span class="nm">고객이 답장을 기다리고 있어요</span><span class="cn">0건</span><button class="p">답장하기</button></div>'
+  +'<div class="td"><span class="tg">상품</span><span class="nm">반려된 상품이 있어요. 수정해서 다시 올려 주세요</span><span class="cn">0건</span><button>수정하기</button></div>'
+  +'<div class="td"><span class="tg">칼럼</span><span class="nm">블라인드된 칼럼이 있어요. 내용을 확인해 주세요</span><span class="cn">0건</span><button>확인하기</button></div></div>'
+  +'<div class="dcard"><h2>상품&middot;칼럼</h2><div class="box3"><h4>상품 15개</h4><div class="t3"><div>승인<b>15</b></div><div>대기<b>0</b></div><div>반려<b class="r">0</b></div></div></div>'
+  +'<div class="box3"><h4>칼럼 0개</h4><div class="t3"><div>게시<b>0</b></div><div>심사<b>0</b></div><div>블라인드<b class="r">0</b></div></div></div></div></div>';
+ return h+'</div></div>';
+}
+/* ===== 화면: 예약 관리 ===== */
+function resFiltered(){
+ var v=S.res,from=validDate(v.from),to=validDate(v.to),q=v.q.trim().toLowerCase();
+ var a=DB.res.filter(function(r){
+  if(v.st!=='전체'&&r.status!==v.st)return false;
+  if(v.lang!=='전체'&&r.lang!==v.lang)return false;
+  if(v.ch!=='전체'&&r.ch!==v.ch)return false;
+  if(v.owner!=='전체'&&r.owner!==v.owner)return false;
+  var bd=v.basis==='방문일'?r.visit:r.recv;
+  if(!inRange(bd,from,to))return false;
+  if(q){var hay=[r.name,r.phone,r.phone.replace(/\D/g,''),r.rno,r.req,r.memo].join(' ').toLowerCase();if(hay.indexOf(q)<0)return false;}
+  return true;});
+ var key=v.sort==='방문일'?'visit':'recv';
+ return a.sort(function(x,y){return x[key]<y[key]?1:-1;});
+}
+function viewRes(){
+ var v=S.res,a=resFiltered(),size=10,pgs=Math.max(1,Math.ceil(a.length/size));if(v.page>pgs)v.page=pgs;if(v.page<1)v.page=1;
+ var rows=a.slice((v.page-1)*size,v.page*size);
+ var all=needList('전체'),ptabs=['전체','신규','방문결과','변경'],pl=needList(v.ptab);
+ var h='<div class="ph"><div><h1>예약 관리</h1><p>전체 예약 목록입니다. 처리가 필요한 예약은 오른쪽에서 바로 처리하세요.</p></div><button class="btn pk" style="cursor:default;height:26px">수기등록</button></div>';
+ h+='<div class="resw"><div class="resl" style="overflow:auto"><div class="fb"><div class="fr">'
+  +sel('res.st',[['전체','예약상태 전체'],['예약','예약상태 예약'],['방문완료','예약상태 방문완료'],['고객취소','예약상태 고객취소'],['미방문','예약상태 미방문']])
+  +sel('res.lang',[['전체','언어 전체'],['영어','언어 영어'],['일본어','언어 일본어'],['중국어(간체)','언어 중국어(간체)'],['중국어(번체)','언어 중국어(번체)']])
+  +sel('res.ch',CHOPT,'new')
+  +sel('res.owner',[['전체','등록 주체 전체'],['고객','등록 주체 고객'],['매장','등록 주체 매장']])
+  +inp('res.qd','여권명·연락처·예약번호·요청사항·매장 메모',212)+'</div><div class="fr">'
+  +[['1w','1주일'],['1m','1개월'],['3m','3개월'],['6m','6개월']].map(function(b){return '<button class="btn'+(v.per===b[0]?' on':'')+'" data-act="rper" data-v="'+b[0]+'">'+b[1]+'</button>';}).join('')
+  +sel('res.basis',[['방문일','방문일 기준'],['접수일','접수일 기준']])+sel('res.sort',[['방문일','방문일 순'],['접수일','접수일 순']])
+  +drange('res')+'<button class="btn pk" data-act="search">검색</button></div></div>';
+ h+='<div class="pagecard"><div class="pc-h">예약목록 ('+a.length+')</div><div class="tw"><table><thead><tr><th>방문일시</th><th>고객 (여권명)</th><th class="new">유입 채널</th><th>예약번호</th><th>국적</th><th>언어</th><th>연락</th><th>예약상태</th><th>관리</th></tr></thead><tbody>'
+  +(rows.length?rows.map(function(r){return '<tr><td>'+r.visit+'<small>접수 '+r.recv+'</small></td><td>'+esc(r.name)+'</td><td>'+esc(r.ch)+'</td><td>'+r.rno+'</td><td>'+esc(r.nation)+'</td><td>'+r.lang+'</td><td>'+r.contact+'</td><td>'+r.status+'</td><td><button class="btn-s" data-act="ropen" data-v="'+r.no+'">상세</button></td></tr>';}).join(''):'<tr><td colspan="9" class="empty">조건에 맞는 예약이 없습니다.</td></tr>')
+  +'</tbody></table></div>'+pager(v.page,a.length,size,'res.page')+'</div></div>';
+ h+='<aside class="resp"><h3>처리 필요 <em>'+all.length+'</em></h3><div class="ptabs">'+ptabs.map(function(t){return '<span class="'+(v.ptab===t?'on':'')+'" data-act="ptab" data-v="'+t+'">'+t+' '+needList(t).length+'</span>';}).join('')+'</div>'
+  +'<div class="pdesc">예약이나 방문 결과 처리가 필요한 예약이에요. 카드를 누르면 예약 상세가 열려요.</div>'
+  +(pl.length?(v.ptab==='전체'?['신규','방문결과','변경'].map(function(t){var g=pl.filter(function(r){return r.need===t;});return g.length?'<div class="pgl">'+t+' &middot; 확인 필요</div>'+g.map(function(r){return resCard(r,'p');}).join(''):'';}).join(''):'<div class="pgl">'+v.ptab+' &middot; 확인 필요</div>'+pl.map(function(r){return resCard(r,'p');}).join('')):'<div class="empty" style="padding:30px 0">처리할 예약이 없습니다.</div>')
+  +'<div class="pfoot">처리하면 여기서 사라져요. 미처리는 방문 다음 날 자동으로 방문완료 처리돼요.</div></aside></div>';
+ if(v.open!=null){
+  var r=DB.res.filter(function(x){return x.no===v.open;})[0];
+  if(r){
+   h+='<div class="ov" data-act="rclose"></div><div class="dw"><div class="hd"><span data-act="rclose">&times;</span>예약 상세</div><div class="stp"><i></i>'+r.status+'</div><div class="dt">'+r.visit+'</div>'
+   +kv('여권명',r.name)+kv('국적',r.nation)+kv('언어',r.lang)+'<div class="kv2 nw"><span>유입 채널</span><b class="new">'+esc(r.ch)+'</b></div>'+kv('전화번호',r.phone)+kv('메신저',r.contact+' '+r.phone.replace(/\D/g,''))+kv('예약 번호',r.rno)+kv('접수 시각',r.recv)+kv('등록 방식',r.owner)
+   +'<div class="sec">고객 요청사항</div><div class="bx">'+(r.req?esc(r.req):'<span style="color:#b5b5b5">요청사항이 없어요.</span>')+'</div>'
+   +'<div class="sec">매장 메모</div><textarea id="memo" placeholder="고객에게는 안 보여요. 매장 안에서만 쓰는 메모예요.">'+esc(r.memo)+'</textarea><button class="sv" data-act="memo" data-v="'+r.no+'">저장</button>'
+   +'<div class="sec">처리 이력</div><div class="hi"><div>접수 ('+(r.owner==='고객'?'고객 직접 예약':'매장 수기 등록')+')<small>'+r.recv+':14</small></div><span>'+r.owner+'</span></div>'
+   +(r.status==='고객취소'?'<div class="hi"><div>예약 취소<small>'+addDays(r.recv.slice(0,10),1)+' '+r.recv.slice(11)+':32</small></div><span>고객</span></div>':'')
+   +((r.status==='방문완료'||r.status==='미방문')?'<div class="hi"><div>'+r.status+' 처리<small>'+r.visit+':05</small></div><span>매장</span></div>':'')
+   +'<div class="sp"></div><div class="hint">방문완료와 미방문은 예약 시작 시간이 된 뒤에 처리할 수 있어요.</div><div class="ab"><div class="f">방문완료</div><div>미방문</div><div class="w">예약 변경</div><div class="c">예약 취소하기</div></div></div>';
+  }
+ }
+ return h;
+}
+function kv(k,v){return '<div class="kv2"><span>'+k+'</span><b>'+esc(v)+'</b></div>';}
+/* ===== 화면: 채팅내역조회 ===== */
+function chatlogFiltered(){
+ var v=S.chatlog,n=v.name.trim().toLowerCase(),m=v.msg.trim().toLowerCase();
+ return DB.chatlog.filter(function(r){
+  if(v.type!=='전체'&&r.type!==v.type)return false;
+  if(v.st!=='전체'&&r.status!==v.st)return false;
+  if(v.reply==='답변'&&!r.reply)return false;if(v.reply==='미답변'&&r.reply)return false;
+  if(v.unread==='미확인'&&!(r.unread>0))return false;if(v.unread==='없음'&&r.unread>0)return false;
+  if(v.ch!=='전체'&&r.ch!==v.ch)return false;
+  if(n&&r.cust.toLowerCase().indexOf(n)<0)return false;
+  if(m&&r.msg.toLowerCase().indexOf(m)<0)return false;
+  return true;}).sort(function(x,y){return x.last<y.last?1:-1;});
+}
+function viewChatlog(){
+ var v=S.chatlog,a=chatlogFiltered(),size=v.size,pgs=Math.max(1,Math.ceil(a.length/size));if(v.page>pgs)v.page=pgs;
+ var rows=a.slice((v.page-1)*size,v.page*size);
+ var h='<div class="ph"><div><h1>채팅내역조회</h1><p>완료 건을 포함한 상품문의/스토어문의 채팅방을 조회합니다.</p></div></div>';
+ h+='<div class="fb"><div class="fr">'
+  +sel('chatlog.type',[['전체','전체 문의'],['스토어문의','스토어문의'],['상품문의','상품문의']])
+  +sel('chatlog.st',[['전체','전체 상태'],['상담대기','상담대기'],['상담중','상담중'],['상담완료','상담완료']])
+  +sel('chatlog.reply',[['전체','답변 전체'],['답변','답변'],['미답변','미답변']])
+  +sel('chatlog.unread',[['전체','미확인 전체'],['미확인','미확인 있음'],['없음','미확인 없음']])
+  +sel('chatlog.ch',CHOPT,'new')
+  +inp('chatlog.named','고객명',166)+inp('chatlog.msgd','메시지',166)+'<button class="btn pk" data-act="search">검색</button></div></div>';
+ h+='<div class="pagecard"><div class="pc-h">채팅내역 목록 ('+a.length+')</div><div class="tw"><table><thead><tr><th>마지막 대화</th><th>유형</th><th>상태</th><th>고객</th><th>언어</th><th class="new">유입 채널</th><th>상품</th><th>답변</th><th>미확인</th><th>상담건수</th><th>메시지</th><th>관리</th></tr></thead><tbody>'
+  +(rows.length?rows.map(function(r){return '<tr><td>'+r.last+'</td><td><span class="tag '+(r.type==='스토어문의'?'tg-st':'tg-pr')+'">'+r.type+'</span></td><td>'+(r.status==='-'?'<span class="tag" style="background:#f3f3f3;color:#aaa">-</span>':'<span class="tag '+(r.status==='상담완료'?'tg-ok':r.status==='상담대기'?'tg-wt':'tg-ing')+'">'+r.status+'</span>')+'</td><td>'+esc(r.cust)+'</td><td>'+r.lang+'</td><td>'+esc(r.ch)+'</td><td>'+esc(r.prod)+'</td><td>'+(r.reply?'있음':'-')+'</td><td>'+(r.unread>0?'<span class="ubadge">'+r.unread+'</span>':'-')+'</td><td>'+r.cnt+'건</td><td style="max-width:420px;overflow:hidden;text-overflow:ellipsis">'+esc(r.msg)+'</td><td><button class="btn-s">채팅하기</button></td></tr>';}).join(''):'<tr><td colspan="12" class="empty">조건에 맞는 채팅내역이 없습니다.</td></tr>')
+  +'</tbody></table></div><div style="display:flex;justify-content:flex-end;align-items:center">'+pager(v.page,a.length,size,'chatlog.page')+'<select data-b="chatlog.size" style="margin-right:20px"><option value="20"'+(size===20?' selected':'')+'>20 / 페이지</option><option value="50"'+(size===50?' selected':'')+'>50 / 페이지</option></select></div></div>';
+ return h;
+}
+/* ===== 화면: 실시간 채팅 ===== */
+function liveBase(skip){
+ var v=S.live;
+ return DB.live.filter(function(r){
+  if(skip!=='kind'&&v.kind!=='전체'&&r.kind!==v.kind)return false;
+  if(skip!=='st'&&v.st!=='전체'&&r.status!==v.st)return false;
+  if(v.reply==='답변'&&!r.replied)return false;if(v.reply==='미답변'&&r.replied)return false;
+  if(v.unread==='미확인'&&!(r.unread>0))return false;
+  if(v.delay==='지연'&&!r.delayed)return false;if(v.delay==='정상'&&r.delayed)return false;
+  if(v.ch!=='전체'&&r.ch!==v.ch)return false;
+  return true;});
+}
+function viewLive(){
+ var v=S.live,list=liveBase(),kb=liveBase('kind'),sb=liveBase('st');
+ var c=function(a,f){return a.filter(f).length;};
+ var h='<div class="ph"><div><h1>채팅 관리</h1><p>상품문의와 스토어문의 상담을 처리합니다.</p></div><span class="conn">&#9679; 실시간 연결</span></div><div class="live">';
+ h+='<div class="fb" style="padding:10px 20px"><div class="chips"><div class="cg">'
+  +[['전체','전체 '+kb.length],['스토어','스토어 '+c(kb,function(r){return r.kind==='스토어';})],['상품','상품 '+c(kb,function(r){return r.kind==='상품';})]].map(function(x){return '<span class="'+(v.kind===(x[0]==='전체'?'전체':x[0])?'on':'')+'" data-act="lk" data-v="'+x[0]+'">'+x[1]+'</span>';}).join('')+'</div>'
+  +'<div class="cg">'+[['전체','전체 상태 '+sb.length],['상담대기','상담대기 '+c(sb,function(r){return r.status==='상담대기';})],['상담중','상담중 '+c(sb,function(r){return r.status==='상담중';})]].map(function(x){return '<span class="'+(v.st===x[0]?'on':'')+'" data-act="ls" data-v="'+x[0]+'">'+x[1]+'</span>';}).join('')+'</div>'
+  +sel('live.reply',[['전체','답변 전체'],['답변','답변 있음'],['미답변','답변 없음']])
+  +sel('live.unread',[['전체','미확인 전체'],['미확인','미확인 있음']])
+  +sel('live.delay',[['전체','지연 전체'],['지연','지연됨'],['정상','지연 없음']])
+  +sel('live.ch',CHOPT,'new')
+  +'<button class="btn line" style="margin-left:4px" data-act="go" data-v="chatlog">&#8635; 문의 내역 조회</button></div></div>';
+ var un=list.reduce(function(s,r){return s+r.unread;},0);
+ h+='<div class="lw"><div class="ll"><div class="lh"><b>처리 대상</b><small>상담대기/상담중 '+list.length+'건 &middot; 미확인 '+un+'건</small></div><div class="li">'
+  +(list.length?list.map(function(r){return '<div class="ci'+(v.sel===r.id?' on':'')+'" data-act="lopen" data-v="'+r.id+'"><div class="a">'+esc(r.name)+'<span class="tag '+(r.kind==='스토어'?'tg-st':'tg-pr')+'">'+r.kind+'</span><span class="tag '+(r.status==='상담대기'?'tg-wt':'tg-ing')+'">'+r.status+'</span><span class="tm">'+r.time+'</span></div><div class="b">'+esc(r.last)+'</div><div class="c"><span class="new new-line">유입 채널 '+esc(r.ch)+'</span>'+(r.unread>0?'<span class="un">'+r.unread+'</span>':'')+'</div></div>';}).join(''):'<div class="lempty" style="margin-top:150px"><div style="font-size:22px;color:#ddd">&#128172;</div><b>채팅이 없습니다</b>새로운 채팅을 기다리고 있어요</div>')
+  +'</div></div>';
+ var sel0=DB.live.filter(function(r){return r.id===v.sel;})[0];
+ h+='<div class="lr">';
+ if(sel0){
+  h+='<div class="lrh"><div class="n">'+esc(sel0.name)+'<span class="tag '+(sel0.kind==='스토어'?'tg-st':'tg-pr')+'">'+sel0.kind+'</span><span class="tag '+(sel0.status==='상담대기'?'tg-wt':'tg-ing')+'">'+sel0.status+'</span></div>'
+   +'<div class="m"><span>언어 '+sel0.lang+'</span><span class="new new-line" id="convch">유입 채널 '+esc(sel0.ch)+'</span>'+(sel0.prod?'<span>상품 '+esc(sel0.prod)+'</span>':'')+'</div></div>'
+   +'<div class="msgs">'+sel0.msgs.map(function(m){return '<div class="bub'+(m[0]==='h'?' h':'')+'">'+esc(m[1])+'<small>'+m[2]+'</small></div>';}).join('')+'</div><div class="inp"><div>메시지를 입력하세요</div><b>보내기</b></div>';
+ }else{
+  h+='<div class="none"><b>문의를 선택하세요</b><span>왼쪽 목록에서 상담대기 또는 상담중 채팅을 선택하면 상세 대화가 열립니다.</span></div>';
+ }
+ return h+'</div></div></div>';
+}
+/* ===== 화면: 상담접수 ===== */
+function consultFiltered(){
+ var v=S.consult,from=validDate(v.from),to=validDate(v.to);
+ return DB.consult.filter(function(r){
+  if(v.st&&r.status!==v.st)return false;
+  if(v.lang&&r.lang!==v.lang)return false;
+  if(v.route&&r.route!==v.route)return false;
+  if(v.ch!=='전체'&&r.ch!==v.ch)return false;
+  if(v.member&&r.member!==v.member)return false;
+  if(v.sns){if(v.sns==='없음'){if(r.sns)return false;}else if(r.sns!==v.sns)return false;}
+  if(v.wait!=='전체'){if(r.status!=='상담대기')return false;var hrs=(new Date(TODAY+'T12:00:00Z')-new Date(r.at.replace(' ','T')+':00Z'))/36e5;if(hrs<({'30분 이상':0.5,'1시간 이상':1,'24시간 이상':24}[v.wait]))return false;}
+  if(!inRange(r.at,from,to))return false;
+  return true;}).sort(function(x,y){return y.no-x.no;});
+}
+function viewConsult(){
+ var v=S.consult,a=consultFiltered();
+ var h='<div class="ph"><div><h1>상담접수</h1><p>상품 예약과 방문 예정 상담의 상태, 고객 연락 정보를 관리합니다.</p></div></div>';
+ h+='<div class="fb"><div class="fr">'
+  +sel('consult.st',[['','상태 선택'],['상담대기','상담대기'],['고객부재중','고객부재중'],['고객취소','고객취소'],['상품예약','상품예약'],['스토어취소','스토어취소']])
+  +sel('consult.lang',[['','언어 선택'],['영어','영어'],['일본어','일본어'],['중국어(간체)','중국어(간체)'],['중국어(번체)','중국어(번체)']])
+  +sel('consult.route',[['','유입경로'],['스토어','스토어'],['상품','상품']])
+  +sel('consult.ch',CHOPT,'new')
+  +sel('consult.member',[['','회원구분'],['회원','회원'],['비회원','비회원']])
+  +sel('consult.sns',[['','SNS'],['wechat','wechat'],['line','line'],['없음','SNS 없음']])
+  +sel('consult.wait',[['전체','대기시간 전체'],['30분 이상','대기시간 30분 이상'],['1시간 이상','대기시간 1시간 이상'],['24시간 이상','대기시간 24시간 이상']])
+  +['전체','1주일','1개월','3개월','6개월'].map(function(p){return '<button class="btn'+(v.per===p?' on':'')+'" data-act="cper" data-v="'+p+'"'+(v.per===p&&p==='전체'?' style="background:var(--pk);border-color:var(--pk);color:#fff"':'')+'>'+p+'</button>';}).join('')
+  +drange('consult')+'<button class="btn pk" data-act="search">검색</button></div></div>';
+ var STS=['상담대기','고객부재중','고객취소','상품예약','스토어취소'];
+ h+='<div class="pagecard"><div class="pc-h">상담접수 목록 ('+a.length+')</div><div class="tw"><table><thead><tr><th>No.</th><th>회원구분</th><th>접수상태</th><th>언어</th><th>유입경로</th><th class="new">유입 채널</th><th>상품명</th><th>고객메모</th><th>가격</th><th>부가세 포함</th><th>연락수단</th><th>휴대폰번호</th><th>SNS</th><th>SNS ID</th><th>이름</th><th>닉네임</th><th>접수일시</th><th>QR</th></tr></thead><tbody>'
+  +(a.length?a.map(function(r){return '<tr><td>'+r.no+'</td><td>'+r.member+'</td><td><select class="rs" data-st="'+r.no+'" style="height:24px">'+STS.map(function(s){return '<option'+(s===r.status?' selected':'')+'>'+s+'</option>';}).join('')+'</select></td><td>'+r.lang+'</td><td>'+r.route+'</td><td>'+esc(r.ch)+'</td><td class="lnk" style="max-width:280px;overflow:hidden;text-overflow:ellipsis">'+(r.prod?esc(r.prod):'<span style="color:#333">-</span>')+'</td><td>'+(r.memo?'<span class="lnk">보기</span>':'-')+'</td><td>'+(r.price||'-')+'</td><td>'+(r.price?'포함':'-')+'</td><td>'+r.contact+'</td><td>'+(r.phone||'-')+'</td><td>'+(r.sns||'-')+'</td><td>'+(r.snsid||'-')+'</td><td>'+esc(r.name)+'</td><td>'+esc(r.nick)+'</td><td>'+r.at+'</td><td>-</td></tr>';}).join(''):'<tr><td colspan="18" class="empty">조건에 맞는 상담접수가 없습니다.</td></tr>')
+  +'</tbody></table></div><div class="pager"><span class="d">&lsaquo;</span><b>1</b><span class="d">&rsaquo;</span></div></div>';
+ return h;
+}
+/* ===== 화면: 리뷰 관리 ===== */
+function revFiltered(){
+ var v=S.rev,q=v.q.trim().toLowerCase(),from=validDate(v.from),to=validDate(v.to);
+ return DB.rev.filter(function(r){
+  if(v.img==='포함'&&!r.img)return false;if(v.img==='미포함'&&r.img)return false;
+  if(v.type&&(v.type==='상품'?r.type!=='상품':r.type!=='스토어'))return false;
+  if(v.ch!=='전체'&&r.ch!==v.ch)return false;
+  if(!inRange(r.at,from,to))return false;
+  if(q&&(r.text+' '+r.author+' '+r.prod).toLowerCase().indexOf(q)<0)return false;
+  return true;});
+}
+function viewRev(){
+ var v=S.rev,a=revFiltered();
+ var np=a.filter(function(r){return r.type==='상품';}).length,ns=a.length-np,avg=a.length?(a.reduce(function(s,r){return s+r.rate;},0)/a.length).toFixed(1):'0.0';
+ var h='<div class="ph"><div><h1>리뷰 관리</h1><p>상품 리뷰와 스토어 리뷰를 조회하고 이미지 포함 여부, 기간, 타입별로 필터링합니다.</p></div></div>';
+ h+='<div class="fb"><div class="fr">'
+  +sel('rev.img',[['','이미지 포함'],['포함','이미지 포함'],['미포함','이미지 미포함']])+drange('rev')
+  +sel('rev.type',[['','리뷰 타입'],['상품','상품 리뷰'],['스토어','스토어 리뷰']])
+  +sel('rev.ch',CHOPT,'new')
+  +inp('rev.qd','리뷰 내용',176)+'<button class="btn pk" data-act="search">&#9906; 검색</button><button class="btn line" data-act="rrst">&#8635; 초기화</button></div></div>';
+ h+='<div class="sum"><div class="sm"><span>전체 리뷰</span><b>'+a.length+'개</b></div><div class="sm"><span>상품 리뷰</span><b>'+np+'개</b></div><div class="sm"><span>스토어 리뷰</span><b>'+ns+'개</b></div><div class="sm"><span>평균 평점</span><b>'+avg+'</b></div></div>';
+ h+=a.length?'<div class="rvg">'+a.map(function(r){
+   var ex=v.exp[r.id],long=r.text.length>120;
+   return '<div class="rv"><div class="a"><span class="'+(r.type==='상품'?'tg1':'tg2')+'">'+r.type+' 리뷰</span><span>'+r.at+'</span><span class="r"><i>'+'&#9733;'.repeat(r.rate)+'<span style="color:#ddd">'+'&#9733;'.repeat(5-r.rate)+'</span></i>'+r.rate+'<em>&#9825; '+r.likes+'</em></span></div>'
+   +'<div class="p">'+(r.type==='상품'?'상품: '+esc(r.prod):'스토어: 리버스클리닉 홍대점')+'</div><div class="w">작성자: '+esc(r.author)+'</div><div class="w" style="margin-top:3px"><span class="new new-line">유입 채널 '+esc(r.ch)+'</span></div>'
+   +'<div class="t'+(ex?' ex':'')+'">'+esc(r.text)+'</div>'+(long?'<span class="mo" data-act="rmore" data-v="'+r.id+'">'+(ex?'접기':'더보기')+'</span>':'')+'</div>';}).join('')+'</div>'
+  :'<div class="rvg" style="display:block"><div class="empty">조건에 맞는 리뷰가 없습니다.</div></div>';
+ return h;
+}
+/* ===== 렌더 ===== */
+var VIEWS={dash:viewDash,res:viewRes,chatlog:viewChatlog,live:viewLive,consult:viewConsult,rev:viewRev};
+function render(){
+ var root=document.getElementById('root');
+ var m=document.getElementById('main'),st=m?m.scrollTop:0,tw=document.querySelector('.tw'),twl=tw?tw.scrollLeft:0,li=document.querySelector('.li'),lis=li?li.scrollTop:0;
+ var sameView=m&&m.getAttribute('data-v')===S.view;
+ var sideScroll=document.querySelector('.side')?document.querySelector('.side').scrollTop:0;
+ root.innerHTML=shell();
+ var mm=document.getElementById('main');mm.setAttribute('data-v',S.view);
+ mm.innerHTML=VIEWS[S.view]();
+ if(sameView){mm.scrollTop=st;var t2=document.querySelector('.tw');if(t2)t2.scrollLeft=twl;var l2=document.querySelector('.li');if(l2)l2.scrollTop=lis;}
+ document.querySelector('.side').scrollTop=sideScroll;
+}
+window.render=render;
+window.go=function(n){if(!VIEWS[n])return;S.view=n;if(n==='res')S.open.res=1;S.res.open=null;render();};
+window.resetDB=function(){freshDB();S=freshState();render();};
+Object.defineProperty(window,'VIEW',{get:function(){return S.view;}});
+window.setCh=function(v){
+ var m={dash:'dash.ch',res:'res.ch',chatlog:'chatlog.ch',live:'live.ch',consult:'consult.ch',rev:'rev.ch'};
+ setP(m[S.view],v);if(S[S.view].page!=null)S[S.view].page=1;render();
+};
+window.setPeriod=function(p){if(PERIODS.indexOf(p)<0)return;S.dash.period=p;render();};
+window.openRes=function(n){S.view='res';S.open.res=1;S.res.open=n;render();};
+window.openChat=function(n){S.view='live';S.live.sel=n;render();};
+/* ===== 이벤트 ===== */
+document.addEventListener('click',function(e){
+ var t=e.target.closest('[data-act]');if(!t)return;
+ var a=t.getAttribute('data-act'),v=t.getAttribute('data-v');
+ if(a==='go'){window.go(v);return;}
+ if(a==='tg'){S.open[v]=S.open[v]?0:1;render();return;}
+ if(a==='ban'){S.banner=false;render();return;}
+ if(a==='dtab'){S.dash.tab=v;render();return;}
+ if(a==='per'){S.dash.period=v;render();return;}
+ if(a==='dcard'){window.openRes(+v);return;}
+ if(a==='pcard'||a==='ropen'){S.res.open=+v;render();return;}
+ if(a==='rclose'){S.res.open=null;render();return;}
+ if(a==='ptab'){S.res.ptab=v;render();return;}
+ if(a==='memo'){var r=DB.res.filter(function(x){return x.no===+v;})[0];r.memo=document.getElementById('memo').value;render();return;}
+ if(a==='rper'){var r2=S.res;if(r2.per===v){r2.per='';r2.from=r2.fromd='';}else{r2.per=v;var f=v==='1w'?addDays(TODAY,-7):addMonths(TODAY,{'1m':1,'3m':3,'6m':6}[v]);r2.from=r2.fromd=f;r2.to=r2.tod='';}r2.page=1;render();return;}
+ if(a==='cper'){var c=S.consult;c.per=v;if(v==='전체'){c.from=c.fromd=c.to=c.tod='';}else{var f2=v==='1주일'?addDays(TODAY,-7):addMonths(TODAY,{'1개월':1,'3개월':3,'6개월':6}[v]);c.from=c.fromd=f2;c.to=c.tod='';}render();return;}
+ if(a==='search'){
+  var vw=S[S.view];
+  if(S.view==='res'){vw.q=vw.qd;vw.from=vw.fromd;vw.to=vw.tod;vw.per='';vw.page=1;}
+  else if(S.view==='chatlog'){vw.name=vw.named;vw.msg=vw.msgd;vw.page=1;}
+  else if(S.view==='consult'){vw.from=vw.fromd;vw.to=vw.tod;vw.per='';}
+  else if(S.view==='rev'){vw.q=vw.qd;vw.from=vw.fromd;vw.to=vw.tod;}
+  render();return;}
+ if(a==='pg'){var n=+v;if(n<1)return;setP(t.getAttribute('data-p'),n);render();return;}
+ if(a==='lk'){S.live.kind=v;render();return;}
+ if(a==='ls'){S.live.st=v;render();return;}
+ if(a==='lopen'){S.live.sel=+v;render();return;}
+ if(a==='rrst'){var o=S.rev;o.img='';o.type='';o.ch='전체';o.q=o.qd='';o.from=o.fromd=o.to=o.tod='';o.exp={};render();return;}
+ if(a==='rmore'){S.rev.exp[v]=!S.rev.exp[v];render();return;}
+});
+document.addEventListener('change',function(e){
+ var t=e.target;
+ if(t.hasAttribute('data-b')){
+  var p=t.getAttribute('data-b'),val=t.value;if(p==='chatlog.size')val=+val;
+  setP(p,val);var vw=S[p.split('.')[0]];if(vw.page!=null)vw.page=1;render();return;}
+ if(t.hasAttribute('data-st')){var r=DB.consult.filter(function(x){return x.no===+t.getAttribute('data-st');})[0];r.status=t.value;render();return;}
+});
+document.addEventListener('input',function(e){var t=e.target;if(t.hasAttribute('data-d'))setP(t.getAttribute('data-d'),t.value);});
+document.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.hasAttribute&&e.target.hasAttribute('data-d')){var b=document.querySelector('[data-act="search"]');if(b)b.click();}});
+freshDB();S=freshState();render();
+</script>
+</body>
+</html>
