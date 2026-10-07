@@ -606,7 +606,12 @@ document.querySelectorAll('.areaBtn').forEach(function (b) {
     area = b.dataset.a;
     document.querySelectorAll('.areaBtn').forEach(function (x) { x.classList.toggle('on', x === b); });
     var want = area === 'FO' ? MEMBER : ADMIN;
-    if (pname() !== want) frame.setAttribute('src', psrc(want));
+    /* 영역 버튼을 누르면 시안도 그 영역의 화면으로 옮긴다 (HOST는 호스트 셸, 그 밖은 어드민 기본 화면) */
+    var code = area === 'HOST' ? "go('h-edit')" : area === 'FO' ? '' : "if(VIEW.name==='h-edit'){go('p-list')}";
+    if (pname() !== want) {
+      frame.addEventListener('load', function once() { frame.removeEventListener('load', once); if (code) runInPreview(code, false); });
+      frame.setAttribute('src', psrc(want));
+    } else if (code) runInPreview(code, false);
     render();
   });
 });
