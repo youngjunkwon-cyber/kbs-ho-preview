@@ -18,7 +18,7 @@ button{font:inherit;cursor:pointer}
 .av:after{content:"";position:absolute;left:3px;top:13px;width:14px;height:10px;border-radius:50%;background:#fff}
 #side{position:fixed;top:50px;left:0;bottom:0;width:185px;background:#fff;overflow-y:auto;border-right:1px solid var(--line);padding:6px 0 30px;z-index:20}
 .mi{display:flex;align-items:center;justify-content:space-between;padding:9px 12px 9px 22px;font-size:13px;color:#222;cursor:pointer;user-select:none}
-.mi.dis{color:#b5b5b5;cursor:default}
+.mi.dis{color:#222;cursor:pointer}
 .mi.open{color:#1668dc}
 .mi .cv{width:7px;height:7px;border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:rotate(45deg);margin-top:-3px}
 .mi.open .cv{transform:rotate(-135deg);margin-top:3px}
@@ -54,7 +54,8 @@ input.ctl::placeholder{color:#bfbfbf}
 .seg button.on{border-color:var(--blue);color:var(--blue);position:relative;z-index:1}
 .seg.fill button.on{background:var(--blue);color:#fff}
 .rng{display:inline-flex;align-items:center;gap:4px;height:32px;border:1px solid var(--bd);border-radius:4px;padding:0 8px;background:#fff}
-.rng input{border:0;outline:none;font:inherit;font-size:12.5px;width:118px;color:#222;background:transparent}
+.rng input{border:0;outline:none;font:inherit;font-size:12.5px;width:92px;color:#222;background:transparent}
+.rng input::placeholder{color:#bfbfbf}.rng .cal{margin-left:6px;flex:none}
 .rng i{font-style:normal;color:#bfbfbf;font-size:11px}
 .btnp{height:32px;background:var(--blue);color:#fff;border:0;border-radius:4px;padding:0 15px;font-size:12.5px;font-weight:500}
 .btnx{height:30px;border:1px solid var(--bd);background:#fff;color:#222;border-radius:4px;padding:0 14px;font-size:12px}
@@ -65,7 +66,7 @@ input.ctl::placeholder{color:#bfbfbf}
 table.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
 .tbl th{background:#fafafa;font-weight:600;text-align:left;padding:13px 8px;white-space:nowrap;color:#222}
 .tbl td{padding:13px 8px;border-bottom:1px solid var(--line);vertical-align:middle;white-space:nowrap}
-.tbl.dense{font-size:12px}.tbl.dense th,.tbl.dense td{padding:12px 5px}.tbl.dense th.st{white-space:normal;min-width:58px;line-height:1.3}
+.tbl.dense{font-size:12px}.tbl.dense th,.tbl.dense td{padding:12px 5px}.tbl.dense th.st{white-space:nowrap}
 .tbl td.c,.tbl th.c{text-align:center}
 .tbl th.new{border-bottom:2px solid var(--pink);background:#fff0f5;color:var(--pink);box-shadow:none;border-radius:0}
 .tbl td.new{background:#fffafc}
@@ -265,21 +266,22 @@ const PRODS={
 '헤어/메이크업':[['디자인 컷','Design Cut','设计剪发','デザインカット'],['퍼스널 컬러 메이크업','Personal Color Makeup','个人色彩彩妆','パーソナルカラーメイク']]};
 const prodOf=(st,lang)=>{const p=pick(PRODS[st.cat]);return (lang==='영어'||lang==='인도네시아어'||lang==='몽골어')?p[1]:lang==='일본어'?p[3]:p[2]};
 const NAT_LANG={'미국':['영어',()=>'+1 '+dg(10)],'캐나다':['영어',()=>'+1 '+dg(10)],'호주':['영어',()=>'+61 4'+dg(8)],'필리핀':['영어',()=>'+63 9'+dg(9)],'베트남':['영어',()=>'+84 9'+dg(8)],
-'일본':['일본어',()=>'+81 90 '+dg(4)+' '+dg(4)],'중국':['중국어(간체)',()=>'+86 1'+pick(['3','5','8'])+dg(9)],'대만':['중국어(번체)',()=>'+886 9'+dg(2)+' '+dg(3)+' '+dg(3)],
-'인도네시아':['인도네시아어',()=>'+62 8'+dg(2)+' '+dg(4)+' '+dg(4)],'몽골':['몽골어',()=>'+976 '+dg(4)+' '+dg(4)]};
+'일본':['일본어',()=>'+81 90'+dg(4)+dg(4)],'중국':['중국어(간체)',()=>'+86 1'+pick(['3','5','8'])+dg(9)],'대만':['중국어(번체)',()=>'+886 9'+dg(2)+dg(3)+dg(3)],
+'인도네시아':['인도네시아어',()=>'+62 8'+dg(2)+dg(4)+dg(4)],'몽골':['몽골어',()=>'+976 '+dg(4)+dg(4)]};
 const WEBP=[['Susan H Pak','미국'],['Isabella Samek','미국'],['Eunice Choi','미국'],['Rassul Ismailov','미국'],['Kaitlyn Chan','캐나다'],['Evelyn Lee','캐나다'],['shiyi Chen','캐나다'],['Karla Torres','미국'],
 ['Yukina Morita','일본'],['MAEDA MIYU','일본'],['YUMA HASEGAWA','일본'],['MARI HAYASHI','일본'],['TAKARA OKANO','일본'],['Sakura Ito','일본'],['zhangyue','중국'],['liangmeiying','중국'],['Hemeiwen','중국'],
 ['Lin Yu Ting','대만'],['Chen Mei Hua','대만'],['Wu Chia Hui','대만'],['Putri Ayu','인도네시아'],['Dewi Lestari','인도네시아'],['Bayarmaa Dorj','몽골'],['Nguyen Thao','베트남'],['Emma Watson K','호주'],['Maria Santos','필리핀']];
 const CNP=[['王小明','WANG XIAOMING'],['李雪','LI XUE'],['Chen Wei','CHEN WEI'],['张雨桐','ZHANG YUTONG'],['Liu Yang','LIU YANG'],['赵一诺','ZHAO YINUO'],['Zhou Mei','ZHOU MEI'],['陈思雨','CHEN SIYU'],['Sun Yi Fei','SUN YIFEI'],['吴佳琪','WU JIAQI'],['Xu Ting','XU TING'],['Gao Yuan','GAO YUAN']];
 const HKP=[['陳大文','CHAN TAI MAN'],['Wong Ka Ming','WONG KA MING'],['Chan Siu Ling','CHAN SIU LING'],['李嘉欣','LEE KA YAN'],['Lau Tsz Hin','LAU TSZ HIN'],['Cheung Mei Yee','CHEUNG MEI YEE'],['Ho Man Kit','HO MAN KIT']];
 const HKNAT='홍콩(중국 특별행정구)';
+const NATOF={};
 function person(ch){
   if(ch==='웹'){const w=pick(WEBP),nl=NAT_LANG[w[1]];const nm=w[0];
-    return {name:nm,pass:nm.toUpperCase(),nat:w[1],lang:nl[0],phone:nl[1](),email:nm.toLowerCase().replace(/[^a-z]/g,'')+ri(99)+'@'+pick(['gmail.com','gmail.com','outlook.com','yahoo.com','naver.com']),nick:nm,sns:'',snsId:''}}
+    NATOF[nm]=w[1];return {name:nm,pass:nm.toUpperCase(),nat:w[1],lang:nl[0],phone:nl[1](),email:nm.toLowerCase().replace(/[^a-z]/g,'')+ri(99)+'@'+pick(['gmail.com','gmail.com','outlook.com','yahoo.com','naver.com']),nick:nm,sns:'',snsId:''}}
   if(ch==='알리페이 중국'){const p=pick(CNP);
     return {name:p[0],pass:p[1],nat:'중국',lang:'중국어(간체)',phone:'+86 1'+pick(['3','5','8'])+dg(9),email:'-',nick:p[0],sns:'WECHAT',snsId:'wxid_'+dg(8)}}
   const p=pick(HKP);
-  return {name:p[0],pass:p[1],nat:HKNAT,lang:'중국어(번체)',phone:'+852 '+pick(['5','6','9'])+dg(3)+' '+dg(4),email:'-',nick:p[0],sns:'WHATSAPP',snsId:'+852'+dg(8)};
+  return {name:p[0],pass:p[1],nat:HKNAT,lang:'중국어(번체)',phone:'+852 '+pick(['5','6','9'])+dg(3)+dg(4),email:'-',nick:p[0],sns:'WHATSAPP',snsId:'+852'+dg(8)};
 }
 const chList=(w,c,h)=>shuffle([].concat(Array(w).fill('웹'),Array(c).fill('알리페이 중국'),Array(h).fill('알리페이 홍콩')));
 const descTs=(n,from,to,sec)=>{const a=[];for(let i=0;i<n;i++){const span=Math.round((new Date(to)-new Date(from))/864e5);const d=add(from,ri(span+1));a.push(tsOf(d,sec,6,23))}return a.sort().reverse()};
@@ -331,6 +333,8 @@ const CONS=[];
 })();
 
 /* ========= 3) 스토어 채팅 / 4) 상품 채팅 ========= */
+/* 알리페이 식별자: 회원마다 고정된 16자리(2088로 시작). 회원 정보에 닉네임이 없을 때만 고객명 자리에 보인다 */
+function aidOf(s){let h=7;for(const c of String(s))h=(h*131+c.charCodeAt(0))%999999999989;return ('2088'+String(100000000000+h%899999999999)).slice(0,16)}
 const CHATS=[],PCHATS=[];
 function mkChat(n,w,c,h,isProd){
   const chs=chList(w,c,h),weekN=Math.round(n*0.55);
@@ -347,7 +351,7 @@ function mkChat(n,w,c,h,isProd){
     const guest=ch==='웹'&&ri(5)<3;
     let cust;
     if(ch==='웹')cust=guest?(isProd?'c30d'+dg(4)+'-'+dg(4)+'-447b-bb2d-d1aeb2a'+dg(4):'게스트'):p.name;
-    else cust=ri(2)?p.nick:('2088'+String(100000000000+((n*2654435761)%899999999999))).slice(0,16);
+    else cust=ri(2)?p.nick:aidOf(p.name);
     const o={no:n-i,first:f,last:l,room,resp,lw,ch,store:st.ko,cat:st.cat,staff:st.staff,sname:snm(st,p.lang),cust,lang:p.lang,email:ch==='웹'&&!guest?p.email:'',
       route:ch==='웹'&&ri(12)===0?'외부(스토어)':'스토어',prod:isProd?prodOf(st,p.lang):'',hay:(cust+' '+st.ko+' '+p.email).toLowerCase()};
     (isProd?PCHATS:CHATS).push(o);
@@ -417,13 +421,20 @@ const ageOf=b=>{const y=+b.slice(0,4);let a=2026-y;if(b.slice(5)>T.slice(5))a--;
 const ageB=a=>a<20?'10대':a<30?'20대':a<40?'30대':a<50?'40대':'50대 이상';
 
 [RES,CONS,CHATS,PCHATS,REV,STAT,SURVEY].forEach(a=>a.forEach(r=>{r.cv=r.ch==='웹'?'웹':'알리페이'}));
+/* 전화번호 정리: +1은 나라별 지역번호로, 같은 이름은 모든 목록에서 같은 번호 */
+(function(){const AR={'캐나다':['416','647','437','604','778','514','438','403','587','613'],'미국':['212','646','917','213','310','415','312','206','617','702']};
+  const fix=(ph,nat)=>{const m=/^\+1 (\d{10})$/.exec(ph||'');if(!m)return ph;const d=m[1],a=(AR[nat]||AR['미국']);return '+1 '+a[(+d.slice(0,2))%a.length]+String(2+(+d[3])%8)+d.slice(4)};
+  const first={};RES.forEach(r=>{const p=fix(r.phone,r.nat);if(!(r.name in first))first[r.name]=p;const o=r.phone;r.phone=first[r.name];if(r.hay&&o)r.hay=r.hay.split(o.toLowerCase()).join(r.phone.toLowerCase())});
+  const sid={};CONS.forEach(r=>{if(r.snsId&&r.ch!=='웹'){if(!(r.name in sid))sid[r.name]=r.snsId;r.snsId=sid[r.name]}});
+  CONS.forEach(r=>{if(!r.phone)return;const o=r.phone;let p=first[r.name];if(!p){p=fix(r.phone,NATOF[r.name]);first[r.name]=p}r.phone=p;if(r.hay)r.hay=r.hay.split(o.toLowerCase()).join(p.toLowerCase())});
+})();
 /* ========= 상태 ========= */
 let _v='res',S,OPEN={};
 const D=()=>({
  res:{open:null,ch:'전체',store:'',cat:'',status:'',lang:'',reg:'',q:'',qd:'',per:'all',from:'',to:'',base:'visit',sort:'visit',page:1,size:10},
  cons:{per:'',from:'',to:'',member:'',status:'',lang:'',route:'',ch:'전체',cat:'',store:'',q:'',qd:'',page:1,size:10},
- chats:{base:'first',per:'week',from:'2026-10-01',to:T,room:'',route:'',ch:'전체',resp:'',lang:'',store:'',q:'',qd:'',page:1,size:10},
- prodchats:{base:'first',per:'week',from:'2026-10-01',to:T,room:'',resp:'',lang:'',ch:'전체',cat:'',store:'',q:'',qd:'',page:1,size:10},
+ chats:{base:'first',per:'week',from:add(T,-7),to:T,room:'',route:'',ch:'전체',resp:'',lang:'',store:'',q:'',qd:'',page:1,size:10},
+ prodchats:{base:'first',per:'week',from:add(T,-7),to:T,room:'',resp:'',lang:'',ch:'전체',cat:'',store:'',q:'',qd:'',page:1,size:10},
  rev:{base:'reg',per:'',from:'',to:'',lang:'',store:'',img:'',ch:'전체',q:'',qd:'',page:1,size:10},
  stat:{mode:'day',lang:'',ch:'전체',active:'',store:'',has:'has',per:'today',from:T,to:T,chart:'bar',tab:'agg',mtype:'all',sortK:'total',sortD:-1},
  survey:{from:'',to:'',nat:'',gender:'',age:'',exp:'',interest:'',ch:'전체',page:1,size:20}
@@ -434,7 +445,7 @@ function perRange(k){
     case 'all':return ['',''];
     case 'today':return [T,T];
     case 'yest':return [add(T,-1),add(T,-1)];
-    case 'week':return [add(T,-6),T];
+    case 'week':return [add(T,-7),T];
     case 'month':return ['2026-10-01',T];
     case 'year':return ['2026-01-01',T];
     case '1w':return [add(T,-7),''];case '1m':return [add(T,-30),''];case '3m':return [add(T,-90),''];case '6m':return [add(T,-182),''];case '1y':return [add(T,-365),''];
@@ -458,7 +469,7 @@ function perBtns(list,fill){
 }
 function rng(){
   const s=S[_v];
-  return `<span class="rng"><input type="date" data-k="from" value="${s.from}"><i>→</i><input type="date" data-k="to" value="${s.to}"></span>`;
+  return `<span class="rng"><input type="text" class="dtin" data-k="from" value="${s.from}" placeholder="시작일" maxlength="10"><i>→</i><input type="text" class="dtin" data-k="to" value="${s.to}" placeholder="종료일" maxlength="10"><svg class="cal" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#bfbfbf" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span>`;
 }
 function txt(ph,w){return `<input class="ctl" data-q placeholder="${esc(ph)}" value="${esc(S[_v].qd)}" style="width:${w}px">`}
 const srch='<button class="btnp" data-act="search">검색</button>';
@@ -478,7 +489,7 @@ function resDrawer(){
   const H=[['접수 ('+(r.reg==='관리자'?'관리자 등록':'고객 직접 예약')+')',r.recv,actor]];
   let cancelAt='';
   if(r.status==='방문완료')H.unshift(['방문 완료',r.visit,'매장']);
-  else if(r.status==='노쇼')H.unshift(['미방문',r.visit.slice(0,10)+' '+hh(Math.min(hm(r.visit)+60,1439)),'매장']);
+  else if(r.status==='노쇼')H.unshift(['노쇼',r.visit.slice(0,10)+' '+hh(Math.min(hm(r.visit)+60,1439)),'매장']);
   else if(r.status==='고객취소'){
     const rd=r.recv.slice(0,10),last=add(r.visit.slice(0,10),-1),end=last<T?last:T;
     const span=Math.max(0,Math.round((new Date(end)-new Date(rd))/864e5));
@@ -531,10 +542,10 @@ function resRows(){
   return rows.sort((a,b)=>a[k]<b[k]?1:a[k]>b[k]?-1:0);
 }
 function vRes(){
-  const s=S.res,rows=resRows();
-  const up=rows.filter(r=>r.status==='예약').length,dn=rows.filter(r=>r.status==='방문완료').length,ns=rows.filter(r=>r.status==='노쇼').length;
+  const s=S.res,rows=resRows(),crow=RES.filter(r=>s.ch==='전체'||r.cv===s.ch);
+  const up=crow.filter(r=>r.status==='예약').length,dn=crow.filter(r=>r.status==='방문완료').length,ns=crow.filter(r=>r.status==='노쇼').length;
   const rate=(dn+ns)?Math.round(ns/(dn+ns)*1000)/10:0;
-  const cards=`<div class="cards">${[['전 매장 예약',rows.length,''],['방문 예정',up,''],['방문 완료',dn,''],['노쇼',ns,''],['노쇼율',rate,'%']].map(a=>`<div class="cd"><i>${a[0]}</i><b>${a[1]}${a[2]?`<u>${a[2]}</u>`:''}</b></div>`).join('')}</div>`;
+  const cards=`<div class="cards">${[['전 매장 예약',crow.length,''],['방문 예정',up,''],['방문 완료',dn,''],['노쇼',ns,''],['노쇼율',rate,'%']].map(a=>`<div class="cd"><i>${a[0]}</i><b>${a[1]}${a[2]?`<u>${a[2]}</u>`:''}</b></div>`).join('')}</div>`;
   const f=`<div class="blk"><div class="fl col"><div class="r">
    ${sel('store','스토어 선택',STORES.map(x=>x.ko),{w:130})}${sel('cat','카테고리 선택',CATS,{w:130})}${sel('status','상태 선택',['예약','방문완료','노쇼','고객취소'],{w:110})}${sel('lang','언어 선택',LANGS,{w:116})}
    ${chSel()}${sel('reg','등록 주체',['고객','관리자'],{w:110})}${txt('여권명, 연락처, 예약번호, 요청사항, 매장메모',290)}</div>
@@ -651,7 +662,7 @@ function aggData(rows){
   let out=list.map(st=>{const rr=rows.filter(r=>r.store===st.ko);const o={name:st.ko,total:rr.length};
     ['스토어','상품'].forEach(k=>o['k:'+k]=rr.filter(r=>r.kind===k).length);LANGS.forEach(k=>o['l:'+k]=rr.filter(r=>r.lang===k).length);CHS.forEach(k=>o['c:'+k]=rr.filter(r=>r.cv===k).length);WAYS.forEach(k=>o['w:'+k]=rr.filter(r=>r.way===k).length);return o});
   if(s.has==='has')out=out.filter(o=>o.total>0);else if(s.has==='none')out=out.filter(o=>o.total===0);
-  out.sort((a,b)=>{const x=a[s.sortK],y=b[s.sortK];const c=typeof x==='string'?x.localeCompare(y,'ko'):x-y;return (c||a.name.localeCompare(b.name,'ko'))*s.sortD*(typeof x==='string'?1:1)||0});
+  out.sort((a,b)=>{const x=a[s.sortK],y=b[s.sortK];const c=typeof x==='string'?x.localeCompare(y,'ko'):x-y;return c?c*s.sortD:a.name.localeCompare(b.name,'ko')});
   return out;
 }
 function detLabel(r){return r.way==='메신저상담'?(r.mg==='K-뷰티 메신저'?'K뷰티':'입점사')+r.mt:r.way}
@@ -677,7 +688,7 @@ function vStat(){
     const ag=aggData(rows);
     const ar=k=>`<span class="ar" data-act="sort" data-v="${k}">${s.sortK===k?(s.sortD>0?'▲':'▼'):'⇅'}</span>`;
     const sh=(l,k,cls)=>`<th class="${cls||''}" rowspan="1">${l}${ar(k)}</th>`;
-    const hdr=`<tr><th rowspan="2" style="text-align:center">스토어명${ar('name')}</th><th rowspan="2">총 문의 건수${ar('total')}</th><th colspan="2">문의구분</th><th colspan="6">언어구분</th><th colspan="3" class="new">유입 채널</th><th colspan="3">문의 방식</th></tr>
+    const hdr=`<tr><th rowspan="2" style="text-align:center">스토어명${ar('name')}</th><th rowspan="2">총 문의 건수${ar('total')}</th><th colspan="2">문의구분</th><th colspan="6">언어구분</th><th colspan="2" class="new">유입 채널</th><th colspan="3">문의 방식</th></tr>
      <tr>${sh('스토어','k:스토어')}${sh('상품','k:상품')}${['중국어(간체)','중국어(번체)','영어','일본어','인니어','몽골어'].map((l,i)=>sh(l,'l:'+LANGS[i])).join('')}${CHS.map(c=>sh(c,'c:'+c,'new')).join('')}${WAYS.map(w=>sh(w,'w:'+w)).join('')}</tr>`;
     const keys=['total','k:스토어','k:상품'].concat(LANGS.map(l=>'l:'+l),CHS.map(c=>'c:'+c),WAYS.map(w=>'w:'+w));
     tab=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span class="sec-t" style="margin:0">스토어별 집계</span><button class="btnx" data-act="nop">엑셀 다운로드</button></div>
@@ -741,9 +752,9 @@ function sideHTML(){
     const real=m.kids&&m.kids.some(k=>k[1]);
     const cv=m.kids?'<i class="cv"></i>':'';
     const lab=m.t+(m.alpha?'<span class="alpha">ALPHA</span>':'');
-    if(!real)return `<div class="mi dis"><span>${lab}</span>${cv}</div>`;
+    if(!real)return `<div class="mi dis" data-act="nop"><span>${lab}</span>${cv}</div>`;
     const open=!!OPEN[m.t];
-    return `<div class="mi ${open?'open':''}" data-act="grp" data-v="${m.t}"><span>${lab}</span>${cv}</div>`+(open?`<div class="sub">${m.kids.map(k=>k[1]?`<div class="mi ${k[1]===_v?'on':''}" data-act="go" data-v="${k[1]}"><span>${k[0]}</span></div>`:`<div class="mi dis"><span>${k[0]}</span></div>`).join('')}</div>`:'');
+    return `<div class="mi ${open?'open':''}" data-act="grp" data-v="${m.t}"><span>${lab}</span>${cv}</div>`+(open?`<div class="sub">${m.kids.map(k=>k[1]?`<div class="mi ${k[1]===_v?'on':''}" data-act="go" data-v="${k[1]}"><span>${k[0]}</span></div>`:`<div class="mi dis" data-act="nop"><span>${k[0]}</span></div>`).join('')}</div>`:'');
   }).join('');
 }
 
@@ -783,9 +794,9 @@ Object.defineProperty(window,'VIEW',{get:()=>_v});
 Object.defineProperty(window,'STATE',{get:()=>S});
 let _tt;
 function toast(m){let el=$('#toast');if(!el){el=document.createElement('div');el.id='toast';document.body.appendChild(el)}el.textContent=m;el.classList.add('on');clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('on'),2000)}
-const isDate=t=>t&&t.tagName==='INPUT'&&t.type==='date'&&t.dataset.k;
+const isDate=t=>t&&t.tagName==='INPUT'&&t.classList.contains('dtin')&&t.dataset.k;
 /* 날짜칸은 입력 중에는 다시 그리지 않고, 포커스를 잃을 때나 Enter에서만 반영 */
-function applyDate(t){_dd=null;const k=t.dataset.k,s=S[_v];if(s[k]===t.value)return false;s[k]=t.value;s.per='';if('page' in s)s.page=1;return true}
+function applyDate(t){_dd=null;const k=t.dataset.k,s=S[_v];if(t.value&&!/^\d{4}-\d{2}-\d{2}$/.test(t.value)){t.value=s[k];return false}if(s[k]===t.value)return false;s[k]=t.value;s.per='';if('page' in s)s.page=1;return true}
 document.addEventListener('change',e=>{
   const t=e.target;if(!t.dataset)return;
   if(t.dataset.cn!==undefined){const r=CONS.find(x=>String(x.no)===t.dataset.cn);if(r){r.status=t.value;render()}return}
@@ -817,7 +828,7 @@ document.addEventListener('click',e=>{
   else if(act==='page'){s.page=+v;render()}
   else if(act==='set'){
     s[a.dataset.k]=v;
-    if(a.dataset.k==='mode'){if(v==='day'){s.per='week';s.from='2026-10-01';s.to=T}else{s.per='';s.from='2026-05-01';s.to=T}}
+    if(a.dataset.k==='mode'){if(v==='day'){s.per='week';s.from=add(T,-7);s.to=T}else{s.per='';s.from='2026-05-01';s.to=T}}
     render();
   }
   else if(act==='rdet'){S.res.open=v;render()}
