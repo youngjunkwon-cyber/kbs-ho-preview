@@ -521,7 +521,7 @@ function viewDash(){
  h+=cards.length?'<div class="rgrid">'+cards.map(function(r){return resCard(r,'dash');}).join('')+'</div>':'<div class="empty" style="padding:40px 0 30px"><div style="font-size:26px;color:#ddd">&#9993;</div>현재 처리할 예약이 없습니다.</div>';
  h+='</div>';
  h+='<div class="dcard" id="dc-stat"><div class="dh"><div><h2>통계</h2><div class="sub">선택한 기간의 스토어 성과와 고객 문의를 확인해 보세요.</div></div>'
-  +'<div class="segw">'+sel('dash.ch',CHOPT,'new')+'<div class="seg">'+PERIODS.map(function(p){return '<span class="'+(d.period===p?'on':'')+'" data-act="per" data-v="'+p+'">'+p+'</span>';}).join('')+'</div></div></div>';
+  +'<div class="segw"><div class="seg">'+PERIODS.map(function(p){return '<span class="'+(d.period===p?'on':'')+'" data-act="per" data-v="'+p+'">'+p+'</span>';}).join('')+'</div></div></div>';
  var K=[['pr','스토어 방문',st.store,'회'],['pr','상품 방문',st.prod,'회'],['ms','메신저 문의',st.msg,'건'],['ms','채팅 문의',st.chat,'건'],['cl','예약 확정',st.conf,'건'],['ck','방문 완료',st.done,'건']];
  var bw=null,bl=null;if(d.ch==='전체'){bw=statsOf(['웹']);bl=statsOf(['알리페이 중국','알리페이 홍콩']);}
  var KEYS=['store','prod','msg','chat','conf','done'];
@@ -741,7 +741,8 @@ window.resetDB=function(){freshDB();S=freshState();render();};
 Object.defineProperty(window,'VIEW',{get:function(){return S.view;}});
 window.setCh=function(v){
  if(v==='알리페이 중국'||v==='알리페이 홍콩')v='알리페이';
- var m={dash:'dash.ch',res:'res.ch',chatlog:'chatlog.ch',live:'live.ch',consult:'consult.ch',rev:'rev.ch'};
+ if(S.view==='dash')return;
+ var m={res:'res.ch',chatlog:'chatlog.ch',live:'live.ch',consult:'consult.ch',rev:'rev.ch'};
  setP(m[S.view],v);if(S[S.view].page!=null)S[S.view].page=1;render();
 };
 window.setBadgeStyle=function(v){S.bs='badge';render();};
