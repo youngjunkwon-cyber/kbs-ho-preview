@@ -343,6 +343,7 @@ function effChStore(st) { return storeHasTargetLang(st) ? st.channel : WEB; }
 /* 상품·칼럼 유효값 = 대상 외 언어면 웹, 스토어가 고정이면 스토어 값, 아니면 자기 값 */
 function effChProduct(p) { if (!langOk(p.lang)) return WEB; const s = effChStore(S(p.store)); return s !== ALLCH ? s : p.channel; }
 const colLangOk = c => String(c.langs || '').split(',').some(x => langOk(x.trim()));
+const effChColumnLang = (c, lang) => langOk(lang) ? effChStore(S(c.store)) : WEB; /* 칼럼의 언어별 값: 대상 언어는 스토어 값, 그 밖의 언어는 웹 */
 function effChColumn(c) { if (!colLangOk(c)) return WEB; return effChStore(S(c.store)); }
 function effChAd(b) { if (!langOk(b.lang)) return WEB; if (b.linkType === '외부링크') return WEB; return b.channel; }
 function effChColl(c) { return langOk(c.lang) ? c.channel : WEB; }
@@ -446,7 +447,7 @@ function reasonsColl(c) { return [WEB, ALI].filter(ch => chIncludes(effChColl(c)
 /* ================================ 화면 ================================ */
 let VIEW = { name: 'p-list', id: null, tab: 1, lang: '중국어(간체)', sect: 0, openMenu: '상품' };
 const CHF = '노출 채널 (전체)';
-const FILTERS = { 'p-list': { ch: CHF, rsn: '전체' }, 's-list': { ch: CHF, rsn: '전체' }, 'a-list': { ch: CHF, rsn: '전체' }, 'c-list': { ch: CHF, rsn: '전체' } };
+const FILTERS = { 'p-list': { ch: CHF, rsn: '전체' }, 's-list': { ch: CHF, rsn: '전체' }, 'a-list': { ch: CHF, rsn: '전체' }, 'c-list': { ch: CHF, rsn: '전체' }, 'col-list': { ch: CHF, rsn: '전체' } };
 const F = () => FILTERS[VIEW.name] || { ch: CHF, rsn: '전체' };
 const el = s => document.querySelector(s);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -492,7 +493,7 @@ const MENU = [
   ['처음으로'], ['공지사항'], ['예약'], ['고객지원'], ['회원'],
   ['스토어', ['정보관리', 's-list'], ['채팅조회'], ['상담조회'], ['리뷰관리'], ['이미지 관리']],
   ['상품', ['상품정보관리', 'p-list'], ['상품채팅조회'], ['상품상담조회'], ['상품리뷰관리']],
-  ['옵션 관리'], ['매거진', null, 'm-edit'], ['스토어 칼럼', null, 'col-edit'], ['SEO'], ['AI 관리'], ['채팅'], ['상담'], ['리뷰'], ['계정'],
+  ['옵션 관리'], ['매거진', null, 'm-edit'], ['스토어 칼럼', null, 'col-list'], ['SEO'], ['AI 관리'], ['채팅'], ['상담'], ['리뷰'], ['계정'],
   ['광고정보관리', null, 'a-list'], ['쿠폰'],
   ['기획전', ['기획전 관리', 'c-list'], ['유형 관리']],
   ['인플루언서'], ['통계'],
@@ -509,7 +510,7 @@ function renderSide() {
       h += '<div class="nav ' + (anyOn ? 'on' : '') + '" onclick="VIEW.openMenu=' + (open ? 'null' : "'" + name + "'") + ';render()"><span>' + name + '</span><span class="caret">' + (open ? '▲' : '▼') + '</span></div>';
       if (open) kids.forEach(k => { const t = k[1];
         h += t ? '<div class="sub ' + (t === VIEW.name || (t === 's-list' && VIEW.name === 's-edit') || (t === 'p-list' && VIEW.name === 'p-edit') ? 'on' : '') + '" onclick="go(\'' + t + '\')">' + k[0] + '</div>' : '<div class="sub dim">' + k[0] + '</div>'; });
-    } else if (leafTarget) h += '<div class="nav ' + (leafTarget === VIEW.name ? 'on' : '') + '" onclick="go(\'' + leafTarget + '\')">' + name + '</div>';
+    } else if (leafTarget) h += '<div class="nav ' + ((leafTarget === VIEW.name || (leafTarget === 'col-list' && VIEW.name === 'col-edit')) ? 'on' : '') + '" onclick="go(\'' + leafTarget + '\')">' + name + '</div>';
     else h += '<div class="nav dim">' + name + '</div>';
   });
   return h;
@@ -606,7 +607,7 @@ window.setBooking = function (on) { S(VIEW.id).bookingEnabled = !!on; render(); 
 /* ------------------------------ 목록 공통 ------------------------------ */
 const S_LIST_TABS = ['원본', '중국어(간체)', '영어', '중국어(번체)', '일본어', '인도네시아어', '몽골어'];
 const storeTabOk = () => !VIEW.stab || VIEW.stab === '원본' || langOk(VIEW.stab);
-const filterOn = () => VIEW.name === 's-list' ? storeTabOk() : aliLangOk();
+const filterOn = () => VIEW.name === 's-list' ? storeTabOk() : VIEW.name === 'col-list' ? true : aliLangOk();
 window.setStab = function (v) { VIEW.stab = v; if (!storeTabOk()) { F().ch = CHF; F().rsn = '전체'; } render(); };
 function chFilterRow(rsnOpts) {
   const dis = filterOn() ? '' : ' disabled';
@@ -941,14 +942,26 @@ function screen_hEdit() {
 }
 
 /* --------------------- BO-CH-13 · 스토어 칼럼 상세 --------------------- */
+function screen_colList() {
+  const rows = DB.columns.map(c => ({ c, eff: effChColumn(c) })).filter(r => passFilter(r.eff));
+  const body = rows.map(r => { const c = r.c, st = S(c.store), nm = esc(st.name);
+    let h = '<tr><td><b>' + esc(c.title) + '</b></td><td>' + nm + '</td><td class="c">' + chCell(r.eff) + '</td><td>' + c.langs + '</td><td><span class="tag all">' + c.status + '</span></td><td>' + c.reg + '</td><td><button class="btn sm" onclick="openCol(\'' + c.id + '\')">상세</button> <button class="btn sm red" disabled>삭제</button></td></tr>';
+    String(c.langs).split(',').map(x => x.trim()).filter(Boolean).forEach(l => { h += '<tr><td class="tblnote" style="padding-left:26px">' + esc(c.title) + ' (' + l + ')</td><td>' + nm + '</td><td class="c">' + chCell(effChColumnLang(c, l)) + '</td><td>' + l + '</td><td><span class="tag all">' + c.status + '</span></td><td>' + c.reg + '</td><td><button class="btn sm" disabled>블라인드</button> <button class="btn sm" onclick="openCol(\'' + c.id + '\')">상세</button></td></tr>'; });
+    return h; }).join('');
+  return '<div class="phd"><div><h2 class="page">스토어 칼럼 목록</h2><div class="pdesc">스토어 칼럼 심사 상태와 블라인드 상태를 관리합니다.</div></div><div></div></div>' +
+    '<div class="card"><div class="filters"><div class="frow">' + dimSel('상태', ['상태: 전체']) + dimSel('언어', ['언어: 전체']) + dimSel('카테고리', ['카테고리: 전체']) + dimSel('스토어', ['스토어: 전체']) + chFilterRow() + '<button class="btn blue" style="align-self:flex-end" disabled>검색</button></div></div>' +
+    '<div class="tblwrap"><table><thead><tr><th>제목</th><th>스토어</th><th>노출 채널</th><th>노출 언어</th><th>상태</th><th>등록일</th><th>관리</th></tr></thead><tbody>' + (body || empty(7)) + '</tbody></table></div></div>';
+}
+window.openCol = function (id) { VIEW.cid = id; go('col-edit'); };
 function screen_colEdit() {
   const c = CL(VIEW.cid || 'CL1'), st = S(c.store);
-  return '<div class="phd"><div><h2 class="page">스토어 칼럼 상세</h2><div class="pdesc">' + esc(c.title) + '</div></div>' +
+  return '<div class="phd"><div><h2 class="page">스토어 칼럼 상세</h2><div class="pdesc">' + esc(c.title) + '</div></div><div><button class="btn" onclick="go(\'col-list\')">뒤로가기</button></div>' +
     '<div class="fl"><span>시안 전환</span><select onchange="pickCol(this.value)">' + DB.columns.map(x => '<option value="' + x.id + '"' + (x.id === c.id ? ' selected' : '') + '>' + esc(x.title) + ' (' + esc(S(x.store).name) + ')</option>').join('') + '</select></div></div>' +
     '<div class="card"><div class="hd">글 정보</div><div class="bd">' +
     '<div class="row"><div class="lbl">스토어</div><div class="val">' + esc(st.name) + ' <span class="tblnote">(노출 채널 ' + effChStore(st) + ')</span></div></div>' +
     '<div class="row"><div class="lbl">노출 언어</div><div class="val">' + c.langs + '</div></div>' +
     '<div class="row"><div class="lbl">게시 상태</div><div class="val"><span class="tag all">' + c.status + '</span></div></div>' +
+    '<div class="row"><div class="lbl">노출 채널</div><div class="val">' + chCell(effChColumn(c)) + '</div></div>' +
     '<div class="row"><div class="lbl">본문</div><div class="val"><span class="tblnote">(시안 주석) 호스트가 작성한 본문이 라이브 그대로 보이는 자리입니다. 그리지 않았습니다.</span></div></div>' +
     '</div></div>';
 }
@@ -1115,7 +1128,7 @@ window.resetDB = function () { EDITSNAP = null; PAGESNAP = null; ADFULL = null; 
 
 /* ------------------------------- 렌더 ------------------------------- */
 function render() {
-  const map = { 'p-list': screen_pList, 'p-edit': screen_pEdit, 's-list': screen_sList, 's-edit': screen_sEdit, 'a-list': screen_aList, 'c-list': screen_cList, 'm-edit': screen_mEdit, 'col-edit': screen_colEdit, 'btn-spec': screen_btnSpec, 'h-edit': screen_hEdit };
+  const map = { 'p-list': screen_pList, 'p-edit': screen_pEdit, 's-list': screen_sList, 's-edit': screen_sEdit, 'a-list': screen_aList, 'c-list': screen_cList, 'm-edit': screen_mEdit, 'col-list': screen_colList, 'col-edit': screen_colEdit, 'btn-spec': screen_btnSpec, 'h-edit': screen_hEdit };
   el('#side').innerHTML = renderSide();
   /* 수정 창이 열린 동안 뒤 목록은 저장된 값(스냅샷)으로 그린다 */
   let swapObj = null, swapLive = null;
