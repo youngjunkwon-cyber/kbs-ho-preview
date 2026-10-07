@@ -109,6 +109,8 @@ td small{display:block;color:var(--tx3);font-size:9.5px;margin-top:3px}
 .seg span{height:24px;padding:0 10px;display:flex;align-items:center;font-size:10px;color:var(--tx2);cursor:pointer;border-radius:3px;border:1px solid transparent}
 .seg span.on{background:#fff;border-color:var(--ln2);color:#111;font-weight:600}
 .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:18px}
+.kb{display:flex;gap:3px;margin-top:6px;flex-wrap:wrap}
+.kb .chb{margin:0;font-size:9.5px;padding:1px 4px}
 .kp{background:#f6f6f7;border-radius:5px;padding:12px 14px;height:76px}
 .kp .kl{display:flex;align-items:center;gap:5px;font-size:9px;color:var(--tx2)}
 .kp .kl svg{width:11px;height:11px;stroke:var(--pk);fill:none;stroke-width:1.6}
@@ -489,12 +491,16 @@ function needList(tab){
  var a=DB.res.filter(function(r){return r.need&&(tab==='전체'||r.need===tab);});
  return a.sort(function(x,y){return x.visit<y.visit?1:-1;});
 }
-function stats(){
- var d=S.dash,chs=d.ch==='전체'?CHS:(d.ch==='웹'?['웹']:['알리페이 중국','알리페이 홍콩']),a=[0,0,0,0,0];
+function statsOf(chs){
+ var d=S.dash,a=[0,0,0,0,0];
  chs.forEach(function(c){KPI[d.period][c].forEach(function(v,i){a[i]+=v;});});
  var rg=PRANGE[d.period];
  var m=DB.msg.filter(function(x){return chs.indexOf(x.ch)>=0&&inRange(x.at,rg[0],rg[1]);});
  return {store:a[0],prod:a[1],msg:m.length,chat:a[2],conf:a[3],done:a[4],rows:m,wa:m.filter(function(x){return x.app==='WhatsApp';}).length,li:m.filter(function(x){return x.app==='LINE';}).length,wc:m.filter(function(x){return x.app==='WeChat';}).length};
+}
+function stats(){
+ var d=S.dash;
+ return statsOf(d.ch==='전체'?CHS:(d.ch==='웹'?['웹']:['알리페이 중국','알리페이 홍콩']));
 }
 function viewDash(){
  var d=S.dash,st=stats();
@@ -509,7 +515,9 @@ function viewDash(){
  h+='<div class="dcard" id="dc-stat"><div class="dh"><div><h2>통계</h2><div class="sub">선택한 기간의 스토어 성과와 고객 문의를 확인해 보세요.</div></div>'
   +'<div class="segw">'+sel('dash.ch',CHOPT,'new')+'<div class="seg">'+PERIODS.map(function(p){return '<span class="'+(d.period===p?'on':'')+'" data-act="per" data-v="'+p+'">'+p+'</span>';}).join('')+'</div></div></div>';
  var K=[['pr','스토어 방문',st.store,'회'],['pr','상품 방문',st.prod,'회'],['ms','메신저 문의',st.msg,'건'],['ms','채팅 문의',st.chat,'건'],['cl','예약 확정',st.conf,'건'],['ck','방문 완료',st.done,'건']];
- h+='<div class="kpis">'+K.map(function(k){return '<div class="kp"><div class="kl">'+ic(k[0])+k[1]+'</div><div class="kv">'+k[2].toLocaleString('en-US')+'<small>'+k[3]+'</small></div></div>';}).join('')+'</div>';
+ var bw=null,bl=null;if(d.ch==='전체'){bw=statsOf(['웹']);bl=statsOf(['알리페이 중국','알리페이 홍콩']);}
+ var KEYS=['store','prod','msg','chat','conf','done'];
+ h+='<div class="kpis">'+K.map(function(k,i){return '<div class="kp"><div class="kl">'+ic(k[0])+k[1]+'</div><div class="kv">'+k[2].toLocaleString('en-US')+'<small>'+k[3]+'</small></div>'+(bw?'<div class="kb"><span class="chb new" title="유입 채널">웹 '+bw[KEYS[i]].toLocaleString('en-US')+'</span><span class="chb new" title="유입 채널">알리페이 '+bl[KEYS[i]].toLocaleString('en-US')+'</span></div>':'')+'</div>';}).join('')+'</div>';
  h+='<div class="dline"></div><div class="h3">메신저 문의 상세</div><div class="m3"><div>WhatsApp<b>'+st.wa+'건</b></div><div>LINE<b>'+st.li+'건</b></div><div>WeChat<b>'+st.wc+'건</b></div></div>'
   +'<div class="note">선택한 기간에 접수된 메신저 문의예요. 실제 대화는 연결된 메신저 앱에서 확인하세요.</div>'
   +'<table class="mt"><thead><tr><th>문의 위치</th><th>채널</th><th>언어</th><th>접수 일시</th></tr></thead><tbody>'
