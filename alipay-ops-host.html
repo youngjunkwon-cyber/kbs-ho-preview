@@ -111,7 +111,7 @@ td small{display:block;color:var(--tx3);font-size:9.5px;margin-top:3px}
 .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:18px}
 .kb{display:flex;gap:3px;margin-top:6px;flex-wrap:wrap}
 .kb .chb{margin:0;font-size:9.5px;padding:1px 4px}
-.kp{background:#f6f6f7;border-radius:5px;padding:12px 14px;height:76px}
+.kp{background:#f6f6f7;border-radius:5px;padding:12px 14px;min-height:76px}
 .kp .kl{display:flex;align-items:center;gap:5px;font-size:9px;color:var(--tx2)}
 .kp .kl svg{width:11px;height:11px;stroke:var(--pk);fill:none;stroke-width:1.6}
 .kp .kv{font-size:20px;font-weight:800;margin-top:9px;letter-spacing:-.3px}
@@ -719,11 +719,12 @@ function render(){
  var root=document.getElementById('root');
  var m=document.getElementById('main'),st=m?m.scrollTop:0,tw=document.querySelector('.tw'),twl=tw?tw.scrollLeft:0,li=document.querySelector('.li'),lis=li?li.scrollTop:0;
  var sameView=m&&m.getAttribute('data-v')===S.view;
+ var scs=[];if(m){Array.prototype.forEach.call(m.querySelectorAll('*'),function(e){var o=getComputedStyle(e).overflowY;if((o==='auto'||o==='scroll')&&e.scrollHeight>e.clientHeight)scs.push([e.scrollTop,e.scrollLeft]);});}
  var sideScroll=document.querySelector('.side')?document.querySelector('.side').scrollTop:0;
  root.innerHTML=shell();
  var mm=document.getElementById('main');mm.setAttribute('data-v',S.view);
  mm.innerHTML=VIEWS[S.view]();
- if(sameView){mm.scrollTop=st;var t2=document.querySelector('.tw');if(t2)t2.scrollLeft=twl;var l2=document.querySelector('.li');if(l2)l2.scrollTop=lis;}
+ if(sameView){var k2=0;Array.prototype.forEach.call(mm.querySelectorAll('*'),function(e){var o=getComputedStyle(e).overflowY;if((o==='auto'||o==='scroll')&&e.scrollHeight>e.clientHeight&&scs[k2]){e.scrollTop=scs[k2][0];e.scrollLeft=scs[k2][1];k2++;}});mm.scrollTop=st;var t2=document.querySelector('.tw');if(t2)t2.scrollLeft=twl;var l2=document.querySelector('.li');if(l2)l2.scrollTop=lis;}
  document.querySelector('.side').scrollTop=sideScroll;
 }
 window.render=render;
