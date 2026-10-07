@@ -109,9 +109,9 @@ td small{display:block;color:var(--tx3);font-size:9.5px;margin-top:3px}
 .seg span{height:24px;padding:0 10px;display:flex;align-items:center;font-size:10px;color:var(--tx2);cursor:pointer;border-radius:3px;border:1px solid transparent}
 .seg span.on{background:#fff;border-color:var(--ln2);color:#111;font-weight:600}
 .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:18px}
-.kb{display:flex;gap:3px;margin-top:6px;flex-wrap:wrap}
-.kb .chb{margin:0;font-size:9.5px;padding:1px 4px}
-.kp{background:#f6f6f7;border-radius:5px;padding:12px 14px;min-height:76px}
+.kb{display:flex;gap:3px;margin-top:6px;flex-wrap:nowrap;white-space:nowrap}
+.kb .chb{margin:0;font-size:9px;padding:1px 3px;flex:none}
+.kp{background:#f6f6f7;border-radius:5px;padding:12px 10px 12px 12px;min-height:76px}
 .kp .kl{display:flex;align-items:center;gap:5px;font-size:9px;color:var(--tx2)}
 .kp .kl svg{width:11px;height:11px;stroke:var(--pk);fill:none;stroke-width:1.6}
 .kp .kv{font-size:20px;font-weight:800;margin-top:9px;letter-spacing:-.3px}
@@ -151,7 +151,8 @@ td small{display:block;color:var(--tx3);font-size:9.5px;margin-top:3px}
 .pdesc{font-size:8.5px;color:var(--tx2);margin:9px 0 6px;line-height:1.45}
 .pgl{font-size:8px;color:var(--tx3);margin:8px 0 5px}
 .pcard{background:#f3f3f4;border-radius:7px;padding:11px 12px;margin-bottom:7px;cursor:pointer}
-.pcard .l1{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:800}
+.pcard .l1{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;font-weight:800}
+.pcard .l1>span:first-child{white-space:nowrap;flex:none}
 .pcard .l1 .bd{font-size:8px;font-weight:600}
 .pcard .l2{font-size:9.5px;font-weight:700;margin-top:6px}
 .pcard .l3,.pcard .l4,.pcard .l5{font-size:8px;color:var(--tx3);margin-top:3px}
@@ -245,6 +246,9 @@ td small{display:block;color:var(--tx3);font-size:9.5px;margin-top:3px}
 .ci .a .chb{font-size:9.5px;line-height:normal;padding:0 6px;margin:0;font-weight:600;height:16px;box-sizing:border-box;display:inline-flex;align-items:center}
 .rv .a .chb{font-size:9px;line-height:normal;padding:0 6px;margin:0;font-weight:600;height:15px;box-sizing:border-box;display:inline-flex;align-items:center}
 .nb{border:1px dashed var(--pk);border-radius:14px;padding:3px 12px;font-size:11px;color:var(--pk);background:#fff;margin:0 auto;white-space:nowrap}
+#toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:90;background:rgba(26,26,26,.92);color:#fff;font-size:11.5px;padding:9px 18px;border-radius:6px;opacity:0;pointer-events:none;transition:opacity .15s;white-space:nowrap}
+#toast.on{opacity:1}
+.ab div[data-act],.td button[data-act],.btn-s[data-act],.lnk[data-act]{cursor:pointer}
 </style>
 </head>
 <body>
@@ -266,7 +270,28 @@ var KPI={
  '전체':{'웹':[2310,5120,96,61,44],'알리페이 중국':[380,902,38,22,16],'알리페이 홍콩':[241,590,22,13,9]}
 };
 var DIAL={'캐나다':'+1','미국':'+1','일본':'+81','중국':'+86','홍콩':'+852','홍콩(중국 특별행정구)':'+852','말레이시아':'+60','카자흐스탄':'+7','러시아':'+7','싱가포르':'+65'};
-function phone(n,i){return (DIAL[n]||'+82')+' '+String(1000000000+((i*2654435761)%8999999999)).slice(0,10);}
+/* 전화번호: 이름이 같은 고객은 모든 화면에서 같은 번호. 상담접수에 적힌 번호를 기준으로 하고, 없는 고객만 나라별 형식으로 만든다 */
+var PH_RAW={'王思雨':'+86 13811220198','林佳怡':'+86 13922334455','陈雨萱':'+86 18601234567','刘梦琪':'+86 13700112233','张文静':'+86 13566778899','Chan Tai Man':'+852 91234567','Leung Ka Yan':'+852 60123456','Wong Mei Ling':'+852 98765432','Cheung Siu Wai':'+852 55667788'};
+var PH_GRP={'+1':[3,3,4],'+81':[2,4,4],'+86':[3,4,4],'+852':[4,4],'+60':[2,3,4],'+7':[3,3,4],'+65':[4,4]};
+function fmtPhone(code,num){var g=PH_GRP[code]||[num.length],o=[],p=0;g.forEach(function(n){o.push(num.substr(p,n));p+=n;});if(p<num.length)o.push(num.slice(p));return code+' '+o.join(' ');}
+function genNum(nation,code,i){
+ var s=(i*2654435761+97)%4294967296,d=function(){s=(s*1664525+1013904223)%4294967296;return Math.floor(s/65536)%10;};
+ var r=function(n){var t='';for(var k=0;k<n;k++)t+=d();return t;};
+ if(code==='+852')return String([5,6,9][d()%3])+r(7);
+ if(code==='+86')return '1'+String(3+d()%7)+r(9);
+ if(code==='+81')return String([70,80,90][d()%3])+r(8);
+ if(code==='+60')return '1'+String(1+d()%9)+r(7);
+ if(code==='+65')return String(8+d()%2)+r(7);
+ if(code==='+7')return (nation==='카자흐스탄'?'7':'9')+r(9);
+ if(code==='+1'){var ar=String(2+d()%8)+r(2);if(ar.slice(1)==='11')ar=ar[0]+'22';return ar+String(2+d()%8)+r(6);}
+ return r(10);
+}
+function phoneOf(name,nation,i){
+ var raw=PH_RAW[name],code,num;
+ if(raw){var m=/^(\+\d+)\s+(\d+)$/.exec(raw);code=m[1];num=m[2];}
+ else{code=DIAL[nation]||'+82';num=genNum(nation,code,i);}
+ return {text:fmtPhone(code,num),local:num};
+}
 
 /* ===== 시드 ===== */
 function seedRes(){
@@ -298,25 +323,19 @@ function seedRes(){
  ['2026-09-05 12:00','2026-09-01 09:09','Chloe Tan','260901068EN01','싱가포르','영어','WhatsApp','미방문','매장','웹','','매장에서 직접 등록','' ],
  ['2026-08-28 13:00','2026-08-20 15:12','Cheung Siu Wai','260820068ZT01','홍콩','중국어(번체)','WhatsApp','방문완료','고객','알리페이 홍콩','','','']
  ];
- return A.map(function(a,i){return {no:i+1,visit:a[0],recv:a[1],name:a[2],rno:a[3],nation:a[4],lang:a[5],contact:a[6],status:a[7],owner:a[8],ch:a[9],req:a[10],memo:a[11],need:a[12],phone:phone(a[4],i+3)};});
+ return A.map(function(a,i){var p=phoneOf(a[2],a[4],i+3);return {no:i+1,visit:a[0],recv:a[1],name:a[2],rno:a[3],nation:a[4],lang:a[5],contact:a[6],status:a[7],owner:a[8],ch:a[9],req:a[10],memo:a[11],need:a[12],phone:p.text,local:p.local};});
 }
-function seedChatlog(){
+function seedChatlog(L){
  var Z='您好,感谢您的咨询。请问有什么可以帮您?';
- var A=[
- ['2026-10-06 18:20','스토어문의','상담대기','王思雨','중국어(간체)','알리페이 중국','-',0,2,2,'你好,请问这周六下午还有位置吗?'],
- ['2026-10-06 15:02','스토어문의','상담대기','Chan Tai Man','중국어(번체)','알리페이 홍콩','-',0,1,1,'請問星期六下午還有空位嗎?'],
- ['2026-10-05 11:40','상품문의','상담중','Sara Miller','영어','웹','Reverse Clinic Special Offer Event',1,1,3,'Is there any discount for two people?'],
+ /* 처리 대상(상담대기·상담중) 대화는 실시간 채팅과 같은 대화이므로 실시간 값에서 그대로 만든다 */
+ var CNT={'Sara Miller':3,'王思雨':2,'Chan Tai Man':1,'林佳怡':4,'Yuki Tanaka':3,'Leung Ka Yan':1,'陈雨萱':2,'Wong Mei Ling':2,'Emma Johnson':5};
+ var A=L.map(function(r){return [r.at,r.kind==='스토어'?'스토어문의':'상품문의',r.status,r.name,r.lang,r.ch,r.prod||'-',r.replied?1:0,r.unread,CNT[r.name]||1,r.last];});
+ A=A.concat([
  ['2026-10-04 20:15','스토어문의','상담완료','게스트','중국어(간체)','웹','-',1,0,2,Z],
- ['2026-10-03 13:48','상품문의','상담중','林佳怡','중국어(간체)','알리페이 중국','Titanium 80KJ',1,0,4,'我想改到下午,可以吗?'],
- ['2026-10-02 09:30','스토어문의','상담완료','Yuki Tanaka','일본어','웹','-',1,0,3,'ありがとうございます。当日よろしくお願いします。'],
- ['2026-10-01 17:05','상품문의','상담대기','Leung Ka Yan','중국어(번체)','알리페이 홍콩','Shurink Universe 600發',0,2,1,'請問這個項目大概需要多久?'],
  ['2026-09-30 12:11','스토어문의','상담완료','게스트','영어','웹','-',0,0,1,'Hello, thank you for your inquiry. How can I help you?'],
  ['2026-09-28 11:34','스토어문의','상담완료','게스트','중국어(간체)','웹','-',0,0,1,Z+' 由于在未登录状态下进行聊天咨询时,对话内容无法保存。'],
- ['2026-09-27 16:22','상품문의','상담완료','陈雨萱','중국어(간체)','알리페이 중국','美版超声刀第二代 300发',1,0,2,'谢谢,我已经预约好了。'],
- ['2026-09-25 10:03','스토어문의','상담중','Emma Johnson','영어','웹','-',1,1,5,'Can I bring my friend on the same day?'],
  ['2026-09-21 15:39','스토어문의','상담완료','게스트','중국어(간체)','웹','-',1,1,1,'您好 请问您想预约27日上午几点呢?'],
  ['2026-09-21 14:32','스토어문의','-','게스트','중국어(간체)','웹','-',0,0,0,'신속한 상담이 필요하신 경우, 고객센터 링크로 연결합니다.'],
- ['2026-09-18 14:30','스토어문의','상담완료','Wong Mei Ling','중국어(번체)','알리페이 홍콩','-',1,0,2,'好的,我取消預約,謝謝。'],
  ['2026-09-15 10:46','상품문의','상담완료','张文静','중국어(간체)','알리페이 중국','热玛吉FLX 600发',1,0,3,'好的,谢谢您的详细说明。'],
  ['2026-09-09 10:33','스토어문의','상담완료','게스트','중국어(간체)','웹','-',1,0,2,Z+' 如需预约,可以回复上面的预约信息。'],
  ['2026-09-08 14:23','상품문의','상담완료','Rina Takeda','일본어','웹','Titanium 80KJ',0,0,1,'こんにちは、施術時間を教えてください。'],
@@ -325,25 +344,29 @@ function seedChatlog(){
  ['2026-09-03 18:16','스토어문의','상담완료','게스트','영어','웹','-',0,0,1,'Hello, I would like to book next week.'],
  ['2026-08-27 09:58','상품문의','상담완료','刘梦琪','중국어(간체)','알리페이 중국','Shurink Universe 600发',1,0,2,'好的,我周日过去。'],
  ['2026-08-24 10:21','스토어문의','상담완료','게스트','일본어','웹','-',0,0,1,'こんにちは、予約はできますか?']
- ];
+ ]);
  return A.map(function(a,i){return {no:i+1,last:a[0],type:a[1],status:a[2],cust:a[3],lang:a[4],ch:a[5],prod:a[6],reply:a[7],unread:a[8],cnt:a[9],msg:a[10]};});
 }
 function seedLive(){
  var A=[
- ['Sara Miller','상품','Reverse Clinic Special Offer Event (Hongdae Branch)','상담대기',1,0,1,'웹','영어','Is there any discount for two people?','10:42',[['c','Hello! Is there any discount for two people?','10:42']]],
- ['게스트','스토어','','상담대기',2,0,0,'웹','중국어(간체)','请问这周末有位置吗?','10:15',[['c','您好,请问这周末有位置吗?','10:14'],['c','我们两个人。','10:15']]],
- ['王思雨','상품','Titanium 80KJ','상담중',0,1,0,'알리페이 중국','중국어(간체)','好的,我会准时到店。','09:58',[['c','请问这个项目大概需要多久?','09:40'],['h','大约一个小时左右。','09:47'],['c','好的,我会准时到店。','09:58']]],
- ['Chan Tai Man','스토어','','상담대기',1,0,1,'알리페이 홍콩','중국어(번체)','請問星期六下午還有空位嗎?','어제',[['c','您好,請問星期六下午還有空位嗎?','어제 18:02']]],
- ['Yuki Tanaka','상품','Shurink Universe 600發','상담중',0,1,0,'웹','일본어','ありがとうございます。','09:20',[['c','当日はどこで受付すればいいですか?','09:05'],['h','1階の受付でお名前をお伝えください。','09:12'],['c','ありがとうございます。','09:20']]],
- ['林佳怡','스토어','','상담대기',3,0,1,'알리페이 중국','중국어(간체)','我想把预约提前一小时。','어제',[['c','您好','어제 20:31'],['c','我想把预约提前一小时。','어제 20:31'],['c','可以吗?','어제 20:32']]],
- ['Emma Johnson','스토어','','상담중',1,1,0,'웹','영어','Can I bring my friend on the same day?','08:51',[['c','Hi, I booked for Saturday.','08:30'],['h','Hello Emma, yes we are ready for you.','08:40'],['c','Can I bring my friend on the same day?','08:51']]],
- ['陈雨萱','상품','美版超声刀第二代 300发','상담중',0,1,0,'알리페이 중국','중국어(간체)','谢谢!','어제',[['c','谢谢!','어제 17:10']]],
- ['Hiro Sato','스토어','','상담대기',0,0,1,'웹','일본어','こんにちは。','어제',[['c','こんにちは。','어제 14:22']]],
- ['Leung Ka Yan','상품','Shurink Universe 600發','상담중',2,1,0,'알리페이 홍콩','중국어(번체)','請問這個項目有注意事項嗎?','10:30',[['c','請問這個項目有注意事項嗎?','10:29'],['c','做完當天可以化妝嗎?','10:30']]],
- ['Mia Tan','상품','Reverse Clinic Special Offer Event (Hongdae Branch)','상담대기',1,0,0,'웹','영어','Do you have English-speaking staff?','10:05',[['c','Do you have English-speaking staff?','10:05']]],
- ['Wong Mei Ling','스토어','','상담중',0,1,0,'알리페이 홍콩','중국어(번체)','好的,謝謝。','09:12',[['c','請問店裡附近有地鐵站嗎?','09:01'],['h','從弘大入口站步行約五分鐘。','09:08'],['c','好的,謝謝。','09:12']]]
+ // [이름, 유형, 상품, 상태, 미확인, 답변, 지연, 채널, 언어, 마지막 대화 일시, 대화]
+ ['Sara Miller','상품','Reverse Clinic Special Offer Event (Hongdae Branch)','상담대기',1,0,1,'웹','영어','2026-10-07 10:42',[['c','Hello! Is there any discount for two people?','10:42']]],
+ ['게스트','스토어','','상담대기',2,0,0,'웹','중국어(간체)','2026-10-07 10:15',[['c','您好,请问这周末有位置吗?','10:14'],['c','我们两个人。','10:15']]],
+ ['王思雨','상품','Titanium 80KJ','상담중',0,1,0,'알리페이 중국','중국어(간체)','2026-10-07 09:58',[['c','请问这个项目大概需要多久?','09:40'],['h','大约一个小时左右。','09:47'],['c','好的,我会准时到店。','09:58']]],
+ ['Chan Tai Man','스토어','','상담대기',1,0,1,'알리페이 홍콩','중국어(번체)','2026-10-06 18:02',[['c','您好,請問星期六下午還有空位嗎?','어제 18:02']]],
+ ['Yuki Tanaka','상품','Shurink Universe 600發','상담중',0,1,0,'웹','일본어','2026-10-07 09:20',[['c','当日はどこで受付すればいいですか?','09:05'],['h','1階の受付でお名前をお伝えください。','09:12'],['c','ありがとうございます。','09:20']]],
+ ['林佳怡','스토어','','상담대기',3,0,1,'알리페이 중국','중국어(간체)','2026-10-06 20:32',[['c','您好','어제 20:31'],['c','我想把预约提前一小时。','어제 20:31'],['c','可以吗?','어제 20:32']]],
+ ['Emma Johnson','스토어','','상담중',1,1,0,'웹','영어','2026-10-07 08:51',[['c','Hi, I booked for Saturday.','08:30'],['h','Hello Emma, yes we are ready for you.','08:40'],['c','Can I bring my friend on the same day?','08:51']]],
+ ['陈雨萱','상품','美版超声刀第二代 300发','상담중',0,1,0,'알리페이 중국','중국어(간체)','2026-10-06 17:10',[['c','谢谢!','어제 17:10']]],
+ ['Hiro Sato','스토어','','상담대기',0,0,1,'웹','일본어','2026-10-06 14:22',[['c','こんにちは。','어제 14:22']]],
+ ['Leung Ka Yan','상품','Shurink Universe 600發','상담중',2,1,0,'알리페이 홍콩','중국어(번체)','2026-10-07 10:30',[['c','請問這個項目有注意事項嗎?','10:29'],['c','做完當天可以化妝嗎?','10:30']]],
+ ['Mia Tan','상품','Reverse Clinic Special Offer Event (Hongdae Branch)','상담대기',1,0,0,'웹','영어','2026-10-07 10:05',[['c','Do you have English-speaking staff?','10:05']]],
+ ['Wong Mei Ling','스토어','','상담중',0,1,0,'알리페이 홍콩','중국어(번체)','2026-10-07 09:12',[['c','請問店裡附近有地鐵站嗎?','09:01'],['h','從弘大入口站步行約五分鐘。','09:08'],['c','好的,謝謝。','09:12']]]
  ];
- return A.map(function(a,i){return {id:i+1,name:a[0],kind:a[1],prod:a[2],status:a[3],unread:a[4],replied:!!a[5],delayed:!!a[6],ch:a[7],lang:a[8],last:a[9],time:a[10],msgs:a[11]};});
+ /* 마지막 대화 글과 시각은 맨 아래 말풍선에서, 목록에 쓰는 짧은 시각 표기는 일시에서 만든다 */
+ return A.map(function(a,i){
+  var m=a[10],day=a[9].slice(0,10),tm=day===TODAY?a[9].slice(11):(day===addDays(TODAY,-1)?'어제':a[9].slice(5,10));
+  return {id:i+1,name:a[0],kind:a[1],prod:a[2],status:a[3],unread:a[4],replied:!!a[5],delayed:!!a[6],ch:a[7],lang:a[8],at:a[9],last:m[m.length-1][1],time:tm,msgs:m};});
 }
 function seedConsult(){
  var P1='轮廓针 + 下巴肉毒 线条更纤细、更干净',P2='鼻雕注射 × 鼻翼肉毒 让鼻线更精致更纤细',P3='(首次访问价) 咬肌肉毒 × 腺体肉毒 轮廓Tox「小脸更立体」';
@@ -372,7 +395,7 @@ function seedConsult(){
  ['비회원','고객취소','일본어','스토어','웹','',0,'','SNS','','line','yuki_t','Yuki Tanaka','GUEST','2025-11-11 09:30'],
  ['회원','상담대기','중국어(간체)','스토어','알리페이 중국','',0,'','전화','+86 13566778899','','','张文静','Wenjing_Z','2025-11-02 14:58']
  ];
- return A.map(function(a,i){return {member:a[0],status:a[1],lang:a[2],route:a[3],ch:a[4],prod:a[5],memo:!!a[6],price:a[7],contact:a[8],phone:a[9],sns:a[10],snsid:a[11],name:a[12],nick:a[13],at:a[14]};})
+ return A.map(function(a,i){return {member:a[0],status:a[1],lang:a[2],route:a[3],ch:a[4],prod:a[5],memo:!!a[6],price:a[7],contact:a[8],phone:a[9],sns:a[10],snsid:a[11],name:a[12],nick:a[13],at:a[14]};}).map(function(r){var m=/^(\+\d+)\s+(\d+)$/.exec(r.phone);if(m)r.phone=fmtPhone(m[1],m[2]);return r;})
   .sort(function(x,y){return x.at<y.at?1:-1;}).map(function(r,i,arr){r.no=arr.length-i;return r;});
 }
 function seedRev(){
@@ -388,9 +411,9 @@ function seedRev(){
  ['상품','2026-01-29 19:40',PB,'Kazu','웹',4,1,'The hospital interior was clean, and the consultation was friendly and professional. The treatment was a little longer than I expected but the result was worth it.',1],
  ['상품','2026-01-29 16:14',PA,'ルビーちゃん','웹',5,0,'本当に効果が良いですね。割引イベントでお得に利用できた上に、施術効果もこんなに素晴らしくて大満足です。スタッフの方も親切で、また来たいです。次回は友達も連れて行きます。',0],
  ['스토어','2026-01-28 12:10','','Emily Carter','웹',5,2,'Easy booking and a very welcoming team. The clinic is close to the station and the whole visit was smooth from start to finish.',0],
- ['상품','2026-10-02 17:20',PA,'王思雨','알리페이 중국',5,1,'第一次来韩国做皮肤管理,医生和工作人员都很亲切,还有中文沟通,让我很安心。效果也比想象中自然,下次来首尔还会再来。',1],
+ ['상품','2026-10-02 17:20',PA,'张文静','알리페이 중국',5,1,'第一次来韩国做皮肤管理,医生和工作人员都很亲切,还有中文沟通,让我很安心。效果也比想象中自然,下次来首尔还会再来。',1],
  ['상품','2026-09-30 15:40',PB,'陈雨萱','알리페이 중국',5,0,'预约很方便,到店后不用等太久。老师讲解得很详细,做完之后皮肤状态明显变好了,推荐给朋友们。',0],
- ['스토어','2026-09-27 12:05','','刘梦琪','알리페이 중국',4,0,'店里环境干净,服务态度很好。因为临时有事改了一次时间,店家处理得很快。',0],
+ ['스토어','2026-09-27 12:05','','张文静','알리페이 중국',4,0,'店里环境干净,服务态度很好。因为临时有事改了一次时间,店家处理得很快。',0],
  ['상품','2026-09-26 18:30',PA,'Leung Ka Yan','알리페이 홍콩',5,1,'店員態度很好,而且有繁體中文溝通,讓人很放心。價錢也比預期便宜,效果自然,下次來韓國還會再預約。',1],
  ['상품','2026-09-15 20:12',PB,'Cheung Siu Wai','알리페이 홍콩',4,0,'整體體驗不錯,環境乾淨,醫師解說很清楚。等待時間稍微長了一點,但結果令人滿意。',0]
  ];
@@ -418,7 +441,7 @@ function seedMsg(){
  return A.map(function(a){return {at:a[0],place:a[1],app:a[2],lang:a[3],ch:'웹'};});
 }
 var DB;
-function freshDB(){DB={res:seedRes(),chatlog:seedChatlog(),live:seedLive(),consult:seedConsult(),rev:seedRev(),msg:seedMsg()};}
+function freshDB(){var lv=seedLive();DB={res:seedRes(),chatlog:seedChatlog(lv),live:lv,consult:seedConsult(),rev:seedRev(),msg:seedMsg()};}
 function freshState(){
  return {bs:'badge',view:'dash',open:{chat:1,cons:1,res:0,gal:1},banner:true,
   dash:{period:'이번 주',ch:'전체',tab:'전체'},
@@ -537,9 +560,9 @@ function viewDash(){
   +(st.rows.length?st.rows.map(function(m){return '<tr><td>'+esc(m.place)+'</td><td>'+m.app+'</td><td>'+m.lang+'</td><td>'+m.at+'</td></tr>';}).join(''):'<tr><td colspan="4" class="none">해당 기간의 메신저 문의가 없습니다.</td></tr>')
   +'</tbody></table></div>';
  h+='<div class="two"><div class="dcard"><h2>할 일</h2>'
-  +'<div class="td" style="margin-top:20px"><span class="tg">채팅</span><span class="nm">고객이 답장을 기다리고 있어요</span><span class="cn">0건</span><button class="p">답장하기</button></div>'
-  +'<div class="td"><span class="tg">상품</span><span class="nm">반려된 상품이 있어요. 수정해서 다시 올려 주세요</span><span class="cn">0건</span><button>수정하기</button></div>'
-  +'<div class="td"><span class="tg">칼럼</span><span class="nm">블라인드된 칼럼이 있어요. 내용을 확인해 주세요</span><span class="cn">0건</span><button>확인하기</button></div></div>'
+  +'<div class="td" style="margin-top:20px"><span class="tg">채팅</span><span class="nm">고객이 답장을 기다리고 있어요</span><span class="cn">0건</span><button class="p" data-act="nop">답장하기</button></div>'
+  +'<div class="td"><span class="tg">상품</span><span class="nm">반려된 상품이 있어요. 수정해서 다시 올려 주세요</span><span class="cn">0건</span><button data-act="nop">수정하기</button></div>'
+  +'<div class="td"><span class="tg">칼럼</span><span class="nm">블라인드된 칼럼이 있어요. 내용을 확인해 주세요</span><span class="cn">0건</span><button data-act="nop">확인하기</button></div></div>'
   +'<div class="dcard"><h2>상품&middot;칼럼</h2><div class="box3"><h4>상품 15개</h4><div class="t3"><div>승인<b>15</b></div><div>대기<b>0</b></div><div>반려<b class="r">0</b></div></div></div>'
   +'<div class="box3"><h4>칼럼 0개</h4><div class="t3"><div>게시<b>0</b></div><div>심사<b>0</b></div><div>블라인드<b class="r">0</b></div></div></div></div></div>';
  return h+'</div></div>';
@@ -563,7 +586,7 @@ function viewRes(){
  var v=S.res,a=resFiltered(),size=10,pgs=Math.max(1,Math.ceil(a.length/size));if(v.page>pgs)v.page=pgs;if(v.page<1)v.page=1;
  var rows=a.slice((v.page-1)*size,v.page*size);
  var all=needList('전체'),ptabs=['전체','신규','방문결과','변경'],pl=needList(v.ptab);
- var h='<div class="ph"><div><h1>예약 관리</h1><p>전체 예약 목록입니다. 처리가 필요한 예약은 오른쪽에서 바로 처리하세요.</p></div><button class="btn pk" style="cursor:default;height:26px">수기등록</button></div>';
+ var h='<div class="ph"><div><h1>예약 관리</h1><p>전체 예약 목록입니다. 처리가 필요한 예약은 오른쪽에서 바로 처리하세요.</p></div><button class="btn pk" style="height:26px" data-act="nop">수기등록</button></div>';
  h+='<div class="resw"><div class="resl" style="overflow:auto"><div class="fb"><div class="fr">'
   +sel('res.st',[['전체','예약상태 전체'],['예약','예약상태 예약'],['방문완료','예약상태 방문완료'],['고객취소','예약상태 고객취소'],['미방문','예약상태 미방문']])
   +sel('res.lang',[['전체','언어 전체'],['영어','언어 영어'],['일본어','언어 일본어'],['중국어(간체)','언어 중국어(간체)'],['중국어(번체)','언어 중국어(번체)']])
@@ -584,13 +607,13 @@ function viewRes(){
   var r=DB.res.filter(function(x){return x.no===v.open;})[0];
   if(r){
    h+='<div class="ov" data-act="rclose"></div><div class="dw"><div class="hd"><span data-act="rclose">&times;</span>예약 상세</div><div class="stw"><div class="stp"><i></i>'+r.status+'</div>'+chB(r.ch)+'</div><div class="dt">'+r.visit+'</div>'
-   +'<div class="kv2"><span>여권명</span><b>'+esc(r.name)+chN(r.ch)+'</b></div>'+kv('국적',r.nation)+kv('언어',r.lang)+(S.bs==='line'?'<div class="kv2 nw"><span>유입 채널</span><b class="new">'+dch(r.ch)+'</b></div>':'')+kv('전화번호',r.phone)+kv('메신저',r.contact+' '+r.phone.replace(/\D/g,''))+kv('예약 번호',r.rno)+kv('접수 시각',r.recv)+kv('등록 방식',r.owner)
+   +'<div class="kv2"><span>여권명</span><b>'+esc(r.name)+chN(r.ch)+'</b></div>'+kv('국적',r.nation)+kv('언어',r.lang)+(S.bs==='line'?'<div class="kv2 nw"><span>유입 채널</span><b class="new">'+dch(r.ch)+'</b></div>':'')+kv('전화번호',r.phone)+kv('메신저',r.contact+' '+r.local)+kv('예약 번호',r.rno)+kv('접수 시각',r.recv)+kv('등록 방식',r.owner)
    +'<div class="sec">고객 요청사항</div><div class="bx">'+(r.req?esc(r.req):'<span style="color:#b5b5b5">요청사항이 없어요.</span>')+'</div>'
    +'<div class="sec">매장 메모</div><textarea id="memo" placeholder="고객에게는 안 보여요. 매장 안에서만 쓰는 메모예요.">'+esc(r.memo)+'</textarea><button class="sv" data-act="memo" data-v="'+r.no+'">저장</button>'
-   +'<div class="sec">처리 이력</div><div class="hi"><div>접수 ('+(r.owner==='고객'?'고객 직접 예약':'매장 수기 등록')+')<small>'+r.recv+':14</small></div><span>'+r.owner+'</span></div>'
+   +'<div class="sec">처리 이력</div><div class="hi"><div>접수 ('+(r.owner==='고객'?'고객 직접 예약':r.owner+' 수기 등록')+')<small>'+r.recv+':14</small></div><span>'+r.owner+'</span></div>'
    +(r.status==='고객취소'?'<div class="hi"><div>예약 취소<small>'+addDays(r.recv.slice(0,10),1)+' '+r.recv.slice(11)+':32</small></div><span>고객</span></div>':'')
    +((r.status==='방문완료'||r.status==='미방문')?'<div class="hi"><div>'+r.status+' 처리<small>'+r.visit+':05</small></div><span>매장</span></div>':'')
-   +'<div class="sp"></div><div class="hint">방문완료와 미방문은 예약 시작 시간이 된 뒤에 처리할 수 있어요.</div><div class="ab"><div class="f">방문완료</div><div>미방문</div><div class="w">예약 변경</div><div class="c">예약 취소하기</div></div></div>';
+   +'<div class="sp"></div><div class="hint">방문완료와 미방문은 예약 시작 시간이 된 뒤에 처리할 수 있어요.</div><div class="ab"><div class="f">방문완료</div><div>미방문</div><div class="w" data-act="nop">예약 변경</div><div class="c" data-act="nop">예약 취소하기</div></div></div>';
   }
  }
  return h;
@@ -621,7 +644,7 @@ function viewChatlog(){
   +sel('chatlog.ch',CHOPT,'new')
   +inp('chatlog.named','고객명',166)+inp('chatlog.msgd','메시지',166)+'<button class="btn pk" data-act="search">검색</button></div></div>';
  h+='<div class="pagecard"><div class="pc-h">채팅내역 목록 ('+a.length+')</div><div class="tw"><table><thead><tr><th>마지막 대화</th><th>유형</th><th>상태</th><th>고객</th><th>언어</th><th class="new">유입 채널</th><th>상품</th><th>답변</th><th>미확인</th><th>상담건수</th><th>메시지</th><th>관리</th></tr></thead><tbody>'
-  +(rows.length?rows.map(function(r){return '<tr><td>'+r.last+'</td><td><span class="tag '+(r.type==='스토어문의'?'tg-st':'tg-pr')+'">'+r.type+'</span></td><td>'+(r.status==='-'?'<span class="tag" style="background:#f3f3f3;color:#aaa">-</span>':'<span class="tag '+(r.status==='상담완료'?'tg-ok':r.status==='상담대기'?'tg-wt':'tg-ing')+'">'+r.status+'</span>')+'</td><td>'+esc(r.cust)+'</td><td>'+r.lang+'</td><td>'+dch(r.ch)+'</td><td>'+esc(r.prod)+'</td><td>'+(r.reply?'있음':'-')+'</td><td>'+(r.unread>0?'<span class="ubadge">'+r.unread+'</span>':'-')+'</td><td>'+r.cnt+'건</td><td style="max-width:420px;overflow:hidden;text-overflow:ellipsis">'+esc(r.msg)+'</td><td><button class="btn-s">채팅하기</button></td></tr>';}).join(''):'<tr><td colspan="12" class="empty">조건에 맞는 채팅내역이 없습니다.</td></tr>')
+  +(rows.length?rows.map(function(r){return '<tr><td>'+r.last+'</td><td><span class="tag '+(r.type==='스토어문의'?'tg-st':'tg-pr')+'">'+r.type+'</span></td><td>'+(r.status==='-'?'<span class="tag" style="background:#f3f3f3;color:#aaa">-</span>':'<span class="tag '+(r.status==='상담완료'?'tg-ok':r.status==='상담대기'?'tg-wt':'tg-ing')+'">'+r.status+'</span>')+'</td><td>'+esc(r.cust)+'</td><td>'+r.lang+'</td><td>'+dch(r.ch)+'</td><td>'+esc(r.prod)+'</td><td>'+(r.reply?'있음':'-')+'</td><td>'+(r.unread>0?'<span class="ubadge">'+r.unread+'</span>':'-')+'</td><td>'+r.cnt+'건</td><td>'+esc(r.msg)+'</td><td><button class="btn-s" data-act="nop">채팅하기</button></td></tr>';}).join(''):'<tr><td colspan="12" class="empty">조건에 맞는 채팅내역이 없습니다.</td></tr>')
   +'</tbody></table></div><div style="display:flex;justify-content:flex-end;align-items:center">'+pager(v.page,a.length,size,'chatlog.page')+'<select data-b="chatlog.size" style="margin-right:20px"><option value="20"'+(size===20?' selected':'')+'>20 / 페이지</option><option value="50"'+(size===50?' selected':'')+'>50 / 페이지</option></select></div></div>';
  return h;
 }
@@ -639,6 +662,7 @@ function liveBase(skip){
 }
 function viewLive(){
  var v=S.live,list=liveBase(),kb=liveBase('kind'),sb=liveBase('st');
+ if(v.sel!=null&&!list.some(function(x){return x.id===v.sel;}))v.sel=null;
  var c=function(a,f){return a.filter(f).length;};
  var h='<div class="ph"><div><h1>채팅 관리</h1><p>상품문의와 스토어문의 상담을 처리합니다.</p></div><span class="conn">&#9679; 실시간 연결</span></div><div class="live">';
  h+='<div class="fb" style="padding:10px 20px"><div class="chips"><div class="cg">'
@@ -693,7 +717,7 @@ function viewConsult(){
   +drange('consult')+'<button class="btn pk" data-act="search">검색</button></div></div>';
  var STS=['상담대기','고객부재중','고객취소','상품예약','스토어취소'];
  h+='<div class="pagecard"><div class="pc-h">상담접수 목록 ('+a.length+')</div><div class="tw"><table><thead><tr><th>No.</th><th>회원구분</th><th>접수상태</th><th>언어</th><th>유입경로</th><th class="new">유입 채널</th><th>상품명</th><th>고객메모</th><th>가격</th><th>부가세 포함</th><th>연락수단</th><th>휴대폰번호</th><th>SNS</th><th>SNS ID</th><th>이름</th><th>닉네임</th><th>접수일시</th><th>QR</th></tr></thead><tbody>'
-  +(a.length?a.map(function(r){return '<tr><td>'+r.no+'</td><td>'+r.member+'</td><td><select class="rs" data-st="'+r.no+'" style="height:24px">'+STS.map(function(s){return '<option'+(s===r.status?' selected':'')+'>'+s+'</option>';}).join('')+'</select></td><td>'+r.lang+'</td><td>'+r.route+'</td><td>'+dch(r.ch)+'</td><td class="lnk" style="max-width:280px;overflow:hidden;text-overflow:ellipsis">'+(r.prod?esc(r.prod):'<span style="color:#333">-</span>')+'</td><td>'+(r.memo?'<span class="lnk">보기</span>':'-')+'</td><td>'+(r.price||'-')+'</td><td>'+(r.price?'포함':'-')+'</td><td>'+r.contact+'</td><td>'+(r.phone||'-')+'</td><td>'+(r.sns||'-')+'</td><td>'+(r.snsid||'-')+'</td><td>'+esc(r.name)+'</td><td>'+esc(r.nick)+'</td><td>'+r.at+'</td><td>-</td></tr>';}).join(''):'<tr><td colspan="18" class="empty">조건에 맞는 상담접수가 없습니다.</td></tr>')
+  +(a.length?a.map(function(r){return '<tr><td>'+r.no+'</td><td>'+r.member+'</td><td><select class="rs" data-st="'+r.no+'" style="height:24px">'+STS.map(function(s){return '<option'+(s===r.status?' selected':'')+'>'+s+'</option>';}).join('')+'</select></td><td>'+r.lang+'</td><td>'+r.route+'</td><td>'+dch(r.ch)+'</td><td class="lnk">'+(r.prod?esc(r.prod):'<span style="color:#333">-</span>')+'</td><td>'+(r.memo?'<span class="lnk" data-act="nop">보기</span>':'-')+'</td><td>'+(r.price||'-')+'</td><td>'+(r.price?'포함':'-')+'</td><td>'+r.contact+'</td><td>'+(r.phone||'-')+'</td><td>'+(r.sns||'-')+'</td><td>'+(r.snsid||'-')+'</td><td>'+esc(r.name)+'</td><td>'+esc(r.nick)+'</td><td>'+r.at+'</td><td>-</td></tr>';}).join(''):'<tr><td colspan="18" class="empty">조건에 맞는 상담접수가 없습니다.</td></tr>')
   +'</tbody></table></div><div class="pager"><span class="d">&lsaquo;</span><b>1</b><span class="d">&rsaquo;</span></div></div>';
  return h;
 }
@@ -716,7 +740,7 @@ function viewRev(){
   +sel('rev.img',[['','이미지 포함'],['포함','이미지 포함'],['미포함','이미지 미포함']])+drange('rev')
   +sel('rev.type',[['','리뷰 타입'],['상품','상품 리뷰'],['스토어','스토어 리뷰']])
   +sel('rev.ch',CHOPT,'new')
-  +inp('rev.qd','리뷰 내용',176)+'<button class="btn pk" data-act="search">&#9906; 검색</button><button class="btn line" data-act="rrst">&#8635; 초기화</button></div></div>';
+  +inp('rev.qd','리뷰 내용',176)+'<button class="btn pk line" data-act="search"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg>검색</button><button class="btn line" data-act="rrst">&#8635; 초기화</button></div></div>';
  h+='<div class="sum"><div class="sm"><span>전체 리뷰</span><b>'+a.length+'개</b></div><div class="sm"><span>상품 리뷰</span><b>'+np+'개</b></div><div class="sm"><span>스토어 리뷰</span><b>'+ns+'개</b></div><div class="sm"><span>평균 평점</span><b>'+avg+'</b></div></div>';
  h+=a.length?'<div class="rvg">'+a.map(function(r){
    var ex=v.exp[r.id],long=r.text.length>120;
@@ -755,9 +779,18 @@ window.setPeriod=function(p){if(PERIODS.indexOf(p)<0)return;S.dash.period=p;rend
 window.openRes=function(n){S.view='res';S.open.res=1;S.res.open=n;render();};
 window.openChat=function(n){S.view='live';S.live.sel=n;render();};
 /* ===== 이벤트 ===== */
+var toastT=null;
+function toast(msg){
+ var el=document.getElementById('toast');
+ if(!el){el=document.createElement('div');el.id='toast';el.setAttribute('role','status');document.body.appendChild(el);}
+ el.textContent=msg;el.className='on';
+ clearTimeout(toastT);toastT=setTimeout(function(){el.className='';},2000);
+}
+window.toast=toast;
 document.addEventListener('click',function(e){
  var t=e.target.closest('[data-act]');if(!t)return;
  var a=t.getAttribute('data-act'),v=t.getAttribute('data-v');
+ if(a==='nop'){toast('시안에서는 동작하지 않습니다');return;}
  if(a==='go'){window.go(v);return;}
  if(a==='bs'){window.setBadgeStyle(v);return;}
  if(a==='tg'){S.open[v]=S.open[v]?0:1;render();return;}

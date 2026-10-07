@@ -57,7 +57,10 @@ input.ctl::placeholder{color:#bfbfbf}
 .rng input{border:0;outline:none;font:inherit;font-size:12.5px;width:118px;color:#222;background:transparent}
 .rng i{font-style:normal;color:#bfbfbf;font-size:11px}
 .btnp{height:32px;background:var(--blue);color:#fff;border:0;border-radius:4px;padding:0 15px;font-size:12.5px;font-weight:500}
-.btnd{height:30px;border:1px solid var(--bd);background:#f5f5f5;color:#bfbfbf;border-radius:4px;padding:0 14px;font-size:12px;cursor:not-allowed}
+.btnx{height:30px;border:1px solid var(--bd);background:#fff;color:#222;border-radius:4px;padding:0 14px;font-size:12px}
+.btnx:hover{border-color:var(--blue);color:var(--blue)}
+#toast{position:fixed;left:50%;bottom:36px;transform:translateX(-50%);background:rgba(0,0,0,.82);color:#fff;padding:9px 18px;border-radius:6px;font-size:12.5px;z-index:90;opacity:0;pointer-events:none;transition:opacity .15s}
+#toast.on{opacity:1}
 .tw{overflow-x:auto}
 table.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
 .tbl th{background:#fafafa;font-weight:600;text-align:left;padding:13px 8px;white-space:nowrap;color:#222}
@@ -97,8 +100,9 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
 .chip{background:#f3f3f3;border-radius:3px;padding:1px 7px;font-size:11px;color:#333;line-height:20px;white-space:nowrap}
 .grp.new .chip{background:#ffeef4;color:#a31d4b}
 .chip.tot{background:#f3f3f3;margin-left:2px;color:#222}
-.stsel{color:#222}
-.stsel i{display:inline-block;width:6px;height:6px;border-right:1.3px solid #aaa;border-bottom:1.3px solid #aaa;transform:rotate(45deg);margin:0 0 3px 6px}
+select.stsel{appearance:none;-webkit-appearance:none;border:1px solid transparent;border-radius:4px;background:transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238c8c8c' stroke-width='1.4'/%3E%3C/svg%3E") no-repeat right 6px center;color:#222;font:inherit;font-size:12px;padding:2px 22px 2px 6px;outline:none;cursor:pointer}
+select.stsel:hover,select.stsel:focus{border-color:var(--bd)}
+select.stsel option{color:#222}
 .sec-t{font-size:14px;font-weight:700;margin:0 0 4px}
 .sec-h{display:flex;align-items:center;gap:14px;margin-bottom:6px}
 .sec-h .sp{flex:1}
@@ -110,7 +114,7 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
 .row2{display:flex;gap:12px;margin:10px 12px 0}
 .row2 .blk{margin:0}
 .donuts{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px;margin:10px 12px 0}
-.dc{flex:1 1 0;min-width:226px;background:#fff;border:1px solid #e9e9e9;border-radius:4px;padding:12px;min-height:196px}
+.dc{flex:1 1 0;min-width:226px;background:#fff;border:1px solid #e9e9e9;border-radius:4px;padding:12px;min-height:214px}
 .dc.new{border:1px solid var(--pink)}
 .dc h4{margin:0 0 8px;font-size:12.5px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
 .dc.new h4{color:var(--pink)}
@@ -146,10 +150,10 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
 .top .bar{flex:1;height:5px;background:#f0f0f0;border-radius:3px;margin:0 8px}
 .top .bar i{display:block;height:100%;background:#3b78f6;border-radius:3px}
 .top .ct{width:28px;text-align:right;font-weight:600}
-.sv-f{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
+.sv-f .sr{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
+.sv-f .sr+.sr{margin-top:10px}
 .sv-f label{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:#444}
-.sv-f label.new{padding:2px 8px;border:1px solid var(--pink);border-radius:5px}
-.sv-f label.new>span{color:var(--pink);font-weight:600}
+.sv-f label.fld{padding-left:10px;color:#222}
 .big{font-size:26px;font-weight:700;margin-top:4px}
 .big.blue{color:var(--blue)}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 12px 0}
@@ -292,7 +296,7 @@ const RES=[];
 })();
 
 /* ========= 2) 상담 ========= */
-const CONS_ST=['방문예정','예약중','상품예약','방문완료','고객취소','고객부재','스토어취소','연락실패'];
+const CONS_ST=['방문예정','예약중','상품예약','방문완료','고객취소','고객부재중','스토어취소','연락실패'];
 const CONS=[];
 (function(){
   const chs=chList(26,6,4),tss=descTs(36,'2026-09-11',T,true);
@@ -307,6 +311,7 @@ const CONS=[];
       way:sns?'SNS':'PHONE',phone:p.phone,sns:sns?sn:'',snsId:sns?(ch!=='웹'?p.snsId:'ac'+dg(7)):'',lang:p.lang,name:p.name,nick:member==='회원'?p.nick:'',
       hay:(p.name+' '+p.phone+' '+st.ko+' '+prod).toLowerCase()});
   });
+  CONS.forEach(r=>r.st0=r.status);
 })();
 
 /* ========= 3) 스토어 채팅 / 4) 상품 채팅 ========= */
@@ -359,20 +364,20 @@ const REV=[];
 /* ========= 6) 문의 통계 ========= */
 const STAT=[];
 (function(){
-  const WAY=['채팅문의','상담문의','메신저상담'];
+  /* 채팅문의 = 스토어 채팅 목록 + 상품별 채팅방 현황(첫대화날짜 기준), 상담문의 = 상담 관리 목록(접수일): 목록에서 파생 */
+  const push=(date,store,kind,lang,way,ch)=>STAT.push({date,store,kind,lang,way,mg:'',mt:'',ch});
+  CHATS.forEach(r=>push(r.first.slice(0,10),r.store,'스토어',r.lang,'채팅문의',r.ch));
+  PCHATS.forEach(r=>push(r.first.slice(0,10),r.store,'상품',r.lang,'채팅문의',r.ch));
+  CONS.forEach(r=>push(r.recv.slice(0,10),r.store,r.route.indexOf('상품')>=0?'상품':'스토어',r.lang,'상담문의',r.ch));
+  /* 메신저상담 = 웹 전용 별도 시드(알리페이에는 메신저 버튼이 없음) */
   const spec=[];
-  const mk=(ch,way,n,inR)=>{for(let i=0;i<n;i++)spec.push({ch,way,inR})};
-  mk('웹','메신저상담',34,1);mk('웹','채팅문의',2,1);mk('웹','상담문의',2,1);
-  mk('알리페이 중국','채팅문의',4,1);mk('알리페이 중국','상담문의',4,1);mk('알리페이 홍콩','채팅문의',3,1);mk('알리페이 홍콩','상담문의',3,1);
-  mk('웹','메신저상담',5,0);mk('웹','상담문의',1,0);mk('알리페이 중국','채팅문의',1,0);mk('알리페이 홍콩','상담문의',1,0);
-  shuffle(spec).forEach(sp=>{
+  for(let i=0;i<34;i++)spec.push(1);for(let i=0;i<5;i++)spec.push(0);
+  spec.forEach(inR=>{
     const st=STORES[Math.floor(Math.pow(R(),1.7)*STORES.length)];
-    const date=sp.inR?add(T,-Math.floor(Math.pow(R(),1.5)*7)):add('2026-09-10',ri(18));
-    let lang;
-    if(sp.ch==='알리페이 중국')lang='중국어(간체)';else if(sp.ch==='알리페이 홍콩')lang='중국어(번체)';
-    else lang=wpick([['영어',55],['일본어',20],['중국어(번체)',10],['중국어(간체)',8],['인도네시아어',4],['몽골어',3]]);
-    const o={date,store:st.ko,kind:ri(100)<30?'스토어':'상품',lang,way:sp.way,mg:'',mt:'',ch:sp.ch};
-    if(sp.way==='메신저상담'){o.mg=ri(100)<39?'K-뷰티 메신저':'입점사 메신저';o.mt=wpick([['왓츠앱',61],['라인',32],['위챗',7]])}
+    const date=inR?add(T,-Math.floor(Math.pow(R(),1.5)*7)):add('2026-09-10',ri(18));
+    const lang=wpick([['영어',55],['일본어',20],['중국어(번체)',10],['중국어(간체)',8],['인도네시아어',4],['몽골어',3]]);
+    const o={date,store:st.ko,kind:ri(100)<30?'스토어':'상품',lang,way:'메신저상담',mg:'',mt:'',ch:'웹'};
+    o.mg=ri(100)<39?'K-뷰티 메신저':'입점사 메신저';o.mt=wpick([['왓츠앱',61],['라인',32],['위챗',7]]);
     STAT.push(o);
   });
 })();
@@ -443,16 +448,30 @@ function txt(ph,w){return `<input class="ctl" data-q placeholder="${esc(ph)}" va
 const srch='<button class="btnp" data-act="search">검색</button>';
 function page(title,sub,inner){return `<div class="ph"><h1>${title}</h1><p>${sub}</p></div>${inner}`}
 const MSGR={'일본어':'LINE','영어':'WhatsApp','중국어(간체)':'WeChat','중국어(번체)':'WhatsApp'};
-const DIAL={'일본':'+81','중국':'+86','홍콩(중국 특별행정구)':'+852','캐나다':'+1','미국':'+1','필리핀':'+63'};
 function resDrawer(){
   const no=S.res.open;if(no==null)return '';const r=RES.find(x=>String(x.no)===String(no));if(!r)return '';
   const num=parseInt(String(r.no).replace(/\D/g,'').slice(-6),10)||7;
-  const ph=(DIAL[r.nat]||'+82')+' '+String(1000000000+(num*2654435761)%8999999999).slice(0,10);
+  const ph=r.phone;                                   /* 목록 데이터의 전화번호 그대로 */
+  const local=ph.replace(/^\+\d+\s*/,'').replace(/\D/g,'');   /* 메신저 번호: 국가번호 없이 */
+  const hm=t=>{const m=+t.slice(11,13)*60+(+t.slice(14,16));return m};
+  const hh=m=>pad(Math.floor(m/60))+':'+pad(m%60);
+  const H=[['접수 ('+(r.reg==='관리자'?'관리자 등록':'고객 직접 예약')+')',r.recv]];
+  if(r.status==='방문완료')H.push(['방문 완료',r.visit]);
+  else if(r.status==='노쇼')H.push(['미방문',r.visit.slice(0,10)+' '+hh(Math.min(hm(r.visit)+60,1439))]);
+  else if(r.status==='고객취소'){
+    const rd=r.recv.slice(0,10),last=add(r.visit.slice(0,10),-1),end=last<T?last:T;
+    const span=Math.max(0,Math.round((new Date(end)-new Date(rd))/864e5));
+    const d=add(rd,span>0?num%(span+1):0);let tm;
+    if(d===rd)tm=hh(Math.min(hm(r.recv)+90,1439));
+    else if(d===T)tm=pad(9+num%6)+':'+pad((num*7)%60);
+    else tm=pad(9+num%12)+':'+pad((num*7)%60);
+    H.push(['고객 취소',d+' '+tm]);
+  }
   const kv=(a,b)=>'<div class="dkv"><span>'+a+'</span><b>'+b+'</b></div>';
   return '<div class="dov" data-act="rclose"></div><aside class="dwr"><div class="dhd"><span class="dx" data-act="rclose">&times;</span>예약 상세</div>'
    +'<div class="dst"><span class="dstp"><i></i>'+r.status+'</span><span class="dchb new" title="유입 채널">'+r.cv+'</span></div>'
-   +'<div class="dti">'+r.visit+'</div>'+kv('여권명',esc(r.name))+kv('국적',r.nat)+kv('언어',r.lang)+kv('전화번호',ph)+kv('메신저',(MSGR[r.lang]||'WhatsApp')+' '+ph.replace(/\D/g,''))+kv('예약 번호',r.no)+kv('접수 시각',r.recv)+kv('등록 방식','고객')
-   +'<div class="dlb">매장</div><div class="dbx">'+esc(r.store)+' ('+r.cat+')</div><div class="dlb">처리 이력</div><div class="dhis"><b>접수 (고객 직접 예약)</b><small>'+r.recv+'</small></div>'
+   +'<div class="dti">'+r.visit+'</div>'+kv('여권명',esc(r.name))+kv('국적',r.nat)+kv('언어',r.lang)+kv('전화번호',esc(ph))+kv('메신저',(MSGR[r.lang]||'WhatsApp')+' '+local)+kv('예약 번호',r.no)+kv('접수 시각',r.recv)+kv('등록 방식',r.reg)
+   +'<div class="dlb">매장</div><div class="dbx">'+esc(r.store)+' ('+r.cat+')</div><div class="dlb">처리 이력</div>'+H.map(h=>'<div class="dhis"><b>'+h[0]+'</b><small>'+h[1]+'</small></div>').join('')
    +'<div class="dnote">시안 주석: 호스트 예약 상세 화면을 기준으로 그린 상세입니다. 어드민 라이브 상세의 나머지 구성은 이 시안에 그리지 않았습니다.</div></aside>';
 }
 function pager(total,withSize){
@@ -493,7 +512,7 @@ function vRes(){
    <div class="r">${perBtns([['전체','all'],['1주일','1w'],['1개월','1m'],['3개월','3m'],['6개월','6m'],['1년','1y']],true)}
    ${sel('base',null,[['visit','방문일 기준'],['recv','접수일 기준']],{w:118})}${sel('sort',null,[['visit','방문일순'],['recv','접수일순']],{w:104})}${rng()}${srch}</div></div></div>`;
   const body=sliceP(rows).map(r=>`<tr><td><b>${esc(r.store)}</b><small>${r.cat}</small></td><td>${r.visit}<small>접수 ${r.recv}</small></td><td>${esc(r.name)}</td><td class="new">${r.cv}</td><td>${r.no}</td><td>${r.nat}</td><td>${r.lang}</td>
-   <td><span class="dot ${r.status==='예약'?'b':r.status==='방문완료'?'ok':r.status==='노쇼'?'r':'g'}">${r.status}</span></td><td><span class="mb" data-act="rdet" data-v="${r.no}">상세</span>${r.status==='예약'?'<span class="mb red">강제취소</span>':''}</td></tr>`).join('');
+   <td><span class="dot ${r.status==='예약'?'b':r.status==='방문완료'?'ok':r.status==='노쇼'?'r':'g'}">${r.status}</span></td><td><span class="mb" data-act="rdet" data-v="${r.no}">상세</span>${r.status==='예약'?'<span class="mb red" data-act="nop">강제취소</span>':''}</td></tr>`).join('');
   const tbl=`<div class="blk"><div class="tw"><table class="tbl"><thead><tr>${thc('매장명')}${thc('방문일시')}${thc('고객(여권명)')}${thc('유입 채널','new')}${thc('예약번호')}${thc('국적')}${thc('언어')}${thc('상태')}${thc('관리')}</tr></thead><tbody>${body||EMPTY(9)}</tbody></table></div>${pager(rows.length,false)}</div>`;
   return page('예약 관리','우리 경유 전 매장 예약을 모니터링·처리합니다.',cards+f+tbl);
 }
@@ -511,7 +530,7 @@ function vCons(){
    ${sel('cat','카테고리 선택',CATS,{w:128})}${sel('store','스토어 선택',STORES.map(x=>x.ko),{w:128})}${txt('검색어',150)}${srch}</div></div>`;
   const ms=count(rows,r=>r.status),ml=count(rows,r=>r.lang),mr=count(rows,r=>r.route);
   const chips=chipsBar(rows.length,chipGrp('접수상태',CONS_ST.map(x=>[x,ms[x]||0]))+chipGrp('언어',LANGS.map(x=>[x,ml[x]||0]))+chipGrp('유입 경로',['스토어','상품','외부(스토어)','외부(상품)'].map(x=>[x,mr[x]||0]))+chGrp(rows));
-  const body=sliceP(rows).map(r=>`<tr><td class="c">${r.no}</td><td>${r.recv.slice(0,16)}</td><td>${r.member}</td><td class="new">${r.cv}</td><td><span class="stsel">${r.status}<i></i></span></td><td class="lnk">${esc(r.store)}</td><td class="lnk">${esc(r.prod)}</td><td>${r.route}</td><td>${r.memo?'<span class="lnk">미리보기</span>':'-'}</td><td>${r.way}</td><td>${r.phone}</td><td>${r.sns}</td><td>${esc(r.snsId)}</td><td>${r.lang}</td><td>${esc(r.name)}</td><td>${esc(r.nick)}</td><td></td><td>-</td></tr>`).join('');
+  const body=sliceP(rows).map(r=>`<tr><td class="c">${r.no}</td><td>${r.recv.slice(0,16)}</td><td>${r.member}</td><td class="new">${r.cv}</td><td><select class="stsel" data-cn="${r.no}">${CONS_ST.map(x=>`<option ${x===r.status?'selected':''}>${x}</option>`).join('')}</select></td><td class="lnk">${esc(r.store)}</td><td class="lnk">${esc(r.prod)}</td><td>${r.route}</td><td>${r.memo?'<span class="lnk" data-act="nop" style="cursor:pointer">미리보기</span>':'-'}</td><td>${r.way}</td><td>${r.phone}</td><td>${r.sns}</td><td>${esc(r.snsId)}</td><td>${r.lang}</td><td>${esc(r.name)}</td><td>${esc(r.nick)}</td><td></td><td>-</td></tr>`).join('');
   const heads=[['No.','c'],['접수일시'],['회원구분'],['유입 채널','new'],['접수상태'],['스토어코드'],['상품명'],['유입경로'],['고객메모'],['연락수단'],['휴대폰번호'],['SNS'],['SNS ID'],['언어'],['이름'],['닉네임'],['QR'],['상담일시']];
   const tbl=`<div class="blk"><div class="tw"><table class="tbl dense"><thead><tr>${heads.map(h=>thc(h[0],h[1])).join('')}</tr></thead><tbody>${body||EMPTY(18)}</tbody></table></div>${pager(rows.length,true)}</div>`;
   return page('상담 관리','상품과 스토어에서 접수된 상담 내역을 조회하고 상태를 관리합니다.',f+chips+tbl);
@@ -632,7 +651,7 @@ function vStat(){
     const hdr=`<tr><th rowspan="2" style="text-align:center">스토어명${ar('name')}</th><th rowspan="2">총 문의 건수${ar('total')}</th><th colspan="2">문의구분</th><th colspan="6">언어구분</th><th colspan="3" class="new">유입 채널</th><th colspan="3">문의 방식</th></tr>
      <tr>${sh('스토어','k:스토어')}${sh('상품','k:상품')}${['중국어(간체)','중국어(번체)','영어','일본어','인니어','몽골어'].map((l,i)=>sh(l,'l:'+LANGS[i])).join('')}${CHS.map(c=>sh(c,'c:'+c,'new')).join('')}${WAYS.map(w=>sh(w,'w:'+w)).join('')}</tr>`;
     const keys=['total','k:스토어','k:상품'].concat(LANGS.map(l=>'l:'+l),CHS.map(c=>'c:'+c),WAYS.map(w=>'w:'+w));
-    tab=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span class="sec-t" style="margin:0">스토어별 집계</span><button class="btnd" disabled>엑셀 다운로드</button></div>
+    tab=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span class="sec-t" style="margin:0">스토어별 집계</span><button class="btnx" data-act="nop">엑셀 다운로드</button></div>
      <div class="tw"><table class="tbl g" id="aggT"><thead>${hdr}</thead><tbody>${ag.map(o=>`<tr><td>${esc(o.name)}</td>${keys.map(k=>`<td class="${k.indexOf('c:')===0?'new':''}">${o[k]}</td>`).join('')}</tr>`).join('')||EMPTY(15)}</tbody></table></div>`;
   }else{
     const mk=s.mode==='day'?(r=>r.date):(r=>r.date.slice(0,7));
@@ -647,7 +666,7 @@ function vStat(){
       html+='<tr>'+(st(0)?`<td rowspan="${spanOf(r,0)}">${mk(r)}</td>`:'')+(st(1)?`<td rowspan="${spanOf(r,1)}">${esc(r.store)}</td><td rowspan="${spanOf(r,1)}">${cm[1][pre(r,1)]}</td>`:'')
        +(st(2)?`<td rowspan="${spanOf(r,2)}">${r.kind}문의</td><td rowspan="${spanOf(r,2)}">${cm[2][pre(r,2)]}</td>`:'')+(st(3)?`<td rowspan="${spanOf(r,3)}">${r.lang}</td><td rowspan="${spanOf(r,3)}">${cm[3][pre(r,3)]}</td>`:'')
        +(st(4)?`<td class="new" rowspan="${spanOf(r,4)}">${r.cv}</td><td class="new" rowspan="${spanOf(r,4)}">${cm[4][pre(r,4)]}</td>`:'')+`<td>${detLabel(r)}</td><td>${cm[5][pre(r,5)]}</td></tr>`});
-    tab=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span class="sec-t" style="margin:0">${s.mode==='day'?'일별':'월별'} 스토어 문의 상세</span><button class="btnd" disabled>엑셀 다운로드</button></div>
+    tab=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span class="sec-t" style="margin:0">${s.mode==='day'?'일별':'월별'} 스토어 문의 상세</span><button class="btnx" data-act="nop">엑셀 다운로드</button></div>
      <div class="tw"><table class="tbl g" id="detT" style="table-layout:auto"><thead><tr>${thc(s.mode==='day'?'일자':'월')}${thc('스토어')}${thc('총건수')}${thc('문의 구분')}${thc('구분 총건수')}${thc('언어')}${thc('언어 건수')}${thc('유입 채널','new')}${thc('유입 채널 건수','new')}${thc('문의 상세')}${thc('상세 건수')}</tr></thead><tbody>${html||EMPTY(11)}</tbody></table></div>`;
   }
   const tabs=`<div class="blk"><div class="tabs"><button class="${s.tab==='agg'?'on':''}" data-act="set" data-k="tab" data-v="agg">스토어별 집계</button><button class="${s.tab==='det'?'on':''}" data-act="set" data-k="tab" data-v="det">상세 보기</button></div>${tab}</div>`;
@@ -664,10 +683,10 @@ function vSurvey(){
   const den=s.ch==='전체'?79:SV_RES[s.ch];const rate=Math.round(rows.length/den*1000)/10;
   const o=(k,ph,opts,w)=>`<select class="ctl ${s[k]===''?'empty':''}" data-k="${k}" style="width:${w}px"><option value="">${ph}</option>${opts.map(x=>`<option ${s[k]===x?'selected':''}>${x}</option>`).join('')}</select>`;
   const nats=Array.from(new Set(SURVEY.map(r=>r.nat)));
-  const f=`<div class="blk"><div class="sv-f"><label>응답시간: ${rng()}</label><label>국적: ${o('nat','전체',nats,124)}</label><label>성별: ${o('gender','전체',['FEMALE','MALE'],92)}</label><label>연령대: ${o('age','전체',['10대','20대','30대','40대','50대 이상'],98)}</label>
-   <label>방문경험: ${o('exp','전체',SV_EXP,120)}</label><label>관심항목: ${o('interest','전체',SV_INT,136)}</label><label class="new"><span>유입 채널:</span><select class="ctl" style="height:28px" data-k="ch">${['전체'].concat(CHS).map(c=>`<option ${c===s.ch?'selected':''}>${c}</option>`).join('')}</select></label><button class="btnp" data-act="search">검색</button></div></div>`;
+  const f=`<div class="blk"><div class="sv-f"><div class="sr"><label>응답시간: ${rng()}</label><label>국적: ${o('nat','전체',nats,124)}</label><label>성별: ${o('gender','전체',['FEMALE','MALE'],92)}</label><label>연령대: ${o('age','전체',['10대','20대','30대','40대','50대 이상'],98)}</label></div>
+   <div class="sr"><label>방문경험: ${o('exp','전체',SV_EXP,120)}</label><label>관심항목: ${o('interest','전체',SV_INT,136)}</label><label class="ctl fld new"><span>유입 채널:</span><select data-k="ch">${['전체'].concat(CHS).map(c=>`<option ${c===s.ch?'selected':''}>${c}</option>`).join('')}</select></label><button class="btnp" data-act="search">검색</button></div></div></div>`;
   const ec=SV_EXP.map(x=>[x,rows.filter(r=>r.exp===x).length]),ic=SV_INT.map(x=>[x,rows.filter(r=>r.ints.indexOf(x)>=0).length]);
-  const sum=`<div class="blk"><div style="display:flex;justify-content:space-between;align-items:center"><span class="sec-t" style="margin:0">응답 요약</span><button class="btnd" disabled>엑셀다운로드</button></div>
+  const sum=`<div class="blk"><div style="display:flex;justify-content:space-between;align-items:center"><span class="sec-t" style="margin:0">응답 요약</span><button class="btnx" data-act="nop">엑셀다운로드</button></div>
    <div class="svline"><span>총 응답 <b class="big" id="svTotal">${rows.length}건</b></span><span>응답률 <b class="big blue" id="svRate">${rate}%</b></span></div>
    <div class="svboxes"><div class="sbox sbox1"><div class="sec-t">한국 방문 경험</div><div class="sitems">${ec.map(a=>`<div class="si"><span>${a[0]}</span><b>${a[1]}</b></div>`).join('')}</div></div>
    <div class="sbox"><div class="sec-t">관심항목</div><div class="sitems">${ic.map(a=>`<div class="si"><span>${a[0]}</span><b>${a[1]}</b></div>`).join('')}</div></div></div></div>`;
@@ -701,35 +720,68 @@ function sideHTML(){
 
 /* ========= 렌더·이벤트 ========= */
 const VIEWS={res:vRes,cons:vCons,chats:vChats,prodchats:vProdChats,rev:vRev,stat:vStat,survey:vSurvey};
+let _lastV=null,_rend=false,_dd=null;  /* _dd: 사용자가 값을 고치는 중인 날짜칸 */
+/* 다시 그리기 전후로 포커스를 잡은 요소를 같은 data 속성 요소로 복원 */
+function focusKey(){
+  const a=document.activeElement,m=$('#main');if(!a||a===document.body||!m||!m.contains(a))return null;
+  const q=(n,v)=>v!=null?'[data-'+n+'="'+String(v).replace(/"/g,'\\"')+'"]':'';
+  const d=a.dataset||{};let ss=null,se=null;try{ss=a.selectionStart;se=a.selectionEnd}catch(e){}
+  return {sel:a.tagName.toLowerCase()+q('act',d.act)+q('k',d.k)+q('v',d.v)+q('cn',d.cn)+(d.q!==undefined?'[data-q]':''),ss,se};
+}
 function render(){
-  const y=window.scrollY;
+  const y=window.scrollY,same=_lastV===_v;
+  const tws=same?Array.from(document.querySelectorAll('#main .tw')).map(e=>[e.scrollLeft,e.scrollTop]):[];
+  if(same&&_dd&&_dd.isConnected&&_dd===document.activeElement)applyDate(_dd);  /* 입력 중이던 날짜가 있으면 같이 반영 */
+  _dd=null;
+  const fk=focusKey();
   $('#side').innerHTML=sideHTML();
-  $('#main').innerHTML=VIEWS[_v]()+(_v==='res'?resDrawer():'');
+  _rend=true;try{$('#main').innerHTML=VIEWS[_v]()+(_v==='res'?resDrawer():'')}finally{_rend=false}
+  if(same)document.querySelectorAll('#main .tw').forEach((e,i)=>{if(tws[i]){e.scrollLeft=tws[i][0];e.scrollTop=tws[i][1]}});
+  if(fk){let el=null;try{el=$('#main '+fk.sel)}catch(e){}
+    if(el){el.focus({preventScroll:true});try{if(fk.ss!=null&&el.setSelectionRange)el.setSelectionRange(fk.ss,fk.se)}catch(e){}}}
   window.scrollTo(0,y);
+  _lastV=_v;
 }
 function go(name){
-  if(!VIEWS[name])return;_v=name;
+  if(!VIEWS[name])return;_v=name;_lastV=null;
   MENU.forEach(m=>{if(m.kids&&m.kids.some(k=>k[1]===name))OPEN[m.t]=true});
   render();window.scrollTo(0,0);
 }
-function resetDB(){S=D();render()}
+function resetDB(){S=D();CONS.forEach(r=>r.status=r.st0);_lastV=null;render()}
 function setCh(v){if(v==='알리페이 중국'||v==='알리페이 홍콩')v='알리페이';const s=S[_v];if(!('ch' in s))return;s.ch=v;if('qd' in s)s.q=s.qd;s.page=1;render()}
 window.go=go;window.resetDB=resetDB;window.render=render;window.setCh=setCh;
 Object.defineProperty(window,'VIEW',{get:()=>_v});
 Object.defineProperty(window,'STATE',{get:()=>S});
+let _tt;
+function toast(m){let el=$('#toast');if(!el){el=document.createElement('div');el.id='toast';document.body.appendChild(el)}el.textContent=m;el.classList.add('on');clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('on'),2000)}
+const isDate=t=>t&&t.tagName==='INPUT'&&t.type==='date'&&t.dataset.k;
+/* 날짜칸은 입력 중에는 다시 그리지 않고, 포커스를 잃을 때나 Enter에서만 반영 */
+function applyDate(t){_dd=null;const k=t.dataset.k,s=S[_v];if(s[k]===t.value)return false;s[k]=t.value;s.per='';if('page' in s)s.page=1;return true}
 document.addEventListener('change',e=>{
-  const t=e.target,k=t.dataset&&t.dataset.k;if(!k)return;const s=S[_v];
+  const t=e.target;if(!t.dataset)return;
+  if(t.dataset.cn!==undefined){const r=CONS.find(x=>String(x.no)===t.dataset.cn);if(r){r.status=t.value;render()}return}
+  const k=t.dataset.k;if(!k||isDate(t))return;const s=S[_v];
   s[k]=k==='size'?+t.value:t.value;
-  if(k==='from'||k==='to')s.per='';
   if(k!=='size'&&k!=='mtype')s.page=1;
   if(k==='size')s.page=1;
   render();
 });
-document.addEventListener('input',e=>{if(e.target.dataset&&e.target.dataset.q!==undefined)S[_v].qd=e.target.value});
-document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset&&e.target.dataset.q!==undefined){const s=S[_v];s.qd=e.target.value;s.q=s.qd;s.page=1;render()}});
+document.addEventListener('focusout',e=>{
+  const t=e.target;if(_rend||!isDate(t)||!applyDate(t))return;
+  const n=e.relatedTarget;
+  if(n&&$('#main').contains(n))return;  /* 다른 조작 대상으로 옮겨 간 경우에는 그 조작이 다시 그림 */
+  setTimeout(render,0);
+});
+document.addEventListener('input',e=>{if(isDate(e.target))_dd=e.target;if(e.target.dataset&&e.target.dataset.q!==undefined)S[_v].qd=e.target.value});
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Enter'||!e.target.dataset)return;
+  if(e.target.dataset.q!==undefined){const s=S[_v];s.qd=e.target.value;s.q=s.qd;s.page=1;render()}
+  else if(isDate(e.target)){applyDate(e.target);render()}
+});
 document.addEventListener('click',e=>{
   const a=e.target.closest('[data-act]');if(!a)return;const act=a.dataset.act,v=a.dataset.v,s=S[_v];
   if(act==='go')go(v);
+  else if(act==='nop')toast('시안에서는 동작하지 않습니다');
   else if(act==='grp'){OPEN[v]=!OPEN[v];render()}
   else if(act==='search'){s.q=s.qd;s.page=1;render()}
   else if(act==='per'){s.per=v;const r=perRange(v);s.from=r[0];s.to=r[1];s.page=1;render()}
