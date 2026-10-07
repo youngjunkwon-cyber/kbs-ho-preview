@@ -159,7 +159,8 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
 .sbox{background:#fafafa;border:1px solid #f0f0f0;border-radius:6px;padding:14px 16px}
 .sbox .sec-t{font-size:13px;margin-bottom:10px}
 .sitems{display:flex;flex-wrap:wrap;gap:8px 26px}
-.sbox1 .sitems{flex-wrap:nowrap}
+.sbox1 .sitems{flex-wrap:nowrap;gap:8px 20px}
+.sbox1 .si{min-width:0;gap:10px;white-space:nowrap}
 .si{display:flex;justify-content:space-between;gap:18px;min-width:150px;font-size:12px;color:#555}
 .si b{color:#222}
 .two .blk{margin:0}
@@ -196,7 +197,7 @@ function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=ri(i+1);[a
 const dg=n=>{let s='';for(let i=0;i<n;i++)s+=ri(10);return s};
 const tmOf=(date,lo=8,hi=21)=>{let h=lo+ri(hi-lo);if(date===T)h=Math.min(h,14);return pad(h)+':'+pad(ri(60))};
 const tsOf=(date,sec,lo,hi)=>date+' '+tmOf(date,lo,hi)+(sec?':'+pad(ri(60)):'');
-const CHS=['웹','알리페이 중국','알리페이 홍콩'];
+const CHS=['웹','알리페이'];/* 화면 표시·필터용 2값. 내부 시드는 r.ch(3값) + r.cv(표시값) */
 const LANGS=['중국어(간체)','중국어(번체)','영어','일본어','인도네시아어','몽골어'];
 const CATS=['피부과','성형외과','에스테틱','헤어/메이크업'];
 const inRange=(d,f,t)=>{d=d.slice(0,10);return (!f||d>=f)&&(!t||d<=t)};
@@ -367,7 +368,7 @@ const STAT=[];
 })();
 
 /* ========= 7) 설문 ========= */
-const SV_RES={'웹':60,'알리페이 중국':12,'알리페이 홍콩':7};
+const SV_RES={'웹':60,'알리페이':19};
 const SV_EXP=['처음이에요','와본 적 있어요','살고 있어요'];
 const SV_INT=['화장품 쇼핑','K-pop 팬 활동','뷰티 팝업스토어','한복 체험','피부 진단','굿즈 쇼핑','뷰티 디바이스 쇼핑','영양제 쇼핑','향수 만들기','안경 맞추기'];
 const SURVEY=[
@@ -384,6 +385,7 @@ const SURVEY=[
 const ageOf=b=>{const y=+b.slice(0,4);let a=2026-y;if(b.slice(5)>T.slice(5))a--;return a};
 const ageB=a=>a<20?'10대':a<30?'20대':a<40?'30대':a<50?'40대':'50대 이상';
 
+[RES,CONS,CHATS,PCHATS,REV,STAT,SURVEY].forEach(a=>a.forEach(r=>{r.cv=r.ch==='웹'?'웹':'알리페이'}));
 /* ========= 상태 ========= */
 let _v='res',S,OPEN={};
 const D=()=>({
@@ -445,14 +447,14 @@ const sliceP=(rows)=>{const s=S[_v];const pages=Math.max(1,Math.ceil(rows.length
 const count=(rows,fn)=>{const m={};rows.forEach(r=>{const k=fn(r);m[k]=(m[k]||0)+1});return m};
 function chipGrp(title,items,cls){return `<span class="grp ${cls||''}"><strong>${title}</strong>${items.map(a=>`<span class="chip">${a[0]} ${a[1]}</span>`).join('')}</span>`}
 function chipsBar(total,groups){return `<div class="blk flat" style="margin-top:10px"><div class="chips"><span class="grp"><strong>총</strong><span class="chip tot">${total}</span></span>${groups}</div></div>`}
-const chGrp=rows=>{const m=count(rows,r=>r.ch);return chipGrp('유입 채널',CHS.map(c=>[c,m[c]||0]),'new')};
+const chGrp=rows=>{const m=count(rows,r=>r.cv);return chipGrp('유입 채널',CHS.map(c=>[c,m[c]||0]),'new')};
 const EMPTY=n=>`<tr class="empty-row"><td colspan="${n}">데이터가 없습니다</td></tr>`;
 const thc=(l,cls)=>`<th class="${cls||''}">${l}</th>`;
 
 /* ========= 화면: 예약 ========= */
 function resRows(){
   const s=S.res;
-  const rows=RES.filter(r=>(s.ch==='전체'||r.ch===s.ch)&&(!s.store||r.store===s.store)&&(!s.cat||r.cat===s.cat)&&(!s.status||r.status===s.status)&&(!s.lang||r.lang===s.lang)&&(!s.reg||r.reg===s.reg)
+  const rows=RES.filter(r=>(s.ch==='전체'||r.cv===s.ch)&&(!s.store||r.store===s.store)&&(!s.cat||r.cat===s.cat)&&(!s.status||r.status===s.status)&&(!s.lang||r.lang===s.lang)&&(!s.reg||r.reg===s.reg)
     &&inRange(s.base==='visit'?r.visit:r.recv,s.from,s.to)&&(!s.q||r.hay.indexOf(s.q.toLowerCase())>=0));
   const k=s.sort==='visit'?'visit':'recv';
   return rows.sort((a,b)=>a[k]<b[k]?1:a[k]>b[k]?-1:0);
@@ -467,7 +469,7 @@ function vRes(){
    ${chSel()}${sel('reg','등록 주체',['고객','관리자'],{w:110})}${txt('여권명, 연락처, 예약번호, 요청사항, 매장메모',290)}</div>
    <div class="r">${perBtns([['전체','all'],['1주일','1w'],['1개월','1m'],['3개월','3m'],['6개월','6m'],['1년','1y']],true)}
    ${sel('base',null,[['visit','방문일 기준'],['recv','접수일 기준']],{w:118})}${sel('sort',null,[['visit','방문일순'],['recv','접수일순']],{w:104})}${rng()}${srch}</div></div></div>`;
-  const body=sliceP(rows).map(r=>`<tr><td><b>${esc(r.store)}</b><small>${r.cat}</small></td><td>${r.visit}<small>접수 ${r.recv}</small></td><td>${esc(r.name)}</td><td class="new">${r.ch}</td><td>${r.no}</td><td>${r.nat}</td><td>${r.lang}</td>
+  const body=sliceP(rows).map(r=>`<tr><td><b>${esc(r.store)}</b><small>${r.cat}</small></td><td>${r.visit}<small>접수 ${r.recv}</small></td><td>${esc(r.name)}</td><td class="new">${r.cv}</td><td>${r.no}</td><td>${r.nat}</td><td>${r.lang}</td>
    <td><span class="dot ${r.status==='예약'?'b':r.status==='방문완료'?'ok':r.status==='노쇼'?'r':'g'}">${r.status}</span></td><td><span class="mb">상세</span>${r.status==='예약'?'<span class="mb red">강제취소</span>':''}</td></tr>`).join('');
   const tbl=`<div class="blk"><div class="tw"><table class="tbl"><thead><tr>${thc('매장명')}${thc('방문일시')}${thc('고객(여권명)')}${thc('유입 채널','new')}${thc('예약번호')}${thc('국적')}${thc('언어')}${thc('상태')}${thc('관리')}</tr></thead><tbody>${body||EMPTY(9)}</tbody></table></div>${pager(rows.length,false)}</div>`;
   return page('예약 관리','우리 경유 전 매장 예약을 모니터링·처리합니다.',cards+f+tbl);
@@ -476,7 +478,7 @@ function vRes(){
 /* ========= 화면: 상담 ========= */
 function consRows(){
   const s=S.cons;
-  return CONS.filter(r=>(s.ch==='전체'||r.ch===s.ch)&&(!s.member||r.member===s.member)&&(!s.status||r.status===s.status)&&(!s.lang||r.lang===s.lang)&&(!s.route||r.route===s.route)&&(!s.cat||r.cat===s.cat)&&(!s.store||r.store===s.store)
+  return CONS.filter(r=>(s.ch==='전체'||r.cv===s.ch)&&(!s.member||r.member===s.member)&&(!s.status||r.status===s.status)&&(!s.lang||r.lang===s.lang)&&(!s.route||r.route===s.route)&&(!s.cat||r.cat===s.cat)&&(!s.store||r.store===s.store)
    &&inRange(r.recv,s.from,s.to)&&(!s.q||r.hay.indexOf(s.q.toLowerCase())>=0));
 }
 function vCons(){
@@ -486,7 +488,7 @@ function vCons(){
    ${sel('cat','카테고리 선택',CATS,{w:128})}${sel('store','스토어 선택',STORES.map(x=>x.ko),{w:128})}${txt('검색어',150)}${srch}</div></div>`;
   const ms=count(rows,r=>r.status),ml=count(rows,r=>r.lang),mr=count(rows,r=>r.route);
   const chips=chipsBar(rows.length,chipGrp('접수상태',CONS_ST.map(x=>[x,ms[x]||0]))+chipGrp('언어',LANGS.map(x=>[x,ml[x]||0]))+chipGrp('유입 경로',['스토어','상품','외부(스토어)','외부(상품)'].map(x=>[x,mr[x]||0]))+chGrp(rows));
-  const body=sliceP(rows).map(r=>`<tr><td class="c">${r.no}</td><td>${r.recv.slice(0,16)}</td><td>${r.member}</td><td class="new">${r.ch}</td><td><span class="stsel">${r.status}<i></i></span></td><td class="lnk">${esc(r.store)}</td><td class="lnk">${esc(r.prod)}</td><td>${r.route}</td><td>${r.memo?'<span class="lnk">미리보기</span>':'-'}</td><td>${r.way}</td><td>${r.phone}</td><td>${r.sns}</td><td>${esc(r.snsId)}</td><td>${r.lang}</td><td>${esc(r.name)}</td><td>${esc(r.nick)}</td><td></td><td>-</td></tr>`).join('');
+  const body=sliceP(rows).map(r=>`<tr><td class="c">${r.no}</td><td>${r.recv.slice(0,16)}</td><td>${r.member}</td><td class="new">${r.cv}</td><td><span class="stsel">${r.status}<i></i></span></td><td class="lnk">${esc(r.store)}</td><td class="lnk">${esc(r.prod)}</td><td>${r.route}</td><td>${r.memo?'<span class="lnk">미리보기</span>':'-'}</td><td>${r.way}</td><td>${r.phone}</td><td>${r.sns}</td><td>${esc(r.snsId)}</td><td>${r.lang}</td><td>${esc(r.name)}</td><td>${esc(r.nick)}</td><td></td><td>-</td></tr>`).join('');
   const heads=[['No.','c'],['접수일시'],['회원구분'],['유입 채널','new'],['접수상태'],['스토어코드'],['상품명'],['유입경로'],['고객메모'],['연락수단'],['휴대폰번호'],['SNS'],['SNS ID'],['언어'],['이름'],['닉네임'],['QR'],['상담일시']];
   const tbl=`<div class="blk"><div class="tw"><table class="tbl dense"><thead><tr>${heads.map(h=>thc(h[0],h[1])).join('')}</tr></thead><tbody>${body||EMPTY(18)}</tbody></table></div>${pager(rows.length,true)}</div>`;
   return page('상담 관리','상품과 스토어에서 접수된 상담 내역을 조회하고 상태를 관리합니다.',f+chips+tbl);
@@ -495,7 +497,7 @@ function vCons(){
 /* ========= 화면: 채팅 공통 ========= */
 function chatRows(src,s){
   const k=s.base==='first'?'first':'last';
-  return src.filter(r=>(s.ch==='전체'||r.ch===s.ch)&&(!s.room||r.room===s.room)&&(!s.resp||r.resp===s.resp)&&(!s.lang||r.lang===s.lang)&&(!s.store||r.store===s.store)&&(!s.cat||r.cat===s.cat)&&(!s.route||r.route===s.route)
+  return src.filter(r=>(s.ch==='전체'||r.cv===s.ch)&&(!s.room||r.room===s.room)&&(!s.resp||r.resp===s.resp)&&(!s.lang||r.lang===s.lang)&&(!s.store||r.store===s.store)&&(!s.cat||r.cat===s.cat)&&(!s.route||r.route===s.route)
    &&inRange(r[k],s.from,s.to)&&(!s.q||r.hay.indexOf(s.q.toLowerCase())>=0));
 }
 function chatChips(rows){
@@ -507,7 +509,7 @@ function vChats(){
   const s=S.chats,rows=chatRows(CHATS,s).sort((a,b)=>a[s.base==='first'?'first':'last']<b[s.base==='first'?'first':'last']?1:-1);
   const f=`<div class="blk"><div class="fl">${sel('base',null,[['first','첫대화날짜기준'],['last','마지막대화날짜기준']],{w:130})}${perBtns([['오늘','today'],['어제','yest'],['이번주','week'],['이번달','month']])}${rng()}
    ${sel('room','채팅방상태',['챗봇','상담'],{w:112})}${sel('route','유입경로',['스토어','외부(스토어)'],{w:108})}${chSel()}${sel('resp','응답여부',['응답','미응답'],{w:104})}${sel('lang','언어',LANGS,{w:100})}${sel('store','스토어 선택',STORES.map(x=>x.ko),{w:128})}${txt('검색어',150)}${srch}</div></div>`;
-  const body=sliceP(rows).map(r=>`<tr><td class="c">${r.no}</td><td>${r.first}</td><td>${r.last}</td><td>${r.route}</td><td class="new">${r.ch}</td><td>${r.room}</td><td>${r.resp}</td><td>${r.lw}</td><td>${esc(r.store)}</td>${staffTds(r.staff)}<td>${esc(r.sname)}</td><td>${esc(r.cust)}</td><td>${r.lang}</td><td>${r.email?esc(r.email):(r.ch==='웹'?'':'-')}</td></tr>`).join('');
+  const body=sliceP(rows).map(r=>`<tr><td class="c">${r.no}</td><td>${r.first}</td><td>${r.last}</td><td>${r.route}</td><td class="new">${r.cv}</td><td>${r.room}</td><td>${r.resp}</td><td>${r.lw}</td><td>${esc(r.store)}</td>${staffTds(r.staff)}<td>${esc(r.sname)}</td><td>${esc(r.cust)}</td><td>${r.lang}</td><td>${r.email?esc(r.email):(r.ch==='웹'?'':'-')}</td></tr>`).join('');
   const heads=[['No','c'],['첫대화날짜'],['마지막대화날짜'],['유입경로'],['유입 채널','new'],['채팅방상태'],['상담상태'],['마지막작성자'],['스토어코드'],['담당자 이름','st'],['담당자 연락처','st'],['담당자 이름','st'],['담당자 연락처','st'],['담당자 이름','st'],['담당자 연락처','st'],['스토어명'],['고객명'],['언어'],['이메일']];
   const tbl=`<div class="blk"><div class="sec-t" style="font-size:13px;padding-bottom:10px;border-bottom:1px solid var(--line);margin:-4px -16px 10px;padding-left:16px">스토어 채팅 목록</div><div class="tw"><table class="tbl dense"><thead><tr>${heads.map(h=>thc(h[0],h[1])).join('')}</tr></thead><tbody>${body||EMPTY(19)}</tbody></table></div>${pager(rows.length,true)}</div>`;
   return page('스토어 채팅 목록','스토어 채팅 목록을 확인할 수 있습니다.',f+chatChips(rows)+tbl);
@@ -516,7 +518,7 @@ function vProdChats(){
   const s=S.prodchats,rows=chatRows(PCHATS,s).sort((a,b)=>a[s.base==='first'?'first':'last']<b[s.base==='first'?'first':'last']?1:-1);
   const f=`<div class="blk"><div class="fl">${sel('base',null,[['first','첫대화날짜기준'],['last','마지막대화날짜기준']],{w:130})}${perBtns([['오늘','today'],['어제','yest'],['이번주','week'],['이번달','month']])}${rng()}
    ${sel('room','채팅방상태',['챗봇','상담'],{w:112})}${sel('resp','응답여부',['응답','미응답'],{w:104})}${sel('lang','언어',LANGS,{w:100})}${chSel()}${sel('cat','카테고리 선택',CATS,{w:128})}${sel('store','스토어 선택',STORES.map(x=>x.ko),{w:128})}${txt('검색어',150)}${srch}</div></div>`;
-  const body=sliceP(rows).map(r=>`<tr><td class="c">${r.no}</td><td>${r.first}</td><td>${r.last}</td><td>${r.room}</td><td>${r.resp}</td><td>${r.lw}</td><td>${esc(r.store)}</td>${staffTds(r.staff)}<td>${esc(r.sname)}</td><td>${esc(r.prod)}</td><td>${esc(r.cust)}</td><td class="new">${r.ch}</td><td>${r.lang}</td></tr>`).join('');
+  const body=sliceP(rows).map(r=>`<tr><td class="c">${r.no}</td><td>${r.first}</td><td>${r.last}</td><td>${r.room}</td><td>${r.resp}</td><td>${r.lw}</td><td>${esc(r.store)}</td>${staffTds(r.staff)}<td>${esc(r.sname)}</td><td>${esc(r.prod)}</td><td>${esc(r.cust)}</td><td class="new">${r.cv}</td><td>${r.lang}</td></tr>`).join('');
   const heads=[['No','c'],['첫대화날짜'],['마지막대화날짜'],['채팅방상태'],['상담상태'],['마지막작성자'],['스토어코드'],['담당자 이름','st'],['담당자 연락처','st'],['담당자 이름','st'],['담당자 연락처','st'],['담당자 이름','st'],['담당자 연락처','st'],['스토어명'],['상품명'],['고객명'],['유입 채널','new'],['언어']];
   const tbl=`<div class="blk"><div class="tw"><table class="tbl dense"><thead><tr>${heads.map(h=>thc(h[0],h[1])).join('')}</tr></thead><tbody>${body||EMPTY(18)}</tbody></table></div>${pager(rows.length,true)}</div>`;
   return page('상품별 채팅방 현황','상품별 채팅방 현황을 확인할 수 있습니다.',f+chatChips(rows)+tbl);
@@ -526,11 +528,11 @@ function vProdChats(){
 function vRev(){
   const s=S.rev;
   const k=s.base==='reg'?'created':'updated';
-  const rows=REV.filter(r=>(s.ch==='전체'||r.ch===s.ch)&&(!s.lang||r.lang===s.lang)&&(!s.store||r.store===s.store)&&(!s.img||(s.img==='y')===r.img)&&inRange(r[k],s.from,s.to)&&(!s.q||r.hay.indexOf(s.q.toLowerCase())>=0)).sort((a,b)=>a[k]<b[k]?1:-1);
+  const rows=REV.filter(r=>(s.ch==='전체'||r.cv===s.ch)&&(!s.lang||r.lang===s.lang)&&(!s.store||r.store===s.store)&&(!s.img||(s.img==='y')===r.img)&&inRange(r[k],s.from,s.to)&&(!s.q||r.hay.indexOf(s.q.toLowerCase())>=0)).sort((a,b)=>a[k]<b[k]?1:-1);
   const f=`<div class="blk"><div class="fl">${sel('base',null,[['reg','등록일기준'],['upd','수정일기준']],{w:110})}${perBtns([['오늘','today'],['이번주','week'],['이번달','month'],['이번년','year']])}${rng()}
    ${sel('lang','언어',LANGS,{w:100})}${sel('store','스토어 선택',STORES.map(x=>x.ko),{w:128})}${sel('img','이미지 여부',[['y','이미지 있음'],['n','이미지 없음']],{w:116})}${chSel()}${txt('검색어',150)}${srch}</div></div>`;
   const trunc=t=>t.length>26?t.slice(0,26)+'...':t;
-  const body=sliceP(rows).map(r=>`<tr><td class="c">${r.no}</td><td>${esc(r.store)}</td><td>${r.lang}</td><td>${esc(r.sname)}</td><td>${r.type}</td><td>${esc(r.author)}</td><td class="new">${r.ch}</td><td>${r.rating}</td><td>${esc(trunc(r.text))}</td><td>${r.img?'<span class="img-ph"></span>':''}</td><td>${r.created}</td><td>${r.updated}</td></tr>`).join('');
+  const body=sliceP(rows).map(r=>`<tr><td class="c">${r.no}</td><td>${esc(r.store)}</td><td>${r.lang}</td><td>${esc(r.sname)}</td><td>${r.type}</td><td>${esc(r.author)}</td><td class="new">${r.cv}</td><td>${r.rating}</td><td>${esc(trunc(r.text))}</td><td>${r.img?'<span class="img-ph"></span>':''}</td><td>${r.created}</td><td>${r.updated}</td></tr>`).join('');
   const heads=[['No.','c'],['스토어 코드'],['언어'],['스토어 이름'],['리뷰 유형'],['작성자'],['유입 채널','new'],['평점'],['리뷰 내용'],['이미지'],['작성일'],['수정일']];
   const tbl=`<div class="blk"><div class="tw"><table class="tbl dense"><thead><tr>${heads.map(h=>thc(h[0],h[1])).join('')}</tr></thead><tbody>${body||EMPTY(12)}</tbody></table></div>${pager(rows.length,true)}</div>`;
   return page('스토어 리뷰 관리','스토어 리뷰를 기간, 언어, 이미지 여부별로 조회합니다.',f+tbl);
@@ -538,13 +540,13 @@ function vRev(){
 
 /* ========= 화면: 문의 통계 ========= */
 const COL={'스토어':'#4b7bf5','상품':'#52c8c8','중국어(간체)':'#4b7bf5','영어':'#52c8c8','중국어(번체)':'#c77dff','일본어':'#f0975c','인도네시아어':'#7bc94a','몽골어':'#f6c344',
- '웹':'#52c8c8','알리페이 중국':'#4b7bf5','알리페이 홍콩':'#f0975c','채팅문의':'#4b7bf5','상담문의':'#f0975c','메신저상담':'#52c8c8','K-뷰티 메신저':'#4b7bf5','입점사 메신저':'#52c8c8',
+ '웹':'#52c8c8','알리페이':'#4b7bf5','채팅문의':'#4b7bf5','상담문의':'#f0975c','메신저상담':'#52c8c8','K-뷰티 메신저':'#4b7bf5','입점사 메신저':'#52c8c8',
  '왓츠앱':'#52c8c8','라인':'#4b7bf5','위챗':'#f0975c','카카오':'#f6c344','샤오홍슈':'#c77dff','페이스북':'#7bc94a'};
 const WAYS=['채팅문의','상담문의','메신저상담'];
 const MTYPES=['왓츠앱','라인','위챗','카카오','샤오홍슈','페이스북'];
 function statRows(){
   const s=S.stat;
-  return STAT.filter(r=>inRange(r.date,s.from,s.to)&&(!s.lang||r.lang===s.lang)&&(s.ch==='전체'||r.ch===s.ch)&&(!s.store||r.store===s.store)&&(!s.active||STORE_BY[r.store].act===(s.active==='y')));
+  return STAT.filter(r=>inRange(r.date,s.from,s.to)&&(!s.lang||r.lang===s.lang)&&(s.ch==='전체'||r.cv===s.ch)&&(!s.store||r.store===s.store)&&(!s.active||STORE_BY[r.store].act===(s.active==='y')));
 }
 function donut(items,total){
   const R0=34,C=2*Math.PI*R0;let off=0;
@@ -576,7 +578,7 @@ function chartSvg(rows){
 function aggData(rows){
   const s=S.stat;let list=STORES.filter(st=>(!s.store||st.ko===s.store)&&(!s.active||st.act===(s.active==='y')));
   let out=list.map(st=>{const rr=rows.filter(r=>r.store===st.ko);const o={name:st.ko,total:rr.length};
-    ['스토어','상품'].forEach(k=>o['k:'+k]=rr.filter(r=>r.kind===k).length);LANGS.forEach(k=>o['l:'+k]=rr.filter(r=>r.lang===k).length);CHS.forEach(k=>o['c:'+k]=rr.filter(r=>r.ch===k).length);WAYS.forEach(k=>o['w:'+k]=rr.filter(r=>r.way===k).length);return o});
+    ['스토어','상품'].forEach(k=>o['k:'+k]=rr.filter(r=>r.kind===k).length);LANGS.forEach(k=>o['l:'+k]=rr.filter(r=>r.lang===k).length);CHS.forEach(k=>o['c:'+k]=rr.filter(r=>r.cv===k).length);WAYS.forEach(k=>o['w:'+k]=rr.filter(r=>r.way===k).length);return o});
   if(s.has==='has')out=out.filter(o=>o.total>0);else if(s.has==='none')out=out.filter(o=>o.total===0);
   out.sort((a,b)=>{const x=a[s.sortK],y=b[s.sortK];const c=typeof x==='string'?x.localeCompare(y,'ko'):x-y;return (c||a.name.localeCompare(b.name,'ko'))*s.sortD*(typeof x==='string'?1:1)||0});
   return out;
@@ -596,7 +598,7 @@ function vStat(){
   /* (c) */
   const mrows=rows.filter(r=>r.way==='메신저상담'),mt2=s.mtype==='all'?mrows:mrows.filter(r=>(s.mtype==='k')===(r.mg==='K-뷰티 메신저'));
   const cnt=(arr,key,list)=>list.map(x=>[x,arr.filter(r=>r[key]===x).length]);
-  const donuts=`<div class="donuts">${dCard('문의구분',cnt(rows,'kind',['스토어','상품']))}${dCard('언어구분',cnt(rows,'lang',['중국어(간체)','영어','중국어(번체)','일본어','인도네시아어','몽골어']))}${dCard('유입 채널',cnt(rows,'ch',CHS),'new')}${dCard('문의 방식',cnt(rows,'way',WAYS))}${dCard('메신저구분',cnt(mrows,'mg',['K-뷰티 메신저','입점사 메신저']))}
+  const donuts=`<div class="donuts">${dCard('문의구분',cnt(rows,'kind',['스토어','상품']))}${dCard('언어구분',cnt(rows,'lang',['중국어(간체)','영어','중국어(번체)','일본어','인도네시아어','몽골어']))}${dCard('유입 채널',cnt(rows,'cv',CHS),'new')}${dCard('문의 방식',cnt(rows,'way',WAYS))}${dCard('메신저구분',cnt(mrows,'mg',['K-뷰티 메신저','입점사 메신저']))}
    ${dCard('메신저종류',cnt(mt2,'mt',MTYPES),'',`<span class="tog small">${[['all','전체'],['k','K-뷰티'],['m','입점사']].map(a=>`<button class="${s.mtype===a[0]?'on':''}" data-act="set" data-k="mtype" data-v="${a[0]}">${a[1]}</button>`).join('')}</span>`)}</div>`;
   /* (d) */
   let tab;
@@ -611,7 +613,7 @@ function vStat(){
      <div class="tw"><table class="tbl g" id="aggT"><thead>${hdr}</thead><tbody>${ag.map(o=>`<tr><td>${esc(o.name)}</td>${keys.map(k=>`<td class="${k.indexOf('c:')===0?'new':''}">${o[k]}</td>`).join('')}</tr>`).join('')||EMPTY(15)}</tbody></table></div>`;
   }else{
     const mk=s.mode==='day'?(r=>r.date):(r=>r.date.slice(0,7));
-    const lv=[mk,r=>r.store,r=>r.kind,r=>r.lang,r=>r.ch,detLabel];
+    const lv=[mk,r=>r.store,r=>r.kind,r=>r.lang,r=>r.cv,detLabel];
     const pre=(r,d)=>lv.slice(0,d+1).map(f=>f(r)).join('|');
     const cm=[];for(let d=0;d<6;d++)cm.push(count(rows,r=>pre(r,d)));
     const sorted=rows.slice().sort((a,b)=>{for(let d=0;d<6;d++){const x=lv[d](a),y=lv[d](b);if(x!==y)return d===0?(x<y?1:-1):x.localeCompare(y,'ko')}return 0});
@@ -621,7 +623,7 @@ function vStat(){
     leaves.forEach((l,i)=>{const r=l.r,pv=i?leaves[i-1].r:null;const st=d=>!pv||pre(pv,d)!==pre(r,d);
       html+='<tr>'+(st(0)?`<td rowspan="${spanOf(r,0)}">${mk(r)}</td>`:'')+(st(1)?`<td rowspan="${spanOf(r,1)}">${esc(r.store)}</td><td rowspan="${spanOf(r,1)}">${cm[1][pre(r,1)]}</td>`:'')
        +(st(2)?`<td rowspan="${spanOf(r,2)}">${r.kind}문의</td><td rowspan="${spanOf(r,2)}">${cm[2][pre(r,2)]}</td>`:'')+(st(3)?`<td rowspan="${spanOf(r,3)}">${r.lang}</td><td rowspan="${spanOf(r,3)}">${cm[3][pre(r,3)]}</td>`:'')
-       +(st(4)?`<td class="new" rowspan="${spanOf(r,4)}">${r.ch}</td><td class="new" rowspan="${spanOf(r,4)}">${cm[4][pre(r,4)]}</td>`:'')+`<td>${detLabel(r)}</td><td>${cm[5][pre(r,5)]}</td></tr>`});
+       +(st(4)?`<td class="new" rowspan="${spanOf(r,4)}">${r.cv}</td><td class="new" rowspan="${spanOf(r,4)}">${cm[4][pre(r,4)]}</td>`:'')+`<td>${detLabel(r)}</td><td>${cm[5][pre(r,5)]}</td></tr>`});
     tab=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span class="sec-t" style="margin:0">${s.mode==='day'?'일별':'월별'} 스토어 문의 상세</span><button class="btnd" disabled>엑셀 다운로드</button></div>
      <div class="tw"><table class="tbl g" id="detT" style="table-layout:auto"><thead><tr>${thc(s.mode==='day'?'일자':'월')}${thc('스토어')}${thc('총건수')}${thc('문의 구분')}${thc('구분 총건수')}${thc('언어')}${thc('언어 건수')}${thc('유입 채널','new')}${thc('유입 채널 건수','new')}${thc('문의 상세')}${thc('상세 건수')}</tr></thead><tbody>${html||EMPTY(11)}</tbody></table></div>`;
   }
@@ -632,7 +634,7 @@ function vStat(){
 /* ========= 화면: 설문 ========= */
 function svRows(){
   const s=S.survey;
-  return SURVEY.filter(r=>(s.ch==='전체'||r.ch===s.ch)&&inRange(r.t,s.from,s.to)&&(!s.nat||r.nat===s.nat)&&(!s.gender||r.gender===s.gender)&&(!s.age||ageB(ageOf(r.birth))===s.age)&&(!s.exp||r.exp===s.exp)&&(!s.interest||r.ints.indexOf(s.interest)>=0));
+  return SURVEY.filter(r=>(s.ch==='전체'||r.cv===s.ch)&&inRange(r.t,s.from,s.to)&&(!s.nat||r.nat===s.nat)&&(!s.gender||r.gender===s.gender)&&(!s.age||ageB(ageOf(r.birth))===s.age)&&(!s.exp||r.exp===s.exp)&&(!s.interest||r.ints.indexOf(s.interest)>=0));
 }
 function vSurvey(){
   const s=S.survey,rows=svRows();
@@ -647,7 +649,7 @@ function vSurvey(){
    <div class="svboxes"><div class="sbox sbox1"><div class="sec-t">한국 방문 경험</div><div class="sitems">${ec.map(a=>`<div class="si"><span>${a[0]}</span><b>${a[1]}</b></div>`).join('')}</div></div>
    <div class="sbox"><div class="sec-t">관심항목</div><div class="sitems">${ic.map(a=>`<div class="si"><span>${a[0]}</span><b>${a[1]}</b></div>`).join('')}</div></div></div></div>`;
   const two='';
-  const body=rows.map(r=>`<tr><td>${r.t}</td><td class="new">${r.ch}</td><td>${r.email}</td><td>${r.nat}</td><td>${r.gender}</td><td>${r.birth}</td><td>${r.exp}</td><td>${r.ints.map(t=>`<span class="tag">${t}</span>`).join('')}</td></tr>`).join('');
+  const body=rows.map(r=>`<tr><td>${r.t}</td><td class="new">${r.cv}</td><td>${r.email}</td><td>${r.nat}</td><td>${r.gender}</td><td>${r.birth}</td><td>${r.exp}</td><td>${r.ints.map(t=>`<span class="tag">${t}</span>`).join('')}</td></tr>`).join('');
   const tbl=`<div class="blk"><div class="sec-t" style="margin-bottom:10px">답변목록</div><div class="tw"><table class="tbl"><thead><tr>${thc('응답일시')}${thc('유입 채널','new')}${thc('이메일')}${thc('국적')}${thc('성별')}${thc('생년월일')}${thc('방문 경험')}${thc('관심 항목')}</tr></thead><tbody>${body||EMPTY(8)}</tbody></table></div>
    <div style="display:flex;justify-content:space-between;align-items:center;padding-top:14px;font-size:12px;color:#666"><span>총 ${rows.length}건</span><select class="ctl" data-k="size" style="height:28px"><option value="20">20 / 페이지</option></select></div></div>`;
   return page('예약자 설문조사','예약자가 제출한 방문 경험과 관심 항목을 조회합니다.',f+sum+two+tbl);
@@ -688,7 +690,7 @@ function go(name){
   render();window.scrollTo(0,0);
 }
 function resetDB(){S=D();render()}
-function setCh(v){const s=S[_v];if(!('ch' in s))return;s.ch=v;if('qd' in s)s.q=s.qd;s.page=1;render()}
+function setCh(v){if(v==='알리페이 중국'||v==='알리페이 홍콩')v='알리페이';const s=S[_v];if(!('ch' in s))return;s.ch=v;if('qd' in s)s.q=s.qd;s.page=1;render()}
 window.go=go;window.resetDB=resetDB;window.render=render;window.setCh=setCh;
 Object.defineProperty(window,'VIEW',{get:()=>_v});
 Object.defineProperty(window,'STATE',{get:()=>S});

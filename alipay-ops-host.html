@@ -70,6 +70,18 @@ td small{display:block;color:var(--tx3);font-size:9.5px;margin-top:3px}
 .tg-st{background:#f3eaff;color:#8a3fd1}.tg-pr{background:#e6f7ea;color:#1a8c33}
 .tg-ok{background:#e6f7ea;color:#1a8c33}.tg-wt{background:#fff4dd;color:#a56a00}.tg-ing{background:#eaf2ff;color:#2f6fe0}
 .ubadge{display:inline-flex;min-width:16px;height:16px;border-radius:3px;background:#fff4dd;color:#b36b00;font-size:9.5px;align-items:center;justify-content:center;padding:0 3px;font-weight:600}
+.chb{display:inline-block;border:1px dashed var(--pk);background:#fff;color:#666;border-radius:3px;font-size:8.5px;font-weight:500;padding:0 5px;line-height:1.5;margin-right:5px;white-space:nowrap;vertical-align:middle}
+.chn{display:inline-block;border:1px dashed var(--pk);background:#f1f1f2;color:#777;border-radius:8px;font-size:8.5px;font-weight:500;padding:0 6px;line-height:1.5;margin-left:6px;white-space:nowrap;vertical-align:middle}
+.rt{display:flex;align-items:center}
+.stw{display:flex;align-items:center;gap:6px;margin-bottom:9px}
+.stw .stp{margin-bottom:0}.stw .chb{margin-right:0}
+.rv .a .chb{margin-right:0}
+.ci .a .chb{margin:0}
+.ci .a .chn{font-weight:500}
+.bsp{position:fixed;right:14px;bottom:14px;z-index:60;background:#fff;border:1px dashed #999;border-radius:6px;padding:8px 12px;font-size:10px;display:flex;flex-direction:column;gap:4px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.bsp b{font-size:10px}
+.bsp label{display:flex;align-items:center;gap:5px;cursor:pointer}
+.bsp input{margin:0}
 /* 대시보드 */
 .dash{width:914px;max-width:100%;margin:0 auto;padding:18px 0 40px}
 .ban{display:flex;align-items:center;gap:12px;background:var(--pk-l);border:1px solid var(--pk-b);border-radius:4px;height:38px;padding:0 14px;font-size:10.5px;font-weight:600}
@@ -231,7 +243,7 @@ td small{display:block;color:var(--tx3);font-size:9.5px;margin-top:3px}
 /* ===== 기본 상수 ===== */
 var TODAY='2026-10-07';
 var CHS=['웹','알리페이 중국','알리페이 홍콩'];
-var CHOPT=[['전체','유입 채널 전체'],['웹','유입 채널 웹'],['알리페이 중국','유입 채널 알리페이 중국'],['알리페이 홍콩','유입 채널 알리페이 홍콩']];
+var CHOPT=[['전체','유입 채널 전체'],['웹','유입 채널 웹'],['알리페이','유입 채널 알리페이']];
 var PERIODS=['이번 주','지난주','1개월','3개월','전체'];
 var PRANGE={'이번 주':['2026-10-05','2026-10-11'],'지난주':['2026-09-28','2026-10-04'],'1개월':['2026-09-07','2026-10-07'],'3개월':['2026-07-07','2026-10-07'],'전체':['0000-00-00','9999-99-99']};
 /* 통계 숫자 [스토어 방문, 상품 방문, 채팅 문의, 예약 확정, 방문 완료] 기간 x 채널. 메신저 문의는 아래 MSG 시드에서 센다 */
@@ -397,7 +409,7 @@ function seedMsg(){
 var DB;
 function freshDB(){DB={res:seedRes(),chatlog:seedChatlog(),live:seedLive(),consult:seedConsult(),rev:seedRev(),msg:seedMsg()};}
 function freshState(){
- return {view:'dash',open:{chat:1,cons:1,res:0,gal:1},banner:true,
+ return {bs:'badge',view:'dash',open:{chat:1,cons:1,res:0,gal:1},banner:true,
   dash:{period:'이번 주',ch:'전체',tab:'전체'},
   res:{st:'전체',lang:'전체',ch:'전체',owner:'전체',q:'',qd:'',per:'',from:'',to:'',fromd:'',tod:'',basis:'방문일',sort:'방문일',page:1,open:null,ptab:'전체'},
   chatlog:{type:'전체',st:'전체',reply:'전체',unread:'전체',ch:'전체',name:'',named:'',msg:'',msgd:'',page:1,size:20},
@@ -408,6 +420,12 @@ function freshState(){
 var S;
 /* ===== 유틸 ===== */
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+/* 화면에는 웹 / 알리페이 두 값만 보인다. 내부 시드는 웹 / 알리페이 중국 / 알리페이 홍콩 그대로 */
+function dch(c){return c==='웹'?'웹':'알리페이';}
+function chOk(c,f){return f==='전체'||(f==='웹'?c==='웹':c!=='웹');}
+function chLine(c){return S.bs==='line'?'<div class="l4"><span class="new new-line">유입 채널 '+dch(c)+'</span></div>':'';}
+function chB(c){return S.bs==='badge'?'<span class="chb new" title="유입 채널">'+dch(c)+'</span>':'';}
+function chN(c){return S.bs==='name'?'<span class="chn new" title="유입 채널">'+dch(c)+'</span>':'';}
 function getP(path){var p=path.split('.'),o=S;for(var i=0;i<p.length;i++)o=o[p[i]];return o;}
 function setP(path,v){var p=path.split('.'),o=S;for(var i=0;i<p.length-1;i++)o=o[p[i]];o[p[p.length-1]]=v;}
 function ic(n){
@@ -444,6 +462,9 @@ var NAV=[
  {t:'마이페이지',ic:'user'},
  {t:'공지사항',ic:'mega'}
 ];
+function bsPanel(){
+ return '<div class="bsp"'+((S.view==='res'&&S.res.open!=null)?' style="right:320px"':'')+'><b>시안 전환 &middot; 유입 채널 표시(카드)</b>'+[['line','줄'],['badge','배지'],['name','이름 옆']].map(function(x){return '<label><input type="radio" name="bs" data-act="bs" data-v="'+x[0]+'"'+(S.bs===x[0]?' checked':'')+'>'+x[1]+'</label>';}).join('')+'</div>';
+}
 function shell(){
  var h='';
  NAV.forEach(function(n){
@@ -453,14 +474,14 @@ function shell(){
   if(op){h+='<div class="subs">'+n.sub.map(function(s){return '<div class="mi'+(s.go?(S.view===s.go?' act':''):' dis')+'"'+(s.go?' data-act="go" data-v="'+s.go+'"':'')+'>'+s.t+'</div>';}).join('')+'</div>';}
  });
  return '<div class="top"><div class="logo"><i>K</i>Beauty Station</div><div class="user"><i></i>리버스클리닉 홍대점</div></div>'
-  +'<div class="body"><aside class="side"><div class="nav">'+h+'</div><div class="copy">Copyright &copy; 2026 Eight International All rights reserved.</div></aside><main id="main"></main></div>';
+  +'<div class="body"><aside class="side"><div class="nav">'+h+'</div><div class="copy">Copyright &copy; 2026 Eight International All rights reserved.</div></aside><main id="main"></main></div>'+bsPanel();
 }
 /* ===== 화면: 대시보드 ===== */
 function resCard(r,click){
  return '<div class="'+(click==='dash'?'rc':'pcard')+'" data-act="'+(click==='dash'?'dcard':'pcard')+'" data-v="'+r.no+'">'
-  +'<div class="l1"><span>'+r.visit.slice(0,10)+(click==='dash'?' ('+['일','월','화','수','목','금','토'][new Date(r.visit.slice(0,10)+'T00:00:00Z').getUTCDay()]+') ':' ')+r.visit.slice(11)+'</span><span class="bd">예약</span></div>'
-  +'<div class="l2">'+esc(r.name)+'</div><div class="l3">'+esc(r.nation)+'</div>'
-  +'<div class="l4"><span class="new new-line">유입 채널 '+esc(r.ch)+'</span></div>'
+  +'<div class="l1"><span>'+r.visit.slice(0,10)+(click==='dash'?' ('+['일','월','화','수','목','금','토'][new Date(r.visit.slice(0,10)+'T00:00:00Z').getUTCDay()]+') ':' ')+r.visit.slice(11)+'</span><span class="rt">'+chB(r.ch)+'<span class="bd">예약</span></span></div>'
+  +'<div class="l2">'+esc(r.name)+chN(r.ch)+'</div><div class="l3">'+esc(r.nation)+'</div>'
+  +chLine(r.ch)
   +'<div class="l5">'+r.rno+' &middot; 접수 '+r.recv+'</div></div>';
 }
 function needList(tab){
@@ -468,7 +489,7 @@ function needList(tab){
  return a.sort(function(x,y){return x.visit<y.visit?1:-1;});
 }
 function stats(){
- var d=S.dash,chs=d.ch==='전체'?CHS:[d.ch],a=[0,0,0,0,0];
+ var d=S.dash,chs=d.ch==='전체'?CHS:(d.ch==='웹'?['웹']:['알리페이 중국','알리페이 홍콩']),a=[0,0,0,0,0];
  chs.forEach(function(c){KPI[d.period][c].forEach(function(v,i){a[i]+=v;});});
  var rg=PRANGE[d.period];
  var m=DB.msg.filter(function(x){return chs.indexOf(x.ch)>=0&&inRange(x.at,rg[0],rg[1]);});
@@ -507,7 +528,7 @@ function resFiltered(){
  var a=DB.res.filter(function(r){
   if(v.st!=='전체'&&r.status!==v.st)return false;
   if(v.lang!=='전체'&&r.lang!==v.lang)return false;
-  if(v.ch!=='전체'&&r.ch!==v.ch)return false;
+  if(!chOk(r.ch,v.ch))return false;
   if(v.owner!=='전체'&&r.owner!==v.owner)return false;
   var bd=v.basis==='방문일'?r.visit:r.recv;
   if(!inRange(bd,from,to))return false;
@@ -531,7 +552,7 @@ function viewRes(){
   +sel('res.basis',[['방문일','방문일 기준'],['접수일','접수일 기준']])+sel('res.sort',[['방문일','방문일 순'],['접수일','접수일 순']])
   +drange('res')+'<button class="btn pk" data-act="search">검색</button></div></div>';
  h+='<div class="pagecard"><div class="pc-h">예약목록 ('+a.length+')</div><div class="tw"><table><thead><tr><th>방문일시</th><th>고객 (여권명)</th><th class="new">유입 채널</th><th>예약번호</th><th>국적</th><th>언어</th><th>연락</th><th>예약상태</th><th>관리</th></tr></thead><tbody>'
-  +(rows.length?rows.map(function(r){return '<tr><td>'+r.visit+'<small>접수 '+r.recv+'</small></td><td>'+esc(r.name)+'</td><td>'+esc(r.ch)+'</td><td>'+r.rno+'</td><td>'+esc(r.nation)+'</td><td>'+r.lang+'</td><td>'+r.contact+'</td><td>'+r.status+'</td><td><button class="btn-s" data-act="ropen" data-v="'+r.no+'">상세</button></td></tr>';}).join(''):'<tr><td colspan="9" class="empty">조건에 맞는 예약이 없습니다.</td></tr>')
+  +(rows.length?rows.map(function(r){return '<tr><td>'+r.visit+'<small>접수 '+r.recv+'</small></td><td>'+esc(r.name)+'</td><td>'+dch(r.ch)+'</td><td>'+r.rno+'</td><td>'+esc(r.nation)+'</td><td>'+r.lang+'</td><td>'+r.contact+'</td><td>'+r.status+'</td><td><button class="btn-s" data-act="ropen" data-v="'+r.no+'">상세</button></td></tr>';}).join(''):'<tr><td colspan="9" class="empty">조건에 맞는 예약이 없습니다.</td></tr>')
   +'</tbody></table></div>'+pager(v.page,a.length,size,'res.page')+'</div></div>';
  h+='<aside class="resp"><h3>처리 필요 <em>'+all.length+'</em></h3><div class="ptabs">'+ptabs.map(function(t){return '<span class="'+(v.ptab===t?'on':'')+'" data-act="ptab" data-v="'+t+'">'+t+' '+needList(t).length+'</span>';}).join('')+'</div>'
   +'<div class="pdesc">예약이나 방문 결과 처리가 필요한 예약이에요. 카드를 누르면 예약 상세가 열려요.</div>'
@@ -540,8 +561,8 @@ function viewRes(){
  if(v.open!=null){
   var r=DB.res.filter(function(x){return x.no===v.open;})[0];
   if(r){
-   h+='<div class="ov" data-act="rclose"></div><div class="dw"><div class="hd"><span data-act="rclose">&times;</span>예약 상세</div><div class="stp"><i></i>'+r.status+'</div><div class="dt">'+r.visit+'</div>'
-   +kv('여권명',r.name)+kv('국적',r.nation)+kv('언어',r.lang)+'<div class="kv2 nw"><span>유입 채널</span><b class="new">'+esc(r.ch)+'</b></div>'+kv('전화번호',r.phone)+kv('메신저',r.contact+' '+r.phone.replace(/\D/g,''))+kv('예약 번호',r.rno)+kv('접수 시각',r.recv)+kv('등록 방식',r.owner)
+   h+='<div class="ov" data-act="rclose"></div><div class="dw"><div class="hd"><span data-act="rclose">&times;</span>예약 상세</div><div class="stw"><div class="stp"><i></i>'+r.status+'</div>'+chB(r.ch)+'</div><div class="dt">'+r.visit+'</div>'
+   +'<div class="kv2"><span>여권명</span><b>'+esc(r.name)+chN(r.ch)+'</b></div>'+kv('국적',r.nation)+kv('언어',r.lang)+(S.bs==='line'?'<div class="kv2 nw"><span>유입 채널</span><b class="new">'+dch(r.ch)+'</b></div>':'')+kv('전화번호',r.phone)+kv('메신저',r.contact+' '+r.phone.replace(/\D/g,''))+kv('예약 번호',r.rno)+kv('접수 시각',r.recv)+kv('등록 방식',r.owner)
    +'<div class="sec">고객 요청사항</div><div class="bx">'+(r.req?esc(r.req):'<span style="color:#b5b5b5">요청사항이 없어요.</span>')+'</div>'
    +'<div class="sec">매장 메모</div><textarea id="memo" placeholder="고객에게는 안 보여요. 매장 안에서만 쓰는 메모예요.">'+esc(r.memo)+'</textarea><button class="sv" data-act="memo" data-v="'+r.no+'">저장</button>'
    +'<div class="sec">처리 이력</div><div class="hi"><div>접수 ('+(r.owner==='고객'?'고객 직접 예약':'매장 수기 등록')+')<small>'+r.recv+':14</small></div><span>'+r.owner+'</span></div>'
@@ -561,7 +582,7 @@ function chatlogFiltered(){
   if(v.st!=='전체'&&r.status!==v.st)return false;
   if(v.reply==='답변'&&!r.reply)return false;if(v.reply==='미답변'&&r.reply)return false;
   if(v.unread==='미확인'&&!(r.unread>0))return false;if(v.unread==='없음'&&r.unread>0)return false;
-  if(v.ch!=='전체'&&r.ch!==v.ch)return false;
+  if(!chOk(r.ch,v.ch))return false;
   if(n&&r.cust.toLowerCase().indexOf(n)<0)return false;
   if(m&&r.msg.toLowerCase().indexOf(m)<0)return false;
   return true;}).sort(function(x,y){return x.last<y.last?1:-1;});
@@ -578,7 +599,7 @@ function viewChatlog(){
   +sel('chatlog.ch',CHOPT,'new')
   +inp('chatlog.named','고객명',166)+inp('chatlog.msgd','메시지',166)+'<button class="btn pk" data-act="search">검색</button></div></div>';
  h+='<div class="pagecard"><div class="pc-h">채팅내역 목록 ('+a.length+')</div><div class="tw"><table><thead><tr><th>마지막 대화</th><th>유형</th><th>상태</th><th>고객</th><th>언어</th><th class="new">유입 채널</th><th>상품</th><th>답변</th><th>미확인</th><th>상담건수</th><th>메시지</th><th>관리</th></tr></thead><tbody>'
-  +(rows.length?rows.map(function(r){return '<tr><td>'+r.last+'</td><td><span class="tag '+(r.type==='스토어문의'?'tg-st':'tg-pr')+'">'+r.type+'</span></td><td>'+(r.status==='-'?'<span class="tag" style="background:#f3f3f3;color:#aaa">-</span>':'<span class="tag '+(r.status==='상담완료'?'tg-ok':r.status==='상담대기'?'tg-wt':'tg-ing')+'">'+r.status+'</span>')+'</td><td>'+esc(r.cust)+'</td><td>'+r.lang+'</td><td>'+esc(r.ch)+'</td><td>'+esc(r.prod)+'</td><td>'+(r.reply?'있음':'-')+'</td><td>'+(r.unread>0?'<span class="ubadge">'+r.unread+'</span>':'-')+'</td><td>'+r.cnt+'건</td><td style="max-width:420px;overflow:hidden;text-overflow:ellipsis">'+esc(r.msg)+'</td><td><button class="btn-s">채팅하기</button></td></tr>';}).join(''):'<tr><td colspan="12" class="empty">조건에 맞는 채팅내역이 없습니다.</td></tr>')
+  +(rows.length?rows.map(function(r){return '<tr><td>'+r.last+'</td><td><span class="tag '+(r.type==='스토어문의'?'tg-st':'tg-pr')+'">'+r.type+'</span></td><td>'+(r.status==='-'?'<span class="tag" style="background:#f3f3f3;color:#aaa">-</span>':'<span class="tag '+(r.status==='상담완료'?'tg-ok':r.status==='상담대기'?'tg-wt':'tg-ing')+'">'+r.status+'</span>')+'</td><td>'+esc(r.cust)+'</td><td>'+r.lang+'</td><td>'+dch(r.ch)+'</td><td>'+esc(r.prod)+'</td><td>'+(r.reply?'있음':'-')+'</td><td>'+(r.unread>0?'<span class="ubadge">'+r.unread+'</span>':'-')+'</td><td>'+r.cnt+'건</td><td style="max-width:420px;overflow:hidden;text-overflow:ellipsis">'+esc(r.msg)+'</td><td><button class="btn-s">채팅하기</button></td></tr>';}).join(''):'<tr><td colspan="12" class="empty">조건에 맞는 채팅내역이 없습니다.</td></tr>')
   +'</tbody></table></div><div style="display:flex;justify-content:flex-end;align-items:center">'+pager(v.page,a.length,size,'chatlog.page')+'<select data-b="chatlog.size" style="margin-right:20px"><option value="20"'+(size===20?' selected':'')+'>20 / 페이지</option><option value="50"'+(size===50?' selected':'')+'>50 / 페이지</option></select></div></div>';
  return h;
 }
@@ -591,7 +612,7 @@ function liveBase(skip){
   if(v.reply==='답변'&&!r.replied)return false;if(v.reply==='미답변'&&r.replied)return false;
   if(v.unread==='미확인'&&!(r.unread>0))return false;
   if(v.delay==='지연'&&!r.delayed)return false;if(v.delay==='정상'&&r.delayed)return false;
-  if(v.ch!=='전체'&&r.ch!==v.ch)return false;
+  if(!chOk(r.ch,v.ch))return false;
   return true;});
 }
 function viewLive(){
@@ -608,13 +629,13 @@ function viewLive(){
   +'<button class="btn line" style="margin-left:4px" data-act="go" data-v="chatlog">&#8635; 문의 내역 조회</button></div></div>';
  var un=list.reduce(function(s,r){return s+r.unread;},0);
  h+='<div class="lw"><div class="ll"><div class="lh"><b>처리 대상</b><small>상담대기/상담중 '+list.length+'건 &middot; 미확인 '+un+'건</small></div><div class="li">'
-  +(list.length?list.map(function(r){return '<div class="ci'+(v.sel===r.id?' on':'')+'" data-act="lopen" data-v="'+r.id+'"><div class="a">'+esc(r.name)+'<span class="tag '+(r.kind==='스토어'?'tg-st':'tg-pr')+'">'+r.kind+'</span><span class="tag '+(r.status==='상담대기'?'tg-wt':'tg-ing')+'">'+r.status+'</span><span class="tm">'+r.time+'</span></div><div class="b">'+esc(r.last)+'</div><div class="c"><span class="new new-line">유입 채널 '+esc(r.ch)+'</span>'+(r.unread>0?'<span class="un">'+r.unread+'</span>':'')+'</div></div>';}).join(''):'<div class="lempty" style="margin-top:150px"><div style="font-size:22px;color:#ddd">&#128172;</div><b>채팅이 없습니다</b>새로운 채팅을 기다리고 있어요</div>')
+  +(list.length?list.map(function(r){return '<div class="ci'+(v.sel===r.id?' on':'')+'" data-act="lopen" data-v="'+r.id+'"><div class="a">'+esc(r.name)+chN(r.ch)+'<span class="tag '+(r.kind==='스토어'?'tg-st':'tg-pr')+'">'+r.kind+'</span><span class="tag '+(r.status==='상담대기'?'tg-wt':'tg-ing')+'">'+r.status+'</span>'+chB(r.ch)+'<span class="tm">'+r.time+'</span></div><div class="b">'+esc(r.last)+'</div>'+((S.bs==='line'||r.unread>0)?'<div class="c">'+(S.bs==='line'?'<span class="new new-line">유입 채널 '+dch(r.ch)+'</span>':'')+(r.unread>0?'<span class="un">'+r.unread+'</span>':'')+'</div>':'')+'</div>';}).join(''):'<div class="lempty" style="margin-top:150px"><div style="font-size:22px;color:#ddd">&#128172;</div><b>채팅이 없습니다</b>새로운 채팅을 기다리고 있어요</div>')
   +'</div></div>';
  var sel0=DB.live.filter(function(r){return r.id===v.sel;})[0];
  h+='<div class="lr">';
  if(sel0){
   h+='<div class="lrh"><div class="n">'+esc(sel0.name)+'<span class="tag '+(sel0.kind==='스토어'?'tg-st':'tg-pr')+'">'+sel0.kind+'</span><span class="tag '+(sel0.status==='상담대기'?'tg-wt':'tg-ing')+'">'+sel0.status+'</span></div>'
-   +'<div class="m"><span>언어 '+sel0.lang+'</span><span class="new new-line" id="convch">유입 채널 '+esc(sel0.ch)+'</span>'+(sel0.prod?'<span>상품 '+esc(sel0.prod)+'</span>':'')+'</div></div>'
+   +'<div class="m"><span>언어 '+sel0.lang+'</span><span class="new new-line" id="convch">유입 채널 '+dch(sel0.ch)+'</span>'+(sel0.prod?'<span>상품 '+esc(sel0.prod)+'</span>':'')+'</div></div>'
    +'<div class="msgs">'+sel0.msgs.map(function(m){return '<div class="bub'+(m[0]==='h'?' h':'')+'">'+esc(m[1])+'<small>'+m[2]+'</small></div>';}).join('')+'</div><div class="inp"><div>메시지를 입력하세요</div><b>보내기</b></div>';
  }else{
   h+='<div class="none"><b>문의를 선택하세요</b><span>왼쪽 목록에서 상담대기 또는 상담중 채팅을 선택하면 상세 대화가 열립니다.</span></div>';
@@ -628,7 +649,7 @@ function consultFiltered(){
   if(v.st&&r.status!==v.st)return false;
   if(v.lang&&r.lang!==v.lang)return false;
   if(v.route&&r.route!==v.route)return false;
-  if(v.ch!=='전체'&&r.ch!==v.ch)return false;
+  if(!chOk(r.ch,v.ch))return false;
   if(v.member&&r.member!==v.member)return false;
   if(v.sns){if(v.sns==='없음'){if(r.sns)return false;}else if(r.sns!==v.sns)return false;}
   if(v.wait!=='전체'){if(r.status!=='상담대기')return false;var hrs=(new Date(TODAY+'T12:00:00Z')-new Date(r.at.replace(' ','T')+':00Z'))/36e5;if(hrs<({'30분 이상':0.5,'1시간 이상':1,'24시간 이상':24}[v.wait]))return false;}
@@ -650,7 +671,7 @@ function viewConsult(){
   +drange('consult')+'<button class="btn pk" data-act="search">검색</button></div></div>';
  var STS=['상담대기','고객부재중','고객취소','상품예약','스토어취소'];
  h+='<div class="pagecard"><div class="pc-h">상담접수 목록 ('+a.length+')</div><div class="tw"><table><thead><tr><th>No.</th><th>회원구분</th><th>접수상태</th><th>언어</th><th>유입경로</th><th class="new">유입 채널</th><th>상품명</th><th>고객메모</th><th>가격</th><th>부가세 포함</th><th>연락수단</th><th>휴대폰번호</th><th>SNS</th><th>SNS ID</th><th>이름</th><th>닉네임</th><th>접수일시</th><th>QR</th></tr></thead><tbody>'
-  +(a.length?a.map(function(r){return '<tr><td>'+r.no+'</td><td>'+r.member+'</td><td><select class="rs" data-st="'+r.no+'" style="height:24px">'+STS.map(function(s){return '<option'+(s===r.status?' selected':'')+'>'+s+'</option>';}).join('')+'</select></td><td>'+r.lang+'</td><td>'+r.route+'</td><td>'+esc(r.ch)+'</td><td class="lnk" style="max-width:280px;overflow:hidden;text-overflow:ellipsis">'+(r.prod?esc(r.prod):'<span style="color:#333">-</span>')+'</td><td>'+(r.memo?'<span class="lnk">보기</span>':'-')+'</td><td>'+(r.price||'-')+'</td><td>'+(r.price?'포함':'-')+'</td><td>'+r.contact+'</td><td>'+(r.phone||'-')+'</td><td>'+(r.sns||'-')+'</td><td>'+(r.snsid||'-')+'</td><td>'+esc(r.name)+'</td><td>'+esc(r.nick)+'</td><td>'+r.at+'</td><td>-</td></tr>';}).join(''):'<tr><td colspan="18" class="empty">조건에 맞는 상담접수가 없습니다.</td></tr>')
+  +(a.length?a.map(function(r){return '<tr><td>'+r.no+'</td><td>'+r.member+'</td><td><select class="rs" data-st="'+r.no+'" style="height:24px">'+STS.map(function(s){return '<option'+(s===r.status?' selected':'')+'>'+s+'</option>';}).join('')+'</select></td><td>'+r.lang+'</td><td>'+r.route+'</td><td>'+dch(r.ch)+'</td><td class="lnk" style="max-width:280px;overflow:hidden;text-overflow:ellipsis">'+(r.prod?esc(r.prod):'<span style="color:#333">-</span>')+'</td><td>'+(r.memo?'<span class="lnk">보기</span>':'-')+'</td><td>'+(r.price||'-')+'</td><td>'+(r.price?'포함':'-')+'</td><td>'+r.contact+'</td><td>'+(r.phone||'-')+'</td><td>'+(r.sns||'-')+'</td><td>'+(r.snsid||'-')+'</td><td>'+esc(r.name)+'</td><td>'+esc(r.nick)+'</td><td>'+r.at+'</td><td>-</td></tr>';}).join(''):'<tr><td colspan="18" class="empty">조건에 맞는 상담접수가 없습니다.</td></tr>')
   +'</tbody></table></div><div class="pager"><span class="d">&lsaquo;</span><b>1</b><span class="d">&rsaquo;</span></div></div>';
  return h;
 }
@@ -660,7 +681,7 @@ function revFiltered(){
  return DB.rev.filter(function(r){
   if(v.img==='포함'&&!r.img)return false;if(v.img==='미포함'&&r.img)return false;
   if(v.type&&(v.type==='상품'?r.type!=='상품':r.type!=='스토어'))return false;
-  if(v.ch!=='전체'&&r.ch!==v.ch)return false;
+  if(!chOk(r.ch,v.ch))return false;
   if(!inRange(r.at,from,to))return false;
   if(q&&(r.text+' '+r.author+' '+r.prod).toLowerCase().indexOf(q)<0)return false;
   return true;});
@@ -677,8 +698,8 @@ function viewRev(){
  h+='<div class="sum"><div class="sm"><span>전체 리뷰</span><b>'+a.length+'개</b></div><div class="sm"><span>상품 리뷰</span><b>'+np+'개</b></div><div class="sm"><span>스토어 리뷰</span><b>'+ns+'개</b></div><div class="sm"><span>평균 평점</span><b>'+avg+'</b></div></div>';
  h+=a.length?'<div class="rvg">'+a.map(function(r){
    var ex=v.exp[r.id],long=r.text.length>120;
-   return '<div class="rv"><div class="a"><span class="'+(r.type==='상품'?'tg1':'tg2')+'">'+r.type+' 리뷰</span><span>'+r.at+'</span><span class="r"><i>'+'&#9733;'.repeat(r.rate)+'<span style="color:#ddd">'+'&#9733;'.repeat(5-r.rate)+'</span></i>'+r.rate+'<em>&#9825; '+r.likes+'</em></span></div>'
-   +'<div class="p">'+(r.type==='상품'?'상품: '+esc(r.prod):'스토어: 리버스클리닉 홍대점')+'</div><div class="w">작성자: '+esc(r.author)+'</div><div class="w" style="margin-top:3px"><span class="new new-line">유입 채널 '+esc(r.ch)+'</span></div>'
+   return '<div class="rv"><div class="a"><span class="'+(r.type==='상품'?'tg1':'tg2')+'">'+r.type+' 리뷰</span>'+chB(r.ch)+'<span>'+r.at+'</span><span class="r"><i>'+'&#9733;'.repeat(r.rate)+'<span style="color:#ddd">'+'&#9733;'.repeat(5-r.rate)+'</span></i>'+r.rate+'<em>&#9825; '+r.likes+'</em></span></div>'
+   +'<div class="p">'+(r.type==='상품'?'상품: '+esc(r.prod):'스토어: 리버스클리닉 홍대점')+'</div><div class="w">작성자: '+esc(r.author)+chN(r.ch)+'</div>'+(S.bs==='line'?'<div class="w" style="margin-top:3px"><span class="new new-line">유입 채널 '+dch(r.ch)+'</span></div>':'')
    +'<div class="t'+(ex?' ex':'')+'">'+esc(r.text)+'</div>'+(long?'<span class="mo" data-act="rmore" data-v="'+r.id+'">'+(ex?'접기':'더보기')+'</span>':'')+'</div>';}).join('')+'</div>'
   :'<div class="rvg" style="display:block"><div class="empty">조건에 맞는 리뷰가 없습니다.</div></div>';
  return h;
@@ -701,9 +722,11 @@ window.go=function(n){if(!VIEWS[n])return;S.view=n;if(n==='res')S.open.res=1;S.r
 window.resetDB=function(){freshDB();S=freshState();render();};
 Object.defineProperty(window,'VIEW',{get:function(){return S.view;}});
 window.setCh=function(v){
+ if(v==='알리페이 중국'||v==='알리페이 홍콩')v='알리페이';
  var m={dash:'dash.ch',res:'res.ch',chatlog:'chatlog.ch',live:'live.ch',consult:'consult.ch',rev:'rev.ch'};
  setP(m[S.view],v);if(S[S.view].page!=null)S[S.view].page=1;render();
 };
+window.setBadgeStyle=function(v){if(['line','badge','name'].indexOf(v)<0)return;S.bs=v;render();};
 window.setPeriod=function(p){if(PERIODS.indexOf(p)<0)return;S.dash.period=p;render();};
 window.openRes=function(n){S.view='res';S.open.res=1;S.res.open=n;render();};
 window.openChat=function(n){S.view='live';S.live.sel=n;render();};
@@ -712,6 +735,7 @@ document.addEventListener('click',function(e){
  var t=e.target.closest('[data-act]');if(!t)return;
  var a=t.getAttribute('data-act'),v=t.getAttribute('data-v');
  if(a==='go'){window.go(v);return;}
+ if(a==='bs'){window.setBadgeStyle(v);return;}
  if(a==='tg'){S.open[v]=S.open[v]?0:1;render();return;}
  if(a==='ban'){S.banner=false;render();return;}
  if(a==='dtab'){S.dash.tab=v;render();return;}
