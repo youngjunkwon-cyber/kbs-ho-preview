@@ -135,7 +135,7 @@ dialog textarea{width:100%;height:320px;font-family:ui-monospace,Menlo,monospace
 .left{position:relative}
 .introOv{position:absolute;left:0;right:0;top:var(--lbarH,44px);bottom:0;background:#f5f6f8;overflow:auto;z-index:5}
 .introOv[hidden]{display:none}
-.ioIn{max-width:1640px;margin:0 auto;padding:22px 32px 48px}
+.ioIn{max-width:1640px;margin:0 auto;padding:22px 32px 48px;position:relative}
 .ioHd{display:flex;align-items:center;gap:8px;margin-bottom:12px}
 .ioHd b{font-size:19px}
 .ioHd .sp{flex:1}
@@ -146,8 +146,37 @@ dialog textarea{width:100%;height:320px;font-family:ui-monospace,Menlo,monospace
 .ioFlows{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:16px}
 .ioF{background:#fff;border:1px solid #e6e6e6;border-radius:10px;padding:16px 20px}
 .ioT{font-size:15px;font-weight:700;color:#262626}
-.lbar .btn.introBtn{border-color:#262626;color:#262626;font-weight:600}
-.lbar .btn.introBtn.on{background:#262626;color:#fff}
+.ioEditHint{display:none;margin:-4px 0 12px;font-size:13px;color:#262626;background:#fff;border:1px dashed #bfbfbf;border-radius:8px;padding:9px 14px}
+.introOv.editing .ioEditHint{display:block}
+.introOv.editing .ioShape,.introOv.editing .ioK{cursor:pointer}
+.introOv.editing .ioShape:hover>:first-child{stroke-width:2.6}
+.introOv.editing .ioK:hover text{text-decoration:underline}
+.ioLog{margin-top:10px;font-size:12px;color:#8c8c8c;text-align:right}
+.lbar .btn.introBtn,.lbar .btn.pinBtn{border-color:#262626;color:#262626;font-weight:600}
+.lbar .btn.introBtn.on,.lbar .btn.pinBtn.on{background:#262626;color:#fff}
+.pop{position:absolute;z-index:8;width:300px;background:#fff;border:1px solid #d9d9d9;border-radius:8px;box-shadow:0 6px 24px rgba(0,0,0,.14);padding:12px;box-sizing:border-box}
+.pop .popT{display:flex;align-items:center;font-size:13px;font-weight:700;color:#262626;margin-bottom:8px}
+.pop .sp{flex:1}
+.pop .x{border:0;background:none;cursor:pointer;font-size:13px;color:#8c8c8c;padding:2px 4px}
+.pop textarea,.pop .popName,.pop .popType{display:block;width:100%;box-sizing:border-box;border:1px solid #d9d9d9;border-radius:4px;font-family:inherit;font-size:12.5px;padding:6px 8px;margin-bottom:6px;line-height:1.5}
+.pop .popName,.pop .popType{height:30px;padding:0 8px}
+.pop textarea:focus,.pop .popName:focus{outline:none;border-color:#e8537a}
+.pop .popN{font-size:11.5px;color:#8c8c8c;line-height:1.5;margin-bottom:6px}
+.pop .popErr{font-size:11.5px;color:#cf1322}
+.pop .popErr:empty{display:none}
+.pop .popA{display:flex;gap:6px;align-items:center;margin-top:4px}
+.pinPop{width:320px;max-height:62%;overflow:auto}
+.pinPop .th{margin:0}
+.pinLayer{position:absolute;pointer-events:none;overflow:hidden;z-index:4}
+.pin{position:absolute;pointer-events:auto;transform:translate(-2px,-100%);min-width:26px;height:26px;padding:0 7px;box-sizing:border-box;border-radius:13px 13px 13px 3px;background:#262626;color:#fff;font-size:12px;font-weight:700;border:2px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,.35);cursor:pointer;font-family:inherit;line-height:22px;text-align:center}
+.pin.done{background:#8c8c8c}
+.pin.sel{background:#e8537a}
+.pinHint{position:absolute;left:50%;transform:translateX(-50%);z-index:6;background:#262626;color:#fff;font-size:12.5px;padding:7px 14px;border-radius:16px;pointer-events:none;white-space:nowrap}
+.pinHint[hidden]{display:none}
+.pinNo{display:inline-block;min-width:22px;height:22px;padding:0 6px;box-sizing:border-box;border-radius:11px 11px 11px 3px;background:#262626;color:#fff;font-size:11px;font-weight:700;line-height:22px;text-align:center;flex:0 0 auto}
+.pinNo.done{background:#8c8c8c}
+.pinAt{font-size:12px;color:#8c8c8c;padding:8px 12px 0}
+.scr>.th{margin:8px 12px 12px}
 </style>
 </head>
 <body>
@@ -160,6 +189,7 @@ dialog textarea{width:100%;height:320px;font-family:ui-monospace,Menlo,monospace
       <button class="btn areaBtn" data-a="HOST">HOST</button>
       <button class="btn areaBtn" data-a="FO">FO</button>
       <button class="btn introBtn" id="introBtn">전제·흐름도</button>
+      <button class="btn pinBtn" id="pinBtn">코멘트 남기기</button>
       <span class="sp2"></span>
       <div class="gtabs" id="gtabs"></div>
       <span class="sp2"></span>
@@ -170,7 +200,7 @@ dialog textarea{width:100%;height:320px;font-family:ui-monospace,Menlo,monospace
     </div>
     <iframe id="prev"></iframe>
 <div class="introOv" id="introOv" hidden><div class="ioIn">
-<div class="ioHd"><b>이번 작업의 전제와 흐름</b><span class="sp"></span><button class="btn" id="introClose">닫고 시안 보기</button></div>
+<div class="ioHd"><b>이번 작업의 전제와 흐름</b><span class="sp"></span><button class="btn" id="ioEditBtn">문구 고치기</button><button class="btn" id="introClose">닫고 시안 보기</button></div>
 <div class="ioPrem"><ul>
 <li><b>무엇을 하나요</b>: 웹(k-beautystation.com)과 알리페이 앱 안의 K-Beauty Station을 서로 다른 채널로 운영합니다. 콘텐츠마다 어느 채널에 낼지 정하고, 하단 버튼도 채널마다 따로 정합니다.</li>
 <li><b>노출 채널</b>: 콘텐츠를 어디에 내보낼지 정하는 값입니다. 전체 / 웹 / 알리페이 앱 중 하나이며, 운영자가 어드민에서 정합니다.</li>
@@ -180,8 +210,12 @@ dialog textarea{width:100%;height:320px;font-family:ui-monospace,Menlo,monospace
 <li><b>범위 밖</b>: 알리페이 결제, 다른 월렛 확대, 상품 단위 예약은 이번 작업에 들어가지 않습니다.</li>
 <li><b>배포 순서</b>: 어드민·호스트 설정 → 기존 데이터 정리 → 고객 화면 적용 → 알리페이 회원 오픈</li>
 </ul></div>
-<div class="ioFlows"><div class="ioF"><div class="ioT">흐름 1. 알리페이 회원 진입</div><svg viewBox="0 0 392 680" width="100%" style="display:block;max-width:560px;margin:10px auto 0" font-family="Noto Sans KR, Malgun Gothic, sans-serif" role="img"><defs><marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2969E0"/></marker><marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#9a9a9a"/></marker></defs><ellipse cx="102" cy="30" rx="90" ry="18" fill="#fff" stroke="#2969E0" stroke-width="1.4"/><text x="102" y="30" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626" font-weight="700">알리페이 앱에서 진입</text><line x1="102" y1="50" x2="102" y2="64" stroke="#2969E0" stroke-width="1.4" marker-end="url(#ab)"/><polygon points="102,66 200,97 102,128 4,97" fill="#fff" stroke="#2969E0" stroke-width="1.4"/><text x="102" y="90" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626">이미 가입한</text><text x="102" y="104" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626">알리페이 회원?</text><line x1="200" y1="97" x2="222" y2="97" stroke="#9a9a9a" stroke-width="1.2" marker-end="url(#ag)"/><text x="212" y="90" text-anchor="middle" font-size="10" fill="#9a9a9a">예</text><ellipse cx="306" cy="97" rx="82" ry="17" fill="#fff" stroke="#9a9a9a" stroke-width="1.4"/><text x="306" y="97" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626" font-weight="700">바로 이용</text><line x1="102" y1="130" x2="102" y2="144" stroke="#2969E0" stroke-width="1.4" marker-end="url(#ab)"/><text x="108" y="139" font-size="10" fill="#2969E0" dominant-baseline="middle">아니오</text><rect x="12" y="146" width="180" height="38" rx="3" fill="#fff" stroke="#2969E0" stroke-width="1.4"/><text x="102" y="158" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626">동의 창</text><text x="102" y="172" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626">(필수 3개 + 마케팅 선택)</text><line x1="102" y1="186" x2="102" y2="200" stroke="#2969E0" stroke-width="1.4" marker-end="url(#ab)"/><polygon points="102,202 200,233 102,264 4,233" fill="#fff" stroke="#2969E0" stroke-width="1.4"/><text x="102" y="233" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626">동의하고 시작?</text><line x1="200" y1="233" x2="222" y2="233" stroke="#9a9a9a" stroke-width="1.2" marker-end="url(#ag)"/><text x="212" y="226" text-anchor="middle" font-size="10" fill="#9a9a9a">닫기</text><ellipse cx="306" cy="233" rx="82" ry="17" fill="#fff" stroke="#9a9a9a" stroke-width="1.4"/><text x="306" y="233" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626" font-weight="700">진입 차단 화면</text><line x1="102" y1="266" x2="102" y2="280" stroke="#2969E0" stroke-width="1.4" marker-end="url(#ab)"/><text x="108" y="275" font-size="10" fill="#2969E0" dominant-baseline="middle">예</text><rect x="12" y="282" width="180" height="38" rx="3" fill="#fff" stroke="#2969E0" stroke-width="1.4"/><text x="102" y="301" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626">알리페이 권한 창</text><line x1="102" y1="322" x2="102" y2="336" stroke="#2969E0" stroke-width="1.4" marker-end="url(#ab)"/><polygon points="102,338 200,369 102,400 4,369" fill="#fff" stroke="#2969E0" stroke-width="1.4"/><text x="102" y="369" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626">필수 권한 허용?</text><line x1="200" y1="369" x2="222" y2="369" stroke="#9a9a9a" stroke-width="1.2" marker-end="url(#ag)"/><text x="212" y="362" text-anchor="middle" font-size="10" fill="#9a9a9a">거부</text><ellipse cx="306" cy="369" rx="82" ry="17" fill="#fff" stroke="#9a9a9a" stroke-width="1.4"/><text x="306" y="369" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626" font-weight="700">진입 차단 화면</text><line x1="102" y1="402" x2="102" y2="416" stroke="#2969E0" stroke-width="1.4" marker-end="url(#ab)"/><text x="108" y="411" font-size="10" fill="#2969E0" dominant-baseline="middle">예</text><polygon points="102,418 200,449 102,480 4,449" fill="#fff" stroke="#2969E0" stroke-width="1.4"/><text x="102" y="442" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626">알리페이 계정</text><text x="102" y="456" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626">정보 확인 성공?</text><line x1="200" y1="449" x2="222" y2="449" stroke="#9a9a9a" stroke-width="1.2" marker-end="url(#ag)"/><text x="212" y="442" text-anchor="middle" font-size="10" fill="#9a9a9a">실패</text><ellipse cx="306" cy="449" rx="82" ry="17" fill="#fff" stroke="#9a9a9a" stroke-width="1.4"/><text x="306" y="442" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626" font-weight="700">진입 차단 화면</text><text x="306" y="456" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626" font-weight="700">(다시 시도)</text><line x1="102" y1="482" x2="102" y2="496" stroke="#2969E0" stroke-width="1.4" marker-end="url(#ab)"/><text x="108" y="491" font-size="10" fill="#2969E0" dominant-baseline="middle">예</text><polygon points="102,498 200,529 102,560 4,529" fill="#fff" stroke="#2969E0" stroke-width="1.4"/><text x="102" y="522" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626">만 14세 이상?</text><text x="102" y="536" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626">(생년월일 없으면 확인)</text><line x1="200" y1="529" x2="222" y2="529" stroke="#9a9a9a" stroke-width="1.2" marker-end="url(#ag)"/><text x="212" y="522" text-anchor="middle" font-size="10" fill="#9a9a9a">미만</text><ellipse cx="306" cy="529" rx="82" ry="17" fill="#fff" stroke="#9a9a9a" stroke-width="1.4"/><text x="306" y="529" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626" font-weight="700">이용할 수 없음</text><line x1="102" y1="562" x2="102" y2="576" stroke="#2969E0" stroke-width="1.4" marker-end="url(#ab)"/><text x="108" y="571" font-size="10" fill="#2969E0" dominant-baseline="middle">예</text><rect x="12" y="578" width="180" height="38" rx="3" fill="#fff" stroke="#2969E0" stroke-width="1.4"/><text x="102" y="597" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626">회원 생성</text><line x1="102" y1="618" x2="102" y2="632" stroke="#2969E0" stroke-width="1.4" marker-end="url(#ab)"/><ellipse cx="102" cy="651" rx="90" ry="17" fill="#fff" stroke="#2969E0" stroke-width="1.4"/><text x="102" y="651" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626" font-weight="700">이용 시작</text></svg></div><div class="ioF"><div class="ioT">흐름 2. 콘텐츠가 어디에 보이는지 정해지는 순서</div><svg viewBox="0 0 392 488" width="100%" style="display:block;max-width:560px;margin:10px auto 0" font-family="Noto Sans KR, Malgun Gothic, sans-serif" role="img"><defs><marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2969E0"/></marker><marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#9a9a9a"/></marker></defs><ellipse cx="102" cy="30" rx="90" ry="18" fill="#fff" stroke="#2969E0" stroke-width="1.4"/><text x="102" y="23" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626" font-weight="700">콘텐츠</text><text x="102" y="37" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626" font-weight="700">(상품·배너 등)</text><line x1="102" y1="50" x2="102" y2="64" stroke="#2969E0" stroke-width="1.4" marker-end="url(#ab)"/><polygon points="102,66 200,97 102,128 4,97" fill="#fff" stroke="#2969E0" stroke-width="1.4"/><text x="102" y="90" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626">기존 노출 조건</text><text x="102" y="104" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626">통과? (활성·기간 등)</text><line x1="200" y1="97" x2="222" y2="97" stroke="#9a9a9a" stroke-width="1.2" marker-end="url(#ag)"/><text x="212" y="90" text-anchor="middle" font-size="10" fill="#9a9a9a">아니오</text><ellipse cx="306" cy="97" rx="82" ry="17" fill="#fff" stroke="#9a9a9a" stroke-width="1.4"/><text x="306" y="90" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626" font-weight="700">어느 채널에도</text><text x="306" y="104" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626" font-weight="700">보이지 않음</text><line x1="102" y1="130" x2="102" y2="144" stroke="#2969E0" stroke-width="1.4" marker-end="url(#ab)"/><text x="108" y="139" font-size="10" fill="#2969E0" dominant-baseline="middle">예</text><polygon points="102,146 200,177 102,208 4,177" fill="#fff" stroke="#2969E0" stroke-width="1.4"/><text x="102" y="170" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626">일본어·인도네시아어·</text><text x="102" y="184" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626">몽골어 콘텐츠?</text><line x1="200" y1="177" x2="222" y2="177" stroke="#9a9a9a" stroke-width="1.2" marker-end="url(#ag)"/><text x="212" y="170" text-anchor="middle" font-size="10" fill="#9a9a9a">예</text><ellipse cx="306" cy="177" rx="82" ry="17" fill="#fff" stroke="#9a9a9a" stroke-width="1.4"/><text x="306" y="177" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626" font-weight="700">웹에만 노출</text><line x1="102" y1="210" x2="102" y2="224" stroke="#2969E0" stroke-width="1.4" marker-end="url(#ab)"/><text x="108" y="219" font-size="10" fill="#2969E0" dominant-baseline="middle">아니오</text><polygon points="102,226 200,257 102,288 4,257" fill="#fff" stroke="#2969E0" stroke-width="1.4"/><text x="102" y="250" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626">스토어가</text><text x="102" y="264" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626">한 채널 전용?</text><line x1="200" y1="257" x2="222" y2="257" stroke="#9a9a9a" stroke-width="1.2" marker-end="url(#ag)"/><text x="212" y="250" text-anchor="middle" font-size="10" fill="#9a9a9a">예</text><ellipse cx="306" cy="257" rx="82" ry="17" fill="#fff" stroke="#9a9a9a" stroke-width="1.4"/><text x="306" y="250" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626" font-weight="700">스토어 채널을 따름</text><text x="306" y="264" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626" font-weight="700">(상품·칼럼)</text><line x1="102" y1="290" x2="102" y2="304" stroke="#2969E0" stroke-width="1.4" marker-end="url(#ab)"/><text x="108" y="299" font-size="10" fill="#2969E0" dominant-baseline="middle">아니오</text><rect x="12" y="306" width="180" height="38" rx="3" fill="#fff" stroke="#2969E0" stroke-width="1.4"/><text x="102" y="318" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626">노출 채널 값 적용</text><text x="102" y="332" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626">(전체 / 웹 / 알리페이 앱)</text><line x1="102" y1="346" x2="102" y2="360" stroke="#2969E0" stroke-width="1.4" marker-end="url(#ab)"/><polygon points="102,362 200,393 102,424 4,393" fill="#fff" stroke="#2969E0" stroke-width="1.4"/><text x="102" y="386" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626">연결 대상이</text><text x="102" y="400" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626">그 채널에 있음?</text><line x1="200" y1="393" x2="222" y2="393" stroke="#9a9a9a" stroke-width="1.2" marker-end="url(#ag)"/><text x="212" y="386" text-anchor="middle" font-size="10" fill="#9a9a9a">아니오</text><ellipse cx="306" cy="393" rx="82" ry="17" fill="#fff" stroke="#9a9a9a" stroke-width="1.4"/><text x="306" y="386" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626" font-weight="700">그 채널에서 숨김</text><text x="306" y="400" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626" font-weight="700">(배너·기획전, 사유 표시)</text><line x1="102" y1="426" x2="102" y2="440" stroke="#2969E0" stroke-width="1.4" marker-end="url(#ab)"/><text x="108" y="435" font-size="10" fill="#2969E0" dominant-baseline="middle">예</text><ellipse cx="102" cy="459" rx="90" ry="17" fill="#fff" stroke="#2969E0" stroke-width="1.4"/><text x="102" y="459" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#262626" font-weight="700">웹 / 알리페이 앱에 노출</text></svg></div></div>
+<div class="ioEditHint">고칠 도형이나 글자를 누르세요. 링크를 가진 누구나 고칠 수 있으며, 고친 사람과 시각이 기록됩니다.</div>
+<div class="ioFlows"><div class="ioF"><div class="ioT">흐름 1. 알리페이 회원 진입</div><div id="ioF1"></div></div><div class="ioF"><div class="ioT">흐름 2. 콘텐츠가 어디에 보이는지 정해지는 순서</div><div id="ioF2"></div></div></div>
+<div class="ioLog" id="ioLog"></div>
 </div></div>
+<div class="pinLayer" id="pinLayer"></div>
+<div class="pinHint" id="pinHint" hidden>코멘트를 남길 자리를 누르세요. Esc를 누르면 코멘트 모드가 꺼집니다.</div>
   </div>
   <div class="right" id="right">
     <div class="rtabs"><button data-rt="rv" class="on">리뷰 (팀 공유)</button><button data-rt="qa">검수 체크리스트</button></div>
@@ -193,6 +227,7 @@ dialog textarea{width:100%;height:320px;font-family:ui-monospace,Menlo,monospace
           <span style="flex:1"></span>
           <button class="btn on" data-rf="all">전체</button>
           <button class="btn" data-rf="open">열린 질문만</button>
+          <button class="btn" data-rf="pin">시안 코멘트</button>
           <button class="btn" id="rvReload">새로고침</button>
         </div>
         <div class="rvst" id="rvSt">불러오는 중</div>
@@ -873,13 +908,13 @@ function qsOf(k) { return FB.filter(function (x) { return !x.parent && x.item ==
 function repliesOf(id) { return FB.filter(function (x) { return x.parent === id; }); }
 function fbLoad() {
   fbState = 'loading'; rvStatus();
-  return fetch(FB_URL).then(function (r) { return r.json(); }).then(function (j) { FB = (j && j.rows) || []; fbState = 'ok'; rvRender(); })
+  return fetch(FB_URL).then(function (r) { return r.json(); }).then(function (j) { FB = (j && j.rows) || []; FBT = {}; ((j && j.texts) || []).forEach(function (x) { FBT[x.key] = x; }); fbState = 'ok'; rvRender(); afterLoad(); })
     .catch(function () { fbState = 'err'; rvRender(); });
 }
 function fbPost(o) { return fetch(FB_URL, { method: 'POST', body: JSON.stringify(o) }).then(function (r) { return r.json(); }); }
 function rvStatus() {
-  var open = FB.filter(function (x) { return !x.parent && x.status === '열림'; }).length, all = FB.filter(function (x) { return !x.parent && x.status !== '삭제'; }).length;
-  document.getElementById('rvCnt').textContent = REVIEW.length + '개 화면 · 질문 ' + all + '건 (열림 ' + open + ')';
+  var open = FB.filter(function (x) { return !x.parent && x.item !== 'PIN' && x.status === '열림'; }).length, all = FB.filter(function (x) { return !x.parent && x.item !== 'PIN' && x.status !== '삭제'; }).length, pins = FB.filter(function (x) { return !x.parent && x.item === 'PIN' && x.status !== '삭제'; }).length;
+  document.getElementById('rvCnt').textContent = REVIEW.length + '개 화면 · 질문 ' + all + '건 (열림 ' + open + ') · 시안 코멘트 ' + pins + '건';
   rvSt.className = 'rvst' + (fbState === 'err' ? ' err' : '');
   rvSt.textContent = fbState === 'loading' ? '불러오는 중' : fbState === 'err' ? '질문을 불러오지 못했습니다. 새로고침을 눌러 주세요.' : '줄마다 질문 남기기로 질문·수정 요청·의견을 남길 수 있습니다. 남긴 글은 이 링크를 여는 모두에게 보입니다.';
 }
@@ -891,6 +926,7 @@ function needName() {
 function rvRender() {
   rvStatus();
   var keep = rvList.scrollTop, h = '';
+  if (rvFilter === 'pin') { rvList.innerHTML = pinListHtml(); rvList.scrollTop = keep; return; }
   REVIEW.forEach(function (s) {
     var lines = s.lines.filter(function (l) { return rvFilter === 'all' || qsOf(l.k).some(function (q) { return q.status === '열림'; }); });
     if (!lines.length) return;
@@ -960,16 +996,385 @@ rvList.addEventListener('click', function (e) {
 });
 rvList.addEventListener('keydown', function (e) { if (e.key === 'Enter' && e.target.dataset && e.target.dataset.rin) { var b = rvList.querySelector('[data-rsend="' + e.target.dataset.rin + '"]'); if (b) b.click(); } });
 rvRender(); fbLoad();
-setInterval(function () { var a = document.activeElement; if (document.visibilityState === 'visible' && !(a && rvList.contains(a) && /INPUT|TEXTAREA|SELECT/.test(a.tagName))) fbLoad(); }, 60000);
+setInterval(function () { var a = document.activeElement; if (document.visibilityState === 'visible' && !(a && (rvList.contains(a) || (a.closest && a.closest('.pop'))) && /INPUT|TEXTAREA|SELECT/.test(a.tagName))) fbLoad(); }, 60000);
+
+/* ===================== 전제·흐름도 (문구 고치기) + 시안 코멘트 핀 ===================== */
+var FBT = {};
+function escA(s) { return esc(s).replace(/"/g, '&quot;'); }
+var IO_BLUE = '#2969E0', IO_GRAY = '#9a9a9a', IO_INK = '#262626';
+var FLOWS = {
+  f1: [
+    { type: 'start', text: '알리페이 앱에서 진입' },
+    { type: 'dec', text: '이미 가입한\n알리페이 회원?', side: { label: '예', text: '바로 이용' }, down: '아니오' },
+    { type: 'proc', text: '동의 창\n(필수 3개 + 마케팅 선택)' },
+    { type: 'dec', text: '동의하고 시작?', side: { label: '닫기', text: '진입 차단 화면' }, down: '예' },
+    { type: 'proc', text: '알리페이 권한 창' },
+    { type: 'dec', text: '필수 권한 허용?', side: { label: '거부', text: '진입 차단 화면' }, down: '예' },
+    { type: 'dec', text: '알리페이 계정\n정보 확인 성공?', side: { label: '실패', text: '진입 차단 화면\n(다시 시도)' }, down: '예' },
+    { type: 'dec', text: '만 14세 이상?\n(생년월일 없으면 확인)', side: { label: '미만', text: '이용할 수 없음' }, down: '예' },
+    { type: 'proc', text: '회원 생성' },
+    { type: 'end', text: '이용 시작' }
+  ],
+  f2: [
+    { type: 'start', text: '콘텐츠\n(상품·배너 등)' },
+    { type: 'dec', text: '기존 노출 조건\n통과? (활성·기간 등)', side: { label: '아니오', text: '어느 채널에도\n보이지 않음' }, down: '예' },
+    { type: 'dec', text: '일본어·인도네시아어·\n몽골어 콘텐츠?', side: { label: '예', text: '웹에만 노출' }, down: '아니오' },
+    { type: 'dec', text: '스토어가\n한 채널 전용?', side: { label: '예', text: '스토어 채널을 따름\n(상품·칼럼)' }, down: '아니오' },
+    { type: 'proc', text: '노출 채널 값 적용\n(전체 / 웹 / 알리페이 앱)' },
+    { type: 'dec', text: '연결 대상이\n그 채널에 있음?', side: { label: '아니오', text: '그 채널에서 숨김\n(배너·기획전, 사유 표시)' }, down: '예' },
+    { type: 'end', text: '웹 / 알리페이 앱에 노출' }
+  ]
+};
+var ioEdit = false, ioPopKey = null;
+function ioDef(key) {
+  var p = key.split('.'), n = FLOWS[p[0]] && FLOWS[p[0]][+p[1]];
+  if (!n) return null;
+  if (p.length === 2) return n.text;
+  if (!n.side && p[2] !== 'd') return null;
+  if (p[2] === 's') return n.side.text;
+  if (p[2] === 'sl') return n.side.label;
+  return n.down;
+}
+function ioEd(key) { var x = FBT['flow:' + key]; return x && x.text !== ioDef(key) ? x : null; }
+function ioTxt(key) { return FBT['flow:' + key] ? FBT['flow:' + key].text : ioDef(key); }
+function ioSvgText(x, y, s, size, color, bold, key, maxW) {
+  var lines = String(s).split('\n');
+  if (maxW) { var mx = 1; lines.forEach(function (l) { mx = Math.max(mx, l.length); }); size = Math.max(9, Math.min(size, Math.floor(maxW / (mx * 0.95)))); }
+  var lh = size + 3, y0 = y - (lines.length - 1) * lh / 2;
+  return '<g class="ioK' + (ioEd(key) ? ' ed' : '') + '" data-key="' + key + '">' + lines.map(function (l, i) {
+    return '<text x="' + x + '" y="' + (y0 + i * lh) + '" text-anchor="middle" dominant-baseline="middle" font-size="' + size + '" fill="' + color + '"' + (bold ? ' font-weight="700"' : '') + '>' + esc(l) + '</text>';
+  }).join('') + '</g>';
+}
+function ioShape(type, cx, cy, w, h, key, stroke) {
+  var s = '';
+  if (type === 'start' || type === 'end') s = '<ellipse cx="' + cx + '" cy="' + cy + '" rx="' + (w / 2) + '" ry="' + (h / 2) + '" fill="#fff" stroke="' + stroke + '" stroke-width="1.4"/>';
+  else if (type === 'dec') s = '<polygon points="' + cx + ',' + (cy - h / 2) + ' ' + (cx + w / 2) + ',' + cy + ' ' + cx + ',' + (cy + h / 2) + ' ' + (cx - w / 2) + ',' + cy + '" fill="#fff" stroke="' + stroke + '" stroke-width="1.4"/>';
+  else s = '<rect x="' + (cx - w / 2) + '" y="' + (cy - h / 2) + '" width="' + w + '" height="' + h + '" rx="3" fill="#fff" stroke="' + stroke + '" stroke-width="1.4"/>';
+  return '<g class="ioShape" data-key="' + key + '">' + s + ioSvgText(cx, cy, ioTxt(key), 11, IO_INK, type === 'start' || type === 'end', key, type === 'dec' ? w - 60 : w - 14) + '</g>';
+}
+function ioFlow(fid) {
+  var MX = 102, W = 180, SX = 306, SW = 164, GAP = 18, H = { start: 36, end: 34, proc: 38, dec: 62 };
+  var y = 12, out = '', prevBottom = null, prevKey = null;
+  FLOWS[fid].forEach(function (n, i) {
+    var key = fid + '.' + i, h = H[n.type], cy = y + h / 2;
+    if (prevBottom != null) {
+      out += '<line x1="' + MX + '" y1="' + prevBottom + '" x2="' + MX + '" y2="' + (y - 2) + '" stroke="' + IO_BLUE + '" stroke-width="1.4" marker-end="url(#ab)"/>';
+      if (prevKey) out += '<g class="ioK' + (ioEd(prevKey) ? ' ed' : '') + '" data-key="' + prevKey + '"><text x="' + (MX + 6) + '" y="' + ((prevBottom + y) / 2 + 1) + '" font-size="10" fill="' + IO_BLUE + '" dominant-baseline="middle">' + esc(ioTxt(prevKey)) + '</text></g>';
+    }
+    out += ioShape(n.type, MX, cy, n.type === 'dec' ? W + 16 : W, h, key, IO_BLUE);
+    if (n.side) {
+      var sh = n.side.type === 'proc' ? 38 : 34, x1 = MX + (n.type === 'dec' ? (W + 16) / 2 : W / 2);
+      out += '<line x1="' + x1 + '" y1="' + cy + '" x2="' + (SX - SW / 2 - 2) + '" y2="' + cy + '" stroke="' + IO_GRAY + '" stroke-width="1.2" marker-end="url(#ag)"/>';
+      out += '<g class="ioK' + (ioEd(key + '.sl') ? ' ed' : '') + '" data-key="' + key + '.sl"><text x="' + ((x1 + SX - SW / 2) / 2) + '" y="' + (cy - 7) + '" text-anchor="middle" font-size="10" fill="' + IO_GRAY + '">' + esc(ioTxt(key + '.sl')) + '</text></g>';
+      out += ioShape(n.side.type || 'end', SX, cy, SW, sh, key + '.s', IO_GRAY);
+    }
+    prevBottom = y + h + 2; prevKey = n.down ? key + '.d' : null; y += h + GAP;
+  });
+  var vh = y - GAP + 12;
+  return '<svg viewBox="0 0 392 ' + vh + '" width="100%" style="display:block;max-width:560px;margin:10px auto 0" font-family="Noto Sans KR, Malgun Gothic, sans-serif" role="img">' +
+    '<defs><marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="' + IO_BLUE + '"/></marker>' +
+    '<marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="' + IO_GRAY + '"/></marker></defs>' + out + '</svg>';
+}
+function ioRender() {
+  document.getElementById('ioF1').innerHTML = ioFlow('f1');
+  document.getElementById('ioF2').innerHTML = ioFlow('f2');
+  var ks = Object.keys(FBT).filter(function (k) { return k.indexOf('flow:') === 0 && FLOWS[k.slice(5).split('.')[0]] && ioEd(k.slice(5)); }), last = null;
+  ks.forEach(function (k) { if (!last || String(FBT[k].at) > String(last.at)) last = FBT[k]; });
+  document.getElementById('ioLog').textContent = ks.length ? '고친 문구 ' + ks.length + '곳. 마지막 수정은 ' + last.author + ', ' + last.at + '입니다.' : '';
+  document.getElementById('introOv').classList.toggle('editing', ioEdit);
+}
+function ioName() { return rvName.value.trim(); }
+function ioSetName(v) { rvName.value = v; try { localStorage.setItem('rvName', v.trim()); } catch (e) {} }
+function ioPopClose() { var p = document.getElementById('ioPop'); if (p) p.remove(); ioPopKey = null; }
+function ioPopOpen(key, g) {
+  ioPopClose(); ioPopKey = key;
+  var ov = document.getElementById('introOv'), r = g.getBoundingClientRect(), o = ov.getBoundingClientRect();
+  var cur = ioEd(key), p = document.createElement('div');
+  p.id = 'ioPop'; p.className = 'pop';
+  p.innerHTML = '<div class="popT">문구 고치기</div>' +
+    (ioName() ? '' : '<input class="popName" placeholder="내 이름" maxlength="20">') +
+    '<textarea class="popTx" rows="3">' + esc(ioTxt(key)) + '</textarea>' +
+    '<div class="popN">줄을 바꾸면 도형 안에서도 줄이 바뀝니다.' + (cur ? ' 지금 문구는 ' + esc(cur.author) + '님이 ' + esc(cur.at) + '에 고쳤습니다.' : '') + '</div>' +
+    '<div class="popErr"></div>' +
+    '<div class="popA">' + (cur ? '<button class="btn" data-io="reset">처음 문구로</button>' : '') + '<span class="sp"></span><button class="btn" data-io="cancel">취소</button><button class="btn pri" data-io="save">저장</button></div>';
+  ov.appendChild(p);
+  var left = r.left - o.left + ov.scrollLeft, top = r.bottom - o.top + ov.scrollTop + 8;
+  left = Math.max(8, Math.min(left, ov.clientWidth - 316));
+  p.style.left = left + 'px'; p.style.top = top + 'px';
+  var tx = p.querySelector('.popTx'); tx.focus(); tx.select();
+  p.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-io]'); if (!b) return;
+    var act = b.getAttribute('data-io');
+    if (act === 'cancel') { ioPopClose(); return; }
+    var ni = p.querySelector('.popName'); if (ni && ni.value.trim()) ioSetName(ni.value);
+    var nm = ioName(), err = p.querySelector('.popErr');
+    if (!nm) { err.textContent = '이름을 적어 주세요.'; (ni || tx).focus(); return; }
+    var val = act === 'reset' ? ioDef(key) : tx.value.replace(/\r/g, '').replace(/\n{2,}/g, '\n').trim();
+    if (!val) { err.textContent = '문구를 적어 주세요.'; return; }
+    if (val === ioTxt(key)) { ioPopClose(); return; }
+    b.disabled = true; err.textContent = '저장하는 중입니다.';
+    var prev = FBT['flow:' + key];
+    FBT['flow:' + key] = { key: 'flow:' + key, text: val, author: nm, at: '방금' }; ioRender();
+    fbPost({ action: 'text', key: 'flow:' + key, text: val, author: nm }).then(function (j) { if (!j.ok) throw 0; ioPopClose(); return fbLoad(); })
+      .catch(function () { if (prev) FBT['flow:' + key] = prev; else delete FBT['flow:' + key]; ioRender(); b.disabled = false; err.textContent = '저장하지 못했습니다. 다시 눌러 주세요.'; });
+  });
+  p.addEventListener('keydown', function (e) { if (e.key === 'Escape') ioPopClose(); if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) p.querySelector('[data-io="save"]').click(); });
+}
+document.getElementById('ioEditBtn').addEventListener('click', function () {
+  ioEdit = !ioEdit; this.classList.toggle('on', ioEdit); this.textContent = ioEdit ? '문구 고치기 끝내기' : '문구 고치기';
+  if (!ioEdit) ioPopClose(); ioRender();
+});
+document.getElementById('introOv').addEventListener('click', function (e) {
+  if (!ioEdit || e.target.closest('#ioPop')) return;
+  var g = e.target.closest('.ioShape, .ioK'); if (!g) return;
+  var key = g.getAttribute('data-key'); if (key) ioPopOpen(key, g);
+});
+ioRender();
+
+/* ---------- 시안 코멘트 핀 ---------- */
+var VNAME = {
+  'bo-alipay-channel.html': { 'p-list': '상품 목록', 'p-edit': '상품정보 수정', 's-list': '스토어 목록', 's-edit': '스토어 정보 수정', 'a-list': '배너 목록', 'c-list': '기획전 목록', 'm-edit': '매거진 등록·수정', 'h-edit': '호스트 상품 등록·수정', 'col-list': '스토어 칼럼 목록', 'col-edit': '스토어 칼럼 상세', 'btn-spec': '버튼 설정 영역' },
+  'alipay-member.html': { fo09: '진입 동의 창', fo08: '진입 차단 화면', fo10: '로그인 영역 정리', fo11: '마이페이지', fo12: '회원 탈퇴', fo13: '예약 입력', bo11: '알리페이 회원 목록' },
+  'alipay-ops-admin.html': { res: '예약 관리', cons: '상담조회', chats: '스토어채팅조회', prodchats: '상품채팅조회', rev: '리뷰조회', stat: '스토어 문의 통계', survey: '예약자 설문조사' },
+  'alipay-ops-host.html': { dash: '대시보드', res: '예약 관리', chatlog: '채팅내역조회', live: '실시간 채팅', consult: '상담 관리', rev: '리뷰 관리' }
+};
+var FAREA = { 'bo-alipay-channel.html': 'BO·HOST', 'alipay-member.html': 'FO·BO 회원', 'alipay-ops-admin.html': 'BO 운영', 'alipay-ops-host.html': 'HOST 운영' };
+var pinMode = false, pinSel = null, pinDraftPos = null, pinEls = {}, pinDraft = {};
+var pinLayer = document.getElementById('pinLayer'), pinHint = document.getElementById('pinHint'), pinBtn = document.getElementById('pinBtn');
+function pinRows() { return FB.filter(function (x) { return !x.parent && x.item === 'PIN'; }); }
+function pinAnc(q) { try { return JSON.parse(q.anchor || '{}'); } catch (e) { return {}; } }
+function pinNo(id) { var n = 0, r = 0; pinRows().forEach(function (q) { if (q.status === '삭제') return; n++; if (q.id === id) r = n; }); return r; }
+function curKey() {
+  var w = frame.contentWindow; if (!w) return '';
+  try {
+    return w.eval("(function(){if(typeof VIEW!=='undefined'){if(typeof VIEW==='object'){var n=VIEW.name,i=n==='h-edit'?VIEW.hid:(/-edit$/.test(n)?VIEW.id:null);return n+(i?':'+i:'');}return String(VIEW);}return (typeof S!=='undefined'&&S&&S.view)?S.view:'';})()");
+  } catch (e) { return ''; }
+}
+function viewLabel(file, key) {
+  var base = String(key).split(':')[0], nm = (VNAME[file] || {})[base] || base;
+  return FAREA[file] + ' · ' + nm;
+}
+function elText(el) { return String(el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 40); }
+function elPath(el, body) { var p = []; while (el && el !== body && el.parentElement) { p.unshift(Array.prototype.indexOf.call(el.parentElement.children, el)); el = el.parentElement; } return p.join('.'); }
+function resolveEl(a, d) {
+  if (!d || !d.body) return null;
+  var el = d.body;
+  if (a.path) { String(a.path).split('.').forEach(function (i) { if (el) el = el.children[+i]; }); }
+  if (el && (!a.tx || elText(el) === a.tx)) return el;
+  if (a.tx && a.tag) {
+    var c = d.body.querySelectorAll(a.tag);
+    for (var i = 0; i < c.length; i++) if (elText(c[i]) === a.tx) return c[i];
+  }
+  return null;
+}
+function pinPos(q) {
+  var a = pinAnc(q); if (a.file !== pname() || a.key !== curKey()) return null;
+  var d; try { d = frame.contentDocument; } catch (e) { return null; }
+  var el = resolveEl(a, d); if (!el) return null;
+  var r = el.getBoundingClientRect(); if (!r.width && !r.height) return null;
+  var x = r.left + (a.rx || 0) * r.width, y = r.top + (a.ry || 0) * r.height;
+  if (x < 0 || y < 0 || x > frame.clientWidth || y > frame.clientHeight) return null;
+  return { x: x, y: y, el: el };
+}
+function pinTick() {
+  pinLayer.style.top = frame.offsetTop + 'px'; pinLayer.style.left = frame.offsetLeft + 'px';
+  pinLayer.style.width = frame.offsetWidth + 'px'; pinLayer.style.height = frame.offsetHeight + 'px';
+  pinHint.style.top = (frame.offsetTop + 8) + 'px';
+  var seen = {};
+  pinRows().forEach(function (q) {
+    if (q.status === '삭제') return;
+    var p = pinPos(q), e = pinEls[q.id];
+    if (!p) { if (e) e.style.display = 'none'; return; }
+    if (!e) { e = document.createElement('button'); e.className = 'pin'; e.setAttribute('data-pin', q.id); pinLayer.appendChild(e); pinEls[q.id] = e; }
+    seen[q.id] = 1;
+    e.textContent = pinNo(q.id);
+    e.title = q.author + ': ' + q.content;
+    e.className = 'pin' + (q.status === '열림' ? '' : ' done') + (pinSel === q.id ? ' sel' : '');
+    e.style.display = ''; e.style.left = p.x + 'px'; e.style.top = p.y + 'px';
+  });
+  Object.keys(pinEls).forEach(function (id) { if (!seen[id]) pinEls[id].style.display = 'none'; });
+  var dp = document.getElementById('pinNew');
+  if (pinDraftPos) {
+    var pp = pinPos({ anchor: JSON.stringify(pinDraftPos) });
+    if (!dp) { dp = document.createElement('div'); dp.id = 'pinNew'; dp.className = 'pin sel'; dp.textContent = '+'; pinLayer.appendChild(dp); }
+    if (pp) { dp.style.display = ''; dp.style.left = pp.x + 'px'; dp.style.top = pp.y + 'px'; } else dp.style.display = 'none';
+  } else if (dp) dp.remove();
+  var pop = document.getElementById('pinPop');
+  if (pop && pop.dataset.id) { var q2 = FB.filter(function (x) { return x.id === pop.dataset.id; })[0], p2 = q2 && pinPos(q2); if (p2) pinPopPlace(pop, p2.x, p2.y); }
+}
+setInterval(pinTick, 250);
+function pinPopPlace(pop, x, y) {
+  var L = document.querySelector('.left'), fx = frame.offsetLeft + x + 18, fy = frame.offsetTop + y - 10;
+  if (fx + pop.offsetWidth > L.clientWidth - 8) fx = frame.offsetLeft + x - pop.offsetWidth - 18;
+  fy = Math.max(frame.offsetTop + 8, Math.min(fy, L.clientHeight - pop.offsetHeight - 8));
+  pop.style.left = Math.max(8, fx) + 'px'; pop.style.top = fy + 'px';
+}
+function pinPopClose() { var p = document.getElementById('pinPop'); if (p) p.remove(); pinDraftPos = null; if (pinSel) { pinSel = null; } }
+function nameField() { return ioName() ? '' : '<input class="popName" placeholder="내 이름" maxlength="20">'; }
+function threadHtml(q, inPop) {
+  var h = '<div class="qh"><span class="qtype">' + esc(q.type) + '</span><span class="qa">' + esc(q.author) + '</span><span>' + esc(q.createdAt) + '</span>' +
+    '<select data-pst="' + esc(q.id) + '" class="st-' + esc(q.status) + '">' + ['열림', '답변함', '반영함', '보류', '삭제'].map(function (v) { return '<option' + (v === q.status ? ' selected' : '') + '>' + v + '</option>'; }).join('') + '</select></div>' +
+    '<div class="qb">' + esc(q.content) + '</div>' +
+    (q.updatedBy ? '<div class="qh" style="margin-top:4px">상태 ' + esc(q.status) + ' · ' + esc(q.updatedBy) + ' · ' + esc(q.updatedAt) + '</div>' : '');
+  repliesOf(q.id).forEach(function (r) { h += '<div class="rp"><div class="qh"><span class="qa">' + esc(r.author) + '</span><span>' + esc(r.createdAt) + '</span></div><div class="qb">' + esc(r.content) + '</div></div>'; });
+  h += '<div class="rf"><input data-prin="' + esc(q.id) + '" placeholder="답글을 적어 주세요" value="' + escA(pinDraft[q.id] || '') + '"><button class="btn" data-prsend="' + esc(q.id) + '">답글</button></div>';
+  return h;
+}
+function pinPopOpen(id) {
+  var q = FB.filter(function (x) { return x.id === id; })[0]; if (!q) return;
+  var old = document.getElementById('pinPop'); if (old) old.remove(); pinDraftPos = null;
+  pinSel = id;
+  var pop = document.createElement('div'); pop.id = 'pinPop'; pop.className = 'pop pinPop'; pop.dataset.id = id;
+  pop.innerHTML = '<div class="popT">코멘트 ' + pinNo(id) + '<span class="sp"></span><button class="x" data-pc="close" title="닫기">✕</button></div>' + nameField() + '<div class="th">' + threadHtml(q, true) + '</div><div class="popErr"></div>';
+  document.querySelector('.left').appendChild(pop);
+  var p = pinPos(q); if (p) pinPopPlace(pop, p.x, p.y);
+}
+function pinRefreshPop() { var pop = document.getElementById('pinPop'); if (pop && pop.dataset.id) { var a = document.activeElement; if (a && pop.contains(a) && a.tagName === 'INPUT') return; pinPopOpen(pop.dataset.id); } }
+function pinCompose(a, x, y) {
+  var old = document.getElementById('pinPop'); if (old) old.remove();
+  pinSel = null; pinDraftPos = a;
+  var pop = document.createElement('div'); pop.id = 'pinPop'; pop.className = 'pop pinPop';
+  pop.innerHTML = '<div class="popT">코멘트 남기기<span class="sp"></span><button class="x" data-pc="close" title="닫기">✕</button></div>' +
+    '<div class="popN">' + esc(viewLabel(a.file, a.key)) + '</div>' + nameField() +
+    '<select class="popType">' + ['질문', '수정 요청', '의견'].map(function (v) { return '<option>' + v + '</option>'; }).join('') + '</select>' +
+    '<textarea class="popTx" rows="3" placeholder="이 자리에 대해 궁금한 점이나 바꿨으면 하는 점을 적어 주세요"></textarea><div class="popErr"></div>' +
+    '<div class="popA"><span class="sp"></span><button class="btn" data-pc="close">취소</button><button class="btn pri" data-pc="add">등록</button></div>';
+  document.querySelector('.left').appendChild(pop);
+  pinPopPlace(pop, x, y);
+  pop.querySelector('.popTx').focus();
+}
+document.querySelector('.left').addEventListener('click', function (e) {
+  var pin = e.target.closest('.pin[data-pin]'); if (pin) { pinPopOpen(pin.getAttribute('data-pin')); return; }
+  var pop = e.target.closest('#pinPop'); if (!pop) return;
+  var b = e.target.closest('button'); if (!b) return;
+  var ni = pop.querySelector('.popName'); if (ni && ni.value.trim()) ioSetName(ni.value);
+  var err = pop.querySelector('.popErr');
+  if (b.dataset.pc === 'close') { pinPopClose(); return; }
+  var nm = ioName();
+  if (b.dataset.pc === 'add') {
+    if (!nm) { err.textContent = '이름을 적어 주세요.'; (ni || pop).focus(); return; }
+    var tx = pop.querySelector('.popTx').value.trim(); if (!tx) { err.textContent = '내용을 적어 주세요.'; return; }
+    var a = pinDraftPos; b.disabled = true; err.textContent = '등록하는 중입니다.';
+    fbPost({ action: 'add', screen: viewLabel(a.file, a.key), item: 'PIN', itemText: a.tx || '', author: nm, type: pop.querySelector('.popType').value, content: tx, anchor: JSON.stringify(a) })
+      .then(function (j) { if (!j.ok) throw 0; pinPopClose(); return fbLoad().then(function () { pinPopOpen(j.id); }); })
+      .catch(function () { b.disabled = false; err.textContent = '등록하지 못했습니다. 다시 눌러 주세요.'; });
+    return;
+  }
+  if (b.dataset.prsend) {
+    var id = b.dataset.prsend; if (!nm) { err.textContent = '이름을 적어 주세요.'; return; }
+    var t = (pinDraft[id] || '').trim(); if (!t) return;
+    var q = FB.filter(function (x) { return x.id === id; })[0]; b.disabled = true;
+    fbPost({ action: 'add', parent: id, screen: q.screen, item: 'PIN', itemText: q.itemText, author: nm, content: t })
+      .then(function (j) { if (!j.ok) throw 0; pinDraft[id] = ''; document.activeElement && document.activeElement.blur(); return fbLoad(); })
+      .catch(function () { b.disabled = false; err.textContent = '등록하지 못했습니다. 다시 눌러 주세요.'; });
+  }
+});
+document.querySelector('.left').addEventListener('input', function (e) { if (e.target.dataset && e.target.dataset.prin) pinDraft[e.target.dataset.prin] = e.target.value; });
+document.querySelector('.left').addEventListener('keydown', function (e) {
+  if (e.target.dataset && e.target.dataset.prin && e.key === 'Enter') { var b = document.querySelector('#pinPop [data-prsend="' + e.target.dataset.prin + '"]'); if (b) b.click(); }
+  if (e.key === 'Escape' && e.target.closest && e.target.closest('#pinPop')) pinPopClose();
+});
+function pinStatus(sel, errBox) {
+  var nm = ioName(); if (!nm) { if (errBox) errBox.textContent = '이름을 적어 주세요.'; else needName(); return; }
+  fbPost({ action: 'status', id: sel.dataset.pst, status: sel.value, author: nm }).then(function (j) { if (!j.ok) throw 0; if (sel.value === '삭제') pinPopClose(); return fbLoad(); })
+    .catch(function () { if (errBox) errBox.textContent = '상태를 바꾸지 못했습니다.'; });
+}
+document.querySelector('.left').addEventListener('change', function (e) {
+  var s = e.target; if (!s.dataset || !s.dataset.pst) return;
+  var pop = document.getElementById('pinPop'), ni = pop && pop.querySelector('.popName'); if (ni && ni.value.trim()) ioSetName(ni.value);
+  pinStatus(s, pop && pop.querySelector('.popErr'));
+});
+/* 코멘트 모드: 켜면 시안 클릭이 시안 동작 대신 코멘트 자리 지정이 된다 */
+function pinSetMode(on) {
+  pinMode = on; pinBtn.classList.toggle('on', on); pinBtn.textContent = on ? '코멘트 모드 끄기' : '코멘트 남기기';
+  pinHint.hidden = !on;
+  try { frame.contentDocument.documentElement.classList.toggle('pinmode', on); } catch (e) {}
+  if (!on && pinDraftPos) pinPopClose();
+}
+pinBtn.addEventListener('click', function () { pinSetMode(!pinMode); });
+function pinHook() {
+  var d; try { d = frame.contentDocument; } catch (e) { return; }
+  if (!d || d.__pinHooked) return; d.__pinHooked = true;
+  var st = d.createElement('style'); st.textContent = 'html.pinmode, html.pinmode *{cursor:crosshair !important}'; (d.head || d.documentElement).appendChild(st);
+  d.documentElement.classList.toggle('pinmode', pinMode);
+  var stop = function (e) { if (!pinMode) return; e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); };
+  ['mousedown', 'pointerdown', 'mouseup', 'pointerup', 'dblclick', 'submit', 'change', 'input'].forEach(function (t) { d.addEventListener(t, stop, true); });
+  d.addEventListener('click', function (e) {
+    if (!pinMode) return; stop(e);
+    var el = e.target; if (!el || el.nodeType !== 1) return;
+    var r = el.getBoundingClientRect();
+    var a = { file: pname(), key: curKey(), path: elPath(el, d.body), tag: el.tagName.toLowerCase(), tx: elText(el), rx: r.width ? +((e.clientX - r.left) / r.width).toFixed(3) : 0, ry: r.height ? +((e.clientY - r.top) / r.height).toFixed(3) : 0 };
+    try { var w = frame.contentWindow; if (w.eval("typeof VIEW!=='undefined'&&typeof VIEW==='object'")) a.st = JSON.parse(w.eval('JSON.stringify(VIEW)')); } catch (x) {}
+    pinCompose(a, e.clientX, e.clientY);
+  }, true);
+  d.addEventListener('keydown', function (e) { if (e.key === 'Escape' && pinMode) pinSetMode(false); }, true);
+}
+frame.addEventListener('load', function () { pinHook(); Object.keys(pinEls).forEach(function (k) { pinEls[k].style.display = 'none'; }); });
+pinHook();
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && pinMode && !(e.target.closest && e.target.closest('#pinPop'))) pinSetMode(false); });
+function pinOpenCode(a) {
+  if (a.st && a.st.name) return 'go(' + JSON.stringify(a.st.name) + (a.st.id != null ? ',' + JSON.stringify(a.st.id) : '') + ');Object.assign(VIEW,' + JSON.stringify(a.st) + ');render()';
+  if (a.file === 'alipay-member.html') {
+    var hit = REVIEW.filter(function (s) { return s.file === a.file && s.open && s.open.indexOf("S.view='" + a.key + "'") >= 0; })[0];
+    return hit ? hit.open : 'S.view=' + JSON.stringify(a.key) + ';render()';
+  }
+  return 'go(' + JSON.stringify(a.key) + ')';
+}
+function pinGo(id) {
+  var q = FB.filter(function (x) { return x.id === id; })[0]; if (!q) return;
+  var a = pinAnc(q); if (!a.file) return;
+  pinPopClose();
+  openCase(a.file, pinOpenCode(a));
+  var tries = 0;
+  (function wait() {
+    tries++;
+    var d; try { d = frame.contentDocument; } catch (e) {}
+    var el = pname() === a.file && a.key === curKey() ? resolveEl(a, d) : null;
+    if (el) { var r = el.getBoundingClientRect(); if (r.top < 0 || r.bottom > frame.clientHeight) el.scrollIntoView({ block: 'center' }); setTimeout(function () { pinPopOpen(id); }, 120); return; }
+    if (tries < 30) setTimeout(wait, 150);
+    else { rvSt.className = 'rvst err'; rvSt.textContent = '코멘트 ' + pinNo(id) + '을 남긴 자리가 지금 시안에서 보이지 않습니다. 팝업이나 탭 안이었다면 직접 열어 주세요.'; }
+  })();
+}
+function pinListHtml() {
+  var rows = pinRows().filter(function (q) { return q.status !== '삭제'; });
+  if (!rows.length) return '<div class="empty">아직 시안 코멘트가 없습니다. 왼쪽 위 코멘트 남기기를 켜고 시안을 누르면 그 자리에 남길 수 있습니다.</div>';
+  var h = '';
+  rows.slice().reverse().forEach(function (q) {
+    h += '<div class="scr"><div class="sh"><span class="pinNo' + (q.status === '열림' ? '' : ' done') + '">' + pinNo(q.id) + '</span><span class="snm">' + esc(q.screen) + '</span><button class="btn" data-pgo="' + esc(q.id) + '">시안에서 보기</button></div>' +
+      (q.itemText ? '<div class="pinAt">누른 자리: ' + esc(q.itemText) + '</div>' : '') +
+      '<div class="th">' + threadHtml(q, false) + '</div></div>';
+  });
+  return h;
+}
+rvList.addEventListener('click', function (e) {
+  var b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.pgo) { pinGo(b.dataset.pgo); return; }
+  if (b.dataset.prsend) {
+    var id = b.dataset.prsend, nm = needName(); if (!nm) return;
+    var t = (pinDraft[id] || '').trim(); if (!t) return;
+    var q = FB.filter(function (x) { return x.id === id; })[0]; b.disabled = true;
+    fbPost({ action: 'add', parent: id, screen: q.screen, item: 'PIN', itemText: q.itemText, author: nm, content: t })
+      .then(function (j) { if (!j.ok) throw 0; pinDraft[id] = ''; return fbLoad(); }).catch(function () { b.disabled = false; fbState = 'err'; rvRender(); });
+  }
+});
+rvList.addEventListener('input', function (e) { if (e.target.dataset && e.target.dataset.prin) pinDraft[e.target.dataset.prin] = e.target.value; });
+rvList.addEventListener('change', function (e) { var s = e.target; if (s.dataset && s.dataset.pst) pinStatus(s, null); });
+rvList.addEventListener('keydown', function (e) { if (e.key === 'Enter' && e.target.dataset && e.target.dataset.prin) { var b = rvList.querySelector('[data-prsend="' + e.target.dataset.prin + '"]'); if (b) b.click(); } });
+function afterLoad() {
+  ioRender(); pinRefreshPop();
+  var n = pinRows().filter(function (q) { return q.status === '열림'; }).length, pb = document.querySelector('[data-rf="pin"]');
+  if (pb) pb.textContent = '시안 코멘트' + (n ? ' ' + n : '');
+}
 
 /* 전제·흐름도: 시안 자리 위에 펼침. 처음 온 사람에게 한 번 자동으로 연다 */
 (function () {
   var ov = document.getElementById('introOv'), bt = document.getElementById('introBtn'), lb = document.querySelector('.lbar');
   function setH() { document.querySelector('.left').style.setProperty('--lbarH', lb.offsetHeight + 'px'); }
-  function show(on) { setH(); ov.hidden = !on; bt.classList.toggle('on', on); if (on) { try { localStorage.setItem('introSeen', '1'); } catch (e) {} } }
+  function show(on) { setH(); ov.hidden = !on; bt.classList.toggle('on', on); if (on) { try { localStorage.setItem('introSeen', '1'); } catch (e) {} if (typeof pinSetMode === 'function' && pinMode) pinSetMode(false); if (typeof pinPopClose === 'function') pinPopClose(); } else if (typeof ioPopClose === 'function') ioPopClose(); }
   bt.addEventListener('click', function () { show(ov.hidden); });
   document.getElementById('introClose').addEventListener('click', function () { show(false); });
   document.querySelectorAll('.lbar .areaBtn').forEach(function (x) { x.addEventListener('click', function () { show(false); }); });
+  document.getElementById('pinBtn').addEventListener('click', function () { show(false); });
   window.addEventListener('resize', setH);
   /* 시안 화면을 여는 모든 버튼(리뷰 탭·검수 탭의 이 화면 열기)은 먼저 이 덮개를 닫는다 */
   var _openCase = openCase; openCase = function (src, code) { show(false); return _openCase(src, code); };
