@@ -84,6 +84,53 @@ dialog textarea{width:100%;height:320px;font-family:ui-monospace,Menlo,monospace
 .gt.on{border-color:#1f1f1f;background:#1f1f1f;color:#fff}
 .gt.on .gc{color:#d9d9d9}
 .gt.on .gb{background:#595959}
+
+/* 리뷰 탭 */
+.rtabs{display:flex;gap:0;border-bottom:1px solid #e8e8e8;background:#fafafa;flex:0 0 auto}
+.rtabs button{flex:1;padding:10px 0;border:0;background:none;font-family:inherit;font-size:13px;font-weight:600;color:#8c8c8c;cursor:pointer;border-bottom:2px solid transparent}
+.rtabs button.on{color:#262626;border-bottom-color:#262626;background:#fff}
+.qa-hide{display:none!important}
+#rv{flex:1;display:flex;flex-direction:column;min-height:0}
+.rvtop{flex:0 0 auto;border-bottom:1px solid #e8e8e8;padding:12px 16px}
+.rvtop h1{margin:0 0 8px;font-size:15px;font-weight:700}
+.rvtop h1 .sub{font-size:12px;color:#8c8c8c;font-weight:400;margin-left:6px}
+.rvtop .row1{align-items:center}
+.rvtop input{height:28px;border:1px solid #d9d9d9;border-radius:4px;padding:0 8px;font-family:inherit;font-size:12px;width:120px}
+.rvtop input:focus{outline:none;border-color:#e8537a}
+.rvst{font-size:11px;color:#8c8c8c}
+.rvst.err{color:#cf1322}
+.scr{border:1px solid #f0f0f0;border-radius:8px;margin-bottom:10px;background:#fff}
+.scr .sh{display:flex;gap:8px;align-items:center;padding:9px 12px;border-bottom:1px solid #f5f5f5}
+.scr .sid{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#8c8c8c;flex:0 0 auto}
+.scr .snm{font-weight:700;font-size:13px;flex:1;line-height:1.4}
+.scr .sh .btn{padding:3px 9px;font-size:11px}
+.ln{padding:9px 12px;border-bottom:1px solid #f7f7f7}
+.ln:last-child{border-bottom:0}
+.ln .lt{display:flex;gap:8px;align-items:flex-start}
+.ln .lx{flex:1;min-width:0}
+.ln .t{font-size:13px;line-height:1.5;color:#262626}
+.ln .w{font-size:12px;color:#8c8c8c;line-height:1.5;margin-top:1px}
+.ln .ask{flex:0 0 auto;padding:3px 8px;font-size:11px}
+.qc{display:inline-block;margin-left:6px;font-size:11px;padding:0 6px;border-radius:9px;background:#f5f5f5;color:#595959;vertical-align:1px}
+.qc.open{background:#fff1f0;color:#cf1322}
+.th{margin:8px 0 0;padding:8px 10px;border:1px solid #f0f0f0;border-radius:6px;background:#fcfcfc}
+.th .qh{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:11px;color:#8c8c8c}
+.th .qtype{font-weight:700;color:#262626}
+.th .qa{font-weight:600;color:#434343}
+.th select{margin-left:auto;height:24px;border:1px solid #d9d9d9;border-radius:4px;font-family:inherit;font-size:11px}
+.th .qb{font-size:12.5px;line-height:1.6;color:#262626;margin-top:4px;white-space:pre-wrap;word-break:break-word}
+.th .rp{margin:6px 0 0 10px;padding-left:8px;border-left:2px solid #f0f0f0}
+.th .rp .qb{margin-top:2px}
+.th .rf{display:flex;gap:6px;margin-top:6px}
+.th .rf input{flex:1;height:28px;border:1px solid #d9d9d9;border-radius:4px;padding:0 8px;font-family:inherit;font-size:12px}
+.th .rf input:focus{outline:none;border-color:#e8537a}
+.st-열림{color:#cf1322}.st-답변함{color:#1677ff}.st-반영함{color:#389e0d}.st-보류{color:#8c8c8c}
+.nf{margin-top:8px;padding:8px 10px;border:1px dashed #d9d9d9;border-radius:6px}
+.nf .r{display:flex;gap:6px;align-items:center;margin-bottom:6px}
+.nf select{height:28px;border:1px solid #d9d9d9;border-radius:4px;font-family:inherit;font-size:12px}
+.nf textarea{width:100%;min-height:64px;padding:6px 8px;border:1px solid #d9d9d9;border-radius:4px;font-family:inherit;font-size:12px;resize:vertical;line-height:1.5}
+.nf textarea:focus{outline:none;border-color:#e8537a}
+.nf .acts{display:flex;justify-content:flex-end;gap:6px;margin-top:6px}
 </style>
 </head>
 <body>
@@ -106,7 +153,22 @@ dialog textarea{width:100%;height:320px;font-family:ui-monospace,Menlo,monospace
     <iframe id="prev"></iframe>
   </div>
   <div class="right" id="right">
-    <div class="top">
+    <div class="rtabs"><button data-rt="rv" class="on">리뷰 (팀 공유)</button><button data-rt="qa">검수 체크리스트</button></div>
+    <div id="rv">
+      <div class="rvtop">
+        <h1>화면별 바뀐 점<span class="sub" id="rvCnt"></span></h1>
+        <div class="row1">
+          <span style="font-size:12px;color:#595959">내 이름</span><input id="rvName" placeholder="이름을 적어 주세요" maxlength="20">
+          <span style="flex:1"></span>
+          <button class="btn on" data-rf="all">전체</button>
+          <button class="btn" data-rf="open">열린 질문만</button>
+          <button class="btn" id="rvReload">새로고침</button>
+        </div>
+        <div class="rvst" id="rvSt">불러오는 중</div>
+      </div>
+      <div class="scroll" id="rvList"></div>
+    </div>
+    <div class="top qa-only">
       <h1>검수 체크리스트<span class="sub" id="cnt"></span></h1>
       <div class="row1">
         <button class="btn on" data-f="all">전체</button>
@@ -127,7 +189,7 @@ dialog textarea{width:100%;height:320px;font-family:ui-monospace,Menlo,monospace
         <span id="pct">진행 0%</span>
       </div>
     </div>
-    <div class="scroll">
+    <div class="scroll qa-only">
       <p class="scope">이 콘솔은 어드민·호스트 화면과 고객 회원 화면만 다룹니다. 고객 화면 노출, 주소 경로, 알림 발송, 원본 권한의 승인 상태, 마이그레이션은 이 콘솔의 범위가 아니며 STG 시나리오(PRD 부록 A 기준)로 따로 봅니다.</p>
       <p class="warn" id="fileWarn">파일을 직접 열어서 왼쪽 시안을 제어할 수 없습니다. 아래 배포 주소로 다시 열어 주세요.<br><a href="https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-alipay-channel.html" target="_blank">https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-alipay-channel.html</a></p>
       <p class="hint">배포 주소: <a href="https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-alipay-channel.html" target="_blank">https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-alipay-channel.html</a><br>
@@ -756,6 +818,118 @@ document.getElementById('resetKeep').addEventListener('click', function () {
 });
 if (location.protocol === 'file:') document.getElementById('fileWarn').style.display = 'block';
 render();
+
+/* ===================== 리뷰 탭 (팀 공유 질문·의견) ===================== */
+var FB_URL = "https://script.google.com/macros/s/AKfycbwZB3CUlmOx6CZObFg1aPlT5r-iL61rDamZcyksh_i-M3uRYeNpoGrW7f9i1voVz-3N/exec";
+var REVIEW = [{"id":"BO-CH-01","name":"상품정보 수정","area":"BO","file":"bo-alipay-channel.html","open":"VIEW.lang='중국어(간체)';go('p-list');go('p-edit','P2');VIEW.tab=1;render()","lines":[{"k":"BO-CH-01-1","t":"관리자설정 탭에 노출 채널 선택 추가 (전체 / 웹 / 알리페이 앱)","why":"상품마다 나갈 채널을 정하려고"},{"k":"BO-CH-01-2","t":"버튼 설정에 알리페이 앱 켜기·끄기 칸 추가","why":"알리페이 앱 버튼을 따로 고르려고"},{"k":"BO-CH-01-3","t":"스토어가 한 채널 전용이거나 일본어 등 상품이면 채널 고정","why":"상품은 스토어와 언어를 따라서"}]},{"id":"BO-CH-02","name":"상품 목록","area":"BO","file":"bo-alipay-channel.html","open":"VIEW.lang='중국어(간체)';go('p-list')","lines":[{"k":"BO-CH-02-1","t":"히든 여부 뒤에 노출 채널 칸 추가","why":"어느 채널에 나가는지 목록에서 보려고"},{"k":"BO-CH-02-2","t":"노출 채널 필터 추가 (일본어 등 언어에선 잠김)","why":"채널별로 걸러 보려고"}]},{"id":"BO-CH-03","name":"스토어 정보 수정","area":"BO","file":"bo-alipay-channel.html","open":"go('s-edit','S1');VIEW.sect=0;render()","lines":[{"k":"BO-CH-03-1","t":"지원언어 아래에 노출 채널 선택 추가","why":"한 번 정하면 모든 언어에 적용"},{"k":"BO-CH-03-2","t":"버튼 및 메신저 설정에 알리페이 앱 칸 추가","why":"알리페이 앱 버튼을 따로 정하려고"},{"k":"BO-CH-03-3","t":"웹·알리페이 앱 전용으로 저장하면 영향 범위 확인 창","why":"상품·칼럼·배너·기획전이 같이 빠져서"}]},{"id":"BO-CH-04","name":"스토어 목록","area":"BO","file":"bo-alipay-channel.html","open":"go('s-list');setStab('원본')","lines":[{"k":"BO-CH-04-1","t":"원본 탭·언어 탭 모두 노출 채널 칸 추가","why":"스토어 값은 언어와 무관하게 하나"},{"k":"BO-CH-04-2","t":"공개여부 뒤에 노출 채널 필터 추가","why":"채널별로 걸러 보려고"}]},{"id":"BO-CH-05","name":"배너 등록·수정","area":"BO","file":"bo-alipay-channel.html","open":"VIEW.lang='중국어(간체)';go('a-list');openAd('B1')","lines":[{"k":"BO-CH-05-1","t":"노출 채널 선택 추가, 외부링크 배너는 웹으로 고정","why":"알리페이 앱엔 외부 링크를 못 내서"},{"k":"BO-CH-05-2","t":"연결 대상은 배너 채널에 나가는 것만 고를 수 있음","why":"눌렀을 때 없는 화면이 안 뜨게"},{"k":"BO-CH-05-3","t":"하단 버튼에 알리페이 앱 표시 여부·내부링크 추가","why":"알리페이 앱에선 외부링크를 못 써서"}]},{"id":"BO-CH-06","name":"배너 목록","area":"BO","file":"bo-alipay-channel.html","open":"VIEW.lang='중국어(간체)';go('a-list')","lines":[{"k":"BO-CH-06-1","t":"노출위치 뒤에 노출 채널 칸과 사유 칸 추가","why":"자동으로 숨겨진 배너를 알아보려고"},{"k":"BO-CH-06-2","t":"노출 채널·사유 필터 추가","why":"숨겨진 배너만 모아 보려고"}]},{"id":"BO-CH-07","name":"매거진 등록·수정","area":"BO","file":"bo-alipay-channel.html","open":"go('m-edit')","lines":[{"k":"BO-CH-07-1","t":"게시 언어 탭마다 노출 채널 선택 추가","why":"언어별 글마다 채널을 정하려고"},{"k":"BO-CH-07-2","t":"알리페이 앱에 나가는 글에 외부 링크·영상이 있으면 저장 후 안내","why":"앱에선 글자로만 보이거나 숨겨져서"}]},{"id":"BO-CH-08","name":"기획전 등록·수정","area":"BO","file":"bo-alipay-channel.html","open":"VIEW.lang='중국어(간체)';go('c-list');openColl('E1')","lines":[{"k":"BO-CH-08-1","t":"노출 채널 선택과 구성 항목 표에 노출 채널 칸 추가","why":"담은 항목이 어디 나가는지 보려고"},{"k":"BO-CH-08-2","t":"한 채널에 보일 항목이 0건이면 안내와 저장 확인","why":"그 채널에선 기획전이 숨겨져서"}]},{"id":"BO-CH-09","name":"기획전 목록","area":"BO","file":"bo-alipay-channel.html","open":"VIEW.lang='중국어(간체)';go('c-list')","lines":[{"k":"BO-CH-09-1","t":"기획전명 뒤에 노출 채널 칸과 사유 칸 추가","why":"담은 항목 때문에 숨겨진 걸 알려고"},{"k":"BO-CH-09-2","t":"노출 채널·사유 필터 추가","why":"숨겨진 기획전만 모아 보려고"}]},{"id":"BO-CH-10","name":"버튼 설정 영역 (상품·스토어 공통)","area":"BO","file":"bo-alipay-channel.html","open":"go('btn-spec')","lines":[{"k":"BO-CH-10-1","t":"항목마다 웹 옆에 알리페이 앱 켜기·끄기 추가","why":"채널마다 버튼 구성을 다르게 하려고"},{"k":"BO-CH-10-2","t":"채팅 항목 신설, 외부링크·메신저는 알리페이 앱에서 끔 고정","why":"알리페이 앱이 지원하지 않는 항목"},{"k":"BO-CH-10-3","t":"채널마다 버튼 최대 2개, 넘기면 저장 막음","why":"하단 버튼 자리가 둘뿐이라서"}]},{"id":"BO-CH-11","name":"알리페이 회원 목록","area":"BO","file":"alipay-member.html","open":"resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();BOW='all';BOQ=false;S.view='bo11';render()","lines":[{"k":"BO-CH-11-1","t":"회원 메뉴에 알리페이 회원 목록 신설","why":"기존 회원과 별개로 관리해서"},{"k":"BO-CH-11-2","t":"19개 칸 (알리페이 식별자·유입 채널 포함, 이메일 없음)","why":"알리페이가 주는 항목에 맞추려고"}]},{"id":"BO-CH-12","name":"예약·채팅·상담·리뷰·통계 유입 채널","area":"BO","file":"alipay-ops-admin.html","open":"resetDB();go('res')","lines":[{"k":"BO-CH-12-1","t":"예약·상담·채팅·리뷰·설문 목록에 유입 채널 칸 추가","why":"건마다 어디서 들어왔는지 보려고"},{"k":"BO-CH-12-2","t":"유입 채널 필터 추가, 건수·예약 카드도 그 기준으로","why":"채널별 숫자를 바로 보려고"},{"k":"BO-CH-12-3","t":"문의 통계 '채널구분' 이름을 '문의 방식'으로 변경","why":"유입 채널과 헷갈리지 않게"},{"k":"BO-CH-12-4","t":"예약 상세 상단 상태 옆에 유입 채널 표시","why":"상세에서도 채널을 바로 보려고"},{"k":"BO-CH-12-5","t":"문의 통계에 유입 채널 필터·도넛·집계 칸 추가","why":"채널별 문의 규모를 보려고"},{"k":"BO-CH-12-6","t":"예약자 설문조사에 유입 채널 필터·칸, 응답률도 채널 기준","why":"채널별 응답을 따로 보려고"}]},{"id":"BO-CH-13","name":"스토어 칼럼 목록·상세","area":"BO","file":"bo-alipay-channel.html","open":"go('col-list')","lines":[{"k":"BO-CH-13-1","t":"목록에 노출 채널 칸·필터, 상세에 노출 채널 표시","why":"칼럼은 스토어 채널을 따라서"},{"k":"BO-CH-13-2","t":"호스트가 지운 외부 링크를 되돌리는 원문 복원 버튼","why":"운영자가 원문을 살릴 수 있게"}]},{"id":"HOST-CH-01","name":"호스트 상품 등록·수정","area":"HOST","file":"bo-alipay-channel.html","open":"go('h-edit');VIEW.hid='P5';render()","lines":[{"k":"HOST-CH-01-1","t":"한쪽 채널에 안 나가는 상품은 위쪽에 안내 표시","why":"설정 없이 상태만 알 수 있게"},{"k":"HOST-CH-01-2","t":"알리페이 앱 전용 매장은 중국어(간체·번체)·영어만 등록","why":"알리페이 앱 대상 언어가 셋이라서"}]},{"id":"HOST-CH-02","name":"호스트 스토어 칼럼 등록·수정 (시안 없음)","area":"HOST","file":null,"open":null,"lines":[{"k":"HOST-CH-02-1","t":"다른 사이트 주소·동영상·SNS를 넣을 수 없게 막음","why":"웹 포함 모든 채널에 적용"},{"k":"HOST-CH-02-2","t":"붙여넣은 외부 링크는 저장 때 지우고 개수 안내","why":"글자만 남기고 원문은 따로 보관"}]},{"id":"HOST-CH-03","name":"호스트 예약·채팅·상담·리뷰·대시보드 유입 채널","area":"HOST","file":"alipay-ops-host.html","open":"resetDB();go('dash')","lines":[{"k":"HOST-CH-03-1","t":"목록·예약 카드·채팅·리뷰에 유입 채널 표시와 필터","why":"어디서 온 고객인지 보고 응대하려고"},{"k":"HOST-CH-03-2","t":"대시보드 숫자마다 웹 N·알리페이 N 함께 표시","why":"필터 없이 채널별 숫자를 보려고"},{"k":"HOST-CH-03-3","t":"실시간 채팅 대화 화면 위에 언어·유입 채널 표시","why":"응대 중에도 고객 채널을 보려고"},{"k":"HOST-CH-03-4","t":"예약 관리 오른쪽 처리 필요 영역은 필터와 무관하게 전부 표시","why":"처리할 일을 놓치지 않게"}]},{"id":"FO-CH-08","name":"진입 차단 화면","area":"FO","file":"alipay-member.html","open":"resetDB();S.blocked='consent';S.step='blocked';S.view='fo08';render()","lines":[{"k":"FO-CH-08-1","t":"동의 창 닫기·권한 거부·확인 실패 때 막는 화면 신설","why":"동의를 통과해야 이용할 수 있어서"},{"k":"FO-CH-08-2","t":"생년월일이 없으면 만 14세 확인 창을 한 번 띄움","why":"만 14세 미만은 이용할 수 없어서"}]},{"id":"FO-CH-09","name":"진입 동의 창","area":"FO","file":"alipay-member.html","open":"resetDB();S.view='fo09';render()","lines":[{"k":"FO-CH-09-1","t":"첫 진입 때 동의 창 (필수 3개 + 마케팅 수신 선택)","why":"회원을 만들기 전에 동의를 받으려고"},{"k":"FO-CH-09-2","t":"동의하면 알리페이 권한 창, 허용하면 회원 생성","why":"알리페이 프로필을 받아 가입하려고"}]},{"id":"FO-CH-10","name":"로그인·회원가입 영역 정리","area":"FO","file":"alipay-member.html","open":"resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.view='fo10';render()","lines":[{"k":"FO-CH-10-1","t":"알리페이 앱에서 로그인·회원가입·비밀번호 찾기 숨김","why":"알리페이 확인이 로그인을 대신해서"},{"k":"FO-CH-10-2","t":"로그인 주소로 직접 들어오면 마이페이지로 보냄","why":"막는 게 아니라 숨기는 것이라서"}]},{"id":"FO-CH-11","name":"마이페이지·계정 설정","area":"FO","file":"alipay-member.html","open":"resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.view='fo11';render()","lines":[{"k":"FO-CH-11-1","t":"닉네임 아래에 '알리페이로 로그인된 상태' 안내","why":"웹 계정과 다른 계정임을 알리려고"},{"k":"FO-CH-11-2","t":"계정 설정에 알리페이에서 받은 프로필이 채워짐","why":"이메일·비밀번호 없는 계정에 맞춰서"}]},{"id":"FO-CH-12","name":"회원 탈퇴","area":"FO","file":"alipay-member.html","open":"resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.view='fo12';render()","lines":[{"k":"FO-CH-12-1","t":"탈퇴 안내 네 줄 (알리페이 연결 끊김 등)","why":"탈퇴 뒤 달라지는 점을 알리려고"},{"k":"FO-CH-12-2","t":"다시 들어오면 새 회원으로 동의부터 다시","why":"알리페이 연결을 끊고 새로 만들어서"}]},{"id":"FO-CH-13","name":"예약 입력","area":"FO","file":"alipay-member.html","open":"resetDB();S.agTerms=true;S.agPriv=true;S.agProf=true;joinNow();S.view='fo13';render()","lines":[{"k":"FO-CH-13-1","t":"이메일 칸 없음, 국적·성별·생년월일 미리 채움","why":"이메일이 없고 프로필은 받아 둬서"},{"k":"FO-CH-13-2","t":"알리페이 번호가 온 회원은 문자 인증 건너뜀","why":"알리페이가 이미 확인한 번호라서"}]},{"id":"FO-SYS","name":"고객 화면·데이터 처리 (시안 없음)","area":"공통","file":null,"open":null,"lines":[{"k":"FO-CH-01-1","t":"지금 접속한 채널을 도메인으로 구분","why":"모든 화면이 같은 기준을 쓰게"},{"k":"FO-CH-02-1","t":"웹·알리페이 앱 모두 채널에 안 맞는 콘텐츠 숨김","why":"어떤 경로로도 볼 수 없게"},{"k":"FO-CH-03-1","t":"채널에 없는 콘텐츠 주소로 들어오면 기존 404","why":"새 화면 없이 마지막 처리만"},{"k":"FO-CH-04-1","t":"웹과 알리페이 앱의 목록 결과를 섞지 않음","why":"채널마다 보이는 목록이 달라서"},{"k":"FO-CH-05-1","t":"알리페이 앱엔 알리페이 앱에서 켠 버튼만 표시","why":"없으면 하단 버튼 영역을 접음"},{"k":"FO-CH-06-1","t":"기획전·홈·매거진 카드에서 채널에 없는 대상 뺌","why":"남은 게 0건이면 묶음째 숨김"},{"k":"FO-CH-07-1","t":"알리페이 앱 언어 선택을 중국어(간체·번체)·영어로","why":"알리페이 앱 대상 언어가 셋이라서"},{"k":"SYS-CH-01-1","t":"콘텐츠마다 노출 채널 값 하나 (전체 / 웹 / 알리페이 앱)","why":"등록 화면과 목록이 이 값을 보여줘서"},{"k":"SYS-CH-02-1","t":"실제로 보이는 채널은 연결 대상까지 따져 정함","why":"목록 사유도 같은 결과로 표시"},{"k":"SYS-CH-03-1","t":"기존 콘텐츠는 전부 '전체', 기존 버튼은 웹 값으로","why":"배포 전 상태를 그대로 이어가려고"},{"k":"SYS-CH-04-1","t":"알리페이 계정으로 따로 로그인 없이 회원 확인","why":"알리페이 회원은 웹 회원과 별개"},{"k":"SYS-CH-05-1","t":"알리페이 회원 예약 알림은 우리 문자로 발송","why":"이메일을 받지 않아서"}]}];
+var FB = [], fbState = 'loading', rvFilter = 'all', rvOpenK = {}, rvDraft = {};
+var rvList = document.getElementById('rvList'), rvSt = document.getElementById('rvSt'), rvName = document.getElementById('rvName');
+try { rvName.value = localStorage.getItem('rvName') || ''; } catch (e) {}
+rvName.addEventListener('input', function () { try { localStorage.setItem('rvName', rvName.value.trim()); } catch (e) {} });
+function rvTab(which) {
+  document.querySelectorAll('.rtabs button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-rt') === which); });
+  document.getElementById('rv').classList.toggle('qa-hide', which !== 'rv');
+  document.querySelectorAll('.qa-only').forEach(function (e) { e.classList.toggle('qa-hide', which !== 'qa'); });
+  var gt = document.getElementById('gtabs'); if (gt) gt.style.display = which === 'rv' ? 'none' : '';
+  try { localStorage.setItem('rvTab', which); } catch (e) {}
+}
+document.querySelectorAll('.rtabs button').forEach(function (b) { b.addEventListener('click', function () { rvTab(b.getAttribute('data-rt')); }); });
+var rvStart = 'rv'; try { rvStart = localStorage.getItem('rvTab') || 'rv'; } catch (e) {}
+rvTab(rvStart);
+document.querySelectorAll('[data-rf]').forEach(function (b) { b.addEventListener('click', function () { rvFilter = b.getAttribute('data-rf'); document.querySelectorAll('[data-rf]').forEach(function (x) { x.classList.toggle('on', x === b); }); rvRender(); }); });
+document.getElementById('rvReload').addEventListener('click', function () { fbLoad(); });
+function qsOf(k) { return FB.filter(function (x) { return !x.parent && x.item === k && x.status !== '삭제'; }); }
+function repliesOf(id) { return FB.filter(function (x) { return x.parent === id; }); }
+function fbLoad() {
+  fbState = 'loading'; rvStatus();
+  return fetch(FB_URL).then(function (r) { return r.json(); }).then(function (j) { FB = (j && j.rows) || []; fbState = 'ok'; rvRender(); })
+    .catch(function () { fbState = 'err'; rvRender(); });
+}
+function fbPost(o) { return fetch(FB_URL, { method: 'POST', body: JSON.stringify(o) }).then(function (r) { return r.json(); }); }
+function rvStatus() {
+  var open = FB.filter(function (x) { return !x.parent && x.status === '열림'; }).length, all = FB.filter(function (x) { return !x.parent && x.status !== '삭제'; }).length;
+  document.getElementById('rvCnt').textContent = REVIEW.length + '개 화면 · 질문 ' + all + '건 (열림 ' + open + ')';
+  rvSt.className = 'rvst' + (fbState === 'err' ? ' err' : '');
+  rvSt.textContent = fbState === 'loading' ? '불러오는 중' : fbState === 'err' ? '질문을 불러오지 못했습니다. 새로고침을 눌러 주세요.' : '줄마다 질문 남기기로 질문·수정 요청·의견을 남길 수 있습니다. 남긴 글은 이 링크를 여는 모두에게 보입니다.';
+}
+function needName() {
+  var nm = rvName.value.trim();
+  if (!nm) { rvName.focus(); rvSt.className = 'rvst err'; rvSt.textContent = '먼저 위쪽 내 이름 칸에 이름을 적어 주세요.'; return null; }
+  return nm;
+}
+function rvRender() {
+  rvStatus();
+  var keep = rvList.scrollTop, h = '';
+  REVIEW.forEach(function (s) {
+    var lines = s.lines.filter(function (l) { return rvFilter === 'all' || qsOf(l.k).some(function (q) { return q.status === '열림'; }); });
+    if (!lines.length) return;
+    h += '<div class="scr"><div class="sh"><span class="sid">' + esc(s.id) + '</span><span class="snm">' + esc(s.name) + '</span>' +
+      (s.file ? '<button class="btn" data-open="' + esc(s.id) + '">이 화면 열기</button>' : '<span class="rvst">시안 없음</span>') + '</div>';
+    lines.forEach(function (l) {
+      var qs = qsOf(l.k), op = qs.filter(function (q) { return q.status === '열림'; }).length;
+      h += '<div class="ln"><div class="lt"><div class="lx"><div class="t">' + esc(l.t) +
+        (qs.length ? '<span class="qc' + (op ? ' open' : '') + '">질문 ' + qs.length + (op ? ' · 열림 ' + op : '') + '</span>' : '') + '</div>' +
+        '<div class="w">' + esc(l.why) + '</div></div>' +
+        '<button class="btn ask" data-k="' + esc(l.k) + '">' + (rvOpenK[l.k] ? '접기' : qs.length ? '질문 보기' : '질문 남기기') + '</button></div>';
+      if (rvOpenK[l.k]) {
+        qs.forEach(function (q) {
+          h += '<div class="th"><div class="qh"><span class="qtype">' + esc(q.type) + '</span><span class="qa">' + esc(q.author) + '</span><span>' + esc(q.createdAt) + '</span><span>' + esc(q.id) + '</span>' +
+            '<select data-st="' + esc(q.id) + '" class="st-' + esc(q.status) + '">' + ['열림', '답변함', '반영함', '보류', '삭제'].map(function (v) { return '<option' + (v === q.status ? ' selected' : '') + '>' + v + '</option>'; }).join('') + '</select></div>' +
+            '<div class="qb">' + esc(q.content) + '</div>' +
+            (q.updatedBy ? '<div class="qh" style="margin-top:4px">상태 ' + esc(q.status) + ' · ' + esc(q.updatedBy) + ' · ' + esc(q.updatedAt) + '</div>' : '');
+          repliesOf(q.id).forEach(function (r) { h += '<div class="rp"><div class="qh"><span class="qa">' + esc(r.author) + '</span><span>' + esc(r.createdAt) + '</span></div><div class="qb">' + esc(r.content) + '</div></div>'; });
+          h += '<div class="rf"><input data-rin="' + esc(q.id) + '" placeholder="답글을 적어 주세요" value="' + esc(rvDraft['r' + q.id] || '') + '"><button class="btn" data-rsend="' + esc(q.id) + '">답글</button></div></div>';
+        });
+        h += '<div class="nf"><div class="r"><select data-ntype="' + esc(l.k) + '">' + ['질문', '수정 요청', '의견'].map(function (v) { return '<option' + ((rvDraft['t' + l.k] || '질문') === v ? ' selected' : '') + '>' + v + '</option>'; }).join('') + '</select><span class="rvst">이 줄에 새 글 남기기</span></div>' +
+          '<textarea data-nin="' + esc(l.k) + '" placeholder="궁금한 점이나 바꿨으면 하는 점을 적어 주세요">' + esc(rvDraft['n' + l.k] || '') + '</textarea>' +
+          '<div class="acts"><button class="btn pri" data-nsend="' + esc(l.k) + '">등록</button></div></div>';
+      }
+      h += '</div>';
+    });
+    h += '</div>';
+  });
+  rvList.innerHTML = h || '<div class="empty">' + (rvFilter === 'open' ? '열린 질문이 없습니다.' : '표시할 화면이 없습니다.') + '</div>';
+  rvList.scrollTop = keep;
+}
+function lineOf(k) { var r = null; REVIEW.forEach(function (s) { s.lines.forEach(function (l) { if (l.k === k) r = { s: s, l: l }; }); }); return r; }
+rvList.addEventListener('input', function (e) {
+  var a = e.target;
+  if (a.dataset.nin) rvDraft['n' + a.dataset.nin] = a.value;
+  if (a.dataset.rin) rvDraft['r' + a.dataset.rin] = a.value;
+});
+rvList.addEventListener('change', function (e) {
+  var a = e.target;
+  if (a.dataset.ntype) rvDraft['t' + a.dataset.ntype] = a.value;
+  if (a.dataset.st) {
+    var nm = needName(); if (!nm) { rvRender(); return; }
+    var id = a.dataset.st, v = a.value;
+    rvSt.textContent = '상태를 바꾸는 중';
+    fbPost({ action: 'status', id: id, status: v, author: nm }).then(function (j) { if (!j.ok) throw 0; return fbLoad(); }).catch(function () { fbState = 'err'; rvRender(); });
+  }
+});
+rvList.addEventListener('click', function (e) {
+  var b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.open) { var s = REVIEW.filter(function (x) { return x.id === b.dataset.open; })[0]; if (s && s.file) openCase(s.file, s.open || ''); return; }
+  if (b.dataset.k) { rvOpenK[b.dataset.k] = !rvOpenK[b.dataset.k]; rvRender(); return; }
+  if (b.dataset.nsend) {
+    var k = b.dataset.nsend, nm = needName(); if (!nm) return;
+    var txt = (rvDraft['n' + k] || '').trim(); if (!txt) { rvSt.className = 'rvst err'; rvSt.textContent = '내용을 적어 주세요.'; return; }
+    var L = lineOf(k); b.disabled = true; rvSt.textContent = '등록하는 중';
+    fbPost({ action: 'add', screen: L.s.id, item: k, itemText: L.l.t, author: nm, type: rvDraft['t' + k] || '질문', content: txt })
+      .then(function (j) { if (!j.ok) throw 0; rvDraft['n' + k] = ''; return fbLoad(); }).catch(function () { b.disabled = false; fbState = 'err'; rvRender(); });
+    return;
+  }
+  if (b.dataset.rsend) {
+    var id = b.dataset.rsend, nm2 = needName(); if (!nm2) return;
+    var tx = (rvDraft['r' + id] || '').trim(); if (!tx) return;
+    var q = FB.filter(function (x) { return x.id === id; })[0]; b.disabled = true; rvSt.textContent = '답글을 등록하는 중';
+    fbPost({ action: 'add', parent: id, screen: q ? q.screen : '', item: q ? q.item : '', itemText: q ? q.itemText : '', author: nm2, content: tx })
+      .then(function (j) { if (!j.ok) throw 0; rvDraft['r' + id] = ''; return fbLoad(); }).catch(function () { b.disabled = false; fbState = 'err'; rvRender(); });
+  }
+});
+rvList.addEventListener('keydown', function (e) { if (e.key === 'Enter' && e.target.dataset && e.target.dataset.rin) { var b = rvList.querySelector('[data-rsend="' + e.target.dataset.rin + '"]'); if (b) b.click(); } });
+rvRender(); fbLoad();
+setInterval(function () { var a = document.activeElement; if (document.visibilityState === 'visible' && !(a && rvList.contains(a) && /INPUT|TEXTAREA|SELECT/.test(a.tagName))) fbLoad(); }, 60000);
 </script>
 </body>
 </html>
