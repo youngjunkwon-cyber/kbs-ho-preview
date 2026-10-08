@@ -40,7 +40,9 @@ h2.page{margin:0 0 4px;font-size:22px;font-weight:700}
 .rg{display:inline-flex;gap:16px;align-items:center;flex-wrap:wrap}
 label.rd{display:inline-flex;gap:6px;align-items:center;cursor:pointer;user-select:none;font-size:13px}
 label.rd input{accent-color:#1677ff;width:14px;height:14px;margin:0}
-label.rd.dis{cursor:not-allowed;color:#bfbfbf}
+label.rd.dis{cursor:not-allowed;color:rgb(191,191,191)}
+label.rd.dis input{-webkit-appearance:none;appearance:none;width:14px;height:14px;margin:0;border:1px solid rgb(217,217,217);border-radius:50%;background:#fff;flex:none}
+label.rd.dis input:checked{background:radial-gradient(circle,rgb(140,140,140) 0 3.5px,#fff 4px)}
 .tag{display:inline-block;padding:1px 8px;border-radius:3px;font-size:12px;line-height:20px;white-space:nowrap}
 .tag.all{background:#f6ffed;border:1px solid #b7eb8f;color:#389e0d}
 .tag.web{background:#e6f4ff;border:1px solid #91caff;color:#0958d9}
@@ -98,7 +100,7 @@ select.dim{color:#8c8c8c}
 .toast{background:#fff;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.16);padding:12px 20px;display:flex;align-items:flex-start;gap:10px;max-width:660px;font-size:14px;line-height:1.5;word-break:keep-all}
 .toast .ic{flex:0 0 auto;width:18px;height:18px;border-radius:50%;background:#faad14;color:#fff;font-size:12px;line-height:18px;text-align:center;font-weight:700}
 .mono{font-family:Consolas,monospace;font-size:12px;color:#8c8c8c}
-.lock{opacity:.45}
+.lock{}
 .fld{padding:8px 0}
 .flbl{font-size:12px;color:#595959;font-weight:500;margin-bottom:6px}
 .fbox{width:100%;box-sizing:border-box;height:32px;border:1px solid #d9d9d9;border-radius:4px;padding:0 10px;font-size:12px;color:#222;background:#fff;display:flex;align-items:center;justify-content:space-between}
@@ -317,7 +319,7 @@ const DB = {
     body: '가을에는 두피가 건조해집니다. 자세한 코스는 <a href="https://k-beautystation.com/products/P1">상품 페이지</a>에서 확인하세요. 후기 영상은 https://www.instagram.com/p/abc/ 에서 볼 수 있습니다. <iframe src="https://www.youtube.com/embed/xyz"></iframe> [상품 카드:P1:두피 스케일링 케어] [상품 카드:P5:헤어 클리닉 4주] [상품 카드:P12:알리페이 전용 두피 패키지]' }],
   columns: [
     { id: 'CL1', title: '여름철 모공 관리 가이드', store: 'S1', status: '게시중', langs: '영어, 중국어(간체), 일본어', reg: '2026-06-10' },
-    { id: 'CL2', title: '눈매교정 전 알아둘 것', store: 'S4', status: '게시중', langs: '중국어(번체), 일본어', reg: '2026-07-02' }
+    { id: 'CL2', title: '눈매교정 전 알아둘 것', store: 'S4', status: '게시중', langs: '중국어(번체), 일본어', reg: '2026-07-02', stripped: true }
   ]
 };
 
@@ -711,7 +713,7 @@ function passFilter(eff, reasons) {
   return true;
 }
 const dimSel = (label, opts) => '<div class="fl"><span>' + label + '</span><select class="dim" disabled>' + opts.map(o => '<option>' + o + '</option>').join('') + '</select></div>';
-const empty = n => '<tr><td colspan="' + n + '" class="c tblnote">조건에 맞는 건이 없습니다.</td></tr>';
+const empty = n => '<tr><td colspan="' + n + '" class="c tblnote">데이터가 없습니다</td></tr>';
 window.setLang = function (v) { VIEW.lang = v; if (!aliLangOk()) F().ch = CHF; render(); };
 const langSelect = () => '<div class="fl"><span>언어</span><select onchange="setLang(this.value)">' + ALL_LANGS.map(l => '<option' + (l === VIEW.lang ? ' selected' : '') + '>' + l + '</option>').join('') + '</select></div>';
 
@@ -1062,7 +1064,7 @@ function screen_colList() {
 window.openCol = function (id) { VIEW.cid = id; go('col-edit'); };
 function screen_colEdit() {
   const c = CL(VIEW.cid || 'CL1'), st = S(c.store);
-  return '<div class="phd"><div><h2 class="page">스토어 칼럼 상세</h2><div class="pdesc">' + esc(c.title) + '</div></div><div><button class="btn" onclick="go(\'col-list\')">뒤로가기</button></div>' +
+  return '<div class="phd"><div><h2 class="page">스토어 칼럼 상세</h2><div class="pdesc">' + esc(c.title) + '</div></div><div>' + (c.stripped ? '<button class="btn" style="margin-right:8px" onclick="restoreCol()">원문 복원</button>' : '') + '<button class="btn" onclick="go(\'col-list\')">뒤로가기</button></div>' +
     '<div class="fl"><span>시안 전환</span><select onchange="pickCol(this.value)">' + DB.columns.map(x => '<option value="' + x.id + '"' + (x.id === c.id ? ' selected' : '') + '>' + esc(x.title) + ' (' + esc(S(x.store).name) + ')</option>').join('') + '</select></div></div>' +
     '<div class="card"><div class="hd">글 정보</div><div class="bd">' +
     '<div class="row"><div class="lbl">스토어</div><div class="val">' + esc(st.name) + '</div></div>' +
@@ -1073,6 +1075,7 @@ function screen_colEdit() {
     '</div></div>';
 }
 window.CL = CL;
+window.restoreCol = function () { const c = CL(VIEW.cid || 'CL1'); c.stripped = false; render(); };
 window.pickCol = function (id) { pageSnapRestore(); pageSnapTake('col-edit'); VIEW.cid = id; render(); };
 
 /* --------------------- BO-CH-10 · 버튼 설정 공통 구조 --------------------- */
@@ -1083,7 +1086,7 @@ const SPEC_ROWS = [
   ['상담접수·채팅 통합 표시', MSG.inquiryHint],
   ['외부링크 설정', MSG.hardOff],
   ['메신저 설정', MSG.hardOff],
-  ['예약', MSG.needBooking]
+  ['예약', '']
 ];
 function screen_btnSpec() {
   const ON = { '상담접수': 1, '예약': 1 };
@@ -1111,6 +1114,20 @@ window.tryInsertLink = function () {
   const m = M('M1'); const cur = window.EDBUF != null ? window.EDBUF : m.body;
   window.EDBUF = cur + ' <a href="' + v.trim() + '">' + v.trim() + '</a>'; MODAL = null; render();
 };
+function focusAdField(o, b, which) {
+  const q = s => document.querySelector(s);
+  let e = null;
+  if (which === 'path' || which === 'target') e = q('#mdholder input[oninput*="setAdInnerPath"], .modal input[oninput*="setAdInnerPath"]') || q('select[onchange^="setAdInnerId"]');
+  else if (which === 'btnpath') e = q('input[oninput*="setAdBtnInnerPath"]') || q('input[oninput*="BtnInner"]');
+  else {
+    const inr = x => JSON.stringify(x && x.inner || null);
+    if (!o || inr(o) !== inr(b)) e = q('input[oninput*="setAdInnerPath"]') || q('select[onchange^="setAdInnerId"]');
+    else if (o.channel !== b.channel) e = q('input[name="bch"]:checked');
+    else if (o.lang !== b.lang) e = q('select[onchange^="setAdLang"]');
+    if (!e) e = q('select[onchange^="setAdInnerId"]') || q('input[name="bch"]:checked');
+  }
+  if (e) e.focus();
+}
 window.saveAd = function () {
   const b = A(VIEW.id), o = adOrig();
   const done = () => { stampName(b.inner); if (b.btn) stampName(b.btn.inner); ADFULL = null; closeMD(); alertBox('저장했습니다', MSG.saveDone); };
@@ -1122,13 +1139,13 @@ window.saveAd = function () {
   const oBtnInner = o && o.linkType === '내부이미지랜딩페이지' && o.btn && o.btn.linkKind === '내부링크' ? o.btn.inner : null;
   if (b.linkType === '내부링크' && b.inner && b.inner.kind === '직접입력' && addrChanged(b.inner, oInner)) {
     const tv = innerTargetOk(b.inner, b.lang, WEB);
-    if (tv.bad) { alertBox('저장할 수 없습니다', MSG.bnPathOnly(false)); return; }
-    if (tv.notFound) { alertBox('저장할 수 없습니다', MSG.bnNotFound); return; }
+    if (tv.bad) { alertBox('저장할 수 없습니다', MSG.bnPathOnly(false), () => focusAdField(o, b, 'path')); return; }
+    if (tv.notFound) { alertBox('저장할 수 없습니다', MSG.bnNotFound, () => focusAdField(o, b, 'path')); return; }
   }
-  if (b.linkType === '내부이미지랜딩페이지' && b.btn && b.btn.linkKind === '내부링크' && b.btn.inner && b.btn.inner.kind === '직접입력' && addrChanged(b.btn.inner, oBtnInner) && innerTargetOk(b.btn.inner, b.lang, WEB).bad) { alertBox('저장할 수 없습니다', MSG.bnPathOnly(true)); return; }
+  if (b.linkType === '내부이미지랜딩페이지' && b.btn && b.btn.linkKind === '내부링크' && b.btn.inner && b.btn.inner.kind === '직접입력' && addrChanged(b.btn.inner, oBtnInner) && innerTargetOk(b.btn.inner, b.lang, WEB).bad) { alertBox('저장할 수 없습니다', MSG.bnPathOnly(true), () => focusAdField(o, b, 'btnpath')); return; }
   if (touched && b.linkType === '내부링크' && b.inner) {
     const miss = targetMiss(b.inner, b); const tv = innerTargetOk(b.inner, b.lang, WEB);
-    if (miss.length && !tv.skip) { alertBox('저장할 수 없습니다', MSG.bnBlock(miss.length === 2 ? '웹과 알리페이 앱' : miss[0])); return; }
+    if (miss.length && !tv.skip) { alertBox('저장할 수 없습니다', MSG.bnBlock(miss.length === 2 ? '웹과 알리페이 앱' : miss[0]), () => focusAdField(o, b)); return; }
   }
   done();
 };
@@ -1176,7 +1193,7 @@ window.saveColl = function () {
   const done = () => { COLLSNAP = null; closeMD(); alertBox('저장했습니다', MSG.saveDone); };
   const total = byStore ? c.stores.length : c.products.length;
   /* 구성 0건은 활성 저장만 막는다. 비활성으로 저장할 때는 막지 않고 안내도 띄우지 않는다 */
-  if (!total) { if (c.active === '활성') { alertBox('저장할 수 없습니다', MSG.exhNone(byStore ? '스토어가' : '상품이')); return; } done(); return; }
+  if (!total) { if (c.active === '활성') { alertBox('저장할 수 없습니다', MSG.exhNone(byStore ? '스토어가' : '상품이'), () => { const e = document.querySelector('.modal .ctbl, .modal table'); if (e) { e.setAttribute('tabindex', '-1'); e.focus(); } }); return; } done(); return; }
   const emptyChs = collEmptyChannels(c); /* 대상 외 언어 기획전은 유효값이 웹이라 웹만 센다 */
   if (!emptyChs.length) { done(); return; }
   const word = byStore ? '스토어가' : '상품이';

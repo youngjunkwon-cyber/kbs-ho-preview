@@ -333,7 +333,8 @@ const CONS=[];
 })();
 
 /* ========= 3) 스토어 채팅 / 4) 상품 채팅 ========= */
-/* 알리페이 식별자: 회원마다 고정된 16자리(2088로 시작). 회원 정보에 닉네임이 없을 때만 고객명 자리에 보인다 */
+/* 알리페이 식별자: 회원마다 고정된 16자리(2088로 시작). 회원 정보에 이름이 없는 회원(NONAME)만 고객명 자리에 보인다 */
+const NONAME=new Set(['赵一诺','Ho Man Kit']);
 function aidOf(s){let h=7;for(const c of String(s))h=(h*131+c.charCodeAt(0))%999999999989;return ('2088'+String(100000000000+h%899999999999)).slice(0,16)}
 const CHATS=[],PCHATS=[];
 function mkChat(n,w,c,h,isProd){
@@ -351,7 +352,7 @@ function mkChat(n,w,c,h,isProd){
     const guest=ch==='웹'&&ri(5)<3;
     let cust;
     if(ch==='웹')cust=guest?(isProd?'c30d'+dg(4)+'-'+dg(4)+'-447b-bb2d-d1aeb2a'+dg(4):'게스트'):p.name;
-    else cust=ri(2)?p.nick:aidOf(p.name);
+    else{ri(2);cust=NONAME.has(p.name)?aidOf(p.name):p.name;}
     const o={no:n-i,first:f,last:l,room,resp,lw,ch,store:st.ko,cat:st.cat,staff:st.staff,sname:snm(st,p.lang),cust,lang:p.lang,email:ch==='웹'&&!guest?p.email:'',
       route:ch==='웹'&&ri(12)===0?'외부(스토어)':'스토어',prod:isProd?prodOf(st,p.lang):'',hay:(cust+' '+st.ko+' '+p.email).toLowerCase()};
     (isProd?PCHATS:CHATS).push(o);
