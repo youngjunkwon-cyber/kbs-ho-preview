@@ -971,6 +971,8 @@ setInterval(function () { var a = document.activeElement; if (document.visibilit
   document.getElementById('introClose').addEventListener('click', function () { show(false); });
   document.querySelectorAll('.lbar .areaBtn').forEach(function (x) { x.addEventListener('click', function () { show(false); }); });
   window.addEventListener('resize', setH);
+  /* 시안 화면을 여는 모든 버튼(리뷰 탭·검수 탭의 이 화면 열기)은 먼저 이 덮개를 닫는다 */
+  var _openCase = openCase; openCase = function (src, code) { show(false); return _openCase(src, code); };
   var seen = null; try { seen = localStorage.getItem('introSeen'); } catch (e) {}
   if (!seen) show(true);
 })();
