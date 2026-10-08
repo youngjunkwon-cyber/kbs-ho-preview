@@ -360,6 +360,8 @@ function mkChat(n,w,c,h,isProd){
 }
 mkChat(30,21,5,4,false);
 mkChat(24,16,5,3,true);
+/* 예시: 같은 날·같은 스토어·같은 문의 구분·같은 언어에 웹과 알리페이가 섞인 경우(10-04 디디유 상품문의 중국어(간체) 웹 1 + 알리페이 1) */
+(function(){const r=PCHATS.find(x=>x.no===20&&x.store==='디디유');if(!r)return;const st=STORES.find(s=>s.ko===r.store);r.lang='중국어(간체)';r.sname=snm(st,r.lang);r.prod=PRODS[st.cat][0][2];r.hay=(r.cust+' '+st.ko+' ').toLowerCase();})();
 
 /* ========= 5) 리뷰 ========= */
 const REV=[];
@@ -699,7 +701,7 @@ function vStat(){
     const lv=[mk,r=>r.store,r=>r.kind,r=>r.lang,r=>r.cv,detLabel];
     const pre=(r,d)=>lv.slice(0,d+1).map(f=>f(r)).join('|');
     const cm=[];for(let d=0;d<6;d++)cm.push(count(rows,r=>pre(r,d)));
-    const sorted=rows.slice().sort((a,b)=>{for(let d=0;d<6;d++){const x=lv[d](a),y=lv[d](b);if(x!==y)return d===0?(x<y?1:-1):x.localeCompare(y,'ko')}return 0});
+    const sorted=rows.slice().sort((a,b)=>{for(let d=0;d<6;d++){const x=lv[d](a),y=lv[d](b);if(x!==y)return d===0?(x<y?1:-1):d===4?CHS.indexOf(x)-CHS.indexOf(y):x.localeCompare(y,'ko')}return 0});
     const leaves=[];sorted.forEach(r=>{const k=pre(r,5);if(!leaves.length||leaves[leaves.length-1].k!==k)leaves.push({k,r});});
     const spanOf=(r,d)=>leaves.filter(l=>pre(l.r,d)===pre(r,d)).length;
     let html='';
