@@ -425,9 +425,9 @@ const ageB=a=>a<20?'10대':a<30?'20대':a<40?'30대':a<50?'40대':'50대 이상'
 /* 전화번호 정리: +1은 나라별 지역번호로, 같은 이름은 모든 목록에서 같은 번호 */
 (function(){const AR={'캐나다':['416','647','437','604','778','514','438','403','587','613'],'미국':['212','646','917','213','310','415','312','206','617','702']};
   const fix=(ph,nat)=>{const m=/^\+1 (\d{10})$/.exec(ph||'');if(!m)return ph;const d=m[1],a=(AR[nat]||AR['미국']);return '+1 '+a[(+d.slice(0,2))%a.length]+String(2+(+d[3])%8)+d.slice(4)};
-  const first={};RES.forEach(r=>{const p=fix(r.phone,r.nat);if(!(r.name in first))first[r.name]=p;const o=r.phone;r.phone=first[r.name];if(r.hay&&o)r.hay=r.hay.split(o.toLowerCase()).join(r.phone.toLowerCase())});
+  const first={'kaitlyn chan':'+1 4385427774','evelyn lee':'+1 6478223394','shiyi chen':'+1 5148426040'};const K=s=>String(s||'').toLowerCase();RES.forEach(r=>{const p=fix(r.phone,r.nat);if(!(K(r.name) in first))first[K(r.name)]=p;const o=r.phone;r.phone=first[K(r.name)];if(r.hay&&o)r.hay=r.hay.split(o.toLowerCase()).join(r.phone.toLowerCase())});
   const sid={};CONS.forEach(r=>{if(r.snsId&&r.ch!=='웹'){if(!(r.name in sid))sid[r.name]=r.snsId;r.snsId=sid[r.name]}});
-  CONS.forEach(r=>{if(!r.phone)return;const o=r.phone;let p=first[r.name];if(!p){p=fix(r.phone,NATOF[r.name]);first[r.name]=p}r.phone=p;if(r.hay)r.hay=r.hay.split(o.toLowerCase()).join(p.toLowerCase())});
+  CONS.forEach(r=>{if(!r.phone)return;const o=r.phone;let p=first[K(r.name)];if(!p){p=fix(r.phone,NATOF[r.name]);first[K(r.name)]=p}r.phone=p;if(r.hay)r.hay=r.hay.split(o.toLowerCase()).join(p.toLowerCase())});
 })();
 /* ========= 상태 ========= */
 let _v='res',S,OPEN={};

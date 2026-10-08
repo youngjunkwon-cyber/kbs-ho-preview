@@ -66,7 +66,8 @@ button{font-family:inherit;font-size:13px}
 .btn.sm{padding:3px 9px;font-size:12px}
 .btn.red{color:#ff4d4f;border-color:#ffa39e}
 .btn:disabled{background:#f5f5f5;border-color:#d9d9d9;color:#bfbfbf;cursor:not-allowed}
-.sw{width:38px;height:20px;border-radius:10px;background:#d9d9d9;position:relative;display:inline-block;cursor:pointer;vertical-align:middle}
+.sw{width:38px;height:20px;border-radius:10px;background:#d9d9d9;position:relative;display:inline-block;cursor:default;vertical-align:middle}
+.sw[onclick]{cursor:pointer}
 .sw.on{background:#1677ff}
 .sw i{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:8px;background:#fff;transition:.15s}
 .sw.on i{left:20px}
@@ -889,7 +890,7 @@ function innerPicker(kindH, idH, cur, pathH, b) {
     const side = tv.skip || tv.notFound ? tv.label : tv.dead ? '노출되지 않음, ' + tv.label :
       (tv.eff ? '노출 채널 ' + tv.eff + ', ' : '') + tv.label + (miss.length ? '. ' + (miss.length === 2 ? '웹과 알리페이 앱' : miss[0]) + '에 노출되지 않습니다.' : '');
     tail = '<input type="text" id="' + fid + '" placeholder="/products/P1" style="width:220px" value="' + esc((cur && cur.path) || '') + '" oninput="var k=this.selectionStart;' + pathH + ';refocus(\'' + fid + '\',k)"> ' +
-      '<span class="tblnote">' + esc(side) + '</span>';
+      '<span class="tblnote" style="display:block;margin-top:6px">' + esc(side) + '</span>';
   } else tail = '<select onchange="' + idH + '">' + opts.map(o => '<option value="' + o[0] + '"' + (cur && cur.id === o[0] ? ' selected' : '') + '>' + esc(o[1]) + '</option>').join('') + '</select>';
   return '<select onchange="' + kindH + '">' + INNER_KINDS.map(k => '<option' + (k === kind ? ' selected' : '') + '>' + k + '</option>').join('') + '</select> ' + tail;
 }
@@ -1277,7 +1278,16 @@ function render() {
   let swapObj = null, swapLive = null;
   if (MODAL === 'ad' && ADFULL && A(VIEW.id)) { swapObj = A(VIEW.id); swapLive = JSON.stringify(swapObj); Object.keys(swapObj).forEach(k => delete swapObj[k]); Object.assign(swapObj, JSON.parse(ADFULL)); }
   else if (MODAL === 'coll' && COLLSNAP && C(VIEW.id)) { swapObj = C(VIEW.id); swapLive = JSON.stringify(swapObj); Object.keys(swapObj).forEach(k => delete swapObj[k]); Object.assign(swapObj, JSON.parse(COLLSNAP)); }
+  /* 같은 화면을 다시 그릴 때 목록 표 가로·세로 스크롤과 셀렉트·입력 포커스를 그대로 둔다 */
+  const L_scr = el('#screen'), L_same = L_scr.getAttribute('data-v') === VIEW.name, L_keep = {}, L_kc = {};
+  const L_skey = (e, c) => (e.className || e.tagName) + '#' + (c[e.className] = (c[e.className] || 0) + 1);
+  const L_isScr = e => { const cs = getComputedStyle(e); return (/auto|scroll/.test(cs.overflowX) && e.scrollWidth > e.clientWidth) || (/auto|scroll/.test(cs.overflowY) && e.scrollHeight > e.clientHeight); };
+  if (L_same) L_scr.querySelectorAll('*').forEach(e => { if (L_isScr(e)) L_keep[L_skey(e, L_kc)] = [e.scrollLeft, e.scrollTop]; });
+  const L_fa = document.activeElement, L_fsig = L_fa && L_scr.contains(L_fa) && /SELECT|INPUT/.test(L_fa.tagName) ? (L_fa.getAttribute('onchange') || L_fa.getAttribute('oninput') || L_fa.id) : null;
   try { el('#screen').innerHTML = map[VIEW.name](); } finally { if (swapObj) { Object.keys(swapObj).forEach(k => delete swapObj[k]); Object.assign(swapObj, JSON.parse(swapLive)); } }
+  L_scr.setAttribute('data-v', VIEW.name);
+  if (L_same) { const L_L_kc2 = {}; L_scr.querySelectorAll('*').forEach(e => { if (L_isScr(e)) { const v = L_keep[L_skey(e, L_L_kc2)]; if (v) { e.scrollLeft = v[0]; e.scrollTop = v[1]; } } }); }
+  if (L_fsig) { const back = [...L_scr.querySelectorAll('select,input')].find(e => (e.getAttribute('onchange') || e.getAttribute('oninput') || e.id) === L_fsig); if (back && !MODAL) back.focus(); }
   const md = { ad: modal_ad, coll: modal_coll, link: modal_link };
   const holder = document.getElementById('mdholder') || (function () { const d = document.createElement('div'); d.id = 'mdholder'; document.body.appendChild(d); return d; })();
   /* 같은 수정 창을 다시 그릴 때는 창 스크롤·표 가로 스크롤·포커스를 그대로 둔다 */
