@@ -68,6 +68,7 @@ button{font-family:inherit;font-size:13px}
 .btn:disabled{background:#f5f5f5;border-color:#d9d9d9;color:#bfbfbf;cursor:not-allowed}
 .sw{width:38px;height:20px;border-radius:10px;background:#d9d9d9;position:relative;display:inline-block;cursor:default;vertical-align:middle}
 .sw[onclick]{cursor:pointer}
+.guide{display:flex;flex-direction:column;gap:14px}.gstep{display:flex;gap:12px;align-items:flex-start}.gno{flex:none;width:22px;height:22px;border-radius:11px;background:#1f1f1f;color:#fff;font-size:12px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;margin-top:1px}.gtt{font-size:13.5px;font-weight:700;color:#222;margin-bottom:3px}.gds{font-size:13px;color:#555;line-height:1.65}
 .sw.on{background:#1677ff}
 .sw i{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:8px;background:#fff;transition:.15s}
 .sw.on i{left:20px}
@@ -1096,13 +1097,14 @@ function screen_btnSpec() {
     rows += btnTblRow(r[0], '<td>' + onoff('sp_w_' + r[0], on, 'void(%V%)', true) + '</td><td' + (hard ? ' class="lock"' : '') + '>' + onoff('sp_a_' + r[0], on && !hard, 'void(%V%)', true) + '</td>', r[1]); });
   return '<div class="phd"><div><h2 class="page">버튼 설정 공통 구조</h2><div class="pdesc">상품과 스토어의 버튼 설정이 공유하는 항목과 규칙입니다.</div></div></div>' +
     '<div class="card"><div class="hd">표 구조</div><div class="bd">' + BTN_TBL_HEAD + rows + '</tbody></table></div></div></div>' +
-    '<div class="card"><div class="hd">버튼 개수 세는 법</div><div class="bd">' +
-    '<div class="row"><div class="lbl">세는 법</div><div class="val">켜 둔 항목 하나가 버튼 하나입니다. 문의하기(상담접수·채팅 통합 표시)도 따로 1개로 셉니다. 웹과 알리페이 앱은 따로 셉니다.</div></div>' +
-    '<div class="row"><div class="lbl">최대 개수</div><div class="val">웹 2개, 알리페이 앱 2개까지 켤 수 있습니다.</div></div>' +
-    '<div class="row"><div class="lbl">3개째를 켜면</div><div class="val">켜지지 않고 화면 위에 안내가 4초 동안 보입니다. "버튼은 웹과 알리페이 앱 각각 2개까지 켤 수 있습니다. 지금 웹에는 상담접수 / 예약 2개가 켜져 있습니다."</div></div>' +
-    '<div class="row"><div class="lbl">이미 3개면</div><div class="val">노출 채널이나 지원언어를 바꿔 잠겼던 쪽이 풀리거나 예약을 다시 사용으로 바꿔 3개가 켜진 상태가 되면 표 아래에 빨간 안내가 뜹니다. 하나를 끌 때까지 저장할 수 없습니다.</div></div>' +
-    '<div class="row"><div class="lbl">노출과의 관계</div><div class="val">버튼은 노출 조건이 아닙니다. 버튼을 하나도 켜지 않아도 상품·스토어는 고객 화면에 나오고, 하단 버튼 자리는 보이지 않습니다. 노출 채널이 웹이면 알리페이 앱 쪽 버튼을, 알리페이 앱이면 웹 쪽 버튼을 바꿀 수 없습니다. 켜 둔 값은 그대로 남습니다.</div></div>' +
-    '<div class="row"><div class="lbl">예시</div><div class="val">웹은 상담접수 / 예약 2개, 알리페이 앱은 상담접수 / 예약 2개가 켜져 있습니다. 여기서 문의하기를 켜면 3개째라 켜지지 않습니다.</div></div>' + '</div></div>';
+    '<div class="card"><div class="hd">운영 가이드: 버튼 설정하기</div><div class="bd guide">' +
+    '<div class="gstep"><span class="gno">1</span><div><div class="gtt">어디서 설정하나요</div><div class="gds">상품은 상품정보관리에서 상품을 열고 관리자설정 탭의 버튼 설정 표에서, 스토어는 스토어 > 정보관리에서 스토어를 열고 버튼 및 메신저 설정에서 정합니다.</div></div></div>' +
+    '<div class="gstep"><span class="gno">2</span><div><div class="gtt">웹과 알리페이 앱을 따로 켭니다</div><div class="gds">표의 항목마다 웹 칸과 알리페이 앱 칸에서 ON / OFF를 고릅니다. 고객 화면 아래쪽에는 그 채널에서 켠 버튼만 나옵니다.</div></div></div>' +
+    '<div class="gstep"><span class="gno">3</span><div><div class="gtt">채널마다 2개까지 켤 수 있습니다</div><div class="gds">켜 둔 항목 하나가 버튼 하나입니다(문의하기도 1개). 이미 2개가 켜진 채널에서 하나를 더 켜면 켜지지 않고 화면 위에 안내가 잠깐 뜹니다. 먼저 하나를 끈 뒤 켜 주세요.</div></div></div>' +
+    '<div class="gstep"><span class="gno">4</span><div><div class="gtt">켤 수 없는 칸이 있습니다</div><div class="gds">알리페이 앱의 외부링크·메신저는 알리페이 앱에서 지원하지 않아 늘 꺼져 있습니다. 노출 채널이 웹이면 알리페이 앱 칸 전체가, 알리페이 앱이면 웹 칸 전체가 잠깁니다(켜 둔 값은 남습니다). 예약은 예약설정에서 예약을 사용하는 스토어만 켤 수 있습니다.</div></div></div>' +
+    '<div class="gstep"><span class="gno">5</span><div><div class="gtt">상품은 스토어 설정을 따를 수 있습니다</div><div class="gds">상품의 스토어 설정 적용이 기본 설정이면 스토어 버튼 구성을 그대로 씁니다. 상품만 다르게 하려면 개별 설정을 고른 뒤 바꿉니다.</div></div></div>' +
+    '<div class="gstep"><span class="gno">6</span><div><div class="gtt">저장이 안 될 때</div><div class="gds">표 아래에 빨간 안내가 보이면 한 채널에 3개 이상 켜져 있는 상태입니다. 하나를 끄고 저장하면 됩니다. 저장한 내용은 1분 안에 고객 화면에 반영됩니다.</div></div></div>' +
+    '<div class="gstep"><span class="gno">7</span><div><div class="gtt">알아 둘 점</div><div class="gds">버튼은 노출 조건이 아닙니다. 버튼을 하나도 켜지 않아도 상품·스토어는 고객 화면에 나오고, 아래쪽 버튼 자리만 보이지 않습니다.</div></div></div>' + '</div></div>';
 }
 
 /* --------------------- BO-CH-07 · 매거진 등록·수정 --------------------- */
