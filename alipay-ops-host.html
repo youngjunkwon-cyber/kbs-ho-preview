@@ -77,6 +77,8 @@ td small{display:block;color:var(--tx3);font-size:9.5px;margin-top:3px}
 .stw .stp{margin-bottom:0}.stw .chb{margin-right:0}
 .rv .a .chb{margin-right:0}
 .ci .a .chb{margin:0}
+.m .cvb{font-size:9.5px;line-height:normal;padding:0 6px;margin:0;font-weight:600;height:16px;box-sizing:border-box;display:inline-flex;align-items:center}
+.lrh .m .cvb+.cvb{margin-left:-6px}
 .ci .a .chn{font-weight:500}
 .bsp{position:fixed;right:14px;bottom:14px;z-index:60;background:#fff;border:1px dashed #999;border-radius:6px;padding:8px 12px;font-size:10px;display:flex;flex-direction:column;gap:4px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
 .bsp b{font-size:10px}
@@ -682,7 +684,7 @@ function viewLive(){
  h+='<div class="lr">';
  if(sel0){
   h+='<div class="lrh"><div class="n">'+esc(sel0.name)+'<span class="tag '+(sel0.kind==='스토어'?'tg-st':'tg-pr')+'">'+sel0.kind+'</span><span class="tag '+(sel0.status==='상담대기'?'tg-wt':'tg-ing')+'">'+sel0.status+'</span></div>'
-   +'<div class="m"><span>언어 '+sel0.lang+'</span><span class="new new-line" id="convch">유입 채널 '+dch(sel0.ch)+'</span>'+(sel0.prod?'<span>상품 '+esc(sel0.prod)+'</span>':'')+'</div></div>'
+   +'<div class="m"><span class="chb new cvb" title="언어">'+sel0.lang+'</span><span class="chb new cvb" id="convch" title="유입 채널">'+dch(sel0.ch)+'</span>'+(sel0.prod?'<span>상품 '+esc(sel0.prod)+'</span>':'')+'</div></div>'
    +'<div class="msgs">'+sel0.msgs.map(function(m){return '<div class="bub'+(m[0]==='h'?' h':'')+'">'+esc(m[1])+'<small>'+m[2]+'</small></div>';}).join('')+'</div><div class="inp"><div>메시지를 입력하세요</div><b data-act="nop" style="cursor:pointer">보내기</b></div>';
  }else{
   h+='<div class="none"><b>문의를 선택하세요</b><span>왼쪽 목록에서 상담대기 또는 상담중 채팅을 선택하면 상세 대화가 열립니다.</span></div>';
