@@ -160,6 +160,7 @@ td.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;letter-
 .side .subg .mi.on{background:#e6f0ff;color:#1668dc;margin:2px 6px;padding-left:34px;border-radius:5px;box-shadow:inset 0 0 0 1.5px #b9d3ff}
 .bomain{flex:1;min-width:0;padding:12px}
 .empty-row td{text-align:center;color:#a6a6a6;padding:46px 0}
+.err{font-size:12px;color:#cf1322;line-height:1.7;margin-top:4px}
 </style>
 </head>
 <body>
@@ -205,6 +206,12 @@ function resetDB(keepRows) {
     mktDate: '',          // 마케팅 정보 수신 동의·변경 시각
     rmsg: '',             // 예약 입력 화면의 연락 메신저 (회원 정보에서 채우지 않는다)
     done13: false,        // 예약 요청을 보낸 뒤 (현행 예약 완료 화면 자리)
+    agreed: false,        // 동의 창에서 동의하고 시작하기를 누른 뒤인가 (식별 실패의 다시 시도가 권한 창부터 띄운다)
+    noNick: false,        // 알리페이 계정에 닉네임이 없는 경우 (마이페이지 닉네임 자리에 알리페이 회원)
+    minor13: '',          // 예약 입력에서 고른 만 14세 미만 생년월일 (회원 정보에 저장하지 않는다)
+    f13: 'book',          // FO-CH-13 화면: book(예약 입력) | consult(상담접수 폼)
+    cd: null,             // 상담접수 폼에서 편집 중인 값
+    doneC: false,         // 상담접수를 보낸 뒤 (현행 접수 완료 화면 자리)
     view: 'fo09'
   };
 }
@@ -236,12 +243,13 @@ var PRIV_FULL = [
 var ALI = { name: '왕샤오메이', nick: 'xiaomei_w', sex: '여성', birth: '1996-03-12', nation: '중국', addr: '상하이시 징안구', phone: '+86 139 0000 1111', id: '2088_9f31c07a' };
 var LANG = { CN: '중국어(간체)', HK: '중국어(번체)' };
 /* 프로필 칸을 누르면 들어가는 예시 값. 값이 있으면 다른 예시 값으로 바꾼다 */
-var EX = { passport: ['WANG XIAOMEI', 'WANG MEI'], name: ['왕샤오메이', '왕메이'], nick: ['xiaomei_w', 'xiaomei_02'], sex: ['여성', '남성'], birth: ['1996-03-12', '1996-03-21'], nation: ['중국', '홍콩'], addr: ['상하이시 징안구', '상하이시 푸둥신구'], msg: ['위챗 wxid_alipay01', '위챗 wxid_alipay02'] };
+var EX = { passport: ['WANG XIAOMEI', 'WANG MEI'], name: ['왕샤오메이', '왕메이'], nick: ['xiaomei_w', 'xiaomei_02'], sex: ['여성', '남성'], birth: ['1996-03-12', '1996-03-21', '2013-11-20'], nation: ['중국', '홍콩'], addr: ['상하이시 징안구', '상하이시 푸둥신구'], msg: ['위챗 wxid_alipay01', '위챗 wxid_alipay02'] };
 /* 시안 조작 힌트. 휴대폰 화면 밖 점선 상자로 둔다 (화면 문구가 아님) */
 var ANNO = {
   fo11: '계정 정보 변경 버튼만 눌러 볼 수 있습니다. 나머지 메뉴는 현행 화면 그대로라 눌러도 반응이 없습니다.',
-  fo11b: '여권 영문명, 국적, 성별, 생년월일, 연락 메신저 칸을 누르면 예시 값이 들어갑니다. 저장을 눌러야 회원 정보에 저장됩니다. 휴대폰 번호는 다른 번호 사용으로 바꾸고 문자 인증을 마치면 바로 저장됩니다.',
-  fo13: '여권 영문명, 국적부터 생년월일까지, 휴대폰 번호, 연락 메신저 칸을 누르면 예시 값이 들어갑니다.'
+  fo11b: '여권 영문명, 국적, 성별, 생년월일, 연락 메신저 칸을 누르면 예시 값이 들어갑니다. 생년월일 예시 값에는 만 14세 미만이 되는 2013-11-20도 있습니다. 저장을 눌러야 회원 정보에 저장됩니다. 휴대폰 번호는 다른 번호 사용으로 바꾸고 문자 인증을 마치면 바로 저장됩니다. 번호가 없으면 빈 칸을 눌러 입력합니다.',
+  fo13: '여권 영문명, 국적부터 생년월일까지, 휴대폰 번호, 연락 메신저 칸을 누르면 예시 값이 들어갑니다. 생년월일 예시 값에는 만 14세 미만이 되는 2013-11-20도 있습니다.',
+  fo13c: '이름, 휴대폰 번호, 연락 메신저 칸을 누르면 예시 값이 들어갑니다. 상담접수 폼에서 고친 값을 회원 정보에 저장할지는 FD에 정해져 있지 않아 이 시안에서는 저장하지 않습니다.'
 };
 var TOAST_T = null;
 function toastFo(msg) { S.toast = msg; if (TOAST_T) clearTimeout(TOAST_T); TOAST_T = setTimeout(function () { S.toast = ''; render(); }, 3000); }
@@ -257,17 +265,24 @@ var VIEWS = [
 ];
 var CAPS = {
   fo09: '권한 창은 알리페이 앱이 그립니다. 우리 화면에 합칠 수 없습니다. 알리페이에서 식별자를 받은 직후 한 번 뜹니다. 회원을 만들기 전이라 뒤 화면은 비어 있고 어둡게만 깔립니다. 이용 약관, 개인정보 처리방침, 알리페이 프로필 제공 셋이 필수라 셋을 다 체크해야 동의 버튼이 켜집니다. 권한 창의 연락처는 필수 권한이라 끄고 허용하면 진입 차단 화면으로 갑니다. 휴대폰 번호 원본은 알리페이가 승인한 경우에만 요청하고 필수라 끄고 허용하면 진입 차단 화면으로 갑니다. 마케팅 정보 수신은 선택입니다. 동의를 누르면 알리페이가 권한 창을 한 번 더 띄웁니다. 권한 창에서 허용한 뒤 회원을 만들기 전에 생년월일을 봅니다. 생년월일이 없는 회원에게는 만 14세 확인 창이 뜨고, 만 14세 이상입니다를 체크해야 확인하고 시작하기 버튼이 켜지고 회원이 만들어집니다. 확인 창을 닫으면 진입 차단 화면으로 가고, 다시 동의하기를 누르면 확인 창이 다시 뜹니다. 생년월일로 만 14세 미만이 확인되면 진입 차단 화면으로 갑니다(상단 생년월일 바꾸기로 확인).',
-  fo08: '상단 상태의 차단 이유 버튼으로 네 가지(동의 창 닫기 / 프로필 거부 / 식별 실패 / 만 14세 미만)를 바꿔 볼 수 있습니다. 헤더, 메뉴, 검색이 없습니다. 필수를 거부하거나 닫았을 때, 알리페이 권한 창에서 프로필을 거부했을 때, 식별에 실패했을 때, 생년월일로 만 14세 미만이 확인됐을 때 머무는 화면입니다. 둘러보기는 없습니다. 버튼은 하나이고, 만 14세 미만 화면에는 버튼이 없습니다.',
+  fo08: '상단 상태의 차단 이유 버튼으로 네 가지(동의 창 닫기 / 프로필 거부 / 식별 실패 / 만 14세 미만)를 바꿔 볼 수 있습니다. 헤더, 메뉴, 검색이 없습니다. 필수를 거부하거나 닫았을 때, 알리페이 권한 창에서 프로필을 거부했을 때, 식별에 실패했을 때, 생년월일로 만 14세 미만이 확인됐을 때 머무는 화면입니다. 둘러보기는 없습니다. 버튼은 하나이고, 만 14세 미만 화면에는 버튼이 없습니다. 식별 실패의 다시 시도는 동의 창에서 동의하고 시작하기를 이미 눌렀으면 알리페이 권한 창부터, 아니면 동의 창부터 다시 띄웁니다.',
   fo10: '알리페이 식별이 로그인을 대신합니다. 로그인 주소로 직접 들어오면 마이페이지로 보냅니다. 알리페이 채널에서는 자체 로그인 경로를 숨깁니다. 점선 박스가 웹 채널에는 있고 알리페이 채널에는 없는 자리입니다. 진입 관문을 통과해야 들어오므로 비로그인 상태 자체가 없습니다.',
-  fo11: '마이페이지는 현행 화면과 같은 구성입니다. 닉네임과 가입일, 알리페이 계정 안내, 예약 내역, 내 활동, 둘러보기, 고객센터가 있고 계정 정보 변경 버튼으로 계정 설정에 들어갑니다. 계정 설정에서는 칸을 눌러 예시 값으로 바꾸고 저장을 눌러야 회원 정보에 저장됩니다(알리페이 회원 탭에서 확인). 휴대폰 번호는 원본 권한이 승인되면 채워지고, 다른 번호 사용으로 바꾼 뒤 문자 인증을 마치면 바로 저장됩니다. 이메일, 비밀번호 변경, 로그아웃 자리가 없습니다. 마케팅 정보 수신은 여기서 켜고 끕니다.',
+  fo11: '마이페이지는 현행 화면과 같은 구성입니다. 닉네임과 가입일, 알리페이 계정 안내, 예약 내역, 내 활동, 둘러보기, 고객센터가 있고 계정 정보 변경 버튼으로 계정 설정에 들어갑니다. 계정 설정에서는 칸을 눌러 예시 값으로 바꾸고 저장을 눌러야 회원 정보에 저장됩니다(알리페이 회원 탭에서 확인). 휴대폰 번호는 원본 권한이 승인되면 채워지고, 다른 번호 사용으로 바꾼 뒤 문자 인증을 마치면 바로 저장됩니다. 이메일, 비밀번호 변경, 로그아웃 자리가 없습니다. 마케팅 정보 수신은 여기서 켜고 끕니다. 알리페이 계정에 닉네임이 없으면 닉네임 자리에 알리페이 회원이 보입니다(회원이 되기 전에 상단 닉네임 비우기로 확인). 만 14세 미만이 되는 생년월일로 고치면 저장하지 않고 칸 아래 안내가 보입니다.',
   fo12: '마이페이지 > 계정 설정의 기존 탈퇴 경로를 그대로 씁니다. 알리페이 연결과 권한이 끊기고 다시 들어오면 새 회원이 되어 진입 관문을 다시 거칩니다.',
-  fo13: '회원 정보에서 채운 값은 고칠 수 있고 고친 값은 회원 정보에 저장됩니다. 이메일 칸이 없습니다. 원본 휴대폰 번호가 온 회원은 번호가 채워진 채 문자 인증을 건너뛰고, 고치면 그때 인증합니다. 원본이 없으면 직접 입력하고 인증합니다. 여권 영문명은 직접 입력합니다. 예약 요청은 웹 예약과 같은 필수값(이메일 제외)이 모두 차야 켜집니다.',
+  fo13: '회원 정보에서 채운 값은 고칠 수 있고 고친 값은 회원 정보에 저장됩니다. 이메일 칸이 없습니다. 원본 휴대폰 번호가 온 회원은 번호가 채워진 채 문자 인증을 건너뛰고, 고치면 그때 인증합니다. 원본이 없으면 직접 입력하고 인증합니다. 여권 영문명은 직접 입력합니다. 예약 요청은 웹 예약과 같은 필수값(이메일 제외)이 모두 차야 켜집니다. 만 14세 미만이 되는 생년월일로 고치면 회원 정보에 저장하지 않고 칸 아래 안내가 보이며 예약 요청이 꺼집니다. 요청 전에 나가면 입력한 값은 남지 않습니다. 상단 상담접수 폼 보기로 알리페이 채널 상담접수 폼을 볼 수 있습니다.',
   bo11: '검색어는 알리페이 식별자, 닉네임, 이름, 연락처를 봅니다. 식별자는 완전 일치로 찾습니다. 빈 값은 알리페이 계정에 값이 없던 항목입니다. 회원 메뉴 아래에 새로 두는 화면입니다. 칼럼은 알리페이가 주는 항목에 맞춘 19개입니다. 이메일과 프로필 동의 여부 칼럼이 없습니다. 회원이면 프로필 제공에 항상 동의한 상태입니다.'
 };
 
 function h(s) { return s == null ? '' : String(s); }
 function dash(v) { return v ? h(v) : '<span class="dash">-</span>'; }
-function go(v) { if (v === 'fo11') S.sub = 'home'; if (S.view === 'fo13' && v !== 'fo13') { S.userSet = {}; S.done13 = false; } if (v === 'fo13' && (S.view !== 'fo13' || S.done13)) { S.tel = S.mtel; S.telVerified = !!S.mtel; S.telSrc = S.mtelSrc; S.telEdited = false; S.telSaved = S.mtelSaved; S.rmsg = ''; S.done13 = false; } S.view = v; render(); }
+/* FO-CH-13을 떠나거나 새로 열 때: 예약 요청·상담접수 전에 넣은 값은 남기지 않는다 */
+function reset13() { S.userSet = {}; S.done13 = false; S.passport = ''; S.minor13 = ''; S.rmsg = ''; S.cd = null; S.doneC = false; S.tel = S.mtel; S.telVerified = !!S.mtel; S.telSrc = S.mtelSrc; S.telEdited = false; S.telSaved = S.mtelSaved; }
+function go(v) { if (v === 'fo11') S.sub = 'home'; if ((S.view === 'fo13' && v !== 'fo13') || (v === 'fo13' && (S.view !== 'fo13' || S.done13 || S.doneC))) reset13(); S.view = v; render(); }
+function setF13(m) { S.f13 = m; if (S.view === 'fo13') reset13(); render(); }
+/* 시안 오늘 2026-10-08 기준 만 14세 미만인가 */
+function minor14(b) { if (!b) return false; var q = b.split('-'), age = 2026 - (+q[0]); if (+q[1] > 10 || (+q[1] === 10 && +q[2] > 8)) age--; return age < 14; }
+/* 예시 값 순환: 지금 값의 다음 값. 목록에 없으면 첫 값 */
+function nextEx(e, cur) { return e[(e.indexOf(cur) + 1) % e.length]; }
 /* 권한 창에서 허용. 연락처를 끄거나 승인된 휴대폰 번호 원본을 끄면 차단, 생년월일로 만 14세 미만이면 차단, 생년월일이 없으면 만 14세 확인 창 */
 function allowPerm() {
   if (!S.contactGranted || (S.plaintext && !S.phoneGranted)) { S.step = 'blocked'; S.blocked = 'prof'; S.view = 'fo08'; return; }
@@ -277,7 +292,7 @@ function allowPerm() {
 }
 function joinNow() {
   S.joined = true; S.step = 'done'; S.blocked = '';
-  S.prof = { name: ALI.name, nick: ALI.nick, sex: ALI.sex, birth: S.birthMode === 'none' ? '' : ALI.birth, nation: ALI.nation, addr: ALI.addr };
+  S.prof = { name: ALI.name, nick: S.noNick ? '' : ALI.nick, sex: ALI.sex, birth: S.birthMode === 'none' ? '' : ALI.birth, nation: ALI.nation, addr: ALI.addr };
   S.mktDate = clk(0).replace('2026-09-15', '2026-09-15 (화)');
   if (S.plaintext && S.phoneGranted) { S.tel = ALI.phone; S.telVerified = true; S.telEdited = false; S.telSrc = 'ali'; S.mtel = ALI.phone; S.mtelSrc = 'ali'; }
   S.view = 'fo11';
@@ -324,7 +339,7 @@ function fo09() {
   } else {
     overlay = '<div class="dim"><div class="mdl">' +
       '<h3>서비스 이용에 동의해 주세요</h3><p class="d">필수 항목에 동의해야 이용할 수 있습니다.</p>' + body +
-      '<div class="cta ' + (ready ? '' : 'dis') + '" ' + (ready ? 'onclick="S.step=\'perm\';render()"' : '') + '>동의하고 시작하기</div>' +
+      '<div class="cta ' + (ready ? '' : 'dis') + '" ' + (ready ? 'onclick="S.agreed=true;S.step=\'perm\';render()"' : '') + '>동의하고 시작하기</div>' +
       '<div class="esc" onclick="S.step=\'blocked\';S.blocked=\'consent\';S.view=\'fo08\';render()">닫기</div>' +
       '</div></div>';
   }
@@ -344,7 +359,7 @@ function blockPage(b) {
   if (b === 'prof') { t = '이용 동의가 필요합니다'; d = '알리페이 프로필 제공에 동의해야 K-Beauty Station을 이용할 수 있습니다.'; btn = '다시 동의하기'; act = "S.contactGranted=true;S.phoneGranted=true;S.step='perm';S.blocked='';S.view='fo09';render()"; }
   else if (b === 'minor') { t = '이용할 수 없습니다'; d = '만 14세 미만은 K-Beauty Station을 이용할 수 없습니다.'; btn = ''; }
   else if (b === 'age') { t = '이용 동의가 필요합니다'; d = '필수 항목에 동의해야 K-Beauty Station을 이용할 수 있습니다.'; btn = '다시 동의하기'; act = "S.step='age';S.agAge=false;S.blocked='';S.view='fo09';render()"; }
-  else if (b === 'fail') { t = '알리페이 계정을 확인할 수 없습니다'; d = '잠시 후 다시 시도해 주세요.'; btn = '다시 시도'; act = "S.step='consent';S.blocked='';S.view='fo09';render()"; }
+  else if (b === 'fail') { t = '알리페이 계정을 확인할 수 없습니다'; d = '잠시 후 다시 시도해 주세요.'; btn = '다시 시도'; act = "if(S.agreed){S.contactGranted=true;S.phoneGranted=true;S.step='perm';}else{S.step='consent';}S.blocked='';S.view='fo09';render()"; }
   else { t = '이용 동의가 필요합니다'; d = '필수 항목에 동의해야 K-Beauty Station을 이용할 수 있습니다.'; btn = '다시 동의하기'; act = "S.step='consent';S.blocked='';S.view='fo09';render()"; }
   return '<div class="blockpage"><div class="logo">K-Beauty Station</div><h3>' + t + '</h3><p>' + d + '</p>' + (btn ? '<div class="cta" onclick="' + act + '">' + btn + '</div>' : '') + '</div>';
 }
@@ -354,6 +369,7 @@ function fo10() {
   if (!S.joined || !S.prof) return phoneNote('마이페이지', '회원이 만들어진 뒤에 보이는 화면입니다. 위쪽 처음으로를 누른 뒤 진입 동의 창에서 동의를 마쳐 주세요.');
   /* 마이페이지는 FO-CH-11과 같은 화면. 웹 채널에만 있는 자리를 점선으로 위에 둔다 */
   return myHome('<div style="padding-top:12px">' +
+    '<div class="gone">(시안 주석) 알리페이 채널에서는 이 자리가 없습니다<br>헤더의 로그인 자리 (비움)</div>' +
     '<div class="gone">(시안 주석) 알리페이 채널에서는 이 자리가 없습니다<br>로그인 / 회원가입</div>' +
     '<div class="gone">(시안 주석) 알리페이 채널에서는 이 자리가 없습니다<br>카카오·구글·라인으로 계속하기</div>' +
     '<div class="gone">(시안 주석) 알리페이 채널에서는 이 자리가 없습니다<br>비밀번호를 잊으셨나요?</div>' +
@@ -371,11 +387,16 @@ function setTelNext() {
   else { S.tel = next; S.telEdited = true; S.telVerified = false; S.telSrc = 'user'; }
   render();
 }
-function edit(key) { var e = EX[key]; S.prof[key] = S.prof[key] === e[0] ? e[1] : e[0]; if (S.view === 'fo13') S.userSet[key] = true; render(); }
+function edit(key) {
+  var e = EX[key];
+  /* 예약 입력의 생년월일: 만 14세 미만이 되는 값은 회원 정보에 저장하지 않고 칸에만 둔다 */
+  if (S.view === 'fo13' && key === 'birth') { var nb = nextEx(e, S.minor13 || S.prof.birth); S.userSet.birth = true; if (minor14(nb)) S.minor13 = nb; else { S.minor13 = ''; S.prof.birth = nb; } render(); return; }
+  S.prof[key] = nextEx(e, S.prof[key]); if (S.view === 'fo13') S.userSet[key] = true; render();
+}
 /* 계정 설정: 칸을 누르면 예시 값이 들어가고, 저장을 눌러야 회원 정보에 들어간다. 휴대폰 번호는 문자 인증을 마치면 바로 저장된다 */
 function openAcct() { S.view = 'fo11'; S.sub = 'acct'; S.draft = { passport: S.passportSaved, nation: S.prof.nation, sex: S.prof.sex, birth: S.prof.birth, msg: S.msg }; S.mtelDraft = ''; render(); }
-function dedit(key) { var e = EX[key]; if (!e) return; S.draft[key] = S.draft[key] === e[0] ? e[1] : e[0]; render(); }
-function saveAcct() { var d = S.draft; S.prof.nation = d.nation; S.prof.sex = d.sex; S.prof.birth = d.birth; S.passportSaved = d.passport; S.msg = d.msg; render(); }
+function dedit(key) { var e = EX[key]; if (!e) return; S.draft[key] = nextEx(e, S.draft[key]); render(); }
+function saveAcct() { var d = S.draft; S.prof.nation = d.nation; S.prof.sex = d.sex; if (!minor14(d.birth)) S.prof.birth = d.birth; S.passportSaved = d.passport; S.msg = d.msg; render(); }
 function toggleMkt() { S.agMkt = !S.agMkt; S.mktDate = clk(28).replace('2026-09-15', '2026-09-15 (화)'); render(); }
 function nextMtel() { S.mtelDraft = nextTel(S.mtelDraft || S.mtel, S.mtelSrc === 'ali'); if (S.mtelDraft === S.mtel) S.mtelDraft = ''; render(); }
 function fo11() {
@@ -401,7 +422,7 @@ function myHome(top) {
 function fo11acct() {
   var p = S.prof; if (!S.draft) S.draft = { passport: S.passportSaved, nation: p.nation, sex: p.sex, birth: p.birth, msg: S.msg };
   var d = S.draft;
-  function f(label, key, ph) { var v = d[key]; return '<div class="fld"><div class="l">' + label + '</div><div class="in ' + (v ? '' : 'plc') + '" onclick="dedit(\'' + key + '\')">' + (v || ph) + '</div></div>'; }
+  function f(label, key, ph) { var v = d[key]; return '<div class="fld"><div class="l">' + label + '</div><div class="in ' + (v ? '' : 'plc') + '" onclick="dedit(\'' + key + '\')">' + (v || ph) + '</div>' + (key === 'birth' && minor14(v) ? '<div class="err">만 14세 미만은 이용할 수 없습니다.</div>' : '') + '</div>'; }
   var tel;
   if (S.mtelDraft) {
     tel = '<div class="fld"><div class="l">휴대폰 번호</div><div class="vrow"><div class="in" onclick="nextMtel()">' + S.mtelDraft + '</div>' +
@@ -410,11 +431,12 @@ function fo11acct() {
     tel = '<div class="fld"><div class="l">휴대폰 번호' + (S.mtelSrc === 'ali' ? '<span class="autotag">알리페이 계정에서 채웠습니다</span>' : '') + '</div><div class="in auto" style="cursor:default">' + S.mtel + '</div>' +
       '<div class="sub">고치면 문자 인증을 다시 합니다.</div><div class="cta ghost sm" onclick="nextMtel()">다른 번호 사용</div></div>';
   } else {
-    tel = '<div class="fld"><div class="l">휴대폰 번호</div><div class="in" onclick="nextMtel()">&nbsp;</div></div>';
+    tel = '<div class="fld"><div class="l">휴대폰 번호</div><div class="in" onclick="nextMtel()">&nbsp;</div><div class="sub">입력한 번호로 문자 인증을 합니다.</div></div>';
   }
   var msg = f('연락 메신저', 'msg', '메신저 아이디를 직접 입력해 주세요');
-  var mk = '<div class="trow"><div><b style="font-weight:500">마케팅 정보 수신</b>' + (S.mktDate ? '<div class="sub" style="margin-top:2px">' + (S.agMkt ? '동의일' : '거부일') + ': ' + S.mktDate + '</div>' : '') + '</div>' +
-    '<span class="sw pk ' + (S.agMkt ? 'on' : '') + '" onclick="toggleMkt()"><i></i></span></div>';
+  var mk = '<div class="trow" style="align-items:flex-start"><b style="font-weight:500">마케팅 정보 수신</b>' +
+    '<div style="display:flex;flex-direction:column;align-items:flex-end"><span class="sw pk ' + (S.agMkt ? 'on' : '') + '" onclick="toggleMkt()"><i></i></span>' +
+    (S.mktDate ? '<div class="sub" style="margin-top:4px;text-align:right">' + (S.agMkt ? '동의일' : '거부일') + ': ' + S.mktDate + '</div>' : '') + '</div></div>';
   return phone('계정 설정',
     '<div class="grp">프로필</div><div style="padding:4px 16px 8px">' +
     f('여권 영문명', 'passport', '여권에 적힌 영문 이름') +
@@ -442,11 +464,12 @@ function fo12() {
 /* ─────────── FO-CH-13 예약 입력 ─────────── */
 function fo13() {
   if (!S.joined || !S.prof) return phoneNote('예약하기', '회원이 만들어진 뒤에 보이는 화면입니다. 위쪽 처음으로를 누른 뒤 진입 동의 창에서 동의를 마쳐 주세요.');
+  if (S.f13 === 'consult') return fo13c();
   /* 예약 요청을 보낸 뒤: 현행 예약 완료 화면 자리 */
   if (S.done13) { ANNO_OFF = true; var dn = phone('', '<div class="gone" style="margin:16px">(시안 주석) 현행 예약 완료 화면을 그대로 씁니다. 예약자 설문도 그대로 보입니다.</div>', '', '', false, true); ANNO_OFF = false; return dn; }
   var p = S.prof;
-  function auto(label, key, ph) { var v = p[key]; return '<div class="fld"><div class="l">' + label + (v && !S.userSet[key] ? '<span class="autotag">회원 정보에서 채웠습니다</span>' : '') + '</div>' +
-    '<div class="in ' + (v ? 'auto' : 'plc') + '" onclick="edit(\'' + key + '\')">' + (v || ph) + '</div></div>'; }
+  function auto(label, key, ph) { var mn = key === 'birth' && S.minor13, v = mn ? S.minor13 : p[key]; return '<div class="fld"><div class="l">' + label + (v && !S.userSet[key] ? '<span class="autotag">회원 정보에서 채웠습니다</span>' : '') + '</div>' +
+    '<div class="in ' + (v ? 'auto' : 'plc') + '" onclick="edit(\'' + key + '\')">' + (v || ph) + '</div>' + (mn ? '<div class="err">만 14세 미만은 이용할 수 없습니다.</div>' : '') + '</div>'; }
   function tap(label, key, ph, ex) { var v = S[key]; return '<div class="fld"><div class="l">' + label + '</div><div class="in ' + (v ? '' : 'plc') + '" onclick="S.' + key + '=S.' + key + '||\'' + ex + '\';render()">' + (v || ph) + '</div></div>'; }
   var tel;
   if (S.telSrc === 'ali' && S.tel && S.telVerified && !S.telEdited) {
@@ -461,16 +484,45 @@ function fo13() {
       (S.telVerified ? '<div class="sub">고치면 문자 인증을 다시 합니다.</div>' : '<div class="sub">입력한 번호로 문자 인증을 합니다.</div>') + '</div>';
   }
   /* 웹 예약과 같은 필수값. 이메일만 뺀다 */
-  var ready = S.passport && p.nation && p.sex && p.birth && S.tel && S.telVerified && S.rmsg;
+  var ready = S.passport && p.nation && p.sex && p.birth && !S.minor13 && S.tel && S.telVerified && S.rmsg;
   return phone('예약하기',
     '<div class="sec"><div class="h">예약자 정보</div><div class="box">' +
     tap('여권 영문명', 'passport', '여권에 적힌 영문 이름', 'WANG XIAOMEI') +
     auto('국적', 'nation', '국적 선택') + auto('성별', 'sex', '성별 선택') + auto('생년월일', 'birth', '생년월일 선택') +
     tel + tap('연락 메신저', 'rmsg', '메신저 아이디를 직접 입력해 주세요', '위챗 wxid_alipay01') +
+    '<div class="gone" style="margin:8px 0 0">(시안 주석) 알리페이 채널에서는<br>앱 열기 버튼이 없습니다</div>' +
     '<div class="fld"><div class="l">요청사항 (선택)</div><div class="in" style="min-height:64px;cursor:text"></div></div>' +
     '<div class="gone" style="margin:12px 0 0">(시안 주석) 알리페이 채널에서는 이 자리가 없습니다<br>이메일</div>' +
     '</div></div>' +
     '<div class="cta ' + (ready ? '' : 'dis') + '" ' + (ready ? 'onclick="S.passportSaved=S.passport;S.passport=\'\';S.booked=(S.booked||0)+1;S.telSaved=true;S.telEdited=false;S.mtel=S.tel;S.mtelSrc=S.telSrc;S.mtelSaved=true;S.mtelDraft=\'\';S.userSet={};S.done13=true;render()"' : '') + '>예약 요청</div>', '', '‹');
+}
+
+/* FO-CH-13 상담접수 폼 (알리페이 채널). 이메일 칸 없음, 프로필 항목은 회원 정보에서 채움, 메신저 앱 열기 버튼 없음 */
+function cedit(key) {
+  var c = S.cd; c.set[key] = true;
+  if (key === 'name') c.name = nextEx(EX.name, c.name);
+  else if (key === 'tel') c.tel = nextTel(c.tel || '', S.mtelSrc === 'ali' || S.plaintext);
+  else if (key === 'msg') c.msg = c.msg ? nextEx(EX.msg, c.msg) : EX.msg[0];
+  render();
+}
+function fo13c() {
+  if (S.doneC) { ANNO_OFF = true; var dn = phone('', '<div class="gone" style="margin:16px">(시안 주석) 현행 상담접수 완료 화면을 그대로 씁니다.</div>', '', '', false, true); ANNO_OFF = false; return dn; }
+  var p = S.prof; if (!S.cd) S.cd = { name: p.name, tel: S.mtel, msg: '', set: {} };
+  var c = S.cd;
+  function fl(label, key, ph, tag) { var v = c[key]; return '<div class="fld"><div class="l">' + label + (tag && v && !c.set[key] ? '<span class="autotag">' + tag + '</span>' : '') + '</div>' +
+    '<div class="in ' + (v ? (tag ? 'auto' : '') : 'plc') + '" onclick="cedit(\'' + key + '\')">' + (v || ph) + '</div></div>'; }
+  var ready = c.name && c.tel && c.msg;
+  return phone('상담접수',
+    '<div class="sec"><div class="h">신청자 정보</div><div class="box">' +
+    fl('이름', 'name', '이름', '회원 정보에서 채웠습니다') +
+    fl('휴대폰 번호', 'tel', '휴대폰 번호', S.mtelSrc === 'ali' && c.tel === ALI.phone ? '알리페이 계정에서 채웠습니다' : '회원 정보에서 채웠습니다') +
+    fl('연락 메신저', 'msg', '메신저 아이디를 직접 입력해 주세요', '') +
+    '<div class="gone" style="margin:8px 0 0">(시안 주석) 알리페이 채널에서는<br>앱 열기 버튼이 없습니다</div>' +
+    '<div class="fld"><div class="l">문의 내용 (선택)</div><div class="in" style="min-height:64px;cursor:text"></div></div>' +
+    '<div class="gone" style="margin:12px 0 0">(시안 주석) 알리페이 채널에서는 이 자리가 없습니다<br>이메일</div>' +
+    '</div></div>' +
+    '<div class="gone" style="margin:0 16px">(시안 주석) 상담접수 폼의 칸 구성, 문구, 휴대폰 번호 인증은 현행 폼을 따릅니다. 이 시안은 프로필 채움, 이메일 자리, 앱 열기 버튼만 확인합니다.</div>' +
+    '<div class="cta ' + (ready ? '' : 'dis') + '" ' + (ready ? 'onclick="S.doneC=true;render()"' : '') + '>상담 신청</div>', '', '‹');
 }
 
 /* ─────────── BO-CH-11 알리페이 회원 ─────────── */
@@ -494,7 +546,7 @@ function withdraw() {
   syncMe(); var old = {}; for (var k in MEM[0]) old[k] = MEM[0][k];
   old.self = false; old.snap = true; old.quit = clk(40);
   MEM.splice(1, 0, old); GEN++;
-  var pt = S.plaintext, w = S.wallet, bm = S.birthMode; resetDB(true); S.plaintext = pt; S.wallet = w; S.birthMode = bm; S.view = 'fo09'; render();
+  var pt = S.plaintext, w = S.wallet, bm = S.birthMode, nn = S.noNick; resetDB(true); S.plaintext = pt; S.wallet = w; S.birthMode = bm; S.noNick = nn; S.view = 'fo09'; render();
 }
 /* BO 사이드바 (alipay-ops-admin.html 메뉴 목록). 회원 그룹만 펼친다. 메뉴는 시안에서 동작하지 않는다 */
 function boSide() {
@@ -521,7 +573,7 @@ function bo11() {
   var sel = function (cur, opts, fn, isNew) { return '<select class="sel' + (isNew ? ' new' : '') + '" onchange="' + fn + '=this.value;render()">' + opts.map(function (o) { return '<option value="' + o[0] + '"' + (cur === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>'; };
   return '<div class="boapp"><div class="botb"><span class="lg">ADMIN</span><span class="me"><i class="av"></i>관리자</span></div><div class="bobody">' + boSide() + '<div class="bomain"><div class="adm"><div class="phd"><h2>알리페이 회원</h2><div class="pdesc">알리페이 계정으로 만들어진 회원입니다. 기존 회원과 별개로 관리합니다.</div></div>' +
     '<div class="filt"><select class="sel" disabled><option>가입 기간</option></select><input class="inp" placeholder="가입 시작일" style="width:110px" disabled><input class="inp" placeholder="가입 종료일" style="width:110px" disabled>' + sel(BOQF, [['all', '탈퇴 여부 (전체)'], ['in', '미탈퇴'], ['out', '탈퇴']], 'BOQF') +
-    sel(BOW, [['all', '유입 채널 (전체)'], ['CN', '알리페이 중국'], ['HK', '알리페이 홍콩']], 'BOW') + sel(BOMF, [['all', '마케팅 수신 여부 (전체)'], ['동의', '동의'], ['미동의', '미동의']], 'BOMF') + '<input class="inp" placeholder="검색어" style="width:150px" disabled><button class="btn blue" disabled>검색</button></div>' +
+    sel(BOW, [['all', '유입 채널 (전체)'], ['CN', '알리페이 중국'], ['HK', '알리페이 홍콩']], 'BOW', true) + sel(BOMF, [['all', '마케팅 수신 여부 (전체)'], ['동의', '동의'], ['미동의', '미동의']], 'BOMF') + '<input class="inp" placeholder="검색어" style="width:150px" disabled><button class="btn blue" disabled>검색</button></div>' +
     '<div class="card"><div class="hd"><span>회원 목록</span><span class="grpbtn"><span class="g' + (BOQ ? ' on' : '') + '" onclick="BOQ=!BOQ;render()">탈퇴정보</span><span class="g' + (BOM ? ' on' : '') + '" onclick="BOM=!BOM;render()">마케팅 활용 정보</span></span></div>' +
     '<div class="tblwrap"><table><thead>' + head + '</thead><tbody>' + (rows || '<tr class="empty-row"><td colspan="' + (17 + (BOQ ? 1 : 0) + (BOM ? 2 : 0)) + '">데이터가 없습니다</td></tr>') + '</tbody></table></div>' +
     '<div class="foot"><span class="pg">‹</span><span class="pg on">1</span><span class="pg">›</span></div></div></div></div></div></div>';
@@ -532,13 +584,14 @@ var ANNO_FORCE = '';
 var HDR = { '마이페이지': ['‹', '🌐', true], '계정 설정': ['‹', '⌂', false], '회원 탈퇴': ['‹', '⚙', false], '예약하기': ['‹', '⚙', false] };
 var ANNO_OFF = false;
 function phoneNote(title, note, noHead) { ANNO_FORCE = note; var c = HDR[title]; var h = c ? phone(title, '', '', c[0], false, noHead, c[1], c[2], '') : phone(title, '', '', '', false, noHead); ANNO_FORCE = ''; return h; }
+function annoKey() { return (S.view === 'fo11' && S.sub === 'acct') ? 'fo11b' : (S.view === 'fo13' && S.f13 === 'consult') ? 'fo13c' : S.view; }
 /* backAct: ‹를 눌렀을 때 동작. 없으면 마이페이지로, ''이면 동작 없음 */
 function phone(title, body, overlay, leftIcon, noMenu, noHead, rightIcon, tabbar, backAct) {
   var back = backAct == null ? "go('fo11')" : backAct;
   return '<div class="phones"><div class="ph"><div class="st"><span>9:41</span><span>●●●</span></div>' +
     (noHead ? '' : '<div class="hd">' + (leftIcon === '‹' ? '<span class="i"' + (back ? ' style="cursor:pointer" onclick="' + back + '"' : '') + '>‹</span>' : '<span class="i">☰</span>') + '<span class="t">' + title + '</span><span class="i">' + (rightIcon ? rightIcon : noMenu ? '' : '⚙') + '</span></div>') +
     '<div class="bd">' + (body || '') + '</div>' + (tabbar ? '<div class="tabbar"><span>홈</span><span>스토어</span><span>상품</span><span class="on">마이페이지</span></div>' : '') + (overlay || '') + (S.toast ? '<div class="ftoast">' + S.toast + '</div>' : '') + '</div>' +
-    (ANNO_FORCE ? '<div class="anno">(시안 주석) ' + ANNO_FORCE + '</div>' : !ANNO_OFF && ANNO[(S.view === 'fo11' && S.sub === 'acct') ? 'fo11b' : S.view] && S.joined ? '<div class="anno">(시안 주석) ' + ANNO[(S.view === 'fo11' && S.sub === 'acct') ? 'fo11b' : S.view] + '</div>' : '') + '</div>';
+    (ANNO_FORCE ? '<div class="anno">(시안 주석) ' + ANNO_FORCE + '</div>' : !ANNO_OFF && ANNO[annoKey()] && S.joined ? '<div class="anno">(시안 주석) ' + ANNO[annoKey()] + '</div>' : '') + '</div>';
 }
 
 /* 다시 그려도 같은 화면이면 휴대폰 화면·창·표의 스크롤과 입력 포커스를 그대로 둔다 */
@@ -553,17 +606,21 @@ function render() {
     '<span class="kv">원본 휴대폰 권한 <em>' + (S.plaintext ? '승인' : '미승인') + '</em></span>' +
     '<span class="kv">들어온 앱 <em>' + (S.wallet === 'CN' ? '알리페이 중국' : '알리페이 홍콩') + '</em></span>' +
     '<span class="kv">생년월일 <em>' + ({ adult: '있음', none: '없음', minor: '만 14세 미만' })[S.birthMode] + '</em></span>' +
+    '<span class="kv">닉네임 <em>' + (S.noNick ? '없음' : '있음') + '</em></span>' +
     '<button' + (S.joined ? ' disabled' : '') + ' onclick="S.plaintext=!S.plaintext;if(S.joined){S.tel=S.plaintext?ALI.phone:\'\';S.telVerified=S.plaintext;S.telEdited=false;S.telSrc=S.plaintext?\'ali\':\'\';S.mtel=S.tel;S.mtelSrc=S.telSrc;S.mtelDraft=\'\';S.mtelSaved=false;S.telSaved=false;}render()">원본 휴대폰 ' + (S.plaintext ? '미승인으로' : '승인으로') + '</button>' +
     '<button' + (S.joined ? ' disabled' : '') + ' onclick="S.wallet=(S.wallet===\'CN\'?\'HK\':\'CN\');render()">' + (S.wallet === 'CN' ? '홍콩 앱으로 들어온 경우 보기' : '중국 앱으로 들어온 경우 보기') + '</button>' +
     '<button onclick="if(!S.joined){S.birthMode=({adult:\'none\',none:\'minor\',minor:\'adult\'})[S.birthMode];S.agAge=false;if(S.step===\'age\')S.step=\'perm\';}render()"' + (S.joined ? ' disabled' : '') + '>생년월일 바꾸기</button>' +
+    '<button onclick="if(!S.joined){S.noNick=!S.noNick;}render()"' + (S.joined ? ' disabled' : '') + '>' + (S.noNick ? '닉네임 채우기' : '닉네임 비우기') + '</button>' +
     '<button onclick="S.blocked=\'fail\';S.step=\'blocked\';S.view=\'fo08\';render()"' + (S.joined ? ' disabled' : '') + '>식별 실패</button>' +
-    '<button onclick="S.agTerms=true;S.agPriv=true;S.agProf=true;S.blocked=\'prof\';S.step=\'blocked\';S.view=\'fo08\';render()"' + (S.joined ? ' disabled' : '') + '>프로필 거부</button>' +
-    '<button onclick="S.agTerms=false;S.agPriv=false;S.agProf=false;S.blocked=\'consent\';S.step=\'blocked\';S.view=\'fo08\';render()"' + (S.joined ? ' disabled' : '') + '>동의 창 닫기</button>' +
+    '<button onclick="S.agTerms=true;S.agPriv=true;S.agProf=true;S.agreed=true;S.blocked=\'prof\';S.step=\'blocked\';S.view=\'fo08\';render()"' + (S.joined ? ' disabled' : '') + '>프로필 거부</button>' +
+    '<button onclick="S.agTerms=false;S.agPriv=false;S.agProf=false;S.agreed=false;S.blocked=\'consent\';S.step=\'blocked\';S.view=\'fo08\';render()"' + (S.joined ? ' disabled' : '') + '>동의 창 닫기</button>' +
     '<button onclick="S.birthMode=\'minor\';S.agAge=false;S.blocked=\'minor\';S.step=\'blocked\';S.view=\'fo08\';render()"' + (S.joined ? ' disabled' : '') + '>만 14세 미만</button>' +
-    '<button onclick="var pt=S.plaintext;var bm=S.birthMode;var w=S.wallet;resetDB();S.plaintext=pt;S.birthMode=bm;S.wallet=w;render()">처음으로</button>';
+    (S.view === 'fo13' ? '<span class="kv">FO-CH-13 화면 <em>' + (S.f13 === 'consult' ? '상담접수 폼' : '예약 입력') + '</em></span>' +
+      '<button onclick="setF13(S.f13===\'consult\'?\'book\':\'consult\')">' + (S.f13 === 'consult' ? '예약 입력 보기' : '상담접수 폼 보기') + '</button>' : '') +
+    '<button onclick="var pt=S.plaintext;var bm=S.birthMode;var w=S.wallet;var nn=S.noNick;resetDB();S.plaintext=pt;S.birthMode=bm;S.wallet=w;S.noNick=nn;render()">처음으로</button>';
   document.getElementById('cap').textContent = CAPS[S.view] || '';
   var m = { fo09: fo09, fo08: fo08, fo10: fo10, fo11: fo11, fo12: fo12, fo13: fo13, bo11: bo11 };
-  var st = document.getElementById('stage'), key = [S.view, S.sub, S.done13, S.step, S.blocked].join('/'), keep = {}, sels = ['.ph .bd', '.mdl', '.tblwrap'], FQ = 'input,select,textarea';
+  var st = document.getElementById('stage'), key = [S.view, S.sub, S.done13, S.step, S.blocked, S.f13, S.doneC].join('/'), keep = {}, sels = ['.ph .bd', '.mdl', '.tblwrap'], FQ = 'input,select,textarea';
   sels.forEach(function (q) { var e = st.querySelector(q); if (e) keep[q] = [e.scrollTop, e.scrollLeft]; });
   var ae = document.activeElement, fi = (ae && st.contains(ae)) ? [].indexOf.call(st.querySelectorAll(FQ), ae) : -1;
   st.innerHTML = m[S.view]();
