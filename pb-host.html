@@ -2480,6 +2480,10 @@ function pDash() {
     c.onclick = function () { h.view = 'res'; h.open = b.no; PB.render(); };
     grid.appendChild(c);
   });
+  /* 상품·칼럼 블록의 상품 수 = 시안 상품 데이터 */
+  var ps = PB.DB.prods.filter(function (p) { return !p.deleted; }), mb = $('[class*=managementBlock]');
+  if (mb) { $('[class*=managementTitle]', mb).textContent = '상품 ' + ps.length + '개'; var cnt = { '승인': ps.filter(function (p) { return p.status === 'approved'; }).length, '대기': ps.filter(function (p) { return p.status === 'pending'; }).length, '반려': ps.filter(function (p) { return p.status === 'rejected'; }).length };
+    $$('[class*=managementStatusLinks] button', mb).forEach(function (x) { var k = $('span', x).textContent.trim(); if (k in cnt) $('strong', x).textContent = cnt[k]; }); }
   var mv = byText(document, 'button', '예약 관리 이동'); if (mv) mv.onclick = function () { go('res'); };
 }
 
@@ -2531,26 +2535,28 @@ function pRes() {
   var all = PB.needList('전체'); $('[class*=totalBadge]').textContent = all.length;
   var ft = $$('[class*=filterTabs] > button'), actCls = ft[0].className, baseCls = ft[1].className, nm = ['전체', '신규', '방문결과', '변경'];
   ft.forEach(function (b, i) { b.className = nm[i] === h.ptab ? actCls : baseCls; b.textContent = nm[i] + ' ' + PB.needList(nm[i]).length; b.onclick = function () { h.ptab = nm[i]; PB.render(); }; });
-  var area = $('[class*=scrollArea]'), secT = $('section', area).cloneNode(true), cardT = $('button', secT).cloneNode(true);
+  var area = $('[class*=scrollArea]'), note = $('[class*=footerNote]', area);
+  var secs = $$('section', area), SEC = {}, KEY = { '신규': '신규', '방문결과': '방문결과', '변경': '변경' };
+  secs.forEach(function (s) { var t = $('h3', s).textContent.trim(); Object.keys(KEY).forEach(function (k) { if (t.indexOf(k) === 0) SEC[k] = s.cloneNode(true); }); });
   area.innerHTML = '';
-  var groups = h.ptab === '전체' ? [['신규', '신규 · 확인 필요'], ['방문결과', '방문결과 · 처리 대기'], ['변경', '변경 · 응답 필요']] : [[h.ptab, { '신규': '신규 · 확인 필요', '방문결과': '방문결과 · 처리 대기', '변경': '변경 · 응답 필요' }[h.ptab]]];
+  var groups = h.ptab === '전체' ? ['신규', '방문결과', '변경'] : [h.ptab];
   groups.forEach(function (g) {
-    var list = PB.needList(g[0]); if (!list.length) return;
-    var s = secT.cloneNode(true), cl = $('[class*=cardList]', s); $('h3', s).textContent = g[1]; cl.innerHTML = '';
+    var list = PB.needList(g); if (!list.length || !SEC[g]) return;
+    var s = SEC[g].cloneNode(true), cl = $('[class*=cardList]', s), cardT = $('button', cl).cloneNode(true); cl.innerHTML = '';
     list.forEach(function (b) {
       var c = cardT.cloneNode(true);
       $('[class*=bookingDateTime]', c).textContent = b.visit;
-      textSet($('[class*=statusBadge] span', c), b.need === '변경' ? '변경 요청' : '예약');
       $('[class*=customerName]', c).textContent = b.name;
       var metas = $$('[class*=bookingMeta]', c); metas[0].textContent = b.nation; metas[1].textContent = b.rno;
       if (b.snap) { var pl = metas[0].cloneNode(true); pl.textContent = b.snap.name; pl.classList.add('pb-prodline'); pl.setAttribute('data-test', 'card-prod'); $('[class*=customerName]', c).after(mark(pl)); }
       $('[class*=receivedAt]', c).textContent = '접수 ' + b.recv;
+      c.setAttribute('aria-label', b.name + ' 예약 상세 열기');
       c.onclick = function () { h.open = b.no; PB.render(); };
       cl.appendChild(c);
     });
     area.appendChild(s);
   });
-  if (!area.children.length) area.innerHTML = '<p style="text-align:center;color:#8c8c8c;font-size:12px;padding:24px 0">현재 처리할 예약이 없어요.</p>';
+  if (note) area.appendChild(note);
 }
 function openDrawer() {
   var h = H(), b = PB.DB.books.filter(function (x) { return x.no === h.open; })[0]; if (!b) return;
@@ -2615,17 +2621,24 @@ function pStat() {
   var lastSub = s.children[s.children.length - 1], nsub = document.createElement('th'); nsub.className = 'ant-table-cell'; nsub.textContent = '예약 건수'; nsub.style.textAlign = 'center'; lastSub.after(mark(nsub));
   var col = $('colgroup'); if (col) col.appendChild(col.lastElementChild.cloneNode(true));
   var mr = $('tr.ant-table-measure-row'); if (mr) mr.appendChild(mr.lastElementChild.cloneNode(true));
-  var tb = $('tbody'), rt = $('tr.ant-table-row', tb).cloneNode(true); $$('tr.ant-table-row', tb).forEach(function (r) { r.remove(); });
+  var tb = $('tbody'), rt = $('tr.ant-table-row', tb).cloneNode(true);
+  var TAG = {}; $$('tbody .ant-tag').forEach(function (t) { var k = t.textContent.trim(); if (!TAG[k]) TAG[k] = t.cloneNode(true); });
+  $$('tr.ant-table-row', tb).forEach(function (r) { r.remove(); });
+  var putTag = function (td, k) { if (TAG[k]) { td.innerHTML = ''; td.appendChild(TAG[k].cloneNode(true)); } else leafSet(td, k); };
   var ps = PB.DB.prods.filter(function (p) { return !p.deleted; });
   ps.forEach(function (p) {
     var r = rt.cloneNode(true), td = r.children;
     leafSet(td[0], p.name); td[1].textContent = langLabel(p.lang); td[2].textContent = p.cat; td[3].textContent = p.sub;
-    leafSet(td[4], p.status === 'approved' ? '승인 완료' : '승인 중'); leafSet(td[5], p.active && !p.hidden ? '활성' : '비활성');
+    putTag(td[4], p.status === 'approved' ? '승인 완료' : '승인 대기'); putTag(td[5], p.active && !p.hidden ? '활성' : '비활성');
     var nums = [p.chat, 0, p.chat, p.cons, p.cons, 0, 0, 0, 0, p.rev, '0.0'];
     for (var i = 0; i < nums.length && 6 + i < td.length; i++) leafSet(td[6 + i], String(nums[i]));
     var c = td[td.length - 1].cloneNode(true); c.textContent = PB.prodBookCount(p.id); c.setAttribute('data-test', 'stat-' + p.id); c.style.fontWeight = '700'; r.appendChild(mark(c));
     tb.appendChild(r);
   });
+  /* 위쪽 요약 카드 = 아래 표 합계 */
+  var sum = function (k) { return ps.reduce(function (n, p) { return n + (+p[k] || 0); }, 0); };
+  var sv = { '채팅 총 건수': sum('chat'), '채팅 미응답': 0, '상담 신청': sum('cons') };
+  $$('.ant-statistic').forEach(function (st) { var t = $('.ant-statistic-title', st).textContent.trim(), v = $('.ant-statistic-content-value', st); if (t in sv) $('.ant-statistic-content-value-int', v).textContent = sv[t]; else if (/리뷰/.test(t)) v.textContent = sum('rev') + ' / 0.0'; });
   $$('.ant-card-head-title').forEach(function (t) { if (/상품별 통계/.test(t.textContent)) textSet(t, '상품별 통계 (' + ps.length + ')'); });
   var back = byText(document, 'button', '상품 관리'); if (back) back.onclick = function () { go('prod'); };
   $$('.ant-pagination-item').forEach(function (li, i) { if (i > 0) li.remove(); });

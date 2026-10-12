@@ -2839,7 +2839,7 @@ function pRes() {
   /* 상단 통계 카드 */
   var st = $$('.ant-statistic'); var vals = [all.length, all.filter(function (x) { return x.status === '예약'; }).length, all.filter(function (x) { return x.status === '방문완료'; }).length, all.filter(function (x) { return x.status === '미방문'; }).length];
   var vd = vals[2] + vals[3] ? Math.round(vals[3] / (vals[2] + vals[3]) * 100) + '%' : '0%'; vals.push(vd);
-  st.forEach(function (s, i) { var c = $('.ant-statistic-content', s); if (c && vals[i] != null) c.textContent = vals[i]; });
+  st.forEach(function (s, i) { var c = $('.ant-statistic-content-value-int', s); if (c && vals[i] != null) c.textContent = String(vals[i]).replace('%', ''); });
   /* 필터 */
   var stSel = selByPh('상태 선택'), ownSel = selByPh('등록 주체');
   var ownItem = ownSel.closest('.ant-form-item'), kindItem = ownItem.cloneNode(true); ownItem.after(mark(kindItem)); var kindSel = $('.ant-select', kindItem);
@@ -2883,12 +2883,18 @@ function prodBlock(x) {
 /* ---------- 상품 정보 관리 ---------- */
 function pProd() {
   var b = B(), ps = PB.DB.prods.filter(function (p) { return !p.deleted && (!b.lang || p.lang === b.lang); });
+  var all = $$('tbody tr.ant-table-row');
+  var stOf = function (r) { var s = r.children[colIdx('상태')]; return s ? s.textContent.trim() : ''; };
+  var rApp = (all.filter(function (r) { return stOf(r) === '승인'; })[0] || all[0]).cloneNode(true), rPend = (all.filter(function (r) { return stOf(r) === '대기'; })[0] || all[0]).cloneNode(true);
   var ci = addCol('페이스북', '예약 건수');
-  rowsFrom(function (tb, rt) {
+  [rApp, rPend].forEach(function (r) { var i = colIdx('예약 건수') - 1; r.children[i].after(r.children[i].cloneNode(true)); });
+  rowsFrom(function (tb) {
     ps.forEach(function (p) {
-      var r = rt.cloneNode(true);
-      var nc = r.children[ci - 1].cloneNode(true); nc.textContent = PB.prodBookCount(p.id); nc.style.fontWeight = '700'; nc.setAttribute('data-test', 'bstat-' + p.id); r.children[ci - 1].after(mark(nc));
-      setCell(r, '상태', p.status === 'approved' ? '승인' : p.status === 'pending' ? '대기' : '반려'); setCell(r, '활성화', p.active ? '활성' : '비활성'); setCell(r, '히든 여부', p.hidden ? '히든' : '노출');
+      var r = (p.status === 'approved' ? rApp : rPend).cloneNode(true);
+      var nc = r.children[ci]; nc.textContent = PB.prodBookCount(p.id); nc.style.fontWeight = '700'; nc.setAttribute('data-test', 'bstat-' + p.id); mark(nc);
+      var sc = $('.ant-select', r.children[colIdx('상태')]); if (sc) setSelect(sc, p.status === 'approved' ? '승인' : p.status === 'pending' ? '대기' : '반려', '');
+      var s1 = $('.ant-switch', r.children[colIdx('활성화')]), s2 = $('.ant-switch', r.children[colIdx('히든 여부')]);
+      if (s1) s1.classList.toggle('ant-switch-checked', !!p.active); if (s2) s2.classList.toggle('ant-switch-checked', !!p.hidden);
       setCell(r, '언어', langLabel(p.lang)); setCell(r, '스토어코드', PB.DB.store.name); setCell(r, '상품명', p.name); setCell(r, '카테고리', p.cat); setCell(r, '세부분류', p.sub); setCell(r, '가격', PB.won(p.price));
       setCell(r, '노출수', p.views); setCell(r, '내부진입수', p.inner); setCell(r, '직접유입수', p.direct); setCell(r, '채팅수', p.chat); setCell(r, '상담수', p.cons); setCell(r, '등록일', p.reg); setCell(r, '수정일', p.reg);
       var mg = r.children[colIdx('관리')]; $$('button', mg).forEach(function (x) { x.onclick = function () { if (x.textContent.trim() === '수정') { b.editPid = p.id; go('pedit'); } else toast('시안에서는 동작하지 않습니다'); }; });
