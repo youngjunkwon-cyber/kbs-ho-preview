@@ -1,0 +1,690 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>상품 예약 시안 | K-Beauty Station</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:Pretendard,"Noto Sans KR","Malgun Gothic","Apple SD Gothic Neo",sans-serif;font-size:12px;color:#1a1a1a;background:#fff;overflow:hidden}
+button,select,input,textarea{font-family:inherit;font-size:12px;color:inherit}
+#app{height:100vh;display:flex;flex-direction:column}
+/* 화면 전환 줄 */
+#sw{height:36px;flex:none;background:#1f1f1f;color:#ddd;display:flex;align-items:center;gap:6px;padding:0 12px;font-size:11.5px}
+#sw b{color:#fff;margin-right:4px}
+#sw .s{height:24px;padding:0 10px;border:1px solid #444;border-radius:4px;background:transparent;color:#ccc;cursor:pointer}
+#sw .s.on{background:#fff;color:#111;border-color:#fff;font-weight:700}
+#sw .sp{flex:1}
+#sw select{height:24px;background:#2b2b2b;color:#eee;border:1px solid #444;border-radius:4px;padding:0 6px}
+#surf{flex:1;min-height:0;display:flex;flex-direction:column}
+#toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%);z-index:99;background:rgba(26,26,26,.92);color:#fff;font-size:12px;padding:9px 18px;border-radius:6px;opacity:0;pointer-events:none;transition:opacity .15s;white-space:nowrap}
+#toast.on{opacity:1}
+[data-act]{cursor:pointer}
+.th-thumb{display:inline-block;border-radius:4px;flex:none}
+/* 공통 모달 */
+.mov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:80;display:flex;align-items:center;justify-content:center}
+.mbox{background:#fff;border-radius:8px;width:420px;max-width:92vw;max-height:86vh;overflow:auto;padding:22px 22px 18px}
+.mbox.wide{width:760px}
+.mbox h3{font-size:15px;font-weight:700;margin-bottom:8px}
+.mbox p{font-size:12.5px;color:#555;line-height:1.6}
+.mbtns{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.mbtns button{height:32px;padding:0 16px;border-radius:4px;border:1px solid #d9d9d9;background:#fff;cursor:pointer}
+.mbtns button.pri{border-color:#3b78f6;background:#3b78f6;color:#fff}
+.mbtns button.pk{border-color:#e8537a;background:#e8537a;color:#fff}
+.xt{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:10px}
+.xt th,.xt td{border:1px solid #e5e5e5;padding:6px 8px;text-align:left;white-space:nowrap}
+.xt th{background:#f3f3f3;font-weight:700}
+.xt th.new{background:#fff0f5;color:#c2185b}
+
+/* ================= HOST ================= */
+.H{--pk:#e8537a;--pkl:#fdeef2;--pkb:#f6cdd8;--ln:#e8e8e8;--ln2:#ddd;--t3:#8a8a8a;--t4:#b5b5b5;--bg:#f5f6f8;flex:1;min-height:0;display:flex;flex-direction:column;font-size:12px}
+.H .top{height:52px;flex:none;border-bottom:1px solid var(--ln);display:flex;align-items:center;justify-content:space-between;padding:0 20px 0 12px}
+.H .logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:14px}
+.H .logo i{width:24px;height:24px;border-radius:7px;background:var(--pk);color:#fff;font-style:normal;display:flex;align-items:center;justify-content:center}
+.H .user{border:1px solid var(--ln);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600}
+.H .body{flex:1;min-height:0;display:flex}
+.H .side{width:190px;flex:none;border-right:1px solid var(--ln);overflow-y:auto;padding:9px 4px}
+.H .mi{display:flex;align-items:center;height:36px;padding:0 12px;border-radius:7px;font-size:11.5px;margin-bottom:2px}
+.H .mi.act{background:var(--pk);color:#fff;font-weight:600}
+.H .mi.g{color:var(--pk)}
+.H .subs{background:#f8f8f8;margin:0 -4px 2px;padding:3px 4px}
+.H .subs .mi{padding-left:32px;height:32px}
+.H .main{flex:1;min-width:0;background:var(--bg);overflow:auto;display:flex;flex-direction:column}
+.H .ph{background:#fff;padding:10px 20px;border-bottom:1px solid var(--ln);display:flex;align-items:center;justify-content:space-between;flex:none}
+.H .ph h1{font-size:16px;font-weight:800}
+.H .ph p{font-size:10.5px;color:var(--t3);margin-top:1px}
+.H .fb{background:#fff;padding:10px 20px 12px;border-bottom:1px solid var(--ln);display:flex;flex-direction:column;gap:8px;flex:none}
+.H .fr{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.H select,.H input[type=text],.H input[type=date]{height:28px;border:1px solid var(--ln2);border-radius:3px;background:#fff;padding:0 8px;font-size:11px;outline:none}
+.H select.new{border-color:var(--pk);box-shadow:0 0 0 1px var(--pk)}
+.H .btn{height:28px;padding:0 12px;border:1px solid var(--ln2);background:#fff;border-radius:3px;font-size:11px;cursor:pointer}
+.H .btn.pk{background:var(--pk);border-color:var(--pk);color:#fff;font-weight:600}
+.H .card{background:#fff;margin:14px 20px 20px;border-radius:2px}
+.H .card .hd{padding:14px 18px 10px;font-size:13px;font-weight:800;display:flex;justify-content:space-between;align-items:center}
+.H .tw{overflow-x:auto;padding:0 18px 4px}
+.H table{border-collapse:collapse;width:100%}
+.H th{background:#f7f7f7;font-size:11px;font-weight:800;text-align:left;padding:9px 8px;white-space:nowrap;border-bottom:1px solid var(--ln)}
+.H th.new{box-shadow:inset 0 -3px 0 var(--pk)}
+.H td{padding:10px 8px;font-size:11px;border-bottom:1px solid var(--ln);white-space:nowrap;vertical-align:middle}
+.H td small{display:block;color:var(--t3);font-size:9.5px;margin-top:2px}
+.H .btn-s{height:22px;padding:0 8px;border:1px solid var(--ln2);background:#fff;border-radius:3px;font-size:10.5px}
+.H .empty{padding:40px 0;text-align:center;color:var(--t3)}
+.H .gh th{text-align:center;border-right:1px solid var(--ln)}
+.H .gh th.g{background:#efefef}
+/* 대시보드 */
+.H .dash{width:900px;max-width:100%;margin:0 auto;padding:18px 0 40px}
+.H .dcard{background:#fff;border:1px solid var(--ln);border-radius:6px;padding:20px;margin-top:16px}
+.H .dcard h2{font-size:14px;font-weight:800}
+.H .dcard .sub{font-size:10px;color:var(--t3);margin-top:3px}
+.H .dh{display:flex;justify-content:space-between;align-items:flex-start}
+.H .tabs{display:flex;gap:6px;margin-top:14px}
+.H .tabs span{height:26px;padding:0 10px;border:1px solid var(--ln);border-radius:3px;font-size:10px;color:var(--t3);display:flex;align-items:center}
+.H .tabs span.on{border-color:#222;color:#111;font-weight:700}
+.H .rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.H .rc{border:1px solid var(--ln);border-radius:5px;padding:12px 13px;background:#fbfbfb;min-height:96px}
+.H .rc .l1{display:flex;justify-content:space-between;font-weight:800;font-size:10.5px}
+.H .rc .l2{font-weight:700;font-size:10.5px;margin-top:5px}
+.H .rc .lp{font-size:10px;margin-top:3px;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.H .rc .l3,.H .rc .l5{font-size:9px;color:var(--t3);margin-top:3px}
+.H .bd{font-size:8.5px;color:var(--pk);border:1px solid var(--pkb);background:var(--pkl);border-radius:3px;padding:0 5px}
+.H .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:16px}
+.H .kp{background:#f6f6f7;border-radius:5px;padding:12px;min-height:70px}
+.H .kp span{font-size:9px;color:#4d4d4d}
+.H .kp b{display:block;font-size:20px;font-weight:800;margin-top:8px}
+/* 예약 관리 */
+.H .resw{display:flex;flex:1;min-height:0}
+.H .resl{flex:1;min-width:0;overflow:auto}
+.H .resp{width:250px;flex:none;background:#fff;border-left:1px solid var(--ln);padding:14px 11px;overflow-y:auto}
+.H .resp h3{font-size:11.5px;font-weight:800}
+.H .resp h3 em{font-style:normal;background:#c85a1d;color:#fff;border-radius:9px;font-size:9px;padding:1px 6px;margin-left:4px}
+.H .pdesc{font-size:8.5px;color:#4d4d4d;margin:9px 0 6px;line-height:1.45}
+.H .pcard{background:#f3f3f4;border-radius:7px;padding:11px 12px;margin-bottom:7px;min-height:84px}
+.H .pcard .l1{display:flex;justify-content:space-between;font-size:12px;font-weight:800}
+.H .pcard .l2{font-size:9.5px;font-weight:700;margin-top:6px}
+.H .pcard .lp{font-size:9.5px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.H .pcard .l3{font-size:8px;color:var(--t3);margin-top:3px}
+.H .ov{position:fixed;inset:0;background:rgba(20,20,20,.5);z-index:50}
+.H .dw{position:fixed;top:0;right:0;bottom:0;width:320px;background:#fff;z-index:51;display:flex;flex-direction:column;padding:16px 14px 14px;overflow-y:auto}
+.H .dw .hd2{display:flex;gap:8px;font-size:12px;font-weight:700;margin-bottom:12px}
+.H .dw .stp{align-self:flex-start;border:1px solid var(--ln);border-radius:12px;font-size:9px;padding:2px 8px;margin-bottom:9px}
+.H .dw .dt{font-size:16px;font-weight:800;margin-bottom:11px}
+.H .kv2{display:flex;justify-content:space-between;font-size:9.5px;margin-bottom:6px;gap:14px}
+.H .kv2 span{color:var(--t3);white-space:nowrap}
+.H .kv2 b{text-align:right}
+.H .kv2.new b{box-shadow:inset 0 -1px 0 var(--pk)}
+.H .sec{font-size:9px;color:var(--t3);margin:10px 0 4px}
+.H .bx{border:1px solid var(--ln);border-radius:4px;padding:7px 8px;font-size:9.5px;min-height:30px}
+.H .ab{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:auto;padding-top:14px}
+.H .ab div{height:32px;border-radius:4px;border:1px solid var(--ln);display:flex;align-items:center;justify-content:center;font-size:9.5px;color:#bbb}
+.H .ab div.w{grid-column:1/3;border-color:#111;color:#111;font-weight:700}
+.prd{display:flex;gap:10px;align-items:center;border:1px solid var(--pkb,#f6cdd8);border-radius:6px;padding:9px 10px;margin:4px 0 12px;background:#fff}
+.prd .pt{flex:1;min-width:0}
+.prd .pn{font-size:11px;font-weight:700;line-height:1.35}
+.prd .pp{font-size:10.5px;margin-top:3px}
+.prd .pl{font-size:10px;color:#2f6fe0;margin-top:4px;display:inline-block}
+.H .form{background:#fff;margin:14px 20px;padding:18px 20px;border-radius:2px;max-width:640px}
+.H .frow{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.H .frow label{width:110px;flex:none;font-size:11.5px;color:#444}
+.H .frow.new label{color:var(--pk);font-weight:600}
+.H .frow select,.H .frow input{flex:1;height:32px}
+.H .note{font-size:10px;color:var(--t3);margin:-6px 0 12px 122px}
+.H .ro{display:flex;align-items:center;gap:10px;border:1px solid var(--ln);border-radius:5px;padding:10px 12px;background:#fafafa;font-size:11.5px}
+.H .pill{display:inline-block;border-radius:10px;padding:1px 9px;font-size:10.5px;font-weight:600}
+.H .pill.on{background:#e6f7ea;color:#1a8c33}.H .pill.off{background:#f1f1f1;color:#888}
+
+/* ================= BO ================= */
+.B{--bl:#3b78f6;--ln:#f0f0f0;--bd:#d9d9d9;--g:#8c8c8c;--pk:#ff4f8b;flex:1;min-height:0;display:flex;flex-direction:column;background:#f4f4f5;font-size:13px}
+.B .hdr{height:50px;flex:none;background:#fff;border-bottom:1px solid var(--ln);display:flex;align-items:center;justify-content:space-between;padding:0 22px 0 20px}
+.B .logo{font-weight:800;color:#e5707c;font-size:17px;letter-spacing:.4px}
+.B .body{flex:1;min-height:0;display:flex}
+.B .side{width:185px;flex:none;background:#fff;border-right:1px solid var(--ln);overflow-y:auto;padding:6px 0 30px}
+.B .mi{padding:9px 12px 9px 22px;font-size:13px}
+.B .mi.open{color:#1668dc}
+.B .sub{background:#fafafa;padding:4px 0}
+.B .sub .mi{padding:7px 12px 7px 40px;font-size:12.5px}
+.B .sub .mi.on{background:#e6f0ff;color:#1668dc;margin:2px 6px;padding-left:34px;border-radius:5px;box-shadow:inset 0 0 0 1.5px #b9d3ff}
+.B .main{flex:1;min-width:0;overflow:auto;padding-bottom:40px}
+.B .ph{background:#fff;padding:14px 20px 12px;border-bottom:1px solid var(--ln)}
+.B .ph h1{font-size:17px;font-weight:700}
+.B .ph p{font-size:11px;color:var(--g);margin-top:2px}
+.B .blk{background:#fff;margin:10px 12px 0;padding:14px 16px;border-radius:2px}
+.B .fl{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.B .ctl{height:32px;border:1px solid var(--bd);border-radius:4px;background:#fff;padding:0 10px;font-size:12.5px;outline:none}
+.B .ctl.new{border-color:var(--pk);box-shadow:0 0 0 1px rgba(255,79,139,.28)}
+.B .btnp{height:32px;background:var(--bl);color:#fff;border:0;border-radius:4px;padding:0 15px;font-size:12.5px;cursor:pointer}
+.B .btnx{height:30px;border:1px solid var(--bd);background:#fff;border-radius:4px;padding:0 14px;font-size:12px;cursor:pointer}
+.B .tw{overflow-x:auto}
+.B table.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.B .tbl th{background:#fafafa;font-weight:600;text-align:left;padding:12px 8px;white-space:nowrap}
+.B .tbl td{padding:12px 8px;border-bottom:1px solid var(--ln);white-space:nowrap;vertical-align:middle}
+.B .tbl th.new{border-bottom:2px solid var(--pk);background:#fff0f5;color:var(--pk)}
+.B .tbl td.new{background:#fffafc}
+.B .tbl td small{display:block;font-size:10.5px;color:#a6a6a6}
+.B .tbl tr.tot td{background:#fafafa;font-weight:700}
+.B .mb{display:inline-block;height:22px;line-height:20px;border:1px solid #ccc;border-radius:3px;padding:0 7px;font-size:11px;background:#fff;margin-right:4px}
+.B .empty-row td{text-align:center;color:#a6a6a6;padding:40px 0}
+.B .tabs{display:flex;gap:22px;border-bottom:1px solid var(--ln);margin:0 0 14px}
+.B .tabs span{padding:10px 2px;font-size:13px;border-bottom:2px solid transparent}
+.B .tabs span.on{color:var(--bl);border-color:var(--bl)}
+.B .frm{display:grid;grid-template-columns:150px 1fr;gap:12px 14px;align-items:center;font-size:12.5px}
+.B .frm .lb{color:#444}
+.B .rad{display:inline-flex;gap:14px}
+.B .rad label{display:inline-flex;align-items:center;gap:5px}
+.B .gd{font-size:11.5px;color:var(--g);margin-top:4px}
+.B .bt{border-collapse:collapse;font-size:12.5px;min-width:440px}
+.B .bt th,.B .bt td{border:1px solid #eee;padding:9px 14px;text-align:center}
+.B .bt th{background:#fafafa;font-weight:600}
+.B .bt td:first-child{text-align:left}
+.B .bt tr.new td{background:#fffafc}
+.B .bt tr.new td:first-child{color:var(--pk);font-weight:600}
+.tg{position:relative;display:inline-block;width:36px;height:20px;border-radius:10px;background:#d9d9d9;vertical-align:middle;cursor:pointer}
+.tg:after{content:"";position:absolute;left:2px;top:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .12s}
+.tg.on{background:#3b78f6}.tg.on:after{left:18px}
+.tg.lock{opacity:.4;cursor:not-allowed}
+.H .tg.on{background:#e8537a}
+.B .lockmsg{font-size:11px;color:#d9363e;margin-top:6px}
+.B .dov{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:60}
+.B .dwr{position:fixed;top:0;right:0;bottom:0;width:340px;background:#fff;z-index:61;display:flex;flex-direction:column;font-size:12px}
+.B .dhd{display:flex;justify-content:space-between;align-items:center;padding:0 18px;height:46px;border-bottom:1px solid #eee;font-size:13px;font-weight:700;flex:none}
+.B .dscroll{flex:1;overflow-y:auto;padding:16px 18px}
+.B .dstp{display:inline-flex;border:1px solid #e0e0e0;border-radius:12px;font-size:11px;padding:3px 10px;background:#f5f5f5;font-weight:600;margin-bottom:10px}
+.B .dti{font-size:18px;font-weight:700;margin:2px 0 12px}
+.B .dkv{display:flex;justify-content:space-between;gap:12px;padding:5px 0;color:#8a8a8a}.B .dkv b{color:#222;text-align:right}
+.B .dkv.new b{box-shadow:inset 0 -1px 0 var(--pk)}
+.B .dsec{margin:12px 0 6px;font-size:11px;font-weight:700;color:#555}
+.B .dtb{border:1px solid #eceef2;background:#f7f8fa;border-radius:8px;padding:9px 12px;min-height:36px}
+.B .card2{background:#fff;border:1px solid #eee;border-radius:6px;padding:16px 18px;margin:10px 12px 0;max-width:760px}
+.B .card2 h3{font-size:14px;margin-bottom:12px}
+
+/* ================= FO ================= */
+.F{flex:1;min-height:0;background:#e9eaee;overflow:auto;display:flex;justify-content:center;padding:18px 0}
+.phone{width:390px;min-height:760px;background:#fff;border-radius:22px;box-shadow:0 0 0 1px #d4d4d8;overflow:hidden;display:flex;flex-direction:column;position:relative;font-size:13px;color:#111}
+.fh{height:52px;flex:none;display:flex;align-items:center;gap:10px;padding:0 16px;border-bottom:1px solid #f0f0f0}
+.fh .bk{font-size:20px;line-height:1;padding:0 4px}
+.fh .lg{font-weight:800;font-size:14px;color:#e8537a}
+.fh .tt{font-weight:700;font-size:14px;flex:1;text-align:center;margin-right:28px}
+.fb2{flex:1;overflow-y:auto;padding-bottom:90px}
+.fhero{height:180px;display:flex;align-items:flex-end;padding:14px 16px;color:#fff;font-weight:800;font-size:18px}
+.fsec{padding:16px}
+.fsec h4{font-size:14px;font-weight:700;margin-bottom:10px}
+.fsub{font-size:12px;color:#777;margin-top:2px}
+.fprod{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #f2f2f2}
+.fprod .nm{font-size:13px;font-weight:600}
+.fprod .pr{font-size:13px;font-weight:700;margin-top:3px}
+.fcta{position:absolute;left:0;right:0;bottom:0;padding:12px 16px 18px;background:#fff;border-top:1px solid #f0f0f0;display:flex;gap:8px}
+.fcta button{flex:1;height:46px;border-radius:10px;border:1px solid #ddd;background:#fff;font-weight:700;font-size:14px;cursor:pointer}
+.fcta button.pri{background:#e8537a;border-color:#e8537a;color:#fff}
+.fcta button:disabled{background:#e5e5e5;border-color:#e5e5e5;color:#aaa;cursor:not-allowed}
+.flabel{font-size:13px;font-weight:700;margin:4px 0 8px}
+.fbox{border:1px solid #e5e5e5;border-radius:10px;padding:12px;display:flex;gap:12px;align-items:center}
+.fsel{width:100%;height:44px;border:1px solid #d9d9d9;border-radius:10px;padding:0 12px;font-size:13px;background:#fff}
+.fdays{display:flex;gap:6px}
+.fday{flex:1;min-width:0;height:58px;border:1px solid #e5e5e5;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;color:#666}
+.fday b{font-size:15px;color:#111}
+.fday.on{border-color:#e8537a;background:#fdeef2}
+.ftimes{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.ftime{height:38px;border:1px solid #e5e5e5;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12.5px}
+.ftime.on{border-color:#e8537a;background:#fdeef2;font-weight:700}
+.ftime.off{color:#ccc;background:#fafafa;cursor:not-allowed;text-decoration:line-through}
+.ferr{background:#fff3f3;border:1px solid #ffd0cc;color:#c23b34;border-radius:10px;padding:12px;font-size:12.5px;line-height:1.5;margin:12px 16px 0}
+.ferr button{margin-top:10px;height:34px;padding:0 14px;border-radius:8px;border:1px solid #c23b34;background:#fff;color:#c23b34;font-weight:700;cursor:pointer}
+.fdone{text-align:center;padding:40px 20px 10px}
+.fdone .ck{width:56px;height:56px;border-radius:50%;background:#fdeef2;color:#e8537a;font-size:28px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.fkv{display:flex;justify-content:space-between;padding:7px 0;font-size:13px;border-bottom:1px solid #f4f4f4}
+.fkv span{color:#888}
+.fcard{border:1px solid #eee;border-radius:12px;padding:12px;margin-bottom:10px}
+.fbadge{display:inline-block;font-size:11px;border-radius:6px;padding:2px 8px;background:#f2f2f2;color:#555;font-weight:600}
+.fbadge.on{background:#fdeef2;color:#e8537a}
+.flink{color:#2f6fe0;font-size:12.5px;margin-top:6px;display:inline-block}
+.fnote{font-size:11.5px;color:#888;margin-top:8px;line-height:1.5}
+</style>
+</head>
+<body>
+<div id="app"><div id="sw"></div><div id="surf"></div></div>
+<script>
+'use strict';
+var TODAY='2026-10-12',NOWTS='2026-10-12 12:00';
+var LANGS={en:'영어',ja:'일본어',zh:'중국어(간체)'};
+var LANG_RNO={en:'EN',ja:'JA',zh:'ZH'};
+var COLORS=['#c9a99a','#a7b8c9','#b9c9a7','#c9b7a7','#a7c9c3','#c3a7c9','#c9c3a7','#a9a7c9'];
+function won(n){return n.toLocaleString('en-US')+'원';}
+function wonFO(n){return '₩'+n.toLocaleString('en-US');}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function thumb(p,w,h){return '<span class="th-thumb" style="width:'+w+'px;height:'+(h||w)+'px;background:'+COLORS[p.color%COLORS.length]+'"></span>';}
+function addDays(d,n){var t=new Date(d+'T00:00:00Z');t.setUTCDate(t.getUTCDate()+n);return t.toISOString().slice(0,10);}
+function wd(d){return ['일','월','화','수','목','금','토'][new Date(d+'T00:00:00Z').getUTCDay()];}
+function wdEn(d){return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date(d+'T00:00:00Z').getUTCDay()];}
+
+/* ===== 시드 ===== */
+function seedStore(){return {id:'S1',name:'리버스클리닉 홍대점',nameEn:'Reverse Clinic Hongdae',code:'RVH',bookingSetting:true,btn:{web:true,ali:false},cap:1,cat:'피부'};}
+function seedProducts(){
+ // [id, lang, name, price, status, active, hidden, deleted, mode, bookWeb, bookAli, exposeCh, color, cat]
+ var A=[
+ [101,'en','Forehead Botox',55000,'approved',1,0,0,'기본',0,0,'both',0,'보톡스'],
+ [102,'ja','おでこボトックス',55000,'approved',1,0,0,'기본',0,0,'both',0,'보톡스'],
+ [103,'en','Laser Toning 10 Sessions',290000,'approved',1,0,0,'개별',1,0,'both',1,'레이저'],
+ [104,'ja','レーザートーニング 10回',290000,'approved',1,0,0,'개별',0,0,'both',1,'레이저'],
+ [105,'en','Skin Booster Rejuran',180000,'pending',1,0,0,'기본',0,0,'both',2,'스킨부스터'],
+ [106,'en','Ulthera 300 Shots',450000,'approved',1,1,0,'기본',0,0,'both',3,'리프팅'],
+ [107,'zh','额头肉毒',55000,'approved',1,0,0,'기본',0,0,'both',0,'보톡스'],
+ [108,'en','Hydrafacial Deep Clean',99000,'approved',1,0,0,'개별',1,1,'both',4,'관리'],
+ [109,'zh','水光管理',99000,'approved',1,0,0,'개별',1,1,'web',4,'관리']
+ ];
+ return A.map(function(a){return {id:a[0],lang:a[1],name:a[2],price:a[3],status:a[4],active:!!a[5],hidden:!!a[6],deleted:!!a[7],mode:a[8],book:{web:!!a[9],ali:!!a[10]},exposeCh:a[11],color:a[12],cat:a[13],chat:(a[0]%7)+2,cons:(a[0]%5)+1,rev:(a[0]%4),views:1200+a[0]*7,inner:300+a[0]*3,direct:80+a[0]};});
+}
+function snapOf(p){return {name:p.name,price:p.price,color:p.color,lang:p.lang};}
+function seedBookings(P){
+ var byId={};P.forEach(function(p){byId[p.id]=p;});
+ // [방문, 접수, 이름, 국적, 언어, 연락, 상태, 등록주체, 유입경로, 상품id, 스냅샷가격(없으면 현재), 처리필요, 채널, 요청사항]
+ var A=[
+ ['2026-10-18 15:00','2026-10-10 08:24','Kaitlyn Chan','캐나다','en','WhatsApp','예약','고객','상품',101,50000,'신규','웹','Please use a gentle product for sensitive skin.'],
+ ['2026-10-18 14:00','2026-10-09 10:58','Evelyn Lee','캐나다','en','WhatsApp','예약','고객','스토어',null,null,'신규','웹',''],
+ ['2026-10-17 11:00','2026-10-11 21:14','Rina Takeda','일본','ja','LINE','예약','고객','스토어',102,null,'신규','웹',''],
+ ['2026-10-16 16:00','2026-10-08 09:40','王思雨','중국','zh','WeChat','예약','고객','상품',107,null,'변경','알리페이',''],
+ ['2026-10-15 13:00','2026-10-07 13:05','Mia Tan','싱가포르','en','WhatsApp','예약','매장',null,108,null,'','웹','전화로 접수'],
+ ['2026-10-12 10:00','2026-10-02 12:00','Claire Wald','미국','en','WhatsApp','예약','고객','상품',106,null,'방문결과','웹',''],
+ ['2026-10-10 14:00','2026-10-01 18:24','Yuko Hamada','일본','ja','LINE','방문완료','고객','스토어',null,null,'','웹',''],
+ ['2026-10-09 12:00','2026-09-28 23:37','Hui Ping Ho','말레이시아','en','WhatsApp','방문완료','고객','상품',103,null,'','웹',''],
+ ['2026-10-05 10:00','2026-09-30 15:20','Altynbekova Kymbat','카자흐스탄','en','KakaoTalk','미방문','고객','스토어',null,null,'','웹',''],
+ ['2026-10-03 15:00','2026-09-25 05:14','Madison Piao','미국','en','WeChat','고객취소','고객','상품',101,52000,'','웹',''],
+ ['2026-09-27 14:00','2026-09-24 02:56','Elina','러시아','en','WhatsApp','방문완료','매장',null,null,null,'','웹','현장 방문'],
+ ['2026-09-20 11:00','2026-09-15 16:20','陈雨萱','중국','zh','WeChat','방문완료','고객','상품',107,null,'','알리페이',''],
+ ['2026-09-12 12:00','2026-09-08 10:11','Chloe Tan','싱가포르','en','WhatsApp','매장취소','고객','상품',108,null,'','웹','']
+ ];
+ return A.map(function(a,i){
+  var p=a[9]?byId[a[9]]:null,snap=p?snapOf(p):null;if(snap&&a[10])snap.price=a[10];
+  var d=a[1].slice(2,10).replace(/-/g,'');
+  return {no:i+1,visit:a[0],recv:a[1],name:a[2],nation:a[3],lang:a[4],contact:a[5],status:a[6],owner:a[7],route:a[8],prodId:a[9],snap:snap,need:a[11],ch:a[12],req:a[13],rno:d+'RVH'+LANG_RNO[a[4]]+('0'+(i%9+1))};
+ });
+}
+function seedCollections(){return [
+ {id:1,name:'가을 보톡스 특가',lang:'en',type:'특가',items:[101,103,108]},
+ {id:2,name:'秋季护肤推荐',lang:'zh',type:'추천상품',items:[107,109]},
+ {id:3,name:'秋のおすすめ',lang:'ja',type:'추천상품',items:[102,104]}
+];}
+var DB,S;
+function freshDB(){var P=seedProducts();DB={store:seedStore(),prods:P,books:seedBookings(P),cols:seedCollections()};}
+function freshState(){return {surf:'HOST',fo:{lang:'en',ch:'web',screen:'store',entry:'store',pid:null,sel:'',date:addDays(TODAY,1),time:'',err:null,lastNo:null,myNo:null},
+ host:{view:'dash',dtab:'전체',st:'전체',kind:'전체',owner:'전체',q:'',qd:'',ptab:'전체',open:null,editPid:null,man:{date:addDays(TODAY,2),time:'14:00',name:'',lang:'en',phone:'',pid:''},statPer:'전체'},
+ bo:{view:'res',st:'전체',kind:'전체',owner:'전체',q:'',qd:'',open:null,lang:'전체',editPid:null,tab:'관리자설정',col:null},
+ modal:null};}
+
+/* ===== 판정 (순수 함수) ===== */
+function prodById(id){return DB.prods.filter(function(p){return p.id===+id;})[0]||null;}
+function storeBookBtn(ch){var s=DB.store;return !!(s.bookingSetting&&s.btn[ch]);}
+/* 상품 예약 버튼: 예약 설정에만 묶임. 기본 설정이면 스토어 예약 버튼 값을 따름 */
+function prodBookBtn(p,ch){
+ if(!DB.store.bookingSetting)return false;
+ if(ch==='ali'&&p.exposeCh==='web')return false;
+ return p.mode==='기본'?!!DB.store.btn[ch]:!!p.book[ch];
+}
+function prodVisible(p,lang){return p.status==='approved'&&p.active&&!p.hidden&&!p.deleted&&p.lang===lang;}
+function judgeBookable(p,lang,ch){
+ var conds=[['예약 설정',DB.store.bookingSetting],['상품 노출',prodVisible(p,lang)],['상품 예약 버튼',prodBookBtn(p,ch)]];
+ var bad=conds.filter(function(c){return !c[1];})[0];
+ return {ok:!bad,reason:bad?bad[0]:'',conds:conds};
+}
+function foOptions(lang,ch){return DB.prods.filter(function(p){return judgeBookable(p,lang,ch).ok;});}
+function manualOptions(){return DB.prods.filter(function(p){return p.status==='approved'&&!p.deleted;});}
+function bookingKind(b){return b.prodId?'상품 예약':'방문 예약';}
+function prodBookCount(pid,from,to){return DB.books.filter(function(b){var d=b.recv.slice(0,10);return b.prodId===pid&&(!from||d>=from)&&(!to||d<=to);}).length;}
+function slotTaken(date,time){return DB.books.filter(function(b){return b.visit===date+' '+time&&b.status==='예약';}).length;}
+var TIMES=['10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00'];
+function slotOpen(date,time){return slotTaken(date,time)<DB.store.cap&&(date+' '+time)>NOWTS;}
+
+/* ===== 공통 ===== */
+function toast(m){var el=document.getElementById('toast');if(!el){el=document.createElement('div');el.id='toast';document.body.appendChild(el);}el.textContent=m;el.className='on';clearTimeout(toast.t);toast.t=setTimeout(function(){el.className='';},2000);}
+function modalHTML(){
+ var m=S.modal;if(!m)return '';
+ if(m.type==='bookOff')return '<div class="mov"><div class="mbox"><h3>예약 설정을 OFF로 전환하시겠어요?</h3><p>이미 잡힌 예약은 그대로 유지돼요. 새 예약만 받지 않아요.</p><div class="mbtns"><button data-act="mclose">취소</button><button class="pri" data-act="bookOffOk">전환</button></div></div></div>';
+ if(m.type==='excel'){
+  var rows=m.rows.slice(0,6);
+  return '<div class="mov"><div class="mbox wide"><h3>엑셀 다운로드 미리보기</h3><p>내려받는 파일의 칼럼과 앞쪽 '+rows.length+'줄입니다. 분홍 칼럼이 이번에 추가됩니다.</p><div style="overflow-x:auto"><table class="xt"><thead><tr><th>예약번호</th><th>방문일시</th><th>고객(여권명)</th><th>언어</th><th class="new">예약 상품</th><th class="new">유입경로</th><th>등록 주체</th><th>예약상태</th></tr></thead><tbody>'
+  +rows.map(function(b){return '<tr><td>'+b.rno+'</td><td>'+b.visit+'</td><td>'+esc(b.name)+'</td><td>'+LANGS[b.lang]+'</td><td>'+(b.snap?esc(b.snap.name):'-')+'</td><td>'+(b.route||'-')+'</td><td>'+(b.owner==='고객'?'고객 직접 예약':'수기 등록 예약')+'</td><td>'+b.status+'</td></tr>';}).join('')
+  +'</tbody></table></div><div class="mbtns"><button data-act="mclose">닫기</button></div></div></div>';
+ }
+ return '';
+}
+function prodBlock(b,surf){
+ if(!b.snap)return '';
+ var p=prodById(b.prodId),live=p&&prodVisible(p,b.snap.lang);
+ return '<div class="prd" data-test="prod-block">'+thumb(b.snap,46)+'<div class="pt"><div class="pn">'+esc(b.snap.name)+'</div><div class="pp">'+won(b.snap.price)+'</div>'+(live?'<span class="pl" data-act="'+(surf==='bo'?'nop':'nop')+'">상품 보기</span>':'')+'</div></div>';
+}
+
+/* ================= FO ================= */
+var FOT={
+ en:{book:'Book',inquiry:'Inquiry',chat:'Chat',products:'Products',bookTitle:'Book a visit',prod:'Product',none:'No product (store visit)',date:'Date',time:'Time',confirm:'Book now',done:'Your booking is confirmed',my:'My bookings',detail:'Booking details',viewProd:'View product',storeFull:'This product can’t be booked right now.',goStore:'Go to store page',pickAgain:'This product can’t be booked right now. Please choose again.',slotGone:'This time was just taken. Please pick another time.',pickTime:'Please choose a time.',stopped:'This store is not taking bookings right now.',status:{'예약':'Booked','방문완료':'Visited','고객취소':'Cancelled','매장취소':'Cancelled','미방문':'Cancelled'}},
+ ja:{book:'予約',inquiry:'お問い合わせ',chat:'チャット',products:'メニュー',bookTitle:'来店予約',prod:'メニュー',none:'選択しない(来店予約)',date:'日付',time:'時間',confirm:'予約する',done:'予約が確定しました',my:'予約一覧',detail:'予約詳細',viewProd:'メニューを見る',storeFull:'このメニューは現在予約できません。',goStore:'店舗ページへ',pickAgain:'このメニューは現在予約できません。もう一度選んでください。',slotGone:'この時間は埋まりました。別の時間を選んでください。',pickTime:'時間を選んでください。',stopped:'この店舗は現在予約を受け付けていません。',status:{'예약':'予約済み','방문완료':'来店済み','고객취소':'キャンセル','매장취소':'キャンセル','미방문':'キャンセル'}},
+ zh:{book:'预约',inquiry:'咨询',chat:'聊天',products:'项目',bookTitle:'预约到店',prod:'项目',none:'不选择(到店预约)',date:'日期',time:'时间',confirm:'立即预约',done:'预约已确认',my:'我的预约',detail:'预约详情',viewProd:'查看项目',storeFull:'该项目暂时无法预约。',goStore:'前往店铺页面',pickAgain:'该项目暂时无法预约，请重新选择。',slotGone:'该时间刚被预约，请选择其他时间。',pickTime:'请选择时间。',stopped:'该店铺暂不接受预约。',status:{'예약':'已预约','방문완료':'已到店','고객취소':'已取消','매장취소':'已取消','미방문':'已取消'}}
+};
+var ME='Kaitlyn Chan';
+function foStoreProds(){var f=S.fo;return DB.prods.filter(function(p){return prodVisible(p,f.lang)&&(f.ch==='web'||p.exposeCh!=='web');});}
+function foHeader(title,back){return '<div class="fh">'+(back?'<span class="bk" data-act="foBack" data-v="'+back+'">&lsaquo;</span>':'')+(title?'<span class="tt">'+esc(title)+'</span>':'<span class="lg">K-Beauty Station</span><span style="flex:1"></span><span data-act="fo" data-v="my" style="font-size:12px;color:#555">'+FOT[S.fo.lang].my+'</span>')+'</div>';}
+function foStore(){
+ var f=S.fo,T=FOT[f.lang],ps=foStoreProds(),bk=storeBookBtn(f.ch);
+ var h=foHeader('',null)+'<div class="fb2"><div class="fhero" style="background:linear-gradient(135deg,#b98f80,#7d6a8a)">'+DB.store.nameEn+'</div>'
+  +'<div class="fsec"><h4>'+T.products+'</h4>'+(ps.length?ps.map(function(p){return '<div class="fprod" data-act="foProd" data-v="'+p.id+'">'+thumb(p,60)+'<div><div class="nm">'+esc(p.name)+'</div><div class="pr">'+wonFO(p.price)+'</div></div></div>';}).join(''):'<div class="fsub">-</div>')+'</div></div>';
+ h+='<div class="fcta"><button data-act="nop">'+T.inquiry+'</button>'+(bk?'<button class="pri" data-act="foBook" data-v="store" data-test="store-book">'+T.book+'</button>':'')+'</div>';
+ return h;
+}
+function foProduct(){
+ var f=S.fo,T=FOT[f.lang],p=prodById(f.pid);
+ if(!p||!prodVisible(p,f.lang)||(f.ch==='ali'&&p.exposeCh==='web'))return foHeader(' ', 'store')+'<div class="fb2"><div class="fsec" style="text-align:center;padding-top:80px;color:#888">404</div></div>';
+ var bk=judgeBookable(p,f.lang,f.ch).ok;
+ var h=foHeader(' ','store')+'<div class="fb2"><div style="height:260px;background:'+COLORS[p.color]+'"></div><div class="fsec"><div class="fsub">'+DB.store.nameEn+'</div><h4 style="font-size:18px;margin:4px 0 6px">'+esc(p.name)+'</h4><div style="font-size:18px;font-weight:800">'+wonFO(p.price)+'</div></div></div>';
+ h+='<div class="fcta"><button data-act="nop">'+T.chat+'</button>'+(bk?'<button class="pri" data-act="foBook" data-v="product" data-test="prod-book">'+T.book+'</button>':'')+'</div>';
+ return h;
+}
+function foBook(){
+ var f=S.fo,T=FOT[f.lang];
+ if(!DB.store.bookingSetting)return foHeader(T.bookTitle,'store')+'<div class="ferr">'+T.stopped+'</div>';
+ var h=foHeader(T.bookTitle,f.entry==='product'?'product':'store')+'<div class="fb2">';
+ if(f.err&&f.err.kind==='prodGone'){
+  h+='<div class="ferr" data-test="fo-err">'+T.storeFull+'<br><button data-act="foGoStore">'+T.goStore+'</button></div>';
+ }
+ h+='<div class="fsec"><div class="flabel">'+T.prod+'</div>';
+ if(f.entry==='product'){
+  var p=prodById(f.pid);
+  h+='<div class="fbox" data-test="fo-fixed">'+thumb(p,54)+'<div><div style="font-weight:700">'+esc(p.name)+'</div><div style="margin-top:3px;font-weight:700">'+wonFO(p.price)+'</div></div></div>';
+ }else{
+  var opts=foOptions(f.lang,f.ch);
+  h+='<select class="fsel" data-fo="sel" data-test="fo-select"><option value="">'+T.none+'</option>'+opts.map(function(p){return '<option value="'+p.id+'"'+(String(f.sel)===String(p.id)?' selected':'')+'>'+esc(p.name)+' · '+wonFO(p.price)+'</option>';}).join('')+'</select>';
+  if(f.err&&f.err.kind==='pickAgain')h+='<div class="ferr" style="margin:10px 0 0" data-test="fo-err">'+T.pickAgain+'</div>';
+  var sp=f.sel?prodById(f.sel):null;
+  if(sp)h+='<div class="fbox" style="margin-top:10px">'+thumb(sp,54)+'<div><div style="font-weight:700">'+esc(sp.name)+'</div><div style="margin-top:3px;font-weight:700">'+wonFO(sp.price)+'</div></div></div>';
+ }
+ h+='</div><div class="fsec"><div class="flabel">'+T.date+'</div><div class="fdays">';
+ for(var i=0;i<7;i++){var d=addDays(TODAY,i);h+='<div class="fday'+(f.date===d?' on':'')+'" data-act="foDate" data-v="'+d+'">'+wdEn(d)+'<b>'+d.slice(8)+'</b></div>';}
+ h+='</div></div><div class="fsec"><div class="flabel">'+T.time+'</div><div class="ftimes">'+TIMES.map(function(t){var ok=slotOpen(f.date,t);return '<div class="ftime'+(f.time===t?' on':'')+(ok?'':' off')+'" '+(ok?'data-act="foTime" data-v="'+t+'"':'')+'>'+t+'</div>';}).join('')+'</div>';
+ if(f.err&&(f.err.kind==='slot'||f.err.kind==='time'))h+='<div class="ferr" style="margin:12px 0 0">'+(f.err.kind==='slot'?T.slotGone:T.pickTime)+'</div>';
+ h+='</div></div><div class="fcta"><button class="pri" data-act="foSubmit" data-test="fo-submit">'+T.confirm+'</button></div>';
+ return h;
+}
+function foDone(){
+ var f=S.fo,T=FOT[f.lang],b=DB.books.filter(function(x){return x.no===f.lastNo;})[0];
+ var h=foHeader('',null)+'<div class="fb2"><div class="fdone"><div class="ck">&#10003;</div><div style="font-size:17px;font-weight:800">'+T.done+'</div><div class="fsub" style="margin-top:6px">'+b.rno+'</div></div><div class="fsec">';
+ if(b.snap)h+='<div class="fbox" style="margin-bottom:12px" data-test="fo-done-prod">'+thumb(b.snap,54)+'<div><div style="font-weight:700">'+esc(b.snap.name)+'</div><div style="margin-top:3px;font-weight:700">'+wonFO(b.snap.price)+'</div></div></div>';
+ h+='<div class="fkv"><span>'+DB.store.nameEn+'</span><b></b></div><div class="fkv"><span>'+T.date+'</span><b>'+b.visit+' (KST)</b></div></div></div><div class="fcta"><button data-act="fo" data-v="my">'+T.my+'</button></div>';
+ return h;
+}
+function foMy(){
+ var f=S.fo,T=FOT[f.lang],list=DB.books.filter(function(b){return b.name===ME;}).sort(function(a,b){return a.visit<b.visit?1:-1;});
+ return foHeader(T.my,'store')+'<div class="fb2"><div class="fsec">'+(list.length?list.map(function(b){
+  return '<div class="fcard" data-act="foMyOpen" data-v="'+b.no+'"><div style="display:flex;justify-content:space-between"><b>'+DB.store.nameEn+'</b><span class="fbadge'+(b.status==='예약'?' on':'')+'">'+T.status[b.status]+'</span></div><div class="fsub" style="margin-top:4px">'+b.visit+'</div>'+(b.snap?'<div style="display:flex;gap:8px;align-items:center;margin-top:8px">'+thumb(b.snap,36)+'<span style="font-size:12.5px">'+esc(b.snap.name)+'</span></div>':'')+'</div>';}).join(''):'<div class="fsub">-</div>')+'</div></div>';
+}
+function foMyDetail(){
+ var f=S.fo,T=FOT[f.lang],b=DB.books.filter(function(x){return x.no===f.myNo;})[0];
+ var p=b.prodId?prodById(b.prodId):null,live=p&&prodVisible(p,b.snap.lang);
+ var h=foHeader(T.detail,'my')+'<div class="fb2"><div class="fsec"><span class="fbadge'+(b.status==='예약'?' on':'')+'">'+T.status[b.status]+'</span><div style="font-size:18px;font-weight:800;margin:8px 0 12px">'+b.visit+'</div>';
+ if(b.snap)h+='<div class="fbox" data-test="fo-my-prod">'+thumb(b.snap,54)+'<div><div style="font-weight:700">'+esc(b.snap.name)+'</div><div style="margin-top:3px;font-weight:700">'+wonFO(b.snap.price)+'</div>'+(live?'<span class="flink" data-act="foProd" data-v="'+p.id+'">'+T.viewProd+' &rsaquo;</span>':'')+'</div></div>';
+ h+='<div style="margin-top:12px"><div class="fkv"><span>No.</span><b>'+b.rno+'</b></div><div class="fkv"><span>Store</span><b>'+DB.store.nameEn+'</b></div></div></div></div>';
+ return h;
+}
+function foSubmit(){
+ var f=S.fo;f.err=null;
+ if(!f.time){f.err={kind:'time'};return;}
+ if(!slotOpen(f.date,f.time)){f.err={kind:'slot'};f.time='';return;}
+ var pid=f.entry==='product'?f.pid:(f.sel?+f.sel:null);
+ if(pid){var j=judgeBookable(prodById(pid),f.lang,f.ch);if(!j.ok){if(f.entry==='product')f.err={kind:'prodGone'};else{f.err={kind:'pickAgain'};f.sel='';}return;}}
+ var p=pid?prodById(pid):null,no=DB.books.length+1;
+ var b={no:no,visit:f.date+' '+f.time,recv:NOWTS,name:ME,nation:'캐나다',lang:f.lang,contact:'WhatsApp',status:'예약',owner:'고객',route:f.entry==='product'?'상품':'스토어',prodId:pid,snap:p?snapOf(p):null,need:'신규',ch:f.ch==='web'?'웹':'알리페이',req:'',rno:'261012RVH'+LANG_RNO[f.lang]+(no<10?'0'+no:no)};
+ DB.books.push(b);f.lastNo=no;f.screen='done';f.time='';
+}
+function renderFO(){
+ var f=S.fo,V={store:foStore,product:foProduct,book:foBook,done:foDone,my:foMy,mydetail:foMyDetail};
+ return '<div class="F"><div class="phone" id="phone">'+V[f.screen]()+'</div></div>';
+}
+
+/* ================= HOST ================= */
+var HNAV=[['대시보드','dash'],['채팅 관리',''],['상품 관리','',[['상품 목록','prod'],['상품 통계','pstat']]],['상담 관리',''],['예약 관리','',[['예약 현황','res'],['예약 시간 설정','']]],['리뷰 관리',''],['스토어 칼럼 관리',''],['갤러리 관리',''],['마이페이지',''],['공지사항','']];
+function hShell(inner){
+ var v=S.host.view,side=HNAV.map(function(n){
+  if(n[2])return '<div class="mi g">'+n[0]+'</div><div class="subs">'+n[2].map(function(s){var on=s[1]&&(v===s[1]||(s[1]==='res'&&v==='manual')||(s[1]==='prod'&&v==='pedit'));return '<div class="mi'+(on?' act':'')+'" data-act="'+(s[1]?'hgo':'nop')+'" data-v="'+s[1]+'">'+s[0]+'</div>';}).join('')+'</div>';
+  var on=n[1]&&(v===n[1]||(n[1]==='prod'&&v==='pedit'));
+  return '<div class="mi'+(on?' act':'')+'" data-act="'+(n[1]?'hgo':'nop')+'" data-v="'+n[1]+'">'+n[0]+'</div>';}).join('');
+ return '<div class="H"><div class="top"><div class="logo"><i>K</i>Beauty Station</div><div class="user">'+DB.store.name+'</div></div><div class="body"><aside class="side">'+side+'</aside><main class="main" id="hmain">'+inner+'</main></div></div>';
+}
+function needList(t){return DB.books.filter(function(b){return b.need&&(t==='전체'||b.need===t);}).sort(function(a,b){return a.visit<b.visit?1:-1;});}
+function hCard(b,cls){
+ return '<div class="'+cls+'" data-act="hopen" data-v="'+b.no+'"><div class="l1"><span>'+b.visit.slice(0,10)+' ('+wd(b.visit.slice(0,10))+') '+b.visit.slice(11)+'</span><span class="bd">예약</span></div><div class="l2">'+esc(b.name)+'</div>'+(b.snap?'<div class="lp" data-test="card-prod">'+esc(b.snap.name)+'</div>':'')+'<div class="l3">'+esc(b.nation)+'</div><div class="l3">'+b.rno+' · 접수 '+b.recv+'</div></div>';
+}
+function hDash(){
+ var t=S.host.dtab,cards=needList(t);
+ var h='<div class="ph"><div><h1>대시보드</h1><p>오늘 처리할 일과 스토어 성과를 한눈에 확인해 보세요.</p></div></div><div class="dash">';
+ h+='<div class="dcard"><div class="dh"><div><h2>예약 현황</h2><div class="sub">확인과 처리가 필요한 예약을 모아 보여드려요.</div></div><span style="font-size:10.5px" data-act="hgo" data-v="res">예약 관리 이동 &rarr;</span></div><div class="tabs">'+['전체','신규','방문결과','변경'].map(function(x){return '<span class="'+(t===x?'on':'')+'" data-act="hdtab" data-v="'+x+'">'+x+' '+needList(x).length+'</span>';}).join('')+'</div>';
+ h+=cards.length?'<div class="rgrid">'+cards.map(function(b){return hCard(b,'rc');}).join('')+'</div>':'<div class="empty">현재 처리할 예약이 없습니다.</div>';
+ var conf=DB.books.filter(function(b){return b.recv.slice(0,10)>=addDays(TODAY,-6);}).length,done=DB.books.filter(function(b){return b.status==='방문완료'&&b.visit.slice(0,10)>=addDays(TODAY,-6);}).length;
+ h+='</div><div class="dcard"><div class="dh"><div><h2>통계</h2><div class="sub">선택한 기간의 스토어 성과와 고객 문의를 확인해 보세요.</div></div><span style="font-size:10px;color:#888">이번 주</span></div><div class="kpis">'+[['스토어 방문',212],['상품 방문',486],['메신저 문의',9],['채팅 문의',14],['예약 확정',conf],['방문 완료',done]].map(function(k){return '<div class="kp"><span>'+k[0]+'</span><b>'+k[1]+'</b></div>';}).join('')+'</div></div>';
+ return h+'</div>';
+}
+function hFiltered(){
+ var v=S.host,q=v.q.trim().toLowerCase();
+ return DB.books.filter(function(b){
+  if(v.st!=='전체'&&b.status!==v.st)return false;
+  if(v.kind!=='전체'&&bookingKind(b)!==v.kind)return false;
+  if(v.owner!=='전체'&&b.owner!==v.owner)return false;
+  if(q){var hay=[b.name,b.rno,b.req,b.snap?b.snap.name:''].join(' ').toLowerCase();if(hay.indexOf(q)<0)return false;}
+  return true;}).sort(function(a,b){return a.visit<b.visit?1:-1;});
+}
+function hSel(k,opts,cls){var cur=S.host[k];return '<select class="'+(cls||'')+'" data-h="'+k+'">'+opts.map(function(o){return '<option value="'+o[0]+'"'+(o[0]===cur?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>';}
+function hRes(){
+ var v=S.host,a=hFiltered(),pl=needList(v.ptab);
+ var h='<div class="ph"><div><h1>예약 관리</h1><p>전체 예약 목록입니다. 처리가 필요한 예약은 오른쪽에서 바로 처리하세요.</p></div><div style="display:flex;gap:6px"><button class="btn" data-act="excel" data-v="host">엑셀 다운로드</button><button class="btn pk" data-act="hgo" data-v="manual">수기등록</button></div></div>';
+ h+='<div class="resw"><div class="resl" id="hresl"><div class="fb"><div class="fr">'
+  +hSel('st',[['전체','예약상태 전체'],['예약','예약상태 예약'],['방문완료','예약상태 방문완료'],['미방문','예약상태 미방문'],['고객취소','예약상태 고객취소'],['매장취소','예약상태 매장취소']])
+  +hSel('kind',[['전체','예약 구분 전체'],['상품 예약','예약 구분 상품 예약'],['방문 예약','예약 구분 방문 예약']],'new')
+  +hSel('owner',[['전체','등록 주체 전체'],['고객','고객 직접 예약'],['매장','수기 등록 예약']])
+  +'<input type="text" data-hq placeholder="여권명·연락처·예약번호·요청사항·매장 메모·상품명" value="'+esc(v.qd)+'" style="width:300px"><button class="btn pk" data-act="hsearch">검색</button></div></div>';
+ h+='<div class="card"><div class="hd">예약목록 ('+a.length+')</div><div class="tw"><table><thead><tr><th>방문일시</th><th>고객 (여권명)</th><th class="new">예약 상품</th><th>예약번호</th><th>국적</th><th>언어</th><th>연락</th><th>예약상태</th><th>관리</th></tr></thead><tbody>'
+  +(a.length?a.map(function(b){return '<tr><td>'+b.visit+'<small>접수 '+b.recv+'</small></td><td>'+esc(b.name)+'</td><td data-test="col-prod">'+(b.snap?esc(b.snap.name):'-')+'</td><td>'+b.rno+'</td><td>'+esc(b.nation)+'</td><td>'+LANGS[b.lang]+'</td><td>'+b.contact+'</td><td>'+b.status+'</td><td><button class="btn-s" data-act="hopen" data-v="'+b.no+'">상세</button></td></tr>';}).join(''):'<tr><td colspan="9" class="empty">조건에 맞는 예약이 없어요.</td></tr>')
+  +'</tbody></table></div></div></div>';
+ h+='<aside class="resp"><h3>처리 필요<em>'+needList('전체').length+'</em></h3><div class="tabs" style="margin-top:10px">'+['전체','신규','방문결과','변경'].map(function(x){return '<span class="'+(v.ptab===x?'on':'')+'" data-act="hptab" data-v="'+x+'">'+x+' '+needList(x).length+'</span>';}).join('')+'</div><div class="pdesc">예약이나 방문 결과 처리가 필요한 예약이에요. 카드를 누르면 예약 상세가 열려요.</div>'
+  +(pl.length?pl.map(function(b){return hCard(b,'pcard');}).join(''):'<div class="empty">처리할 예약이 없어요.</div>')+'</aside></div>';
+ if(v.open!=null){
+  var b=DB.books.filter(function(x){return x.no===v.open;})[0];
+  h+='<div class="ov" data-act="hclose"></div><div class="dw" data-test="drawer"><div class="hd2"><span data-act="hclose">&times;</span>예약 상세</div><div class="stp">'+b.status+'</div><div class="dt">'+b.visit+'</div>'
+   +prodBlock(b,'host')
+   +kv2('여권명',b.name)+kv2('국적',b.nation)+kv2('언어',LANGS[b.lang])+kv2('메신저',b.contact)+kv2('예약 번호',b.rno)+kv2('접수 시각',b.recv)+kv2('등록 주체',b.owner==='고객'?'고객 직접 예약':'수기 등록 예약')+kv2('유입경로',b.route||'-','new')
+   +'<div class="sec">고객 요청사항</div><div class="bx">'+(b.req?esc(b.req):'<span style="color:#bbb">요청사항이 없어요.</span>')+'</div>'
+   +(b.status==='예약'?'<div class="ab"><div>방문완료</div><div>미방문</div><div class="w" data-act="nop">예약 변경</div></div>':'')+'</div>';
+ }
+ return h;
+}
+function kv2(k,v,cls){return '<div class="kv2 '+(cls||'')+'" data-k="'+k+'"><span>'+k+'</span><b>'+esc(v)+'</b></div>';}
+function hManual(){
+ var m=S.host.man,opts=manualOptions();
+ var h='<div class="ph"><div><h1>수기 예약 추가</h1><p>전화·현장 방문 등 다른 경로로 받은 예약을 직접 등록해요.</p></div></div><div class="form">'
+  +'<div class="frow"><label>방문 일시</label><input type="date" data-m="date" value="'+m.date+'"><select data-m="time">'+TIMES.map(function(t){return '<option'+(m.time===t?' selected':'')+'>'+t+'</option>';}).join('')+'</select></div>'
+  +'<div class="frow"><label>여권명</label><input type="text" data-m="name" value="'+esc(m.name)+'" placeholder="여권에 적힌 영문 이름"></div>'
+  +'<div class="frow"><label>언어</label><select data-m="lang">'+Object.keys(LANGS).map(function(k){return '<option value="'+k+'"'+(m.lang===k?' selected':'')+'>'+LANGS[k]+'</option>';}).join('')+'</select></div>'
+  +'<div class="frow"><label>연락처</label><input type="text" data-m="phone" value="'+esc(m.phone)+'" placeholder="전화 또는 메신저"></div>'
+  +'<div class="frow new"><label>예약 상품</label><select data-m="pid" data-test="man-select"><option value="">선택 안 함</option>'+opts.map(function(p){return '<option value="'+p.id+'"'+(String(m.pid)===String(p.id)?' selected':'')+'>'+esc(p.name)+' · '+LANGS[p.lang]+'</option>';}).join('')+'</select></div>'
+  +'<div style="display:flex;gap:6px;justify-content:flex-end;margin-top:6px"><button class="btn" data-act="hgo" data-v="res">취소</button><button class="btn pk" data-act="manSave">등록</button></div></div>';
+ return h;
+}
+function hProd(){
+ var h='<div class="ph"><div><h1>상품 관리</h1><p>우리 스토어 상품을 등록하고 관리합니다.</p></div></div><div class="card"><div class="hd">상품 목록 ('+DB.prods.filter(function(p){return !p.deleted;}).length+')</div><div class="tw"><table><thead><tr><th>상품명</th><th>언어</th><th>가격</th><th>승인상태</th><th>진열</th><th>관리</th></tr></thead><tbody>'
+  +DB.prods.filter(function(p){return !p.deleted;}).map(function(p){return '<tr><td>'+esc(p.name)+'</td><td>'+LANGS[p.lang]+'</td><td>'+won(p.price)+'</td><td>'+{approved:'승인 완료',pending:'승인 대기',rejected:'등록 반려'}[p.status]+'</td><td>'+(p.active&&!p.hidden?'활성':'비활성')+'</td><td><button class="btn-s" data-act="hpedit" data-v="'+p.id+'">수정</button></td></tr>';}).join('')+'</tbody></table></div></div>';
+ return h;
+}
+function hPedit(){
+ var p=prodById(S.host.editPid),w=prodBookBtn(p,'web'),a=prodBookBtn(p,'ali');
+ return '<div class="ph"><div><h1>상품 수정</h1><p>'+esc(p.name)+'</p></div><button class="btn" data-act="hgo" data-v="prod">목록</button></div><div class="form">'
+  +'<div class="frow"><label>상품명</label><input type="text" value="'+esc(p.name)+'" readonly></div><div class="frow"><label>상품가</label><input type="text" value="'+won(p.price)+'" readonly></div>'
+  +'<div class="frow new" style="align-items:flex-start"><label>예약 버튼</label><div style="flex:1"><div class="ro" data-test="host-btn"><span>웹</span><span class="pill '+(w?'on':'off')+'">'+(w?'켜짐':'꺼짐')+'</span><span style="margin-left:14px">알리페이</span><span class="pill '+(a?'on':'off')+'">'+(a?'켜짐':'꺼짐')+'</span></div><div style="font-size:10.5px;color:#8a8a8a;margin-top:6px">예약 버튼은 K-Beauty Station이 켜고 꺼요. 바꾸고 싶으면 담당 매니저에게 말씀해 주세요.</div></div></div></div>';
+}
+function hPstat(){
+ var per=S.host.statPer,from=per==='이번 달'?'2026-10-01':(per==='지난 달'?'2026-09-01':''),to=per==='지난 달'?'2026-09-30':'';
+ var ps=DB.prods.filter(function(p){return !p.deleted;});
+ return '<div class="ph"><div><h1>상품 통계</h1><p>상품별 상담, 채팅, 리뷰 지표를 집계해서 확인합니다.</p></div></div><div class="fb"><div class="fr">'+hSel('statPer',[['전체','기간 전체'],['이번 달','이번 달 (접수일 기준)'],['지난 달','지난 달 (접수일 기준)']])+'</div></div>'
+ +'<div class="card"><div class="hd">상품별 통계</div><div class="tw"><table class="gh"><thead><tr><th rowspan="2" style="text-align:left">상품명</th><th rowspan="2">언어</th><th class="g" colspan="2">채팅</th><th class="g" colspan="3">상담</th><th class="g">리뷰</th><th class="g new">예약</th></tr><tr><th>총 건수</th><th>미응답</th><th>신청</th><th>방문예정</th><th>상품예약</th><th>작성</th><th class="new">예약 건수</th></tr></thead><tbody>'
+ +ps.map(function(p){return '<tr><td>'+esc(p.name)+'</td><td style="text-align:center">'+LANGS[p.lang]+'</td><td style="text-align:center">'+p.chat+'</td><td style="text-align:center">'+(p.chat%3)+'</td><td style="text-align:center">'+p.cons+'</td><td style="text-align:center">'+(p.cons%2)+'</td><td style="text-align:center">'+(p.cons%3?1:0)+'</td><td style="text-align:center">'+p.rev+'</td><td style="text-align:center;font-weight:700" data-test="stat-'+p.id+'">'+prodBookCount(p.id,from,to)+'</td></tr>';}).join('')+'</tbody></table></div></div>';
+}
+function renderHOST(){
+ var V={dash:hDash,res:hRes,manual:hManual,prod:hProd,pedit:hPedit,pstat:hPstat};
+ return hShell(V[S.host.view]());
+}
+
+/* ================= BO ================= */
+var BMENU=[['처음으로'],['공지사항'],['예약',[['예약 관리','res']]],['고객지원'],['회원'],['스토어',[['스토어 정보 관리','store']]],['상품',[['상품 정보 관리','prod']]],['옵션 관리'],['매거진'],['채팅'],['상담'],['리뷰'],['계정'],['광고정보관리'],['쿠폰'],['기획전',[['기획전 관리','col']]],['인플루언서'],['통계']];
+function bShell(inner){
+ var v=S.bo.view,map={pedit:'prod',coldet:'col'};
+ var side=BMENU.map(function(m){
+  if(!m[1])return '<div class="mi" data-act="nop">'+m[0]+'</div>';
+  return '<div class="mi open">'+m[0]+'</div><div class="sub">'+m[1].map(function(k){return '<div class="mi'+((v===k[1]||map[v]===k[1])?' on':'')+'" data-act="bgo" data-v="'+k[1]+'">'+k[0]+'</div>';}).join('')+'</div>';}).join('');
+ return '<div class="B"><div class="hdr"><div class="logo">ADMIN</div><div style="font-size:12px">관리자</div></div><div class="body"><aside class="side">'+side+'</aside><main class="main" id="bmain">'+inner+'</main></div></div>';
+}
+function bPage(t,s,inner){return '<div class="ph"><h1>'+t+'</h1><p>'+s+'</p></div>'+inner;}
+function bSel(k,opts,cls){var cur=S.bo[k];return '<select class="ctl '+(cls||'')+'" data-b="'+k+'">'+opts.map(function(o){return '<option value="'+o[0]+'"'+(o[0]===cur?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>';}
+function bRes(){
+ var v=S.bo,q=v.q.trim().toLowerCase();
+ var a=DB.books.filter(function(b){if(v.st!=='전체'&&b.status!==v.st)return false;if(v.kind!=='전체'&&bookingKind(b)!==v.kind)return false;if(v.owner!=='전체'&&b.owner!==v.owner)return false;if(q){var hay=[b.name,b.rno,b.req,b.snap?b.snap.name:''].join(' ').toLowerCase();if(hay.indexOf(q)<0)return false;}return true;}).sort(function(x,y){return x.visit<y.visit?1:-1;});
+ var f='<div class="blk"><div class="fl">'+bSel('st',[['전체','상태 전체'],['예약','예약'],['방문완료','방문완료'],['미방문','미방문'],['고객취소','고객취소'],['매장취소','매장취소']])+bSel('kind',[['전체','예약 구분 전체'],['상품 예약','상품 예약'],['방문 예약','방문 예약']],'new')+bSel('owner',[['전체','등록 주체 전체'],['고객','고객 직접 예약'],['매장','수기 등록 예약']])
+  +'<input class="ctl" data-bq placeholder="여권명, 연락처, 예약번호, 요청사항, 매장메모, 상품명" value="'+esc(v.qd)+'" style="width:320px"><button class="btnp" data-act="bsearch">검색</button><span style="flex:1"></span><button class="btnx" data-act="excel" data-v="bo">엑셀 다운로드</button></div></div>';
+ var t='<div class="blk"><div class="tw"><table class="tbl"><thead><tr><th>매장명</th><th>방문일시</th><th>고객(여권명)</th><th class="new">예약 상품</th><th>예약번호</th><th>국적</th><th>언어</th><th>상태</th><th>관리</th></tr></thead><tbody>'
+  +(a.length?a.map(function(b){return '<tr><td><b>'+DB.store.name+'</b></td><td>'+b.visit+'<small>접수 '+b.recv+'</small></td><td>'+esc(b.name)+'</td><td class="new" data-test="bcol-prod">'+(b.snap?esc(b.snap.name):'-')+'</td><td>'+b.rno+'</td><td>'+esc(b.nation)+'</td><td>'+LANGS[b.lang]+'</td><td>'+b.status+'</td><td><span class="mb" data-act="bopen" data-v="'+b.no+'">상세</span></td></tr>';}).join(''):'<tr class="empty-row"><td colspan="9">데이터가 없습니다</td></tr>')+'</tbody></table></div></div>';
+ var d='';
+ if(v.open!=null){var b=DB.books.filter(function(x){return x.no===v.open;})[0];
+  var dk=function(k,val,c){return '<div class="dkv '+(c||'')+'" data-k="'+k+'"><span>'+k+'</span><b>'+esc(val)+'</b></div>';};
+  d='<div class="dov" data-act="bclose"></div><aside class="dwr" data-test="bdrawer"><div class="dhd"><span>예약 상세</span><span data-act="bclose" style="font-size:22px;font-weight:300">&times;</span></div><div class="dscroll"><span class="dstp">'+b.status+'</span><div class="dti">'+b.visit+'</div>'+prodBlock(b,'bo')
+   +dk('매장',DB.store.name)+dk('여권명',b.name)+dk('국적',b.nation)+dk('언어',LANGS[b.lang])+dk('예약 번호',b.rno)+dk('접수 시각',b.recv)+dk('등록 주체',b.owner==='고객'?'고객 직접 예약':'수기 등록 예약')+dk('유입경로',b.route||'-','new')
+   +'<div class="dsec">고객 요청사항</div><div class="dtb">'+(b.req?esc(b.req):'남긴 내용 없음')+'</div></div></aside>';}
+ return bPage('예약 관리','우리 경유 전 매장 예약을 모니터링·처리합니다.',f+t)+d;
+}
+function bStore(){
+ var s=DB.store;
+ return bPage('스토어 정보 수정',s.name,'<div class="card2"><h3>예약 설정</h3><div class="frm"><span class="lb">예약 사용 여부</span><span><span class="tg '+(s.bookingSetting?'on':'')+'" data-act="bookSetting" data-test="book-setting"></span><div class="gd">서비스 내 예약 기능과 구글 예약을 사용하려면 예약 설정이 필요해요.</div></span></div></div>'
+  +'<div class="card2"><h3>버튼 및 메신저 설정 · 예약</h3><table class="bt"><thead><tr><th>버튼</th><th>웹</th><th>알리페이</th></tr></thead><tbody><tr><td>예약</td>'+['web','ali'].map(function(c){return '<td><span class="tg '+(s.btn[c]?'on':'')+(s.bookingSetting?'':' lock')+'" data-act="storeBtn" data-v="'+c+'" data-test="store-btn-'+c+'"></span></td>';}).join('')+'</tr></tbody></table>'+(s.bookingSetting?'':'<div class="lockmsg">예약 설정이 OFF인 경우 활성화할 수 없습니다.</div>')+'</div>');
+}
+function bProd(){
+ var v=S.bo,ps=DB.prods.filter(function(p){return !p.deleted&&(v.lang==='전체'||p.lang===v.lang);});
+ var f='<div class="blk"><div class="fl">'+bSel('lang',[['전체','언어 전체'],['en','영어'],['ja','일본어'],['zh','중국어(간체)']])+'</div></div>';
+ var t='<div class="blk"><div class="tw"><table class="tbl"><thead><tr><th>상태</th><th>활성화</th><th>히든 여부</th><th>언어</th><th>스토어코드</th><th>상품명</th><th>가격</th><th>노출수</th><th>내부진입수</th><th>직접유입수</th><th>채팅수</th><th>상담수</th><th>버튼 클릭수</th><th class="new">예약 건수</th><th>관리</th></tr></thead><tbody>'
+  +ps.map(function(p){return '<tr><td>'+{approved:'승인',pending:'대기',rejected:'반려'}[p.status]+'</td><td>'+(p.active?'ON':'OFF')+'</td><td>'+(p.hidden?'ON':'OFF')+'</td><td>'+LANGS[p.lang]+'</td><td>'+DB.store.code+'</td><td>'+esc(p.name)+'</td><td>'+won(p.price)+'</td><td>'+p.views+'</td><td>'+p.inner+'</td><td>'+p.direct+'</td><td>'+p.chat+'</td><td>'+p.cons+'</td><td>'+(p.chat+p.cons)+'</td><td class="new" data-test="bstat-'+p.id+'"><b>'+prodBookCount(p.id)+'</b></td><td><span class="mb" data-act="bpedit" data-v="'+p.id+'">수정</span></td></tr>';}).join('')+'</tbody></table></div></div>';
+ return bPage('입점사 스토어별 상품 정보 관리','상품을 조회하고 관리합니다.',f+t);
+}
+function bPedit(){
+ var p=prodById(S.bo.editPid),s=DB.store,lockAll=!s.bookingSetting,base=p.mode==='기본';
+ var row=function(lab,c,isNew){
+  var lockAli=c==='ali'&&p.exposeCh==='web';
+  return '';};
+ var cell=function(c){
+  var locked=lockAll||(c==='ali'&&p.exposeCh==='web')||base;
+  var on=base?prodBookBtn(p,c):(prodBookBtn(p,c));
+  return '<td><span class="tg '+(on?'on':'')+(locked?' lock':'')+'" data-act="'+(locked?'lockinfo':'prodBtn')+'" data-v="'+c+'" data-test="prod-btn-'+c+'"></span></td>';};
+ var stat=function(){return '<td><span class="tg on lock"></span></td><td><span class="tg lock"></span></td>';};
+ var h='<div class="blk"><div class="tabs"><span>상품정보</span><span class="on">관리자설정</span></div>'
+  +'<div class="frm"><span class="lb">노출 채널</span><span>'+(p.exposeCh==='web'?'웹':'웹 · 알리페이')+'</span>'
+  +'<span class="lb">스토어 설정 적용</span><span><span class="rad"><label><input type="radio" name="md" data-act="mode" data-v="개별"'+(base?'':' checked')+'>개별 설정</label><label><input type="radio" name="md" data-act="mode" data-v="기본"'+(base?' checked':'')+'>기본 설정</label></span><div class="gd">기본 설정 선택 시 스토어에 설정된 버튼 구성을 동일하게 적용합니다.</div></span>'
+  +'<span class="lb" style="align-self:start;padding-top:8px">버튼 설정</span><span><table class="bt"><thead><tr><th>버튼</th><th>웹</th><th>알리페이</th></tr></thead><tbody>'
+  +'<tr><td>상담접수</td>'+stat()+'</tr><tr><td>문의하기</td><td><span class="tg lock"></span></td><td><span class="tg lock"></span></td></tr><tr><td>외부링크</td><td><span class="tg lock"></span></td><td><span class="tg lock"></span></td></tr><tr><td>메신저</td><td><span class="tg on lock"></span></td><td><span class="tg lock"></span></td></tr>'
+  +'<tr class="new"><td>예약</td>'+cell('web')+cell('ali')+'</tr></tbody></table>'
+  +(lockAll?'<div class="lockmsg" data-test="lockmsg">예약 설정이 OFF인 경우 활성화할 수 없습니다.</div>':'')
+  +'</span></div></div>';
+ return bPage('상품정보 수정',esc(p.name)+' · '+LANGS[p.lang],h);
+}
+function bCol(){
+ var t='<div class="blk"><div class="tw"><table class="tbl"><thead><tr><th>언어</th><th>유형</th><th>기획전명</th><th>상품</th><th>대상 클릭수</th><th>채팅수</th><th>상담수</th><th>버튼 클릭수</th><th class="new">예약 건수</th><th>관리</th></tr></thead><tbody>'
+  +DB.cols.map(function(c){var sum=c.items.reduce(function(s,id){return s+prodBookCount(id);},0);return '<tr><td>'+LANGS[c.lang]+'</td><td>'+c.type+'</td><td>'+esc(c.name)+'</td><td>'+c.items.length+'개</td><td>'+(c.id*137)+'</td><td>'+(c.id*5)+'</td><td>'+(c.id*3)+'</td><td>'+(c.id*21)+'</td><td class="new" data-test="col-'+c.id+'"><b>'+sum+'</b></td><td><span class="mb" data-act="bcol" data-v="'+c.id+'">상세</span></td></tr>';}).join('')+'</tbody></table></div></div>';
+ return bPage('기획전 관리','기획전을 등록하고 성과를 확인합니다.',t);
+}
+function bColDet(){
+ var c=DB.cols.filter(function(x){return x.id===S.bo.col;})[0],sum=0;
+ var rows=c.items.map(function(id){var p=prodById(id),n=prodBookCount(id);sum+=n;return '<tr><td>'+esc(p.name)+'</td><td>'+LANGS[p.lang]+'</td><td class="new" data-test="colp-'+id+'">'+n+'</td></tr>';}).join('');
+ return bPage('기획전 상세',esc(c.name),'<div class="blk"><button class="btnx" data-act="bgo" data-v="col">목록</button><div class="tw" style="margin-top:10px"><table class="tbl"><thead><tr><th>대상 상품</th><th>언어</th><th class="new">예약 건수</th></tr></thead><tbody>'+rows+'<tr class="tot"><td>합계</td><td></td><td class="new" data-test="col-total">'+sum+'</td></tr></tbody></table></div></div>');
+}
+function renderBO(){var V={res:bRes,store:bStore,prod:bProd,pedit:bPedit,col:bCol,coldet:bColDet};return bShell(V[S.bo.view]());}
+
+/* ================= 렌더 ================= */
+function swHTML(){
+ var s=S.surf,f=S.fo;
+ return '<b>상품 예약 시안</b>'+['FO','HOST','BO'].map(function(x){return '<button class="s'+(s===x?' on':'')+'" data-act="surf" data-v="'+x+'">'+{FO:'고객 화면',HOST:'입점사 (HOST)',BO:'운영사 (BO)'}[x]+'</button>';}).join('')
+  +'<span class="sp"></span>'+(s==='FO'?'<span>언어</span><select data-sw="lang">'+[['en','English'],['ja','日本語'],['zh','简体中文']].map(function(o){return '<option value="'+o[0]+'"'+(f.lang===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select><span>채널</span><select data-sw="ch"><option value="web"'+(f.ch==='web'?' selected':'')+'>웹</option><option value="ali"'+(f.ch==='ali'?' selected':'')+'>알리페이</option></select>':'')
+  +'<span style="color:#888">기준 시각 '+NOWTS+'</span>';
+}
+function render(){
+ var keep={};document.querySelectorAll('#surf [id]').forEach(function(e){keep[e.id]=[e.scrollTop,e.scrollLeft];});
+ document.querySelectorAll('#surf .tw,#surf .fb2').forEach(function(e,i){keep['_c'+i]=[e.scrollTop,e.scrollLeft];});
+ var sameKey=render.k===S.surf+(S.surf==='HOST'?S.host.view:S.surf==='BO'?S.bo.view:S.fo.screen);
+ document.getElementById('sw').innerHTML=swHTML();
+ document.getElementById('surf').innerHTML=(S.surf==='FO'?renderFO():S.surf==='HOST'?renderHOST():renderBO())+modalHTML();
+ if(sameKey){Object.keys(keep).forEach(function(k){var e=k.charAt(0)==='_'?null:document.getElementById(k);if(e){e.scrollTop=keep[k][0];e.scrollLeft=keep[k][1];}});document.querySelectorAll('#surf .tw,#surf .fb2').forEach(function(e,i){var v=keep['_c'+i];if(v){e.scrollTop=v[0];e.scrollLeft=v[1];}});}
+ render.k=S.surf+(S.surf==='HOST'?S.host.view:S.surf==='BO'?S.bo.view:S.fo.screen);
+}
+/* ===== 검수 콘솔용 전역 ===== */
+window.render=render;
+window.resetDB=function(){freshDB();S=freshState();render.k=null;render();};
+window.go=function(surf,view){S.surf=surf;if(surf==='HOST'&&view)S.host.view=view;if(surf==='BO'&&view)S.bo.view=view;if(surf==='FO'&&view)S.fo.screen=view;S.modal=null;render();};
+window.foOpenStore=function(lang,ch){S.surf='FO';if(lang)S.fo.lang=lang;if(ch)S.fo.ch=ch;S.fo.screen='store';S.fo.err=null;render();};
+window.foOpenProduct=function(id,lang,ch){S.surf='FO';if(lang)S.fo.lang=lang;if(ch)S.fo.ch=ch;S.fo.pid=id;S.fo.screen='product';S.fo.err=null;render();};
+window.setProd=function(id,patch){var p=prodById(id);Object.keys(patch).forEach(function(k){if(k==='book')Object.assign(p.book,patch.book);else p[k]=patch[k];});render();};
+window.setStore=function(patch){Object.keys(patch).forEach(function(k){if(k==='btn')Object.assign(DB.store.btn,patch.btn);else DB.store[k]=patch[k];});render();};
+window.openHostBooking=function(no){S.surf='HOST';S.host.view='res';S.host.open=no;render();};
+window.openBoBooking=function(no){S.surf='BO';S.bo.view='res';S.bo.open=no;render();};
+Object.defineProperty(window,'VIEW',{get:function(){return S.surf+':'+(S.surf==='HOST'?S.host.view:S.surf==='BO'?S.bo.view:S.fo.screen);}});
+Object.defineProperty(window,'STATE',{get:function(){return S;}});
+
+/* ===== 이벤트 ===== */
+document.addEventListener('click',function(e){
+ var t=e.target.closest('[data-act]');if(!t)return;
+ var a=t.getAttribute('data-act'),v=t.getAttribute('data-v'),f=S.fo;
+ if(a==='nop'){toast('시안에서는 동작하지 않습니다');return;}
+ if(a==='surf'){S.surf=v;S.modal=null;render();return;}
+ if(a==='mclose'){S.modal=null;render();return;}
+ /* FO */
+ if(a==='fo'){f.screen=v;f.err=null;render();return;}
+ if(a==='foBack'){f.screen=v;f.err=null;render();return;}
+ if(a==='foProd'){f.pid=+v;f.screen='product';f.err=null;render();return;}
+ if(a==='foBook'){f.entry=v;f.sel='';f.time='';f.err=null;f.date=addDays(TODAY,1);f.screen='book';render();return;}
+ if(a==='foDate'){f.date=v;f.time='';f.err=null;render();return;}
+ if(a==='foTime'){f.time=v;if(f.err&&(f.err.kind==='time'||f.err.kind==='slot'))f.err=null;render();return;}
+ if(a==='foSubmit'){foSubmit();render();return;}
+ if(a==='foGoStore'){f.screen='store';f.err=null;render();return;}
+ if(a==='foMyOpen'){f.myNo=+v;f.screen='mydetail';render();return;}
+ /* HOST */
+ if(a==='hgo'){S.host.view=v;S.host.open=null;render();return;}
+ if(a==='hdtab'){S.host.dtab=v;render();return;}
+ if(a==='hptab'){S.host.ptab=v;render();return;}
+ if(a==='hopen'){S.host.view='res';S.host.open=+v;render();return;}
+ if(a==='hclose'){S.host.open=null;render();return;}
+ if(a==='hsearch'){S.host.q=S.host.qd;render();return;}
+ if(a==='hpedit'){S.host.editPid=+v;S.host.view='pedit';render();return;}
+ if(a==='manSave'){var m=S.host.man;if(!m.name.trim()){toast('여권명을 입력해 주세요.');return;}var p=m.pid?prodById(m.pid):null,no=DB.books.length+1;
+  DB.books.push({no:no,visit:m.date+' '+m.time,recv:NOWTS,name:m.name.trim(),nation:'-',lang:m.lang,contact:m.phone||'-',status:'예약',owner:'매장',route:null,prodId:p?p.id:null,snap:p?snapOf(p):null,need:'',ch:'웹',req:'',rno:'261012RVH'+LANG_RNO[m.lang]+(no<10?'0'+no:no)});
+  S.host.man={date:addDays(TODAY,2),time:'14:00',name:'',lang:'en',phone:'',pid:''};S.host.view='res';S.host.open=no;toast('수기 예약을 등록했습니다.');render();return;}
+ if(a==='excel'){var src=v==='host'?hFiltered():DB.books.slice().sort(function(x,y){return x.visit<y.visit?1:-1;});S.modal={type:'excel',rows:src};render();return;}
+ /* BO */
+ if(a==='bgo'){S.bo.view=v;S.bo.open=null;render();return;}
+ if(a==='bopen'){S.bo.open=+v;render();return;}
+ if(a==='bclose'){S.bo.open=null;render();return;}
+ if(a==='bsearch'){S.bo.q=S.bo.qd;render();return;}
+ if(a==='bpedit'){S.bo.editPid=+v;S.bo.view='pedit';render();return;}
+ if(a==='bcol'){S.bo.col=+v;S.bo.view='coldet';render();return;}
+ if(a==='bookSetting'){if(DB.store.bookingSetting){S.modal={type:'bookOff'};}else{DB.store.bookingSetting=true;toast('예약 설정을 저장했습니다.');}render();return;}
+ if(a==='bookOffOk'){DB.store.bookingSetting=false;DB.store.btn.web=false;DB.store.btn.ali=false;DB.prods.forEach(function(p){p.book.web=false;p.book.ali=false;});S.modal=null;toast('예약 설정을 저장했습니다.');render();return;}
+ if(a==='storeBtn'){if(!DB.store.bookingSetting){toast('예약 설정이 OFF인 경우 활성화할 수 없습니다.');return;}DB.store.btn[v]=!DB.store.btn[v];render();return;}
+ if(a==='mode'){prodById(S.bo.editPid).mode=v;render();return;}
+ if(a==='prodBtn'){var pp=prodById(S.bo.editPid);pp.book[v]=!pp.book[v];render();return;}
+ if(a==='lockinfo'){var p2=prodById(S.bo.editPid);toast(!DB.store.bookingSetting?'예약 설정이 OFF인 경우 활성화할 수 없습니다.':(p2.mode==='기본'?'기본 설정에서는 스토어 버튼 구성을 그대로 따릅니다.':'노출 채널이 웹이라 알리페이 열은 바꿀 수 없습니다.'));return;}
+});
+document.addEventListener('change',function(e){
+ var t=e.target;
+ if(t.hasAttribute('data-fo')){S.fo.sel=t.value;if(S.fo.err&&S.fo.err.kind==='pickAgain')S.fo.err=null;render();return;}
+ if(t.hasAttribute('data-sw')){S.fo[t.getAttribute('data-sw')]=t.value;S.fo.err=null;if(S.fo.screen==='book'&&S.fo.entry==='store')S.fo.sel='';render();return;}
+ if(t.hasAttribute('data-h')){S.host[t.getAttribute('data-h')]=t.value;render();return;}
+ if(t.hasAttribute('data-b')){S.bo[t.getAttribute('data-b')]=t.value;render();return;}
+ if(t.hasAttribute('data-m')){S.host.man[t.getAttribute('data-m')]=t.value;return;}
+});
+document.addEventListener('input',function(e){
+ var t=e.target;
+ if(t.hasAttribute('data-hq'))S.host.qd=t.value;
+ if(t.hasAttribute('data-bq'))S.bo.qd=t.value;
+ if(t.hasAttribute('data-m'))S.host.man[t.getAttribute('data-m')]=t.value;
+});
+document.addEventListener('keydown',function(e){if(e.key!=='Enter')return;var t=e.target;if(t.hasAttribute&&t.hasAttribute('data-hq')){S.host.q=S.host.qd;render();}if(t.hasAttribute&&t.hasAttribute('data-bq')){S.bo.q=S.bo.qd;render();}});
+freshDB();S=freshState();render();
+</script>
+</body>
+</html>
