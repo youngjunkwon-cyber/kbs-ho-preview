@@ -97,18 +97,17 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
     <div class="scroll">
       <p class="warn" id="fileWarn">파일을 직접 열어서 왼쪽 시안을 제어할 수 없습니다. 아래 배포 주소로 다시 열어 주세요.<br><a href="https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-product-booking.html" target="_blank">https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-product-booking.html</a></p>
       <p class="hint">기준 문서: 상품예약_PRD_v0.5_20261012<br>
-      케이스마다 세 줄을 봅니다. <b>열면</b>: "이 화면 열기"를 누르면 왼쪽 시안이 그 상태로 맞춰집니다. 직접 바꾼 값은 지워집니다. <b>조작</b>: 그다음 직접 할 일입니다. <b>기대</b>: 화면이 이와 같으면 통과입니다.<br>
-      시안 맨 위 검은 줄에서 고객 화면 / 입점사 / 운영사를 오갑니다. 고객 화면일 때는 같은 줄에서 언어와 채널(웹 / 알리페이)을 바꿉니다. 기준 시각은 2026-10-12 12:00 입니다.<br>
-      기록은 이 브라우저에만 남습니다. 끝나면 "결과 복사"로 보내 주세요.</p>
+      <b>화면은 스테이징 실화면을 그대로 떠서 만들었습니다.</b> HOST·BO·FO의 셸·표·드로어·폼은 실제 HTML과 CSS이고, 분홍 점선이 이번에 더하는 요소입니다(맨 위 검은 줄에서 표시를 끌 수 있음). 데이터는 스테이징 아비쥬 명동점 기준 시드입니다.<br>
+      케이스마다 세 줄을 봅니다. <b>열면</b>: "이 화면 열기"를 누르면 왼쪽 시안이 그 상태로 맞춰집니다. <b>조작</b>: 그다음 직접 할 일입니다. <b>기대</b>: 화면이 이와 같으면 통과입니다.<br>
+      맨 위 검은 줄에서 고객 화면 / 입점사 / 운영사를 오가고, 고객 화면일 때는 언어와 채널(웹 / 알리페이)을 바꿉니다. 기준 시각은 2026-10-12 12:00 입니다. 기록은 이 브라우저에만 남으니 끝나면 "결과 복사"로 보내 주세요.</p>
       <details class="out"><summary>이 시안에서 확인하지 않는 것</summary><ul>
-        <li>발송 템플릿 문안(알림톡·이메일·문자). 상품 예약용 템플릿은 문안이 정해지면 따로 봅니다</li>
-        <li>예약 처리 모달(시간 변경·방문완료·미방문·취소·변경 수락·거절)의 상품명 한 줄. 요약이 있는 모달을 화면으로 확인한 뒤 붙입니다</li>
-        <li>상품 상세 버튼 노출 조합·순서(최대 2개 규칙). PRD 미확정이라 시안은 예약 버튼만 다룹니다</li>
-        <li>알림톡·HOST 화면의 상품명 언어(일본어로 예약하면 일본어 상품명이 보임). PRD 미확정</li>
-        <li>BO 통계 메뉴·대시보드·인플루언서 기획전의 예약 건수. PRD 미확정</li>
-        <li>버튼 클릭수에 예약 버튼을 넣는 것. PRD 미확정</li>
-        <li>예약 변경·취소·방문 처리 흐름. 방문 예약과 같아 이 시안에서는 버튼만 둡니다</li>
-        <li>고객 화면의 실제 디자인. 스토어 페이지·상품 상세·예약 화면은 동작 확인용으로 간략히 그렸습니다</li>
+        <li>BO 버튼 설정의 알리페이 열. 알리페이 채널 분기가 아직 라이브에 없어, 이 시안은 라이브 구조대로 예약 ON/OFF(웹) 한 줄만 둡니다. 알리페이 채널 동작은 고객 화면에서만 봅니다</li>
+        <li>고객 화면 예약 완료 화면. 실화면을 확보하지 못해 예약 상세 화면 양식을 따라 그렸습니다. 정보 입력·내 예약 화면은 스테이징 실측 수치로 다시 그린 화면입니다</li>
+        <li>고객 화면 문구는 영어 기준입니다. 언어를 바꾸면 상품 목록·선택지만 그 언어 상품으로 바뀝니다</li>
+        <li>발송 템플릿 문안(알림톡·이메일·문자)</li>
+        <li>예약 처리 모달의 상품명 한 줄. 요약이 있는 모달을 확인한 뒤 붙입니다</li>
+        <li>상품 상세 버튼 노출 조합·순서(최대 2개 규칙), 버튼 클릭수의 예약 항목, BO 통계 메뉴·대시보드·인플루언서 기획전의 예약 건수. PRD 미확정</li>
+        <li>예약 변경·취소·방문 처리 흐름. 스토어 예약과 같아 버튼만 둡니다</li>
       </ul></details>
       <div id="list"></div>
     </div>
@@ -142,68 +141,67 @@ function askBox(opt, done) {
 function tellBox(msg, title) { askBox({ title: title || '알림', message: msg, alert: true, okText: '닫기' }); }
 
 /* [id, 제목, 조작, 기대, 열면 실행할 코드, 열면 설명, 참고] */
-var BOOK_BY_PROD = "foOpenProduct(101,'en','web');STATE.fo.entry='product';STATE.fo.screen='book';STATE.fo.date='2026-10-19';STATE.fo.time='11:00';";
-var BOOK_BY_STORE = "foOpenStore('en','web');STATE.fo.entry='store';STATE.fo.screen='book';STATE.fo.date='2026-10-19';STATE.fo.time='11:00';";
+var BOOK_BY_PROD = "foOpenProduct(101,'en','web');STATE.fo.entry='product';STATE.fo.screen='info';STATE.fo.date='2026-10-19';STATE.fo.time='11:00';";
+var BOOK_BY_STORE = "foOpenStore('en','web');STATE.fo.entry='store';STATE.fo.screen='info';STATE.fo.date='2026-10-19';STATE.fo.time='11:00';";
 var GROUPS = [
 ['고객 화면 · 예약 버튼 (5.3)', [
- ['F-01','스토어 페이지에 예약 버튼','없음. 화면만 확인합니다.','스토어 페이지 아래에 Inquiry 와 Book 버튼이 있다. 상품 목록에 Forehead Botox · Laser Toning 10 Sessions · Hydrafacial Deep Clean 세 개만 보인다(승인 대기 Skin Booster, 숨김 Ulthera 는 안 보임)',"foOpenStore('en','web')",'고객 화면, 영어, 웹, 스토어 페이지',''],
- ['F-02','기본 설정 상품은 스토어 예약 버튼을 따른다','Forehead Botox 를 엽니다.','상품 상세 아래 Book 버튼이 있다(이 상품은 스토어 설정 적용 = 기본 설정이고 스토어 예약 버튼 웹이 켜져 있음)',"foOpenStore('en','web')",'고객 화면, 영어, 웹',''],
- ['F-03','스토어 예약 버튼을 끄면 기본 설정 상품도 꺼진다','스토어 페이지와 Forehead Botox 상세를 차례로 봅니다.','스토어 페이지에 Book 이 없다. Forehead Botox 상세에도 Book 이 없다',"setStore({btn:{web:false}});foOpenStore('en','web')",'스토어 예약 버튼(웹)을 끈 상태',''],
- ['F-04','스토어 예약 버튼이 꺼져도 개별 설정 상품은 켤 수 있다','스토어 페이지에서 Laser Toning 10 Sessions 를 엽니다.','스토어 페이지에는 Book 이 없지만 Laser Toning 상세에는 Book 이 있다(상품 페이지에서만 예약받는 운영)',"setStore({btn:{web:false}});foOpenStore('en','web')",'스토어 예약 버튼(웹)을 끈 상태',''],
- ['F-05','개별 설정에서 꺼진 상품은 버튼이 없다','없음. 화면만 확인합니다.','レーザートーニング 10回 상세에 予約 버튼이 없다(채팅 버튼만)',"foOpenProduct(104,'ja','web')",'일본어, 개별 설정·예약 웹 꺼짐 상품',''],
- ['F-06','예약 설정이 꺼지면 모든 예약 버튼이 사라진다','스토어 페이지, Laser Toning 상세를 봅니다.','두 화면 모두 Book 이 없다',"setStore({bookingSetting:false});foOpenStore('en','web')",'예약 설정 OFF',''],
- ['F-07','알리페이 채널은 알리페이 열을 따른다','스토어 페이지와 Hydrafacial Deep Clean 상세를 봅니다.','스토어 페이지에 Book 이 없다(스토어 예약 버튼 알리페이 열 꺼짐). Hydrafacial 상세에는 Book 이 있다(개별 설정 알리페이 켜짐)',"foOpenStore('en','ali')",'영어, 알리페이 채널',''],
- ['F-08','노출 채널이 웹인 상품은 알리페이에 없다','검은 줄 채널을 웹으로 바꿉니다.','알리페이일 때 水光管理 상세가 404. 웹으로 바꾸면 상품이 열리고 预约 버튼이 있다',"foOpenProduct(109,'zh','ali')",'중국어(간체), 알리페이, 노출 채널 웹 상품','']
+ ['F-01','스토어 페이지에 예약 버튼','아래로 스크롤해 상품 카드를 봅니다.','하단에 Chat on · Book now 버튼. 상품 카드는 Abijou Botox · Abijou Skin Booster · Abijou Acne Care 세 개뿐(승인 대기 Lifting, 숨김 Laser Toning 은 없음)',"foOpenStore('en','web')",'고객 화면, 영어, 웹, 스토어 페이지',''],
+ ['F-02','기본 설정 상품은 스토어 예약 버튼을 따른다','Abijou Botox 의 View Details 를 누릅니다.','상품 상세 하단에 Book now 가 있다(이 상품은 스토어 설정 적용 = 기본 설정, 스토어 예약 ON)',"foOpenStore('en','web')",'고객 화면, 영어, 웹',''],
+ ['F-03','스토어 예약을 끄면 기본 설정 상품도 꺼진다','스토어 페이지와 Abijou Botox 상세를 차례로 봅니다.','두 화면 모두 Book now 가 없다',"setStore({btn:{web:false}});foOpenStore('en','web')",'스토어 예약 버튼을 끈 상태',''],
+ ['F-04','스토어 예약이 꺼져도 개별 설정 상품은 예약 가능','Abijou Skin Booster 상세를 엽니다.','스토어 페이지에는 Book now 가 없지만 Skin Booster 상세에는 있다(상품 페이지에서만 예약받는 운영)',"setStore({btn:{web:false}});foOpenStore('en','web')",'스토어 예약 버튼을 끈 상태',''],
+ ['F-05','개별 설정에서 꺼진 상품은 버튼이 없다','없음. 화면만 확인합니다.','Abijou スキンブースター 상세 하단에 Chat on 만 있고 Book now 가 없다',"foOpenProduct(104,'ja','web')",'일본어, 개별 설정·예약 OFF 상품',''],
+ ['F-06','예약 설정이 꺼지면 모든 예약 버튼이 사라진다','스토어 페이지, Abijou Skin Booster 상세를 봅니다.','두 화면 모두 Book now 가 없다',"setStore({bookingSetting:false});foOpenStore('en','web')",'예약 설정 OFF',''],
+ ['F-07','알리페이 채널은 알리페이 값을 따른다','스토어 페이지와 Abijou Acne Care 상세를 봅니다.','스토어 페이지에 Book now 가 없다(스토어 알리페이 꺼짐). Acne Care 상세에는 있다(이 상품은 알리페이도 켜짐)',"foOpenStore('en','ali')",'영어, 알리페이 채널','알리페이 값은 시드로 세팅(BO 화면에는 알리페이 열이 아직 없음)'],
+ ['F-08','노출 채널이 웹인 상품은 알리페이에 없다','검은 줄 채널을 웹으로 바꿉니다.','알리페이일 때 Abijou 皮肤护理 상세가 404. 웹으로 바꾸면 상품이 열리고 Book now 가 있다',"foOpenProduct(109,'zh','ali')",'중국어(간체), 알리페이, 노출 채널 웹 상품','']
 ]],
 ['고객 화면 · 상품 선택 (5.2)', [
- ['P-01','상품 상세로 들어오면 상품이 고정된다','Book 을 누릅니다.','예약 화면 맨 위 Product 에 Forehead Botox · ₩55,000 상자만 있다. 선택 칸(드롭다운)과 바꾸는 버튼이 없다',"foOpenProduct(101,'en','web')",'Forehead Botox 상세',''],
- ['P-02','스토어로 들어오면 선택 칸이 있고 기본은 선택 안 함','Book 을 누릅니다.','Product 아래 드롭다운이 있고 "No product (store visit)" 가 선택돼 있다. 상품 상자는 없다',"foOpenStore('en','web')",'스토어 페이지',''],
- ['P-03','선택 칸에는 예약 가능한 상품만 나온다','Book → 드롭다운을 엽니다.','No product 아래 Forehead Botox, Laser Toning 10 Sessions, Hydrafacial Deep Clean 세 개. Skin Booster(승인 대기), Ulthera(숨김)는 없다',"foOpenStore('en','web')",'스토어 페이지',''],
- ['P-04','선택 칸은 고객 언어를 따른다','Book → 드롭다운을 엽니다.','選択しない(来店予約) 와 おでこボトックス 하나만 있다. レーザートーニング(예약 버튼 꺼짐)은 없다',"foOpenStore('ja','web')",'일본어, 스토어 페이지',''],
- ['P-05','상품을 고르면 상품 상자가 나타난다','Book → Laser Toning 10 Sessions 선택.','드롭다운 아래 썸네일·상품명·₩290,000 상자가 나타난다. 다시 No product 를 고르면 상자가 사라진다',"foOpenStore('en','web')",'스토어 페이지',''],
- ['P-06','상품 예약과 방문 예약은 같은 예약표를 쓴다','Book → 날짜 18 을 누릅니다.','14:00 과 15:00 이 취소선으로 막혀 있다. 15:00 은 상품 예약(Forehead Botox), 14:00 은 방문 예약으로 이미 찬 시간이다(동시에 받을 예약 수 1)',"foOpenStore('en','web')",'스토어 페이지',''],
- ['P-07','상품 예약을 끝내면 완료 화면과 내 예약에 상품이 남는다','Book now 를 누른 뒤 My bookings → 방금 예약을 엽니다.','완료 화면에 Forehead Botox 상자가 있다. 내 예약 목록 카드와 상세에도 같은 상품이 있고 상세에는 View product 링크가 있다',BOOK_BY_PROD,'상품 상세로 들어와 10-19 11:00 을 고른 상태',''],
- ['P-08','선택 안 함으로 예약하면 상품이 없다','Book now → 위쪽 입점사 (HOST) → 예약 관리.','완료 화면에 상품 상자가 없다. HOST 예약 목록 맨 위(10-19 11:00) 예약 상품 칸이 "-"',BOOK_BY_STORE,'스토어로 들어와 선택 안 함, 10-19 11:00','']
+ ['P-01','상품 상세로 들어오면 상품이 고정된다','Book now 를 누릅니다.','예약 화면 주소 아래 Product 영역에 Abijou Botox · 99,000 KRW 상자만 있다. 선택 칸이 없다',"foOpenProduct(101,'en','web')",'Abijou Botox 상세',''],
+ ['P-02','스토어로 들어오면 선택 칸, 기본은 선택 안 함','Book now 를 누릅니다.','Product 아래 선택 칸에 "No product (store booking)". 상품 상자는 없다',"foOpenStore('en','web')",'스토어 페이지',''],
+ ['P-03','선택 칸에는 예약 가능한 상품만','Book now → 선택 칸을 누릅니다.','No product 아래 Abijou Botox, Abijou Skin Booster, Abijou Acne Care 세 개',"foOpenStore('en','web')",'스토어 페이지',''],
+ ['P-04','선택 칸은 고객 언어를 따른다','Book now → 선택 칸을 누릅니다.','No product 와 Abijou ボトックス 하나만(スキンブースター 는 예약 OFF 라 없음)',"foOpenStore('ja','web')",'일본어, 스토어 페이지',''],
+ ['P-05','상품을 고르면 상품 상자가 나타난다','Book now → Abijou Skin Booster 선택.','선택 칸 아래 썸네일·상품명·190,000 KRW 상자. 다시 No product 를 고르면 사라진다',"foOpenStore('en','web')",'스토어 페이지',''],
+ ['P-06','상품 예약과 스토어 예약은 같은 예약표','Book now → 달력 18 을 누릅니다.','14:00(스토어 예약)과 15:00(상품 예약 Abijou Botox)이 흐리게 막혀 있다(동시에 받을 예약 수 1)',"foOpenStore('en','web')",'스토어 페이지',''],
+ ['P-07','정보 입력 요약 카드에 상품','없음. 화면만 확인합니다.','검은 요약 카드에 Booking at / Selected time 아래 "Product: Abijou Botox · 99,000 KRW" 한 줄',BOOK_BY_PROD,'상품 상세로 들어와 10-19 11:00 을 고른 뒤 정보 입력 화면',''],
+ ['P-08','상품 예약을 끝내면 완료·내 예약에 상품','Book → View my bookings → 방금 예약의 View details.','완료 화면 Product 영역에 Abijou Botox. 내 예약 카드에 상품명 한 줄, 상세에 Product 상자와 View product 링크',BOOK_BY_PROD,'정보 입력 화면',''],
+ ['P-09','선택 안 함으로 예약하면 상품이 없다','Book → 위쪽 입점사 (HOST) → 예약 관리 이동.','완료 화면에 Product 영역이 없다. HOST 예약 목록 맨 위(10-19 11:00) 예약 상품 칸 "-"',BOOK_BY_STORE,'스토어로 들어와 선택 안 함, 정보 입력 화면','']
 ]],
 ['고객 화면 · 제출 시점 재확인 (5.5)', [
- ['R-01','상품 상세로 들어왔는데 그 사이 상품이 내려가면','Book now 를 누릅니다.','예약이 만들어지지 않는다. 위쪽에 "This product can’t be booked right now." 와 Go to store page 버튼. 버튼을 누르면 스토어 페이지로 간다',BOOK_BY_PROD+"setProd(101,{hidden:true})",'Forehead Botox 로 예약 화면을 연 뒤 상품이 숨김 처리된 상태',''],
- ['R-02','스토어로 들어와 고른 상품이 그 사이 예약 불가가 되면','Book now 를 누릅니다.','예약이 만들어지지 않는다. 선택 칸이 No product 로 돌아가고 아래에 "This product can’t be booked right now. Please choose again."',BOOK_BY_STORE+"STATE.fo.sel='103';setProd(103,{book:{web:false}})",'Laser Toning 을 고른 뒤 그 상품 예약 버튼이 꺼진 상태',''],
- ['R-03','그 사이 시간이 차면','Book now 를 누릅니다.','"This time was just taken. Please pick another time." 시간 선택이 풀리고 11:00 이 막혀 있다',BOOK_BY_STORE+"DB.books.push({no:99,visit:'2026-10-19 11:00',recv:'2026-10-12 11:59',name:'X',nation:'-',lang:'en',contact:'-',status:'예약',owner:'고객',route:'스토어',prodId:null,snap:null,need:'',ch:'웹',req:'',rno:'261012RVHEN99'})",'다른 고객이 같은 시간을 먼저 예약한 상태','']
+ ['R-01','상품 상세로 들어왔는데 그 사이 상품이 내려가면','Book 을 누릅니다.','예약이 만들어지지 않는다. 위에 "This product can’t be booked right now." 와 Go to store page 버튼. 누르면 스토어 페이지',BOOK_BY_PROD+"setProd(101,{hidden:true})",'Abijou Botox 정보 입력 화면을 연 뒤 상품이 숨김 처리된 상태',''],
+ ['R-02','스토어로 들어와 고른 상품이 예약 불가가 되면','Book 을 누릅니다.','예약 일정 화면으로 돌아가고 선택 칸이 No product, 아래에 "Please choose again." 문구',BOOK_BY_STORE+"STATE.fo.sel='103';setProd(103,{book:{web:false}})",'Skin Booster 를 고른 뒤 그 상품 예약이 꺼진 상태',''],
+ ['R-03','그 사이 시간이 차면','Book 을 누릅니다.','예약 일정 화면으로 돌아가 "This time was just taken." 문구, 11:00 이 막혀 있다',BOOK_BY_STORE+"DB.books.push({no:99,visit:'2026-10-19 11:00',recv:'2026-10-12 11:59',name:'X',nation:'-',lang:'en',contact:'-',status:'예약',owner:'고객',route:'스토어',prodId:null,snap:null,need:'',ch:'웹',req:'',phone:'-',rno:'261012009EN99'})",'다른 고객이 같은 시간을 먼저 예약한 상태','']
 ]],
 ['저장값 · 링크 (5.4)', [
- ['S-01','예약 후 가격이 바뀌어도 예약에는 그때 가격','없음. 화면만 확인합니다.','드로어 상품 상자에 Forehead Botox · 50,000원. (지금 상품가는 55,000원. 상품 관리에서 확인)',"openHostBooking(1)",'HOST 예약 상세, Kaitlyn Chan 예약',''],
- ['S-02','노출 중인 상품만 상품 보기 링크','상세를 닫고 Claire Wald(10-12 10:00) 예약을 엽니다.','Kaitlyn Chan 예약에는 "상품 보기" 링크가 있다. Claire Wald(Ulthera, 숨김 상품)는 상품 상자는 있지만 링크가 없다',"openHostBooking(1)",'HOST 예약 상세',''],
- ['S-03','고객 화면에서도 같다','없음. 화면만 확인합니다.','My bookings 의 Forehead Botox 예약 상세에 ₩50,000 과 상품 상자가 보이고 View product 링크가 없다(상품을 숨김 처리함)',"setProd(101,{hidden:true});STATE.surf='FO';STATE.fo.screen='mydetail';STATE.fo.myNo=1",'Forehead Botox 를 숨긴 뒤 고객 내 예약 상세','']
+ ['S-01','예약 후 가격이 바뀌어도 예약 때 가격','없음. 화면만 확인합니다.','드로어 상품 상자에 Abijou Botox · 89,000원 (지금 상품가는 99,000원)',"openHostBooking(1)",'HOST 예약 상세, Kaitlyn Chan',''],
+ ['S-02','노출 중인 상품만 상품 보기 링크','드로어를 닫고 Claire Wald(10-12 10:00) 상세를 엽니다.','Kaitlyn Chan 은 "상품 보기" 링크가 있다. Claire Wald(Laser Toning, 숨김)는 상자는 있지만 링크가 없다',"openHostBooking(1)",'HOST 예약 상세',''],
+ ['S-03','고객 화면에서도 같다','없음. 화면만 확인합니다.','예약 상세 Product 상자에 89,000 KRW, View product 링크 없음(상품을 숨김 처리함)',"setProd(101,{hidden:true});STATE.surf='FO';STATE.fo.screen='mydetail';STATE.fo.myNo=1;render()",'Abijou Botox 를 숨긴 뒤 고객 예약 상세','']
 ]],
-['입점사 (HOST) (5.7·5.8·5.9·5.10·5.12)', [
- ['H-01','대시보드 예약 현황 카드에 상품명 한 줄','없음. 화면만 확인합니다.','전체 5 카드 중 상품 예약 4장(Kaitlyn Chan, Rina Takeda, 王思雨, Claire Wald)에 이름 아래 상품명 한 줄. Evelyn Lee(방문 예약)는 줄이 없다. 카드 높이가 들쭉날쭉하지 않다',"go('HOST','dash')",'HOST 대시보드',''],
- ['H-02','대시보드 통계 6칸은 그대로','없음. 화면만 확인합니다.','스토어 방문·상품 방문·메신저 문의·채팅 문의·예약 확정·방문 완료 6칸뿐이다. 상품 예약 칸이 따로 없다',"go('HOST','dash')",'HOST 대시보드',''],
- ['H-03','처리 필요 패널 카드에도 상품명','없음. 화면만 확인합니다.','오른쪽 처리 필요 카드도 대시보드와 같게 상품 예약만 상품명 한 줄',"go('HOST','res')",'HOST 예약 관리',''],
- ['H-04','예약 목록 예약 상품 칼럼','없음. 화면만 확인합니다.','고객 다음에 "예약 상품" 칼럼. 상품이 없는 예약(Evelyn Lee 등)은 "-"',"go('HOST','res')",'HOST 예약 관리',''],
- ['H-05','예약 구분 필터','예약 구분을 상품 예약 → 방문 예약으로 바꿉니다.','상품 예약이면 예약 상품 칸이 모두 채워진 9건, 방문 예약이면 모두 "-"인 4건',"go('HOST','res')",'HOST 예약 관리',''],
- ['H-06','상품명으로 검색','검색칸에 toning 입력 → 검색.','Hui Ping Ho 한 건만 남는다(Laser Toning 10 Sessions)',"go('HOST','res')",'HOST 예약 관리',''],
- ['H-07','드로어의 상품 정보와 유입경로','Kaitlyn Chan → Evelyn Lee → Mia Tan 예약을 차례로 엽니다.','Kaitlyn Chan: 상품 상자 + 유입경로 "상품". Evelyn Lee: 상품 상자 없음 + 유입경로 "스토어". Mia Tan(수기): 상품 상자 Hydrafacial + 등록 주체 "수기 등록 예약" + 유입경로 "-"',"go('HOST','res')",'HOST 예약 관리',''],
- ['H-08','수기 예약 상품 선택','예약 상품 드롭다운을 엽니다.','첫 줄 "선택 안 함". 아래에 승인된 상품이 언어와 함께(예: Forehead Botox · 영어). 예약 버튼이 꺼진 レーザートーニング 10回 · 일본어도 있다. 승인 대기 Skin Booster 는 없다',"go('HOST','manual')",'HOST 수기 예약 추가',''],
- ['H-09','수기 예약을 상품으로 등록','여권명 Test User, 예약 상품 Laser Toning 10 Sessions · 영어 → 등록.','예약 관리로 돌아가 새 예약 드로어가 열린다. 상품 상자 Laser Toning · 290,000원, 등록 주체 수기 등록 예약, 유입경로 "-"',"go('HOST','manual')",'HOST 수기 예약 추가',''],
- ['H-10','HOST 상품 화면은 예약 버튼을 보기만','Laser Toning 10 Sessions 의 수정을 누릅니다.','예약 버튼 줄에 웹 켜짐 · 알리페이 꺼짐. 바꾸는 스위치가 없고 아래에 "예약 버튼은 K-Beauty Station이 켜고 꺼요..." 안내',"go('HOST','prod')",'HOST 상품 관리',''],
- ['H-11','상품 통계에 예약 그룹','없음. 화면만 확인합니다. 그다음 기간을 이번 달로 바꿉니다.','채팅·상담·리뷰 옆에 "예약" 그룹과 "예약 건수" 칼럼. 상담 그룹의 "상품예약" 칼럼과 겹치는 말이 없다. Forehead Botox 2건(취소 포함). 이번 달로 바꾸면 1건(9월 접수 취소 건이 빠짐)',"go('HOST','pstat')",'HOST 상품 통계',''],
- ['H-12','엑셀 다운로드 칼럼','엑셀 다운로드를 누릅니다.','미리보기 칼럼에 "예약 상품" 과 "유입경로" 가 있다. 수기 예약은 유입경로 "-"',"go('HOST','res')",'HOST 예약 관리','']
+['입점사 (HOST)', [
+ ['H-01','대시보드 예약 현황 카드에 상품명','없음. 화면만 확인합니다.','카드 5장 중 상품 예약 4장(Kaitlyn Chan, Rina Takeda, Wang Siyu, Claire Wald)에 이름 아래 상품명. Evelyn Lee(스토어 예약)는 없다',"go('HOST','dash')",'HOST 대시보드',''],
+ ['H-02','대시보드 통계 6칸은 그대로','없음. 화면만 확인합니다.','스토어 방문·상품 방문·메신저 문의·채팅 문의·예약 확정·방문 완료 6칸뿐',"go('HOST','dash')",'HOST 대시보드',''],
+ ['H-03','처리 필요 패널 카드에도 상품명','없음. 화면만 확인합니다.','오른쪽 처리 필요 카드도 상품 예약만 고객명 아래 상품명',"go('HOST','res')",'HOST 예약 관리',''],
+ ['H-04','예약 목록 예약 상품 칼럼','없음. 화면만 확인합니다.','고객 (여권명) 다음에 "예약 상품". 상품이 없는 예약은 "-". 칼럼이 늘어 표가 가로로 스크롤된다',"go('HOST','res')",'HOST 예약 관리',''],
+ ['H-05','예약 구분 필터','"예약 구분 전체" 칸 → 상품 예약 → 스토어 예약.','상품 예약 9건(예약 상품 칸이 모두 채워짐), 스토어 예약 4건(모두 "-")',"go('HOST','res')",'HOST 예약 관리',''],
+ ['H-06','상품명으로 검색','검색칸에 booster 입력 → 검색.','Hui Ping Ho 한 건(Abijou Skin Booster)',"go('HOST','res')",'HOST 예약 관리',''],
+ ['H-07','드로어의 상품 정보와 유입경로','Kaitlyn Chan → Evelyn Lee → Mia Tan 상세를 차례로.','Kaitlyn: 상품 상자 + 유입경로 "상품". Evelyn: 상자 없음 + 유입경로 "스토어". Mia Tan(수기): 상자 Acne Care + 등록 방식 "수기 등록 예약" + 유입경로 "-"',"go('HOST','res')",'HOST 예약 관리',''],
+ ['H-08','수기 예약 상품 선택','방문 일시 카드의 예약 상품 칸을 누릅니다.','첫 줄 "선택 안 함". 승인된 상품이 언어와 함께(예: Abijou Botox · 영어). 예약이 꺼진 Abijou スキンブースター 도 있다. 승인 대기 Lifting 은 없다',"go('HOST','manual')",'HOST 수기 예약 추가',''],
+ ['H-09','수기 예약을 상품으로 등록','방문 날짜·시간, 이름 Test User, 언어, 예약 상품 Abijou Skin Booster · 영어 → 등록.','예약 관리로 돌아가 새 예약 드로어가 열린다. 상품 상자 Skin Booster · 190,000원, 등록 방식 수기 등록 예약, 유입경로 "-"',"go('HOST','manual')",'HOST 수기 예약 추가',''],
+ ['H-10','HOST 상품 수정은 예약 버튼을 보기만','Abijou Skin Booster 의 수정 → 상품가 아래를 봅니다.','"예약 버튼" 줄에 웹 켜짐 · 알리페이 꺼짐. 바꾸는 스위치가 없고 아래 안내 문구',"go('HOST','prod')",'HOST 상품 관리',''],
+ ['H-11','상품 통계에 예약 그룹','표를 오른쪽 끝까지 스크롤합니다.','리뷰 그룹 옆에 "예약" 그룹과 "예약 건수". 상담 그룹의 "상품예약" 칼럼과 다른 말. Abijou Botox 2건(취소 포함)',"go('HOST','pstat')",'HOST 상품 통계','실화면에 기간 필터가 없어 기간별 보기는 확인하지 않음']
 ]],
-['운영사 (BO) (5.3·5.8·5.9·5.10)', [
- ['B-01','예약 관리 칼럼·필터·드로어','예약 구분 필터를 바꿔 보고, 아무 예약이나 상세를 엽니다.','"예약 상품" 칼럼과 "예약 구분" 필터가 HOST 와 같게 동작. 드로어에 상품 상자와 유입경로',"go('BO','res')",'BO 예약 관리',''],
- ['B-02','상품 목록 예약 건수','없음. 화면만 확인합니다.','버튼 클릭수 다음에 "예약 건수". Forehead Botox 2, Laser Toning 1, Hydrafacial 2, 额头肉毒 2',"go('BO','prod')",'BO 상품 정보 관리',''],
- ['B-03','관리자설정에 예약 줄 (개별 설정)','예약 줄 알리페이 스위치를 켜고 → 고객 화면 · 영어 · 알리페이에서 Laser Toning 상세를 봅니다.','버튼 설정 표 맨 아래 "예약" 줄, 웹 켜짐·알리페이 꺼짐. 알리페이를 켜면 고객 화면 알리페이 채널에서 Book 이 보인다',"STATE.bo.editPid=103;go('BO','pedit')",'BO 상품정보 수정, Laser Toning(개별 설정)',''],
- ['B-04','기본 설정이면 예약 줄은 스토어 값으로 잠긴다','없음. 화면만 확인합니다. 그다음 개별 설정으로 바꿉니다.','기본 설정: 예약 웹 켜짐·알리페이 꺼짐(스토어 값), 둘 다 흐리게 잠김. 개별 설정으로 바꾸면 스위치가 풀린다',"STATE.bo.editPid=101;go('BO','pedit')",'BO 상품정보 수정, Forehead Botox(기본 설정)',''],
- ['B-05','노출 채널이 웹이면 알리페이 열 잠김','알리페이 스위치를 누릅니다.','노출 채널 "웹". 예약 줄 알리페이 열이 잠겨 있고 누르면 "노출 채널이 웹이라..." 안내',"STATE.bo.editPid=109;go('BO','pedit')",'BO 상품정보 수정, 水光管理',''],
- ['B-06','예약 설정을 끄면 상품 예약 버튼도 꺼지고 잠긴다','예약 사용 여부 스위치 → 전환 → 상품 정보 관리 → Laser Toning 수정.','확인 모달 "예약 설정을 OFF로 전환하시겠어요?" / "이미 잡힌 예약은 그대로 유지돼요. 새 예약만 받지 않아요." 전환 뒤 스토어 예약 버튼이 꺼지고 잠김. Laser Toning 예약 줄 웹·알리페이 모두 꺼지고 잠기며 "예약 설정이 OFF인 경우 활성화할 수 없습니다."',"go('BO','store')",'BO 스토어 정보 수정',''],
- ['B-07','다시 켜도 자동으로 돌아오지 않는다','예약 사용 여부를 다시 켜고 → Laser Toning 수정.','예약 설정은 켜졌지만 스토어 예약 버튼과 Laser Toning 예약 웹은 꺼진 채다(운영사가 다시 켜야 함)',"go('BO','store');DB.store.bookingSetting=false;DB.store.btn.web=false;DB.prods.forEach(function(p){p.book.web=false;p.book.ali=false;});render()",'예약 설정을 끈 직후',''],
- ['B-08','기획전 예약 건수','가을 보톡스 특가의 상세를 엽니다.','목록 예약 건수: 가을 보톡스 특가 5, 秋季护肤推荐 2, 秋のおすすめ 1. 상세: Forehead Botox 2 · Laser Toning 1 · Hydrafacial 2 · 합계 5',"go('BO','col')",'BO 기획전 관리',''],
- ['B-09','새 예약이 수치에 바로 잡힌다','Book now → 운영사 (BO) → 상품 정보 관리, 기획전 관리.','Forehead Botox 예약 건수 3, 가을 보톡스 특가 6',BOOK_BY_PROD,'Forehead Botox 로 예약 직전','']
+['운영사 (BO)', [
+ ['B-01','예약 관리 칼럼·필터·드로어','예약 구분 칸을 바꿔 보고, 아무 예약이나 상세를 엽니다.','"예약 상품" 칼럼과 "예약 구분" 필터가 HOST 와 같게 동작. 드로어에 상품 상자와 유입경로',"go('BO','res')",'BO 예약 관리',''],
+ ['B-02','상품 목록 예약 건수','표를 오른쪽으로 스크롤해 페이스북 칼럼 다음을 봅니다.','"예약 건수": Abijou Botox 2, Skin Booster 1, Acne Care 2, 肉毒杆菌 2',"go('BO','prod')",'BO 상품 정보 관리',''],
+ ['B-03','관리자설정 버튼 설정에 예약 줄','예약 ON 을 누른 뒤 고객 화면 · 일본어 · 웹에서 Abijou スキンブースター 상세를 봅니다.','메신저 설정 다음에 "예약 ON / OFF"(OFF 선택). ON 으로 바꾸면 고객 화면에 Book now 가 생긴다',"STATE.bo.editPid=104;go('BO','pedit')",'BO 상품정보 수정 · 관리자설정, スキンブースター(개별 설정)',''],
+ ['B-04','기본 설정이면 예약 줄도 잠긴다','없음. 화면만 확인합니다. 그다음 개별 설정을 누릅니다.','기본 설정: 예약 ON(스토어 값)이 다른 버튼처럼 흐리게 잠김. 개별 설정을 누르면 잠금이 풀린다',"STATE.bo.editPid=101;go('BO','pedit')",'BO 상품정보 수정, Abijou Botox(기본 설정)',''],
+ ['B-05','예약 설정을 끄면 상품 예약도 꺼지고 잠긴다','예약 사용 여부 스위치 → 전환 → 상품 정보 관리 → Skin Booster 수정.','확인 모달 "예약 설정을 OFF로 전환하시겠어요?" / "이미 잡힌 예약은 그대로 유지돼요. 새 예약만 받지 않아요." 전환 뒤 버튼 및 메신저 설정의 예약이 OFF·잠김. Skin Booster 예약 줄도 OFF·잠김 + "예약 설정이 OFF인 경우 활성화할 수 없습니다."',"go('BO','store')",'BO 스토어 정보 수정(예약 설정 위치로 스크롤)',''],
+ ['B-06','다시 켜도 자동으로 돌아오지 않는다','예약 사용 여부를 다시 켜고 → 상품 정보 관리 → Skin Booster 수정.','예약 설정은 켜졌지만 스토어 예약과 Skin Booster 예약은 OFF 그대로(운영사가 다시 켜야 함)',"DB.store.bookingSetting=false;DB.store.btn.web=false;DB.prods.forEach(function(p){p.book.web=false;p.book.ali=false;});go('BO','store')",'예약 설정을 끈 직후',''],
+ ['B-07','기획전 예약 건수','가을 보톡스 특가 행을 누릅니다.','목록 "예약 건수"(오른쪽 끝): 가을 보톡스 특가 5, 秋季护肤推荐 2, 秋のおすすめ 1. 행을 누르면 아래에 상품별 Abijou Botox 2 · Skin Booster 1 · Acne Care 2 · 합계 5',"go('BO','col')",'BO 기획전 관리',''],
+ ['B-08','새 예약이 수치에 바로 잡힌다','Book → 위쪽 운영사 (BO) → 상품정보관리, 기획전 관리.','Abijou Botox 예약 건수 3, 가을 보톡스 특가 6',BOOK_BY_PROD,'Abijou Botox 정보 입력 화면','']
 ]]
 ];
 
 /* ===== 콘솔 동작 ===== */
-var KEY='qa-product-booking-v1';
+var KEY='qa-product-booking-v2';
 var REC=JSON.parse(localStorage.getItem(KEY)||'{}');
 var FILTER='all';
 var frame=document.getElementById('prev');
