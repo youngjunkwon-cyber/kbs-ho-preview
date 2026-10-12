@@ -186,6 +186,19 @@ dialog textarea{width:100%;height:320px;font-family:ui-monospace,Menlo,monospace
 .caseH li{margin:1px 0}
 .caseH ul{margin:2px 0 0;padding-left:16px}
 .caseH b{color:#262626;margin-right:4px}
+.alNote{font-size:14px;line-height:1.7;color:#434343}
+.alSec{margin-bottom:16px}
+.alList{margin:10px 0 0;padding-left:22px}
+.alList>li{font-size:14px;line-height:1.7;color:#434343;margin-bottom:14px}
+.alList>li>b{color:#262626;font-size:15px}
+.alList p{margin:4px 0 0}
+.alList ul{margin:4px 0 0;padding-left:18px}
+.alTag{display:inline-block;margin-left:8px;padding:0 8px;border:1px solid #d9d9d9;border-radius:10px;font-size:11.5px;line-height:20px;color:#262626;vertical-align:1px}
+.alTbl{width:100%;border-collapse:collapse;margin-top:10px;font-size:13.5px;line-height:1.6}
+.alTbl th{background:#fafafa;text-align:left;font-weight:600;color:#262626;border:1px solid #e6e6e6;padding:8px 10px}
+.alTbl td{border:1px solid #e6e6e6;padding:8px 10px;color:#434343;vertical-align:top}
+.alTbl td:first-child{width:30%;color:#262626}
+.alTbl td:last-child{width:22%;color:#595959}
 </style>
 </head>
 <body>
@@ -198,6 +211,7 @@ dialog textarea{width:100%;height:320px;font-family:ui-monospace,Menlo,monospace
       <button class="btn areaBtn" data-a="HOST">HOST</button>
       <button class="btn areaBtn" data-a="FO">FO</button>
       <button class="btn introBtn" id="introBtn">전제·흐름도</button>
+      <button class="btn introBtn" id="alBtn">알리페이 확인</button>
       <button class="btn pinBtn" id="pinBtn">코멘트 남기기</button>
       <span class="sp2"></span>
       <div class="gtabs" id="gtabs"></div>
@@ -223,6 +237,38 @@ dialog textarea{width:100%;height:320px;font-family:ui-monospace,Menlo,monospace
 <div class="ioFlows"><div class="ioF"><div class="ioT">흐름 1. 알리페이 회원 진입</div><div id="ioF1"></div></div><div class="ioF"><div class="ioT">흐름 2. 콘텐츠가 어디에 보이는지 정해지는 순서</div><div id="ioF2"></div></div></div>
 <div class="ioLog" id="ioLog"></div>
 </div></div>
+<div class="introOv alOv" id="alOv" hidden><div class="ioIn">
+<div class="ioHd"><b>알리페이 확인 사항</b><span class="sp"></span><button class="btn" id="alCopy">메일 본문 복사</button><button class="btn" id="alClose">닫고 시안 보기</button></div>
+<div class="ioPrem alNote">알리페이 기술 담당(사공명 부장)에게 메일로 확인할 항목입니다. 지난 회신과 알리페이 개발자 문서로 이미 답을 받은 것은 아래에 따로 적었습니다.</div>
+<div class="ioF alSec"><div class="ioT">이번 메일로 묻는 것</div>
+<ol class="alList">
+<li><b>진입 동의 구조 심사</b><span class="alTag">진입 관문을 열기 전에 답이 필요합니다</span>
+<p>알리페이 채널에 들어올 때 당사 동의 창에서 필수 항목 동의를 받고, 이어서 getAuthCode로 필수 권한 허용을 받은 이용자만 서비스를 이용하도록 할 예정입니다.</p>
+<ul><li>이 구조가 심사에서 허용되는지 확인 부탁드립니다.</li><li>심사를 월렛(중국, 홍콩)마다 따로 받는지, 심사 기간은 얼마나 걸리는지, 수정할 때마다 다시 심사를 받는지도 알려 주세요.</li></ul></li>
+<li><b>회원 정보 조회 권한</b><span class="alTag">진입 관문을 열기 전에 답이 필요합니다</span>
+<p>회원 정보 조회(inquiryUserInfo)를 쓰려면 별도로 권한을 열어야 하는지 알려 주세요. 필요하다면 당사가 신청하는 방식인지, 알리페이에서 열어 주시는 방식인지도 알려 주세요.</p></li>
+<li><b>진입 주소 등록</b>
+<p>알리페이 중국 앱과 알리페이 홍콩 앱의 진입 주소를 각각 alipay-app.kbstations.com/zh, alipay-app.kbstations.com/zh-TW로 등록하려고 합니다. 당사가 콘솔에서 직접 설정하는 방식인지, 주소를 전달드리면 알리페이에서 설정해 주시는 방식인지 알려 주세요.</p></li>
+<li><b>원본 휴대폰 번호 권한</b>
+<p>가리지 않은 휴대폰 번호 권한(PLAINTEXT_MOBILE_PHONE)을 당사가 승인받을 수 있는지, 승인 절차가 있다면 알려 주세요.</p></li>
+<li><b>권한 해제</b>
+<p>회원이 탈퇴할 때 알리페이에서 받은 권한을 해제하는 API가 있는지 알려 주세요.</p></li>
+<li><b>휴대폰 번호의 마케팅 사용</b>
+<p>알리페이에서 받은 휴대폰 번호를, 마케팅 수신에 동의한 회원에게 당사가 보내는 마케팅 문자에 사용해도 되는지 확인 부탁드립니다.</p></li>
+<li><b>홍콩 월렛 테스트 계정</b>
+<p>홍콩 월렛에서 실기기 테스트를 할 수 있는 테스트 계정을 받을 수 있는지 알려 주세요.</p></li>
+<li><b>홍콩 월렛 검색 키워드</b>
+<p>홍콩 월렛에 등록할 검색 키워드를 사전에 전달드려야 한다고 안내해 주셨습니다. 등록할 수 있는 키워드 개수와 형식을 알려 주세요. 의료 관련 단어(예: 韓國醫美)를 넣을 수 있는지도 확인 부탁드립니다. 후보는 K-Beauty Station, 韓國美容, 韓國護膚, 首爾美容, 韓國皮膚科, 韓國髮型屋, 韓國美甲, 韓國美容預約입니다.</p></li>
+</ol></div>
+<div class="ioF alSec"><div class="ioT">이미 답을 받은 것</div>
+<table class="alTbl"><thead><tr><th>항목</th><th>답</th><th>근거</th></tr></thead><tbody>
+<tr><td>웹뷰에서 계정 권한 요청(getAuthCode)을 쓸 수 있는지</td><td>쓸 수 있습니다. 월렛마다 주는 사용자 정보가 다를 수 있어 userId로 회원을 식별하라고 권했습니다.</td><td>2026년 8월 19일 사공명 부장 회신</td></tr>
+<tr><td>권한 창에서 거부한 권한 목록이 응답에 오는지</td><td>허용된 권한(authSuccessScopes)과 거부된 권한(authErrorScopes)이 응답에 따로 옵니다.</td><td>알리페이 개발자 문서(my.getAuthCode)</td></tr>
+<tr><td>어느 월렛에서 열렸는지 알 수 있는지</td><td>my.getSystemInfo의 app 값으로 알 수 있습니다. 중국은 alipay, 홍콩은 alipayHK입니다.</td><td>2026년 7월 10일 사공명 부장 회신</td></tr>
+</tbody></table></div>
+<div class="ioLog">자세한 처리 기준은 PRD v3.3 16장에 있습니다.</div>
+</div></div>
+
 <div class="pinLayer" id="pinLayer"></div>
 <div class="pinHint" id="pinHint" hidden>코멘트를 남길 자리를 누르세요. Esc를 누르면 코멘트 모드가 꺼집니다.</div>
   </div>
@@ -1415,6 +1461,32 @@ function afterLoad() {
   var _openCase = openCase; openCase = function (src, code) { show(false); return _openCase(src, code); };
   var seen = null; try { seen = localStorage.getItem('introSeen'); } catch (e) {}
   if (!seen) show(true);
+})();
+/* 알리페이 확인 사항: 시안 자리 위에 펼침. 전제·흐름도와 동시에 열리지 않는다 */
+(function () {
+  var ov = document.getElementById('alOv'), bt = document.getElementById('alBtn'), io = document.getElementById('introOv'), ib = document.getElementById('introBtn'), lb = document.querySelector('.lbar');
+  function show(on) { document.querySelector('.left').style.setProperty('--lbarH', lb.offsetHeight + 'px'); ov.hidden = !on; bt.classList.toggle('on', on); if (on) { io.hidden = true; ib.classList.remove('on'); if (typeof pinSetMode === 'function' && pinMode) pinSetMode(false); if (typeof pinPopClose === 'function') pinPopClose(); } }
+  bt.addEventListener('click', function () { show(ov.hidden); });
+  document.getElementById('alClose').addEventListener('click', function () { show(false); });
+  ib.addEventListener('click', function () { show(false); });
+  document.querySelectorAll('.lbar .areaBtn').forEach(function (x) { x.addEventListener('click', function () { show(false); }); });
+  document.getElementById('pinBtn').addEventListener('click', function () { show(false); });
+  var _oc = openCase; openCase = function (src, code) { show(false); return _oc(src, code); };
+  /* 메일 본문 복사: 화면에 보이는 질문 목록을 그대로 글로 옮긴다 */
+  document.getElementById('alCopy').addEventListener('click', function () {
+    var b = this, lines = [];
+    ov.querySelectorAll('.alList>li').forEach(function (li, i) {
+      lines.push((i + 1) + '. ' + li.querySelector('b').textContent);
+      li.querySelectorAll('p').forEach(function (p) { lines.push(p.textContent); });
+      li.querySelectorAll('ul>li').forEach(function (x) { lines.push('- ' + x.textContent); });
+      lines.push('');
+    });
+    var txt = lines.join('\n').trim();
+    function done(ok) { b.textContent = ok ? '복사했습니다' : '복사하지 못했습니다'; setTimeout(function () { b.textContent = '메일 본문 복사'; }, 1800); }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function () { done(true); }, function () { fallback(); });
+    else fallback();
+    function fallback() { var ta = document.createElement('textarea'); ta.value = txt; ta.style.position = 'fixed'; ta.style.left = '-9999px'; document.body.appendChild(ta); ta.select(); var ok = false; try { ok = document.execCommand('copy'); } catch (e) {} ta.remove(); done(ok); }
+  });
 })();
 </script>
 </body>
