@@ -993,7 +993,7 @@ function pDone() {
 function pMy() {
   var f = F(), app = document.getElementById('app'); app.innerHTML = ''; app.appendChild(header('Bookings & Consultations', 'store'));
   var mine = PB.DB.books.filter(function (b) { return b.name === PB.ME; });
-  var grp = { upcoming: mine.filter(function (b) { return b.status === '예약' || b.status === '변경요청'; }), visited: mine.filter(function (b) { return b.status === '방문완료'; }), cancelled: mine.filter(function (b) { return /취소|노쇼/.test(b.status); }) };
+  var grp = { upcoming: mine.filter(function (b) { return b.status === '예약' || b.status === '변경요청'; }), visited: mine.filter(function (b) { return b.status === '방문완료'; }), cancelled: mine.filter(function (b) { return /취소|미방문/.test(b.status); }) };
   var list = grp[f.tab] || [], ttl = { upcoming: 'Upcoming bookings', visited: 'Completed visits', cancelled: 'Cancelled bookings' }[f.tab];
   var w = document.createElement('main'); w.className = 'pb-my';
   w.innerHTML = '<div class="pb-my-h"><b>' + ttl + '</b><b>' + list.length + ' booking(s)</b></div><div class="pb-tabs">' + [['upcoming', 'Upcoming'], ['visited', 'Visited'], ['cancelled', 'Cancelled']].map(function (t) { return '<button class="' + (f.tab === t[0] ? 'on' : '') + '" data-tab="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div>'
