@@ -102,7 +102,7 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
       맨 위 검은 줄에서 고객 화면 / 입점사 / 운영사를 오가고, 고객 화면일 때는 언어와 채널(웹 / 알리페이)을 바꿉니다. 기준 시각은 2026-10-12 12:00 입니다. 기록은 이 브라우저에만 남으니 끝나면 "결과 복사"로 보내 주세요.</p>
       <details class="out"><summary>이 시안에서 확인하지 않는 것</summary><ul>
         <li>BO 버튼 설정의 알리페이 열. 알리페이 채널 분기가 아직 라이브에 없어, 이 시안은 라이브 구조대로 예약 ON/OFF(웹) 한 줄만 둡니다. 알리페이 채널 동작은 고객 화면에서만 봅니다</li>
-        <li>고객 화면 예약 완료 화면. 실화면을 확보하지 못해 예약 상세 화면 양식을 따라 그렸습니다. 정보 입력·내 예약 화면은 스테이징 실측 수치로 다시 그린 화면입니다</li>
+        <li>고객 화면 예약 완료 화면. 실화면을 확보하지 못해 예약 상세 화면 양식을 따라 그렸습니다. 내 예약 화면은 스테이징 실측 수치로 다시 그린 화면입니다. 정보 입력 화면은 라이브 실화면을 떠서 쓰고, 동의 체크박스의 체크된 모양은 실화면을 확보하지 못해 분홍 채움 체크로 그렸습니다(시안 검수 편의를 위해 Book 이 필요한 항목은 동의를 미리 체크해 둠)</li>
         <li>고객 화면 문구는 영어 기준입니다. 언어를 바꾸면 상품 목록·선택지만 그 언어 상품으로 바뀝니다</li>
         <li>발송 템플릿 문안(알림톡·이메일·문자)</li>
         <li>예약 처리 모달의 상품명 한 줄. 요약이 있는 모달을 확인한 뒤 붙입니다</li>
@@ -141,8 +141,8 @@ function askBox(opt, done) {
 function tellBox(msg, title) { askBox({ title: title || '알림', message: msg, alert: true, okText: '닫기' }); }
 
 /* [id, 제목, 조작, 기대, 열면 실행할 코드, 열면 설명, 참고] */
-var BOOK_BY_PROD = "foOpenProduct(101,'en','web');STATE.fo.entry='product';STATE.fo.screen='info';STATE.fo.date='2026-10-19';STATE.fo.time='11:00';";
-var BOOK_BY_STORE = "foOpenStore('en','web');STATE.fo.entry='store';STATE.fo.screen='info';STATE.fo.date='2026-10-19';STATE.fo.time='11:00';";
+var BOOK_BY_PROD = "foOpenProduct(101,'en','web');STATE.fo.agree=true;STATE.fo.entry='product';STATE.fo.screen='info';STATE.fo.date='2026-10-19';STATE.fo.time='11:00';";
+var BOOK_BY_STORE = "foOpenStore('en','web');STATE.fo.agree=true;STATE.fo.entry='store';STATE.fo.screen='info';STATE.fo.date='2026-10-19';STATE.fo.time='11:00';";
 var GROUPS = [
 ['고객 화면 · 예약 버튼 (5.3)', [
  ['F-01','스토어 페이지에 예약 버튼','아래로 스크롤해 상품 카드를 봅니다.','하단에 Chat on · Book now 버튼. 상품 카드는 Abijou Botox · Abijou Skin Booster · Abijou Acne Care 세 개뿐(승인 대기 Lifting, 숨김 Laser Toning 은 없음)',"foOpenStore('en','web')",'고객 화면, 영어, 웹, 스토어 페이지',''],
