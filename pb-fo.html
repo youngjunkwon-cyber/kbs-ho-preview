@@ -554,11 +554,7 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 #pb-toast{position:fixed;left:50%;top:24px;transform:translateX(-50%);z-index:4000;background:#fff;color:rgba(0,0,0,.88);font-size:14px;padding:9px 12px;border-radius:8px;box-shadow:0 6px 16px 0 rgba(0,0,0,.08),0 3px 6px -4px rgba(0,0,0,.12),0 9px 28px 8px rgba(0,0,0,.05);opacity:0;pointer-events:none;transition:opacity .15s}
 #pb-toast.on{opacity:1}
 .pb-prodline{color:#2d2d2d !important;font-weight:600}
-.pb-prod{display:flex;gap:12px;align-items:center;border:1px solid #e4e7eb;border-radius:8px;padding:10px 12px;margin:0 0 16px;background:#fff}
 .pb-thumb{width:48px;height:48px;border-radius:6px;flex:none;display:block}
-.pb-prod-t{min-width:0}
-.pb-prod-n{font-size:14px;font-weight:700;color:#22272e;line-height:1.35}
-.pb-prod-p{font-size:13px;color:#4b5563;margin-top:2px}
 .pb-prod-l{display:inline-block;font-size:12px;color:#e8537a;margin-top:4px;text-decoration:underline}
 .pb-foot-hint{font-size:12px;color:#8a9099;background:#f5f6f8;border-radius:6px;padding:8px 10px;margin:0 0 8px}
 .pb-foot-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -571,6 +567,13 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 .pb-st{font-weight:600;font-size:13px;color:#8a9099;background:#f1f2f4;border-radius:4px;padding:1px 8px}
 .pb-st.on{color:#1a8c33;background:#e8f7ec}
 .pb-extra{color:rgba(0,0,0,.45);font-size:13px;margin-top:6px}
+
+/* 드로어 예약 상품 섹션: 실화면 읽기 전용 상자 안에 썸네일·상품명·가격·상품 보기 */
+.pb-prodbox{display:flex !important;align-items:center;gap:10px}
+.pb-prodbox .pb-thumb{width:36px;height:36px;border-radius:6px;flex:none;display:block}
+.pb-prodbox-t{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.pb-prodbox-t b{font-weight:700}
+.pb-prodbox .pb-prod-l{margin:0;flex:none}
 
 /* 폰 프레임: fixed 요소가 프레임 기준이 되도록 transform 컨테이너 */
 html,body{background:#fff !important;margin:0}
@@ -657,6 +660,8 @@ html,body{background:#fff !important;margin:0}
 /* FO 는 새 요소 점선 표시를 하지 않는다 (사용자 요청 2026-10-13) */
 body.pb-mark .pb-new{outline:none !important}
 .pb-card-p.pb-hiA{font-size:15px;font-weight:600;color:#2d2d2d;margin-top:2px}
+.pb-fhead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.pb-freset{border:0;background:none;padding:0;font-family:Pretendard;font-size:14px;font-weight:500;color:#8e8e8e;text-decoration:underline;cursor:pointer}
 </style></head>
 <body class="pretendard_822c6fe1-module__DANrza__variable"><div id="app"></div>
 <template id="T_f_store9"><div class="index-module-scss-module__db6oSW__routeProgressBar" aria-hidden="true"><div class="index-module-scss-module__db6oSW__routeProgressBar__fill" style="transform:scaleX(0)"></div></div><!--$--><!--$--><!--/$--><!--/$--><div id="app"><!--$--><div class="StoreDetailHome-module-scss-module__XXJAJa__storeDetailHome"><header class="StoreDetailHeader-module__Z4HdZa__fixedHeader"><div class="StoreDetailHeader-module__Z4HdZa__headerBar"><button type="button" class="HeaderIconButton-module-scss-module__6s0Whq__headerIconButton" aria-label="Go Back"><span class="HeaderIconButton-module-scss-module__6s0Whq__headerIconButton__icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 12H19M5 12L11 18M5 12L11 6" stroke="#FFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></button><div class="StoreDetailHeader-module__Z4HdZa__headerTitle"><span class="StoreDetailHeader-module__Z4HdZa__headerStoreName">Abijou Clinic Myeongdong</span></div><div><div class="index-module-scss-module__OHZpaq__languageDropdown"><button type="button" class="index-module-scss-module__OHZpaq__languageDropdown__button " aria-haspopup="menu" aria-expanded="false" aria-controls="_R_qolubsnpfjivb_"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M1.35 6.75012H18.15M1.35 12.7501H18.15M9.25 0.750122C7.56534 3.44973 6.6722 6.56799 6.6722 9.75012C6.6722 12.9323 7.56534 16.0505 9.25 18.7501M10.25 0.750122C11.9347 3.44973 12.8278 6.56799 12.8278 9.75012C12.8278 12.9323 11.9347 16.0505 10.25 18.7501M0.75 9.75012C0.75 10.932 0.982792 12.1023 1.43508 13.1943C1.88738 14.2862 2.55031 15.2784 3.38604 16.1141C4.22177 16.9498 5.21392 17.6127 6.30585 18.065C7.39778 18.5173 8.5681 18.7501 9.75 18.7501C10.9319 18.7501 12.1022 18.5173 13.1942 18.065C14.2861 17.6127 15.2782 16.9498 16.114 16.1141C16.9497 15.2784 17.6126 14.2862 18.0649 13.1943C18.5172 12.1023 18.75 10.932 18.75 9.75012C18.75 7.36317 17.8018 5.07399 16.114 3.38616C14.4261 1.69833 12.1369 0.750122 9.75 0.750122C7.36305 0.750122 5.07387 1.69833 3.38604 3.38616C1.69821 5.07399 0.75 7.36317 0.75 9.75012Z" stroke="#FFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></button><div id="_R_qolubsnpfjivb_" role="menu" class="index-module-scss-module__OHZpaq__languageDropdown__popover "><button role="menuitem" class="index-module-scss-module__OHZpaq__languageDropdown__popover__item "><div>简体中文</div></button><button role="menuitem" class="index-module-scss-module__OHZpaq__languageDropdown__popover__item "><div>繁體中文</div></button><button role="menuitem" aria-current="true" class="index-module-scss-module__OHZpaq__languageDropdown__popover__item index-module-scss-module__OHZpaq__languageDropdown__popover__item-active"><div>ENGLISH</div></button><button role="menuitem" class="index-module-scss-module__OHZpaq__languageDropdown__popover__item "><div>日本語</div></button></div></div></div></div><nav class="StoreDetailHeader-module__Z4HdZa__anchorNav" aria-label="Abijou Clinic Myeongdong detail sections"><button type="button" class="StoreDetailHeader-module__Z4HdZa__anchorNavButton StoreDetailHeader-module__Z4HdZa__anchorNavButtonActive" aria-current="page">Intro</button><button type="button" class="StoreDetailHeader-module__Z4HdZa__anchorNavButton">Products</button><button type="button" class="StoreDetailHeader-module__Z4HdZa__anchorNavButton">FAQ</button><button type="button" class="StoreDetailHeader-module__Z4HdZa__anchorNavButton">Gallery</button></nav></header><main><section id="store-section-intro" class="StoreDetailHeroSection-module-scss-module__k6xyFW__hero" aria-label="Abijou Clinic Myeongdong"><img class="StoreDetailHeroSection-module-scss-module__k6xyFW__heroImage" src="https://media.stg.k-beautystation.com/920x/9d57a23d-abf8-41ef-b487-57755218dd7d?v=be19dae90a521a85" alt="Abijou Clinic Myeongdong"><button type="button" class="StoreDetailHeroSection-module-scss-module__k6xyFW__heroOpenButton" aria-label="Abijou Clinic Myeongdong representative images"><span class="StoreDetailHeroSection-module-scss-module__k6xyFW__srOnly">Open representative images</span></button><div class="StoreDetailHeroSection-module-scss-module__k6xyFW__heroDim"></div><div class="StoreDetailHeroSection-module-scss-module__k6xyFW__heroContent"><h1 class="StoreDetailHeroSection-module-scss-module__k6xyFW__heroTitle">A beautiful visual, Abijou Clinic</h1><p class="StoreDetailHeroSection-module-scss-module__k6xyFW__description">Abijou Clinic is a large network hospital that has been leading beauty trends since 2006, backed by years of expertise and know-how.</p></div><div class="StoreDetailHeroSection-module-scss-module__k6xyFW__bottomContainer"><div class="StoreDetailHeroSection-module-scss-module__k6xyFW__bottomRight"><button type="button" class="StoreDetailHeroSection-module-scss-module__k6xyFW__readMoreDescription">Read More</button></div></div></section><section class="StoreDetailContactSection-module-scss-module__PNCana__section"><div class="StoreDetailContactSection-module-scss-module__PNCana__sectionHeaderDescription"><div class="StoreDetailContactSection-module-scss-module__PNCana__eyebrow">Feel free to contact the store with any questions.</div><div class="StoreDetailContactSection-module-scss-module__PNCana__sectionTitle">Don't just worry about it.
@@ -732,7 +737,13 @@ function fillDrawer(pre, b, qrCls) {
   var dt = function (v) { if (!v) return ''; if (!bo) return v.slice(0, 16); var d = v.slice(0, 10); return d + ' (' + PB.wdKo(d) + ') ' + v.slice(11, 16); };
   $('h2', cont).textContent = dt(b.visit);
   var cr = $('[class*=changeRequestBox]', cont); if (cr) $('strong', cr).textContent = dt(b.chg);
-  (cr || $('h2', cont)).after(prodBlock(b)); /* 상품 없는 예약 = 방문 상담 */
+  /* 예약 상품: 드로어 실화면 섹션 부품(h3 + 읽기 전용 상자)을 복제해 날짜 바로 아래에 둔다. 상품 없는 예약 = 방문 상담 */
+  var sec0 = $$('section', cont).filter(function (s) { return $('[class*=readonlyBox]', s); })[0], ps = sec0.cloneNode(true);
+  $('h3', ps).textContent = '예약 상품'; ps.setAttribute('data-test', 'prod-block'); var box = $('[class*=readonlyBox]', ps); box.classList.add('pb-prodbox');
+  if (!b.snap) { ps.setAttribute('data-kind', 'consult'); box.textContent = '방문 상담'; }
+  else { var lp = PB.prodById(b.prodId), live = lp && PB.prodVisible(lp, b.snap.lang);
+    box.innerHTML = '<span class="pb-thumb" style="background:' + thumbColor(b.prodId) + '"></span><span class="pb-prodbox-t"><b>' + esc(b.snap.name) + '</b><span>' + PB.won(b.snap.price) + '원</span></span>' + (live ? '<a class="pb-prod-l" href="#">상품 보기</a>' : ''); }
+  (cr || $('h2', cont)).after(mark(ps));
   var qr = b.contact === 'WeChat' || b.contact === 'LINE';
   var V = { '매장': PB.DB.store.name, '여권명': b.name, '국적': b.nation, '언어': langLabel(b.lang), '전화번호': b.phone, '예약 번호': b.rno, '접수 시각': b.recv, '등록 방식': b.owner,
     '취소 시각': b.cancelAt ? (bo ? b.cancelAt : b.cancelAt.slice(0, 16)) : '', '취소한 사람': b.cancelBy || '', '취소 사유': b.cancelReason || '' };
@@ -772,8 +783,21 @@ function fillDrawer(pre, b, qrCls) {
     if (b.status === '예약' || b.status === '변경거절') { if (due) { var g = $('[class*=footerGuide]', foot); if (g) g.remove(); $$('[class*=splitActions] button', foot).forEach(function (x) { x.disabled = false; }); } }
     if (b.status === '방문완료' || b.status === '미방문') $$('button', foot).forEach(function (x) { x.disabled = !(due && in7); });
   }
-  if (foot) $$('button', foot).forEach(function (x) { x.onclick = function () { toast('시안에서는 동작하지 않습니다'); }; });
+  if (foot) $$('button', foot).forEach(function (x) { x.onclick = function () { if (x.textContent.trim() === '예약 변경') timeModal(pre, b, dt); else toast('시안에서는 동작하지 않습니다'); }; });
   return dw;
+}
+
+/* 예약 시간 변경 모달: 실화면 스냅샷(hm_/bm_시간변경) 그대로, 요약(기존 예약) 아래에 예약 상품 한 줄만 더한다 */
+function timeModal(pre, b, dt) {
+  var t = tpl(pre === 'bd' ? 'bm_시간변경' : 'hm_시간변경'), root = t.firstElementChild; document.getElementById('app').appendChild(root);
+  var ob = $('[class*=originalBooking]', root); $('strong', ob).textContent = dt(b.visit);
+  var pr = ob.cloneNode(true); $('span', pr).textContent = '예약 상품'; $('strong', pr).textContent = b.snap ? b.snap.name : '방문 상담'; pr.setAttribute('data-test', 'modal-prod'); ob.after(mark(pr));
+  var di = $('input#bookingDate', root); if (di) di.value = b.visit.slice(0, 10);
+  var tv = $('[class*=ant-select-content]', root) || $('.ant-select-selection-item', root); if (tv && tv.firstChild && tv.firstChild.nodeType === 3) tv.firstChild.textContent = b.visit.slice(11);
+  root.setAttribute('data-test', 'time-modal');
+  var close = function () { root.remove(); };
+  $$('button', root).forEach(function (x) { var t2 = x.textContent.trim(); if (t2 === '닫기' || x.classList.contains('ant-modal-close')) x.onclick = close; else if (t2 === '다음') x.onclick = function () { toast('시안에서는 동작하지 않습니다'); }; });
+  var wrap = $('.ant-modal-wrap', root); if (wrap) wrap.onclick = function (e) { if (e.target === wrap) close(); };
 }
 
 /* ===== FO: 스테이징 고객 화면 스냅샷(스토어·상품·예약 일정) + 실측 수치로 그린 정보 입력·내 예약 ===== */
@@ -884,11 +908,14 @@ function pBook() {
     var inner = document.createElement('div'); inner.className = 'pb-fpick'; inner.setAttribute('data-test', 'fo-select');
     inner.setAttribute('data-options', JSON.stringify(opts.map(function (o) { return o.name; }))); inner.setAttribute('data-selected', cur ? cur.name : 'Visit consultation');
     if (f.err && f.err.kind === 'pickAgain') { var er = document.createElement('p'); er.className = 'pb-ferr'; er.setAttribute('data-test', 'fo-err'); er.textContent = "This product can't be booked right now. Please choose again."; sec.appendChild(er); }
-    /* Visit consultation 카드: 같은 카드 부품, 상품명 자리만(가격·버튼 없음) */
-    var vg = src.querySelector('[class*=productGrid]').cloneNode(false), vli = src.querySelector('[class*=productGrid] li').cloneNode(true), va = vli.querySelector('article');
-    vli.querySelector('h3').textContent = 'Visit consultation'; $$('[class*=__divider], [class*=priceRow]', va).forEach(function (e) { e.remove(); });
-    va.setAttribute('data-test', 'fo-pick-consult'); if (!cur) va.classList.add('pb-pick-on'); va.onclick = function () { f.sel = ''; if (f.err && f.err.kind === 'pickAgain') f.err = null; PB.render(); };
-    vg.appendChild(vli); inner.appendChild(vg);
+    /* 맨 위 칸 = 지금 선택. 기본은 Visit consultation 카드(같은 카드 부품, 이름만), 상품을 고르면 이 자리가 고른 상품 카드로 바뀐다 */
+    var vg = src.querySelector('[class*=productGrid]').cloneNode(false), vli, va;
+    if (cur) { vli = fullCard(cur, f); va = vli.querySelector('article'); va.setAttribute('data-test', 'fo-selcard'); }
+    else { vli = src.querySelector('[class*=productGrid] li').cloneNode(true); va = vli.querySelector('article'); vli.querySelector('h3').textContent = 'Visit consultation'; $$('[class*=__divider], [class*=priceRow]', va).forEach(function (e) { e.remove(); }); va.setAttribute('data-test', 'fo-pick-consult'); }
+    va.classList.add('pb-pick-on'); vg.appendChild(vli); inner.appendChild(vg);
+    /* Reset: 상품을 골랐을 때만, 제목 줄 오른쪽. 누르면 Visit consultation 으로 */
+    if (cur) { var h2r = sec.querySelector('h2'), hr = document.createElement('div'); hr.className = 'pb-fhead'; h2r.before(hr); hr.appendChild(h2r);
+      var rb = document.createElement('button'); rb.type = 'button'; rb.className = 'pb-freset'; rb.textContent = 'Reset'; rb.setAttribute('data-test', 'fo-reset'); rb.onclick = function () { f.sel = ''; PB.render(); }; hr.appendChild(rb); }
     var tabs = src.querySelector('[class*=categoryTabs]').cloneNode(true), tabT = tabs.children[0].cloneNode(true), onCls = tabT.className.split(' ').filter(function (c) { return /categoryTabActive/.test(c); })[0];
     var grid = src.querySelector('[class*=productGrid]').cloneNode(false);
     var cats = ['All']; opts.forEach(function (o) { var c = SUB_EN[o.sub] || o.sub; if (cats.indexOf(c) < 0) cats.push(c); });

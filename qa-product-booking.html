@@ -96,7 +96,7 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
     </div>
     <div class="scroll">
       <p class="warn" id="fileWarn">파일을 직접 열어서 왼쪽 시안을 제어할 수 없습니다. 아래 배포 주소로 다시 열어 주세요.<br><a href="https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-product-booking.html" target="_blank">https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-product-booking.html</a></p>
-      <p class="hint">기준 문서: 상품예약_PRD_v0.16_20261013<br>
+      <p class="hint">기준 문서: 상품예약_PRD_v0.17_20261013<br>
       <b>화면은 스테이징 실화면을 그대로 떠서 만들었습니다.</b> HOST·BO·FO의 셸·표·드로어·폼은 실제 HTML과 CSS이고, 분홍 점선이 이번에 더하는 요소입니다(HOST·BO 만 표시, 고객 화면은 표시하지 않음. 맨 위 검은 줄에서 표시를 끌 수 있음). 데이터는 스테이징 아비쥬 명동점 기준 시드입니다.<br>
       케이스마다 세 줄을 봅니다. <b>열면</b>: "이 화면 열기"를 누르면 왼쪽 시안이 그 상태로 맞춰집니다. <b>조작</b>: 그다음 직접 할 일입니다. <b>기대</b>: 화면이 이와 같으면 통과입니다.<br>
       맨 위 검은 줄에서 고객 화면 / 입점사 / 운영사를 오가고, 고객 화면일 때는 언어와 채널(웹 / 알리페이)을 바꿉니다. 기준 시각은 2026-10-12 12:00 입니다. 기록은 이 브라우저에만 남으니 끝나면 "결과 복사"로 보내 주세요.</p>
@@ -105,7 +105,7 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
         <li>고객 화면 예약 완료 화면. 실화면을 확보하지 못해 예약 상세 화면 양식을 따라 그렸습니다. 내 예약 화면은 스테이징 실측 수치로 다시 그린 화면입니다. 정보 입력 화면은 라이브 실화면을 떠서 쓰고, 동의 체크박스의 체크된 모양은 실화면을 확보하지 못해 분홍 채움 체크로 그렸습니다(시안 검수 편의를 위해 Book 이 필요한 항목은 동의를 미리 체크해 둠)</li>
         <li>고객 화면 문구는 영어 기준입니다. 언어를 바꾸면 상품 목록·선택지만 그 언어 상품으로 바뀝니다</li>
         <li>발송 템플릿 문안(알림톡·이메일·문자)</li>
-        <li>예약 처리 모달의 상품명 한 줄. 요약이 있는 모달을 확인한 뒤 붙입니다</li>
+        <li>방문완료·미방문·변경 수락·거절 모달. 스테이징에 해당 상태의 처리 가능한 예약이 없어 실화면을 확보하지 못했습니다(요약이 있으면 시간 변경 모달과 같이 예약 상품 한 줄)</li>
         <li>상품 상세 버튼 노출 조합·순서(최대 2개 규칙), 버튼 클릭수의 예약 항목, BO 통계 메뉴·대시보드·인플루언서 기획전의 예약 건수. PRD 미확정</li>
         <li>예약 변경·취소·방문 처리 흐름. 스토어 예약과 같아 버튼만 둡니다</li>
       </ul></details>
@@ -159,7 +159,7 @@ var GROUPS = [
  ['P-02','스토어로 들어오면 시간 아래 상품 선택, 기본은 Visit consultation','Book now 를 누르고 시간 아래까지 내립니다.','맨 위에 날짜·시간, 그 아래 "Select a product (optional)". 항상 펼쳐져 있고(여닫는 화살표 없음) 맨 위 "Visit consultation" 카드가 선택됨(분홍 테두리) = 스토어 예약. 그 아래 칩과 상품 카드',"foOpenStore('en','web')",'스토어 페이지',''],
  ['P-03','카드 목록에는 예약 가능한 상품만','Book now 를 누르고 상품 선택을 봅니다.','Visit consultation 아래 Abijou Botox, Abijou Skin Booster, Abijou Acne Care 세 장. 칩은 All · Botox · Skin Boosters · Acne/Scar',"foOpenStore('en','web')",'스토어 페이지',''],
  ['P-04','카드 목록은 고객 언어를 따른다','Book now 를 누르고 상품 선택을 봅니다.','Visit consultation 아래 Abijou ボトックス 한 장만(スキンブースター 는 예약 OFF 라 없음)',"foOpenStore('ja','web')",'일본어, 스토어 페이지',''],
- ['P-05','하나만 고른다: 상품을 고르면 바뀌고, 풀면 Visit consultation','Book now → Skin Booster → Botox → Botox 다시 누르기 → Acne Care → Visit consultation.','Skin Booster 를 누르면 분홍 테두리가 Visit consultation 에서 Skin Booster 로 옮겨간다. Botox 를 누르면 Botox 로. Botox 를 다시 누르면 풀려서 Visit consultation 으로 돌아간다. Acne Care 를 고른 뒤 Visit consultation 을 눌러도 같다',"foOpenStore('en','web')",'스토어 페이지',''],
+ ['P-05','상품을 고르면 맨 위 칸이 그 상품으로 바뀌고, Reset 으로 되돌린다','Book now → Skin Booster → Botox → Botox 다시 누르기 → Acne Care → 제목 오른쪽 Reset.','Skin Booster 를 누르면 맨 위 Visit consultation 자리가 Skin Booster 카드로 바뀌고(목록의 Skin Booster 도 분홍 테두리), 제목 오른쪽에 Reset. Botox 를 누르면 맨 위가 Botox 로. Botox 를 다시 누르면 맨 위가 Visit consultation 으로 돌아가고 Reset 이 사라진다. Acne Care 를 고른 뒤 Reset 을 눌러도 같다',"foOpenStore('en','web')",'스토어 페이지',''],
  ['P-06','상품 예약과 스토어 예약은 같은 예약표','Book now → 달력 18 을 누릅니다.','14:00(스토어 예약)과 15:00(상품 예약 Abijou Botox)이 흐리게 막혀 있다(동시에 받을 예약 수 1)',"foOpenStore('en','web')",'스토어 페이지',''],
  ['P-07','정보 입력 요약 카드 제목이 상품명','없음. 화면만 확인합니다.','검은 요약 카드 제목이 "Abijou Botox", 아래 줄 "at Abijou Clinic Myeongdong · 99,000 KRW", 그다음 Selected time',BOOK_BY_PROD,'상품 상세로 들어와 10-19 11:00 을 고른 뒤 정보 입력 화면',''],
  ['P-08','상품 예약을 끝내면 완료·내 예약에 상품','Book → View my bookings → 방금 예약의 View details.','완료 화면 제목 "Your booking is confirmed / Abijou Clinic Myeongdong", 아래 Product 상자에 Abijou Botox. 내 예약 카드 제목이 "Abijou Clinic Myeongdong (D-7)", 바로 아래 진한 글자로 Abijou Botox. 상세 제목 "You are scheduled to visit / Abijou Clinic Myeongdong", 아래 Product 상자와 View product 링크',BOOK_BY_PROD,'정보 입력 화면',''],
@@ -184,7 +184,8 @@ var GROUPS = [
  ['H-04','예약 목록 예약 상품 칼럼','없음. 화면만 확인합니다.','고객 (여권명) 다음에 "예약 상품". 상품이 없는 예약은 "방문 상담"(빈칸·"-" 없음). 칼럼이 늘어 표가 가로로 스크롤된다',"go('HOST','res')",'HOST 예약 관리',''],
  ['H-05','예약 구분 필터','"예약 구분 전체" 칸 → 상품 예약 → 스토어 예약.','상품 예약 9건(예약 상품 칸이 모두 상품명), 스토어 예약 4건(모두 "방문 상담")',"go('HOST','res')",'HOST 예약 관리',''],
  ['H-06','상품명으로 검색','검색칸에 booster 입력 → 검색.','Hui Ping Ho 한 건(Abijou Skin Booster)',"go('HOST','res')",'HOST 예약 관리',''],
- ['H-07','드로어의 상품 정보와 유입경로','Kaitlyn Chan → Evelyn Lee → Mia Tan 상세를 차례로.','Kaitlyn: 상품 상자 + 유입경로 "상품". Evelyn: 상품 자리에 "방문 상담"(썸네일·가격 없음) + 유입경로 "스토어". Mia Tan(수기): 상자 Acne Care + 등록 방식 "매장" + 유입경로 "-"',"go('HOST','res')",'HOST 예약 관리',''],
+ ['H-07','드로어의 상품 정보와 유입경로','Kaitlyn Chan → Evelyn Lee → Mia Tan 상세를 차례로.','날짜 바로 아래 "예약 상품" 섹션(실화면 읽기 상자). Kaitlyn: 썸네일·Abijou Botox·89,000원·상품 보기 + 유입경로 "상품". Evelyn: "방문 상담"만 + 유입경로 "스토어". Mia Tan(수기): Acne Care + 등록 방식 "매장" + 유입경로 "-"',"go('HOST','res')",'HOST 예약 관리',''],
+ ['H-12','예약 시간 변경 모달에 예약 상품','Kaitlyn Chan 상세 → 예약 변경 → 닫기. 그다음 Evelyn Lee 상세 → 예약 변경.','실화면과 같은 "예약 시간 변경" 모달. "기존 예약" 줄 아래 "예약 상품 Abijou Botox" 한 줄. Evelyn 은 "예약 상품 방문 상담". 취소 모달에는 요약이 없어 상품 줄을 넣지 않음',"go('HOST','res')",'HOST 예약 관리',''],
  ['H-08','수기 예약 상품 선택','방문 일시 카드의 예약 상품 칸을 누릅니다.','칸에는 처음부터 "방문 상담"이 선택돼 있고, 목록 첫 줄도 "방문 상담". 승인된 상품이 언어와 함께(예: Abijou Botox · 영어). 예약이 꺼진 Abijou スキンブースター 도 있다. 승인 대기 Lifting 은 없다',"go('HOST','manual')",'HOST 수기 예약 추가',''],
  ['H-09','수기 예약을 상품으로 등록','방문 날짜·시간, 이름 Test User, 언어, 예약 상품 Abijou Skin Booster · 영어 → 등록.','예약 관리로 돌아가 새 예약 드로어가 열린다. 상품 상자 Skin Booster · 190,000원, 등록 방식 "매장", 유입경로 "-"',"go('HOST','manual')",'HOST 수기 예약 추가',''],
  ['H-10','HOST 상품 수정은 예약 버튼을 보기만','Abijou Skin Booster 의 수정 → 상품가 아래를 봅니다.','"예약 버튼" 줄에 웹 켜짐 · 알리페이 꺼짐. 바꾸는 스위치가 없고 아래 안내 문구',"go('HOST','prod')",'HOST 상품 관리',''],
