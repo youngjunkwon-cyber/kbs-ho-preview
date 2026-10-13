@@ -2596,8 +2596,8 @@ function pManual() {
   var visitCard = byText(document, 'h5', '방문 일시').closest('.ant-card-body');
   var langItem = byText(document, '.ant-form-item', '언어', true) || $$('.ant-form-item').filter(function (f) { return /언어/.test($('label', f) ? $('label', f).textContent : ''); })[0];
   var item = langItem.cloneNode(true), lab = $('label', item); lab.innerHTML = '예약 상품<span class="ant-form-item-optional">(선택사항)</span>'; lab.className = 'ant-form-item-required-mark-optional';
-  var ps = $('.ant-select', item), pp = m.pid ? PB.prodById(m.pid) : null; setSelect(ps, pp ? pp.name + ' · ' + langLabel(pp.lang) : '', '선택 안 함'); ps.setAttribute('data-test', 'man-select');
-  ps.onclick = function () { dropdown(ps, [['', '선택 안 함']].concat(PB.manualOptions().map(function (p) { return [p.id, p.name + ' · ' + langLabel(p.lang)]; })), m.pid, function (v) { m.pid = v; PB.render(); }, ACC); };
+  var ps = $('.ant-select', item), pp = m.pid ? PB.prodById(m.pid) : null; setSelect(ps, pp ? pp.name + ' · ' + langLabel(pp.lang) : '방문 상담', '방문 상담'); ps.setAttribute('data-test', 'man-select');
+  ps.onclick = function () { dropdown(ps, [['', '방문 상담']].concat(PB.manualOptions().map(function (p) { return [p.id, p.name + ' · ' + langLabel(p.lang)]; })), m.pid, function (v) { m.pid = v; PB.render(); }, ACC); };
   var wrap = document.createElement('div'); wrap.style.marginTop = '8px'; wrap.appendChild(mark(item)); visitCard.appendChild(wrap);
   /* 이름·언어 */
   var name = $('input[placeholder*="영문명"]'); if (name) { name.value = m.name; name.oninput = function () { m.name = name.value; }; name.setAttribute('data-m', 'name'); }
