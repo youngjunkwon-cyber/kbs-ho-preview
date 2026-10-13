@@ -107,7 +107,7 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
     </div>
     <div class="scroll">
       <p class="warn" id="fileWarn">파일을 직접 열어서 왼쪽 시안을 제어할 수 없습니다. 아래 배포 주소로 다시 열어 주세요.<br><a href="https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-product-booking.html" target="_blank">https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-product-booking.html</a></p>
-      <p class="hint">기준 문서: 상품예약_PRD_v0.22_20261013 · 스테이징 실화면을 그대로 떠서 만든 시안(HOST · BO 분홍 점선 = 이번에 더하는 요소) · 기준 시각 2026-10-12 12:00 · 시드 매장 아비쥬 명동점</p>
+      <p class="hint">기준 문서: 상품예약_PRD_v0.23_20261013 · 스테이징 실화면을 그대로 떠서 만든 시안(HOST · BO 분홍 점선 = 이번에 더하는 요소) · 기준 시각 2026-10-12 12:00 · 시드 매장 아비쥬 명동점</p>
       <ul class="guide">
         <li><b>이 화면 열기</b>를 누르면 왼쪽 시안이 그 케이스 상태로 맞춰집니다(매번 시드부터 다시 시작).</li>
         <li><b>조작</b>을 번호대로 하고, <b>기대</b>의 "2:" 는 조작 2번 뒤에 보여야 할 것입니다. 번호 없는 줄은 처음 화면 또는 전체에 해당합니다.</li>
@@ -196,15 +196,15 @@ var GROUPS = [
  ]],
  ["D","고객 화면 · 예약한 뒤","PRD 5.11 · 5.4",[
   {"id":"D-01","t":"완료 · 내 예약 목록 · 상세의 상품","open":"정보 입력 화면","code":"foOpenProduct(101,'en','web');STATE.fo.agree=true;STATE.fo.entry='product';STATE.fo.screen='info';STATE.fo.date='2026-10-19';STATE.fo.time='11:00';","steps":["Book 을 누릅니다.","View my bookings 를 누릅니다.","방금 예약의 View details 를 누릅니다."],"exp":["1: 제목 \"Your booking is confirmed\" / Abijou Clinic Myeongdong(스토어가 제목)","1: 아래 Product 에 메인 화면 상품 카드(이미지 · Abijou Botox · 99,000 KRW · 스토어명 · 별점)","2: 카드 제목 \"Abijou Clinic Myeongdong (D-7)\", 바로 아래 진한 글자로 Abijou Botox","3: 같은 Product 카드, 누르면 상품 상세"]},
-  {"id":"D-02","t":"스토어 예약은 상품 자리에 방문 상담","open":"스토어로 들어와 Visit consultation 그대로, 정보 입력 화면","code":"foOpenStore('en','web');STATE.fo.agree=true;STATE.fo.entry='store';STATE.fo.screen='info';STATE.fo.date='2026-10-19';STATE.fo.time='11:00';","steps":["Book 을 누릅니다.","위쪽 입점사 (HOST) → 예약 관리."],"exp":["1: Product 영역에 \"Visit consultation\" 카드(가격 없음, 스토어 대표 이미지)","2: 목록 맨 위(10-19 11:00) 예약 상품 칸 \"방문 상담\""]},
+  {"id":"D-02","t":"스토어 예약은 상품 자리에 방문 상담","open":"스토어로 들어와 Visit consultation 그대로, 정보 입력 화면","code":"foOpenStore('en','web');STATE.fo.agree=true;STATE.fo.entry='store';STATE.fo.screen='info';STATE.fo.date='2026-10-19';STATE.fo.time='11:00';","steps":["Book 을 누릅니다.","위쪽 입점사 (HOST) → 예약 관리."],"exp":["1: Product 영역에 \"Visit consultation\" 카드(가격 없음, 스토어 대표 이미지)","2: 목록 맨 위(10-19 11:00) 고객 칸 둘째 줄 \"방문 상담\""]},
   {"id":"D-03","t":"고객 예약 상세는 예약 때 저장한 값","open":"Abijou Botox 를 숨긴 뒤 고객 예약 상세","code":"setProd(101,{hidden:true});STATE.surf='FO';STATE.fo.screen='mydetail';STATE.fo.myNo=1;render()","steps":["없음. 화면만 확인합니다.","Product 카드를 누릅니다."],"exp":["1: Product 카드 가격 89,000 KRW(지금 상품가는 99,000)","2: 상품이 숨김이라 상품 상세로 가지 않는다"]}
  ]],
  ["E","입점사 (HOST)","PRD 5.7 · 5.9 · 5.12",[
   {"id":"E-01","t":"대시보드 예약 현황 카드에 상품명","open":"HOST 대시보드","code":"go('HOST','dash')","steps":["없음. 화면만 확인합니다."],"exp":["카드 5장 모두 날짜 바로 아래에 이름보다 큰 글자로 상품명, 이름은 그 아래","상품 예약 4장은 상품명, Evelyn Lee(스토어 예약)는 \"방문 상담\""]},
   {"id":"E-02","t":"대시보드 통계: 방문 2칸 고정, 나머지는 값이 있을 때만","open":"HOST 대시보드","code":"go('HOST','dash')","steps":["이번 주를 봅니다.","지난주를 누릅니다."],"exp":["1: 스토어 방문 · 상품 방문 2칸만(나머지 0건이라 숨김), 2칸이 줄을 꽉 채움","2: 스토어 방문 · 상품 방문 · 예약 확정 5건 · 방문 완료 2건 4칸(메신저 · 채팅 문의는 0건이라 숨김)"]},
   {"id":"E-03","t":"처리 필요 패널 카드에도 상품명","open":"HOST 예약 관리","code":"go('HOST','res')","steps":["없음. 화면만 확인합니다."],"exp":["오른쪽 처리 필요 카드도 날짜 · 시간 바로 아래(고객명 위)에 고객명보다 큰 글자로 상품명","스토어 예약은 \"방문 상담\""]},
-  {"id":"E-04","t":"예약 목록 예약 상품 칼럼","open":"HOST 예약 관리","code":"go('HOST','res')","steps":["없음. 화면만 확인합니다."],"exp":["고객 (여권명) 다음에 \"예약 상품\"","상품이 없는 예약은 \"방문 상담\"(빈칸 · \"-\" 없음)","칼럼이 하나 늘어 표가 가로로 스크롤된다. 1440 화면에서 연락 · 예약상태 칸은 스크롤해야 보인다(실화면 표 그대로 둔 결과, 정할 것)"]},
-  {"id":"E-05","t":"예약 구분 필터","open":"HOST 예약 관리","code":"go('HOST','res')","steps":["\"예약 구분 전체\" 칸 → 상품 예약.","스토어 예약."],"exp":["1: 9건, 예약 상품 칸이 모두 상품명","2: 4건, 모두 \"방문 상담\""]},
+  {"id":"E-04","t":"예약 목록 예약 상품 칼럼","open":"HOST 예약 관리","code":"go('HOST','res')","steps":["없음. 화면만 확인합니다."],"exp":["새 칼럼은 없다. 고객 (여권명) 칸 둘째 줄에 작은 회색 글자로 상품명(방문일시 칸 \"접수 …\" 줄과 같은 모양)","상품이 없는 예약은 \"방문 상담\"(빈칸 · \"-\" 없음)","칼럼 수가 실화면과 같아 예약상태 · 관리까지 보인다. 긴 상품명은 끝이 \"…\"(마우스를 올리면 전체 이름)"]},
+  {"id":"E-05","t":"예약 구분 필터","open":"HOST 예약 관리","code":"go('HOST','res')","steps":["\"예약 구분 전체\" 칸 → 상품 예약.","스토어 예약."],"exp":["1: 9건, 고객 칸 둘째 줄이 모두 상품명","2: 4건, 모두 \"방문 상담\""]},
   {"id":"E-06","t":"상품명으로 검색","open":"HOST 예약 관리","code":"go('HOST','res')","steps":["검색칸에 booster 입력 → 검색."],"exp":["Hui Ping Ho 한 건(Abijou Skin Booster)"]},
   {"id":"E-07","t":"드로어의 예약 상품 섹션과 유입경로","open":"HOST 예약 관리","code":"go('HOST','res')","steps":["Kaitlyn Chan 상세를 엽니다.","Evelyn Lee 상세를 엽니다.","Mia Tan 상세를 엽니다."],"exp":["날짜 바로 아래 \"예약 상품\" 섹션(다른 섹션과 같은 회색 읽기 상자, 썸네일 없음)","1: Abijou Botox · 89,000원 · 상품 보기 + 유입경로 \"상품\"","2: \"방문 상담\"만 + 유입경로 \"스토어\"","3: Acne Care + 등록 방식 \"매장\" + 유입경로 \"-\"(수기)"]},
   {"id":"E-08","t":"예약 후 가격이 바뀌어도 예약 때 가격","open":"HOST 예약 상세, Kaitlyn Chan","code":"openHostBooking(1)","steps":["없음. 화면만 확인합니다."],"exp":["\"예약 상품\" 섹션에 Abijou Botox · 89,000원(지금 상품가는 99,000원)"]},
@@ -217,7 +217,7 @@ var GROUPS = [
   {"id":"E-15","t":"상품 예약 사용이 꺼지면 HOST 에도 꺼짐으로 보인다","open":"스토어의 상품 예약 사용 OFF, HOST Skin Booster 수정","code":"setStore({prodBook:false});STATE.host.editPid=103;go('HOST','pedit')","steps":["상품가 아래를 봅니다."],"exp":["\"예약 버튼\" 웹 꺼짐 · 알리페이 꺼짐(상품은 개별 설정 ON 이지만 스토어 스위치가 꺼짐)"]}
  ]],
  ["F","운영사 (BO) · 설정과 예약 관리","PRD 5.3 · 5.9",[
-  {"id":"F-01","t":"예약 관리 칼럼 · 필터 · 드로어","open":"BO 예약 관리","code":"go('BO','res')","steps":["예약 구분 칸을 바꿔 봅니다.","아무 예약이나 상세를 엽니다."],"exp":["1: \"예약 상품\" 칼럼과 \"예약 구분\" 필터가 HOST 와 같게 동작. 1440 화면에서 상태 칸은 가로 스크롤해야 보인다(HOST 와 같은 결과, 정할 것)","2: \"예약 상품\" 섹션과 유입경로"]},
+  {"id":"F-01","t":"예약 관리 칼럼 · 필터 · 드로어","open":"BO 예약 관리","code":"go('BO','res')","steps":["예약 구분 칸을 바꿔 봅니다.","아무 예약이나 상세를 엽니다."],"exp":["1: 고객(여권명) 칸 둘째 줄 상품명과 \"예약 구분\" 필터가 HOST 와 같게 동작. 새 칼럼이 없어 상태 · 관리까지 한 화면에 보인다","2: \"예약 상품\" 섹션과 유입경로"]},
   {"id":"F-02","t":"관리자설정 버튼 설정에 예약 줄","open":"BO 상품정보 수정 · 관리자설정, スキンブースター(개별 설정)","code":"STATE.bo.editPid=104;go('BO','pedit')","steps":["예약 ON 을 누릅니다.","고객 화면 · 일본어 · 웹에서 Abijou スキンブースター 상세를 봅니다."],"exp":["메신저 설정 다음에 \"예약 ON / OFF\"(처음 OFF)","2: Book now 가 생긴다"]},
   {"id":"F-03","t":"기본 설정이면 예약 줄도 잠긴다","open":"BO 상품정보 수정, Abijou Botox(기본 설정)","code":"STATE.bo.editPid=101;go('BO','pedit')","steps":["없음. 화면만 확인합니다.","개별 설정을 누릅니다."],"exp":["1: 예약 ON(스토어 값)이 다른 버튼처럼 흐리게 잠김","2: 잠금이 풀린다"]},
   {"id":"F-04","t":"상품 예약 사용을 끄면 상품 예약이 전부 닫힌다","open":"BO 스토어 정보 수정. 배포 때는 모든 스토어가 OFF로 시작(시안 매장은 켜 둔 상태)","code":"go('BO','store')","steps":["\"예약\" 옆 \"상품 예약 사용\" OFF 를 누릅니다.","고객 화면 스토어 페이지 → Book now.","Abijou Botox 상세를 엽니다.","운영사 상품정보관리 → Skin Booster 수정.","운영사 예약 관리."],"exp":["처음에는 \"예약\" 옆 \"상품 예약 사용\"이 ON(시안 매장은 켜 둔 상태)","2: 상품 영역이 없다. 스토어 예약은 그대로","3: Book now 가 없다","4: 예약 줄 OFF · 잠김 + \"스토어의 상품 예약 사용이 OFF인 경우 활성화할 수 없습니다.\"","5: 이미 잡힌 상품 예약은 그대로 있다"],"note":"배포 때는 모든 스토어가 OFF 로 시작하고, 새 스토어도 OFF 가 기본"},

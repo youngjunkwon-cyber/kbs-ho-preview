@@ -2316,6 +2316,8 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 .pb-prodbox-t b{font-weight:700}
 .pb-prodbox .pb-prod-l{margin:0;flex:none}
 .pb-prodline.pb-hiB{font-size:15px !important;font-weight:700 !important;color:#212121 !important;margin-top:2px}
+/* 예약 목록 고객 칸 둘째 줄(상품명): 표가 넘쳐 예약상태 칸이 가려지지 않게 한 줄 말줄임(전체 이름은 마우스 올리면) */
+[data-test=col-prod]{display:inline-block;max-width:116px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:top}
 </style></head>
 <body><div id="app"></div>
 <template id="T_h_dash">
@@ -2484,6 +2486,13 @@ function timeModal(pre, b, dt) {
 }
 
 
+/* 예약 목록 고객 칸 둘째 줄 = 예약 상품(없으면 방문 상담). 방문일시 칸의 "접수 …" 둘째 줄과 같은 부품을 복제해 씀 */
+function prodLine(cell, text, secTpl, testId) {
+  var w = cell.firstElementChild && cell.firstElementChild.tagName === 'DIV' ? cell.firstElementChild : null;
+  if (!w) { w = document.createElement('div'); while (cell.firstChild) w.appendChild(cell.firstChild); cell.appendChild(w); }
+  var ln = document.createElement('div'), s = secTpl.cloneNode(true); s.textContent = text; s.title = text; s.setAttribute('data-test', testId); ln.appendChild(mark(s)); w.appendChild(ln);
+}
+
 /* ===== HOST: 스테이징 호스트 실화면 스냅샷 위에 상품 예약 요소를 끼운다 ===== */
 var HV = { dash: 'h_dash', res: 'h_res', manual: 'h_new', prod: 'h_prod', pstat: 'h_pstat', pedit: 'h_pedit' };
 var ACC = '#e8537a';
@@ -2572,17 +2581,14 @@ function pRes() {
   var sb = byText(document, 'form button', '검색'); if (sb) sb.onclick = function () { h.q = h.qd; PB.render(); };
   /* 표 */
   var rows = filtered();
-  var thr = $('thead tr'), th1 = thr.children[1], nth = th1.cloneNode(true); nth.textContent = '예약 상품'; th1.after(mark(nth));
-  var col = $('colgroup'); if (col && col.children[1]) col.children[1].after(col.children[1].cloneNode(true));
-  var mr = $('tr.ant-table-measure-row'); if (mr) mr.children[1].after(mr.children[1].cloneNode(true));
   var tb = $('tbody'), rt = $('tr.ant-table-row', tb).cloneNode(true); $$('tr.ant-table-row', tb).forEach(function (r) { r.remove(); });
   rows.forEach(function (b) {
     var r = rt.cloneNode(true), td = r.children;
     var sp = $$('span', td[0]); sp[0].textContent = b.visit; sp[1].textContent = '접수 ' + b.recv;
     leafSet(td[1], b.name);
-    var pc = td[1].cloneNode(true); leafSet(pc, b.snap ? b.snap.name : '방문 상담'); pc.setAttribute('data-test', 'col-prod'); td[1].after(mark(pc));
-    td = r.children; td[3].textContent = b.rno; td[4].textContent = b.nation; td[5].textContent = langLabel(b.lang); td[6].textContent = b.contact; td[7].textContent = b.status;
-    $('button', td[8]).onclick = function () { h.open = b.no; PB.render(); };
+    prodLine(td[1], b.snap ? b.snap.name : '방문 상담', sp[1], 'col-prod');
+    td[2].textContent = b.rno; td[3].textContent = b.nation; td[4].textContent = langLabel(b.lang); td[5].textContent = b.contact; td[6].textContent = b.status;
+    $('button', td[7]).onclick = function () { h.open = b.no; PB.render(); };
     tb.appendChild(r);
   });
   if (!rows.length) { var er = document.createElement('tr'); er.innerHTML = '<td colspan="9" style="text-align:center;padding:40px;color:#999">데이터 없음</td>'; tb.appendChild(er); }

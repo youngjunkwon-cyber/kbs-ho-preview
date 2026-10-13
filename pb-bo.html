@@ -2906,6 +2906,13 @@ function timeModal(pre, b, dt) {
 }
 
 
+/* 예약 목록 고객 칸 둘째 줄 = 예약 상품(없으면 방문 상담). 방문일시 칸의 "접수 …" 둘째 줄과 같은 부품을 복제해 씀 */
+function prodLine(cell, text, secTpl, testId) {
+  var w = cell.firstElementChild && cell.firstElementChild.tagName === 'DIV' ? cell.firstElementChild : null;
+  if (!w) { w = document.createElement('div'); while (cell.firstChild) w.appendChild(cell.firstChild); cell.appendChild(w); }
+  var ln = document.createElement('div'), s = secTpl.cloneNode(true); s.textContent = text; s.title = text; s.setAttribute('data-test', testId); ln.appendChild(mark(s)); w.appendChild(ln);
+}
+
 /* ===== BO: 스테이징 어드민 실화면 스냅샷 위에 상품 예약 요소를 끼운다 ===== */
 var BV = { res: 'b_res', prod: 'b_prod', pedit: 'b_pedit', col: 'b_col', store: 'b_store', sinq: 'b_sinq_pb' };
 var ACC = '#1677ff';
@@ -2973,17 +2980,17 @@ function pRes() {
   if (inp) { inp.placeholder = '여권명, 연락처, 예약번호, 요청사항, 매장메모, 상품명'; inp.value = b.qd; inp.style.minWidth = '330px'; mark(inp); inp.oninput = function () { b.qd = inp.value; }; inp.onkeydown = function (e) { if (e.key === 'Enter') { b.q = b.qd; PB.render(); } }; }
   var sb = byText(document, 'form button', '검색'); if (sb) sb.onclick = function () { b.q = b.qd; PB.render(); };
   /* 표 */
-  var rows = filtered(), pi = addCol('고객(여권명)', '예약 상품');
+  var rows = filtered();
   rowsFrom(function (tb, rt) {
     rows.forEach(function (x) {
       var r = rt.cloneNode(true), td = r.children;
       var s0 = $$('.ant-typography', td[0]); leafSet(s0[0], PB.DB.store.name); s0[1].textContent = PB.DB.store.cat;
       var s1 = $$('.ant-typography', td[1]); s1[0].textContent = x.visit; s1[1].textContent = '접수 ' + x.recv;
       leafSet(td[2], x.name);
-      var pc = td[2].cloneNode(true); leafSet(pc, x.snap ? x.snap.name : '방문 상담'); $$('strong', pc).forEach(function (s) { s.style.fontWeight = '400'; }); pc.setAttribute('data-test', 'bcol-prod'); td[2].after(mark(pc));
-      td = r.children; td[4].textContent = x.rno; td[5].textContent = x.nation; td[6].textContent = langLabel(x.lang);
-      var bt = $('.ant-badge-status-text', td[7]); if (bt) { bt.textContent = x.status; bt.style.color = DOT[x.status]; } var dot = $('.ant-badge-status-dot', td[7]); if (dot) { dot.style.color = DOT[x.status]; dot.style.background = DOT[x.status]; }
-      $('button', td[8]).onclick = function () { b.open = x.no; PB.render(); };
+      prodLine(td[2], x.snap ? x.snap.name : '방문 상담', s1[1], 'bcol-prod');
+      td = r.children; td[3].textContent = x.rno; td[4].textContent = x.nation; td[5].textContent = langLabel(x.lang);
+      var bt = $('.ant-badge-status-text', td[6]); if (bt) { bt.textContent = x.status; bt.style.color = DOT[x.status]; } var dot = $('.ant-badge-status-dot', td[6]); if (dot) { dot.style.color = DOT[x.status]; dot.style.background = DOT[x.status]; }
+      $('button', td[7]).onclick = function () { b.open = x.no; PB.render(); };
       tb.appendChild(r);
     });
   });
