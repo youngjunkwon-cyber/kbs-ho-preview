@@ -771,7 +771,6 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 
 /* 드로어 예약 상품 섹션: 실화면 읽기 전용 상자 안에 썸네일·상품명·가격·상품 보기 */
 .pb-prodbox{display:flex !important;align-items:center;gap:10px}
-.pb-prodbox .pb-thumb{width:36px;height:36px;border-radius:6px;flex:none;display:block}
 .pb-prodbox-t{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
 .pb-prodbox-t b{font-weight:700}
 .pb-prodbox .pb-prod-l{margin:0;flex:none}
@@ -946,12 +945,12 @@ function fillDrawer(pre, b, qrCls) {
   var dt = function (v) { if (!v) return ''; if (!bo) return v.slice(0, 16); var d = v.slice(0, 10); return d + ' (' + PB.wdKo(d) + ') ' + v.slice(11, 16); };
   $('h2', cont).textContent = dt(b.visit);
   var cr = $('[class*=changeRequestBox]', cont); if (cr) $('strong', cr).textContent = dt(b.chg);
-  /* 예약 상품: 드로어 실화면 섹션 부품(h3 + 읽기 전용 상자)을 복제해 날짜 바로 아래에 둔다. 상품 없는 예약 = 방문 상담 */
+  /* 예약 상품: 드로어 실화면 섹션 부품(h3 + 읽기 전용 상자, 썸네일 없음)을 복제해 날짜 바로 아래에 둔다. 상품 없는 예약 = 방문 상담 */
   var sec0 = $$('section', cont).filter(function (s) { return $('[class*=readonlyBox]', s); })[0], ps = sec0.cloneNode(true);
   $('h3', ps).textContent = '예약 상품'; ps.setAttribute('data-test', 'prod-block'); var box = $('[class*=readonlyBox]', ps); box.classList.add('pb-prodbox');
   if (!b.snap) { ps.setAttribute('data-kind', 'consult'); box.textContent = '방문 상담'; }
   else { var lp = PB.prodById(b.prodId), live = lp && PB.prodVisible(lp, b.snap.lang);
-    box.innerHTML = '<span class="pb-thumb" style="background:' + thumbColor(b.prodId) + '"></span><span class="pb-prodbox-t"><b>' + esc(b.snap.name) + '</b><span>' + PB.won(b.snap.price) + '원</span></span>' + (live ? '<a class="pb-prod-l" href="#">상품 보기</a>' : ''); }
+    box.innerHTML = '<span class="pb-prodbox-t"><b>' + esc(b.snap.name) + '</b><span>' + PB.won(b.snap.price) + '원</span></span>' + (live ? '<a class="pb-prod-l" href="#">상품 보기</a>' : ''); }
   (cr || $('h2', cont)).after(mark(ps));
   var qr = b.contact === 'WeChat' || b.contact === 'LINE';
   var V = { '매장': PB.DB.store.name, '여권명': b.name, '국적': b.nation, '언어': langLabel(b.lang), '전화번호': b.phone, '예약 번호': b.rno, '접수 시각': b.recv, '등록 방식': b.owner,
@@ -1259,7 +1258,7 @@ function fillProdSlots(w) {
   /* 예약 완료·내 예약 상세 Product: FO 메인 상품 카드(ProductCard: 이미지·상품명·가격·스토어명·별점) 실화면 부품 그대로 */
   $$('.pb-prodslot', w).forEach(function (slot) {
     var b = bookingById(+slot.getAttribute('data-bno')), card = tpl('fc_card').firstElementChild, a = card.querySelector('a'), p = b.snap ? (PB.prodById(b.prodId) || {}) : null;
-    var hd = card.querySelector('[class*=__header]'), im = card.querySelector('img'); im.style.aspectRatio = '1 / 1'; im.style.objectFit = 'cover'; if (b.snap) { im.removeAttribute('src'); im.style.visibility = 'hidden'; hd.style.background = thumbColor(b.prodId); } else im.src = 'https://image.kbstations.com/2025/06/25/e3de94ab-8ed5-4ac8-8f32-af57daafc04b'; /* 방문 상담 = 스토어 대표 이미지 */
+    var hd = card.querySelector('[class*=__header]'), im = card.querySelector('img'); im.style.aspectRatio = '180 / 121'; im.style.objectFit = 'cover'; /* 실측: 카드 180x223, 이미지 180x121 (380px 폭 기준) */ if (b.snap) { im.removeAttribute('src'); im.style.visibility = 'hidden'; hd.style.background = thumbColor(b.prodId); } else im.src = 'https://image.kbstations.com/2025/06/25/e3de94ab-8ed5-4ac8-8f32-af57daafc04b'; /* 방문 상담 = 스토어 대표 이미지 */
     card.querySelector('h3').textContent = b.snap ? b.snap.name : 'Visit consultation';
     var pr = card.querySelector('[class*=__price]'); if (b.snap) { var sps = pr.querySelectorAll('span'); sps[0].textContent = PB.won(b.snap.price); pr.setAttribute('aria-label', 'price ' + PB.won(b.snap.price) + ' KRW'); } else pr.remove();
     card.querySelector('[class*=__storeName]').textContent = PB.DB.store.nameEn;
