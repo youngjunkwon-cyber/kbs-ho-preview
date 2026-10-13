@@ -2905,6 +2905,7 @@ function timeModal(pre, b, dt) {
   var wrap = $('.ant-modal-wrap', root); if (wrap) wrap.onclick = function (e) { if (e.target === wrap) close(); };
 }
 
+
 /* ===== BO: 스테이징 어드민 실화면 스냅샷 위에 상품 예약 요소를 끼운다 ===== */
 var BV = { res: 'b_res', prod: 'b_prod', pedit: 'b_pedit', col: 'b_col', store: 'b_store', sinq: 'b_sinq_pb' };
 var ACC = '#1677ff';
@@ -2980,7 +2981,6 @@ function pRes() {
       var s1 = $$('.ant-typography', td[1]); s1[0].textContent = x.visit; s1[1].textContent = '접수 ' + x.recv;
       leafSet(td[2], x.name);
       var pc = td[2].cloneNode(true); leafSet(pc, x.snap ? x.snap.name : '방문 상담'); $$('strong', pc).forEach(function (s) { s.style.fontWeight = '400'; }); pc.setAttribute('data-test', 'bcol-prod'); td[2].after(mark(pc));
-      if (x.owner === '매장') { var tg = document.createElement('span'); tg.className = 'ant-tag ant-tag-filled css-19u5a7b css-var-root'; tg.textContent = '수기'; var w = td[2].firstElementChild; w.appendChild(document.createTextNode(' ')); w.appendChild(tg); }
       td = r.children; td[4].textContent = x.rno; td[5].textContent = x.nation; td[6].textContent = langLabel(x.lang);
       var bt = $('.ant-badge-status-text', td[7]); if (bt) { bt.textContent = x.status; bt.style.color = DOT[x.status]; } var dot = $('.ant-badge-status-dot', td[7]); if (dot) { dot.style.color = DOT[x.status]; dot.style.background = DOT[x.status]; }
       $('button', td[8]).onclick = function () { b.open = x.no; PB.render(); };
@@ -3127,7 +3127,7 @@ function pSinq() {
   $$('#periodType label.ant-radio-button-wrapper').forEach(function (l) { var k = l.textContent.trim(), on = b.sper === k; l.classList.toggle('ant-radio-button-wrapper-checked', on); $('.ant-radio-button', l).classList.toggle('ant-radio-button-checked', on); $('input', l).checked = on; if (k === '직접 선택') return; l.setAttribute('data-test', 'sinq-per-' + k); l.onclick = function (e) { e.preventDefault(); b.sper = k; PB.render(); }; });
   var rg = sinqRange(b.sper); $$('.ant-picker input').forEach(function (i, n) { i.value = rg[n] || ''; });
   var tl = $$('span').filter(function (e) { return e.textContent === '전체 문의 건수'; })[0]; if (tl) { tl.nextElementSibling.textContent = tot; tl.nextElementSibling.setAttribute('data-test', 'sinq-all'); }
-  $$('[class*=chartArea], .ant-card-body > [data-chart-source-type]').forEach(function (c) { if (c.closest('[class*=donutChart]')) return; c.innerHTML = '<div class="pb-chartnote">그래프는 시안에서 그리지 않습니다. 아래 카드·표와 같은 기준으로 셉니다.</div>'; });
+  $$('[class*=chartArea], .ant-card-body > [data-chart-source-type]').forEach(function (c) { if (c.closest('[class*=donutChart]')) return; c.style.height = (/chartArea/.test(c.className) ? 480 : 340) + 'px'; /* 라이브 실측 그래프 높이 */ c.innerHTML = '<div class="pb-chartnote">그래프는 시안에서 그리지 않습니다. 아래 카드·표와 같은 기준으로 셉니다.</div>'; });
   /* TOP 10 */
   var ti = $('[class*=topStoreItem]'); if (ti) { $('[class*=topStoreName]', ti).textContent = PB.DB.store.name; $('[class*=topStoreCount]', ti).textContent = tot; }
   /* 카드 */

@@ -92,7 +92,7 @@ function freshDB(){var P=seedProducts();DB={store:seedStore(),prods:P,books:seed
 function freshState(){return {surf:'HOST',mark:true,
  fo:{lang:'en',ch:'web',screen:'store',entry:'store',pid:null,sel:'',date:addDays(TODAY,1),time:'',err:null,lastNo:null,myNo:null,tab:'upcoming'},
  host:{view:'dash',dtab:'전체',st:'',kind:'',owner:'',q:'',qd:'',ptab:'전체',open:null,editPid:null,man:{date:'',time:'',name:'',lang:'',pid:''},statPer:'전체'},
- bo:{view:'res',st:'',kind:'',owner:'',q:'',qd:'',open:null,lang:'',editPid:null,col:null,offModal:false,sper:'이번달'}};}
+ bo:{view:'res',st:'',kind:'',owner:'',q:'',qd:'',open:null,lang:'',editPid:null,col:null,offModal:false,sper:'오늘'}};}
 
 /* ===== 판정 (순수 함수) ===== */
 function prodById(id){return DB.prods.filter(function(p){return p.id===+id;})[0]||null;}

@@ -2483,6 +2483,7 @@ function timeModal(pre, b, dt) {
   var wrap = $('.ant-modal-wrap', root); if (wrap) wrap.onclick = function (e) { if (e.target === wrap) close(); };
 }
 
+
 /* ===== HOST: 스테이징 호스트 실화면 스냅샷 위에 상품 예약 요소를 끼운다 ===== */
 var HV = { dash: 'h_dash', res: 'h_res', manual: 'h_new', prod: 'h_prod', pstat: 'h_pstat', pedit: 'h_pedit' };
 var ACC = '#e8537a';
@@ -2629,7 +2630,7 @@ function pManual() {
   /* 방문 날짜·시간 */
   var dateIn = $('.ant-picker input'); dateIn.value = m.date; dateIn.readOnly = true;
   dateIn.closest('.ant-picker').onclick = function (e) { var o = []; for (var i = 1; i <= 14; i++) { var d = PB.addDays(PB.TODAY, i); o.push([d, d + ' (' + PB.wdKo(d) + ')']); } dropdown(e.currentTarget, o, m.date, function (v) { m.date = v; PB.render(); }, ACC); };
-  var timeSel = $$('.ant-select')[0]; setSelect(timeSel, m.time, '방문 시간을 선택해주세요'); timeSel.classList.remove('ant-select-disabled');
+  var timeSel = $$('.ant-select')[0]; setSelect(timeSel, m.time, '방문 시간을 선택해주세요'); timeSel.classList.toggle('ant-select-disabled', !m.date); /* 실화면: 날짜 고르기 전엔 시간 칸 비활성 */
   timeSel.onclick = function () { if (!m.date) { toast('방문 날짜를 먼저 선택해주세요'); return; } dropdown(timeSel, PB.TIMES.map(function (t) { return [t, t]; }), m.time, function (v) { m.time = v; PB.render(); }, ACC); };
   /* 예약 상품 (신설): 방문 일시 카드 안에 한 줄 */
   var visitCard = byText(document, 'h5', '방문 일시').closest('.ant-card-body');
