@@ -96,7 +96,7 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
     </div>
     <div class="scroll">
       <p class="warn" id="fileWarn">파일을 직접 열어서 왼쪽 시안을 제어할 수 없습니다. 아래 배포 주소로 다시 열어 주세요.<br><a href="https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-product-booking.html" target="_blank">https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-product-booking.html</a></p>
-      <p class="hint">기준 문서: 상품예약_PRD_v0.19_20261013<br>
+      <p class="hint">기준 문서: 상품예약_PRD_v0.20_20261013<br>
       <b>화면은 스테이징 실화면을 그대로 떠서 만들었습니다.</b> HOST·BO·FO의 셸·표·드로어·폼은 실제 HTML과 CSS이고, 분홍 점선이 이번에 더하는 요소입니다(HOST·BO 만 표시, 고객 화면은 표시하지 않음. 맨 위 검은 줄에서 표시를 끌 수 있음). 데이터는 스테이징 아비쥬 명동점 기준 시드입니다.<br>
       케이스마다 세 줄을 봅니다. <b>열면</b>: "이 화면 열기"를 누르면 왼쪽 시안이 그 상태로 맞춰집니다. <b>조작</b>: 그다음 직접 할 일입니다. <b>기대</b>: 화면이 이와 같으면 통과입니다.<br>
       맨 위 검은 줄에서 고객 화면 / 입점사 / 운영사를 오가고, 고객 화면일 때는 언어와 채널(웹 / 알리페이)을 바꿉니다. 기준 시각은 2026-10-12 12:00 입니다. 기록은 이 브라우저에만 남으니 끝나면 "결과 복사"로 보내 주세요.</p>
@@ -185,7 +185,7 @@ var GROUPS = [
  ['H-04','예약 목록 예약 상품 칼럼','없음. 화면만 확인합니다.','고객 (여권명) 다음에 "예약 상품". 상품이 없는 예약은 "방문 상담"(빈칸·"-" 없음). 칼럼이 늘어 표가 가로로 스크롤된다',"go('HOST','res')",'HOST 예약 관리',''],
  ['H-05','예약 구분 필터','"예약 구분 전체" 칸 → 상품 예약 → 스토어 예약.','상품 예약 9건(예약 상품 칸이 모두 상품명), 스토어 예약 4건(모두 "방문 상담")',"go('HOST','res')",'HOST 예약 관리',''],
  ['H-06','상품명으로 검색','검색칸에 booster 입력 → 검색.','Hui Ping Ho 한 건(Abijou Skin Booster)',"go('HOST','res')",'HOST 예약 관리',''],
- ['H-07','드로어의 상품 정보와 유입경로','Kaitlyn Chan → Evelyn Lee → Mia Tan 상세를 차례로.','날짜 바로 아래 "예약 상품" 섹션(실화면 읽기 상자). Kaitlyn: 썸네일·Abijou Botox·89,000원·상품 보기 + 유입경로 "상품". Evelyn: "방문 상담"만 + 유입경로 "스토어". Mia Tan(수기): Acne Care + 등록 방식 "매장" + 유입경로 "-"',"go('HOST','res')",'HOST 예약 관리',''],
+ ['H-07','드로어의 상품 정보와 유입경로','Kaitlyn Chan → Evelyn Lee → Mia Tan 상세를 차례로.','날짜 바로 아래 "예약 상품" 섹션(실화면 읽기 상자). Kaitlyn: Abijou Botox·89,000원·상품 보기(썸네일 없음) + 유입경로 "상품". Evelyn: "방문 상담"만 + 유입경로 "스토어". Mia Tan(수기): Acne Care + 등록 방식 "매장" + 유입경로 "-"',"go('HOST','res')",'HOST 예약 관리',''],
  ['H-12','예약 시간 변경 모달에 예약 상품','Kaitlyn Chan 상세 → 예약 변경 → 닫기. 그다음 Evelyn Lee 상세 → 예약 변경.','실화면과 같은 "예약 시간 변경" 모달. "기존 예약" 줄 아래 "예약 상품 Abijou Botox" 한 줄. Evelyn 은 "예약 상품 방문 상담". 취소 모달에는 요약이 없어 상품 줄을 넣지 않음',"go('HOST','res')",'HOST 예약 관리',''],
  ['H-08','수기 예약 상품 선택','방문 일시 카드의 예약 상품 칸을 누릅니다.','칸에는 처음부터 "방문 상담"이 선택돼 있고, 목록 첫 줄도 "방문 상담". 승인된 상품이 언어와 함께(예: Abijou Botox · 영어). 예약이 꺼진 Abijou スキンブースター 도 있다. 승인 대기 Lifting 은 없다',"go('HOST','manual')",'HOST 수기 예약 추가',''],
  ['H-09','수기 예약을 상품으로 등록','방문 날짜·시간, 이름 Test User, 언어, 예약 상품 Abijou Skin Booster · 영어 → 등록.','예약 관리로 돌아가 새 예약 드로어가 열린다. "예약 상품" 섹션 Skin Booster · 190,000원, 등록 방식 "매장", 유입경로 "-"',"go('HOST','manual')",'HOST 수기 예약 추가',''],

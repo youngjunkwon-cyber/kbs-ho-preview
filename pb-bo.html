@@ -2527,7 +2527,6 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 
 /* 드로어 예약 상품 섹션: 실화면 읽기 전용 상자 안에 썸네일·상품명·가격·상품 보기 */
 .pb-prodbox{display:flex !important;align-items:center;gap:10px}
-.pb-prodbox .pb-thumb{width:36px;height:36px;border-radius:6px;flex:none;display:block}
 .pb-prodbox-t{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
 .pb-prodbox-t b{font-weight:700}
 .pb-prodbox .pb-prod-l{margin:0;flex:none}
@@ -2765,12 +2764,12 @@ function fillDrawer(pre, b, qrCls) {
   var dt = function (v) { if (!v) return ''; if (!bo) return v.slice(0, 16); var d = v.slice(0, 10); return d + ' (' + PB.wdKo(d) + ') ' + v.slice(11, 16); };
   $('h2', cont).textContent = dt(b.visit);
   var cr = $('[class*=changeRequestBox]', cont); if (cr) $('strong', cr).textContent = dt(b.chg);
-  /* 예약 상품: 드로어 실화면 섹션 부품(h3 + 읽기 전용 상자)을 복제해 날짜 바로 아래에 둔다. 상품 없는 예약 = 방문 상담 */
+  /* 예약 상품: 드로어 실화면 섹션 부품(h3 + 읽기 전용 상자, 썸네일 없음)을 복제해 날짜 바로 아래에 둔다. 상품 없는 예약 = 방문 상담 */
   var sec0 = $$('section', cont).filter(function (s) { return $('[class*=readonlyBox]', s); })[0], ps = sec0.cloneNode(true);
   $('h3', ps).textContent = '예약 상품'; ps.setAttribute('data-test', 'prod-block'); var box = $('[class*=readonlyBox]', ps); box.classList.add('pb-prodbox');
   if (!b.snap) { ps.setAttribute('data-kind', 'consult'); box.textContent = '방문 상담'; }
   else { var lp = PB.prodById(b.prodId), live = lp && PB.prodVisible(lp, b.snap.lang);
-    box.innerHTML = '<span class="pb-thumb" style="background:' + thumbColor(b.prodId) + '"></span><span class="pb-prodbox-t"><b>' + esc(b.snap.name) + '</b><span>' + PB.won(b.snap.price) + '원</span></span>' + (live ? '<a class="pb-prod-l" href="#">상품 보기</a>' : ''); }
+    box.innerHTML = '<span class="pb-prodbox-t"><b>' + esc(b.snap.name) + '</b><span>' + PB.won(b.snap.price) + '원</span></span>' + (live ? '<a class="pb-prod-l" href="#">상품 보기</a>' : ''); }
   (cr || $('h2', cont)).after(mark(ps));
   var qr = b.contact === 'WeChat' || b.contact === 'LINE';
   var V = { '매장': PB.DB.store.name, '여권명': b.name, '국적': b.nation, '언어': langLabel(b.lang), '전화번호': b.phone, '예약 번호': b.rno, '접수 시각': b.recv, '등록 방식': b.owner,
