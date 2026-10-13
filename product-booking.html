@@ -41,7 +41,7 @@ function wdKo(d){return ['일','월','화','수','목','금','토'][new Date(d+'
 function won(n){return n.toLocaleString('en-US');}
 
 /* ===== 시드 (스테이징 아비쥬 명동점 기준) ===== */
-function seedStore(){return {id:9,name:'아비쥬 명동점',nameEn:'Abijou Clinic Myeongdong',code:'ABJ',cat:'피부과',bookingSetting:true,btn:{web:true,ali:false},cap:1};}
+function seedStore(){return {id:9,name:'아비쥬 명동점',nameEn:'Abijou Clinic Myeongdong',code:'ABJ',cat:'피부과',bookingSetting:true,prodBook:true,btn:{web:true,ali:false},cap:1};}
 function seedProducts(){
  // [id, lang, name, price, status, active, hidden, deleted, mode, bookWeb, bookAli, exposeCh, sub]
  var A=[
@@ -55,7 +55,7 @@ function seedProducts(){
  [108,'en','Abijou Acne Care',120000,'approved',1,0,0,'개별',1,1,'both','여드름/흉터'],
  [109,'zh','Abijou 皮肤护理',120000,'approved',1,0,0,'개별',1,1,'web','여드름/흉터']
  ];
- return A.map(function(a,i){return {id:a[0],lang:a[1],name:a[2],price:a[3],status:a[4],active:!!a[5],hidden:!!a[6],deleted:!!a[7],mode:a[8],book:{web:!!a[9],ali:!!a[10]},exposeCh:a[11],cat:'피부과',sub:a[12],reg:'2026-0'+(6+i%3)+'-1'+i+' 16:2'+i,chat:(a[0]%7)+1,cons:(a[0]%5),rev:(a[0]%3),views:120+a[0]%40,inner:30+a[0]%17,direct:8+a[0]%9};});
+ return A.map(function(a,i){return {id:a[0],lang:a[1],name:a[2],price:a[3],status:a[4],active:!!a[5],hidden:!!a[6],deleted:!!a[7],mode:a[8],book:{web:!!a[9],ali:!!a[10]},exposeCh:a[11],cat:'피부과',sub:a[12],reg:'2026-0'+(6+i%3)+'-1'+i+' 16:2'+i,chat:(a[0]%7)+1,cons:(a[0]%5),rev:(a[0]%3),views:120+a[0]%40,inner:30+a[0]%17,direct:8+a[0]%9,bclk:(a[9]||a[8]==='기본')?(a[0]%6)+2:0};});
 }
 function snapOf(p){return {name:p.name,price:p.price,lang:p.lang};}
 function seedBookings(P){
@@ -92,20 +92,21 @@ function freshDB(){var P=seedProducts();DB={store:seedStore(),prods:P,books:seed
 function freshState(){return {surf:'HOST',mark:true,
  fo:{lang:'en',ch:'web',screen:'store',entry:'store',pid:null,sel:'',date:addDays(TODAY,1),time:'',err:null,lastNo:null,myNo:null,tab:'upcoming'},
  host:{view:'dash',dtab:'전체',st:'',kind:'',owner:'',q:'',qd:'',ptab:'전체',open:null,editPid:null,man:{date:'',time:'',name:'',lang:'',pid:''},statPer:'전체'},
- bo:{view:'res',st:'',kind:'',owner:'',q:'',qd:'',open:null,lang:'',editPid:null,col:null,offModal:false}};}
+ bo:{view:'res',st:'',kind:'',owner:'',q:'',qd:'',open:null,lang:'',editPid:null,col:null,offModal:false,sper:'이번달'}};}
 
 /* ===== 판정 (순수 함수) ===== */
 function prodById(id){return DB.prods.filter(function(p){return p.id===+id;})[0]||null;}
 function storeBookBtn(ch){var s=DB.store;return !!(s.bookingSetting&&s.btn[ch]);}
 /* 상품 예약 버튼: 예약 설정에만 묶임. 기본 설정이면 스토어 예약 버튼 값을 따름 */
+/* 스토어의 "상품 예약 사용"이 꺼져 있으면 그 스토어 상품은 전부 꺼짐 (배포 때 전 스토어 꺼 둠, BO가 켬) */
 function prodBookBtn(p,ch){
- if(!DB.store.bookingSetting)return false;
+ if(!DB.store.bookingSetting||!DB.store.prodBook)return false;
  if(ch==='ali'&&p.exposeCh==='web')return false;
  return p.mode==='기본'?!!DB.store.btn[ch]:!!p.book[ch];
 }
 function prodVisible(p,lang){return p.status==='approved'&&p.active&&!p.hidden&&!p.deleted&&p.lang===lang;}
 function judgeBookable(p,lang,ch){
- var conds=[['예약 설정',DB.store.bookingSetting],['상품 노출',prodVisible(p,lang)],['상품 예약 버튼',prodBookBtn(p,ch)]];
+ var conds=[['예약 설정',DB.store.bookingSetting],['상품 예약 사용',!!DB.store.prodBook],['상품 노출',prodVisible(p,lang)],['상품 예약 버튼',prodBookBtn(p,ch)]];
  var bad=conds.filter(function(c){return !c[1];})[0];
  return {ok:!bad,reason:bad?bad[0]:'',conds:conds};
 }
@@ -144,7 +145,7 @@ function manSave(){
  S.host.man={date:'',time:'',name:'',lang:'',pid:''};S.host.view='res';S.host.open=no;
  return '';
 }
-function bookOff(){DB.store.bookingSetting=false;DB.store.btn.web=false;DB.store.btn.ali=false;DB.prods.forEach(function(p){p.book.web=false;p.book.ali=false;});}
+function bookOff(){DB.store.bookingSetting=false;DB.store.prodBook=false;DB.store.btn.web=false;DB.store.btn.ali=false;DB.prods.forEach(function(p){p.book.web=false;p.book.ali=false;});}
 
 /* ===== 렌더 ===== */
 function swHTML(){
@@ -179,7 +180,7 @@ window.foOpenStore=function(lang,ch){S.surf='FO';if(lang)S.fo.lang=lang;if(ch)S.
 window.foOpenProduct=function(id,lang,ch){S.surf='FO';if(lang)S.fo.lang=lang;if(ch)S.fo.ch=ch;S.fo.pid=id;S.fo.screen='product';S.fo.err=null;render();};
 window.setProd=function(id,patch){var p=prodById(id);Object.keys(patch).forEach(function(k){if(k==='book')Object.assign(p.book,patch.book);else p[k]=patch[k];});render();};
 /* 상품이 많은 매장 보기용: 예약 가능한 영어 상품 n개 추가 (id 201~) */
-window.addDemoProducts=function(n){var subs=['보톡스','스킨부스터','리프팅','여드름/흉터','색소/점/문신'],names=['Glow Facial','Aqua Peel','Jawline Botox','Rejuran Healer','Ultherapy 300','Thermage FLX','Pico Toning','Acne Scar Laser','Chin Filler','Neck Lift','Exosome Care','LDM Hydration'];for(var i=0;i<n;i++){var id=201+i;DB.prods.push({id:id,lang:'en',name:'Abijou '+names[i%names.length],price:50000+i*10000,status:'approved',active:true,hidden:false,deleted:false,mode:'기본',book:{web:false,ali:false},exposeCh:null,cat:'피부과',sub:subs[i%subs.length],reg:'2026-09-0'+(1+i%9)+' 10:00',chat:1,cons:0,rev:0,views:100,inner:20,direct:5});}render();};
+window.addDemoProducts=function(n){var subs=['보톡스','스킨부스터','리프팅','여드름/흉터','색소/점/문신'],names=['Glow Facial','Aqua Peel','Jawline Botox','Rejuran Healer','Ultherapy 300','Thermage FLX','Pico Toning','Acne Scar Laser','Chin Filler','Neck Lift','Exosome Care','LDM Hydration'];for(var i=0;i<n;i++){var id=201+i;DB.prods.push({id:id,lang:'en',name:'Abijou '+names[i%names.length],price:50000+i*10000,status:'approved',active:true,hidden:false,deleted:false,mode:'기본',book:{web:false,ali:false},exposeCh:null,cat:'피부과',sub:subs[i%subs.length],reg:'2026-09-0'+(1+i%9)+' 10:00',chat:1,cons:0,rev:0,views:100,inner:20,direct:5,bclk:0});}render();};
 window.setStore=function(patch){Object.keys(patch).forEach(function(k){if(k==='btn')Object.assign(DB.store.btn,patch.btn);else DB.store[k]=patch[k];});render();};
 window.openHostBooking=function(no){S.surf='HOST';S.host.view='res';S.host.open=no;render();};
 window.openBoBooking=function(no){S.surf='BO';S.bo.view='res';S.bo.open=no;render();};

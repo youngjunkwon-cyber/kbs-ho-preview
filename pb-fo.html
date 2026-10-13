@@ -1094,7 +1094,7 @@ function pProduct() {
   var ft = $('footer[class*=productDetailFooter]'); if (ft) ft.remove();
   var nf = footerFrom(); document.getElementById('app').appendChild(nf);
   var book = $$('button', nf).filter(function (b) { return /Book now/.test(b.textContent); })[0];
-  if (!PB.judgeBookable(p, f.lang, f.ch).ok) book.remove(); else { book.setAttribute('data-test', 'prod-book'); book.onclick = function () { startBook('product'); }; mark(book); }
+  if (!PB.judgeBookable(p, f.lang, f.ch).ok) book.remove(); else { book.setAttribute('data-test', 'prod-book'); book.onclick = function () { p.bclk = (p.bclk || 0) + 1; startBook('product'); }; mark(book); }
   $('button', nf).onclick = function () { toast('Not available in this mockup'); };
 }
 
@@ -1144,8 +1144,11 @@ function pBook() {
     sec.appendChild(inner);
   }
   /* 위치: 날짜 → 시간 → 상품 (상품 상세 진입도 같은 자리) */
+  /* 스토어 진입인데 고를 수 있는 상품이 없으면(상품 예약 사용 OFF 포함) 상품 영역을 두지 않는다 = 지금 스토어 예약 화면 그대로 */
+  var noPick = f.entry !== 'product' && !PB.foOptions(f.lang, f.ch).length && !(f.err && f.err.kind === 'pickAgain');
+  if (noPick) f.sel = '';
   var ts = $$('[class*=timeSection]').filter(function (x) { return x !== sec; })[0], dv = $('[class*=scheduleDivider]');
-  ts.after(mark(sec)); if (dv) sec.before(dv.cloneNode(true));
+  if (!noPick) { ts.after(mark(sec)); if (dv) sec.before(dv.cloneNode(true)); }
   /* 달력 */
   var days = $('[class*=__days]'), dayT = $('button[class*=__day]', days).cloneNode(true), selCls = (Array.prototype.slice.call($$('button[class*=__day]', days)).map(function (b) { return b.className.split(' ').filter(function (c) { return /selectedDay/.test(c); })[0]; }).filter(Boolean)[0]) || 'x';
   dayT.className = dayT.className.split(' ').filter(function (c) { return !/selectedDay/.test(c); }).join(' ');
