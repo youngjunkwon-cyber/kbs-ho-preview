@@ -732,7 +732,7 @@ function fillDrawer(pre, b, qrCls) {
   var dt = function (v) { if (!v) return ''; if (!bo) return v.slice(0, 16); var d = v.slice(0, 10); return d + ' (' + PB.wdKo(d) + ') ' + v.slice(11, 16); };
   $('h2', cont).textContent = dt(b.visit);
   var cr = $('[class*=changeRequestBox]', cont); if (cr) $('strong', cr).textContent = dt(b.chg);
-  if (b.snap) (cr || $('h2', cont)).after(prodBlock(b));
+  (cr || $('h2', cont)).after(prodBlock(b)); /* 상품 없는 예약 = 방문 상담 */
   var qr = b.contact === 'WeChat' || b.contact === 'LINE';
   var V = { '매장': PB.DB.store.name, '여권명': b.name, '국적': b.nation, '언어': langLabel(b.lang), '전화번호': b.phone, '예약 번호': b.rno, '접수 시각': b.recv, '등록 방식': b.owner,
     '취소 시각': b.cancelAt ? (bo ? b.cancelAt : b.cancelAt.slice(0, 16)) : '', '취소한 사람': b.cancelBy || '', '취소 사유': b.cancelReason || '' };
@@ -946,7 +946,7 @@ function pInfo() {
   var when = wdEn(f.date) + ', ' + monEn(f.date) + ' ' + (+f.date.slice(8)) + ', 2026 ' + f.time + ' (KST)';
   var nt = $('[class*=bookingNotice]'); $('strong', nt).textContent = 'Booking at ' + PB.DB.store.nameEn; var sp = $$('span', nt).filter(function (x) { return !/Dot/.test(x.className); })[0]; sp.textContent = 'Selected time: ' + when; sp.classList.add('pb-fnote');
   /* 상품 예약: 상품명이 제목, 아래 줄 "at 스토어명 · 가격", 그다음 Selected time */
-  if (p) { var st0 = $('strong', nt); st0.textContent = p.name; mark(st0); st0.setAttribute('data-test', 'fo-info-prod'); var sb2 = sp.cloneNode(false); sb2.className = 'pb-fnote-hi2'; sb2.textContent = 'at ' + PB.DB.store.nameEn + ' · ' + krw(p.price); st0.after(mark(sb2)); }
+  { var st0 = $('strong', nt); st0.textContent = p ? p.name : 'Visit consultation'; mark(st0); st0.setAttribute('data-test', 'fo-info-prod'); var sb2 = sp.cloneNode(false); sb2.className = 'pb-fnote-hi2'; sb2.textContent = 'at ' + PB.DB.store.nameEn + (p ? ' · ' + krw(p.price) : ''); st0.after(mark(sb2)); } /* 상품 없는 예약 = Visit consultation */
   var form = $('form'); form.onsubmit = function (e) { e.preventDefault(); };
   if (f.err && f.err.kind === 'prodGone') { var eb = document.createElement('div'); eb.className = 'pb-ferr box'; eb.setAttribute('data-test', 'fo-err'); eb.innerHTML = "This product can't be booked right now.<button class='pb-ferr-b' type='button' data-go='store'>Go to store page</button>"; nt.before(eb); $('[data-go]', eb).onclick = function () { f.err = null; nav('store'); }; }
   /* 예시 데이터 */
@@ -977,7 +977,7 @@ function detailRows(b) {
   return '<div class="pb-row"><span>Scheduled visit</span><b>' + d + ' (' + wdEn(d) + ') ' + b.visit.slice(11) + '</b></div><div class="pb-row"><span>Booking number</span><b>' + b.rno + '</b></div><div class="pb-row"><span>Address</span><b>B1, 78 Namdaemun-ro, Jung-gu, Seoul (Myeong-dong 1-ga, Timewalk Myeongdong Building)</b></div>';
 }
 function prodSection(b, testId) {
-  if (!b.snap) return '';
+  if (!b.snap) return '<div class="pb-row pb-new" data-test="' + testId + '" data-kind="consult"><span>Product</span><div class="pb-fprod in"><div><div class="pb-fprod-n">Visit consultation</div></div></div></div>';
   var p = PB.prodById(b.prodId), live = p && PB.prodVisible(p, b.snap.lang);
   return '<div class="pb-row pb-new" data-test="' + testId + '"><span>Product</span><div class="pb-fprod in"><span class="pb-fthumb" style="background:' + thumbColor(b.prodId) + '"></span><div><div class="pb-fprod-n">' + esc(b.snap.name) + '</div><div class="pb-fprod-p">' + krw(b.snap.price) + '</div>' + (live ? '<a class="pb-flink" data-pid="' + p.id + '">View product ›</a>' : '') + '</div></div></div>';
 }
@@ -998,7 +998,7 @@ function pMy() {
   var w = document.createElement('main'); w.className = 'pb-my';
   w.innerHTML = '<div class="pb-my-h"><b>' + ttl + '</b><b>' + list.length + ' booking(s)</b></div><div class="pb-tabs">' + [['upcoming', 'Upcoming'], ['visited', 'Visited'], ['cancelled', 'Cancelled']].map(function (t) { return '<button class="' + (f.tab === t[0] ? 'on' : '') + '" data-tab="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div>'
     + '<div class="pb-my-body"><div class="pb-my-bar"><span>' + list.length + ' total</span><span class="pb-sort">Visit date &amp; time ⌄</span></div>'
-    + (list.length ? list.map(function (b) { var d = b.visit.slice(0, 10), dd = Math.round((new Date(d) - new Date(PB.TODAY)) / 864e5); var Dd = (b.status === '예약' ? ' (D-' + dd + ')' : ''), tt = '<div class="pb-card-n">' + esc(PB.DB.store.nameEn) + Dd + '</div>' + (b.snap ? '<div class="pb-card-p pb-hiA pb-new" data-test="fo-card-prod">' + esc(b.snap.name) + '</div>' : ''); /* 예약 후 목록: 스토어명이 제목, 상품명은 바로 아래 진한 줄 */ return '<div class="pb-card">' + badge(b.status) + tt + '<div class="pb-hr"></div><div class="pb-card-dt"><div><span>Date</span><b>' + d + ' (' + wdEn(d).toUpperCase() + ')</b></div><div><span>TIME</span><b>' + b.visit.slice(11) + ' (KST)</b></div></div><button class="pb-pk sm" data-no="' + b.no + '">View details</button></div>'; }).join('') : '<div class="pb-empty"><b>You don\'t have any active bookings yet</b><span>Your bookings will appear here.</span></div>')
+    + (list.length ? list.map(function (b) { var d = b.visit.slice(0, 10), dd = Math.round((new Date(d) - new Date(PB.TODAY)) / 864e5); var Dd = (b.status === '예약' ? ' (D-' + dd + ')' : ''), tt = '<div class="pb-card-n">' + esc(PB.DB.store.nameEn) + Dd + '</div>' + ('<div class="pb-card-p pb-hiA pb-new" data-test="fo-card-prod">' + esc(b.snap ? b.snap.name : 'Visit consultation') + '</div>'); /* 예약 후 목록: 스토어명이 제목, 상품명은 바로 아래 진한 줄 */ return '<div class="pb-card">' + badge(b.status) + tt + '<div class="pb-hr"></div><div class="pb-card-dt"><div><span>Date</span><b>' + d + ' (' + wdEn(d).toUpperCase() + ')</b></div><div><span>TIME</span><b>' + b.visit.slice(11) + ' (KST)</b></div></div><button class="pb-pk sm" data-no="' + b.no + '">View details</button></div>'; }).join('') : '<div class="pb-empty"><b>You don\'t have any active bookings yet</b><span>Your bookings will appear here.</span></div>')
     + '<div class="pb-prev">View previous consultation requests ›</div></div>';
   app.appendChild(w);
   $$('[data-tab]', w).forEach(function (t) { t.onclick = function () { f.tab = t.getAttribute('data-tab'); PB.render(); }; });

@@ -2742,7 +2742,7 @@ function fillDrawer(pre, b, qrCls) {
   var dt = function (v) { if (!v) return ''; if (!bo) return v.slice(0, 16); var d = v.slice(0, 10); return d + ' (' + PB.wdKo(d) + ') ' + v.slice(11, 16); };
   $('h2', cont).textContent = dt(b.visit);
   var cr = $('[class*=changeRequestBox]', cont); if (cr) $('strong', cr).textContent = dt(b.chg);
-  if (b.snap) (cr || $('h2', cont)).after(prodBlock(b));
+  (cr || $('h2', cont)).after(prodBlock(b)); /* 상품 없는 예약 = 방문 상담 */
   var qr = b.contact === 'WeChat' || b.contact === 'LINE';
   var V = { '매장': PB.DB.store.name, '여권명': b.name, '국적': b.nation, '언어': langLabel(b.lang), '전화번호': b.phone, '예약 번호': b.rno, '접수 시각': b.recv, '등록 방식': b.owner,
     '취소 시각': b.cancelAt ? (bo ? b.cancelAt : b.cancelAt.slice(0, 16)) : '', '취소한 사람': b.cancelBy || '', '취소 사유': b.cancelReason || '' };
@@ -2858,7 +2858,7 @@ function pRes() {
       var s0 = $$('.ant-typography', td[0]); leafSet(s0[0], PB.DB.store.name); s0[1].textContent = PB.DB.store.cat;
       var s1 = $$('.ant-typography', td[1]); s1[0].textContent = x.visit; s1[1].textContent = '접수 ' + x.recv;
       leafSet(td[2], x.name);
-      var pc = td[2].cloneNode(true); leafSet(pc, x.snap ? x.snap.name : '-'); $$('strong', pc).forEach(function (s) { s.style.fontWeight = '400'; }); pc.setAttribute('data-test', 'bcol-prod'); td[2].after(mark(pc));
+      var pc = td[2].cloneNode(true); leafSet(pc, x.snap ? x.snap.name : '방문 상담'); $$('strong', pc).forEach(function (s) { s.style.fontWeight = '400'; }); pc.setAttribute('data-test', 'bcol-prod'); td[2].after(mark(pc));
       if (x.owner === '매장') { var tg = document.createElement('span'); tg.className = 'ant-tag ant-tag-filled css-19u5a7b css-var-root'; tg.textContent = '수기'; var w = td[2].firstElementChild; w.appendChild(document.createTextNode(' ')); w.appendChild(tg); }
       td = r.children; td[4].textContent = x.rno; td[5].textContent = x.nation; td[6].textContent = langLabel(x.lang);
       var bt = $('.ant-badge-status-text', td[7]); if (bt) { bt.textContent = x.status; bt.style.color = DOT[x.status]; } var dot = $('.ant-badge-status-dot', td[7]); if (dot) { dot.style.color = DOT[x.status]; dot.style.background = DOT[x.status]; }
@@ -2874,8 +2874,9 @@ function openDrawer() {
   var close = function () { b.open = null; PB.render(); }; $('.ant-drawer-close', dw).onclick = close; var mk = $('.ant-drawer-mask', dw); if (mk) mk.onclick = close;
 }
 function prodBlock(x) {
-  var p = PB.prodById(x.prodId), live = p && PB.prodVisible(p, x.snap.lang);
   var d = document.createElement('div'); d.className = 'pb-prod'; d.setAttribute('data-test', 'prod-block');
+  if (!x.snap) { d.setAttribute('data-kind', 'consult'); d.innerHTML = '<div class="pb-prod-t"><div class="pb-prod-n">방문 상담</div></div>'; return mark(d); }
+  var p = PB.prodById(x.prodId), live = p && PB.prodVisible(p, x.snap.lang);
   d.innerHTML = '<span class="pb-thumb" style="background:' + thumbColor(x.prodId) + '"></span><div class="pb-prod-t"><div class="pb-prod-n">' + esc(x.snap.name) + '</div><div class="pb-prod-p">' + PB.won(x.snap.price) + '원</div>' + (live ? '<a class="pb-prod-l" style="color:#1677ff" href="#">상품 보기</a>' : '') + '</div>';
   return mark(d);
 }
