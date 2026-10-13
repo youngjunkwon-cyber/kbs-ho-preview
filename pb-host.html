@@ -2290,6 +2290,7 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 .pb-st{font-weight:600;font-size:13px;color:#8a9099;background:#f1f2f4;border-radius:4px;padding:1px 8px}
 .pb-st.on{color:#1a8c33;background:#e8f7ec}
 .pb-extra{color:rgba(0,0,0,.45);font-size:13px;margin-top:6px}
+.pb-prodline.pb-hiB{font-size:15px !important;font-weight:700 !important;color:#212121 !important;margin-top:2px}
 </style></head>
 <body><div id="app"></div>
 <template id="T_h_dash">
@@ -2475,7 +2476,7 @@ function pDash() {
     tag.className = tagCls[lab] || tag.className; tag.textContent = lab;
     $('b', c).textContent = b.name;
     var sp = $(':scope > span', c); sp.textContent = b.nation;
-    if (b.snap) { var pl = document.createElement('span'); pl.className = 'pb-prodline'; pl.textContent = b.snap.name; mark(pl); $('b', c).after(pl); }
+    if (b.snap) { var pl = document.createElement('span'); pl.className = 'pb-prodline pb-hiB'; pl.textContent = b.snap.name; mark(pl); $('b', c).before(pl); }
     $('small', c).textContent = b.rno + ' · 접수 ' + b.recv;
     c.onclick = function () { h.view = 'res'; h.open = b.no; PB.render(); };
     grid.appendChild(c);
@@ -2484,6 +2485,16 @@ function pDash() {
   var ps = PB.DB.prods.filter(function (p) { return !p.deleted; }), mb = $('[class*=managementBlock]');
   if (mb) { $('[class*=managementTitle]', mb).textContent = '상품 ' + ps.length + '개'; var cnt = { '승인': ps.filter(function (p) { return p.status === 'approved'; }).length, '대기': ps.filter(function (p) { return p.status === 'pending'; }).length, '반려': ps.filter(function (p) { return p.status === 'rejected'; }).length };
     $$('[class*=managementStatusLinks] button', mb).forEach(function (x) { var k = $('span', x).textContent.trim(); if (k in cnt) $('strong', x).textContent = cnt[k]; }); }
+  /* 통계 칸: 스토어 방문·상품 방문은 항상, 메신저 문의·채팅 문의·예약 확정·방문 완료는 값이 있을 때만 보인다 */
+  var PER = { '이번 주': ['2026-10-12', '2026-10-18'], '지난주': ['2026-10-05', '2026-10-11'], '1개월': ['2026-09-13', '2026-10-12'], '3개월': ['2026-07-14', '2026-10-12'], '전체': ['0000', '9999'] };
+  h.per = h.per || '이번 주'; var pr = PER[h.per], inR = function (d) { return d >= pr[0] && d <= pr[1]; };
+  var MV = { '스토어 방문': 0, '상품 방문': 0, '메신저 문의': 0, '채팅 문의': 0,
+    '예약 확정': PB.DB.books.filter(function (x) { return inR(x.recv.slice(0, 10)); }).length,
+    '방문 완료': PB.DB.books.filter(function (x) { return x.status === '방문완료' && inR(x.visit.slice(0, 10)); }).length };
+  var FIX = { '스토어 방문': 1, '상품 방문': 1 }, mg = $('[class*=metricGrid]'), shown = 0;
+  $$('[class*=metricCard]', mg).forEach(function (cd) { var k = $(':scope > span:not([class*=metricIcon])', cd).textContent.trim(), v = MV[k] || 0; var st = $('strong', cd); st.firstChild.textContent = v; var on = FIX[k] || v > 0; cd.style.display = on ? '' : 'none'; cd.setAttribute('data-test', 'metric-' + k); if (on) shown++; });
+  if (mg) mg.style.gridTemplateColumns = 'repeat(' + shown + ', minmax(0px, 1fr))';
+  var seg = $$('.ant-segmented-item'); seg.forEach(function (lb) { var t = lb.textContent.trim(), on = t === h.per; lb.classList.toggle('ant-segmented-item-selected', on); lb.classList.toggle('ant-segmented-item-selected-text', on); var ip = $('input', lb); if (ip) ip.checked = on; lb.onclick = function (e) { e.preventDefault(); h.per = t; PB.render(); }; });
   var mv = byText(document, 'button', '예약 관리 이동'); if (mv) mv.onclick = function () { go('res'); };
 }
 
@@ -2548,7 +2559,7 @@ function pRes() {
       $('[class*=bookingDateTime]', c).textContent = b.visit;
       $('[class*=customerName]', c).textContent = b.name;
       var metas = $$('[class*=bookingMeta]', c); metas[0].textContent = b.nation; metas[1].textContent = b.rno;
-      if (b.snap) { var pl = metas[0].cloneNode(true); pl.textContent = b.snap.name; pl.classList.add('pb-prodline'); pl.setAttribute('data-test', 'card-prod'); $('[class*=customerName]', c).after(mark(pl)); }
+      if (b.snap) { var pl = metas[0].cloneNode(true); pl.textContent = b.snap.name; pl.classList.add('pb-prodline', 'pb-hiB'); pl.setAttribute('data-test', 'card-prod'); $('[class*=customerName]', c).before(mark(pl)); }
       $('[class*=receivedAt]', c).textContent = '접수 ' + b.recv;
       c.setAttribute('aria-label', b.name + ' 예약 상세 열기');
       c.onclick = function () { h.open = b.no; PB.render(); };
