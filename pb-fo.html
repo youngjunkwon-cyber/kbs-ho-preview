@@ -187,8 +187,26 @@ button { cursor: pointer; background: 0px 0px; border-width: medium; border-styl
 .AccountSettingsPage-module-scss-module__Fx5xia__disabledField input { background-color: var(--color-bg-lightgray); color: rgb(170, 170, 170); border-color: rgb(238, 238, 238); padding-right: 38px; }
 .AccountSettingsPage-module-scss-module__Fx5xia__switch:disabled { cursor: wait; opacity: 0.6; }
 .AccountSettingsPage-module-scss-module__Fx5xia__qrButton:disabled { cursor: wait; opacity: 0.6; }
+.Select-module-scss-module__1G91Ha__root { width: 100%; min-width: 0px; font: inherit; position: relative; }
+.Select-module-scss-module__1G91Ha__trigger { background-color: var(--color-bg-white); width: 100%; height: 52px; color: var(--color-text-heading); font-style: inherit; font-variant: inherit; font-weight: inherit; font-stretch: inherit; line-height: inherit; font-family: inherit; font-optical-sizing: inherit; font-size-adjust: inherit; font-kerning: inherit; font-feature-settings: inherit; font-variation-settings: inherit; font-language-override: inherit; text-align: left; cursor: pointer; border: 1px solid rgb(228, 228, 228); border-radius: 8px; outline: none; justify-content: space-between; align-items: center; gap: 8px; padding: 0px 12px; font-size: 14px; display: flex; }
+.Select-module-scss-module__1G91Ha__trigger:focus-visible, .Select-module-scss-module__1G91Ha__trigger[aria-expanded="true"] { border-color: var(--Colors-Border-Focus,#1d1d1d); }
 .Select-module-scss-module__1G91Ha__trigger:disabled { background-color: var(--color-bg-lightgray); color: rgb(198, 198, 198); cursor: not-allowed; }
+.Select-module-scss-module__1G91Ha__triggerLabel { color: var(--color-text-body); text-overflow: ellipsis; white-space: nowrap; min-width: 0px; font-family: Pretendard; font-size: 14px; font-style: normal; font-weight: 500; line-height: 130%; overflow: hidden; }
+.Select-module-scss-module__1G91Ha__placeholder { color: var(--Colors-Text-Placeholder,#c6c6c6); }
+.Select-module-scss-module__1G91Ha__chevron { color: rgb(198, 198, 198); width: 24px; height: 24px; transition: transform 0.15s; transform: translateY(0px) rotate(0deg); }
+.Select-module-scss-module__1G91Ha__chevronOpen { color: var(--color-text-heading); transform: translateY(0px) rotate(180deg); }
+.Select-module-scss-module__1G91Ha__menu { z-index: 30; background-color: var(--color-bg-white); border: 1px solid rgb(228, 228, 228); border-radius: 10px; flex-direction: column; width: 100%; max-width: min(360px, -32px + 100vw); display: flex; position: absolute; top: calc(100% + 6px); left: 0px; overflow: hidden; box-shadow: rgba(0, 0, 0, 0.14) 0px 8px 24px; }
+.Select-module-scss-module__1G91Ha__menuRight { left: auto; right: 0px; }
+.Select-module-scss-module__1G91Ha__searchableMenu { width: 100%; max-width: 460px; position: fixed; left: 50%; right: auto; transform: translate(-50%); }
+.Select-module-scss-module__1G91Ha__searchWrap { border-bottom: 1px solid var(--color-border-light); padding: 10px; }
+.Select-module-scss-module__1G91Ha__searchInput { background-color: var(--color-bg-white); width: 100%; min-width: 0px; color: var(--color-text-heading); font-style: inherit; font-variant: inherit; font-stretch: inherit; line-height: inherit; font-family: inherit; font-optical-sizing: inherit; font-size-adjust: inherit; font-kerning: inherit; font-feature-settings: inherit; font-variation-settings: inherit; font-language-override: inherit; border: 1px solid rgb(228, 228, 228); border-radius: 8px; outline: none; height: 52px; padding: 0px 16px; font-size: 14px; font-weight: 500; }
+.Select-module-scss-module__1G91Ha__searchInput:focus { border-color: rgb(29, 29, 29); }
 .Select-module-scss-module__1G91Ha__searchInput:disabled { background-color: var(--color-bg-lightgray); color: rgb(142, 142, 142); }
+.Select-module-scss-module__1G91Ha__options { max-height: 280px; padding: 4px; overflow-y: auto; }
+.Select-module-scss-module__1G91Ha__option { color: rgb(85, 85, 85); width: 100%; min-height: 44px; font-style: inherit; font-variant: inherit; font-weight: inherit; font-stretch: inherit; line-height: inherit; font-family: inherit; font-optical-sizing: inherit; font-size-adjust: inherit; font-kerning: inherit; font-feature-settings: inherit; font-variation-settings: inherit; font-language-override: inherit; text-align: left; cursor: pointer; background: 0px 0px; border: 0px; border-radius: 7px; align-items: center; padding: 10px 12px; font-size: 14px; display: flex; }
+.Select-module-scss-module__1G91Ha__option:hover, .Select-module-scss-module__1G91Ha__option:focus-visible { background-color: var(--color-bg-lightgray); outline: none; }
+.Select-module-scss-module__1G91Ha__optionSelected { color: rgb(251, 111, 146); background: rgb(255, 240, 244); font-weight: 600; }
+.Select-module-scss-module__1G91Ha__status { color: rgb(142, 142, 142); text-align: center; margin: 0px; padding: 20px 12px; font-size: 13px; }
 .BookingInformationPage-module-scss-module__oG4JGG__informationField input:disabled, .BookingInformationPage-module-scss-module__oG4JGG__informationField select:disabled, .BookingInformationPage-module-scss-module__oG4JGG__informationField textarea:disabled { background-color: var(--color-bg-lightgray); color: rgb(142, 142, 142); }
 .BookingInformationPage-module-scss-module__oG4JGG__verificationButton:disabled { cursor: not-allowed; background: rgb(228, 228, 228); }
 .BookingInformationPage-module-scss-module__oG4JGG__verificationButton.BookingInformationPage-module-scss-module__oG4JGG__verificationTimer:disabled { color: rgb(251, 111, 146); cursor: default; opacity: 1; background: rgb(255, 230, 236); }
@@ -796,7 +814,8 @@ function pBook() {
       grid.appendChild(li);
     });
     inner.appendChild(tabs); inner.appendChild(grid);
-    inner.setAttribute('data-test', 'fo-select'); inner.setAttribute('data-options', JSON.stringify(opts.map(function (o) { return o.name; })));
+    sec.appendChild(inner);
+    var inner = sec.querySelector('.pb-fpick, .pb-fdd'); inner.setAttribute('data-test', 'fo-select'); inner.setAttribute('data-options', JSON.stringify(PB.foOptions(f.lang, f.ch).map(function (o) { return o.name; })));
     var cur = f.sel ? PB.prodById(f.sel) : null; inner.setAttribute('data-selected', cur ? cur.name : 'No product (store booking)');
     if (f.err && f.err.kind === 'pickAgain') { var er = document.createElement('p'); er.className = 'pb-ferr'; er.setAttribute('data-test', 'fo-err'); er.textContent = "This product can't be booked right now. Please choose again."; sec.appendChild(er); }
     sec.appendChild(inner);
