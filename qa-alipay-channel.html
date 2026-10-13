@@ -245,10 +245,10 @@ dialog textarea{width:100%;height:320px;font-family:ui-monospace,Menlo,monospace
 <li><b>진입 동의 구조 심사</b><span class="alTag">진입 관문을 열기 전에 답이 필요합니다</span>
 <p>알리페이 채널에 들어올 때 당사 동의 창에서 필수 항목 동의를 받고, 이어서 getAuthCode로 필수 권한 허용을 받은 이용자만 서비스를 이용하도록 할 예정입니다.</p>
 <ul><li>이 구조가 심사에서 허용되는지 확인 부탁드립니다.</li><li>심사를 월렛(중국, 홍콩)마다 따로 받는지, 심사 기간은 얼마나 걸리는지, 수정할 때마다 다시 심사를 받는지도 알려 주세요.</li></ul></li>
-<li><b>회원 정보 조회 권한</b><span class="alTag">진입 관문을 열기 전에 답이 필요합니다</span>
-<p>회원 정보 조회(inquiryUserInfo)를 쓰려면 별도로 권한을 열어야 하는지 알려 주세요. 필요하다면 당사가 신청하는 방식인지, 알리페이에서 열어 주시는 방식인지도 알려 주세요.</p></li>
+<li><b>회원 정보 조회 권한 개통 요청</b><span class="alTag">진입 관문을 열기 전에 답이 필요합니다</span>
+<p>회원 정보 조회를 위해 getAuthCode·getSiteInfo 호출 권한을 열어 주세요.</p></li>
 <li><b>진입 주소 등록</b>
-<p>알리페이 중국 앱과 알리페이 홍콩 앱의 진입 주소를 각각 alipay-app.kbstations.com/zh, alipay-app.kbstations.com/zh-TW로 등록하려고 합니다. 당사가 콘솔에서 직접 설정하는 방식인지, 주소를 전달드리면 알리페이에서 설정해 주시는 방식인지 알려 주세요.</p></li>
+<p>알리페이 중국 앱과 알리페이 홍콩 앱의 진입 주소를 각각 alipay-app.kbstations.com/zh, alipay-app.kbstations.com/zh-TW로 등록하려고 합니다. 현재 미니프로그램의 개발 콘솔 권한을 받아 당사가 직접 설정할 수 있는지, 아니면 주소를 전달드리면 설정해 주시는지 알려 주세요.</p></li>
 <li><b>원본 휴대폰 번호 권한</b>
 <p>가리지 않은 휴대폰 번호 권한(PLAINTEXT_MOBILE_PHONE)을 당사가 승인받을 수 있는지, 승인 절차가 있다면 알려 주세요.</p></li>
 <li><b>권한 해제</b>
@@ -264,6 +264,8 @@ dialog textarea{width:100%;height:320px;font-family:ui-monospace,Menlo,monospace
 <table class="alTbl"><thead><tr><th>항목</th><th>답</th><th>근거</th></tr></thead><tbody>
 <tr><td>웹뷰에서 계정 권한 요청(getAuthCode)을 쓸 수 있는지</td><td>쓸 수 있습니다. 월렛마다 주는 사용자 정보가 다를 수 있어 userId로 회원을 식별하라고 권했습니다.</td><td>2026년 8월 19일 사공명 부장 회신</td></tr>
 <tr><td>권한 창에서 거부한 권한 목록이 응답에 오는지</td><td>허용된 권한(authSuccessScopes)과 거부된 권한(authErrorScopes)이 응답에 따로 옵니다.</td><td>알리페이 개발자 문서(my.getAuthCode)</td></tr>
+<tr><td>회원 정보 조회 권한을 여는 절차</td><td>사용자 인증 기능은 우리가 개발 콘솔에서 직접 추가합니다. getAuthCode·getSiteInfo 호출 권한은 알리페이 솔루션 아키텍트에게 요청합니다. 그래서 메일 2번은 질문이 아니라 요청으로 보냅니다.</td><td>알리페이 개발자 문서(How to obtain user authorization)</td></tr>
+<tr><td>미니프로그램 설정·배포를 누가 하는지</td><td>문서상 생성·업로드·설정·배포는 가맹점이 개발 콘솔에서 합니다. 지금 채널은 알리페이가 올려 주었기 때문에 콘솔 권한을 받을 수 있는지를 메일 3번으로 묻습니다.</td><td>알리페이 개발자 문서(Manage Alipay+ mini programs in partner apps)</td></tr>
 <tr><td>어느 월렛에서 열렸는지 알 수 있는지</td><td>my.getSystemInfo의 app 값으로 알 수 있습니다. 중국은 alipay, 홍콩은 alipayHK입니다.</td><td>2026년 7월 10일 사공명 부장 회신</td></tr>
 </tbody></table></div>
 <div class="ioLog">자세한 처리 기준은 PRD v3.3 16장에 있습니다.</div>
