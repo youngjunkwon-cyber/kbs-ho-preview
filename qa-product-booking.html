@@ -156,20 +156,20 @@ var GROUPS = [
 ]],
 ['고객 화면 · 상품 선택 (5.2)', [
  ['P-01','상품 상세로 들어오면 상품이 고정된다','Book now 를 누릅니다.','예약 화면 주소 아래 Product 영역에 Abijou Botox · 99,000 KRW 상자만 있다. 선택 칸이 없다',"foOpenProduct(101,'en','web')",'Abijou Botox 상세',''],
- ['P-02','스토어로 들어오면 상품 카드 목록, 처음엔 아무것도 선택 안 됨','Book now 를 누릅니다.','"Select a product (optional)" 아래 칩(All · 세부분류)과 상품 카드(상품명·가격). 선택된 카드 없음, Clear selection 없음 = 스토어 예약',"foOpenStore('en','web')",'스토어 페이지',''],
- ['P-03','카드 목록에는 예약 가능한 상품만','Book now 를 누르고 카드 목록을 봅니다.','Abijou Botox, Abijou Skin Booster, Abijou Acne Care 세 장. 칩은 All · Botox · Skin Boosters · Acne/Scar',"foOpenStore('en','web')",'스토어 페이지',''],
- ['P-04','카드 목록은 고객 언어를 따른다','Book now 를 누르고 카드 목록을 봅니다.','Abijou ボトックス 한 장만(スキンブースター 는 예약 OFF 라 없음)',"foOpenStore('ja','web')",'일본어, 스토어 페이지',''],
- ['P-05','카드를 누르면 선택, 해제는 따로','Book now → Skin Booster 카드 → 제목 오른쪽 Clear selection → 카드 다시 누르기 → 한 번 더 누르기.','고르면 분홍 테두리 + 제목 오른쪽 Clear selection. Clear selection 을 누르면 선택이 풀리고 버튼도 사라짐. 고른 카드를 다시 눌러도 풀림',"foOpenStore('en','web')",'스토어 페이지',''],
+ ['P-02','스토어로 들어오면 한 줄 칸, 처음엔 미선택','Book now 를 누르고, 칸을 눌러 펼칩니다.','"Select a product (optional)" 아래 한 줄 칸에 "Select a product"(접힌 상태, 날짜·시간이 첫 화면에 보임). 칸을 누르면 바로 아래에 칩·상품 카드가 펼쳐지고 선택된 카드는 없다 = 스토어 예약',"foOpenStore('en','web')",'스토어 페이지',''],
+ ['P-03','카드 목록에는 예약 가능한 상품만','Book now → 칸을 눌러 펼칩니다.','Abijou Botox, Abijou Skin Booster, Abijou Acne Care 세 장. 칩은 All · Botox · Skin Boosters · Acne/Scar',"foOpenStore('en','web')",'스토어 페이지',''],
+ ['P-04','카드 목록은 고객 언어를 따른다','Book now → 칸을 눌러 펼칩니다.','Abijou ボトックス 한 장만(スキンブースター 는 예약 OFF 라 없음)',"foOpenStore('ja','web')",'일본어, 스토어 페이지',''],
+ ['P-05','카드를 고르면 접히며 칸에 표시, 해제는 따로','Book now → 칸 → Skin Booster 카드 → Clear selection → 칸 → Skin Booster → 칸 → Skin Booster 다시 누르기.','카드를 고르면 목록이 접히고 칸에 "Abijou Skin Booster · 190,000 KRW", 제목 옆 Clear selection. Clear selection 을 누르면 칸이 "Select a product" 로 돌아감. 펼친 목록에서 고른 카드(분홍 테두리)를 다시 눌러도 해제',"foOpenStore('en','web')",'스토어 페이지',''],
  ['P-06','상품 예약과 스토어 예약은 같은 예약표','Book now → 달력 18 을 누릅니다.','14:00(스토어 예약)과 15:00(상품 예약 Abijou Botox)이 흐리게 막혀 있다(동시에 받을 예약 수 1)',"foOpenStore('en','web')",'스토어 페이지',''],
  ['P-07','정보 입력 요약 카드에 상품','없음. 화면만 확인합니다.','검은 요약 카드에 Booking at / Selected time 아래 "Product: Abijou Botox · 99,000 KRW" 한 줄',BOOK_BY_PROD,'상품 상세로 들어와 10-19 11:00 을 고른 뒤 정보 입력 화면',''],
  ['P-08','상품 예약을 끝내면 완료·내 예약에 상품','Book → View my bookings → 방금 예약의 View details.','완료 화면 Product 영역에 Abijou Botox. 내 예약 카드에 상품명 한 줄, 상세에 Product 상자와 View product 링크',BOOK_BY_PROD,'정보 입력 화면',''],
- ['P-10','상품이 많으면 5개씩 더 보기','Book now → 카드 5장 확인 → View More Products → 한 번 더 → 칩 Botox.','처음 5장. View More Products 를 누를 때마다 5장씩 늘고, 다 보이면 버튼이 사라진다(영어 상품 15개). 칩을 바꾸면 다시 5장부터',"addDemoProducts(12);foOpenStore('en','web')",'스토어 페이지, 예시 상품 12개 추가',''],
- ['P-11','카드 화살표 = 정보 펼침, View Details = 상품 페이지','Book now → Abijou Botox 화살표 → 다시 화살표 → View Details.','화살표: 카드 테두리 진해지고 설명·Procedure Time·Anesthesia·Recovery Time·Visible Results In 펼침, 다시 누르면 닫힘. 선택은 바뀌지 않음. View Details: Abijou Botox 상품 페이지로 이동',"foOpenStore('en','web')",'스토어 페이지',''],
+ ['P-10','상품이 많으면 5개씩 더 보기','Book now → 칸 → 카드 5장 확인 → View More Products → 한 번 더 → 칩 Botox.','처음 5장. View More Products 를 누를 때마다 5장씩 늘고, 다 보이면 버튼이 사라진다(영어 상품 15개). 칩을 바꾸면 다시 5장부터',"addDemoProducts(12);foOpenStore('en','web')",'스토어 페이지, 예시 상품 12개 추가',''],
+ ['P-11','카드 화살표 = 정보 펼침, View Details = 상품 페이지','Book now → 칸 → Abijou Botox 화살표 → 다시 화살표 → View Details.','화살표: 카드 테두리 진해지고 설명·Procedure Time·Anesthesia·Recovery Time·Visible Results In 펼침, 다시 누르면 닫힘. 선택은 바뀌지 않음. View Details: Abijou Botox 상품 페이지로 이동',"foOpenStore('en','web')",'스토어 페이지',''],
  ['P-09','선택 안 함으로 예약하면 상품이 없다','Book → 위쪽 입점사 (HOST) → 예약 관리 이동.','완료 화면에 Product 영역이 없다. HOST 예약 목록 맨 위(10-19 11:00) 예약 상품 칸 "-"',BOOK_BY_STORE,'스토어로 들어와 선택 안 함, 정보 입력 화면','']
 ]],
 ['고객 화면 · 제출 시점 재확인 (5.5)', [
  ['R-01','상품 상세로 들어왔는데 그 사이 상품이 내려가면','Book 을 누릅니다.','예약이 만들어지지 않는다. 위에 "This product can’t be booked right now." 와 Go to store page 버튼. 누르면 스토어 페이지',BOOK_BY_PROD+"setProd(101,{hidden:true})",'Abijou Botox 정보 입력 화면을 연 뒤 상품이 숨김 처리된 상태',''],
- ['R-02','스토어로 들어와 고른 상품이 예약 불가가 되면','Book 을 누릅니다.','예약 일정 화면으로 돌아가고 선택된 카드가 없는 상태, 아래에 "Please choose again." 문구',BOOK_BY_STORE+"STATE.fo.sel='103';setProd(103,{book:{web:false}})",'Skin Booster 를 고른 뒤 그 상품 예약이 꺼진 상태',''],
+ ['R-02','스토어로 들어와 고른 상품이 예약 불가가 되면','Book 을 누릅니다.','예약 일정 화면으로 돌아가고 칸이 "Select a product"(미선택), 아래에 "Please choose again." 문구',BOOK_BY_STORE+"STATE.fo.sel='103';setProd(103,{book:{web:false}})",'Skin Booster 를 고른 뒤 그 상품 예약이 꺼진 상태',''],
  ['R-03','그 사이 시간이 차면','Book 을 누릅니다.','예약 일정 화면으로 돌아가 "This time was just taken." 문구, 11:00 이 막혀 있다',BOOK_BY_STORE+"DB.books.push({no:99,visit:'2026-10-19 11:00',recv:'2026-10-12 11:59',name:'X',nation:'-',lang:'en',contact:'-',status:'예약',owner:'고객',route:'스토어',prodId:null,snap:null,need:'',ch:'웹',req:'',phone:'-',rno:'261012009EN99'})",'다른 고객이 같은 시간을 먼저 예약한 상태','']
 ]],
 ['저장값 · 링크 (5.4)', [
