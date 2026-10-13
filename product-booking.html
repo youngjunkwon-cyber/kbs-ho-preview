@@ -120,8 +120,12 @@ function needList(t){return DB.books.filter(function(b){return b.need&&(t==='전
 var ME='Kaitlyn Chan';
 
 /* ===== 동작 ===== */
+/* 클리닉 스토어(피부과·성형외과·치과·메디컬체크) 예약 나이: 방문 예정일 기준 만 18세 이상. 예약 요청을 누를 때 판정, 저장하지 않음 */
+var CLINIC_CATS=['피부과','성형외과','치과','메디컬체크'];
+function ageOn(birth,day){var b=birth.split('-'),d=day.split('-'),a=(+d[0])-(+b[0]);if(+b[1]>+d[1]||(+b[1]===+d[1]&&+b[2]>+d[2]))a--;return a;}
 function foSubmit(){
  var f=S.fo;f.err=null;
+ if(CLINIC_CATS.indexOf(DB.store.cat)>=0&&f.birth&&/^\d{4}-\d{2}-\d{2}$/.test(f.birth)&&ageOn(f.birth,f.date)<18){f.err={kind:'age18'};return;}
  if(!f.time){f.err={kind:'time'};return;}
  if(!slotOpen(f.date,f.time)){f.err={kind:'slot'};f.time='';return;}
  var pid=f.entry==='product'?f.pid:(f.sel?+f.sel:null);
