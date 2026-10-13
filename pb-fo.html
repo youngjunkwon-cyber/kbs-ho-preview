@@ -331,6 +331,12 @@ button { cursor: pointer; background: 0px 0px; border-width: medium; border-styl
 .StoreDetailFaqSection-module__iCg1ga__faqToggleIcon { width: 20px; height: 20px; color: var(--color-text-heading); flex: 0 0 20px; justify-content: center; align-items: center; transition: transform 0.16s; display: flex; }
 .StoreDetailFaqSection-module__iCg1ga__chevronIcon { width: 20px; height: 20px; }
 .StoreDetailHeader-module__Z4HdZa__fixedHeader { z-index: 20; backdrop-filter: blur(2px); background: rgba(0, 0, 0, 0.2); width: 100%; max-width: 460px; position: fixed; top: 0px; left: 50%; transform: translate(-50%); }
+.StoreDetailHeader-module__Z4HdZa__fixedHeaderScrolled { background-color: var(--color-bg-white); backdrop-filter: none; }
+.StoreDetailHeader-module__Z4HdZa__fixedHeaderScrolled .StoreDetailHeader-module__Z4HdZa__anchorNav { background-color: var(--color-bg-white); }
+.StoreDetailHeader-module__Z4HdZa__fixedHeaderScrolled .StoreDetailHeader-module__Z4HdZa__anchorNav::after { background: var(--Colors-Border-Default,#e4e4e4); }
+.StoreDetailHeader-module__Z4HdZa__fixedHeaderScrolled .StoreDetailHeader-module__Z4HdZa__anchorNavButton { color: var(--Colors-Text-Caption,#8e8e8e); }
+.StoreDetailHeader-module__Z4HdZa__fixedHeaderScrolled .StoreDetailHeader-module__Z4HdZa__anchorNavButtonActive { color: var(--Colors-Icon-Strong,#2d2d2d); }
+.StoreDetailHeader-module__Z4HdZa__fixedHeaderScrolled .StoreDetailHeader-module__Z4HdZa__anchorNavButtonActive::after { background: var(--Colors-Icon-Strong,#2d2d2d); }
 .StoreDetailHeader-module__Z4HdZa__headerBar { height: calc(56px + var(--safe-top)); padding: var(--safe-top) 16px 0; grid-template-columns: 48px 1fr 48px; align-items: center; display: grid; }
 .StoreDetailHeader-module__Z4HdZa__headerTitle { justify-content: center; align-self: stretch; align-items: center; min-width: 0px; display: flex; }
 .StoreDetailHeader-module__Z4HdZa__headerStoreName { color: rgb(255, 255, 255); text-align: center; -webkit-line-clamp: 2; text-overflow: ellipsis; font-family: Pretendard; font-size: 14px; font-style: normal; font-weight: 500; line-height: 130%; display: -webkit-box; overflow: hidden; }
@@ -391,6 +397,8 @@ button { cursor: pointer; background: 0px 0px; border-width: medium; border-styl
 .StoreReviewSummarySection-module-scss-module__oOOYMq__reviewStars { gap: 3.03px; display: flex; }
 .StoreReviewSummarySection-module-scss-module__oOOYMq__reviewChevron { width: 24px; height: 24px; margin-left: 2px; font-size: 24px; line-height: 1; }
 .StoreDetailProductCard-module-scss-module__qqh-iG__card { width: 100%; color: var(--color-text-heading); border: 1px solid var(--Colors-Border-Inverse,#fff); background-color: var(--color-bg-lightgray); border-radius: 12px; flex-direction: column; justify-content: center; align-items: flex-start; gap: 8px; padding: 12px; display: flex; box-shadow: rgb(255, 255, 255) 0px 0px 10px 2px inset, rgba(0, 0, 0, 0.1) 0px 0px 10px; }
+.StoreDetailProductCard-module-scss-module__qqh-iG__cardOpen { border: 1px solid var(--colors-btn-icon-strong,#2d2d2d); background-color: var(--color-bg-lightgray); border-radius: 12px; overflow: hidden; box-shadow: rgb(255, 255, 255) 0px 0px 15px 2px inset, rgba(0, 0, 0, 0.1) 0px 0px 10px; }
+.StoreDetailProductCard-module-scss-module__qqh-iG__cardOpen .StoreDetailProductCard-module-scss-module__qqh-iG__chevron { transform: rotate(180deg); }
 .StoreDetailProductCard-module-scss-module__qqh-iG__summary { flex-direction: column; justify-content: center; align-items: flex-end; gap: 8px; width: 100%; min-width: 0px; display: flex; }
 .StoreDetailProductCard-module-scss-module__qqh-iG__productNameRow { align-self: stretch; align-items: center; display: flex; }
 .StoreDetailProductCard-module-scss-module__qqh-iG__title { -webkit-line-clamp: 2; width: 100%; color: var(--color-text-heading); text-overflow: ellipsis; word-break: break-word; -webkit-box-orient: vertical; flex: 1 0 0px; margin: 0px; font-family: Pretendard; font-size: 16px; font-weight: 500; line-height: 1.3; display: -webkit-box; overflow: hidden; }
@@ -410,6 +418,12 @@ button { cursor: pointer; background: 0px 0px; border-width: medium; border-styl
   100% { transform: rotate(360deg) scale(1); }
 }
 .StoreDetailProductCard-module-scss-module__qqh-iG__chevron { flex-shrink: 0; width: 16px; height: 16px; transition: transform 0.16s; display: block; }
+.StoreDetailProductCard-module-scss-module__qqh-iG__detailPanel { background: var(--Colors-Background-White,#fff); border-radius: 8px; flex-direction: column; align-items: flex-start; gap: 12px; width: 100%; padding: 12px; display: flex; }
+.StoreDetailProductCard-module-scss-module__qqh-iG__description { -webkit-line-clamp: 5; width: 100%; color: var(--color-text-heading); text-overflow: ellipsis; white-space: pre-wrap; word-break: break-word; -webkit-box-orient: vertical; align-self: stretch; margin: 0px; font-family: Pretendard; font-size: 14px; font-style: normal; font-weight: 500; line-height: 130%; display: -webkit-box; overflow: hidden; }
+.StoreDetailProductCard-module-scss-module__qqh-iG__detailDivider { background: var(--Colors-Text-Placeholder,#c6c6c6); width: 100%; height: 1px; }
+.StoreDetailProductCard-module-scss-module__qqh-iG__detailList { grid-template-columns: max-content 1fr; gap: 10px 8px; display: grid; }
+.StoreDetailProductCard-module-scss-module__qqh-iG__detailList > div { display: contents; }
+.StoreDetailProductCard-module-scss-module__qqh-iG__detailList > div > dt, .StoreDetailProductCard-module-scss-module__qqh-iG__detailList > div > dd { color: var(--color-text-body); word-break: break-word; font-family: Pretendard; font-size: 12px; font-style: normal; font-weight: 500; line-height: 130%; }
 .StoreDetailProductSection-module__f8EI3q__section { background-color: var(--color-bg-white); flex-direction: column; display: flex; }
 .StoreDetailProductSection-module__f8EI3q__sectionInner { background-color: var(--color-bg-lightgray); border-radius: 16px; flex-direction: column; gap: 12px; width: 100%; min-width: 0px; padding: 32px 0px; display: flex; overflow: hidden; }
 .StoreDetailProductSection-module__f8EI3q__sectionHeader { flex-direction: column; align-items: flex-start; gap: 8px; width: 100%; min-width: 0px; padding: 0px 16px; display: flex; }
@@ -712,6 +726,15 @@ document.documentElement.style.setProperty('--pb-acc-bg', '#fff9fb');
 function F() { return PB.S.fo; }
 function nav(screen) { var f = F(); f.screen = screen; PB.render(); }
 var SUB_EN = { '보톡스': 'Botox', '스킨부스터': 'Skin Boosters', '여드름/흉터': 'Acne/Scar', '리프팅': 'Lifting', '색소/점/문신': 'Pigmentation/Mole/Tattoo', '필러': 'Filler', '바디': 'Body' };
+/* 아코디언 시술 정보 (시안 예시 데이터) */
+var DETAIL = {
+  '보톡스': { desc: 'Botox treatment to relax facial muscles and soften wrinkles and jawline.', t: '10-20 min', a: 'Numbing cream', r: 'None', v: '3-7 days' },
+  '스킨부스터': { desc: 'Skin booster injections that hydrate and improve skin texture and glow.', t: '30-40 min', a: 'Numbing cream', r: '1-3 days', v: '1-2 weeks' },
+  '여드름/흉터': { desc: 'Acne care to calm active breakouts and reduce redness.', t: '40-60 min', a: 'None', r: '1-2 days', v: '1-2 weeks' },
+  '리프팅': { desc: 'Lifting treatment that tightens sagging skin along the face line.', t: '30-60 min', a: 'Numbing cream', r: '1-3 days', v: '2-4 weeks' },
+  '색소/점/문신': { desc: 'Laser toning to even out pigmentation and brighten skin tone.', t: '20-30 min', a: 'Numbing cream', r: 'None', v: '2-3 sessions' },
+  _: { desc: 'Treatment details vary by procedure.', t: 'Varies by treatment', a: 'Varies by treatment', r: 'Varies by treatment', v: 'Varies by treatment' }
+};
 function krw(n) { return PB.won(n) + ' KRW'; }
 function wdEn(d) { return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][new Date(d + 'T00:00:00Z').getUTCDay()]; }
 function monEn(d) { return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][+d.slice(5, 7) - 1]; }
@@ -802,18 +825,36 @@ function pBook() {
     var cats = ['All']; opts.forEach(function (o) { var c = SUB_EN[o.sub] || o.sub; if (cats.indexOf(c) < 0) cats.push(c); });
     if (cats.indexOf(f.cat || 'All') < 0) f.cat = 'All';
     tabs.innerHTML = '';
-    cats.forEach(function (c) { var t = tabT.cloneNode(true); t.textContent = c; var on = (f.cat || 'All') === c; t.className = tabT.className.split(' ').filter(function (x) { return x !== onCls; }).join(' ') + (on ? ' ' + onCls : ''); t.setAttribute('aria-selected', on ? 'true' : 'false'); t.onclick = function () { f.cat = c; PB.render(); }; tabs.appendChild(t); });
-    var shown = opts.filter(function (o) { return (f.cat || 'All') === 'All' || (SUB_EN[o.sub] || o.sub) === f.cat; });
+    cats.forEach(function (c) { var t = tabT.cloneNode(true); t.textContent = c; var on = (f.cat || 'All') === c; t.className = tabT.className.split(' ').filter(function (x) { return x !== onCls; }).join(' ') + (on ? ' ' + onCls : ''); t.setAttribute('aria-selected', on ? 'true' : 'false'); t.onclick = function () { f.cat = c; f.showN = 5; PB.render(); }; tabs.appendChild(t); });
+    /* 스토어 페이지 카드 UI 그대로: View Details(상품 페이지), 화살표 = 아코디언(설명·시술 정보). 카드 본문을 누르면 선택/해제.
+       처음 5개, View More Products 로 5개씩 추가 (실화면과 같음) */
+    var all = opts.filter(function (o) { return (f.cat || 'All') === 'All' || (SUB_EN[o.sub] || o.sub) === f.cat; });
+    var lim = f.showN || 5, shown = all.slice(0, lim); f.acc = f.acc || {};
+    var Pc = 'StoreDetailProductCard-module-scss-module__qqh-iG__';
     shown.forEach(function (o) {
-      var li = liT.cloneNode(true), on = String(f.sel || '') === String(o.id);
+      var li = liT.cloneNode(true), on = String(f.sel || '') === String(o.id), open = !!f.acc[o.id];
       li.querySelector('h3').textContent = o.name;
       li.querySelector('p[class*=__price]').textContent = krw(o.price);
-      var ac = li.querySelector('[class*=__actions]'); if (ac) ac.remove();
       var art = li.querySelector('article'); art.setAttribute('data-test', 'fo-pick-' + o.id); if (on) art.classList.add('pb-pick-on');
+      var more = li.querySelector('[class*=moreButton]'); more.setAttribute('aria-label', 'View details for product ' + o.name);
+      more.onclick = function (e) { e.preventDefault(); e.stopPropagation(); f.pid = o.id; f.entry = 'product'; f.screen = 'product'; PB.render(); };
+      var ic = li.querySelector('[class*=iconButton]'); ic.setAttribute('aria-expanded', open ? 'true' : 'false'); ic.setAttribute('aria-label', open ? '상세정보 닫기' : '상세정보 보기'); ic.setAttribute('data-test', 'fo-acc-' + o.id);
+      ic.onclick = function (e) { e.stopPropagation(); f.acc[o.id] = !open; PB.render(); };
+      if (open) {
+        art.classList.add(Pc + 'cardOpen');
+        var d = DETAIL[o.sub] || DETAIL._, pn = document.createElement('div'); pn.className = Pc + 'detailPanel';
+        pn.innerHTML = '<p class="' + Pc + 'description">' + esc(d.desc) + '</p><div class="' + Pc + 'detailDivider"></div><dl class="' + Pc + 'detailList">' +
+          [['Procedure Time', d.t], ['Anesthesia', d.a], ['Recovery Time', d.r], ['Visible Results In', d.v]].map(function (x) { return '<div><dt>' + x[0] + '</dt><dd>' + esc(x[1]) + '</dd></div>'; }).join('') + '</dl>';
+        art.appendChild(pn);
+      }
       art.onclick = function () { f.sel = on ? '' : o.id; if (f.err && f.err.kind === 'pickAgain') f.err = null; PB.render(); };
       grid.appendChild(li);
     });
-    inner.appendChild(tabs); inner.appendChild(grid);
+    if (all.length > lim) {
+      var mbox = src.querySelector('[class*=moreProductsContainer]');
+      if (mbox) { mbox = mbox.cloneNode(true); mbox.setAttribute('data-test', 'fo-more'); var mb = mbox.querySelector('button'); mb.onclick = function () { f.showN = lim + 5; PB.render(); }; }
+    }
+    inner.appendChild(tabs); inner.appendChild(grid); if (typeof mbox !== 'undefined' && mbox && all.length > lim) inner.appendChild(mbox);
     sec.appendChild(inner);
     var inner = sec.querySelector('.pb-fpick, .pb-fdd'); inner.setAttribute('data-test', 'fo-select'); inner.setAttribute('data-options', JSON.stringify(PB.foOptions(f.lang, f.ch).map(function (o) { return o.name; })));
     var cur = f.sel ? PB.prodById(f.sel) : null; inner.setAttribute('data-selected', cur ? cur.name : 'No product (store booking)');
