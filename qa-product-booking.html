@@ -162,7 +162,7 @@ var GROUPS = [
  ['P-05','상품을 고르면 맨 위 칸이 그 상품으로 바뀌고, Reset 으로 되돌린다','Book now → Skin Booster → Botox → Botox 다시 누르기 → Acne Care → 제목 오른쪽 Reset.','Skin Booster 를 누르면 맨 위 Visit consultation 자리가 Skin Booster 카드로 바뀌고(목록의 Skin Booster 도 분홍 테두리), 제목 오른쪽에 Reset. Botox 를 누르면 맨 위가 Botox 로. Botox 를 다시 누르면 맨 위가 Visit consultation 으로 돌아가고 Reset 이 사라진다. Acne Care 를 고른 뒤 Reset 을 눌러도 같다',"foOpenStore('en','web')",'스토어 페이지',''],
  ['P-06','상품 예약과 스토어 예약은 같은 예약표','Book now → 달력 18 을 누릅니다.','14:00(스토어 예약)과 15:00(상품 예약 Abijou Botox)이 흐리게 막혀 있다(동시에 받을 예약 수 1)',"foOpenStore('en','web')",'스토어 페이지',''],
  ['P-07','정보 입력 요약 카드 제목이 상품명','없음. 화면만 확인합니다.','검은 요약 카드 제목이 "Abijou Botox", 아래 줄 "at Abijou Clinic Myeongdong · 99,000 KRW", 그다음 Selected time',BOOK_BY_PROD,'상품 상세로 들어와 10-19 11:00 을 고른 뒤 정보 입력 화면',''],
- ['P-08','상품 예약을 끝내면 완료·내 예약에 상품','Book → View my bookings → 방금 예약의 View details.','완료 화면 제목 "Your booking is confirmed / Abijou Clinic Myeongdong", 아래 Product 에 스토어 상품 카드(Abijou Botox · 99,000 KRW · View Details · 설명 화살표, 썸네일 없음). 내 예약 카드 제목 "Abijou Clinic Myeongdong (D-7)", 바로 아래 진한 글자로 Abijou Botox. 상세도 같은 Product 카드',BOOK_BY_PROD,'정보 입력 화면',''],
+ ['P-08','상품 예약을 끝내면 완료·내 예약에 상품','Book → View my bookings → 방금 예약의 View details.','완료 화면 제목 "Your booking is confirmed / Abijou Clinic Myeongdong", 아래 Product 에 메인 화면과 같은 상품 카드(이미지 자리·Abijou Botox·99,000 KRW·스토어명·별점). 내 예약 카드 제목 "Abijou Clinic Myeongdong (D-7)", 바로 아래 진한 글자로 Abijou Botox. 상세도 같은 Product 카드(누르면 상품 상세)',BOOK_BY_PROD,'정보 입력 화면',''],
  ['P-10','상품이 많으면 5개씩 더 보기','Book now → 상품 선택 → 카드 5장 확인 → View More Products → 한 번 더 → 칩 Botox.','처음 5장. View More Products 를 누를 때마다 5장씩 늘고, 다 보이면 버튼이 사라진다(영어 상품 15개). 칩을 바꾸면 다시 5장부터',"addDemoProducts(12);foOpenStore('en','web')",'스토어 페이지, 예시 상품 12개 추가',''],
  ['P-11','카드 화살표 = 정보 펼침, View Details = 상품 페이지','Book now → 상품 선택의 Abijou Botox 화살표 → 다시 화살표 → View Details.','화살표: 카드 테두리 진해지고 설명·Procedure Time·Anesthesia·Recovery Time·Visible Results In 펼침, 다시 누르면 닫힘. 선택은 바뀌지 않음. View Details: Abijou Botox 상품 페이지로 이동',"foOpenStore('en','web')",'스토어 페이지',''],
  ['P-09','Visit consultation 으로 예약하면 상품 자리에 방문 상담','Book → 위쪽 입점사 (HOST) → 예약 관리 이동.','완료 화면 Product 영역에 "Visit consultation"(가격·링크 없음). HOST 예약 목록 맨 위(10-19 11:00) 예약 상품 칸 "방문 상담"',BOOK_BY_STORE,'스토어로 들어와 Visit consultation 그대로, 정보 입력 화면','']
@@ -175,7 +175,7 @@ var GROUPS = [
 ['저장값 · 링크 (5.4)', [
  ['S-01','예약 후 가격이 바뀌어도 예약 때 가격','없음. 화면만 확인합니다.','드로어 상품 상자에 Abijou Botox · 89,000원 (지금 상품가는 99,000원)',"openHostBooking(1)",'HOST 예약 상세, Kaitlyn Chan',''],
  ['S-02','노출 중인 상품만 상품 보기 링크','드로어를 닫고 Claire Wald(10-12 10:00) 상세를 엽니다.','Kaitlyn Chan 은 "상품 보기" 링크가 있다. Claire Wald(Laser Toning, 숨김)는 상자는 있지만 링크가 없다',"openHostBooking(1)",'HOST 예약 상세',''],
- ['S-03','고객 화면에서도 같다','없음. 화면만 확인합니다.','예약 상세 Product 상자에 89,000 KRW, View product 링크 없음(상품을 숨김 처리함)',"setProd(101,{hidden:true});STATE.surf='FO';STATE.fo.screen='mydetail';STATE.fo.myNo=1;render()",'Abijou Botox 를 숨긴 뒤 고객 예약 상세','']
+ ['S-03','고객 화면에서도 같다','없음. 화면만 확인합니다.','예약 상세 Product 카드에 89,000 KRW(예약 때 저장한 값). 상품을 숨김 처리해 카드를 눌러도 상품 상세로 가지 않음',"setProd(101,{hidden:true});STATE.surf='FO';STATE.fo.screen='mydetail';STATE.fo.myNo=1;render()",'Abijou Botox 를 숨긴 뒤 고객 예약 상세','']
 ]],
 ['입점사 (HOST)', [
  ['H-01','대시보드 예약 현황 카드에 상품명','없음. 화면만 확인합니다.','카드 5장 모두 날짜 바로 아래, 이름보다 큰 글자로 상품명(이름은 그 아래). 상품 예약 4장은 상품명, Evelyn Lee(스토어 예약)는 "방문 상담"',"go('HOST','dash')",'HOST 대시보드',''],
