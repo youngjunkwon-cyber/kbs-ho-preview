@@ -1207,7 +1207,7 @@ function detailRows(b) {
   return '<div class="pb-row"><span>Scheduled visit</span><b>' + d + ' (' + wdEn(d) + ') ' + b.visit.slice(11) + '</b></div><div class="pb-row"><span>Booking number</span><b>' + b.rno + '</b></div><div class="pb-row"><span>Address</span><b>B1, 78 Namdaemun-ro, Jung-gu, Seoul (Myeong-dong 1-ga, Timewalk Myeongdong Building)</b></div>';
 }
 function prodSection(b, testId) {
-  /* 예약 완료·내 예약 상세의 Product: FO 에 있는 스토어 상품 카드 UI 그대로(썸네일 상자 아님). 카드는 bindLinks 에서 채운다 */
+  /* 예약 완료·내 예약 상세의 Product: 자리만 만들고, 카드(FO 메인 ProductCard)는 fillProdSlots 에서 채운다 */
   return '<div class="pb-row pb-new" data-test="' + testId + '"' + (b.snap ? '' : ' data-kind="consult"') + '><span>Product</span><div class="pb-prodslot" data-bno="' + b.no + '"></div></div>';
 }
 /* 예약 완료·상세 제목: 예약 후 화면은 스토어명이 제목(상품은 아래 Product 영역) */
