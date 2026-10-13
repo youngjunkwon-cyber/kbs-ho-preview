@@ -206,6 +206,8 @@ function resetDB(keepRows) {
     mktDate: '',          // 마케팅 정보 수신 동의·변경 시각
     rmsg: '',             // 예약 입력 화면의 연락 메신저 (회원 정보에서 채우지 않는다)
     done13: false,        // 예약 요청을 보낸 뒤 (현행 예약 완료 화면 자리)
+    clinic13: false,      // 예약하는 스토어가 클리닉(피부과·성형외과·치과·메디컬체크)인지
+    age18: false,         // 클리닉 스토어 만 18세 미만 알림 창
     agreed: false,        // 동의 창에서 동의하고 시작하기를 누른 뒤인가 (식별 실패의 다시 시도가 권한 창부터 띄운다)
     noNick: false,        // 알리페이 계정에 닉네임이 없는 경우 (마이페이지 닉네임 자리에 알리페이 회원)
     minor13: '',          // 예약 입력에서 고른 만 14세 미만 생년월일 (회원 정보에 저장하지 않는다)
@@ -243,12 +245,12 @@ var PRIV_FULL = [
 var ALI = { name: '왕샤오메이', nick: 'xiaomei_w', sex: '여성', birth: '1996-03-12', nation: '중국', addr: '상하이시 징안구', phone: '+86 139 0000 1111', id: '2088_9f31c07a' };
 var LANG = { CN: '중국어(간체)', HK: '중국어(번체)' };
 /* 프로필 칸을 누르면 들어가는 예시 값. 값이 있으면 다른 예시 값으로 바꾼다 */
-var EX = { passport: ['WANG XIAOMEI', 'WANG MEI'], name: ['왕샤오메이', '왕메이'], nick: ['xiaomei_w', 'xiaomei_02'], sex: ['여성', '남성'], birth: ['1996-03-12', '1996-03-21', '2013-11-20'], nation: ['중국', '홍콩'], addr: ['상하이시 징안구', '상하이시 푸둥신구'], msg: ['위챗 wxid_alipay01', '위챗 wxid_alipay02'] };
+var EX = { passport: ['WANG XIAOMEI', 'WANG MEI'], name: ['왕샤오메이', '왕메이'], nick: ['xiaomei_w', 'xiaomei_02'], sex: ['여성', '남성'], birth: ['1996-03-12', '1996-03-21', '2009-05-01', '2008-10-20', '2013-11-20'], nation: ['중국', '홍콩'], addr: ['상하이시 징안구', '상하이시 푸둥신구'], msg: ['위챗 wxid_alipay01', '위챗 wxid_alipay02'] };
 /* 시안 조작 힌트. 휴대폰 화면 밖 점선 상자로 둔다 (화면 문구가 아님) */
 var ANNO = {
   fo11: '계정 정보 변경 버튼만 눌러 볼 수 있습니다. 나머지 메뉴는 현행 화면 그대로라 눌러도 반응이 없습니다.',
   fo11b: '여권 영문명, 국적, 성별, 생년월일, 연락 메신저 칸을 누르면 예시 값이 들어갑니다. 생년월일 예시 값에는 만 14세 미만이 되는 2013-11-20도 있습니다. 저장을 눌러야 회원 정보에 저장됩니다. 휴대폰 번호는 다른 번호 사용으로 바꾸고 문자 인증을 마치면 바로 저장됩니다. 번호가 없으면 빈 칸을 눌러 입력합니다.',
-  fo13: '여권 영문명, 국적부터 생년월일까지, 휴대폰 번호, 연락 메신저 칸을 누르면 예시 값이 들어갑니다. 생년월일 예시 값에는 만 14세 미만이 되는 2013-11-20도 있습니다.',
+  fo13: '여권 영문명, 국적부터 생년월일까지, 휴대폰 번호, 연락 메신저 칸을 누르면 예시 값이 들어갑니다. 생년월일 예시 값에는 만 14세 미만이 되는 2013-11-20, 방문 예정일(2026-10-20)에 만 17세인 2009-05-01, 그날 만 18세가 되는 2008-10-20도 있습니다.',
   fo13c: '이름, 휴대폰 번호, 연락 메신저 칸을 누르면 예시 값이 들어갑니다. 상담접수 폼에서 고친 값은 현행 상담접수 폼 로직 그대로라 회원 정보를 덮어쓰지 않습니다.'
 };
 var TOAST_T = null;
@@ -269,17 +271,21 @@ var CAPS = {
   fo10: '알리페이 식별이 로그인을 대신합니다. 로그인 주소로 직접 들어오면 마이페이지로 보냅니다. 알리페이 채널에서는 자체 로그인 경로를 숨깁니다. 점선 박스가 웹 채널에는 있고 알리페이 채널에는 없는 자리입니다. 진입 관문을 통과해야 들어오므로 비로그인 상태 자체가 없습니다.',
   fo11: '마이페이지는 현행 화면과 같은 구성입니다. 닉네임과 가입일, 알리페이 계정 안내, 예약 내역, 내 활동, 둘러보기, 고객센터가 있고 계정 정보 변경 버튼으로 계정 설정에 들어갑니다. 계정 설정에서는 칸을 눌러 예시 값으로 바꾸고 저장을 눌러야 회원 정보에 저장됩니다(알리페이 회원 탭에서 확인). 휴대폰 번호는 원본 권한이 승인되면 채워지고, 다른 번호 사용으로 바꾼 뒤 문자 인증을 마치면 바로 저장됩니다. 이메일, 비밀번호 변경, 로그아웃 자리가 없습니다. 마케팅 정보 수신은 여기서 켜고 끕니다. 알리페이 계정에 닉네임이 없으면 닉네임 자리에 알리페이 회원이 보입니다(회원이 되기 전에 상단 닉네임 비우기로 확인). 만 14세 미만이 되는 생년월일로 고치면 저장하지 않고 칸 아래 안내가 보입니다.',
   fo12: '마이페이지 > 계정 설정의 기존 탈퇴 경로를 그대로 씁니다. 알리페이 연결과 권한이 끊기고 다시 들어오면 새 회원이 되어 진입 관문을 다시 거칩니다.',
-  fo13: '회원 정보에서 채운 값은 고칠 수 있고 고친 값은 회원 정보에 저장됩니다. 이메일 칸이 없습니다. 원본 휴대폰 번호가 온 회원은 번호가 채워진 채 문자 인증을 건너뛰고, 고치면 그때 인증합니다. 원본이 없으면 직접 입력하고 인증합니다. 여권 영문명은 직접 입력합니다. 예약 요청은 웹 예약과 같은 필수값(이메일 제외)이 모두 차야 켜집니다. 만 14세 미만이 되는 생년월일로 고치면 회원 정보에 저장하지 않고 칸 아래 안내가 보이며 예약 요청이 꺼집니다. 국적·성별·생년월일은 칸을 벗어나는 순간 회원 정보에 들어가고, 휴대폰 번호·연락 메신저·여권 영문명은 요청 전에 나가면 남지 않습니다. 상단 상담접수 폼 보기로 알리페이 채널 상담접수 폼을 볼 수 있습니다.',
+  fo13: '회원 정보에서 채운 값은 고칠 수 있고 고친 값은 회원 정보에 저장됩니다. 이메일 칸이 없습니다. 원본 휴대폰 번호가 온 회원은 번호가 채워진 채 문자 인증을 건너뛰고, 고치면 그때 인증합니다. 원본이 없으면 직접 입력하고 인증합니다. 여권 영문명은 직접 입력합니다. 예약 요청은 웹 예약과 같은 필수값(이메일 제외)이 모두 차야 켜집니다. 클리닉 스토어(피부과·성형외과·치과·메디컬체크)는 방문 예정일 기준 만 18세 이상만 예약할 수 있어, 만 18세 미만이면 예약 요청을 눌렀을 때 요청을 보내지 않고 알림 창이 뜹니다(상단 클리닉 스토어로 바꿔 확인). 입력한 값은 그대로 남습니다. 만 14세 미만이 되는 생년월일로 고치면 회원 정보에 저장하지 않고 칸 아래 안내가 보이며 예약 요청이 꺼집니다. 국적·성별·생년월일은 칸을 벗어나는 순간 회원 정보에 들어가고, 휴대폰 번호·연락 메신저·여권 영문명은 요청 전에 나가면 남지 않습니다. 상단 상담접수 폼 보기로 알리페이 채널 상담접수 폼을 볼 수 있습니다.',
   bo11: '검색어는 알리페이 식별자, 닉네임, 이름, 연락처를 봅니다. 식별자는 완전 일치로 찾습니다. 빈 값은 알리페이 계정에 값이 없던 항목입니다. 회원 메뉴 아래에 새로 두는 화면입니다. 칼럼은 알리페이가 주는 항목에 맞춘 19개입니다. 이메일과 프로필 동의 여부 칼럼이 없습니다. 회원이면 프로필 제공에 항상 동의한 상태입니다.'
 };
 
 function h(s) { return s == null ? '' : String(s); }
 function dash(v) { return v ? h(v) : '<span class="dash">-</span>'; }
 /* FO-CH-13을 떠나거나 새로 열 때: 예약 요청·상담접수 전에 넣은 값은 남기지 않는다 */
-function reset13() { S.userSet = {}; S.done13 = false; S.passport = ''; S.minor13 = ''; S.rmsg = ''; S.cd = null; S.doneC = false; S.tel = S.mtel; S.telVerified = !!S.mtel; S.telSrc = S.mtelSrc; S.telEdited = false; S.telSaved = S.mtelSaved; }
+function reset13() { S.userSet = {}; S.done13 = false; S.age18 = false; S.passport = ''; S.minor13 = ''; S.rmsg = ''; S.cd = null; S.doneC = false; S.tel = S.mtel; S.telVerified = !!S.mtel; S.telSrc = S.mtelSrc; S.telEdited = false; S.telSaved = S.mtelSaved; }
 function go(v) { if (v === 'fo11') S.sub = 'home'; if ((S.view === 'fo13' && v !== 'fo13') || (v === 'fo13' && (S.view !== 'fo13' || S.done13 || S.doneC))) reset13(); S.view = v; render(); }
 function setF13(m) { S.f13 = m; if (S.view === 'fo13') reset13(); render(); }
 /* 시안 오늘 2026-10-08 기준 만 14세 미만인가 */
+/* 클리닉 스토어 예약 나이: 방문 예정일 기준 만 18세 이상 */
+var VISIT13 = '2026-10-20';
+function adult18(b) { if (!b) return false; var q = b.split('-'), v = VISIT13.split('-'), age = (+v[0]) - (+q[0]); if (+q[1] > +v[1] || (+q[1] === +v[1] && +q[2] > +v[2])) age--; return age >= 18; }
+function submit13() { if (S.clinic13 && !adult18(S.prof.birth)) { S.age18 = true; render(); return; } S.passportSaved = S.passport; S.passport = ''; S.booked = (S.booked || 0) + 1; S.telSaved = true; S.telEdited = false; S.mtel = S.tel; S.mtelSrc = S.telSrc; S.mtelSaved = true; S.mtelDraft = ''; S.userSet = {}; S.done13 = true; render(); }
 function minor14(b) { if (!b) return false; var q = b.split('-'), age = 2026 - (+q[0]); if (+q[1] > 10 || (+q[1] === 10 && +q[2] > 8)) age--; return age < 14; }
 /* 예시 값 순환: 지금 값의 다음 값. 목록에 없으면 첫 값 */
 function nextEx(e, cur) { return e[(e.indexOf(cur) + 1) % e.length]; }
@@ -494,7 +500,7 @@ function fo13() {
     '<div class="fld"><div class="l">요청사항 (선택)</div><div class="in" style="min-height:64px;cursor:text"></div></div>' +
     '<div class="gone" style="margin:12px 0 0">(시안 주석) 알리페이 채널에서는 이 자리가 없습니다<br>이메일</div>' +
     '</div></div>' +
-    '<div class="cta ' + (ready ? '' : 'dis') + '" ' + (ready ? 'onclick="S.passportSaved=S.passport;S.passport=\'\';S.booked=(S.booked||0)+1;S.telSaved=true;S.telEdited=false;S.mtel=S.tel;S.mtelSrc=S.telSrc;S.mtelSaved=true;S.mtelDraft=\'\';S.userSet={};S.done13=true;render()"' : '') + '>예약 요청</div>', '', '‹');
+    '<div class="cta ' + (ready ? '' : 'dis') + '" ' + (ready ? 'onclick="submit13()"' : '') + '>예약 요청</div>', S.age18 ? '<div class="dim"><div class="mdl"><h3>예약할 수 없습니다</h3><p class="d">이 스토어는 방문일 기준 만 18세 이상만 예약할 수 있습니다.</p><div class="cta" onclick="S.age18=false;render()">확인</div></div></div>' : '', '‹');
 }
 
 /* FO-CH-13 상담접수 폼 (알리페이 채널). 이메일 칸 없음, 프로필 항목은 회원 정보에서 채움, 메신저 앱 열기 버튼 없음 */
@@ -616,7 +622,9 @@ function render() {
     '<button onclick="S.agTerms=false;S.agPriv=false;S.agProf=false;S.agreed=false;S.blocked=\'consent\';S.step=\'blocked\';S.view=\'fo08\';render()"' + (S.joined ? ' disabled' : '') + '>동의 창 닫기</button>' +
     '<button onclick="S.birthMode=\'minor\';S.agAge=false;S.blocked=\'minor\';S.step=\'blocked\';S.view=\'fo08\';render()"' + (S.joined ? ' disabled' : '') + '>만 14세 미만</button>' +
     (S.view === 'fo13' ? '<span class="kv">FO-CH-13 화면 <em>' + (S.f13 === 'consult' ? '상담접수 폼' : '예약 입력') + '</em></span>' +
-      '<button onclick="setF13(S.f13===\'consult\'?\'book\':\'consult\')">' + (S.f13 === 'consult' ? '예약 입력 보기' : '상담접수 폼 보기') + '</button>' : '') +
+      '<button onclick="setF13(S.f13===\'consult\'?\'book\':\'consult\')">' + (S.f13 === 'consult' ? '예약 입력 보기' : '상담접수 폼 보기') + '</button>' +
+      (S.f13 === 'consult' ? '' : '<span class="kv">스토어 <em>' + (S.clinic13 ? '클리닉' : '클리닉 아님') + '</em></span><span class="kv">방문 예정일 <em>' + VISIT13 + '</em></span>' +
+      '<button onclick="S.clinic13=!S.clinic13;S.age18=false;render()">' + (S.clinic13 ? '클리닉 아닌 스토어로' : '클리닉 스토어로') + '</button>') : '') +
     '<button onclick="var pt=S.plaintext;var bm=S.birthMode;var w=S.wallet;var nn=S.noNick;resetDB();S.plaintext=pt;S.birthMode=bm;S.wallet=w;S.noNick=nn;render()">처음으로</button>';
   document.getElementById('cap').textContent = CAPS[S.view] || '';
   var m = { fo09: fo09, fo08: fo08, fo10: fo10, fo11: fo11, fo12: fo12, fo13: fo13, bo11: bo11 };
