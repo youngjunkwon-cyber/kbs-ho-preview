@@ -1207,7 +1207,7 @@ function pBook() {
   var grid = $('[class*=timeGrid]'), tT = $('button', grid).cloneNode(true); tT.className = tT.className.split(' ').filter(function (c) { return !/timeSelected/.test(c); }).join(' ');
   var tSel = 'BookingSchedulePage-module-scss-module__TxJ5FW__timeSelected';
   grid.innerHTML = '';
-  PB.TIMES.forEach(function (t) { var b = tT.cloneNode(true); b.textContent = t; var ok = PB.slotOpen(f.date, t); b.disabled = !ok; if (f.time === t) b.classList.add(tSel); b.onclick = function () { f.time = t; if (f.err && /slot|time/.test(f.err.kind)) f.err = null; PB.render(); }; grid.appendChild(b); });
+  PB.TIMES.forEach(function (t) { if ((f.date + ' ' + t) <= PB.NOWTS) return; /* 실화면(STG 2026-10-14): 오늘의 지난 시간은 흐리게가 아니라 아예 안 보임 */ var b = tT.cloneNode(true); b.textContent = t; var ok = PB.slotOpen(f.date, t); b.disabled = !ok; if (f.time === t) b.classList.add(tSel); b.onclick = function () { f.time = t; if (f.err && /slot|time/.test(f.err.kind)) f.err = null; PB.render(); }; grid.appendChild(b); });
   if (f.err && f.err.kind === 'slot') { var se = document.createElement('p'); se.className = 'pb-ferr'; se.textContent = 'This time was just taken. Please pick another time.'; grid.after(se); }
   /* 다음 버튼 */
   var nb = $('[class*=scheduleNextButton]');

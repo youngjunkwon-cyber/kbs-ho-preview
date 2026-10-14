@@ -2544,7 +2544,7 @@ function pDash() {
   var PER = { '이번 주': ['2026-10-12', '2026-10-18'], '지난주': ['2026-10-05', '2026-10-11'], '1개월': ['2026-09-13', '2026-10-12'], '3개월': ['2026-07-14', '2026-10-12'], '전체': ['0000', '9999'] };
   h.per = h.per || '이번 주'; var pr = PER[h.per], inR = function (d) { return d >= pr[0] && d <= pr[1]; };
   var MV = { '스토어 방문': 0, '상품 방문': 0, '메신저 문의': 0, '채팅 문의': 0,
-    '예약 확정': PB.DB.books.filter(function (x) { return inR(x.recv.slice(0, 10)); }).length,
+    '예약 확정': PB.DB.books.filter(function (x) { return inR(x.recv.slice(0, 10)) && !/취소/.test(x.status); /* 확정 건만, 취소는 세지 않음 (사용자 결정 2026-10-14) */ }).length,
     '방문 완료': PB.DB.books.filter(function (x) { return x.status === '방문완료' && inR(x.visit.slice(0, 10)); }).length };
   var FIX = { '스토어 방문': 1, '상품 방문': 1 }, mg = $('[class*=metricGrid]'), shown = 0;
   $$('[class*=metricCard]', mg).forEach(function (cd) { var k = $(':scope > span:not([class*=metricIcon])', cd).textContent.trim(), v = MV[k] || 0; var st = $('strong', cd); st.firstChild.textContent = v; var on = FIX[k] || v > 0; cd.style.display = on ? '' : 'none'; cd.setAttribute('data-test', 'metric-' + k); if (on) shown++; });
