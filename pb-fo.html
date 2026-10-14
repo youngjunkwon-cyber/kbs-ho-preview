@@ -1008,7 +1008,7 @@ function fillDrawer(pre, b, qrCls) {
   $('h3', ps).textContent = '예약 상품'; ps.setAttribute('data-test', 'prod-block'); var box = $('[class*=readonlyBox]', ps); box.classList.add('pb-prodbox');
   if (!b.snap) { ps.setAttribute('data-kind', 'consult'); box.textContent = '스토어 예약'; }
   else { var lp = PB.prodById(b.prodId), live = lp && PB.prodVisible(lp, b.snap.lang);
-    box.innerHTML = '<span class="pb-prodbox-t"><b>' + esc(b.snap.name) + '</b><span>' + PB.won(b.snap.price) + '원</span></span>' + (live ? '<a class="pb-prod-l" href="#">상품 보기</a>' : ''); }
+    box.innerHTML = '<span class="pb-prodbox-t"><b>' + esc(b.snap.name) + '</b><span>' + PB.won(b.snap.price) + '원</span></span>' + (live ? '<a class="pb-prod-l" href="#" onclick="event.preventDefault();toast(\'시안에서는 동작하지 않습니다\')">상품 보기</a>' : ''); }
   (cr || $('h2', cont)).after(mark(ps));
   var qr = b.contact === 'WeChat' || b.contact === 'LINE';
   var V = { '매장': PB.DB.store.name, '여권명': b.name, '국적': b.nation, '언어': langLabel(b.lang), '전화번호': b.phone, '예약 번호': b.rno, '접수 시각': b.recv, '등록 방식': b.owner,
@@ -1056,8 +1056,8 @@ function fillDrawer(pre, b, qrCls) {
 /* 예약 시간 변경 모달: 실화면 스냅샷(hm_/bm_시간변경) 그대로, 요약(기존 예약) 아래에 예약 상품 한 줄만 더한다 */
 function timeModal(pre, b, dt) {
   var t = tpl(pre === 'bd' ? 'bm_시간변경' : 'hm_시간변경'), root = t.firstElementChild; document.getElementById('app').appendChild(root);
-  var ob = $('[class*=originalBooking]', root); $('strong', ob).textContent = dt(b.visit);
-  var pr = ob.cloneNode(true); $('span', pr).textContent = '예약 상품'; $('strong', pr).textContent = b.snap ? b.snap.name : '스토어 예약'; pr.setAttribute('data-test', 'modal-prod'); ob.after(mark(pr));
+  var ob = $('[class*=originalBooking]', root); $('strong', ob).textContent = b.visit.slice(0, 10) + ' (' + PB.wdKo(b.visit.slice(0, 10)) + ') ' + b.visit.slice(11);
+  var pr = ob.cloneNode(true), pv = b.snap ? b.snap.name : '스토어 예약'; $('span', pr).textContent = '예약 상품'; $('span', pr).classList.add('pb-mlab'); $('strong', pr).textContent = pv; $('strong', pr).title = pv; $('strong', pr).classList.add('pb-mval'); pr.setAttribute('data-test', 'modal-prod'); ob.after(mark(pr));
   var di = $('input#bookingDate', root); if (di) di.value = b.visit.slice(0, 10);
   var tv = $('[class*=ant-select-content]', root) || $('.ant-select-selection-item', root); if (tv && tv.firstChild && tv.firstChild.nodeType === 3) tv.firstChild.textContent = b.visit.slice(11);
   root.setAttribute('data-test', 'time-modal');
@@ -1091,13 +1091,13 @@ var DETAIL = {
   _: { desc: 'Treatment details vary by procedure.', t: 'Varies by treatment', a: 'Varies by treatment', r: 'Varies by treatment', v: 'Varies by treatment' }
 };
 /* 스토어 페이지 상품 카드 한 장 (목록과 같은 동작: View Details = 상품 상세, 화살표 = 설명 펼침) */
-function fullCard(o, f) {
-  var Pc = 'StoreDetailProductCard-module-scss-module__qqh-iG__', open = !!(f.acc = f.acc || {})[o.id];
+function fullCard(o, f, accKey) {
+  var ak = accKey || 'acc', Pc = 'StoreDetailProductCard-module-scss-module__qqh-iG__', open = !!(f[ak] = f[ak] || {})[o.id];
   var li = tpl('f_store9').querySelector('#store-section-products [class*=productGrid] li').cloneNode(true), art = li.querySelector('article');
   li.querySelector('h3').textContent = o.name; li.querySelector('p[class*=__price]').textContent = krw(o.price);
-  var more = li.querySelector('[class*=moreButton]'); more.onclick = function (e) { e.preventDefault(); e.stopPropagation(); f.pid = o.id; f.entry = 'product'; f.screen = 'product'; PB.render(); };
+  var more = li.querySelector('[class*=moreButton]'); more.onclick = function (e) { e.preventDefault(); e.stopPropagation(); f.back = { screen: f.screen, entry: f.entry, sel: f.sel }; f.pid = o.id; f.screen = 'product'; PB.render(); };
   var ic = li.querySelector('[class*=iconButton]'); ic.setAttribute('aria-expanded', open ? 'true' : 'false'); ic.setAttribute('data-test', 'fo-acc-' + o.id);
-  ic.onclick = function (e) { e.stopPropagation(); f.acc[o.id] = !open; PB.render(); };
+  ic.onclick = function (e) { e.stopPropagation(); f[ak][o.id] = !open; PB.render(); };
   if (open) { art.classList.add(Pc + 'cardOpen'); var d = DETAIL[o.sub] || DETAIL._, pn = document.createElement('div'); pn.className = Pc + 'detailPanel';
     pn.innerHTML = '<p class="' + Pc + 'description">' + esc(d.desc) + '</p><div class="' + Pc + 'detailDivider"></div><dl class="' + Pc + 'detailList">' + [['Procedure Time', d.t], ['Anesthesia', d.a], ['Recovery Time', d.r], ['Visible Results In', d.v]].map(function (x) { return '<div><dt>' + x[0] + '</dt><dd>' + esc(x[1]) + '</dd></div>'; }).join('') + '</dl>'; art.appendChild(pn); }
   return li;
@@ -1133,20 +1133,37 @@ function pStore() {
     var cont = card.parentElement; while (cont && cont.querySelectorAll('article[class*=StoreDetailProductCard]').length < 2 && cont.parentElement) cont = cont.parentElement;
     var wrap = card; while (wrap.parentElement !== cont) wrap = wrap.parentElement;
     var wt = wrap.cloneNode(true); Array.prototype.slice.call(cont.children).forEach(function (ch) { if (ch.querySelector('article[class*=StoreDetailProductCard]') || /StoreDetailProductCard/.test(ch.className)) ch.remove(); });
-    PB.DB.prods.filter(function (p) { return PB.prodVisible(p, f.lang) && (f.ch === 'web' || p.exposeCh !== 'web'); }).forEach(function (p) {
-      /* 예약 화면 목록과 같은 카드 부품: View Details = 상품 상세, 화살표 = 설명 펼침/닫힘 (실화면 동작) */
-      var w = fullCard(p, f); $('article', w).setAttribute('data-test', 'fo-card-' + p.id);
+    /* 예약 화면 목록과 같은 카드 부품 · 칩 · 5개씩 더 보기 (스토어 페이지 전용 상태 f.scat / f.sshow) */
+    var vis = PB.DB.prods.filter(function (p) { return PB.prodVisible(p, f.lang) && (f.ch === 'web' || p.exposeCh !== 'web'); });
+    var ssec = $('#store-section-products'), stabs = ssec && $('[class*=categoryTabs]', ssec);
+    var scats = ['All']; vis.forEach(function (o) { var c = SUB_EN[o.sub] || o.sub; if (scats.indexOf(c) < 0) scats.push(c); });
+    if (scats.indexOf(f.scat || 'All') < 0) f.scat = 'All';
+    if (stabs) { var stT = stabs.children[0].cloneNode(true), sOn = stT.className.split(' ').filter(function (c) { return /categoryTabActive/.test(c); })[0];
+      stabs.innerHTML = ''; scats.forEach(function (c) { var t = stT.cloneNode(true); t.textContent = c; var on = (f.scat || 'All') === c; t.className = stT.className.split(' ').filter(function (x) { return x !== sOn; }).join(' ') + (on ? ' ' + sOn : ''); t.setAttribute('aria-selected', on ? 'true' : 'false'); t.onclick = function () { f.scat = c; f.sshow = 5; PB.render(); }; stabs.appendChild(t); }); }
+    var sall = vis.filter(function (o) { return (f.scat || 'All') === 'All' || (SUB_EN[o.sub] || o.sub) === f.scat; }), slim = f.sshow || 5;
+    sall.slice(0, slim).forEach(function (p) {
+      var w = fullCard(p, f, 'accS'); $('article', w).setAttribute('data-test', 'fo-card-' + p.id);
       cont.appendChild(w);
     });
+    var smore = ssec && $('[class*=moreProductsContainer]', ssec);
+    if (smore) { if (sall.length > slim) { smore.setAttribute('data-test', 'fo-store-more'); $('button', smore).onclick = function () { f.sshow = slim + 5; PB.render(); }; } else smore.remove(); }
   }
   /* 하단 버튼: 스토어 예약 버튼 */
   var ft = $('footer[class*=productDetailFooter]'), book = ft && $$('button', ft).filter(function (b) { return /Book now/.test(b.textContent); })[0];
   if (book) { if (!PB.storeBookBtn(f.ch)) book.remove(); else { book.setAttribute('data-test', 'store-book'); book.onclick = function () { startBook('store'); }; } }
+  /* 알리페이 채널에는 메신저 버튼이 없음(알리페이 PRD) */
+  if (ft && f.ch === 'ali') $$('button', ft).forEach(function (b) { if (!/Book now/.test(b.textContent)) b.remove(); });
   soloMessenger(ft, 'KakaoTalk');
-  var chat = ft && $('button', ft); if (chat) chat.onclick = function () { toast('Not available in this mockup'); };
+  var chat = ft && $('button', ft); if (chat && !/Book now/.test(chat.textContent)) chat.onclick = function () { toast('Not available in this mockup'); };
 }
 /* 하단 버튼이 메신저 하나만 남으면 실화면의 단독 메신저 버튼(messengerButton: #2d2d2d 바탕, 흰 "Chat on" 16px + 메신저 로고)으로 교체 */
 var MSG_LOGO = { KakaoTalk: 'kakaotalk.3b065h1wjn7xe.svg', WeChat: 'wechat.3ozdl1nlx1n2q.svg', WhatsApp: 'whatsapp.05f013tjv-8yp.svg', LINE: 'line.1c_mng3lzxh54.svg', Facebook: 'facebook.36abnljkoj4sc.svg' };
+function msgButton(name) {
+  var nb = document.createElement('button'); nb.type = 'button'; nb.className = 'pb-msg1'; nb.setAttribute('data-test', 'fo-msg');
+  nb.innerHTML = '<span class="pb-msg1-l">Chat on</span><img alt="' + name + '" height="16" src="https://k-beautystation-web.vercel.app/_next/static/immutable/media/' + MSG_LOGO[name] + '">';
+  nb.onclick = function () { toast('Not available in this mockup'); };
+  return nb;
+}
 function soloMessenger(ft, name) {
   if (!ft) return; var bs = $$('button', ft); if (bs.length !== 1 || /Book now/.test(bs[0].textContent)) return;
   var nb = document.createElement('button'); nb.type = 'button'; nb.className = 'pb-msg1'; nb.setAttribute('data-test', 'fo-msg-solo');
@@ -1154,7 +1171,7 @@ function soloMessenger(ft, name) {
   nb.onclick = function () { toast('Not available in this mockup'); };
   bs[0].replaceWith(nb);
 }
-function startBook(entry) { var f = F(); f.entry = entry; f.sel = ''; f.time = ''; f.err = null; f.date = PB.TODAY; /* 실화면: 처음엔 오늘이 선택돼 있음 */ nav('book'); }
+function startBook(entry) { var f = F(); f.viaUrl = false; f.entry = entry; f.sel = ''; f.time = ''; f.err = null; f.date = PB.TODAY; /* 실화면: 처음엔 오늘이 선택돼 있음 */ f.cat = 'All'; f.showN = 5; f.acc = {}; nav('book'); }
 
 /* ---------- 상품 상세 ---------- */
 function pProduct() {
@@ -1163,14 +1180,21 @@ function pProduct() {
     var app = document.getElementById('app'); app.innerHTML = ''; app.appendChild(header('', 'store'));
     var e = document.createElement('div'); e.className = 'pb-404'; e.innerHTML = '<div class="pb-404-c">404</div><div class="pb-404-t">We couldn\'t find this page</div>'; app.appendChild(e); return;
   }
+  /* 헤더: Go Back = 들어온 자리로(스토어 페이지 · 예약 화면 · 내 예약 상세), 기억한 자리가 없으면 스토어 페이지 */
+  $$('header button').forEach(function (b) { if (b.getAttribute('aria-label') === 'Go Back') b.onclick = function () { var bk = f.back; f.back = null; if (bk) { f.screen = bk.screen; if (bk.entry) f.entry = bk.entry; if (bk.sel !== undefined) f.sel = bk.sel; PB.render(); } else nav('store'); }; else b.onclick = function () { toast('Not available in this mockup'); }; });
   var h1 = $('h1[class*=productName]'); if (h1) h1.textContent = p.name;
+  /* 4: Recommended Services = 지금 보이는 다른 시드 상품(실화면 카드 부품 그대로), 없으면 영역 없음 */
+  var rsec = $('section[aria-labelledby=recommended-services-heading]');
+  if (rsec) { var rul = $('ul', rsec), rli = rul && $('li', rul), recs = PB.DB.prods.filter(function (q) { return q.id !== p.id && PB.prodVisible(q, f.lang) && !(f.ch === 'ali' && q.exposeCh === 'web'); });
+    if (!rli || !recs.length) { var rdv = rsec.previousElementSibling; if (rdv && /divider/.test(rdv.className)) rdv.remove(); rsec.remove(); }
+    else { var rT = rli.cloneNode(true); rul.innerHTML = ''; rul.setAttribute('data-test', 'fo-recs'); recs.slice(0, 10).forEach(function (q) { var li = rT.cloneNode(true), a = $('a', li), im = $('img', li), hd = $('[class*=__header]', li), pr = $('[class*=__price]', li); $('h3', li).textContent = q.name; if (pr) { var sp = $$('span', pr); if (sp[0]) sp[0].textContent = PB.won(q.price); pr.setAttribute('aria-label', 'price ' + PB.won(q.price) + ' KRW'); } if (im) { im.removeAttribute('src'); im.style.visibility = 'hidden'; } if (hd) hd.style.background = thumbColor(q.id); var sn = $('[class*=__storeName]', li); if (sn) sn.textContent = PB.DB.store.nameEn; a.setAttribute('aria-label', q.name + ' product detail view'); a.removeAttribute('href'); a.onclick = function (e) { e.preventDefault(); f.pid = q.id; PB.render(); }; rul.appendChild(li); }); } }
   var pr = $('[class*=price__value]'); if (pr) pr.textContent = krw(p.price);
   $$('[class*=description__text]').forEach(function (d) { d.textContent = p.name; });
-  var ft = $('footer[class*=productDetailFooter]'); if (ft) ft.remove();
-  var nf = footerFrom(); document.getElementById('app').appendChild(nf);
-  var book = $$('button', nf).filter(function (b) { return /Book now/.test(b.textContent); })[0];
-  if (!PB.judgeBookable(p, f.lang, f.ch).ok) { book.remove(); soloMessenger(nf, 'KakaoTalk'); } else { book.setAttribute('data-test', 'prod-book'); book.onclick = function () { p.bclk = (p.bclk || 0) + 1; startBook('product'); }; mark(book); }
-  $('button', nf).onclick = function () { toast('Not available in this mockup'); };
+  /* 하단 버튼 줄: 상품 상세 실화면 부품(Bwsfja productDetailFooter). 메신저 = 검은 messengerButton(STG 상품 3222 실측), 예약 = productDetailFooter__button--primary1 */
+  var nf = $('footer[class*=productDetailFooter]'); if (!nf) { nf = document.createElement('footer'); nf.className = 'index-module-scss-module__Bwsfja__productDetailFooter'; document.getElementById('app').appendChild(nf); } nf.innerHTML = '';
+  if (f.ch !== 'ali') nf.appendChild(msgButton('KakaoTalk'));
+  var book = document.createElement('button'); book.type = 'button'; book.className = 'index-module-scss-module__Bwsfja__productDetailFooter__button index-module-scss-module__Bwsfja__productDetailFooter__button--primary1'; book.textContent = 'Book now'; nf.appendChild(book);
+  if (!PB.judgeBookable(p, f.lang, f.ch).ok) { book.remove(); var only = $('.pb-msg1', nf); if (only) only.setAttribute('data-test', 'fo-msg-solo'); } else { book.setAttribute('data-test', 'prod-book'); book.onclick = function () { p.bclk = (p.bclk || 0) + 1; startBook('product'); }; mark(book); }
 }
 
 /* ---------- 예약 일정 (상품 영역 추가) ---------- */
@@ -1178,6 +1202,7 @@ function pBook() {
   var f = F();
   if (!PB.DB.store.bookingSetting) { var app = document.getElementById('app'); app.innerHTML = ''; app.appendChild(header('Book', 'store')); var s = document.createElement('div'); s.className = 'pb-stop'; s.innerHTML = '<b>Bookings are unavailable right now</b><span>This store has temporarily paused bookings</span>'; app.appendChild(s); return; }
   $('header [class*=headerTitle]').textContent = 'Book';
+  if (f.viaUrl && f.entry === 'product') { var up = PB.prodById(f.pid); if (!up || !PB.judgeBookable(up, f.lang, f.ch).ok) { $$('[class*=scheduleCalendar], [class*=scheduleDivider], [class*=timeSection], [class*=scheduleFooter]').forEach(function (x) { x.remove(); }); var ub = document.createElement('div'); ub.className = 'pb-ferr box'; ub.setAttribute('data-test', 'fo-url-err'); ub.innerHTML = "This product can't be booked right now.<button class='pb-ferr-b' type='button'>Go to store page</button>"; var si = $('[class*=scheduleIntro]'); if (si) si.after(mark(ub)); else ($('main') || document.getElementById('app')).prepend(mark(ub)); $('button', ub).onclick = function () { f.viaUrl = false; nav('store'); }; $$('header button').forEach(function (b, i) { b.onclick = function () { f.viaUrl = false; nav('store'); }; }); return; } }
   $$('header button').forEach(function (b, i) { b.onclick = function () { nav(i === 0 ? (f.entry === 'product' ? 'product' : 'store') : 'store'); }; });
   /* 상품 영역 */
   var intro = $('[class*=scheduleIntro]'), sec = document.createElement('section'); sec.className = 'BookingSchedulePage-module-scss-module__TxJ5FW__timeSection pb-fsec'; sec.innerHTML = '<h2>Product</h2>';
@@ -1224,7 +1249,7 @@ function pBook() {
   if (noPick) f.sel = '';
   var ts = $$('[class*=timeSection]').filter(function (x) { return x !== sec; })[0], dv = $('[class*=scheduleDivider]');
   if (!noPick) { ts.after(mark(sec)); if (dv) sec.before(dv.cloneNode(true)); }
-  else if (f.err && f.err.kind === 'pickAgain') { var ne = $('.pb-ferr', sec); ts.after(ne); }
+  else if (f.err && f.err.kind === 'pickAgain') { var ne = $('.pb-ferr', sec); ne.textContent = '지금 이 상품은 예약할 수 없어요. 그대로 예약하고 매장에서 정할 수 있어요.'; ts.after(ne); }
   /* 달력 */
   var days = $('[class*=__days]'), dayT = $('button[class*=__day]', days).cloneNode(true), selCls = (Array.prototype.slice.call($$('button[class*=__day]', days)).map(function (b) { return b.className.split(' ').filter(function (c) { return /selectedDay/.test(c); })[0]; }).filter(Boolean)[0]) || 'x';
   dayT.className = dayT.className.split(' ').filter(function (c) { return !/selectedDay/.test(c); }).join(' ');
@@ -1268,7 +1293,6 @@ function pInfo() {
   setIn('input[name=passportName]', 'KAITLYN CHAN'); f.birth = f.birth || '1996-04-12'; setIn('input[name=birthDate]', f.birth); var bi = $('input[name=birthDate]'); if (bi) { bi.readOnly = false; bi.oninput = function () { f.birth = bi.value; }; } setIn('input[type=email]', 'kaitlyn@example.com (Verified)'); setIn('input[name=messengerId]', 'kaitlyn.chan');
   var tl = $$('[class*=triggerLabel]'); if (tl[0]) tl[0].textContent = 'Canada'; if (tl[1]) tl[1].textContent = 'Female';
   var cc = $('[class*=verifiedCountryCode]'); if (cc) cc.textContent = '+1'; var pn = $('[class*=verifiedPhoneNumber]'); if (pn) pn.textContent = '4165550199 (Verified)';
-  var ta = $('textarea'); if (ta) ta.placeholder = 'e.g. I would like a consultation. Is English interpretation available? I am also curious about recovery time.';
   /* 메신저 칩 (아이콘은 라이브 정적 파일) */
   var ICON = { WhatsApp: 'whatsapp.0hq-eh2chewsx.png', LINE: 'line.3qblh4j4u4rrq.png', WeChat: 'wechat.38ybbwvm7ncvr.png', KakaoTalk: 'kakaotalk.0y3rqbtj5gp03.png' };
   var chips = $$('[class*=messengerChips] button'), selCls = 'BookingInformationPage-module-scss-module__oG4JGG__messengerChipSelected'; f.msg = f.msg || 'WhatsApp';
@@ -1286,7 +1310,7 @@ function pInfo() {
     $('button', dm).onclick = function () { f.err = null; PB.render(); }; document.getElementById('app').appendChild(mark(dm));
   }
   var sb = $('[class*=informationFooter] button'); sb.setAttribute('data-test', 'fo-submit'); sb.disabled = !f.agree;
-  sb.onclick = function (e) { e.preventDefault(); if (sb.disabled) return; if (bi) f.birth = bi.value; PB.foSubmit(); var er = f.err; if (er && (er.kind === 'pickAgain' || er.kind === 'slot' || er.kind === 'time')) { f.screen = 'book'; } PB.render(); };
+  sb.onclick = function (e) { e.preventDefault(); if (sb.disabled) return; if (bi) f.birth = bi.value; PB.foSubmit(); var er = f.err; if (er && (er.kind === 'pickAgain' || er.kind === 'slot' || er.kind === 'time' || er.kind === 'closed')) { f.screen = 'book'; } PB.render(); };
 }
 
 /* ---------- 예약 완료 / 내 예약 (실측 수치로 재현) ---------- */
@@ -1361,7 +1385,7 @@ function pMyPage() {
 
 function pMy() {
   var f = F(), app = document.getElementById('app'); app.innerHTML = ''; app.appendChild(header('Bookings & Consultations', 'store'));
-  var mine = PB.DB.books.filter(function (b) { return b.name === PB.ME; });
+  var mine = PB.DB.books.filter(function (b) { return b.name === PB.ME; }).sort(function (a, c) { return a.visit < c.visit ? -1 : 1; }); /* 정렬 표시 "Visit date & time"과 같게 */
   var grp = { upcoming: mine.filter(function (b) { return b.status === '예약' || b.status === '변경요청'; }), visited: mine.filter(function (b) { return b.status === '방문완료'; }), cancelled: mine.filter(function (b) { return /취소|미방문/.test(b.status); }) };
   var list = grp[f.tab] || [], ttl = { upcoming: 'Upcoming bookings', visited: 'Completed visits', cancelled: 'Cancelled bookings' }[f.tab];
   var w = document.createElement('main'); w.className = 'pb-my';
@@ -1394,13 +1418,14 @@ function fillProdSlots(w) {
     var pr = card.querySelector('[class*=__price]'); if (b.snap) { var sps = pr.querySelectorAll('span'); sps[0].textContent = PB.won(b.snap.price); pr.setAttribute('aria-label', 'price ' + PB.won(b.snap.price) + ' KRW'); } else pr.remove();
     card.querySelector('[class*=__storeName]').textContent = PB.DB.store.nameEn;
     var rr = card.querySelector('[class*=reviewRating]'), rc = card.querySelector('[class*=reviewCount]'); if (rr) rr.textContent = '4.9'; if (rc) rc.textContent = '(5,000+)';
-    a.setAttribute('aria-label', (b.snap ? b.snap.name : 'Decide at the store') + ' product detail view');
-    var live = p && p.id && PB.prodVisible(p, b.snap.lang);
-    a.onclick = function (e) { e.preventDefault(); if (live) { F().pid = p.id; nav('product'); } else if (!b.snap) nav('store'); };
+    a.setAttribute('aria-label', b.snap ? b.snap.name + ' product detail view' : 'Decide at the store'); if (!b.snap) a.style.cursor = 'default';
+    var live = p && p.id && PB.prodVisible(p, b.snap.lang) && !(F().ch === 'ali' && p.exposeCh === 'web');
+    /* 상품 상세는 예약한 언어로 연다(다른 언어로 보고 있어도 404가 나지 않게). 상품 없는 예약 카드는 누르는 동작 없음 */
+    a.onclick = function (e) { e.preventDefault(); if (live) { F().back = { screen: F().screen }; F().lang = b.snap.lang; F().pid = p.id; nav('product'); } };
     card.style.width = '180px'; slot.appendChild(card);
   });
 }
-function bindLinks(w) { fillProdSlots(w); $$('[data-pid]', w).forEach(function (a) { a.onclick = function () { F().pid = +a.getAttribute('data-pid'); nav('product'); }; }); }
+function bindLinks(w) { fillProdSlots(w); $$('[data-pid]', w).forEach(function (a) { a.onclick = function () { F().back = { screen: F().screen }; F().pid = +a.getAttribute('data-pid'); nav('product'); }; }); }
 window.draw = draw;
 PB.ready('FO');
 </script></body></html>
