@@ -2710,16 +2710,7 @@ function pEdit() {
   var pr = $('input#price'); if (pr) pr.value = PB.won(p.price);
   var ds = $('textarea'); if (ds) ds.value = p.name;
   $$('[class*=pageHeader__right] button').forEach(function (b) { var t = b.textContent.trim(); if (t === '목록') b.onclick = function () { go('prod'); }; else b.onclick = function () { toast('시안에서는 동작하지 않습니다'); }; });
-  var priceItem = $('input#price').closest('.ant-form-item'), col = priceItem.closest('.ant-col');
-  var row = document.createElement('div'); row.className = 'pb-ro-row';
-  var w = PB.prodBookBtn(p, 'web'), a = PB.prodBookBtn(p, 'ali');
-  var lab = $('.ant-form-item-label', priceItem).cloneNode(true); $('label', lab).textContent = '예약 버튼'; $('label', lab).className = ''; $('label', lab).removeAttribute('for');
-  row.appendChild(lab);
-  var box = document.createElement('div'); box.className = 'pb-ro'; box.setAttribute('data-test', 'host-btn');
-  box.innerHTML = '<span>웹</span><b class="pb-st ' + (w ? 'on' : '') + '">' + (w ? '켜짐' : '꺼짐') + '</b><span style="margin-left:14px">알리페이</span><b class="pb-st ' + (a ? 'on' : '') + '">' + (a ? '켜짐' : '꺼짐') + '</b>';
-  row.appendChild(box);
-  var ex = document.createElement('div'); ex.className = 'pb-extra'; ex.textContent = '예약 버튼은 K-Beauty Station이 켜고 꺼요. 바꾸고 싶으면 담당 매니저에게 말씀해 주세요.'; row.appendChild(ex);
-  col.closest('.ant-row').after(mark(row));
+  /* 예약 버튼 상태 줄은 넣지 않는다 (입점사는 예약 버튼을 보거나 바꾸지 않음, 2026-10-14 결정) */
 }
 window.draw = draw;
 PB.ready('HOST');
