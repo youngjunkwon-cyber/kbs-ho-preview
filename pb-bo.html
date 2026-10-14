@@ -3024,7 +3024,7 @@ function addCol(afterLabel, label) {
   return i + 1;
 }
 /* 버튼 클릭수 = 상담접수 ~ 예약 칸의 합 */
-function clickSum(r) { var a = colIdx('상담접수'), z = colIdx('예약'), t = colIdx('버튼 클릭수'), n = 0; for (var i = a; i <= z; i++) n += +(r.children[i].textContent.replace(/[^0-9]/g, '') || 0); r.children[t].textContent = n; r.children[t].setAttribute('data-test', 'clksum'); }
+function clickSum(r) { var a = colIdx('상담접수'), z = colIdx('예약하기'), t = colIdx('버튼 클릭수'), n = 0; for (var i = a; i <= z; i++) n += +(r.children[i].textContent.replace(/[^0-9]/g, '') || 0); r.children[t].textContent = n; r.children[t].setAttribute('data-test', 'clksum'); }
 function rowsFrom(fn) { var tb = $('tbody'), rt = $('tr.ant-table-row', tb).cloneNode(true); $$('tr.ant-table-row', tb).forEach(function (r) { r.remove(); }); fn(tb, rt); }
 
 /* ---------- 예약 관리 ---------- */
@@ -3085,8 +3085,10 @@ function pProd() {
   var all = $$('tbody tr.ant-table-row');
   var stOf = function (r) { var s = r.children[colIdx('상태')]; return s ? s.textContent.trim() : ''; };
   var rApp = (all.filter(function (r) { return stOf(r) === '승인'; })[0] || all[0]).cloneNode(true), rPend = (all.filter(function (r) { return stOf(r) === '대기'; })[0] || all[0]).cloneNode(true);
-  var fi = colIdx('페이스북'), ki = addCol('페이스북', '예약'), ci = addCol('예약', '예약 건수');
-  [rApp, rPend].forEach(function (r) { r.children[fi].after(r.children[fi].cloneNode(true)); r.children[fi].after(r.children[fi].cloneNode(true)); });
+  /* 이름 짓기는 기존 칸과 같게: 버튼 클릭수 안 "예약하기"(페이스북 다음), 건수 "예약수"(상담수 다음) */
+  var fi = colIdx('페이스북'), si = colIdx('상담수');
+  [rApp, rPend].forEach(function (r) { r.children[fi].after(r.children[fi].cloneNode(true)); r.children[si].after(r.children[si].cloneNode(true)); });
+  addCol('페이스북', '예약하기'); addCol('상담수', '예약수'); var ki = colIdx('예약하기'), ci = colIdx('예약수');
   rowsFrom(function (tb) {
     ps.forEach(function (p) {
       var r = (p.status === 'approved' ? rApp : rPend).cloneNode(true);
@@ -3169,19 +3171,19 @@ function offModal() {
 
 /* ---------- 기획전 관리 ---------- */
 function pCol() {
-  var b = B(), fi = colIdx('페이스북'), ki = addCol('페이스북', '예약'), ci = addCol('예약', '예약 건수');
+  var b = B(), fi = colIdx('페이스북'), si = colIdx('상담수'); addCol('페이스북', '예약하기'); addCol('상담수', '예약수');
   rowsFrom(function (tb, rt) {
     PB.DB.cols.forEach(function (c) {
       var r = rt.cloneNode(true), sum = c.items.reduce(function (a, id) { return a + PB.prodBookCount(id); }, 0);
       var kc = r.children[fi].cloneNode(true); kc.textContent = c.items.reduce(function (a, id) { return a + (PB.prodById(id).bclk || 0); }, 0); kc.setAttribute('data-test', 'colclk-' + c.id); r.children[fi].after(mark(kc));
-      var nc = r.children[fi].cloneNode(true); nc.textContent = sum; nc.style.fontWeight = '700'; nc.setAttribute('data-test', 'col-' + c.id); kc.after(mark(nc)); clickSum(r);
+      var nc = r.children[si].cloneNode(true); nc.textContent = sum; nc.style.fontWeight = '700'; nc.setAttribute('data-test', 'col-' + c.id); r.children[si].after(mark(nc)); clickSum(r);
       setCell(r, '기획전 상태', '활성'); setCell(r, '언어', langLabel(c.lang)); setCell(r, '노출 기간', c.period); setCell(r, '유형', c.type); setCell(r, '기획전명', c.name); setCell(r, '상품', c.items.length); setCell(r, '스토어', 0);
       r.style.cursor = 'pointer'; r.onclick = function () { b.col = b.col === c.id ? null : c.id; PB.render(); };
       tb.appendChild(r);
       if (b.col === c.id) {
         var er = document.createElement('tr'); er.className = 'ant-table-expanded-row pb-new';
         var tot = 0, rows = c.items.map(function (id) { var p = PB.prodById(id), n = PB.prodBookCount(id); tot += n; return '<tr><td>' + esc(p.name) + '</td><td>' + langLabel(p.lang) + '</td><td data-test="colp-' + id + '" style="text-align:right;font-weight:600">' + n + '</td></tr>'; }).join('');
-        er.innerHTML = '<td colspan="' + r.children.length + '" style="background:#fafafa;padding:12px 16px"><table class="pb-sub"><thead><tr><th>대상 상품</th><th>언어</th><th style="text-align:right">예약 건수</th></tr></thead><tbody>' + rows + '<tr class="pb-sub-tot"><td>합계</td><td></td><td data-test="col-total" style="text-align:right">' + tot + '</td></tr></tbody></table></td>';
+        er.innerHTML = '<td colspan="' + r.children.length + '" style="background:#fafafa;padding:12px 16px"><table class="pb-sub"><thead><tr><th>대상 상품</th><th>언어</th><th style="text-align:right">예약수</th></tr></thead><tbody>' + rows + '<tr class="pb-sub-tot"><td>합계</td><td></td><td data-test="col-total" style="text-align:right">' + tot + '</td></tr></tbody></table></td>';
         tb.appendChild(er);
       }
     });
