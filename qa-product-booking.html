@@ -107,7 +107,7 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
     </div>
     <div class="scroll">
       <p class="warn" id="fileWarn">파일을 직접 열어서 왼쪽 시안을 제어할 수 없습니다. 아래 배포 주소로 다시 열어 주세요.<br><a href="https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-product-booking.html" target="_blank">https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-product-booking.html</a></p>
-      <p class="hint">기준 문서: 상품예약_PRD_v0.28_20261014 · 스테이징 실화면을 그대로 떠서 만든 시안(HOST · BO 분홍 점선 = 이번에 더하는 요소) · 기준 시각 2026-10-12 12:00 · 시드 매장 아비쥬 명동점</p>
+      <p class="hint">기준 문서: 상품예약_PRD_v0.29_20261014 · 스테이징 실화면을 그대로 떠서 만든 시안(HOST · BO 분홍 점선 = 이번에 더하는 요소) · 기준 시각 2026-10-12 12:00 · 시드 매장 아비쥬 명동점</p>
       <ul class="guide">
         <li><b>이 화면 열기</b>를 누르면 왼쪽 시안이 그 케이스 상태로 맞춰집니다(매번 시드부터 다시 시작).</li>
         <li><b>조작</b>을 번호대로 하고, <b>기대</b>의 "2:" 는 조작 2번 뒤에 보여야 할 것입니다. 번호 없는 줄은 처음 화면 또는 전체에 해당합니다.</li>
@@ -115,7 +115,7 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
       </ul>
       <details class="out"><summary>이 시안에서 확인하지 않는 것</summary><ul>
         <li>BO 버튼 설정의 알리페이 열. 알리페이 채널 분기가 아직 라이브에 없어, 이 시안은 라이브 구조대로 예약 ON/OFF(웹) 한 줄만 둡니다. 알리페이 채널 동작은 고객 화면에서만 봅니다</li>
-        <li>고객 화면 예약 완료 화면. 실화면을 확보하지 못해 예약 상세 화면 양식을 따라 그렸습니다. 내 예약 목록 · 예약 상세 · 마이페이지 메인은 라이브 캡처(2026-10-14)와 같은 폭으로 대조해 다시 그린 화면입니다. 정보 입력 화면은 라이브 실화면을 떠서 쓰고, 동의 체크박스의 체크된 모양은 실화면을 확보하지 못해 분홍 채움 체크로 그렸습니다(시안 검수 편의를 위해 Book 이 필요한 항목은 동의를 미리 체크해 둠)</li>
+        <li>고객 화면 예약 완료 화면은 STG 테스트 예약(2026-10-14, 바로 취소함)으로 확인한 구조 그대로 다시 그렸습니다. 내 예약 목록 · 예약 상세 · 마이페이지 메인은 라이브 캡처(2026-10-14)와 같은 폭으로 대조해 다시 그린 화면입니다. 정보 입력 화면은 라이브 실화면을 떠서 쓰고, 동의 체크박스의 체크된 모양은 실화면을 확보하지 못해 분홍 채움 체크로 그렸습니다(시안 검수 편의를 위해 Book 이 필요한 항목은 동의를 미리 체크해 둠)</li>
         <li>고객 화면 문구는 영어 기준입니다. 언어를 바꾸면 상품 목록·선택지만 그 언어 상품으로 바뀝니다</li>
         <li>발송 템플릿 문안(알림톡·이메일·문자). 초안은 상품예약_발송템플릿_초안.md 에 따로 정리했습니다</li>
         <li>방문완료·미방문·변경 수락·거절 모달. 스테이징에 해당 상태의 처리 가능한 예약이 없어 실화면을 확보하지 못했습니다(요약이 있으면 시간 변경 모달과 같이 예약 상품 한 줄)</li>
@@ -196,8 +196,8 @@ var GROUPS = [
   {"id":"C-09","t":"그 사이 시간이 차면","open":"다른 고객이 같은 시간을 먼저 예약한 상태","code":"foOpenStore('en','web');STATE.fo.agree=true;STATE.fo.entry='store';STATE.fo.screen='info';STATE.fo.date='2026-10-19';STATE.fo.time='11:00';DB.books.push({no:99,visit:'2026-10-19 11:00',recv:'2026-10-12 11:59',name:'X',nation:'-',lang:'en',contact:'-',status:'예약',owner:'고객',route:'스토어',prodId:null,snap:null,need:'',ch:'웹',req:'',phone:'-',rno:'261012009EN99'})","steps":["Book 을 누릅니다."],"exp":["예약 일정 화면으로 돌아간다","\"This time was just taken. Please pick another time.\"","11:00 이 막혀 있다"]}
  ]],
  ["D","고객 화면 · 예약한 뒤","PRD 5.11 · 5.4",[
-  {"id":"D-01","t":"완료 · 내 예약 목록 · 상세의 상품","open":"정보 입력 화면","code":"foOpenProduct(101,'en','web');STATE.fo.agree=true;STATE.fo.entry='product';STATE.fo.screen='info';STATE.fo.date='2026-10-19';STATE.fo.time='11:00';","steps":["Book 을 누릅니다.","View my bookings 를 누릅니다.","방금 예약의 View details 를 누릅니다."],"exp":["1: 제목 \"Your booking is confirmed\" / Abijou Clinic Myeongdong(스토어가 제목)","1: 아래 Product 에 메인 화면 상품 카드(이미지 · Abijou Botox · 99,000 KRW · 스토어명 · 별점)","2: 카드 제목 \"Abijou Clinic Myeongdong (D-7)\", 바로 아래 진한 글자로 Abijou Botox","3: 같은 Product 카드, 누르면 상품 상세"]},
-  {"id":"D-02","t":"스토어 예약은 상품 자리에 스토어 예약","open":"스토어로 들어와 Store booking 그대로, 정보 입력 화면","code":"foOpenStore('en','web');STATE.fo.agree=true;STATE.fo.entry='store';STATE.fo.screen='info';STATE.fo.date='2026-10-19';STATE.fo.time='11:00';","steps":["Book 을 누릅니다.","위쪽 입점사 (HOST) → 예약 관리."],"exp":["1: Product 영역에 \"Store booking\" 카드(가격 없음, 스토어 대표 이미지)","2: 목록 맨 위(10-19 11:00) 고객 칸 둘째 줄 \"스토어 예약\""]},
+  {"id":"D-01","t":"완료 · 내 예약 목록 · 상세의 상품","open":"정보 입력 화면","code":"foOpenProduct(101,'en','web');STATE.fo.agree=true;STATE.fo.entry='product';STATE.fo.screen='info';STATE.fo.date='2026-10-19';STATE.fo.time='11:00';","steps":["Book 을 누릅니다.","View booking details 를 누릅니다.","위쪽 고객 화면에서 내 예약 목록(콘솔 go('FO','my'))을 엽니다."],"exp":["1: STG 실화면과 같은 완료 화면(초록 체크 · \"Your booking is complete\" · 요약 표 · View booking details · 설문 카드)","1: 요약 표 Store 바로 아래 \"Product  Abijou Botox\" 한 줄","2: 예약 상세 Product 에 메인 화면 상품 카드(이미지 · Abijou Botox · 99,000 KRW · 스토어명 · 별점)","2: 카드 제목 \"Abijou Clinic Myeongdong (D-7)\", 바로 아래 진한 글자로 Abijou Botox","3: 같은 Product 카드, 누르면 상품 상세"]},
+  {"id":"D-02","t":"스토어 예약은 상품 자리에 스토어 예약","open":"스토어로 들어와 Store booking 그대로, 정보 입력 화면","code":"foOpenStore('en','web');STATE.fo.agree=true;STATE.fo.entry='store';STATE.fo.screen='info';STATE.fo.date='2026-10-19';STATE.fo.time='11:00';","steps":["Book 을 누릅니다.","위쪽 입점사 (HOST) → 예약 관리."],"exp":["1: 완료 화면 요약 표의 Product 줄이 \"Store booking\"","2: 목록 맨 위(10-19 11:00) 고객 칸 둘째 줄 \"스토어 예약\""]},
   {"id":"D-03","t":"고객 예약 상세는 예약 때 저장한 값","open":"Abijou Botox 를 숨긴 뒤 고객 예약 상세","code":"setProd(101,{hidden:true});STATE.surf='FO';STATE.fo.screen='mydetail';STATE.fo.myNo=1;render()","steps":["없음. 화면만 확인합니다.","Product 카드를 누릅니다."],"exp":["1: Product 카드 가격 89,000 KRW(지금 상품가는 99,000)","2: 상품이 숨김이라 상품 상세로 가지 않는다"]},
   {"id":"D-04","t":"마이페이지 메인 Booking History 카드에도 상품","open":"고객 화면 마이페이지 메인(Kaitlyn Chan, 다가오는 예약 1건)","code":"STATE.surf='FO';go('FO','mypage')","steps":["없음. 화면만 확인합니다.","View list 를 누릅니다."],"exp":["Booking History 카드: 제목 \"Abijou Clinic Myeongdong (D-6)\", 바로 아래 진한 글자로 Abijou Botox(예약 목록 카드와 같은 모양)","2: 예약 목록으로 이동"],"note":"마이페이지 메인은 사용자 라이브 캡처(2026-10-14)를 보고 다시 그린 화면. 다가오는 예약이 여러 건일 때 카드가 어떻게 나오는지는 미확인(시안은 가장 가까운 1건)"}
  ]],
