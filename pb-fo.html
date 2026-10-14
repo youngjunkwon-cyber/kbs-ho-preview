@@ -1308,7 +1308,7 @@ function pDone() {
   var f = F(), b = bookingById(f.lastNo), app = document.getElementById('app'); app.innerHTML = ''; app.appendChild(header('', 'store'));
   var d = b.visit.slice(0, 10), vd = wdEn(d) + ', ' + d.slice(5, 7) + '/' + d.slice(8, 10) + '/' + d.slice(0, 4) + ' ' + b.visit.slice(11) + ' (KST)';
   var w = document.createElement('main'); w.className = 'pb-done';
-  w.innerHTML = '<section class="pb-dn-hero"><span class="pb-dn-ic"><svg width="23" height="16" viewBox="0 0 23 16" fill="none"><path d="M2 8l6.5 6L21 2" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><h1>Your booking is complete</h1><p>We sent the confirmation details to your email</p></div></section>'
+  w.innerHTML = '<section class="pb-dn-hero"><span class="pb-dn-ic"><svg width="23" height="16" viewBox="0 0 23 16" fill="none"><path d="M2 8l6.5 6L21 2" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><h1>Your booking is complete</h1><p>' + (b.ch === '알리페이' ? 'We sent the confirmation details by text message' : 'We sent the confirmation details to your email') + '</p></div></section>'
     + '<section class="pb-dn-sum"><dl><div><dt>Store</dt><dd>' + esc(PB.DB.store.nameEn) + '</dd></div>'
     + '<div class="pb-new" data-test="fo-done-prod"' + (b.snap ? '' : ' data-kind="consult"') + '><dt>Product</dt><dd>' + esc(b.snap ? b.snap.name : 'Decide at the store') + '</dd></div>'
     + '<div><dt>Visit date</dt><dd>' + vd + '</dd></div><div><dt>Booking number</dt><dd>' + b.rno + '</dd></div></dl>'
