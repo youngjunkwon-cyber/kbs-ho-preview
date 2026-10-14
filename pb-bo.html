@@ -2670,7 +2670,9 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 /* 스토어 문의 통계 시안: 도넛·그래프 자리 */
 .pb-donut{width:130px;height:130px;margin:24px auto 0;border-radius:50%;-webkit-mask:radial-gradient(circle,transparent 55%,#000 56%);mask:radial-gradient(circle,transparent 55%,#000 56%)}
 .pb-chartnote{display:flex;align-items:center;justify-content:center;height:100%;min-height:200px;color:#8c8c8c;font-size:13px}
-[class*=_summaryGrid_]{grid-template-columns:repeat(3,minmax(0,1fr))!important} /* 라이브 1440 화면과 같은 3열 (시안 프레임이 넓어 4열로 접히며 글자가 겹침) */
+/* 문의 통계 카드: 좁은 폭은 실화면처럼 자동(280px 이상, 2열), 넓은 폭에서만 라이브 1440 화면과 같은 3열 */
+[class*=_summaryGrid_]{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))!important}
+@media (min-width:1200px){[class*=_summaryGrid_]{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
 
 /* 예약 목록 고객 칸 둘째 줄(상품명): HOST처럼 한 줄 말줄임, 마우스 올리면 전체 이름 */
 [data-test=bcol-prod]{display:inline-block;max-width:116px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:top}

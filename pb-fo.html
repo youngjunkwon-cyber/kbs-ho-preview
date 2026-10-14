@@ -1096,7 +1096,7 @@ function fullCard(o, f, accKey) {
   var li = tpl('f_store9').querySelector('#store-section-products [class*=productGrid] li').cloneNode(true), art = li.querySelector('article');
   li.querySelector('h3').textContent = o.name; li.querySelector('p[class*=__price]').textContent = krw(o.price);
   var more = li.querySelector('[class*=moreButton]'); more.onclick = function (e) { e.preventDefault(); e.stopPropagation(); f.back = { screen: f.screen, entry: f.entry, sel: f.sel }; f.pid = o.id; f.screen = 'product'; PB.render(); };
-  var ic = li.querySelector('[class*=iconButton]'); ic.setAttribute('aria-expanded', open ? 'true' : 'false'); ic.setAttribute('data-test', 'fo-acc-' + o.id);
+  var ic = li.querySelector('[class*=iconButton]'); ic.setAttribute('aria-expanded', open ? 'true' : 'false'); ic.setAttribute('data-test', (ak === 'accTop' ? 'fo-acc-top-' : 'fo-acc-') + o.id);
   ic.onclick = function (e) { e.stopPropagation(); f[ak][o.id] = !open; PB.render(); };
   if (open) { art.classList.add(Pc + 'cardOpen'); var d = DETAIL[o.sub] || DETAIL._, pn = document.createElement('div'); pn.className = Pc + 'detailPanel';
     pn.innerHTML = '<p class="' + Pc + 'description">' + esc(d.desc) + '</p><div class="' + Pc + 'detailDivider"></div><dl class="' + Pc + 'detailList">' + [['Procedure Time', d.t], ['Anesthesia', d.a], ['Recovery Time', d.r], ['Visible Results In', d.v]].map(function (x) { return '<div><dt>' + x[0] + '</dt><dd>' + esc(x[1]) + '</dd></div>'; }).join('') + '</dl>'; art.appendChild(pn); }
@@ -1415,6 +1415,7 @@ function fillProdSlots(w) {
     var b = bookingById(+slot.getAttribute('data-bno')), card = tpl('fc_card').firstElementChild, a = card.querySelector('a'), p = b.snap ? (PB.prodById(b.prodId) || {}) : null;
     var hd = card.querySelector('[class*=__header]'), im = card.querySelector('img'); im.style.aspectRatio = '180 / 121'; im.style.objectFit = 'cover'; /* 실측: 카드 180x223, 이미지 180x121 (380px 폭 기준) */ if (b.snap) { im.removeAttribute('src'); im.style.visibility = 'hidden'; hd.style.background = thumbColor(b.prodId); } else im.src = 'https://image.kbstations.com/2025/06/25/e3de94ab-8ed5-4ac8-8f32-af57daafc04b'; /* 스토어 예약 = 스토어 대표 이미지 */
     card.querySelector('h3').textContent = b.snap ? b.snap.name : 'Decide at the store';
+    im.setAttribute('alt', (b.snap ? b.snap.name : PB.DB.store.nameEn) + ' product image');
     var pr = card.querySelector('[class*=__price]'); if (b.snap) { var sps = pr.querySelectorAll('span'); sps[0].textContent = PB.won(b.snap.price); pr.setAttribute('aria-label', 'price ' + PB.won(b.snap.price) + ' KRW'); } else pr.remove();
     card.querySelector('[class*=__storeName]').textContent = PB.DB.store.nameEn;
     var rr = card.querySelector('[class*=reviewRating]'), rc = card.querySelector('[class*=reviewCount]'); if (rr) rr.textContent = '4.9'; if (rc) rc.textContent = '(5,000+)';
