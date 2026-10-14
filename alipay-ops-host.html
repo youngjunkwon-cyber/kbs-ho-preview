@@ -445,7 +445,7 @@ function seedMsg(){
 var DB;
 function freshDB(){var lv=seedLive();DB={res:seedRes(),chatlog:seedChatlog(lv),live:lv,consult:seedConsult(),rev:seedRev(),msg:seedMsg()};}
 function freshState(){
- return {view:'dash',open:{chat:1,cons:1,res:0,gal:1},banner:true,
+ return {view:'dash',open:{qa:1,gal:1},banner:true,
   dash:{period:'이번 주',ch:'전체',tab:'전체'},
   res:{st:'전체',lang:'전체',ch:'전체',owner:'전체',q:'',qd:'',per:'',from:'',to:'',fromd:'',tod:'',basis:'방문일',sort:'방문일',page:1,open:null,ptab:'전체'},
   chatlog:{type:'전체',st:'전체',reply:'전체',unread:'전체',ch:'전체',name:'',named:'',msg:'',msgd:'',page:1,size:20},
@@ -486,10 +486,8 @@ function pager(page,total,size,path){
 /* ===== 셸 ===== */
 var NAV=[
  {t:'대시보드',ic:'home',go:'dash'},
- {g:'chat',t:'채팅 관리',ic:'chat',sub:[{t:'실시간 채팅',go:'live'},{t:'채팅내역조회',go:'chatlog'}]},
- {g:'cons',t:'상담 관리',ic:'list',nw:1,sub:[{t:'메신저상담'},{t:'상담접수',go:'consult'}]},
+ {g:'qa',t:'문의·예약',ic:'chat',nw:1,sub:[{t:'실시간 채팅',go:'live'},{t:'채팅내역조회',go:'chatlog'},{t:'메신저상담'},{t:'상담접수',go:'consult'},{t:'예약 현황',go:'res'},{t:'예약 시간 설정'}]},
  {t:'상품 관리',ic:'grid'},
- {g:'res',t:'예약 관리',ic:'cal',sub:[{t:'예약 현황',go:'res'},{t:'예약 시간 설정'}]},
  {t:'리뷰 관리',ic:'star',go:'rev'},
  {t:'스토어 칼럼 관리',ic:'book'},
  {g:'gal',t:'갤러리 관리',ic:'img',sub:[{t:'전/후 사진'},{t:'일반 사진'}]},
@@ -502,7 +500,7 @@ function shell(){
  NAV.forEach(function(n){
   if(!n.g){h+='<div class="mi'+(n.go?(S.view===n.go?' act':''):' dis')+'"'+(n.go?' data-act="go" data-v="'+n.go+'"':'')+'>'+ic(n.ic)+n.t+'</div>';return;}
   var op=S.open[n.g];
-  h+='<div class="mi grp'+(op?' open':'')+(n.nw?' new':'')+'"'+(n.nw?' title="이번에 순서를 옮긴 메뉴"':'')+' data-act="tg" data-v="'+n.g+'">'+ic(n.ic)+n.t+'<span class="chev">'+ic(op?'up':'down')+'</span></div>';
+  h+='<div class="mi grp'+(op?' open':'')+(n.nw?' new':'')+'"'+(n.nw?' title="이번에 새로 묶은 메뉴"':'')+' data-act="tg" data-v="'+n.g+'">'+ic(n.ic)+n.t+'<span class="chev">'+ic(op?'up':'down')+'</span></div>';
   if(op){h+='<div class="subs">'+n.sub.map(function(s){return '<div class="mi'+(s.go?(S.view===s.go?' act':''):' dis')+'"'+(s.go?' data-act="go" data-v="'+s.go+'"':'')+'>'+s.t+'</div>';}).join('')+'</div>';}
  });
  return '<div class="top"><div class="logo"><i>K</i>Beauty Station</div><div class="nb">시안 표시: 분홍 점선은 이번에 새로 더한 요소입니다 (라이브 화면에는 없고, 실제 배지는 중립 회색 윤곽선)</div><div class="user"><i></i>리버스클리닉 홍대점</div></div>'
@@ -769,7 +767,7 @@ function render(){
  if(fk){var fe2=document.querySelector('[data-d="'+fk+'"]')||document.querySelector('[data-b="'+fk+'"]')||document.getElementById(fk);if(fe2){fe2.focus();try{fe2.setSelectionRange(fs,fe);}catch(e){}}}
 }
 window.render=render;
-window.go=function(n){if(!VIEWS[n])return;S.view=n;if(n==='res')S.open.res=1;S.res.open=null;render();};
+window.go=function(n){if(!VIEWS[n])return;S.view=n;if(['live','chatlog','consult','res'].indexOf(n)>=0)S.open.qa=1;S.res.open=null;render();};
 window.resetDB=function(){freshDB();S=freshState();render();};
 Object.defineProperty(window,'VIEW',{get:function(){return S.view;}});
 window.setCh=function(v){
@@ -780,7 +778,7 @@ window.setCh=function(v){
 };
 window.setBadgeStyle=function(){render();};
 window.setPeriod=function(p){if(PERIODS.indexOf(p)<0)return;S.dash.period=p;render();};
-window.openRes=function(n){S.view='res';S.open.res=1;S.res.open=n;render();};
+window.openRes=function(n){S.view='res';S.open.qa=1;S.res.open=n;render();};
 window.openChat=function(n){S.view='live';S.live.sel=n;render();};
 /* ===== 이벤트 ===== */
 var toastT=null;
