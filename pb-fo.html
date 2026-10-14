@@ -1134,9 +1134,8 @@ function pStore() {
     var wrap = card; while (wrap.parentElement !== cont) wrap = wrap.parentElement;
     var wt = wrap.cloneNode(true); Array.prototype.slice.call(cont.children).forEach(function (ch) { if (ch.querySelector('article[class*=StoreDetailProductCard]') || /StoreDetailProductCard/.test(ch.className)) ch.remove(); });
     PB.DB.prods.filter(function (p) { return PB.prodVisible(p, f.lang) && (f.ch === 'web' || p.exposeCh !== 'web'); }).forEach(function (p) {
-      var w = wt.cloneNode(true), c = w.matches('article') ? w : $('article', w);
-      $('h3', c).textContent = p.name; $('p[class*=__price]', c).textContent = PB.won(p.price) + '  KRW';
-      var more = $('[class*=moreButton]', c) || c; more.onclick = function (e) { e.preventDefault(); f.pid = p.id; nav('product'); }; c.setAttribute('data-test', 'fo-card-' + p.id);
+      /* 예약 화면 목록과 같은 카드 부품: View Details = 상품 상세, 화살표 = 설명 펼침/닫힘 (실화면 동작) */
+      var w = fullCard(p, f); $('article', w).setAttribute('data-test', 'fo-card-' + p.id);
       cont.appendChild(w);
     });
   }
