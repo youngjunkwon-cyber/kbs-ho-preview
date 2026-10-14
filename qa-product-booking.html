@@ -107,7 +107,7 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
     </div>
     <div class="scroll">
       <p class="warn" id="fileWarn">파일을 직접 열어서 왼쪽 시안을 제어할 수 없습니다. 아래 배포 주소로 다시 열어 주세요.<br><a href="https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-product-booking.html" target="_blank">https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-product-booking.html</a></p>
-      <p class="hint">기준 문서: 상품예약_PRD_v0.26_20261014 · 스테이징 실화면을 그대로 떠서 만든 시안(HOST · BO 분홍 점선 = 이번에 더하는 요소) · 기준 시각 2026-10-12 12:00 · 시드 매장 아비쥬 명동점</p>
+      <p class="hint">기준 문서: 상품예약_PRD_v0.27_20261014 · 스테이징 실화면을 그대로 떠서 만든 시안(HOST · BO 분홍 점선 = 이번에 더하는 요소) · 기준 시각 2026-10-12 12:00 · 시드 매장 아비쥬 명동점</p>
       <ul class="guide">
         <li><b>이 화면 열기</b>를 누르면 왼쪽 시안이 그 케이스 상태로 맞춰집니다(매번 시드부터 다시 시작).</li>
         <li><b>조작</b>을 번호대로 하고, <b>기대</b>의 "2:" 는 조작 2번 뒤에 보여야 할 것입니다. 번호 없는 줄은 처음 화면 또는 전체에 해당합니다.</li>
@@ -123,6 +123,7 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
         <li>인플루언서 기획전의 예약 건수·버튼 클릭수. 기획전 관리와 같은 칸이라 기획전 관리 화면으로 확인합니다</li>
         <li>스토어 문의 통계의 그래프(일별 추이, 스토어별 채널 분포). 시안에서는 그리지 않고, 카드·표·전체 문의 건수로 확인합니다. 기존 문의 건수는 시안용 표본입니다</li>
         <li>클리닉 나이 규칙의 예약 변경 재판정. 고객 화면 예약 변경 화면이 시안에 없습니다(PRD 5.13)</li>
+        <li>마이페이지 메인의 다른 메뉴(Chat History 등). 캡처를 보고 모양만 다시 그렸고 눌러도 동작하지 않습니다</li>
         <li>예약 변경·취소·방문 처리 흐름. 스토어 예약과 같아 버튼만 둡니다</li>
       <li>클리닉 나이 알림 창의 모양. 고객 화면의 알림 창 실화면을 확보하지 못해 고객 화면 버튼 색으로 단순하게 그렸습니다(문구·판정은 확정, 웹 영어 문구 2026-10-13 확정)</li></ul></details>
       <div id="list"></div>
@@ -197,7 +198,8 @@ var GROUPS = [
  ["D","고객 화면 · 예약한 뒤","PRD 5.11 · 5.4",[
   {"id":"D-01","t":"완료 · 내 예약 목록 · 상세의 상품","open":"정보 입력 화면","code":"foOpenProduct(101,'en','web');STATE.fo.agree=true;STATE.fo.entry='product';STATE.fo.screen='info';STATE.fo.date='2026-10-19';STATE.fo.time='11:00';","steps":["Book 을 누릅니다.","View my bookings 를 누릅니다.","방금 예약의 View details 를 누릅니다."],"exp":["1: 제목 \"Your booking is confirmed\" / Abijou Clinic Myeongdong(스토어가 제목)","1: 아래 Product 에 메인 화면 상품 카드(이미지 · Abijou Botox · 99,000 KRW · 스토어명 · 별점)","2: 카드 제목 \"Abijou Clinic Myeongdong (D-7)\", 바로 아래 진한 글자로 Abijou Botox","3: 같은 Product 카드, 누르면 상품 상세"]},
   {"id":"D-02","t":"스토어 예약은 상품 자리에 스토어 예약","open":"스토어로 들어와 Store booking 그대로, 정보 입력 화면","code":"foOpenStore('en','web');STATE.fo.agree=true;STATE.fo.entry='store';STATE.fo.screen='info';STATE.fo.date='2026-10-19';STATE.fo.time='11:00';","steps":["Book 을 누릅니다.","위쪽 입점사 (HOST) → 예약 관리."],"exp":["1: Product 영역에 \"Store booking\" 카드(가격 없음, 스토어 대표 이미지)","2: 목록 맨 위(10-19 11:00) 고객 칸 둘째 줄 \"스토어 예약\""]},
-  {"id":"D-03","t":"고객 예약 상세는 예약 때 저장한 값","open":"Abijou Botox 를 숨긴 뒤 고객 예약 상세","code":"setProd(101,{hidden:true});STATE.surf='FO';STATE.fo.screen='mydetail';STATE.fo.myNo=1;render()","steps":["없음. 화면만 확인합니다.","Product 카드를 누릅니다."],"exp":["1: Product 카드 가격 89,000 KRW(지금 상품가는 99,000)","2: 상품이 숨김이라 상품 상세로 가지 않는다"]}
+  {"id":"D-03","t":"고객 예약 상세는 예약 때 저장한 값","open":"Abijou Botox 를 숨긴 뒤 고객 예약 상세","code":"setProd(101,{hidden:true});STATE.surf='FO';STATE.fo.screen='mydetail';STATE.fo.myNo=1;render()","steps":["없음. 화면만 확인합니다.","Product 카드를 누릅니다."],"exp":["1: Product 카드 가격 89,000 KRW(지금 상품가는 99,000)","2: 상품이 숨김이라 상품 상세로 가지 않는다"]},
+  {"id":"D-04","t":"마이페이지 메인 Booking History 카드에도 상품","open":"고객 화면 마이페이지 메인(Kaitlyn Chan, 다가오는 예약 1건)","code":"STATE.surf='FO';go('FO','mypage')","steps":["없음. 화면만 확인합니다.","View list 를 누릅니다."],"exp":["Booking History 카드: 제목 \"Abijou Clinic Myeongdong (D-6)\", 바로 아래 진한 글자로 Abijou Botox(예약 목록 카드와 같은 모양)","2: 예약 목록으로 이동"],"note":"마이페이지 메인은 사용자 라이브 캡처(2026-10-14)를 보고 다시 그린 화면. 다가오는 예약이 여러 건일 때 카드가 어떻게 나오는지는 미확인(시안은 가장 가까운 1건)"}
  ]],
  ["E","입점사 (HOST)","PRD 5.7 · 5.9 · 5.12",[
   {"id":"E-01","t":"대시보드 예약 현황 카드에 상품명","open":"HOST 대시보드","code":"go('HOST','dash')","steps":["없음. 화면만 확인합니다."],"exp":["카드 5장 모두 날짜 바로 아래에 이름보다 큰 글자로 상품명, 이름은 그 아래","상품 예약 4장은 상품명, Evelyn Lee(스토어 예약)는 \"스토어 예약\""]},

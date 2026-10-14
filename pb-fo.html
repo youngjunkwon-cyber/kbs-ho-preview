@@ -869,6 +869,35 @@ body.pb-mark .pb-new{outline:none !important}
 .pb-alert h3{margin:0 0 8px;font-size:16px;font-weight:700;color:#2d2d2d}
 .pb-alert p{margin:0 0 20px;font-size:14px;line-height:1.5;color:#555}
 .pb-alert button{width:100%;height:48px;border:0;border-radius:12px;background:#fb6f92;color:#fff;font-family:Pretendard;font-size:16px;font-weight:700;cursor:pointer}
+
+/* 내 예약 정렬 칸 (캡처: 테두리 있는 알약 + 아래 꺾쇠) */
+.pb-sort{display:inline-flex;align-items:center;gap:4px;border:1px solid #f0f0f0}
+/* 마이페이지 메인 (사용자 라이브 캡처 2026-10-14 재현) */
+.pb-mp{background:#fff;font-family:Pretendard,sans-serif;color:#2d2d2d}
+.pb-mp-name{padding:24px 16px 20px;border-bottom:1px solid #f2f2f2}
+.pb-mp-name span{display:block;font-size:12px;color:#2d2d2d}
+.pb-mp-name b{display:block;font-size:18px;font-weight:700;margin-top:6px}
+.pb-mp-name em{display:block;font-style:normal;font-size:12px;color:#8e8e8e;margin-top:4px}
+.pb-mp-bh{padding:36px 16px 40px}
+.pb-mp-bht{display:flex;justify-content:space-between;align-items:center;margin-bottom:34px}
+.pb-mp-bht span{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:500}
+.pb-mp-bht button{display:flex;align-items:center;gap:2px;border:0;background:none;font:500 14px Pretendard,sans-serif;color:#2d2d2d;cursor:pointer;padding:0}
+.pb-mp-card{width:300px}
+.pb-mp-card .pb-card{margin:0}
+.pb-mp-sec{background:#f8f8f8;padding:10px 16px;font-size:14px;font-weight:500;color:#555}
+.pb-mp-row{display:flex;align-items:center;gap:6px;padding:25px 16px;border-bottom:1px solid #f2f2f2;font-size:14px;cursor:pointer}
+.pb-mp-row span{flex:1}
+.pb-mp-ex{display:flex;align-items:center;padding:20px 16px;cursor:pointer}
+.pb-mp-ex div{flex:1}
+.pb-mp-ex small{display:block;font-size:12px;color:#8e8e8e}
+.pb-mp-ex b{display:block;font-size:16px;font-weight:700;margin-top:2px}
+.pb-mp-ex b.mag{font-family:Georgia,serif;font-size:14px;letter-spacing:.5px}
+.pb-mp-gap{height:36px;border-bottom:1px solid #f2f2f2}
+.pb-mp-acc{text-align:right;padding:28px 16px 12px}
+.pb-mp-acc button{border:1px solid #e4e4e4;background:#f8f8f8;border-radius:8px;padding:8px 14px;font:500 12px Pretendard,sans-serif;color:#2d2d2d}
+.pb-mp-tab{position:sticky;bottom:0;display:grid;grid-template-columns:repeat(4,1fr);background:#fff;border-top:1px solid #f2f2f2;height:64px}
+.pb-mp-tab a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:9px;font-weight:700;color:#555;letter-spacing:.5px;cursor:pointer}
+.pb-mp-tab a.on{color:#fb6f92}
 </style></head>
 <body class="pretendard_822c6fe1-module__DANrza__variable"><div id="app"></div>
 <template id="T_f_store9"><div class="index-module-scss-module__db6oSW__routeProgressBar" aria-hidden="true"><div class="index-module-scss-module__db6oSW__routeProgressBar__fill" style="transform:scaleX(0)"></div></div><!--$--><!--$--><!--/$--><!--/$--><div id="app"><!--$--><div class="StoreDetailHome-module-scss-module__XXJAJa__storeDetailHome"><header class="StoreDetailHeader-module__Z4HdZa__fixedHeader"><div class="StoreDetailHeader-module__Z4HdZa__headerBar"><button type="button" class="HeaderIconButton-module-scss-module__6s0Whq__headerIconButton" aria-label="Go Back"><span class="HeaderIconButton-module-scss-module__6s0Whq__headerIconButton__icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 12H19M5 12L11 18M5 12L11 6" stroke="#FFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></button><div class="StoreDetailHeader-module__Z4HdZa__headerTitle"><span class="StoreDetailHeader-module__Z4HdZa__headerStoreName">Abijou Clinic Myeongdong</span></div><div><div class="index-module-scss-module__OHZpaq__languageDropdown"><button type="button" class="index-module-scss-module__OHZpaq__languageDropdown__button " aria-haspopup="menu" aria-expanded="false" aria-controls="_R_qolubsnpfjivb_"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M1.35 6.75012H18.15M1.35 12.7501H18.15M9.25 0.750122C7.56534 3.44973 6.6722 6.56799 6.6722 9.75012C6.6722 12.9323 7.56534 16.0505 9.25 18.7501M10.25 0.750122C11.9347 3.44973 12.8278 6.56799 12.8278 9.75012C12.8278 12.9323 11.9347 16.0505 10.25 18.7501M0.75 9.75012C0.75 10.932 0.982792 12.1023 1.43508 13.1943C1.88738 14.2862 2.55031 15.2784 3.38604 16.1141C4.22177 16.9498 5.21392 17.6127 6.30585 18.065C7.39778 18.5173 8.5681 18.7501 9.75 18.7501C10.9319 18.7501 12.1022 18.5173 13.1942 18.065C14.2861 17.6127 15.2782 16.9498 16.114 16.1141C16.9497 15.2784 17.6126 14.2862 18.0649 13.1943C18.5172 12.1023 18.75 10.932 18.75 9.75012C18.75 7.36317 17.8018 5.07399 16.114 3.38616C14.4261 1.69833 12.1369 0.750122 9.75 0.750122C7.36305 0.750122 5.07387 1.69833 3.38604 3.38616C1.69821 5.07399 0.75 7.36317 0.75 9.75012Z" stroke="#FFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></button><div id="_R_qolubsnpfjivb_" role="menu" class="index-module-scss-module__OHZpaq__languageDropdown__popover "><button role="menuitem" class="index-module-scss-module__OHZpaq__languageDropdown__popover__item "><div>简体中文</div></button><button role="menuitem" class="index-module-scss-module__OHZpaq__languageDropdown__popover__item "><div>繁體中文</div></button><button role="menuitem" aria-current="true" class="index-module-scss-module__OHZpaq__languageDropdown__popover__item index-module-scss-module__OHZpaq__languageDropdown__popover__item-active"><div>ENGLISH</div></button><button role="menuitem" class="index-module-scss-module__OHZpaq__languageDropdown__popover__item "><div>日本語</div></button></div></div></div></div><nav class="StoreDetailHeader-module__Z4HdZa__anchorNav" aria-label="Abijou Clinic Myeongdong detail sections"><button type="button" class="StoreDetailHeader-module__Z4HdZa__anchorNavButton StoreDetailHeader-module__Z4HdZa__anchorNavButtonActive" aria-current="page">Intro</button><button type="button" class="StoreDetailHeader-module__Z4HdZa__anchorNavButton">Products</button><button type="button" class="StoreDetailHeader-module__Z4HdZa__anchorNavButton">FAQ</button><button type="button" class="StoreDetailHeader-module__Z4HdZa__anchorNavButton">Gallery</button></nav></header><main><section id="store-section-intro" class="StoreDetailHeroSection-module-scss-module__k6xyFW__hero" aria-label="Abijou Clinic Myeongdong"><img class="StoreDetailHeroSection-module-scss-module__k6xyFW__heroImage" src="https://media.stg.k-beautystation.com/920x/9d57a23d-abf8-41ef-b487-57755218dd7d?v=be19dae90a521a85" alt="Abijou Clinic Myeongdong"><button type="button" class="StoreDetailHeroSection-module-scss-module__k6xyFW__heroOpenButton" aria-label="Abijou Clinic Myeongdong representative images"><span class="StoreDetailHeroSection-module-scss-module__k6xyFW__srOnly">Open representative images</span></button><div class="StoreDetailHeroSection-module-scss-module__k6xyFW__heroDim"></div><div class="StoreDetailHeroSection-module-scss-module__k6xyFW__heroContent"><h1 class="StoreDetailHeroSection-module-scss-module__k6xyFW__heroTitle">A beautiful visual, Abijou Clinic</h1><p class="StoreDetailHeroSection-module-scss-module__k6xyFW__description">Abijou Clinic is a large network hospital that has been leading beauty trends since 2006, backed by years of expertise and know-how.</p></div><div class="StoreDetailHeroSection-module-scss-module__k6xyFW__bottomContainer"><div class="StoreDetailHeroSection-module-scss-module__k6xyFW__bottomRight"><button type="button" class="StoreDetailHeroSection-module-scss-module__k6xyFW__readMoreDescription">Read More</button></div></div></section><section class="StoreDetailContactSection-module-scss-module__PNCana__section"><div class="StoreDetailContactSection-module-scss-module__PNCana__sectionHeaderDescription"><div class="StoreDetailContactSection-module-scss-module__PNCana__eyebrow">Feel free to contact the store with any questions.</div><div class="StoreDetailContactSection-module-scss-module__PNCana__sectionTitle">Don't just worry about it.
@@ -1053,7 +1082,7 @@ function draw() {
   frameDraw('fo:' + f.screen + ':' + (f.screen === 'product' ? f.pid : ''), function () {
     var app = document.getElementById('app'); app.innerHTML = '';
     if (FV[f.screen]) { var t = tpl(FV[f.screen]); while (t.firstChild) app.appendChild(t.firstChild); $$('.react-modal-sheet-root, [class*=routeProgressBar]', app).forEach(function (e) { e.remove(); }); }
-    ({ store: pStore, product: pProduct, book: pBook, info: pInfo, done: pDone, my: pMy, mydetail: pMyDetail })[f.screen]();
+    ({ store: pStore, product: pProduct, book: pBook, info: pInfo, done: pDone, my: pMy, mydetail: pMyDetail, mypage: pMyPage })[f.screen]();
     var sc = $('#app'); if (sc) sc.setAttribute('data-screen', f.screen);
   });
 }
@@ -1242,6 +1271,47 @@ function pDone() {
   app.appendChild(w); $('[data-go]', w).onclick = function () { f.tab = 'upcoming'; nav('my'); };
   bindLinks(w);
 }
+/* 예약 카드 (내 예약 목록 · 마이페이지 Booking History 공통): 스토어명이 제목, 상품명은 바로 아래 진한 줄 */
+function myCard(b) {
+  var d = b.visit.slice(0, 10), dd = Math.round((new Date(d) - new Date(PB.TODAY)) / 864e5), Dd = (b.status === '예약' ? ' (D-' + dd + ')' : '');
+  return '<div class="pb-card">' + badge(b.status) + '<div class="pb-card-n">' + esc(PB.DB.store.nameEn) + Dd + '</div>'
+    + '<div class="pb-card-p pb-hiA pb-new" data-test="fo-card-prod">' + esc(b.snap ? b.snap.name : 'Store booking') + '</div>'
+    + '<div class="pb-hr"></div><div class="pb-card-dt"><div><span>Date</span><b>' + d + ' (' + wdEn(d).toUpperCase() + ')</b></div><div><span>TIME</span><b>' + b.visit.slice(11) + ' (KST)</b></div></div><button class="pb-pk sm" data-no="' + b.no + '">View details</button></div>';
+}
+var IC = {
+  down: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
+  right: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>',
+  cal: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
+  chat: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg>',
+  mark: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>',
+  star: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>',
+  coupon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m9 15 6-6M9.5 9.5h.01M14.5 14.5h.01"/></svg>',
+  head: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14v-3a9 9 0 0 1 18 0v3"/><path d="M21 16a2 2 0 0 1-2 2h-1v-6h1a2 2 0 0 1 2 2zM3 16a2 2 0 0 0 2 2h1v-6H5a2 2 0 0 0-2 2z"/></svg>',
+  globe: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>',
+  home: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"/></svg>',
+  pin: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>',
+  wand: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="m4 20 11-11M14 4v2M19 9h2M17.5 5.5 19 4M9 4l.5 1.5M19 14l-1.5-.5"/><path d="m13 7 4 4"/></svg>',
+  user: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>'
+};
+/* ---------- 마이페이지 메인 (사용자 라이브 캡처 2026-10-14 기준 재현). Booking History 카드 = 내 예약 목록 카드와 같은 부품 + 상품 줄 ---------- */
+function pMyPage() {
+  var app = document.getElementById('app'); app.innerHTML = ''; var h = header('My Page', 'store'); var hb = $$('button', h); if (hb[1]) { hb[1].innerHTML = IC.globe; hb[1].onclick = function () { toast('Not available in this mockup'); }; } app.appendChild(h);
+  var up = PB.DB.books.filter(function (b) { return b.name === PB.ME && (b.status === '예약' || b.status === '변경요청'); }).sort(function (a, c) { return a.visit < c.visit ? -1 : 1; });
+  var row = function (ic, t) { return '<div class="pb-mp-row">' + ic + '<span>' + t + '</span>' + IC.right + '</div>'; };
+  var w = document.createElement('main'); w.className = 'pb-mp';
+  w.innerHTML = '<div class="pb-mp-name"><span>Name</span><b>' + esc(PB.ME.split(' ')[0]) + '</b><em>Joined 2025. 10. 30</em></div>'
+    + '<div class="pb-mp-bh"><div class="pb-mp-bht"><span>' + IC.cal + ' Booking History</span><button data-go="my">View list ' + IC.right + '</button></div>'
+    + (up.length ? '<div class="pb-mp-card" data-test="fo-mypage-card">' + myCard(up[0]) + '</div>' : '') + '</div>'
+    + '<div class="pb-mp-sec">My Activity</div>' + row(IC.chat, 'Chat History') + row(IC.mark, 'Bookmarks') + row(IC.star, 'My Reviews') + row(IC.coupon, 'Coupon List')
+    + '<div class="pb-mp-sec">Explore</div><div class="pb-mp-ex"><div><small>Looking for curated Korean beauty content?</small><b class="mag">K-BEAUTY MAGAZINES</b></div>' + IC.right + '</div><div class="pb-mp-ex"><div><small>K-beauty guides written by experts</small><b>Expert Guide</b></div>' + IC.right + '</div>'
+    + '<div class="pb-mp-gap"></div>' + row(IC.head, 'Customer Center') + '<div class="pb-mp-acc"><button>Change account information</button></div>'
+    + '<nav class="pb-mp-tab"><a>' + IC.home + 'HOME</a><a>' + IC.pin + 'STORE</a><a>' + IC.wand + 'PRODUCT</a><a class="on">' + IC.user + 'MY PAGE</a></nav>';
+  app.appendChild(w);
+  $('[data-go=my]', w).onclick = function () { F().tab = 'upcoming'; nav('my'); };
+  $$('[data-no]', w).forEach(function (t) { t.onclick = function () { F().myNo = +t.getAttribute('data-no'); nav('mydetail'); }; });
+  $$('.pb-mp-row, .pb-mp-ex, .pb-mp-acc button, .pb-mp-tab a', w).forEach(function (x) { x.onclick = function () { toast('Not available in this mockup'); }; });
+}
+
 function pMy() {
   var f = F(), app = document.getElementById('app'); app.innerHTML = ''; app.appendChild(header('Bookings & Consultations', 'store'));
   var mine = PB.DB.books.filter(function (b) { return b.name === PB.ME; });
@@ -1249,8 +1319,8 @@ function pMy() {
   var list = grp[f.tab] || [], ttl = { upcoming: 'Upcoming bookings', visited: 'Completed visits', cancelled: 'Cancelled bookings' }[f.tab];
   var w = document.createElement('main'); w.className = 'pb-my';
   w.innerHTML = '<div class="pb-my-h"><b>' + ttl + '</b><b>' + list.length + ' booking(s)</b></div><div class="pb-tabs">' + [['upcoming', 'Upcoming'], ['visited', 'Visited'], ['cancelled', 'Cancelled']].map(function (t) { return '<button class="' + (f.tab === t[0] ? 'on' : '') + '" data-tab="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div>'
-    + '<div class="pb-my-body"><div class="pb-my-bar"><span>' + list.length + ' total</span><span class="pb-sort">Visit date &amp; time ⌄</span></div>'
-    + (list.length ? list.map(function (b) { var d = b.visit.slice(0, 10), dd = Math.round((new Date(d) - new Date(PB.TODAY)) / 864e5); var Dd = (b.status === '예약' ? ' (D-' + dd + ')' : ''), tt = '<div class="pb-card-n">' + esc(PB.DB.store.nameEn) + Dd + '</div>' + ('<div class="pb-card-p pb-hiA pb-new" data-test="fo-card-prod">' + esc(b.snap ? b.snap.name : 'Store booking') + '</div>'); /* 예약 후 목록: 스토어명이 제목, 상품명은 바로 아래 진한 줄 */ return '<div class="pb-card">' + badge(b.status) + tt + '<div class="pb-hr"></div><div class="pb-card-dt"><div><span>Date</span><b>' + d + ' (' + wdEn(d).toUpperCase() + ')</b></div><div><span>TIME</span><b>' + b.visit.slice(11) + ' (KST)</b></div></div><button class="pb-pk sm" data-no="' + b.no + '">View details</button></div>'; }).join('') : '<div class="pb-empty"><b>You don\'t have any active bookings yet</b><span>Your bookings will appear here.</span></div>')
+    + '<div class="pb-my-body"><div class="pb-my-bar"><span>' + list.length + ' total</span><span class="pb-sort">Visit date &amp; time ' + IC.down + '</span></div>'
+    + (list.length ? list.map(myCard).join('') : '<div class="pb-empty"><b>You don\'t have any active bookings yet</b><span>Your bookings will appear here.</span></div>')
     + '<div class="pb-prev">View previous consultation requests ›</div></div>';
   app.appendChild(w);
   $$('[data-tab]', w).forEach(function (t) { t.onclick = function () { f.tab = t.getAttribute('data-tab'); PB.render(); }; });
