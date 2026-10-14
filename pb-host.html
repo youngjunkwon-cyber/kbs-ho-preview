@@ -2518,6 +2518,8 @@ document.addEventListener('click', function (e) {
 /* ---------- 대시보드 ---------- */
 function pDash() {
   var h = H();
+  /* 공지 띠배너: 라이브 캡처(2026-10-14)대로 문구 · 건수, 닫기(X) 누르면 배너가 닫힘 */
+  var nb = $('section[class*=_banner_]'); if (nb) { var nt = $('[class*=_title_]', nb); if (nt) nt.textContent = '[안내] 이미지 등록 기능 개선 안내'; var na = $('[class*=_actionButton_]', nb); if (na) { na.textContent = '외 2건 공지 더보기'; na.onclick = function () { toast('시안에서는 동작하지 않습니다'); }; } var nc = $('[class*=_closeButton_]', nb); if (nc) nc.onclick = function () { h.noticeClosed = true; PB.render(); }; if (h.noticeClosed) nb.remove(); }
   var tabs = $$('[class*=bookingTabs] > button'); var act = tabs[0].className;
   var names = ['전체', '신규', '방문결과', '변경'];
   tabs.forEach(function (b, i) { b.className = names[i] === h.dtab ? act : ''; $('strong', b).textContent = PB.needList(names[i]).length; b.onclick = function () { h.dtab = names[i]; PB.render(); }; });
