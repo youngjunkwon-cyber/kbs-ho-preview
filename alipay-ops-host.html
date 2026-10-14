@@ -547,7 +547,9 @@ function viewDash(){
  h+='<div class="dcard" id="dc-stat"><div class="dh"><div><h2>통계</h2><div class="sub">선택한 기간의 스토어 성과와 고객 문의를 확인해 보세요.</div></div>'
   +'<div class="segw"><div class="seg">'+PERIODS.map(function(p){return '<span class="'+(d.period===p?'on':'')+'" data-act="per" data-v="'+p+'">'+p+'</span>';}).join('')+'</div></div></div>';
  var K=[['pr','스토어 방문',st.store,'회'],['pr','상품 방문',st.prod,'회'],['ms','메신저 문의',st.msg,'건'],['ms','채팅 문의',st.chat,'건'],['cl','예약 확정',st.conf,'건'],['ck','방문 완료',st.done,'건']];
- h+='<div class="kpis">'+K.map(function(k){return '<div class="kp"><div class="kl">'+ic(k[0])+k[1]+'</div><div class="kv">'+k[2].toLocaleString('en-US')+'<small>'+k[3]+'</small></div></div>';}).join('')+'</div>';
+ /* 스토어 방문·상품 방문은 항상, 나머지 넷은 선택한 기간 값이 1 이상일 때만 보인다. 보이는 칸이 한 줄 폭을 나눠 쓴다 */
+ K=K.filter(function(k,i){return i<2||k[2]>0;});
+ h+='<div class="kpis" style="grid-template-columns:repeat('+K.length+',1fr)">'+K.map(function(k){return '<div class="kp"><div class="kl">'+ic(k[0])+k[1]+'</div><div class="kv">'+k[2].toLocaleString('en-US')+'<small>'+k[3]+'</small></div></div>';}).join('')+'</div>';
  h+='<div class="dline"></div><div class="h3">메신저 문의 상세</div><div class="m3"><div>WhatsApp<b>'+st.wa+'건</b></div><div>LINE<b>'+st.li+'건</b></div><div>WeChat<b>'+st.wc+'건</b></div></div>'
   +'<div class="note">선택한 기간에 접수된 메신저 문의예요. 실제 대화는 연결된 메신저 앱에서 확인하세요.</div>'
   +'<table class="mt"><thead><tr><th>문의 위치</th><th>채널</th><th>언어</th><th>접수 일시</th></tr></thead><tbody>'
