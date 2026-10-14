@@ -412,12 +412,20 @@ function renderTabs(total) {
     b.className = 'gt' + (GSEL === key ? ' on' : '') + (c.t && c.p + c.f === c.t ? ' done' : '');
     b.title = title; b.setAttribute('data-g', key);
     b.innerHTML = '<span class="gl"><span>' + esc(label) + '</span><span class="gc">' + (c.p + c.f) + '/' + c.t + '</span></span><span class="gb"><i class="p" style="width:' + (c.t ? c.p / c.t * 100 : 0) + '%"></i><i class="f" style="width:' + (c.t ? c.f / c.t * 100 : 0) + '%"></i></span>';
-    b.addEventListener('click', function () { GSEL = key; try { localStorage.setItem(KEY + '_tab', GSEL); } catch (e) {} render(); document.getElementById('scroll').scrollTop = 0; });
+    b.addEventListener('click', function () { GSEL = key; try { localStorage.setItem(KEY + '_tab', GSEL); } catch (e) {} render(); document.getElementById('scroll').scrollTop = 0; previewForGroup(key); });
     box.appendChild(b);
   }
   tab('all', '전체', '모든 묶음', total);
   groups.forEach(function (g) { tab(g[0], g[0] + ' ' + g[1].split(' · ').slice(-1)[0], g[0] + ' ' + g[1], gcount(g)); });
   setH();
+}
+/* 묶음 탭을 누르면 시안도 그 묶음 첫 케이스 화면으로(영역 버튼으로 좁혔으면 그 영역의 첫 케이스) */
+function previewForGroup(key) {
+  if (key === 'all') { if (AREA !== 'all') runInPreview("STATE.surf='" + AREA + "'", false); return; }
+  var g = GROUPS.filter(function (x) { return x[0] === key; })[0]; if (!g) return;
+  var c = g[3].filter(function (x) { return inArea(x, g); })[0]; if (!c) return;
+  showOv(null); runInPreview(c.code, true);
+  var el = document.querySelector('.tc[data-id="' + c.id + '"]'); document.querySelectorAll('.tc.cur').forEach(function (x) { x.classList.remove('cur'); }); if (el) el.classList.add('cur');
 }
 function render() {
   var list = document.getElementById('list'), h = '', shown = 0;
@@ -490,6 +498,8 @@ document.getElementById('doCopy').addEventListener('click', function () { var ta
 document.getElementById('reset').addEventListener('click', function () { askBox({ title: '기록 초기화', message: '통과 · 실패 · 메모를 모두 지웁니다.', okText: '지우기' }, function (v) { if (!v) return; REC = {}; saveRec(); render(); }); });
 document.getElementById('resetKeep').addEventListener('click', function () { askBox({ title: '통과 외 초기화', message: '통과 건은 두고 실패 · 미확인 · 메모를 지웁니다.', okText: '지우기' }, function (v) { if (!v) return; Object.keys(REC).forEach(function (k) { if (REC[k].s !== 'pass') delete REC[k]; else delete REC[k].m; }); saveRec(); render(); }); });
 if (location.protocol === 'file:') document.getElementById('fileWarn').style.display = 'block';
+/* 다시 열었을 때도 저장된 탭 · 영역에 맞춰 시안을 세운다 */
+frame.addEventListener('load', function once() { frame.removeEventListener('load', once); setTimeout(function () { if (GSEL !== 'all') previewForGroup(GSEL); else if (AREA !== 'all') runInPreview("STATE.surf='" + AREA + "'", false); }, 300); });
 
 /* ===== 덮개 화면 (한 번에 하나) ===== */
 var OV = null;
