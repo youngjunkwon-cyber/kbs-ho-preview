@@ -3017,10 +3017,11 @@ document.addEventListener('click', function (e) {
 function colIdx(label) { var ths = $$('thead tr:first-child th'); for (var i = 0; i < ths.length; i++) if (ths[i].textContent.trim() === label) return i; return -1; }
 function setCell(tr, label, txt) { var i = colIdx(label); if (i >= 0 && tr.children[i]) leafSet(tr.children[i], String(txt)); }
 /* 표 열 하나 추가 (헤더·colgroup·측정행·행) */
+function measureLabel(mc, label) { var tl = $$('*', mc).filter(function (e) { return !e.children.length && e.textContent.trim(); })[0]; if (tl) tl.textContent = label; return mc; }
 function addCol(afterLabel, label) {
   var i = colIdx(afterLabel), th = $$('thead tr:first-child th')[i], nth = th.cloneNode(true); nth.textContent = label; nth.removeAttribute('style'); th.after(mark(nth));
   var cg = $('colgroup'); if (cg && cg.children[i]) cg.children[i].after(cg.children[i].cloneNode(true));
-  var mr = $('tr.ant-table-measure-row'); if (mr && mr.children[i]) mr.children[i].after(mr.children[i].cloneNode(true));
+  var mr = $('tr.ant-table-measure-row'); if (mr && mr.children[i]) mr.children[i].after(measureLabel(mr.children[i].cloneNode(true), label));
   return i + 1;
 }
 /* 버튼 클릭수 = 상담접수 ~ 예약 칸의 합 */
@@ -3092,7 +3093,7 @@ function pProd() {
   rowsFrom(function (tb) {
     ps.forEach(function (p) {
       var r = (p.status === 'approved' ? rApp : rPend).cloneNode(true);
-      var nc = r.children[ci]; nc.textContent = PB.prodBookCount(p.id); nc.style.fontWeight = '700'; nc.setAttribute('data-test', 'bstat-' + p.id); mark(nc);
+      var nc = r.children[ci]; nc.textContent = PB.prodBookCount(p.id); nc.setAttribute('data-test', 'bstat-' + p.id); mark(nc);
       var kc = r.children[ki]; kc.textContent = p.bclk || 0; kc.style.fontWeight = ''; kc.setAttribute('data-test', 'bclk-' + p.id); mark(kc); clickSum(r);
       var sc = $('.ant-select', r.children[colIdx('상태')]); if (sc) setSelect(sc, p.status === 'approved' ? '승인' : p.status === 'pending' ? '대기' : '반려', '');
       var s1 = $('.ant-switch', r.children[colIdx('활성화')]), s2 = $('.ant-switch', r.children[colIdx('히든 여부')]);
@@ -3176,7 +3177,7 @@ function pCol() {
     PB.DB.cols.forEach(function (c) {
       var r = rt.cloneNode(true), sum = c.items.reduce(function (a, id) { return a + PB.prodBookCount(id); }, 0);
       var kc = r.children[fi].cloneNode(true); kc.textContent = c.items.reduce(function (a, id) { return a + (PB.prodById(id).bclk || 0); }, 0); kc.setAttribute('data-test', 'colclk-' + c.id); r.children[fi].after(mark(kc));
-      var nc = r.children[si].cloneNode(true); nc.textContent = sum; nc.style.fontWeight = '700'; nc.setAttribute('data-test', 'col-' + c.id); r.children[si].after(mark(nc)); clickSum(r);
+      var nc = r.children[si].cloneNode(true); nc.textContent = sum; nc.setAttribute('data-test', 'col-' + c.id); r.children[si].after(mark(nc)); clickSum(r);
       setCell(r, '기획전 상태', '활성'); setCell(r, '언어', langLabel(c.lang)); setCell(r, '노출 기간', c.period); setCell(r, '유형', c.type); setCell(r, '기획전명', c.name); setCell(r, '상품', c.items.length); setCell(r, '스토어', 0);
       r.style.cursor = 'pointer'; r.onclick = function () { b.col = b.col === c.id ? null : c.id; PB.render(); };
       tb.appendChild(r);
@@ -3266,6 +3267,7 @@ function pSinq() {
   var hr = $$('thead tr'), grp = $$('th', hr[0]).filter(function (t) { return t.textContent.trim() === '채널구분'; })[0]; grp.colSpan = 4;
   var th = hr[1].lastElementChild.cloneNode(true); $('.ant-table-column-title', th).textContent = '플랫폼 예약'; th.setAttribute('aria-label', '플랫폼 예약'); hr[1].appendChild(mark(th));
   var cg = $('colgroup'); if (cg) cg.appendChild(cg.lastElementChild.cloneNode(true));
+  var mr0 = $('tr.ant-table-measure-row'); if (mr0 && mr0.lastElementChild) mr0.appendChild(measureLabel(mr0.lastElementChild.cloneNode(true), '플랫폼 예약'));
   var tr = $('tbody tr.ant-table-row'), c = tr.cells;
   var vals = [PB.DB.store.name, tot, by('kind', '스토어'), by('kind', '상품')].concat(['zh', 'tw', 'en', 'ja', 'id', 'mn'].map(function (l) { return by('lang', l); }), ['채팅문의', '상담문의', '메신저상담'].map(function (k) { return by('ch', k); }));
   vals.forEach(function (v, i) { if (c[i]) c[i].textContent = v; });
@@ -3282,7 +3284,7 @@ function pSlist() {
   /* 상품 예약 사용 칼럼: 예약 설정 칼럼 바로 오른쪽(없으면 버튼 클릭수 다음). 값은 예약 설정 칸과 같은 태그(사용 = 초록, 미사용 = 회색). 배포 때 모든 스토어 OFF라 전부 미사용 */
   if ((b.applied || []).indexOf('상품 예약 사용') >= 0) {
     var after = colIdx('예약 설정') >= 0 ? '예약 설정' : '버튼 클릭수', ci = addCol(after, '상품 예약 사용'); $$('thead tr:first-child th')[ci].setAttribute('data-test', 'slist-th-pb');
-    $$('tbody tr.ant-table-row').forEach(function (r) { var ref = r.children[ci - 1], c = ref.cloneNode(false); c.innerHTML = '<span class="ant-tag ant-tag-filled css-19u5a7b css-var-root">미사용</span>'; c.setAttribute('data-test', 'slist-pb'); ref.after(mark(c)); });
+    $$('tbody tr.ant-table-row').forEach(function (r) { var ref = r.children[ci - 1], c = ref.cloneNode(false); c.removeAttribute('style'); c.innerHTML = '<span class="ant-tag ant-tag-filled css-19u5a7b css-var-root">미사용</span>'; c.setAttribute('data-test', 'slist-pb'); ref.after(mark(c)); });
   }
 
 }

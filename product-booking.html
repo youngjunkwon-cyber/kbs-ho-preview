@@ -137,7 +137,7 @@ function foSubmit(){
  if(pid){var j=judgeBookable(prodById(pid),f.lang,f.ch);if(!j.ok){if(f.entry==='product')f.err={kind:'prodGone'};else{f.err={kind:'pickAgain'};f.sel='';}return;}}
  var p=pid?prodById(pid):null,no=DB.books.length+1;
  DB.books.push({no:no,visit:f.date+' '+f.time,recv:NOWTS,name:ME,nation:'캐나다',lang:f.lang,contact:'WhatsApp',status:'예약',owner:'고객',route:f.entry==='product'?'상품':'스토어',prodId:pid,snap:p?snapOf(p):null,need:'신규',ch:f.ch==='web'?'웹':'알리페이',req:'',phone:'+1 4165550199',rno:rnoFor(NOWTS,f.lang,DB.books)});
- f.lastNo=no;f.screen='done';f.time='';
+ f.lastNo=no;f.screen='done';f.time='';f.agree=false; /* 다음 예약은 동의 체크 없이 시작(라이브 정보 입력 화면은 처음에 미체크) */
 }
 function manSave(){
  var m=S.host.man;
@@ -184,7 +184,7 @@ window.go=function(surf,view){S.surf=surf;if(surf==='HOST'&&view){S.host.view=vi
 window.foOpenStore=function(lang,ch){S.surf='FO';if(lang)S.fo.lang=lang;if(ch)S.fo.ch=ch;S.fo.screen='store';S.fo.err=null;render();};
 window.foOpenProduct=function(id,lang,ch){S.surf='FO';if(lang)S.fo.lang=lang;if(ch)S.fo.ch=ch;S.fo.pid=id;S.fo.screen='product';S.fo.err=null;render();};
 /* 예약하기 URL 진입(PRD 5.2): 스토어 예약 URL = 스토어 진입(유입경로 스토어), 상품 예약 URL = 상품 고정(유입경로 상품). 스토어 페이지 · 상품 상세를 거치지 않고 예약 화면이 바로 열림 */
-window.foOpenUrl=function(kind,pid,lang,ch){S.surf='FO';if(lang)S.fo.lang=lang;if(ch)S.fo.ch=ch;var f=S.fo;f.err=null;f.sel='';f.time='';f.date=TODAY;f.cat='All';f.showN=5;f.acc={};f.back=null;f.entry=kind==='product'?'product':'store';if(kind==='product')f.pid=+pid;f.viaUrl=true;f.screen='book';render();};
+window.foOpenUrl=function(kind,pid,lang,ch){S.surf='FO';if(lang)S.fo.lang=lang;if(ch)S.fo.ch=ch;var f=S.fo;f.err=null;f.accTop={};f.sel='';f.time='';f.date=TODAY;f.cat='All';f.showN=5;f.acc={};f.back=null;f.entry=kind==='product'?'product':'store';if(kind==='product')f.pid=+pid;f.viaUrl=true;f.screen='book';render();};
 window.setProd=function(id,patch){var p=prodById(id);Object.keys(patch).forEach(function(k){if(k==='book')Object.assign(p.book,patch.book);else p[k]=patch[k];});render();};
 /* 상품이 많은 매장 보기용: 예약 가능한 영어 상품 n개 추가 (id 201~) */
 window.addDemoProducts=function(n){var subs=['보톡스','스킨부스터','리프팅','여드름/흉터','색소/점/문신'],names=['Glow Facial','Aqua Peel','Jawline Botox','Rejuran Healer','Ultherapy 300','Thermage FLX','Pico Toning','Acne Scar Laser','Chin Filler','Neck Lift','Exosome Care','LDM Hydration'];for(var i=0;i<n;i++){var id=201+i;DB.prods.push({id:id,lang:'en',name:'Abijou '+names[i%names.length],price:50000+i*10000,status:'approved',active:true,hidden:false,deleted:false,mode:'기본',book:{web:false,ali:false},exposeCh:null,cat:'피부과',sub:subs[i%subs.length],reg:'2026-09-0'+(1+i%9)+' 10:00',chat:1,cons:0,rev:0,views:100,inner:20,direct:5,bclk:0});}render();};

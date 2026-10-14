@@ -1171,7 +1171,7 @@ function soloMessenger(ft, name) {
   nb.onclick = function () { toast('Not available in this mockup'); };
   bs[0].replaceWith(nb);
 }
-function startBook(entry) { var f = F(); f.viaUrl = false; f.entry = entry; f.sel = ''; f.time = ''; f.err = null; f.date = PB.TODAY; /* 실화면: 처음엔 오늘이 선택돼 있음 */ f.cat = 'All'; f.showN = 5; f.acc = {}; nav('book'); }
+function startBook(entry) { var f = F(); f.accTop = {}; f.viaUrl = false; f.entry = entry; f.sel = ''; f.time = ''; f.err = null; f.date = PB.TODAY; /* 실화면: 처음엔 오늘이 선택돼 있음 */ f.cat = 'All'; f.showN = 5; f.acc = {}; nav('book'); }
 
 /* ---------- 상품 상세 ---------- */
 function pProduct() {
@@ -1218,7 +1218,7 @@ function pBook() {
     if (f.err && f.err.kind === 'pickAgain') { var er = document.createElement('p'); er.className = 'pb-ferr'; er.setAttribute('data-test', 'fo-err'); er.textContent = "This product can't be booked right now. Please choose again."; sec.appendChild(er); }
     /* 맨 위 칸 = 지금 선택. 기본은 I'll decide at the store / Decide at the store 카드(같은 카드 부품, 이름만), 상품을 고르면 이 자리가 고른 상품 카드로 바뀐다 */
     var vg = src.querySelector('[class*=productGrid]').cloneNode(false), vli, va;
-    if (cur) { vli = fullCard(cur, f); va = vli.querySelector('article'); va.setAttribute('data-test', 'fo-selcard'); }
+    if (cur) { vli = fullCard(cur, f, 'accTop'); va = vli.querySelector('article'); va.setAttribute('data-test', 'fo-selcard'); }
     else { vli = src.querySelector('[class*=productGrid] li').cloneNode(true); va = vli.querySelector('article'); vli.querySelector('h3').textContent = "I'll decide at the store"; $$('[class*=__divider], [class*=priceRow]', va).forEach(function (e) { e.remove(); }); va.setAttribute('data-test', 'fo-pick-consult'); }
     va.classList.add('pb-pick-on'); vg.appendChild(vli); inner.appendChild(vg);
     /* Reset: 상품을 골랐을 때만, 제목 줄 오른쪽. 누르면 I'll decide at the store / Decide at the store 으로 */

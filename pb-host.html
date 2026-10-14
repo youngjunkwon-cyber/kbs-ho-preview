@@ -2686,7 +2686,7 @@ function prodCols(ps) {
   if (!h.pApplied) return;
   var ths = $$('thead tr:first-child th'), mi = ths.length - 1, nth = ths[mi - 1].cloneNode(true); nth.textContent = '예약수'; nth.style.textAlign = 'center'; nth.setAttribute('data-test', 'hprod-th-pb'); ths[mi].before(mark(nth));
   var cg = $('colgroup'); if (cg && cg.children[mi - 1]) cg.children[mi - 1].after(cg.children[mi - 1].cloneNode(true));
-  var mr = $('tr.ant-table-measure-row'); if (mr && mr.children[mi - 1]) mr.children[mi - 1].after(mr.children[mi - 1].cloneNode(true));
+  var mr = $('tr.ant-table-measure-row'); if (mr && mr.children[mi - 1]) { var mc = mr.children[mi - 1].cloneNode(true), tl = $$('*', mc).filter(function (e) { return !e.children.length && e.textContent.trim(); })[0]; if (tl) tl.textContent = '예약수'; mr.children[mi - 1].after(mc); }
   $$('tbody tr.ant-table-row').forEach(function (r, k) { var c = document.createElement('td'); c.className = 'ant-table-cell'; c.style.textAlign = 'center'; c.textContent = PB.prodBookCount(ps[k].id); c.setAttribute('data-test', 'hprod-pb-' + ps[k].id); r.children[r.children.length - 1].before(mark(c)); });
 }
 
