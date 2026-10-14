@@ -472,7 +472,7 @@ function fo13() {
   if (!S.joined || !S.prof) return phoneNote('예약하기', '회원이 만들어진 뒤에 보이는 화면입니다. 위쪽 처음으로를 누른 뒤 진입 동의 창에서 동의를 마쳐 주세요.');
   if (S.f13 === 'consult') return fo13c();
   /* 예약 요청을 보낸 뒤: 현행 예약 완료 화면 자리 */
-  if (S.done13) { ANNO_OFF = true; var dn = phone('', '<div class="gone" style="margin:16px">(시안 주석) 현행 예약 완료 화면을 그대로 씁니다. 예약자 설문도 그대로 보입니다.</div>', '', '', false, true); ANNO_OFF = false; return dn; }
+  if (S.done13) { ANNO_OFF = true; var dn = phone('', '<div style="padding:32px 16px 6px;text-align:center"><div style="font-size:16px;font-weight:700">Your booking is complete</div><div id="doneMsg" style="font-size:12px;color:#666;margin-top:6px">We sent the confirmation details by text message</div></div><div class="gone" style="margin:16px">(시안 주석) 현행 예약 완료 화면을 그대로 쓰고, 이메일로 보냈다는 문장(We sent the confirmation details to your email)만 문자로 보냈다는 문장으로 바꿉니다. 요약 표와 예약자 설문도 그대로 보입니다.</div>', '', '', false, true); ANNO_OFF = false; return dn; }
   var p = S.prof;
   function auto(label, key, ph) { var mn = key === 'birth' && S.minor13, v = mn ? S.minor13 : p[key]; return '<div class="fld"><div class="l">' + label + (v && !S.userSet[key] ? '<span class="autotag">회원 정보에서 채웠습니다</span>' : '') + '</div>' +
     '<div class="in ' + (v ? 'auto' : 'plc') + '" onclick="edit(\'' + key + '\')">' + (v || ph) + '</div>' + (mn ? '<div class="err">만 14세 미만은 이용할 수 없습니다.</div>' : '') + '</div>'; }
