@@ -2842,10 +2842,10 @@ function fillDrawer(pre, b, qrCls) {
   var dt = function (v) { if (!v) return ''; if (!bo) return v.slice(0, 16); var d = v.slice(0, 10); return d + ' (' + PB.wdKo(d) + ') ' + v.slice(11, 16); };
   $('h2', cont).textContent = dt(b.visit);
   var cr = $('[class*=changeRequestBox]', cont); if (cr) $('strong', cr).textContent = dt(b.chg);
-  /* 예약 상품: 드로어 실화면 섹션 부품(h3 + 읽기 전용 상자, 썸네일 없음)을 복제해 날짜 바로 아래에 둔다. 상품 없는 예약 = 방문 상담 */
+  /* 예약 상품: 드로어 실화면 섹션 부품(h3 + 읽기 전용 상자, 썸네일 없음)을 복제해 날짜 바로 아래에 둔다. 상품 없는 예약 = 방문 예약 */
   var sec0 = $$('section', cont).filter(function (s) { return $('[class*=readonlyBox]', s); })[0], ps = sec0.cloneNode(true);
   $('h3', ps).textContent = '예약 상품'; ps.setAttribute('data-test', 'prod-block'); var box = $('[class*=readonlyBox]', ps); box.classList.add('pb-prodbox');
-  if (!b.snap) { ps.setAttribute('data-kind', 'consult'); box.textContent = '방문 상담'; }
+  if (!b.snap) { ps.setAttribute('data-kind', 'consult'); box.textContent = '방문 예약'; }
   else { var lp = PB.prodById(b.prodId), live = lp && PB.prodVisible(lp, b.snap.lang);
     box.innerHTML = '<span class="pb-prodbox-t"><b>' + esc(b.snap.name) + '</b><span>' + PB.won(b.snap.price) + '원</span></span>' + (live ? '<a class="pb-prod-l" href="#">상품 보기</a>' : ''); }
   (cr || $('h2', cont)).after(mark(ps));
@@ -2896,7 +2896,7 @@ function fillDrawer(pre, b, qrCls) {
 function timeModal(pre, b, dt) {
   var t = tpl(pre === 'bd' ? 'bm_시간변경' : 'hm_시간변경'), root = t.firstElementChild; document.getElementById('app').appendChild(root);
   var ob = $('[class*=originalBooking]', root); $('strong', ob).textContent = dt(b.visit);
-  var pr = ob.cloneNode(true); $('span', pr).textContent = '예약 상품'; $('strong', pr).textContent = b.snap ? b.snap.name : '방문 상담'; pr.setAttribute('data-test', 'modal-prod'); ob.after(mark(pr));
+  var pr = ob.cloneNode(true); $('span', pr).textContent = '예약 상품'; $('strong', pr).textContent = b.snap ? b.snap.name : '방문 예약'; pr.setAttribute('data-test', 'modal-prod'); ob.after(mark(pr));
   var di = $('input#bookingDate', root); if (di) di.value = b.visit.slice(0, 10);
   var tv = $('[class*=ant-select-content]', root) || $('.ant-select-selection-item', root); if (tv && tv.firstChild && tv.firstChild.nodeType === 3) tv.firstChild.textContent = b.visit.slice(11);
   root.setAttribute('data-test', 'time-modal');
@@ -2906,7 +2906,7 @@ function timeModal(pre, b, dt) {
 }
 
 
-/* 예약 목록 고객 칸 둘째 줄 = 예약 상품(없으면 방문 상담). 방문일시 칸의 "접수 …" 둘째 줄과 같은 부품을 복제해 씀 */
+/* 예약 목록 고객 칸 둘째 줄 = 예약 상품(없으면 방문 예약). 방문일시 칸의 "접수 …" 둘째 줄과 같은 부품을 복제해 씀 */
 function prodLine(cell, text, secTpl, testId) {
   var w = cell.firstElementChild && cell.firstElementChild.tagName === 'DIV' ? cell.firstElementChild : null;
   if (!w) { w = document.createElement('div'); while (cell.firstChild) w.appendChild(cell.firstChild); cell.appendChild(w); }
@@ -2987,7 +2987,7 @@ function pRes() {
       var s0 = $$('.ant-typography', td[0]); leafSet(s0[0], PB.DB.store.name); s0[1].textContent = PB.DB.store.cat;
       var s1 = $$('.ant-typography', td[1]); s1[0].textContent = x.visit; s1[1].textContent = '접수 ' + x.recv;
       leafSet(td[2], x.name);
-      prodLine(td[2], x.snap ? x.snap.name : '방문 상담', s1[1], 'bcol-prod');
+      prodLine(td[2], x.snap ? x.snap.name : '방문 예약', s1[1], 'bcol-prod');
       td = r.children; td[3].textContent = x.rno; td[4].textContent = x.nation; td[5].textContent = langLabel(x.lang);
       var bt = $('.ant-badge-status-text', td[6]); if (bt) { bt.textContent = x.status; bt.style.color = DOT[x.status]; } var dot = $('.ant-badge-status-dot', td[6]); if (dot) { dot.style.color = DOT[x.status]; dot.style.background = DOT[x.status]; }
       $('button', td[7]).onclick = function () { b.open = x.no; PB.render(); };
