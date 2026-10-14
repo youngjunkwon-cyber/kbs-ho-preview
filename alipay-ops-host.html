@@ -263,7 +263,7 @@ var CHS=['웹','알리페이 중국','알리페이 홍콩'];
 var CHOPT=[['전체','유입 채널 전체'],['웹','유입 채널 웹'],['알리페이','유입 채널 알리페이']];
 var PERIODS=['이번 주','지난주','1개월','3개월','전체'];
 var PRANGE={'이번 주':['2026-10-05','2026-10-11'],'지난주':['2026-09-28','2026-10-04'],'1개월':['2026-09-07','2026-10-07'],'3개월':['2026-07-07','2026-10-07'],'전체':['0000-00-00','9999-99-99']};
-/* 방문 숫자 [스토어 방문, 상품 방문] 기간 x 채널. 메신저 문의는 MSG 시드, 채팅 문의·예약 확정·방문 완료는 채팅내역·예약 목록에서 센다 */
+/* 방문 숫자 [스토어 방문, 상품 방문] 기간 x 채널. 메신저 문의는 MSG 시드, 채팅 문의·예약 확정(취소 제외)·방문 완료는 채팅내역·예약 목록에서 센다 */
 var KPI={
  '이번 주':{'웹':[65,139],'알리페이 중국':[12,31],'알리페이 홍콩':[8,19]},
  '지난주':{'웹':[88,171],'알리페이 중국':[15,40],'알리페이 홍콩':[9,22]},
@@ -526,7 +526,7 @@ function statsOf(chs){
  var m=DB.msg.filter(function(x){return chs.indexOf(x.ch)>=0&&inRange(x.at,rg[0],rg[1]);});
  var inCh=function(x){return chs.indexOf(x.ch)>=0;};
  var chat=DB.chatlog.filter(function(x){return inCh(x)&&inRange(x.last,rg[0],rg[1]);}).length;
- var conf=DB.res.filter(function(x){return inCh(x)&&inRange(x.recv,rg[0],rg[1]);}).length;
+ var conf=DB.res.filter(function(x){return inCh(x)&&x.status!=='고객취소'&&inRange(x.recv,rg[0],rg[1]);}).length;
  var done=DB.res.filter(function(x){return inCh(x)&&x.status==='방문완료'&&inRange(x.visit,rg[0],rg[1]);}).length;
  return {store:a[0],prod:a[1],msg:m.length,chat:chat,conf:conf,done:done,rows:m,wa:m.filter(function(x){return x.app==='WhatsApp';}).length,li:m.filter(function(x){return x.app==='LINE';}).length,wc:m.filter(function(x){return x.app==='WeChat';}).length};
 }
