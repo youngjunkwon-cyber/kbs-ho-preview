@@ -1008,6 +1008,14 @@ function timeModal(pre, b, dt) {
   var wrap = $('.ant-modal-wrap', root); if (wrap) wrap.onclick = function (e) { if (e.target === wrap) close(); };
 }
 
+
+/* 예약 목록 고객 칸 둘째 줄 = 예약 상품(없으면 방문 상담). 방문일시 칸의 "접수 …" 둘째 줄과 같은 부품을 복제해 씀 */
+function prodLine(cell, text, secTpl, testId) {
+  var w = cell.firstElementChild && cell.firstElementChild.tagName === 'DIV' ? cell.firstElementChild : null;
+  if (!w) { w = document.createElement('div'); while (cell.firstChild) w.appendChild(cell.firstChild); cell.appendChild(w); }
+  var ln = document.createElement('div'), s = secTpl.cloneNode(true); s.textContent = text; s.title = text; s.setAttribute('data-test', testId); ln.appendChild(mark(s)); w.appendChild(ln);
+}
+
 /* ===== FO: 스테이징 고객 화면 스냅샷(스토어·상품·예약 일정) + 실측 수치로 그린 정보 입력·내 예약 ===== */
 var FV = { store: 'f_store9', product: 'f_prod_s', book: 'f_book_s' };
 var ACC = '#fb6f92';
@@ -1079,7 +1087,7 @@ function pStore() {
   if (book) { if (!PB.storeBookBtn(f.ch)) book.remove(); else { book.setAttribute('data-test', 'store-book'); book.onclick = function () { startBook('store'); }; } }
   var chat = ft && $('button', ft); if (chat) chat.onclick = function () { toast('Not available in this mockup'); };
 }
-function startBook(entry) { var f = F(); f.entry = entry; f.sel = ''; f.time = ''; f.err = null; f.date = PB.addDays(PB.TODAY, 1); nav('book'); }
+function startBook(entry) { var f = F(); f.entry = entry; f.sel = ''; f.time = ''; f.err = null; f.date = PB.TODAY; /* 실화면: 처음엔 오늘이 선택돼 있음 */ nav('book'); }
 
 /* ---------- 상품 상세 ---------- */
 function pProduct() {
