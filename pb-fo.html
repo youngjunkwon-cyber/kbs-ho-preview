@@ -1183,20 +1183,20 @@ function pBook() {
   var intro = $('[class*=scheduleIntro]'), sec = document.createElement('section'); sec.className = 'BookingSchedulePage-module-scss-module__TxJ5FW__timeSection pb-fsec'; sec.innerHTML = '<h2>Product</h2>';
   if (f.entry === 'product') { var p = PB.prodById(f.pid); var bx = fullCard(p, f).querySelector('article'); bx.setAttribute('data-test', 'fo-fixed'); sec.appendChild(bx); }
   else {
-    /* 스토어 진입: 날짜·시간 아래에 상품 선택(항상 펼침). 맨 위 "Store booking"(= 스토어 예약)이 기본 선택.
+    /* 스토어 진입: 날짜·시간 아래에 상품 선택(항상 펼침). 맨 위 "I'll decide at the store / Decide at the store"(= 스토어 예약)이 기본 선택.
        아래 스토어 페이지 상품 카드 UI(칩 · View Details · 설명 화살표 · 5개씩 더 보기) 중 하나를 고르면 그 상품으로 바뀜(하나만).
-       고른 상품 카드를 다시 누르면 풀리고 Store booking 으로 돌아감 */
+       고른 상품 카드를 다시 누르면 풀리고 I'll decide at the store / Decide at the store 으로 돌아감 */
     sec.querySelector('h2').textContent = 'Select a product (optional)';
     var opts = PB.foOptions(f.lang, f.ch), cur = f.sel ? PB.prodById(f.sel) : null, src = tpl('f_store9').querySelector('#store-section-products');
     var inner = document.createElement('div'); inner.className = 'pb-fpick'; inner.setAttribute('data-test', 'fo-select');
-    inner.setAttribute('data-options', JSON.stringify(opts.map(function (o) { return o.name; }))); inner.setAttribute('data-selected', cur ? cur.name : 'Store booking');
+    inner.setAttribute('data-options', JSON.stringify(opts.map(function (o) { return o.name; }))); inner.setAttribute('data-selected', cur ? cur.name : "I'll decide at the store");
     if (f.err && f.err.kind === 'pickAgain') { var er = document.createElement('p'); er.className = 'pb-ferr'; er.setAttribute('data-test', 'fo-err'); er.textContent = "This product can't be booked right now. Please choose again."; sec.appendChild(er); }
-    /* 맨 위 칸 = 지금 선택. 기본은 Store booking 카드(같은 카드 부품, 이름만), 상품을 고르면 이 자리가 고른 상품 카드로 바뀐다 */
+    /* 맨 위 칸 = 지금 선택. 기본은 I'll decide at the store / Decide at the store 카드(같은 카드 부품, 이름만), 상품을 고르면 이 자리가 고른 상품 카드로 바뀐다 */
     var vg = src.querySelector('[class*=productGrid]').cloneNode(false), vli, va;
     if (cur) { vli = fullCard(cur, f); va = vli.querySelector('article'); va.setAttribute('data-test', 'fo-selcard'); }
-    else { vli = src.querySelector('[class*=productGrid] li').cloneNode(true); va = vli.querySelector('article'); vli.querySelector('h3').textContent = 'Store booking'; $$('[class*=__divider], [class*=priceRow]', va).forEach(function (e) { e.remove(); }); va.setAttribute('data-test', 'fo-pick-consult'); }
+    else { vli = src.querySelector('[class*=productGrid] li').cloneNode(true); va = vli.querySelector('article'); vli.querySelector('h3').textContent = "I'll decide at the store"; $$('[class*=__divider], [class*=priceRow]', va).forEach(function (e) { e.remove(); }); va.setAttribute('data-test', 'fo-pick-consult'); }
     va.classList.add('pb-pick-on'); vg.appendChild(vli); inner.appendChild(vg);
-    /* Reset: 상품을 골랐을 때만, 제목 줄 오른쪽. 누르면 Store booking 으로 */
+    /* Reset: 상품을 골랐을 때만, 제목 줄 오른쪽. 누르면 I'll decide at the store / Decide at the store 으로 */
     if (cur) { var h2r = sec.querySelector('h2'), hr = document.createElement('div'); hr.className = 'pb-fhead'; h2r.before(hr); hr.appendChild(h2r);
       var rb = document.createElement('button'); rb.type = 'button'; rb.className = 'pb-freset'; rb.textContent = 'Reset'; rb.setAttribute('data-test', 'fo-reset'); rb.onclick = function () { f.sel = ''; PB.render(); }; hr.appendChild(rb); }
     var tabs = src.querySelector('[class*=categoryTabs]').cloneNode(true), tabT = tabs.children[0].cloneNode(true), onCls = tabT.className.split(' ').filter(function (c) { return /categoryTabActive/.test(c); })[0];
@@ -1260,7 +1260,7 @@ function pInfo() {
   var when = wdEn(f.date) + ', ' + monEn(f.date) + ' ' + (+f.date.slice(8)) + ', 2026 ' + f.time + ' (KST)';
   var nt = $('[class*=bookingNotice]'); $('strong', nt).textContent = 'Booking at ' + PB.DB.store.nameEn; var sp = $$('span', nt).filter(function (x) { return !/Dot/.test(x.className); })[0]; sp.textContent = 'Selected time: ' + when; sp.classList.add('pb-fnote');
   /* 상품 예약: 상품명이 제목, 아래 줄 "at 스토어명 · 가격", 그다음 Selected time */
-  { var st0 = $('strong', nt); st0.textContent = p ? p.name : 'Store booking'; mark(st0); st0.setAttribute('data-test', 'fo-info-prod'); var sb2 = sp.cloneNode(false); sb2.className = 'pb-fnote-hi2'; sb2.textContent = 'at ' + PB.DB.store.nameEn + (p ? ' · ' + krw(p.price) : ''); st0.after(mark(sb2)); } /* 상품 없는 예약 = Store booking */
+  { var st0 = $('strong', nt); st0.textContent = p ? p.name : 'Decide at the store'; mark(st0); st0.setAttribute('data-test', 'fo-info-prod'); var sb2 = sp.cloneNode(false); sb2.className = 'pb-fnote-hi2'; sb2.textContent = 'at ' + PB.DB.store.nameEn + (p ? ' · ' + krw(p.price) : ''); st0.after(mark(sb2)); } /* 상품 없는 예약 = I'll decide at the store / Decide at the store */
   var form = $('form'); form.onsubmit = function (e) { e.preventDefault(); };
   if (f.err && f.err.kind === 'prodGone') { var eb = document.createElement('div'); eb.className = 'pb-ferr box'; eb.setAttribute('data-test', 'fo-err'); eb.innerHTML = "This product can't be booked right now.<button class='pb-ferr-b' type='button' data-go='store'>Go to store page</button>"; nt.before(eb); $('[data-go]', eb).onclick = function () { f.err = null; nav('store'); }; }
   /* 예시 데이터 */
@@ -1304,13 +1304,13 @@ function prodSection(b, testId) {
 function detTitle(b, storeLead) { return '<h1 class="pb-det-t">' + storeLead + '<br>' + esc(PB.DB.store.nameEn) + '</h1>'; }
 function pDone() {
   /* STG 실화면(2026-10-14 테스트 예약): 제목 없는 헤더 · 초록 체크 · "Your booking is complete" · Store / Visit date / Booking number 표 · View booking details · 관심사 설문 카드.
-     이번 추가: 표의 Store 바로 아래 "Product" 한 줄(상품 없는 예약은 Store booking) */
+     이번 추가: 표의 Store 바로 아래 "Product" 한 줄(상품 없는 예약은 I'll decide at the store / Decide at the store) */
   var f = F(), b = bookingById(f.lastNo), app = document.getElementById('app'); app.innerHTML = ''; app.appendChild(header('', 'store'));
   var d = b.visit.slice(0, 10), vd = wdEn(d) + ', ' + d.slice(5, 7) + '/' + d.slice(8, 10) + '/' + d.slice(0, 4) + ' ' + b.visit.slice(11) + ' (KST)';
   var w = document.createElement('main'); w.className = 'pb-done';
   w.innerHTML = '<section class="pb-dn-hero"><span class="pb-dn-ic"><svg width="23" height="16" viewBox="0 0 23 16" fill="none"><path d="M2 8l6.5 6L21 2" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><h1>Your booking is complete</h1><p>We sent the confirmation details to your email</p></div></section>'
     + '<section class="pb-dn-sum"><dl><div><dt>Store</dt><dd>' + esc(PB.DB.store.nameEn) + '</dd></div>'
-    + '<div class="pb-new" data-test="fo-done-prod"' + (b.snap ? '' : ' data-kind="consult"') + '><dt>Product</dt><dd>' + esc(b.snap ? b.snap.name : 'Store booking') + '</dd></div>'
+    + '<div class="pb-new" data-test="fo-done-prod"' + (b.snap ? '' : ' data-kind="consult"') + '><dt>Product</dt><dd>' + esc(b.snap ? b.snap.name : 'Decide at the store') + '</dd></div>'
     + '<div><dt>Visit date</dt><dd>' + vd + '</dd></div><div><dt>Booking number</dt><dd>' + b.rno + '</dd></div></dl>'
     + '<button type="button" data-go="det">View booking details</button></section>'
     + '<section class="pb-dn-sv"><button type="button"><svg width="12" height="12" viewBox="0 0 12 12"><circle cx="6" cy="6" r="6" fill="#fb6f92"/><path d="M6 5.2v3.3M6 3.4v.1" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg><div class="pb-dn-msg"><strong>Tell us what K-beauty interests you before your visit</strong><small>We\'ll share information and benefits that match your interests</small></div><span class="pb-dn-det">View details</span></button></section>';
@@ -1322,7 +1322,7 @@ function pDone() {
 function myCard(b) {
   var d = b.visit.slice(0, 10), dd = Math.round((new Date(d) - new Date(PB.TODAY)) / 864e5), Dd = (b.status === '예약' ? ' (D-' + dd + ')' : '');
   return '<div class="pb-card">' + badge(b.status) + '<div class="pb-card-n">' + esc(PB.DB.store.nameEn) + Dd + '</div>'
-    + '<div class="pb-card-p pb-hiA pb-new" data-test="fo-card-prod">' + esc(b.snap ? b.snap.name : 'Store booking') + '</div>'
+    + '<div class="pb-card-p pb-hiA pb-new" data-test="fo-card-prod">' + esc(b.snap ? b.snap.name : 'Decide at the store') + '</div>'
     + '<div class="pb-hr"></div><div class="pb-card-dt"><div><span>Date</span><b>' + d + ' (' + wdEn(d).toUpperCase() + ')</b></div><div><span>TIME</span><b>' + b.visit.slice(11) + ' (KST)</b></div></div><button class="pb-pk sm" data-no="' + b.no + '">View details</button></div>';
 }
 var IC = {
@@ -1390,11 +1390,11 @@ function fillProdSlots(w) {
   $$('.pb-prodslot', w).forEach(function (slot) {
     var b = bookingById(+slot.getAttribute('data-bno')), card = tpl('fc_card').firstElementChild, a = card.querySelector('a'), p = b.snap ? (PB.prodById(b.prodId) || {}) : null;
     var hd = card.querySelector('[class*=__header]'), im = card.querySelector('img'); im.style.aspectRatio = '180 / 121'; im.style.objectFit = 'cover'; /* 실측: 카드 180x223, 이미지 180x121 (380px 폭 기준) */ if (b.snap) { im.removeAttribute('src'); im.style.visibility = 'hidden'; hd.style.background = thumbColor(b.prodId); } else im.src = 'https://image.kbstations.com/2025/06/25/e3de94ab-8ed5-4ac8-8f32-af57daafc04b'; /* 스토어 예약 = 스토어 대표 이미지 */
-    card.querySelector('h3').textContent = b.snap ? b.snap.name : 'Store booking';
+    card.querySelector('h3').textContent = b.snap ? b.snap.name : 'Decide at the store';
     var pr = card.querySelector('[class*=__price]'); if (b.snap) { var sps = pr.querySelectorAll('span'); sps[0].textContent = PB.won(b.snap.price); pr.setAttribute('aria-label', 'price ' + PB.won(b.snap.price) + ' KRW'); } else pr.remove();
     card.querySelector('[class*=__storeName]').textContent = PB.DB.store.nameEn;
     var rr = card.querySelector('[class*=reviewRating]'), rc = card.querySelector('[class*=reviewCount]'); if (rr) rr.textContent = '4.9'; if (rc) rc.textContent = '(5,000+)';
-    a.setAttribute('aria-label', (b.snap ? b.snap.name : 'Store booking') + ' product detail view');
+    a.setAttribute('aria-label', (b.snap ? b.snap.name : 'Decide at the store') + ' product detail view');
     var live = p && p.id && PB.prodVisible(p, b.snap.lang);
     a.onclick = function (e) { e.preventDefault(); if (live) { F().pid = p.id; nav('product'); } else if (!b.snap) nav('store'); };
     card.style.width = '180px'; slot.appendChild(card);
