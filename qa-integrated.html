@@ -241,6 +241,7 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
       <h1>알리페이 + 상품 예약 통합 검수<span class="sub" id="cnt"></span></h1>
       <div class="row1">
         <button class="btn on" data-f="all">전체</button>
+        <button class="btn" data-f="nopass">통과 안 준 것</button>
         <button class="btn" data-f="todo">미확인</button>
         <button class="btn" data-f="fail">실패만</button>
         <span style="flex:1"></span>
@@ -678,7 +679,7 @@ function render() {
   var list = document.getElementById('list'), h = '', shown = 0;
   GROUPS.forEach(function (g) {
     if (GSEL !== 'all' && g[0] !== GSEL) return;
-    var cs = g[3].filter(function (c) { if (!inArea(c, g)) return false; var r = REC[c.id] || {}; if (FILTER === 'todo') return !r.s; if (FILTER === 'fail') return r.s === 'fail'; return true; });
+    var cs = g[3].filter(function (c) { if (!inArea(c, g)) return false; var r = REC[c.id] || {}; if (FILTER === 'nopass') return r.s !== 'pass'; if (FILTER === 'todo') return !r.s; if (FILTER === 'fail') return r.s === 'fail'; return true; });
     if (!cs.length) return;
     var gc = gcount(g);
     h += '<div class="grp"><h2><span class="k">' + g[0] + '</span>' + esc(g[1]) + prdRefs(g[2]).map(function (r) { return '<button class="prdl" data-sec="' + esc(r) + '" title="문서 보기에서 이 절 열기">PRD ' + esc(r) + '</button>'; }).join('') + '<span class="n">' + (gc.p + gc.f) + ' / ' + gc.t + '</span></h2>';
