@@ -2950,7 +2950,7 @@ function fillDrawer(pre, b, qrCls) {
     var k = $('dt', r).textContent.trim(), dd = $('dd', r);
     if (k === '메신저') {
       var mv = $('[class*=messengerValue]', dd), sp = $('span', mv), btn = $('button', mv);
-      sp.textContent = qr ? b.contact : b.contact === '-' ? '-' : b.contact + ' ' + b.phone.replace(/\D/g, '');
+      sp.textContent = qr ? b.contact : b.contact === '-' ? '-' : b.contact + ' ' + b.phone.replace(/^\+\d+\s+/, '').replace(/\D/g, ''); /* 메신저 번호는 국가번호를 뺀 번호(라이브 캡처) */
       if (qr && !btn) { btn = document.createElement('button'); btn.type = 'button'; btn.className = qrCls; btn.textContent = 'QR 보기'; mv.appendChild(btn); }
       if (!qr && btn) btn.remove();
       if (btn && qr) btn.onclick = function () { toast('시안에서는 동작하지 않습니다'); };
@@ -3358,6 +3358,9 @@ function pSinq() {
   var ms = function (l) { return cnt(function (x) { return x.ch === '메신저상담' && x.lang === l; }); };
   panels('메신저구분').forEach(function (p) { legend(p, [['K-뷰티 메신저', 0], ['입점사 메신저', by('ch', '메신저상담')]]); });
   panels('메신저종류').forEach(function (p) { legend(p, [['왓츠앱', ms('en')], ['라인', ms('ja')], ['위챗', ms('zh')], ['카카오', 0], ['샤오홍슈', 0], ['페이스북', 0]]); });
+  /* 도넛 카드 6개 높이를 가장 큰 카드에 맞춤(줄바꿈돼도 같음) */
+  var dp = $$('[class*=summaryPanel]').filter(function (p) { return $('[class*=donutChart]', p); }); dp.forEach(function (p) { p.style.minHeight = ''; });
+  var dh = Math.max.apply(null, dp.map(function (p) { return p.offsetHeight; }).concat([0])); if (dh) dp.forEach(function (p) { p.style.minHeight = dh + 'px'; p.style.boxSizing = 'border-box'; });
   /* 탭: 스토어별 집계 / 상세 보기 */
   $$('.ant-tabs-tab').forEach(function (tb) { var k = tb.getAttribute('data-node-key'); if (!k) return; tb.setAttribute('data-test', 'sinq-tab-' + k); tb.onclick = function () { b.stab = k === 'detail' ? 'detail' : ''; PB.render(); }; });
   $$('button').filter(function (x) { return x.textContent.trim() === '엑셀 다운로드'; }).forEach(function (x) { x.onclick = function () { toast('시안에서는 동작하지 않습니다'); }; });

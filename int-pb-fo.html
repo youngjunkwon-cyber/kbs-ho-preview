@@ -1032,7 +1032,7 @@ function fillDrawer(pre, b, qrCls) {
     var k = $('dt', r).textContent.trim(), dd = $('dd', r);
     if (k === '메신저') {
       var mv = $('[class*=messengerValue]', dd), sp = $('span', mv), btn = $('button', mv);
-      sp.textContent = qr ? b.contact : b.contact === '-' ? '-' : b.contact + ' ' + b.phone.replace(/\D/g, '');
+      sp.textContent = qr ? b.contact : b.contact === '-' ? '-' : b.contact + ' ' + b.phone.replace(/^\+\d+\s+/, '').replace(/\D/g, ''); /* 메신저 번호는 국가번호를 뺀 번호(라이브 캡처) */
       if (qr && !btn) { btn = document.createElement('button'); btn.type = 'button'; btn.className = qrCls; btn.textContent = 'QR 보기'; mv.appendChild(btn); }
       if (!qr && btn) btn.remove();
       if (btn && qr) btn.onclick = function () { toast('시안에서는 동작하지 않습니다'); };
