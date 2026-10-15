@@ -1202,6 +1202,9 @@ window.saveColl = function () {
   confirmBox('저장할까요?', shown, done, function () {});
 };
 window.save = function (kind) { const obj = kind === 'store' ? S(VIEW.id) : P(VIEW.id); if (kind === 'store' && !String(obj.langs || '').split(',').map(x => x.trim()).filter(Boolean).length) { alertBox('저장할 수 없습니다', '지원언어를 1개 이상 선택해 주세요.'); return; }
+  if (kind === 'store') { const was = EDITSNAP && EDITSNAP.kind === 'store' && EDITSNAP.id === VIEW.id ? JSON.parse(EDITSNAP.json).bookingEnabled : obj.bookingEnabled, ov = { web: 0, ali: 0 };
+    DB.products.filter(p => p.store === obj.id && p.mode === '기본 설정').forEach(p => { const e = effBtns(p).btns; if (!was) e.booking = { web: false, ali: false }; const ch = effChProduct(p), w = ch === ALI ? 0 : onCount(e, ROWS_PRODUCT_B, 'web'), al = (!langOk(p.lang) || ch === WEB) ? 0 : onCount(e, ROWS_PRODUCT_B, 'ali'); if (w > CAP) ov.web++; if (al > CAP) ov.ali++; });
+    if (ov.web || ov.ali) { alertBox('저장할 수 없습니다', (ov.web ? '<p><b>웹 버튼 3개 대상</b></p><p>상품 ' + ov.web + '건</p>' : '') + (ov.ali ? '<p' + (ov.web ? ' style="margin-top:12px"' : '') + '><b>알리페이 앱 버튼 3개 대상</b></p><p>상품 ' + ov.ali + '건</p>' : '') + '<p style="margin-top:12px">기본 설정 상품은 스토어 버튼과 상품의 예약 버튼을 합쳐 각각 2개까지 켤 수 있습니다.</p>'); return; } }
   const done = () => { EDITSNAP = null; go(kind === 'store' ? 's-list' : 'p-list'); alertBox('저장했습니다', MSG.saveDone); };
   const rows = kind === 'store' ? ROWS_STORE : ROWS_PRODUCT_B;
   const eff = kind === 'store' ? effStoreBtns(obj) : effBtns(obj);
