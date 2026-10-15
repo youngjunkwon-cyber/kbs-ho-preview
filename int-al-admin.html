@@ -204,7 +204,7 @@ const MSG = {
   hardOff:     '알리페이 앱 미지원 항목입니다.',
   inquiryHint: '기존 문의하기 버튼입니다. 다른 항목처럼 독립된 버튼이라 켜면 1개로 셉니다.',
   bnBtnTarget: (label, ch) => '연결 대상(' + label + ')이 ' + ch + '에 노출되지 않습니다. ' + ch + '에서는 하단 버튼이 보이지 않습니다.',
-  storeAliBlock: (n, m) => '일본어·인도네시아어·몽골어 ' + [n ? '상품 ' + n + '건' : '', m ? '칼럼 ' + m + '건' : ''].filter(Boolean).join('과 ') + '이 있어 알리페이 앱 전용으로 바꿀 수 없습니다. 해당 ' + [n ? '상품' : '', m ? '칼럼' : ''].filter(Boolean).join('·') + '을 정리한 뒤 바꿔 주세요.',
+  storeAliBlock: (n, m) => '<p><b>알리페이 앱 미지원 언어 대상</b></p><p>' + [n ? '상품 ' + n + '건' : '', m ? '칼럼 ' + m + '건' : ''].filter(Boolean).join(', ') + '</p>',
   needBooking: '예약설정에서 예약을 사용하면 켤 수 있습니다.',
   cap:         '웹과 알리페이 앱 각각 2개까지 켤 수 있습니다.',
   capHead:     '버튼은 웹과 알리페이 앱 각각 2개까지 켤 수 있습니다.',
@@ -789,8 +789,7 @@ function screen_sList() {
         '<td><button class="btn sm" disabled>위치</button> <button class="btn sm" onclick="go(\'s-edit\',\'' + st.id + '\')">수정</button> <button class="btn sm red" disabled>삭제</button></td></tr>'; }).join('');
   } else {
     head = '<tr><th>스토어명</th><th>카테고리</th><th>언어</th><th>노출 채널</th><th>노출</th><th>상품 수</th></tr>'; ncol = 6;
-    body = DB.stores.filter(st => st.langs.split(',').map(x => x.trim()).indexOf(tab) !== -1).map(st => { const eff = effChStore(st); if (!passFilter(eff)) return '';
-      const cnt = DB.products.filter(p => p.store === st.id && p.lang === tab).length;
+    body = DB.stores.filter(st => st.langs.split(',').map(x => x.trim()).indexOf(tab) !== -1).map(st => { const eff = langOk(tab) ? effChStore(st) : WEB; if (!passFilter(eff)) return ''; const cnt = DB.products.filter(p => p.store === st.id && p.lang === tab).length;
       return '<tr><td>' + esc(st.name) + '</td><td>' + st.cat + '</td><td>' + tab + '</td><td class="c">' + chCell(eff) + '</td><td>활성</td><td>' + cnt + '</td></tr>'; }).join('');
   }
   return '<div class="phd"><div><h2 class="page">스토어 정보 관리</h2><div class="pdesc">입점사 스토어 정보를 조회하고 등록, 수정, 삭제할 수 있습니다.</div></div>' +
@@ -1210,8 +1209,7 @@ window.saveColl = function () {
   const shown = emptyChs.map(ch => sentP(MSG.saveColl(word, ch)) + linesFor(ch)).join('');
   confirmBox('저장할까요?', shown, done, function () {});
 };
-window.save = function (kind) {
-  const obj = kind === 'store' ? S(VIEW.id) : P(VIEW.id);
+window.save = function (kind) { const obj = kind === 'store' ? S(VIEW.id) : P(VIEW.id); if (kind === 'store' && !String(obj.langs || '').split(',').map(x => x.trim()).filter(Boolean).length) { alertBox('저장할 수 없습니다', '지원언어를 1개 이상 선택해 주세요.'); return; }
   const done = () => { EDITSNAP = null; go(kind === 'store' ? 's-list' : 'p-list'); alertBox('저장했습니다', MSG.saveDone); };
   const rows = kind === 'store' ? ROWS_STORE : ROWS_PRODUCT;
   const eff = kind === 'store' ? effStoreBtns(obj) : effBtns(obj);
@@ -1230,7 +1228,7 @@ window.save = function (kind) {
     const langOnly = obj.channel === VIEW.savedCh || !storeHasTargetLang(obj); /* 지원언어 저장, 또는 같은 저장에서 대상 언어를 모두 뺀 경우는 현행처럼 확인 창 없이 바로 저장 */
     if ((im.N || im.M || im.A || im.K) && !langOnly) {
       confirmBox(ch + euro(ch) + ' 저장할까요?',
-        '<p><b>' + esc(obj.name) + '</b></p>' + (function () { const lostL = [im.N ? '상품 ' + im.N + '건' : '', im.M ? '칼럼 ' + im.M + '건' : '', im.A ? '배너 ' + im.A + '건' : '', im.K ? '기획전 ' + im.K + '건' : ''].filter(Boolean), g = gainOfStoreCh(obj, ch), gainL = [g.P ? '상품 ' + g.P + '건' : '', g.Q ? '칼럼 ' + g.Q + '건' : ''].filter(Boolean); return (lostL.length ? '<p style="margin-top:12px"><b>' + lost + ' 미노출 대상</b></p><p>' + lostL.join(', ') + '</p>' : '') + (gainL.length ? '<p style="margin-top:12px"><b>' + ch + ' 신규 노출 대상</b></p><p>' + gainL.join(', ') + '</p>' : ''); })(),
+        (function () { const lostL = [im.N ? '상품 ' + im.N + '건' : '', im.M ? '칼럼 ' + im.M + '건' : '', im.A ? '배너 ' + im.A + '건' : '', im.K ? '기획전 ' + im.K + '건' : ''].filter(Boolean), g = gainOfStoreCh(obj, ch), gainL = [g.P ? '상품 ' + g.P + '건' : '', g.Q ? '칼럼 ' + g.Q + '건' : ''].filter(Boolean); return (lostL.length ? '<p><b>' + lost + ' 미노출 대상</b></p><p>' + lostL.join(', ') + '</p>' : '') + (gainL.length ? '<p style="margin-top:12px"><b>' + ch + ' 신규 노출 대상</b></p><p>' + gainL.join(', ') + '</p>' : ''); })(),
         done, function () {}, ch + euro(ch) + ' 저장');
       return;
     }
