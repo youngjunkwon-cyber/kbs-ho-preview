@@ -2615,7 +2615,7 @@ function pRes() {
   stSel.onclick = function () { dropdown(stSel, [['', '예약상태 전체'], ['예약', '예약'], ['방문완료', '방문완료'], ['미방문', '미방문'], ['고객취소', '고객취소'], ['매장취소', '매장취소'], ['변경요청', '변경요청'], ['변경완료', '변경완료'], ['변경거절', '변경거절']], h.st, function (v) { h.st = v; PB.render(); }, ACC); };
   kindSel.onclick = function () { dropdown(kindSel, [['', '예약 구분 전체'], ['상품 예약', '상품 예약'], ['스토어 예약', '스토어 예약']], h.kind, function (v) { h.kind = v; PB.render(); }, ACC); };
   ownSel.onclick = function () { dropdown(ownSel, [['', '등록 주체 전체'], ['고객', '고객 직접 예약'], ['매장', '수기 등록 예약']], h.owner, function (v) { h.owner = v; PB.render(); }, ACC); };
-  var inp = $('form input.ant-input'); inp.placeholder = '여권명·연락처·예약번호·요청사항·매장 메모·상품명'; inp.value = h.qd; inp.style.minWidth = '300px'; mark(inp);
+  var inp = $('form input.ant-input'); inp.placeholder = '여권명·연락처·예약번호·요청사항·매장 메모·상품명'; inp.value = h.qd; inp.style.minWidth = '196px'; mark(inp);
   inp.oninput = function () { h.qd = inp.value; }; inp.onkeydown = function (e) { if (e.key === 'Enter') { h.q = h.qd; PB.render(); } };
   var sb = byText(document, 'form button', '검색'); if (sb) sb.onclick = function () { h.q = h.qd; PB.render(); };
   /* 표 */

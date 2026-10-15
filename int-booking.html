@@ -138,7 +138,7 @@ function foSubmit(){
  var pid=f.entry==='product'?f.pid:(f.sel?+f.sel:null);
  if(pid){var j=judgeBookable(prodById(pid),f.lang,f.ch);if(!j.ok){if(f.entry==='product')f.err={kind:'prodGone'};else{f.err={kind:'pickAgain'};f.sel='';}return;}}
  var p=pid?prodById(pid):null,no=DB.books.length+1;
- DB.books.push({no:no,visit:f.date+' '+f.time,recv:NOWTS,name:f.ch==='ali'?'Li Na':ME,nation:f.ch==='ali'?'중국':'캐나다',lang:f.lang,contact:'WhatsApp',status:'예약',owner:'고객',route:f.entry==='product'?'상품':'스토어',prodId:pid,snap:p?snapOf(p):null,need:'신규',ch:f.ch==='web'?'웹':'알리페이',req:'',phone:f.ch==='ali'?'+86 13800000099':'+1 4165550199',rno:rnoFor(NOWTS,f.lang,DB.books)});
+ DB.books.push({no:no,visit:f.date+' '+f.time,recv:NOWTS,name:f.ch==='ali'?'Wang Siyu':ME,nation:f.ch==='ali'?'중국':'캐나다',lang:f.lang,contact:'WhatsApp',status:'예약',owner:'고객',route:f.entry==='product'?'상품':'스토어',prodId:pid,snap:p?snapOf(p):null,need:'신규',ch:f.ch==='web'?'웹':'알리페이',req:'',phone:f.ch==='ali'?'+86 13800000099':'+1 4165550199',rno:rnoFor(NOWTS,f.lang,DB.books)});
  f.lastNo=no;f.screen='done';f.time='';f.agree=false; /* 다음 예약은 동의 체크 없이 시작(라이브 정보 입력 화면은 처음에 미체크) */
 }
 function manSave(){

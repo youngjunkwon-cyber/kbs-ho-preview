@@ -3023,6 +3023,7 @@ function draw() {
     $$('.ant-modal-root, .ant-message').forEach(function (m) { m.remove(); });
     ({ res: pRes, prod: pProd, pedit: pEdit, col: pCol, store: pStore, sinq: pSinq, slist: pSlist })[b.view]();
     if (b.view === 'res' && b.open != null) openDrawer();
+    $$('.pb-modal, .pb-modal-mask').forEach(function (x) { (x.parentElement && x.parentElement !== document.body ? x.parentElement : x).remove(); });
     if (b.offModal) offModal();
   });
 }
@@ -3154,10 +3155,10 @@ function pEdit() {
   ['활성화', '히든 여부'].forEach(function (n) { var l = byText(document, 'label', n); if (l) { var g = l.closest('.ant-form-item').querySelector('[role=radiogroup]'); radioSet(g, (n === '활성화' ? p.active : p.hidden) ? 'y' : 'n', false); } });
   /* 개별 / 기본 */
   var modeLabels = $$('label.ant-radio-wrapper', mg);
-  modeLabels.forEach(function (l) { var isBase = /기본/.test(l.textContent); var on = isBase === base; l.classList.toggle('ant-radio-wrapper-checked', on); $('.ant-radio', l).classList.toggle('ant-radio-checked', on); l.onclick = function (e) { e.preventDefault(); if (!isBase && p.mode === '기본') { p.book.web = false; p.book.ali = false; } p.mode = isBase ? '기본' : '개별'; PB.render(); }; });
+  modeLabels.forEach(function (l) { var isBase = /기본/.test(l.textContent); var on = isBase === base; l.classList.toggle('ant-radio-wrapper-checked', on); $('.ant-radio', l).classList.toggle('ant-radio-checked', on); l.onclick = function (e) { e.preventDefault(); if (!isBase && p.mode === '기본') { p.book.web = false; p.book.ali = false; p.wb = Object.assign({}, STORE_WB); /* 개별로 바꾸는 순간 스토어 값을 복사 */ } p.mode = isBase ? '기본' : '개별'; PB.render(); }; });
   /* 기존 버튼 4종: 기본 설정이면 잠김 */
   p.wb = p.wb || {};
-  WB.forEach(function (w) { var l = byText(document, 'label', w[0]); if (!l) return; var g = l.closest('.ant-form-item').querySelector('[role=radiogroup]'); if (base) { var cur = $('input:checked', g); radioSet(g, cur ? cur.value : 'n', true); return; }
+  WB.forEach(function (w) { var l = byText(document, 'label', w[0]); if (!l) return; var g = l.closest('.ant-form-item').querySelector('[role=radiogroup]'); if (base) { radioSet(g, STORE_WB[w[1]] ? 'y' : 'n', true); return; }
     radioSet(g, p.wb[w[1]] ? 'y' : 'n', false); g.setAttribute('data-test', 'wb-' + w[1]);
     $$('label.ant-radio-wrapper', g).forEach(function (lb) { lb.onclick = function (e) { e.preventDefault(); var on = $('input', lb).value === 'y'; if (on && !p.wb[w[1]] && seats(p).web.length >= 2) { seatToast('웹', seats(p).web); return; } p.wb[w[1]] = on; PB.render(); }; }); });
   /* 예약 (신설) */
@@ -3187,6 +3188,7 @@ function pEdit() {
   }
 }
 /* 버튼 자리 수(1부 7장·8장, 3부 8): 켠 항목마다 한 자리, 채널마다 최대 2자리. 잠긴 열은 0개로 셈. 예약 줄도 같은 규칙 */
+var STORE_WB = { '메신저': true }; /* 시안 스토어 정보 수정의 웹 버튼 값(스냅샷): 메신저만 ON */
 var WB = [['상담접수', '상담접수'], ['문의하기(상담+채팅)로 통합 노출', '문의하기'], ['외부링크 설정', '외부링크'], ['메신저 설정', '메신저']];
 function seats(p) {
   var s = PB.DB.store, live = s.bookingSetting && s.prodBook, webLock = p.exposeCh === 'ali', aliLock = p.exposeCh === 'web' || ['zh', 'en'].indexOf(p.lang) < 0;
@@ -3246,7 +3248,6 @@ function offModal() {
   m.innerHTML = '<div class="pb-modal-mask"></div><div class="pb-modal"><div class="pb-modal-t">예약 설정을 끌까요?</div><div class="pb-modal-c">이미 잡힌 예약은 그대로 유지돼요. 새 예약만 받지 않아요.</div><div class="pb-modal-f"><button class="pb-mb" data-v="n">취소</button><button class="pb-mb pri" data-v="y">전환</button></div></div>';
   document.body.appendChild(m);
   $$('.pb-mb', m).forEach(function (x) { x.onclick = function () { m.remove(); b.offModal = false; if (x.getAttribute('data-v') === 'y') { PB.bookOff(); toast('예약 설정을 저장했습니다.'); } PB.render(); }; });
-  var mc = $('.pb-modal-c', m); if (mc) mc.textContent = '이미 잡힌 예약은 그대로 유지돼요. 새 예약만 받지 않아요. 예약 버튼 설정값은 그대로 두고, 다시 켜면 그대로 돌아와요.';
 }
 
 /* ---------- 기획전 관리 ---------- */
