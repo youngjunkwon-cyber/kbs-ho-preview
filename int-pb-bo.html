@@ -3197,7 +3197,7 @@ function seats(p) {
   var ali = aliLock ? [] : (p.ab || ['상담접수']).slice(); if (!aliLock && live && p.book.ali) ali.push('예약');
   return { web: web, ali: ali };
 }
-function seatToast(ch, list) { toast('버튼은 웹과 알리페이 앱 각각 2개까지 켤 수 있습니다. 지금 ' + ch + '에는 ' + list.join(' / ') + ' ' + list.length + '개가 켜져 있습니다.'); }
+function seatToast(ch, list) { toast('버튼은 최대 2개까지 설정 가능합니다.'); }
 function seatBlock(st) {
   var nm = function (a) { return a.length ? ' (' + a.join(' / ') + ')' : ''; }, m = document.createElement('div');
   m.innerHTML = '<div class="pb-modal-mask"></div><div class="pb-modal" data-test="seat-modal"><div class="pb-modal-t">저장할 수 없습니다</div><div class="pb-modal-c"></div><div class="pb-modal-f"><button class="pb-mb pri">확인</button></div></div>';
