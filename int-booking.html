@@ -83,7 +83,7 @@ function seedBookings(P){
  function mk(a,i){
   var p=a[9]?byId[a[9]]:null,snap=p?snapOf(p):null;if(snap&&a[10])snap.price=a[10];
   var d=a[1].slice(2,10).replace(/-/g,'');
-  return {no:i+1,visit:a[0],recv:a[1],name:a[2],nation:a[3],lang:a[4],contact:a[5],status:a[6],owner:a[7],route:a[8],prodId:a[9],snap:snap,need:a[11],ch:a[12],req:a[13],phone:'+1 41655501'+(10+i),rno:null,chg:a[6]==='변경요청'?'2026-10-17 13:00':null,cancelBy:a[6]==='고객취소'?'고객':a[6]==='매장취소'?'매장':null,cancelAt:/취소/.test(a[6])?a[1].slice(0,10)===a[0].slice(0,10)?a[1]+':40':(function(){var t=new Date(a[0].slice(0,10)+'T00:00:00Z');t.setUTCDate(t.getUTCDate()-2);return t.toISOString().slice(0,10)+' 18:51:12';})():null,cancelReason:a[6]==='고객취소'?'고객 직접 취소':a[6]==='매장취소'?'매장 사정':null};
+  return {no:i+1,visit:a[0],recv:a[1],name:a[2],nation:a[3],lang:a[4],contact:a[5],status:a[6],owner:a[7],route:a[8],prodId:a[9],snap:snap,need:a[11],ch:a[12],req:a[13],phone:({'중국':'+86 138000001','홍콩':'+852 600001','일본':'+81 9000001','러시아':'+7 9000001','카자흐스탄':'+7 7000001','말레이시아':'+60 120001','싱가포르':'+65 80001'}[a[3]]||'+1 41655501')+(10+i),rno:null,chg:a[6]==='변경요청'?'2026-10-17 13:00':null,cancelBy:a[6]==='고객취소'?'고객':a[6]==='매장취소'?'매장':null,cancelAt:/취소/.test(a[6])?a[1].slice(0,10)===a[0].slice(0,10)?a[1]+':40':(function(){var t=new Date(a[0].slice(0,10)+'T00:00:00Z');t.setUTCDate(t.getUTCDate()-2);return t.toISOString().slice(0,10)+' 18:51:12';})():null,cancelReason:a[6]==='고객취소'?'고객 직접 취소':a[6]==='매장취소'?'매장 사정':null};
  }
 }
 function seedCollections(){return [
@@ -106,6 +106,7 @@ function storeBookBtn(ch){var s=DB.store;return !!(s.bookingSetting&&s.btn[ch]);
 function prodBookBtn(p,ch){
  if(!DB.store.bookingSetting||!DB.store.prodBook)return false;
  if(ch==='ali'&&(p.exposeCh==='web'||['zh','en'].indexOf(p.lang)<0))return false; /* 알리페이 열: 노출 채널 웹 · 대상 외 언어는 잠김 */
+ if(ch==='web'&&p.exposeCh==='ali')return false; /* 웹 열: 노출 채널 알리페이 앱이면 잠김 */
  return p.mode==='기본'?!!DB.store.btn[ch]:!!p.book[ch];
 }
 function prodVisible(p,lang){return p.status==='approved'&&p.active&&!p.hidden&&!p.deleted&&p.lang===lang;}
@@ -137,7 +138,7 @@ function foSubmit(){
  var pid=f.entry==='product'?f.pid:(f.sel?+f.sel:null);
  if(pid){var j=judgeBookable(prodById(pid),f.lang,f.ch);if(!j.ok){if(f.entry==='product')f.err={kind:'prodGone'};else{f.err={kind:'pickAgain'};f.sel='';}return;}}
  var p=pid?prodById(pid):null,no=DB.books.length+1;
- DB.books.push({no:no,visit:f.date+' '+f.time,recv:NOWTS,name:ME,nation:'캐나다',lang:f.lang,contact:'WhatsApp',status:'예약',owner:'고객',route:f.entry==='product'?'상품':'스토어',prodId:pid,snap:p?snapOf(p):null,need:'신규',ch:f.ch==='web'?'웹':'알리페이',req:'',phone:'+1 4165550199',rno:rnoFor(NOWTS,f.lang,DB.books)});
+ DB.books.push({no:no,visit:f.date+' '+f.time,recv:NOWTS,name:f.ch==='ali'?'Li Na':ME,nation:f.ch==='ali'?'중국':'캐나다',lang:f.lang,contact:'WhatsApp',status:'예약',owner:'고객',route:f.entry==='product'?'상품':'스토어',prodId:pid,snap:p?snapOf(p):null,need:'신규',ch:f.ch==='web'?'웹':'알리페이',req:'',phone:f.ch==='ali'?'+86 13800000099':'+1 4165550199',rno:rnoFor(NOWTS,f.lang,DB.books)});
  f.lastNo=no;f.screen='done';f.time='';f.agree=false; /* 다음 예약은 동의 체크 없이 시작(라이브 정보 입력 화면은 처음에 미체크) */
 }
 function manSave(){
