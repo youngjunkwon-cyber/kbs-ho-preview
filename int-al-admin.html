@@ -195,7 +195,7 @@ const ROWS_PRODUCT = [
   { k: 'extlink',   label: '외부링크 설정', aliHardOff: true },
   { k: 'messenger', label: '메신저 설정',   aliHardOff: true }
 ];
-const ROWS_STORE = [...ROWS_PRODUCT, { k: 'booking', label: '예약', needBooking: true }];
+const ROWS_STORE = [...ROWS_PRODUCT, { k: 'booking', label: '예약', needBooking: true }]; const ROWS_PRODUCT_B = [...ROWS_PRODUCT, { k: 'booking', label: '예약', needBooking: true, own: true }];
 
 const eul = w => ((w.charCodeAt(w.length - 1) - 0xAC00) % 28 ? '을' : '를');
 const euro = w => { const j = (w.charCodeAt(w.length - 1) - 0xAC00) % 28; return (j === 0 || j === 8) ? '로' : '으로'; };
@@ -356,13 +356,7 @@ const M = id => DB.magazines.filter(x => x.id === id)[0];
 const CL = id => DB.columns.filter(x => x.id === id)[0];
 
 /* ---------------------------- 유효 버튼 ---------------------------- */
-function effBtns(p) {
-  const st = S(p.store); const out = {};
-  const src = p.mode === '기본 설정' ? st : p;
-  ROWS_PRODUCT.forEach(r => { out[r.k] = { web: !!src.btns[r.k].web, ali: !!src.btns[r.k].ali }; });
-  ROWS_PRODUCT.filter(r => r.aliHardOff).forEach(r => { out[r.k].ali = false; });
-  return { btns: out };
-}
+function effBtns(p) { const st = S(p.store); const out = {}; const src = p.mode === '기본 설정' ? st : p; ROWS_PRODUCT.forEach(r => { out[r.k] = { web: !!src.btns[r.k].web, ali: !!src.btns[r.k].ali }; }); ROWS_PRODUCT.filter(r => r.aliHardOff).forEach(r => { out[r.k].ali = false; }); if (!p.btns.booking) p.btns.booking = { web: false, ali: false }; out.booking = st.bookingEnabled ? { web: !!p.btns.booking.web, ali: !!p.btns.booking.ali } : { web: false, ali: false }; return { btns: out }; }
 function effStoreBtns(st) {
   const out = {};
   ROWS_STORE.forEach(r => { out[r.k] = { web: !!st.btns[r.k].web, ali: !!st.btns[r.k].ali }; });
@@ -609,7 +603,7 @@ const btnTblRow = (label, cells, note) => '<tr' + (note ? ' class="hasn"' : '') 
   (note ? '<tr class="nr"><td colspan="4" class="tblnote">' + note + '</td></tr>' : '');
 function btnTable(kind, obj) {
   const isStore = kind === 'store';
-  const rows = isStore ? ROWS_STORE : ROWS_PRODUCT;
+  const rows = isStore ? ROWS_STORE : ROWS_PRODUCT_B;
   const eff = isStore ? effStoreBtns(obj) : effBtns(obj);
   const lOk = isStore ? true : langOk(obj.lang);
   const effCh = isStore ? effChStore(obj) : effChProduct(obj);
@@ -617,11 +611,11 @@ function btnTable(kind, obj) {
   const aliLock = !lOk || effCh === WEB || locked;
   const webLock = effCh === ALI || locked;
   const chWebLock = effCh === ALI, chAliLock = !lOk || effCh === WEB;
-  let html = BTN_TBL_HEAD;
-  rows.forEach(r => { const e = (r.needBooking && !obj.bookingEnabled && obj.btns && obj.btns[r.k]) ? obj.btns[r.k] : eff.btns[r.k];
-    let webDis = webLock, aliDis = aliLock || r.aliHardOff, note = '';
+  let html = BTN_TBL_HEAD; const bkOn = isStore ? obj.bookingEnabled : S(obj.store).bookingEnabled;
+  rows.forEach(r => { const e = (r.needBooking && !bkOn && obj.btns && obj.btns[r.k]) ? obj.btns[r.k] : eff.btns[r.k];
+    let webDis = webLock, aliDis = aliLock || r.aliHardOff, note = ''; if (r.own) { webDis = chWebLock; aliDis = chAliLock; }
     if (r.aliHardOff) note = MSG.hardOff;
-    if (r.needBooking && !obj.bookingEnabled) { webDis = true; aliDis = true; note = MSG.needBooking; }
+    if (r.needBooking && !bkOn) { webDis = true; aliDis = true; note = MSG.needBooking; }
     if (r.k === 'inquiry' && !note) note = MSG.inquiryHint;
     html += btnTblRow(r.label,
       '<td' + (webDis ? ' class="lock"' : '') + '>' + onoff('w_' + kind + '_' + r.k, e.web, "setBtn('" + kind + "','" + r.k + "','web',%V%)", webDis) + '</td>' +
@@ -643,7 +637,7 @@ function btnTable(kind, obj) {
 
 window.setBtn = function (kind, k, ch, on) {
   const obj = kind === 'store' ? S(VIEW.id) : P(VIEW.id);
-  const rows = kind === 'store' ? ROWS_STORE : ROWS_PRODUCT;
+  const rows = kind === 'store' ? ROWS_STORE : ROWS_PRODUCT_B;
   const eff = () => (kind === 'store' ? effStoreBtns(obj) : effBtns(obj)).btns;
   const chName = ch === 'web' ? '웹' : '알리페이 앱';
   const keep = obj.btns[k][ch];
@@ -719,7 +713,7 @@ window.setLang = function (v) { VIEW.lang = v; if (!aliLangOk()) F().ch = CHF; r
 const langSelect = () => '<div class="fl"><span>언어</span><select onchange="setLang(this.value)">' + ALL_LANGS.map(l => '<option' + (l === VIEW.lang ? ' selected' : '') + '>' + l + '</option>').join('') + '</select></div>';
 
 /* --------------------------- 상품 목록 --------------------------- */
-const P_COLS = ['상태', '활성화', '히든 여부', '언어', '스토어코드', '상품명', '카테고리', '세부분류', '가격', 'Vat포함여부', '외부링크', '외부링크 클릭수', '기본채널 사용', '노출수', '내부진입수', '직접유입수', '전/후사진 연결', '썸네일', '상세이미지', '등록일', '수정일', '삭제일', '관리'];
+const P_COLS = ['상태', '활성화', '히든 여부', '언어', '스토어코드', '상품명', '카테고리', '세부분류', '가격', 'Vat포함여부', '외부링크', '외부링크 클릭수', '기본채널 사용', '노출수', '내부진입수', '직접유입수', '채팅수', '상담수', '예약수', '버튼 클릭수', '상담접수', '인앱채팅', '외부링크', '위챗', '샤오홍슈', '왓츠앱', '라인', '카카오톡', '페이스북', '예약하기', '전/후사진 연결', '썸네일', '상세이미지', '등록일', '수정일', '삭제일', '관리'];
 function screen_pList() {
   const rows = DB.products.filter(p => p.lang === VIEW.lang);
   const head = '<tr><th>상태</th><th>활성화</th><th>히든 여부</th><th>노출 채널</th>' + P_COLS.slice(3).map(c => '<th>' + c + '</th>').join('') + '</tr>';
@@ -727,7 +721,7 @@ function screen_pList() {
     const st = S(p.store);
     return '<tr><td>' + p.status + ' ⌄</td><td>' + swch(p.active) + '</td><td>' + swch(p.hidden) + '</td><td class="c">' + chCell(eff) + '</td>' +
       '<td>' + p.lang + '</td><td>' + esc(st.code) + '</td><td>' + esc(p.name) + '</td><td>' + p.cat + '</td><td>' + p.sub + '</td><td>' + p.price + '</td><td>' + p.vat + '</td>' +
-      '<td class="tblnote">-</td><td>0</td><td>' + (st.messenger.length ? st.messenger[0].base : '미사용') + '</td><td>0</td><td>0</td><td>0</td>' +
+      '<td class="tblnote">-</td><td>0</td><td>' + (st.messenger.length ? st.messenger[0].base : '미사용') + '</td><td>0</td><td>0</td><td>0</td>' + '<td>0</td><td>0</td><td class="c" data-test="pbk-' + p.id + '">' + (p.bk || 0) + '</td><td class="c">' + (p.bclk || 0) + '</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td class="c" data-test="pclk-' + p.id + '">' + (p.bclk || 0) + '</td>' +
       '<td class="tblnote">-</td><td class="tblnote">-</td><td class="tblnote">-</td><td>2026-09-01</td><td>2026-09-05</td><td class="tblnote">-</td>' +
       '<td><button class="btn sm" disabled>미리보기</button> <button class="btn sm" onclick="go(\'p-edit\',\'' + p.id + '\')">수정</button> <button class="btn sm red" disabled>삭제</button></td></tr>'; }).join('');
   return '<div class="phd"><div><h2 class="page">입점사 스토어별 상품 정보 관리</h2><div class="pdesc">입점사 스토어별 상품 정보 관리 페이지입니다. 상품정보를 등록, 수정, 삭제할 수 있습니다.</div></div><div><button class="btn" disabled>신규상품등록</button></div></div>' +
@@ -968,11 +962,11 @@ function screen_cList() {
   const rows = DB.collections.filter(c => c.lang === VIEW.lang);
   const body = rows.map(c => { const eff = effChColl(c), rs = reasonsColl(c); if (!passFilter(eff, rs)) return '';
     return '<tr><td>' + c.active + '</td><td>' + c.lang + '</td><td>' + c.from + ' ~ ' + c.to + '</td><td>' + c.type + '</td><td>' + esc(c.name) + '</td><td class="c">' + chCell(eff) + '</td><td>' + rsnCell(rs) + '</td>' +
-      '<td>' + c.products.length + '</td><td>' + c.stores.length + '</td><td>2026-08-25</td><td>2026-09-08</td><td><button class="btn sm" onclick="openColl(\'' + c.id + '\')">수정</button></td></tr>'; }).join('');
+      '<td>' + c.products.length + '</td><td>' + c.stores.length + '</td>' + (function () { const ps = c.products.map(id => DB.products.find(p => p.id === id)).filter(Boolean), bk = ps.reduce((n, p) => n + (p.bk || 0), 0), ck = ps.reduce((n, p) => n + (p.bclk || 0), 0); return '<td>0</td><td>0</td><td>0</td><td class="c" data-test="cbk-' + c.id + '">' + bk + '</td><td class="c">' + ck + '</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td class="c" data-test="cclk-' + c.id + '">' + ck + '</td>'; })() + '<td>2026-08-25</td><td>2026-09-08</td><td><button class="btn sm" onclick="openColl(\'' + c.id + '\')">수정</button></td></tr>'; }).join('');
   return '<div class="phd"><div><h2 class="page">기획전 관리</h2><div class="pdesc">기획전 노출 정보와 연결 상품, 스토어 성과를 관리합니다.</div></div><div><button class="btn" disabled>기획전 추가</button></div></div>' +
     '<div class="card"><div class="filters"><div class="frow"><button class="btn" disabled>오늘</button><button class="btn" disabled>어제</button><button class="btn" disabled>이번주</button><button class="btn" disabled>이번달</button>' + dimSel('상태', ['상태']) + langSelect() + dimSel('유형', ['유형'].concat(COLL_TYPES)) + '</div>' +
     '<div class="frow">' + chFilterRow(RSN_OPTS) + '<button class="btn blue" style="align-self:flex-end" disabled>검색</button></div></div>' +
-    '<div class="tblwrap"><table><thead><tr><th>기획전 상태</th><th>언어</th><th>노출 기간</th><th>유형</th><th>기획전명</th><th>노출 채널</th><th>사유</th><th>상품</th><th>스토어</th><th>등록일</th><th>수정일</th><th>관리</th></tr></thead><tbody>' + (body || empty(12)) + '</tbody></table></div></div>';
+    '<div class="tblwrap"><table><thead><tr><th>기획전 상태</th><th>언어</th><th>노출 기간</th><th>유형</th><th>기획전명</th><th>노출 채널</th><th>사유</th><th>상품</th><th>스토어</th><th>대상 클릭수</th><th>채팅수</th><th>상담수</th><th>예약수</th><th>버튼 클릭수</th><th>상담접수</th><th>인앱채팅</th><th>외부링크</th><th>위챗</th><th>샤오홍슈</th><th>왓츠앱</th><th>라인</th><th>카카오톡</th><th>페이스북</th><th>예약하기</th><th>등록일</th><th>수정일</th><th>관리</th></tr></thead><tbody>' + (body || empty(27)) + '</tbody></table></div></div>';
 }
 
 /* ------------------------ 기획전 수정 모달 ------------------------ */
@@ -1211,7 +1205,7 @@ window.saveColl = function () {
 };
 window.save = function (kind) { const obj = kind === 'store' ? S(VIEW.id) : P(VIEW.id); if (kind === 'store' && !String(obj.langs || '').split(',').map(x => x.trim()).filter(Boolean).length) { alertBox('저장할 수 없습니다', '지원언어를 1개 이상 선택해 주세요.'); return; }
   const done = () => { EDITSNAP = null; go(kind === 'store' ? 's-list' : 'p-list'); alertBox('저장했습니다', MSG.saveDone); };
-  const rows = kind === 'store' ? ROWS_STORE : ROWS_PRODUCT;
+  const rows = kind === 'store' ? ROWS_STORE : ROWS_PRODUCT_B;
   const eff = kind === 'store' ? effStoreBtns(obj) : effBtns(obj);
   const effCh = kind === 'store' ? effChStore(obj) : effChProduct(obj);
   const webCnt = effCh === ALI ? 0 : onCount(eff.btns, rows, 'web'), aliCnt = (effCh === ALLCH || effCh === ALI) && (kind === 'store' || langOk(obj.lang)) ? onCount(eff.btns, rows, 'ali') : 0;
