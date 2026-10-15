@@ -227,7 +227,7 @@ const MSG = {
   hostHidden:  '이 상품은 알리페이 앱에서는 보이지 않아요.',
   hostHiddenWeb: '이 상품은 웹에서는 보이지 않아요.',
   hostLangLimit: '이 매장은 알리페이 앱 전용이라 중국어(간체), 중국어(번체), 영어만 등록할 수 있어요.',
-  storeDefault:'기본 설정은 스토어 버튼 구성을 그대로 적용합니다.',
+  storeDefault:'기본 설정은 예약을 뺀 버튼을 스토어 버튼 구성대로 적용합니다. 예약은 상품마다 따로 정합니다.',
   msgLang:     '메신저 설정을 켜면 언어별로 1개씩 등록할 수 있습니다.',
   magAli:      (u, e, all) => [u ? '외부 사이트 주소 ' + u + '개는 알리페이 앱에서 글자로만 보입니다.' : '', e ? '외부 영상·SNS ' + e + '개는 알리페이 앱에서 보이지 않습니다.' : '', all ? '웹에서는 그대로 보입니다.' : ''].filter(Boolean).map(x => '<p style="margin:0 0 4px">' + x + '</p>').join(''),
   saveDone:    '목록과 고객 화면에 1분 안에 반영됩니다.',
@@ -572,8 +572,7 @@ function renderSide() {
 
 /* ------------------------------ 호스트 셸 ------------------------------ */
 const HOSTMENU = [
-  ['대시보드', 'home'], ['채팅 관리', 'chat', ['실시간 채팅', '채팅내역조회']], ['상품 관리', 'grid', 'on'],
-  ['상담 관리', 'card', ['메신저상담', '상담접수']], ['예약 관리', 'cal', ['예약 현황', '예약 시간 설정']], ['리뷰 관리', 'star'],
+  ['대시보드', 'home'], ['문의·예약', 'chat', ['실시간 채팅', '채팅내역조회', '메신저상담', '상담접수', '예약 현황', '예약 시간 설정']], ['상품 관리', 'grid', 'on'], ['리뷰 관리', 'star'],
   ['스토어 칼럼 관리', 'book'], ['갤러리 관리', 'img', ['전/후 사진', '일반 사진']], ['마이페이지', 'user'], ['공지사항', 'mega']
 ];
 const HICON = {
@@ -630,8 +629,7 @@ function btnTable(kind, obj) {
     html += '<div class="notice red">' + over + (webCnt > CAP && aliCnt > CAP ? ' 각각 2개 이하여야 저장할 수 있습니다.' : ' 2개 이하여야 저장할 수 있습니다.') + '</div>';
   }
   /* 잠금 문구는 하나만. 기본 설정 잠금 → 노출 채널 잠금 */
-  if (locked) html += '<div class="hint">기본 설정 적용 중입니다. 개별 설정을 선택하면 수정할 수 있습니다.</div>';
-  else if (lOk && effCh !== ALLCH && !(!isStore && storeFixes(S(obj.store)))) html += '<div class="hint">' + MSG.lockCol(effCh) + '</div>';
+  if (locked) html += '<div class="hint">기본 설정 적용 중입니다. 예약을 뺀 버튼은 개별 설정을 선택하면 수정할 수 있습니다.</div>'; if (lOk && effCh !== ALLCH) html += '<div class="hint">' + MSG.lockCol(effCh) + '</div>';
   return html;
 }
 
@@ -709,7 +707,7 @@ function passFilter(eff, reasons) {
 }
 const dimSel = (label, opts) => '<div class="fl"><span>' + label + '</span><select class="dim" disabled>' + opts.map(o => '<option>' + o + '</option>').join('') + '</select></div>';
 const empty = n => '<tr><td colspan="' + n + '" class="c tblnote">데이터가 없습니다</td></tr>';
-window.setLang = function (v) { VIEW.lang = v; if (!aliLangOk()) F().ch = CHF; render(); };
+window.setLang = function (v) { VIEW.lang = v; if (!aliLangOk()) Object.keys(FILTERS).forEach(k => { FILTERS[k].ch = CHF; }); render(); };
 const langSelect = () => '<div class="fl"><span>언어</span><select onchange="setLang(this.value)">' + ALL_LANGS.map(l => '<option' + (l === VIEW.lang ? ' selected' : '') + '>' + l + '</option>').join('') + '</select></div>';
 
 /* --------------------------- 상품 목록 --------------------------- */
@@ -731,7 +729,7 @@ function screen_pList() {
     '<div class="frow">' + chFilterRow() + dimSel('단독 상품 포함 여부', ['단독 상품 포함 여부']) + dimSel('등록일', ['등록일']) + '</div>' +
     '<div class="frow"><button class="btn" disabled>오늘</button><button class="btn" disabled>어제</button><button class="btn" disabled>이번주</button><button class="btn" disabled>이번달</button><input type="text" placeholder="Start date" style="width:120px" disabled> ~ <input type="text" placeholder="End date" style="width:120px" disabled></div>' +
     '<div class="frow"><input type="text" placeholder="검색어" style="width:220px" disabled><button class="btn blue" disabled>검색</button></div>' +
-    '</div><div class="tblwrap"><table><thead>' + head + '</thead><tbody>' + (body || empty(24)) + '</tbody></table></div></div>';
+    '</div><div class="tblwrap"><table><thead>' + head + '</thead><tbody>' + (body || empty((head.match(/<th/g) || []).length)) + '</tbody></table></div></div>';
 }
 
 /* ---- 상품정보 수정 ---- */
@@ -1093,7 +1091,7 @@ function screen_btnSpec() {
     '<div class="gstep"><span class="gno">2</span><div><div class="gtt">웹과 알리페이 앱을 따로 켭니다</div><div class="gds">표의 항목마다 웹 칸과 알리페이 앱 칸에서 ON / OFF를 고릅니다. 고객 화면 아래쪽에는 그 채널에서 켠 버튼만 나옵니다.</div></div></div>' +
     '<div class="gstep"><span class="gno">3</span><div><div class="gtt">채널마다 2개까지 켤 수 있습니다</div><div class="gds">켜 둔 항목 하나가 버튼 하나입니다(문의하기도 1개). 이미 2개가 켜진 채널에서 하나를 더 켜면 켜지지 않고 화면 위에 안내가 잠깐 뜹니다. 먼저 하나를 끈 뒤 켜 주세요.</div></div></div>' +
     '<div class="gstep"><span class="gno">4</span><div><div class="gtt">켤 수 없는 칸이 있습니다</div><div class="gds">알리페이 앱의 외부링크·메신저는 알리페이 앱에서 지원하지 않아 늘 꺼져 있습니다. 노출 채널이 웹이면 알리페이 앱 칸 전체가, 알리페이 앱이면 웹 칸 전체가 잠깁니다(켜 둔 값은 남습니다). 예약은 예약설정에서 예약을 사용하는 스토어만 켤 수 있습니다.</div></div></div>' +
-    '<div class="gstep"><span class="gno">5</span><div><div class="gtt">상품은 스토어 설정을 따를 수 있습니다</div><div class="gds">상품의 스토어 설정 적용이 기본 설정이면 스토어 버튼 구성을 그대로 씁니다. 상품만 다르게 하려면 개별 설정을 고른 뒤 바꿉니다.</div></div></div>' +
+    '<div class="gstep"><span class="gno">5</span><div><div class="gtt">상품은 스토어 설정을 따를 수 있습니다</div><div class="gds">상품의 스토어 설정 적용이 기본 설정이면 예약을 뺀 버튼은 스토어 버튼 구성을 그대로 씁니다. 상품만 다르게 하려면 개별 설정을 고른 뒤 바꿉니다. 예약 행은 기본 설정이어도 상품마다 따로 정하고, 개별 설정으로 바꿔도 값이 그대로입니다.</div></div></div>' +
     '<div class="gstep"><span class="gno">6</span><div><div class="gtt">저장이 안 될 때</div><div class="gds">표 아래에 빨간 안내가 보이면 한 채널에 3개 이상 켜져 있는 상태입니다. 하나를 끄고 저장하면 됩니다. 저장한 내용은 1분 안에 고객 화면에 반영됩니다.</div></div></div>' +
     '<div class="gstep"><span class="gno">7</span><div><div class="gtt">알아 둘 점</div><div class="gds">버튼은 노출 조건이 아닙니다. 버튼을 하나도 켜지 않아도 상품·스토어는 고객 화면에 나오고, 아래쪽 버튼 자리만 보이지 않습니다.</div></div></div>' + '</div></div>';
 }

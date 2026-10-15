@@ -432,7 +432,7 @@ const ageB=a=>a<20?'10대':a<30?'20대':a<40?'30대':a<50?'40대':'50대 이상'
   CONS.forEach(r=>{if(!r.phone)return;const o=r.phone;let p=first[K(r.name)];if(!p){p=fix(r.phone,NATOF[r.name]);first[K(r.name)]=p}r.phone=p;if(r.hay)r.hay=r.hay.split(o.toLowerCase()).join(p.toLowerCase())});
 })();
 /* ========= 상태 ========= */
-let _v='res',S,OPEN={};
+let _v='cons',S,OPEN={'상담':true};
 const D=()=>({
  res:{open:null,ch:'전체',store:'',cat:'',status:'',lang:'',reg:'',q:'',qd:'',per:'all',from:'',to:'',base:'visit',sort:'visit',page:1,size:10},
  cons:{per:'',from:'',to:'',member:'',status:'',lang:'',route:'',ch:'전체',cat:'',store:'',q:'',qd:'',page:1,size:10},
@@ -743,12 +743,12 @@ function vSurvey(){
 /* ========= 사이드바 ========= */
 const MENU=[
 {t:'처음으로'},{t:'공지사항'},
-{t:'예약',kids:[['예약 관리','res']]},{t:'고객지원',kids:[]},{t:'회원',kids:[]},{t:'스토어',kids:[]},{t:'상품',kids:[]},{t:'옵션 관리',kids:[]},{t:'매거진',kids:[]},{t:'스토어 칼럼',kids:[]},{t:'SEO',kids:[]},{t:'AI 관리',kids:[]},
+{t:'예약',kids:[['예약 관리','']]},{t:'고객지원',kids:[]},{t:'회원',kids:[]},{t:'스토어',kids:[]},{t:'상품',kids:[]},{t:'옵션 관리',kids:[]},{t:'매거진',kids:[]},{t:'스토어 칼럼',kids:[]},{t:'SEO',kids:[]},{t:'AI 관리',kids:[]},
 {t:'채팅',kids:[['전체채팅조회',''],['고객1:1문의',''],['스토어채팅조회','chats'],['상품채팅조회','prodchats']]},
 {t:'상담',kids:[['상담조회','cons'],['메신저 상담조회','']]},
 {t:'리뷰',kids:[['리뷰조회','rev'],['외부 리뷰 관리','']]},
 {t:'계정',kids:[]},{t:'광고정보관리'},{t:'쿠폰',kids:[]},{t:'기획전',kids:[]},{t:'인플루언서',kids:[]},
-{t:'통계',kids:[['상담 · 채팅 통계',''],['스토어 문의 통계','stat'],['예약자 설문조사','survey']]},
+{t:'통계',kids:[['상담 · 채팅 통계',''],['스토어 문의 통계',''],['예약자 설문조사','survey']]},
 {t:'카탈로그 관리',kids:[],alpha:1},{t:'장소 관리',kids:[],alpha:1}];
 function sideHTML(){
   return MENU.map(m=>{
@@ -762,7 +762,7 @@ function sideHTML(){
 }
 
 /* ========= 렌더·이벤트 ========= */
-const VIEWS={res:vRes,cons:vCons,chats:vChats,prodchats:vProdChats,rev:vRev,stat:vStat,survey:vSurvey};
+const VIEWS={cons:vCons,chats:vChats,prodchats:vProdChats,rev:vRev,survey:vSurvey};
 let _lastV=null,_rend=false,_dd=null;  /* _dd: 사용자가 값을 고치는 중인 날짜칸 */
 /* 다시 그리기 전후로 포커스를 잡은 요소를 같은 data 속성 요소로 복원 */
 function focusKey(){

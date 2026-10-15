@@ -58,7 +58,7 @@ function seedProducts(){
  [108,'en','Abijou Acne Care',120000,'approved',1,0,0,'개별',1,1,'both','여드름/흉터'],
  [109,'zh','Abijou 皮肤护理',120000,'approved',1,0,0,'개별',1,1,'web','여드름/흉터']
  ];
- return A.map(function(a,i){return {id:a[0],lang:a[1],name:a[2],price:a[3],status:a[4],active:!!a[5],hidden:!!a[6],deleted:!!a[7],mode:a[8],book:{web:!!a[9],ali:!!a[10]},exposeCh:a[11],cat:'피부과',sub:a[12],reg:'2026-0'+(6+i%3)+'-1'+i+' 16:2'+i,chat:(a[0]%7)+1,cons:(a[0]%5),rev:(a[0]%3),views:120+a[0]%40,inner:30+a[0]%17,direct:8+a[0]%9,bclk:(a[9]||a[8]==='기본')?(a[0]%6)+2:0};});
+ return A.map(function(a,i){return {id:a[0],lang:a[1],name:a[2],price:a[3],status:a[4],active:!!a[5],hidden:!!a[6],deleted:!!a[7],mode:a[8],book:{web:!!a[9],ali:!!a[10]},exposeCh:a[11],cat:'피부과',sub:a[12],reg:'2026-0'+(6+i%3)+'-1'+i+' 16:2'+i,chat:(a[0]%7)+1,cons:(a[0]%5),rev:(a[0]%3),views:120+a[0]%40,inner:30+a[0]%17,direct:8+a[0]%9,bclk:(a[9]||a[10])?(a[0]%6)+2:0};});
 }
 function snapOf(p){return {name:p.name,price:p.price,lang:p.lang};}
 function seedBookings(P){
@@ -138,7 +138,7 @@ function foSubmit(){
  var pid=f.entry==='product'?f.pid:(f.sel?+f.sel:null);
  if(pid){var j=judgeBookable(prodById(pid),f.lang,f.ch);if(!j.ok){if(f.entry==='product')f.err={kind:'prodGone'};else{f.err={kind:'pickAgain'};f.sel='';}return;}}
  var p=pid?prodById(pid):null,no=DB.books.length+1;
- DB.books.push({no:no,visit:f.date+' '+f.time,recv:NOWTS,name:f.ch==='ali'?'Wang Siyu':ME,nation:f.ch==='ali'?'중국':'캐나다',lang:f.lang,contact:'WhatsApp',status:'예약',owner:'고객',route:f.entry==='product'?'상품':'스토어',prodId:pid,snap:p?snapOf(p):null,need:'신규',ch:f.ch==='web'?'웹':'알리페이',req:'',phone:f.ch==='ali'?'+86 13800000099':'+1 4165550199',rno:rnoFor(NOWTS,f.lang,DB.books)});
+ DB.books.push({no:no,visit:f.date+' '+f.time,recv:NOWTS,name:f.ch==='ali'?'Wang Siyu':ME,nation:f.ch==='ali'?'중국':'캐나다',lang:f.lang,contact:f.msg||'WhatsApp',mid:f.mid||(f.ch==='ali'?'13800000099':'4165550199'),status:'예약',owner:'고객',route:f.entry==='product'?'상품':'스토어',prodId:pid,snap:p?snapOf(p):null,need:'신규',ch:f.ch==='web'?'웹':'알리페이',req:'',phone:f.ch==='ali'?'+86 13800000099':'+1 4165550199',rno:rnoFor(NOWTS,f.lang,DB.books)});
  f.lastNo=no;f.screen='done';f.time='';f.agree=false; /* 다음 예약은 동의 체크 없이 시작(라이브 정보 입력 화면은 처음에 미체크) */
 }
 function manSave(){
@@ -158,7 +158,7 @@ function swHTML(){
  var s=S.surf,f=S.fo;
  return '<b>알리페이 + 상품 예약 통합 시안</b>'+['FO','HOST','BO'].map(function(x){return '<button class="s'+(s===x?' on':'')+'" data-surf="'+x+'">'+{FO:'고객 화면',HOST:'입점사 (HOST)',BO:'운영사 (BO)'}[x]+'</button>';}).join('')
   +'<span class="sp"></span>'
-  +(s==='FO'?'<span>언어</span><select data-sw="lang">'+[['en','English'],['ja','日本語'],['zh','简体中文']].map(function(o){return '<option value="'+o[0]+'"'+(f.lang===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select><span>채널</span><select data-sw="ch"><option value="web"'+(f.ch==='web'?' selected':'')+'>웹</option><option value="ali"'+(f.ch==='ali'?' selected':'')+'>알리페이</option></select>':'')
+  +(s==='FO'?'<span>언어</span><select data-sw="lang">'+[['en','English'],['ja','日本語'],['zh','简体中文']].map(function(o){return '<option value="'+o[0]+'"'+(f.lang===o[0]?' selected':'')+(f.ch==='ali'&&o[0]==='ja'?' disabled':'')+'>'+o[1]+(f.ch==='ali'&&o[0]==='ja'?' (웹 전용)':'')+'</option>';}).join('')+'</select><span>채널</span><select data-sw="ch"><option value="web"'+(f.ch==='web'?' selected':'')+'>웹</option><option value="ali"'+(f.ch==='ali'?' selected':'')+'>알리페이</option></select>':'')
   +(s==='FO'?'<span>예약 URL로 열기</span><select data-url="1"><option value="">고르기</option><option value="store">스토어 예약 URL</option>'+DB.prods.filter(function(p){return p.lang===f.lang&&!p.deleted;}).map(function(p){return '<option value="p'+p.id+'">상품 예약 URL · '+p.name.replace(/</g,'&lt;')+'</option>';}).join('')+'</select>':'')
   +'<label><input type="checkbox" data-sw="mark"'+(S.mark?' checked':'')+'>이번에 추가한 요소 표시</label>'
   +'<span style="color:#888">기준 시각 '+NOWTS+'</span>';
@@ -173,6 +173,8 @@ function render(){
 /* 자식 프레임이 쓰는 창구 */
 window.PB={
  get DB(){return DB;},get S(){return S;},TODAY:TODAY,NOWTS:NOWTS,LANGS:LANGS,TIMES:TIMES,ME:ME,
+ /* 기존 문의 표본(BO 스토어 문의 통계 · HOST 대시보드 공용): [문의구분, 언어, 채널, 접수일, 유입 채널, 접수 시각] */
+ SINQ_BASE:[['스토어','en','메신저상담','2026-10-03','웹','11:40'],['상품','en','메신저상담','2026-10-05','웹','15:12'],['상품','ja','메신저상담','2026-10-06','웹','10:05'],['스토어','zh','채팅문의','2026-10-08','알리페이','13:31'],['상품','en','상담문의','2026-10-09','알리페이','16:48'],['상품','en','메신저상담','2026-10-11','웹','09:27'],['스토어','ja','메신저상담','2026-10-12','웹','10:16']],
  addDays:addDays,wdKo:wdKo,won:won,prodById:prodById,prodVisible:prodVisible,prodBookBtn:prodBookBtn,storeBookBtn:storeBookBtn,judgeBookable:judgeBookable,
  foOptions:foOptions,manualOptions:manualOptions,bookingKind:bookingKind,prodBookCount:prodBookCount,slotOpen:slotOpen,needList:needList,
  foSubmit:foSubmit,manSave:manSave,bookOff:bookOff,render:render,
@@ -200,7 +202,7 @@ window.frameDoc=function(s){return frameOf(s||S.surf).contentDocument;};
 
 document.addEventListener('click',function(e){var t=e.target.closest('[data-surf]');if(t){S.surf=t.getAttribute('data-surf');render();}});
 document.addEventListener('change',function(e){var t=e.target;if(t.hasAttribute('data-url')){var v=t.value;if(v==='store')window.foOpenUrl('store');else if(v)window.foOpenUrl('product',+v.slice(1));return;}if(!t.hasAttribute('data-sw'))return;var k=t.getAttribute('data-sw');
- if(k==='mark'){S.mark=t.checked;}else{S.fo[k]=t.value;S.fo.err=null;if(S.fo.screen==='book'&&S.fo.entry==='store')S.fo.sel='';}render();});
+ if(k==='mark'){S.mark=t.checked;}else{S.fo[k]=t.value;S.fo.err=null;if(k==='ch'&&t.value==='ali'&&S.fo.lang==='ja')S.fo.lang='en'; /* 알리페이 앱은 중국어(간체)·중국어(번체)·영어만 */if(S.fo.screen==='book'&&S.fo.entry==='store')S.fo.sel='';}render();});
 freshDB();S=freshState();render();
 </script>
 </body>

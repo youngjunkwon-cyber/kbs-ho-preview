@@ -1032,7 +1032,7 @@ function fillDrawer(pre, b, qrCls) {
     var k = $('dt', r).textContent.trim(), dd = $('dd', r);
     if (k === '메신저') {
       var mv = $('[class*=messengerValue]', dd), sp = $('span', mv), btn = $('button', mv);
-      sp.textContent = qr ? b.contact : b.contact === '-' ? '-' : b.contact + ' ' + b.phone.replace(/^\+\d+\s+/, '').replace(/\D/g, ''); /* 메신저 번호는 국가번호를 뺀 번호(라이브 캡처) */
+      sp.textContent = qr ? b.contact : b.contact === '-' ? '-' : b.contact + ' ' + (b.mid || b.phone.replace(/^\+\d+\s+/, '').replace(/\D/g, '')); /* 고객이 넣은 메신저 아이디. 시드는 국가번호를 뺀 번호(라이브 캡처) */
       if (qr && !btn) { btn = document.createElement('button'); btn.type = 'button'; btn.className = qrCls; btn.textContent = 'QR 보기'; mv.appendChild(btn); }
       if (!qr && btn) btn.remove();
       if (btn && qr) btn.onclick = function () { toast('시안에서는 동작하지 않습니다'); };
@@ -1096,7 +1096,7 @@ function F() { return PB.S.fo; }
 function meName() { return F().ch === 'ali' ? 'Wang Siyu' : PB.ME; }
 /* 예약 상세 고객 정보: 알리페이 회원 예약은 예약의 값(이메일 없음, 1부 FO-CH-13), 웹은 시안 고객(Kaitlyn Chan) */
 function guestOf(b) { var ali = b.ch === '알리페이', NAT = { '중국': 'China', '홍콩': 'Hong Kong', '캐나다': 'Canada' }; return ali ? { ali: true, nat: NAT[b.nation] || b.nation, pn: b.name.toUpperCase(), mid: b.name.toLowerCase().split(' ').join('.') } : { ali: false, nat: 'Canada', pn: 'KAITLYN CHAN', mid: 'kaitlyn.chan' }; }
-function chOut(p, ch) { return (ch === 'ali' && p.exposeCh === 'web') || (ch === 'web' && p.exposeCh === 'ali'); }
+function chOut(p, ch) { return (ch === 'ali' && (p.exposeCh === 'web' || ['zh', 'tw', 'en'].indexOf(p.lang) < 0)) || (ch === 'web' && p.exposeCh === 'ali'); }
 function nav(screen) { var f = F(); f.screen = screen; PB.render(); }
 var SUB_EN = { '보톡스': 'Botox', '스킨부스터': 'Skin Boosters', '여드름/흉터': 'Acne/Scar', '리프팅': 'Lifting', '색소/점/문신': 'Pigmentation/Mole/Tattoo', '필러': 'Filler', '바디': 'Body' };
 /* 아코디언 시술 정보 (시안 예시 데이터) */
@@ -1145,6 +1145,9 @@ function footerFrom(store) { return tpl('f_store9').querySelector('footer').clon
 /* ---------- 스토어 페이지 ---------- */
 function pStore() {
   var f = F();
+  if (f.ch === 'ali' && ['zh', 'tw', 'en'].indexOf(f.lang) < 0) { var app0 = document.getElementById('app'); app0.innerHTML = ''; app0.appendChild(header('', 'store')); var e0 = document.createElement('div'); e0.className = 'pb-404'; e0.setAttribute('data-test', 'fo-404'); e0.innerHTML = '<div class="pb-404-c">404</div><div class="pb-404-t">We couldn\'t find this page</div>'; app0.appendChild(e0); return; }
+  { var hdr0 = $('header[class*=fixedHeader]'), SC = 'StoreDetailHeader-module__Z4HdZa__fixedHeaderScrolled', paint0 = function () { var hh = $('header[class*=fixedHeader]'); if (hh) hh.classList.toggle(SC, (window.scrollY || document.documentElement.scrollTop) > 180); };
+    if (hdr0) { paint0(); if (!window.__pbHdr) { window.__pbHdr = true; window.addEventListener('scroll', paint0, { passive: true }); } } }
   /* 상품 카드: 지금 언어·채널로 보이는 상품 */
   var card = $$('article[class*=StoreDetailProductCard]').filter(function (a) { return $('[class*=moreButton]', a); })[0] || $('article[class*=StoreDetailProductCard]');
   if (card) {
@@ -1172,7 +1175,7 @@ function pStore() {
   if (f.ch === 'ali') { $$('[aria-label="Messenger channels"], [class*=StoreInstagramSection-module__KqSlTq__section]').forEach(function (x) { x.remove(); }); }
   /* 알리페이 채널에는 메신저 버튼이 없음(알리페이 PRD) */
   if (ft && f.ch === 'ali') $$('button', ft).forEach(function (b) { if (!/Book now/.test(b.textContent)) b.remove(); });
-  soloMessenger(ft, 'KakaoTalk');
+  soloMessenger(ft, 'WeChat'); /* 시안 스토어 메신저 = WeChat(BO 스토어 정보와 같음) */
   var chat = ft && $('button', ft); if (chat && !/Book now/.test(chat.textContent)) chat.onclick = function () { toast('Not available in this mockup'); };
 }
 /* 하단 버튼이 메신저 하나만 남으면 실화면의 단독 메신저 버튼(messengerButton: #2d2d2d 바탕, 흰 "Chat on" 16px + 메신저 로고)으로 교체 */
@@ -1212,7 +1215,7 @@ function pProduct() {
   /* 하단 버튼 줄: 상품 상세 실화면 부품(Bwsfja productDetailFooter). 메신저 = 검은 messengerButton(STG 상품 3222 실측), 예약 = productDetailFooter__button--primary1 */
   var nf = $('footer[class*=productDetailFooter]'); if (!nf) { nf = document.createElement('footer'); nf.className = 'index-module-scss-module__Bwsfja__productDetailFooter'; document.getElementById('app').appendChild(nf); } nf.innerHTML = '';
   var msgOn = p.mode === '기본' ? true : !!(p.wb && p.wb['메신저']);
-  if (f.ch !== 'ali' && msgOn) nf.appendChild(msgButton('KakaoTalk'));
+  if (f.ch !== 'ali' && msgOn) nf.appendChild(msgButton('WeChat'));
   var book = document.createElement('button'); book.type = 'button'; book.className = 'index-module-scss-module__Bwsfja__productDetailFooter__button index-module-scss-module__Bwsfja__productDetailFooter__button--primary1'; book.textContent = 'Book now'; nf.appendChild(book);
   if (!PB.judgeBookable(p, f.lang, f.ch).ok) { book.remove(); var only = $('.pb-msg1', nf); if (only) only.setAttribute('data-test', 'fo-msg-solo'); if (!nf.children.length) { nf.setAttribute('data-test', 'fo-footer-empty'); nf.style.display = 'none'; } } else { book.setAttribute('data-test', 'prod-book'); book.onclick = function () { p.bclk = (p.bclk || 0) + 1; startBook('product'); }; mark(book); }
 }
@@ -1312,7 +1315,7 @@ function pInfo() {
   if (f.err && f.err.kind === 'prodGone') { var eb = document.createElement('div'); eb.className = 'pb-ferr box'; eb.setAttribute('data-test', 'fo-err'); eb.innerHTML = "This product can't be booked right now.<button class='pb-ferr-b' type='button' data-go='store'>Go to store page</button>"; nt.before(eb); $('[data-go]', eb).onclick = function () { f.err = null; nav('store'); }; }
   /* 예시 데이터 */
   var setIn = function (sel, v) { var x = $(sel); if (x) { x.value = v; x.setAttribute('value', v); } };
-  setIn('input[name=passportName]', 'KAITLYN CHAN'); f.birth = f.birth || '1996-04-12'; setIn('input[name=birthDate]', f.birth); var bi = $('input[name=birthDate]'); if (bi) { bi.readOnly = false; bi.oninput = function () { f.birth = bi.value; }; } setIn('input[type=email]', 'kaitlyn@example.com (Verified)'); setIn('input[name=messengerId]', 'kaitlyn.chan');
+  setIn('input[name=passportName]', 'KAITLYN CHAN'); f.birth = f.birth || '1996-04-12'; setIn('input[name=birthDate]', f.birth); var bi = $('input[name=birthDate]'); if (bi) { bi.readOnly = false; bi.oninput = function () { f.birth = bi.value; }; } setIn('input[type=email]', 'kaitlyn@example.com (Verified)'); setIn('input[name=messengerId]', f.mid != null ? f.mid : '4165550199'); var mid0 = $('input[name=messengerId]'); if (mid0) mid0.oninput = function () { f.mid = mid0.value; };
   var tl = $$('[class*=triggerLabel]'); if (tl[0]) tl[0].textContent = 'Canada'; if (tl[1]) tl[1].textContent = 'Female';
   var cc = $('[class*=verifiedCountryCode]'); if (cc) cc.textContent = '+1'; var pn = $('[class*=verifiedPhoneNumber]'); if (pn) pn.textContent = '4165550199 (Verified)';
   if (f.ch === 'ali') {
@@ -1320,7 +1323,7 @@ function pInfo() {
     ['Nationality', 'Gender', 'Date of birth'].forEach(function (l) { tag(l, '회원 정보에서 채웠습니다'); }); tag('Mobile phone number', '알리페이 계정에서 채웠습니다');
     var vf = $('[class*=verifiedPhoneForm]'); if (vf) { var hs = document.createElement('div'); hs.className = 'pb-fohint'; hs.setAttribute('data-test', 'fo-phone-hint'); hs.textContent = '고치면 문자 인증을 다시 합니다.'; vf.after(mark(hs)); }
     if (tl[0]) tl[0].textContent = 'China'; var cc2 = $('[class*=verifiedCountryCode]'); if (cc2) cc2.textContent = '+86'; var pn2 = $('[class*=verifiedPhoneNumber]'); if (pn2) pn2.textContent = '13800000099 (Verified)';
-    var pi = $('input[name=passportName]'); if (pi) { pi.value = ''; pi.setAttribute('value', ''); } var mi = $('input[name=messengerId]'); if (mi) { mi.value = ''; mi.setAttribute('value', ''); mi.placeholder = '메신저 아이디를 직접 입력해 주세요'; mi.setAttribute('data-test', 'fo-msgid'); mark(mi); }
+    var pi = $('input[name=passportName]'); if (pi) { pi.value = ''; pi.setAttribute('value', ''); } var mi = $('input[name=messengerId]'); if (mi) { mi.value = f.mid || ''; mi.setAttribute('value', f.mid || ''); mi.oninput = function () { f.mid = mi.value; }; mi.placeholder = '메신저 아이디를 직접 입력해 주세요'; mi.setAttribute('data-test', 'fo-msgid'); mark(mi); }
   }
   /* 메신저 칩 (아이콘은 라이브 정적 파일) */
   var ICON = { WhatsApp: 'whatsapp.0hq-eh2chewsx.png', LINE: 'line.3qblh4j4u4rrq.png', WeChat: 'wechat.38ybbwvm7ncvr.png', KakaoTalk: 'kakaotalk.0y3rqbtj5gp03.png' };
@@ -1373,7 +1376,7 @@ function pDone() {
 }
 /* 예약 카드 (내 예약 목록 · 마이페이지 Booking History 공통): 스토어명이 제목, 상품명은 바로 아래 진한 줄 */
 function myCard(b) {
-  var d = b.visit.slice(0, 10), dd = Math.round((new Date(d) - new Date(PB.TODAY)) / 864e5), Dd = (b.status === '예약' ? ' (D-' + dd + ')' : '');
+  var d = b.visit.slice(0, 10), dd = Math.round((new Date(d) - new Date(PB.TODAY)) / 864e5), Dd = (b.status === '예약' || b.status === '변경요청' ? ' (D-' + dd + ')' : '');
   return '<div class="pb-card">' + badge(b.status) + '<div class="pb-card-n">' + esc(PB.DB.store.nameEn) + Dd + '</div>'
     + '<div class="pb-card-p pb-hiA pb-new" data-test="fo-card-prod">' + esc(b.snap ? b.snap.name : 'Decide at the store') + '</div>'
     + '<div class="pb-hr"></div><div class="pb-card-dt"><div><span>Date</span><b>' + d + ' (' + wdEn(d).toUpperCase() + ')</b></div><div><span>TIME</span><b>' + b.visit.slice(11) + ' (KST)</b></div></div><button class="pb-pk sm" data-no="' + b.no + '">View details</button></div>';
@@ -1434,7 +1437,7 @@ function pMyDetail() {
     + (b.status === '예약' ? '<div class="pb-det-btns"><button class="pb-pk">Request a change</button><button class="pb-gr">Cancel</button></div><p class="pb-note">Changes and cancellations are available until midnight before your visit.</p>' : '')
     + '<div class="pb-band"></div><h2 class="pb-det-h2">Guest information</h2><div class="pb-two2"><div class="pb-row"><span>Nationality</span><i>' + esc(guestOf(b).nat) + '</i></div><div class="pb-row"><span>Gender</span><i>FEMALE</i></div><div class="pb-row"><span>Passport name</span><i>' + esc(guestOf(b).pn) + '</i></div><div class="pb-row"><span>Birth</span><i>1996-04-12</i></div></div>'
     /* 실화면(라이브 캡처 2026-10-14): 구분선 아래 연락처 3줄 */
-    + '<div class="pb-hr"></div>' + (guestOf(b).ali ? '' : '<div class="pb-row pb-ct"><span>E-mail</span><i>kaitlyn@example.com</i></div>') + '<div class="pb-row pb-ct"><span>Mobile phone</span><i>' + esc(b.phone) + '</i></div><div class="pb-row pb-ct"><span>Messenger</span><i>' + esc(b.contact) + '&nbsp;&nbsp; ' + esc(guestOf(b).mid) + '</i></div>';
+    + '<div class="pb-hr"></div>' + (guestOf(b).ali ? '' : '<div class="pb-row pb-ct"><span>E-mail</span><i>kaitlyn@example.com</i></div>') + '<div class="pb-row pb-ct"><span>Mobile phone</span><i>' + esc(b.phone) + '</i></div><div class="pb-row pb-ct"><span>Messenger</span><i>' + esc(b.contact) + '&nbsp;&nbsp; ' + esc(b.mid || b.phone.replace(/^\+\d+\s+/, '').replace(/\D/g, '')) + '</i></div>';
   app.appendChild(w); $$('.pb-det-btns button', w).forEach(function (x) { x.onclick = function () { toast('Not available in this mockup'); }; });
   bindLinks(w);
 }
