@@ -804,7 +804,7 @@ function screen_sEdit() {
     const im = st.channel !== ALLCH && st.channel !== VIEW.savedCh && storeHasTargetLang(st) ? impactOfStoreCh(st, st.channel) : null;
     bd = '<div class="bd">' +
       fld('카테고리', true, fbox(st.cat, true)) +
-      fld('지원언어', false, '<div class="chkrow">' + STLANG.map(L => '<span class="chkit"><input type="checkbox"' + (has(L) ? ' checked' : '') + ' onclick="toggleLang(\'' + L + '\')"> ' + L + '</span>').join('') + '</div>') +
+      fld('지원언어', false, '<div class="chkrow">' + STLANG.map(L => '<label class="chkit" style="cursor:pointer"><input type="checkbox"' + (has(L) ? ' checked' : '') + ' onclick="toggleLang(\'' + L + '\')"> ' + L + '</label>').join('') + '</div>') +
       fld('노출 채널', false, chRadio('sch', effChStore(st), 'store', !storeHasTargetLang(st)) +
         '<div class="hint">' + MSG.storeAll + '</div>' +
         (im && (im.N || im.M) ? '<div class="notice">' + MSG.storeChange(st.channel, im.N, im.M) + '</div>' : '')) +
