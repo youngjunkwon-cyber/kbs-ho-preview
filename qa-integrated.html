@@ -241,6 +241,7 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
       <h1>알리페이 + 상품 예약 통합 검수<span class="sub" id="cnt"></span></h1>
       <div class="row1">
         <button class="btn on" data-f="all">전체</button>
+        <button class="btn" data-f="first" title="통과가 없고(예전 콘솔에서 이어받은 통과 포함) 건너뛰기도 아닌 케이스">먼저 볼 것 <b id="nFirst"></b></button>
         <button class="btn" data-f="nopass">통과 안 준 것</button>
         <button class="btn" data-f="todo">미확인</button>
         <button class="btn" data-f="fail">실패만</button>
@@ -682,7 +683,7 @@ function render() {
   var list = document.getElementById('list'), h = '', shown = 0;
   GROUPS.forEach(function (g) {
     if (GSEL !== 'all' && g[0] !== GSEL) return;
-    var cs = g[3].filter(function (c) { if (!inArea(c, g)) return false; var r = REC[c.id] || {}; if (FILTER === 'nopass') return r.s !== 'pass'; if (FILTER === 'todo') return !r.s; if (FILTER === 'fail') return r.s === 'fail'; return true; });
+    var cs = g[3].filter(function (c) { if (!inArea(c, g)) return false; var r = REC[c.id] || {}; if (FILTER === 'first') return r.s !== 'pass' && !c.skip; if (FILTER === 'nopass') return r.s !== 'pass'; if (FILTER === 'todo') return !r.s; if (FILTER === 'fail') return r.s === 'fail'; return true; });
     if (!cs.length) return;
     var gc = gcount(g);
     h += '<div class="grp"><h2><span class="k">' + g[0] + '</span>' + esc(g[1]) + prdRefs(g[2]).map(function (r) { return '<button class="prdl" data-sec="' + esc(r) + '" title="문서 보기에서 이 절 열기">PRD ' + esc(r) + '</button>'; }).join('') + '<span class="n">' + (gc.p + gc.f) + ' / ' + gc.t + '</span></h2>';
@@ -697,7 +698,7 @@ function render() {
     h += '</div>';
   });
   list.innerHTML = h || '<div class="empty">조건에 맞는 케이스가 없습니다.</div>';
-  var all = allCases(), P = 0, F = 0; all.forEach(function (c) { var r = REC[c.id] || {}; if (r.s === 'pass') P++; else if (r.s === 'fail') F++; });
+  var all = allCases(), P = 0, F = 0; var nfE = document.getElementById('nFirst'); if (nfE) nfE.textContent = all.filter(function (c) { return (REC[c.id] || {}).s !== 'pass' && !c.skip; }).length; all.forEach(function (c) { var r = REC[c.id] || {}; if (r.s === 'pass') P++; else if (r.s === 'fail') F++; });
   document.getElementById('nPass').textContent = P; document.getElementById('nFail').textContent = F; document.getElementById('nTodo').textContent = all.length - P - F;
   document.getElementById('barP').style.width = (P / all.length * 100) + '%'; document.getElementById('barF').style.width = (F / all.length * 100) + '%';
   document.getElementById('pct').textContent = '진행 ' + Math.round((P + F) / all.length * 100) + '%';
