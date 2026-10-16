@@ -204,7 +204,7 @@ const MSG = {
   hardOff:     '알리페이 앱 미지원 항목입니다.',
   inquiryHint: '기존 문의하기 버튼입니다. 다른 항목처럼 독립된 버튼이라 켜면 1개로 셉니다.',
   bnBtnTarget: (label, ch) => '연결 대상(' + label + ')이 ' + ch + '에 노출되지 않습니다. ' + ch + '에서는 하단 버튼이 보이지 않습니다.',
-  storeAliBlock: (n, m) => '<p><b>알리페이 앱 미지원 언어 대상</b></p><p>' + [n ? '상품 ' + n + '건' : '', m ? '칼럼 ' + m + '건' : ''].filter(Boolean).join(', ') + '</p>',
+  storeAliBlock: (n, m, L) => '<p><b>알리페이 앱 미지원 언어 대상</b></p><p>' + [L && L.length ? '지원언어 ' + L.join('·') : '', n ? '상품 ' + n + '건' : '', m ? '칼럼 ' + m + '건' : ''].filter(Boolean).join(', ') + '</p>',
   needBooking: '예약설정에서 예약을 사용하면 켤 수 있습니다.',
   cap:         '웹과 알리페이 앱 각각 2개까지 켤 수 있습니다.',
   capHead:     '버튼은 웹과 알리페이 앱 각각 2개까지 켤 수 있습니다.',
@@ -376,7 +376,8 @@ const onCount = (b, rows, ch) => ctaList(b, rows, ch).length;
 const langOk = l => ALI_LANGS.indexOf(l) !== -1;
 /* 스토어 유효값 = 저장값 (스토어는 언어 무관) */
 const storeHasTargetLang = st => String(st.langs || '').split(',').some(x => langOk(x.trim()));
-function effChStore(st) { return storeHasTargetLang(st) ? st.channel : WEB; }
+const storeOutLangs = st => String(st.langs || '').split(',').map(x => x.trim()).filter(x => x && !langOk(x));
+function effChStore(st) { if (!storeHasTargetLang(st)) return WEB; return (st.channel === ALI && storeOutLangs(st).length) ? ALLCH : st.channel; }
 /* 상품·칼럼 유효값 = 대상 외 언어면 웹, 스토어가 고정이면 스토어 값, 아니면 자기 값 */
 function effChProduct(p) { if (!langOk(p.lang)) return WEB; const s = effChStore(S(p.store)); return s !== ALLCH ? s : p.channel; }
 const colLangOk = c => String(c.langs || '').split(',').some(x => langOk(x.trim()));
@@ -651,7 +652,7 @@ window.setCh = function (kind, v) {
   if (kind === 'store' && v === ALI) {
     const n = DB.products.filter(p => p.store === obj.id && !langOk(p.lang)).length;
     const m = DB.columns.filter(c => c.store === obj.id && String(c.langs || '').split(',').some(x => !langOk(x.trim()))).length;
-    if (n || m) { alertBox('바꿀 수 없습니다', MSG.storeAliBlock(n, m), function () { const r = document.querySelector('input[name=sch]:checked'); if (r) r.focus(); }); render(); return; }
+    const L = storeOutLangs(obj); if (n || m || L.length) { alertBox('바꿀 수 없습니다', MSG.storeAliBlock(n, m, L), function () { const r = document.querySelector('input[name=sch]:checked'); if (r) r.focus(); }); render(); return; }
   }
   obj.channel = v; render();
 };
