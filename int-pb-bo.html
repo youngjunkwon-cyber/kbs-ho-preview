@@ -3162,7 +3162,7 @@ function xchLabel(p) { if (['zh', 'tw', 'en'].indexOf(p.lang) < 0) return '웹';
 function pEdit() {
   var b = B(), p = PB.prodById(b.editPid) || PB.DB.prods[0], s = PB.DB.store, base = p.mode === '기본';
   var hdr = $('[class*=pageHeaderTopTitleText]'); if (hdr) hdr.title = p.name;
-  var rx = document.getElementById('productForm_ignoreStoreContactActionApply_extra'); if (rx) { rx.textContent = '기본 설정은 예약을 뺀 버튼을 스토어 버튼 구성대로 적용합니다. 예약은 상품마다 따로 정합니다.'; mark(rx); } /* 1부 8장 */
+  var rx = document.getElementById('productForm_ignoreStoreContactActionApply_extra'); if (rx) { rx.textContent = '기본 설정은 스토어 버튼 구성을 그대로 적용합니다.'; } /* 1부 8장 */
   $$('button').forEach(function (x) { var t = x.textContent.trim(); if (t === '취소') x.onclick = function () { go('prod'); }; if (t === '수정') x.onclick = function () { toast('시안에서는 동작하지 않습니다'); }; });
   var mg = $('[role=radiogroup][id$=isStoreButtonSetting], [role=radiogroup][id*=StoreSetting], [role=radiogroup][id*=useStore]');
   if (!mg) { var lab = byText(document, 'label', '스토어 설정 적용'); mg = lab && lab.closest('.ant-form-item').querySelector('[role=radiogroup]'); }
@@ -3181,8 +3181,8 @@ function pEdit() {
   var msgCol = byText(document, 'label', '메신저 설정').closest('.ant-col.ant-col-12'), nc = msgCol.cloneNode(true);
   var nl = $('label', nc); nl.textContent = '예약'; nl.title = '예약'; nl.setAttribute('for', 'productForm_isActiveBooking');
   var g = $('[role=radiogroup]', nc); g.id = 'productForm_isActiveBooking'; $$('input', g).forEach(function (i) { i.name = 'isActiveBooking'; });
-  var lock = !s.bookingSetting, aliOnly = p.exposeCh === 'ali'; radioSet(g, p.book.web ? 'y' : 'n', lock || aliOnly) /* 통합: 잠겨도 저장된 값을 그대로 보여 줌(알리페이 PRD 설정값 유지) */; g.setAttribute('data-test', 'prod-book-web');
-  $$('label.ant-radio-wrapper', g).forEach(function (l) { l.onclick = function (e) { e.preventDefault(); if (!s.bookingSetting) { toast('예약설정에서 예약을 사용하면 켤 수 있습니다.'); return; } if (aliOnly) return; var on = $('input', l).value === 'y'; if (on && !p.book.web && seats(p).web.length >= 2) { seatToast('웹', seats(p).web); return; } p.book.web = on; PB.render(); }; });
+  var lock = !s.bookingSetting, aliOnly = p.exposeCh === 'ali'; radioSet(g, p.book.web ? 'y' : 'n', lock || aliOnly || base) /* 기본 설정이면 예약 줄도 잠김(PRD v1.13) */ /* 통합: 잠겨도 저장된 값을 그대로 보여 줌(알리페이 PRD 설정값 유지) */; g.setAttribute('data-test', 'prod-book-web');
+  $$('label.ant-radio-wrapper', g).forEach(function (l) { l.onclick = function (e) { e.preventDefault(); if (base) return; if (!s.bookingSetting) { toast('예약설정에서 예약을 사용하면 켤 수 있습니다.'); return; } if (aliOnly) return; var on = $('input', l).value === 'y'; if (on && !p.book.web && seats(p).web.length >= 2) { seatToast('웹', seats(p).web); return; } p.book.web = on; PB.render(); }; });
   if (aliOnly && !lock) { var ax = document.createElement('div'); ax.className = 'pb-lockhint'; ax.setAttribute('data-test', 'lockmsg-web'); ax.textContent = '알리페이 앱에만 노출되는 상태에서는 웹 버튼을 수정할 수 없습니다. 설정값은 유지됩니다.'; $('.ant-form-item-control', nc).appendChild(ax); }
   if (!s.bookingSetting) { var ex = document.createElement('div'); ex.className = 'ant-form-item-explain ant-form-item-explain-connected'; ex.innerHTML = '<div class="pb-lockhint" data-test="lockmsg">예약설정에서 예약을 사용하면 켤 수 있습니다.</div>'; $('.ant-form-item-control', nc).appendChild(ex); }
   var row = msgCol.parentElement, holder = msgCol.cloneNode(false); holder.style.cssText = msgCol.style.cssText; holder.appendChild($('.ant-form-item', nc)); msgCol.after(mark(holder));
@@ -3190,15 +3190,15 @@ function pEdit() {
   /* 예약 (알리페이 앱): 노출 채널이 웹뿐이거나 대상 외 언어(일본어 등) 상품이면 잠김. 기본 설정이어도 상품마다 따로 */
   var hA = holder.cloneNode(true), lbA = $('label', hA); $$('[data-test=lockmsg-web]', hA).forEach(function (x) { x.remove(); }); lbA.textContent = '예약 (알리페이 앱)'; lbA.title = lbA.textContent; lbA.setAttribute('for', 'productForm_isActiveBookingAli');
   var gA = $('[role=radiogroup]', hA); gA.id = 'productForm_isActiveBookingAli'; $$('input', gA).forEach(function (i) { i.name = 'isActiveBookingAli'; }); /* 잠금 안내는 줄마다(스토어 화면과 같음): 복제된 안내를 그대로 둔다 */
-  var webOnly = p.exposeCh === 'web', outLang = ['zh', 'en'].indexOf(p.lang) < 0, lockA = lock || webOnly || outLang;
+  var webOnly = p.exposeCh === 'web', outLang = ['zh', 'en'].indexOf(p.lang) < 0, lockA = lock || webOnly || outLang || base;
   radioSet(gA, p.book.ali ? 'y' : 'n', lockA); gA.setAttribute('data-test', 'prod-book-ali');
-  $$('label.ant-radio-wrapper', gA).forEach(function (l) { l.onclick = function (e) { e.preventDefault(); if (!s.bookingSetting) { toast('예약설정에서 예약을 사용하면 켤 수 있습니다.'); return; } if (webOnly || outLang) return; var on = $('input', l).value === 'y'; if (on && !p.book.ali && seats(p).ali.length >= 2) { seatToast('알리페이 앱', seats(p).ali); return; } p.book.ali = on; PB.render(); }; });
+  $$('label.ant-radio-wrapper', gA).forEach(function (l) { l.onclick = function (e) { e.preventDefault(); if (base) return; if (!s.bookingSetting) { toast('예약설정에서 예약을 사용하면 켤 수 있습니다.'); return; } if (webOnly || outLang) return; var on = $('input', l).value === 'y'; if (on && !p.book.ali && seats(p).ali.length >= 2) { seatToast('알리페이 앱', seats(p).ali); return; } p.book.ali = on; PB.render(); }; });
   if (webOnly && !lock) { var wx = document.createElement('div'); wx.className = 'pb-lockhint'; wx.setAttribute('data-test', 'lockmsg-ali'); wx.textContent = '웹에만 노출되는 상태에서는 알리페이 앱 버튼을 수정할 수 없습니다. 설정값은 유지됩니다.'; gA.closest('.ant-form-item-control').appendChild(wx); }
   holder.after(mark(hA));
   {
     var st = seats(p), nm = function (a) { return a.length ? ' (' + a.join(' / ') + ')' : ''; }, sl = document.createElement('div'); sl.className = 'pb-seatline'; sl.setAttribute('data-test', 'seat-line');
     sl.textContent = '웹 ' + st.web.length + '개' + nm(st.web) + ', 알리페이 앱 ' + st.ali.length + '개' + nm(st.ali) + '입니다. 각각 2개까지 켤 수 있습니다.'; hA.after(mark(sl));
-    if (base) { var bh = document.createElement('div'); bh.className = 'pb-seatline'; bh.setAttribute('data-test', 'base-hint'); bh.textContent = '기본 설정 적용 중입니다. 예약을 뺀 버튼은 개별 설정을 선택하면 수정할 수 있습니다.'; sl.after(mark(bh)); }
+    if (base) { var bh = document.createElement('div'); bh.className = 'pb-seatline'; bh.setAttribute('data-test', 'base-hint'); bh.textContent = '기본 설정 적용 중입니다. 개별 설정을 선택하면 수정할 수 있습니다.'; sl.after(mark(bh)); }
     var ov = [['웹', st.web.length], ['알리페이 앱', st.ali.length]].filter(function (x) { return x[1] > 2; });
     if (ov.length) { var rd = document.createElement('div'); rd.className = 'pb-seatover'; rd.setAttribute('data-test', 'seat-over'); rd.textContent = ov.map(function (x) { return x[0] + ' 버튼 ' + x[1] + '개입니다.'; }).join(' ') + (ov.length > 1 ? ' 각각 2개 이하여야 저장할 수 있습니다.' : ' 2개 이하여야 저장할 수 있습니다.'); sl.after(mark(rd)); }
     $$('button').forEach(function (x) { if (x.textContent.trim() === '수정') x.onclick = function () { if (ov.length) seatBlock(st); else toast('시안에서는 동작하지 않습니다'); }; });
