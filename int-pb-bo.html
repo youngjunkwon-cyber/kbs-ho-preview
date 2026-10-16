@@ -3142,11 +3142,24 @@ function pProd() {
       if (s1) s1.classList.toggle('ant-switch-checked', !!p.active); if (s2) s2.classList.toggle('ant-switch-checked', !!p.hidden);
       setCell(r, '언어', langLabel(p.lang)); setCell(r, '스토어코드', PB.DB.store.name); setCell(r, '상품명', p.name); setCell(r, '카테고리', p.cat); setCell(r, '세부분류', p.sub); setCell(r, '가격', PB.won(p.price));
       setCell(r, '노출수', p.views); setCell(r, '내부진입수', p.inner); setCell(r, '직접유입수', p.direct); setCell(r, '채팅수', p.chat); setCell(r, '상담수', p.cons); setCell(r, '등록일', p.reg); setCell(r, '수정일', p.reg);
-      var mg = r.children[colIdx('관리')]; $$('button', mg).forEach(function (x) { x.onclick = function () { if (x.textContent.trim() === '수정') { b.editPid = p.id; go('pedit'); } else toast('시안에서는 동작하지 않습니다'); }; });
+      var mg = r.children[colIdx('관리')]; $$('button', mg).forEach(function (x) { x.onclick = function () { toast('시안에서는 동작하지 않습니다'); }; }); /* 상품 수정 화면은 어드민 시안 한 벌에서 봄 */
       tb.appendChild(r);
     });
   });
   $$('.ant-pagination-item').forEach(function (li, i) { if (i > 0) li.remove(); });
+  listLangToast(); listEmpty();
+}
+/* 언어별 목록은 어드민 시안에서 봄(언어 탭 · 언어 셀렉트) */
+function listLangToast() {
+  $$('.ant-tabs-tab').forEach(function (tb) { if (/^(원본|중국어|영어|일본어|인도네시아어|몽골어)/.test(tb.textContent.trim()) && !tb.classList.contains('ant-tabs-tab-active')) tb.onclick = function (e) { e.preventDefault(); e.stopPropagation(); toast('시안에서는 동작하지 않습니다'); }; });
+  $$('form .ant-select').forEach(function (s) { if (/^언어/.test(s.textContent.replace(/\s+/g, ''))) s.onclick = function () { toast('시안에서는 동작하지 않습니다'); }; });
+}
+/* 필터 결과 0건: 표 빈 상태, 페이지 번호 숨김 */
+function listEmpty() {
+  var tb = $('tbody'); if (!tb || $('tr.ant-table-row', tb)) return;
+  var n = $$('thead tr:first-child th').length || 1, tr = document.createElement('tr'); tr.className = 'ant-table-placeholder'; tr.setAttribute('data-test', 'list-empty');
+  tr.innerHTML = '<td class="ant-table-cell" colspan="' + n + '" style="text-align:center;padding:32px 0;color:rgba(0,0,0,.25)">데이터가 없습니다</td>'; tb.appendChild(mark(tr));
+  $$('.ant-pagination').forEach(function (p) { p.style.display = 'none'; });
 }
 
 /* ---------- 상품정보 수정 · 관리자설정 ---------- */
@@ -3358,7 +3371,7 @@ function pSinq() {
   var tl = $$('span').filter(function (e) { return e.textContent === '전체 문의 건수'; })[0]; if (tl) { tl.nextElementSibling.textContent = tot; tl.nextElementSibling.setAttribute('data-test', 'sinq-all'); }
   $$('[class*=chartArea], .ant-card-body > [data-chart-source-type]').forEach(function (c) { if (c.closest('[class*=donutChart]')) return; c.style.height = (/chartArea/.test(c.className) ? 480 : 340) + 'px'; /* 라이브 실측 그래프 높이 */ c.innerHTML = '<div class="pb-chartnote">그래프는 시안에서 그리지 않습니다. 아래 카드·표와 같은 기준으로 셉니다.</div>'; });
   /* TOP 10 */
-  var ti = $('[class*=topStoreItem]'); if (ti) { $('[class*=topStoreName]', ti).textContent = PB.DB.store.name; $('[class*=topStoreCount]', ti).textContent = tot; }
+  var ti = $('[class*=topStoreItem]'); if (ti) { $('[class*=topStoreName]', ti).textContent = PB.DB.store.name; $('[class*=topStoreCount]', ti).textContent = tot; var bar = $('[class*=topStoreBar] > div', ti); if (bar) bar.style.width = (tot ? 100 : 0) + '%'; if (!tot) { var em = document.createElement('div'); em.setAttribute('data-test', 'sinq-top-empty'); em.style.cssText = 'padding:24px 0;text-align:center;color:rgba(0,0,0,.25)'; em.textContent = '조회된 문의 통계가 없습니다.'; ti.after(mark(em)); ti.remove(); } }
   /* 카드 */
   var panels = function (n) { return $$('[class*=summaryPanel]').filter(function (p) { var s = $('strong', p); return s && s.textContent === n; }); };
   var legend = function (p, items) {
@@ -3398,6 +3411,7 @@ function pSinq() {
   vals.forEach(function (v, i) { if (c[i]) c[i].textContent = v; });
   var pc = c[c.length - 1].cloneNode(true); pc.textContent = by('ch', '플랫폼 예약'); pc.setAttribute('data-test', 'sinq-col-pb'); tr.appendChild(mark(pc));
   c[1].setAttribute('data-test', 'sinq-total'); IC();
+  if (!tot) { var ncol = c.length; tr.parentNode.innerHTML = '<tr data-test="sinq-empty"><td colspan="' + ncol + '" style="text-align:center;padding:24px 0;color:rgba(0,0,0,.25)">조회된 문의 통계가 없습니다.</td></tr>'; }
   var xb = byText(document, 'button', '엑셀 다운로드'); if (xb) xb.onclick = function () { toast('시안에서는 동작하지 않습니다'); };
   sinqRename();
 }
@@ -3411,6 +3425,7 @@ function pSlist() {
   /* 노출 채널 필터는 공개여부 선택 뒤(1부 8장). 시안 스토어는 모두 "전체" */
   addFilter('공개여부', 'sxch', CH_OPTS, false);
   if (b.sxch && b.sxch !== '전체') $$('tbody tr.ant-table-row').forEach(function (r) { r.remove(); });
+  listLangToast(); listEmpty();
   /* 스냅샷 날짜를 시안 기준 시각(2026-10-12 12:00) 안으로 */
   var w = document.createTreeWalker(document.getElementById('app'), NodeFilter.SHOW_TEXT), t; while ((t = w.nextNode())) { if (/2026-10-1[3-4]/.test(t.nodeValue)) t.nodeValue = t.nodeValue.replace(/2026-10-1[3-4] \d\d:\d\d/g, '2026-10-12 11:02').replace(/2026-10-1[3-4]/g, '2026-10-12'); }
   $$('.ant-picker input').forEach(function (i) { if (/2026-10-1[3-4]/.test(i.value)) i.value = '2026-10-12'; if (i.value === '2026-10-07') i.value = '2026-10-05'; });

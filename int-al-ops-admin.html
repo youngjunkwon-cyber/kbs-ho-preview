@@ -281,7 +281,7 @@ function person(ch){
   if(ch==='알리페이 중국'){const p=pick(CNP);
     return {name:p[0],pass:p[1],nat:'중국',lang:'중국어(간체)',phone:'+86 1'+pick(['3','5','8'])+dg(9),email:'-',nick:p[0],sns:'WECHAT',snsId:'wxid_'+dg(8)}}
   const p=pick(HKP);
-  return {name:p[0],pass:p[1],nat:HKNAT,lang:'중국어(번체)',phone:'+852 '+pick(['5','6','9'])+dg(3)+dg(4),email:'-',nick:p[0],sns:'WHATSAPP',snsId:'+852'+dg(8)};
+  return {name:p[0],pass:p[1],nat:HKNAT,lang:'중국어(번체)',phone:'+852 '+pick(['5','6','9'])+dg(3)+dg(4),email:'-',nick:p[0],sns:'WHATSAPP',snsId:dg(8)};
 }
 const chList=(w,c,h)=>shuffle([].concat(Array(w).fill('웹'),Array(c).fill('알리페이 중국'),Array(h).fill('알리페이 홍콩')));
 const descTs=(n,from,to,sec)=>{const a=[];for(let i=0;i<n;i++){const span=Math.round((new Date(to)-new Date(from))/864e5);const d=add(from,ri(span+1));a.push(tsOf(d,sec,6,23))}return a.sort().reverse()};
