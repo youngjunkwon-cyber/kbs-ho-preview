@@ -2957,7 +2957,8 @@ function fillDrawer(pre, b, qrCls) {
     } else if (k in V) dd.textContent = V[k];
     r.setAttribute('data-k', k);
   });
-  var last = $$('[class*=detailRow]', dl).pop(), rr = last.cloneNode(true); $('dt', rr).textContent = '유입경로'; $('dd', rr).textContent = b.route || '-'; rr.setAttribute('data-k', '유입경로'); dl.appendChild(mark(rr));
+  /* 유입경로는 BO 상세에만(PRD v1.9 2부 5.8: HOST에는 보이지 않음) */
+  if (bo) { var last = $$('[class*=detailRow]', dl).pop(), rr = last.cloneNode(true); $('dt', rr).textContent = '유입경로'; $('dd', rr).textContent = b.route || '-'; rr.setAttribute('data-k', '유입경로'); dl.appendChild(mark(rr)); }
   $$('section', cont).forEach(function (s) {
     var h = $('h3', s).textContent.trim();
     if (h === '고객 요청사항') $('p', s).textContent = b.req || '남긴 내용 없음';
