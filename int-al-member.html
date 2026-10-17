@@ -708,7 +708,7 @@ td.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;letter-
 .rf .rf-logo svg{display:block;width:79px;height:22px}
 .rf .rf-bigbtn{margin-top:32px;color:#fff;cursor:pointer;background:#fb6f92;border:0;border-radius:8px;width:100%;height:52px;font-size:16px;font-weight:700;font-family:Pretendard,sans-serif}
 .rf .BookingUnavailablePage-module-scss-module__MOQRtq__notice{padding-top:120px}
-/* 동의 창 · 만 14세 확인 창: 실화면 확인 창(BookingChangeApprovalModal · BookingChangeRejectionModal) 값 */
+/* 동의 창: 실화면 확인 창(BookingChangeApprovalModal · BookingChangeRejectionModal) 값 */
 .rf .rf-dim{position:fixed;inset:0;z-index:40;background:#0000008c;display:flex;align-items:center;justify-content:center;padding:24px}
 .rf .rf-modal.mdl{width:100%;max-width:332px;max-height:100%;overflow:auto;background:#fff;border-radius:12px;box-shadow:0 0 4px #0000001a;padding:0}
 .rf .rf-modal__content{display:flex;flex-direction:column;gap:12px;width:100%;padding:16px}
@@ -788,7 +788,7 @@ function resetDB(keepRows) {
     agTerms: false, agPriv: false, agProf: false,   // 필수 셋
     agMkt: false,                   // 선택 둘
     open: {},
-    step: 'consent',      // consent(우리 창) → perm(알리페이 권한 창) → age(생년월일 없는 회원만, 만 14세 확인 창) → done | blocked
+    step: 'consent',      // consent(우리 창) → perm(알리페이 권한 창) → done | blocked
     blocked: '',          // '' | consent | prof | fail
     plaintext: true,      // 알리페이가 원본 휴대폰 권한을 승인해 준 상태인가 (담당 확인 결과에 따라 갈린다)
     phoneGranted: true,   // 알리페이 권한 창의 휴대폰 번호 원본 (승인된 동안 필수, 거부하면 차단)
@@ -797,8 +797,8 @@ function resetDB(keepRows) {
     mtel: '', mtelSrc: '', mtelSaved: false, mtelDraft: '',   // 회원 정보에 저장된 인증 번호와 마이페이지 수정 중 번호
     passport: '', passportSaved: '', msg: '',
     userSet: {},          // 예약 입력 화면에서 이용자가 직접 넣은 칸
-    birthMode: 'adult',   // adult(생년월일 있음, 만 14세 이상) | none(생년월일 없음) | minor(생년월일로 만 14세 미만)
-    agAge: false,         // 만 14세 확인 창의 만 14세 이상입니다 (생년월일 없는 회원만)
+    birthMode: 'adult',   // adult(생년월일 있음) | none(생년월일 없음)
+    agAge: false,         // 쓰지 않음(나이 확인 단계 삭제, 2026-10-17)
     contactGranted: true, // 알리페이 권한 창의 연락처 (필수 권한)
     toast: '',
     booked: 0,            // 이 시안에서 보낸 예약 요청 수 (알리페이 회원 목록의 예약 칸)
@@ -812,7 +812,7 @@ function resetDB(keepRows) {
     age18: false,         // 클리닉 스토어 만 18세 미만 알림 창
     agreed: false,        // 동의 창에서 동의하고 시작하기를 누른 뒤인가 (식별 실패의 다시 시도가 권한 창부터 띄운다)
     noNick: false,        // 알리페이 계정에 닉네임이 없는 경우 (마이페이지 닉네임 자리에 알리페이 회원)
-    minor13: '',          // 예약 입력에서 고른 만 14세 미만 생년월일 (회원 정보에 저장하지 않는다)
+    minor13: '',          // 쓰지 않음(2026-10-17)
     f13: 'book',          // FO-CH-13 화면: book(예약 입력) | consult(상담접수 폼)
     cd: null,             // 상담접수 폼에서 편집 중인 값
     doneC: false,         // 상담접수를 보낸 뒤 (현행 접수 완료 화면 자리)
@@ -847,13 +847,13 @@ var PRIV_FULL = [
 var ALI = { name: '왕샤오메이', nick: 'xiaomei_w', sex: '여성', birth: '1996-03-12', nation: '중국', addr: '상하이시 징안구', phone: '+86 13900001111', id: '2088_9f31c07a' };
 var LANG = { CN: '중국어(간체)', HK: '중국어(번체)' };
 /* 프로필 칸을 누르면 들어가는 예시 값. 값이 있으면 다른 예시 값으로 바꾼다 */
-var EX = { passport: ['WANG XIAOMEI', 'WANG MEI'], name: ['왕샤오메이', '왕메이'], nick: ['xiaomei_w', 'xiaomei_02'], sex: ['여성', '남성'], birth: ['1996-03-12', '1996-03-21', '2013-11-20'], nation: ['중국', '홍콩(중국 특별행정구)'], addr: ['상하이시 징안구', '상하이시 푸둥신구'], msg: ['위챗 wxid_alipay01', '위챗 wxid_alipay02'] };
+var EX = { passport: ['WANG XIAOMEI', 'WANG MEI'], name: ['왕샤오메이', '왕메이'], nick: ['xiaomei_w', 'xiaomei_02'], sex: ['여성', '남성'], birth: ['1996-03-12', '1996-03-21'], nation: ['중국', '홍콩(중국 특별행정구)'], addr: ['상하이시 징안구', '상하이시 푸둥신구'], msg: ['위챗 wxid_alipay01', '위챗 wxid_alipay02'] };
 /* 시안 조작 힌트. 휴대폰 화면 밖 점선 상자로 둔다 (화면 문구가 아님) */
 var ANNO = {
-  fo11: '계정 정보 변경 버튼만 눌러 볼 수 있습니다. 나머지 메뉴는 현행 화면 그대로라 눌러도 반응이 없습니다.',
-  fo11b: '여권 영문명, 국적, 성별, 생년월일, 연락 메신저 칸을 누르면 예시 값이 들어갑니다. 생년월일 예시 값에는 만 14세 미만이 되는 2013-11-20도 있습니다. 저장을 눌러야 회원 정보에 저장됩니다. 휴대폰 번호는 다른 번호 사용으로 바꾸고 문자 인증을 마치면 바로 저장됩니다. 번호가 없으면 빈 칸을 눌러 입력합니다.',
-  fo13: '여권 영문명, 국적부터 생년월일까지, 휴대폰 번호, 연락 메신저 칸을 누르면 예시 값이 들어갑니다. 생년월일 예시 값에는 만 14세 미만이 되는 2013-11-20, 방문 예정일(2026-10-20)에 만 17세인 2009-05-01, 그날 만 18세가 되는 2008-10-20도 있습니다.',
-  fo13c: '이름, 휴대폰 번호, 연락 메신저 칸을 누르면 예시 값이 들어갑니다. 상담접수 폼에서 고친 값은 현행 상담접수 폼 로직 그대로라 회원 정보를 덮어쓰지 않습니다.'
+  fo11: 'Change account information 버튼만 눌러 볼 수 있습니다. 나머지 메뉴는 현행 화면 그대로라 눌러도 반응이 없습니다.',
+  fo11b: 'Name (as in passport), Nationality, Gender, Date of Birth, Messenger 칸을 누르면 예시 값이 들어갑니다. Save를 눌러야 회원 정보에 저장됩니다. Phone Number는 Use a different number로 바꾸고 Get verification code로 문자 인증을 마치면 바로 저장됩니다. 번호가 없으면 빈 칸을 눌러 입력합니다.',
+  fo13: 'Passport name, Nationality부터 Date of birth까지, Mobile phone number, Messenger contact 칸을 누르면 예시 값이 들어갑니다. Date of birth 예시 값에는 방문 예정일(2026-10-20)에 만 17세인 2009-05-01, 그날 만 18세가 되는 2008-10-20도 있습니다.',
+  fo13c: 'Name, Mobile number, Social media ID 칸을 누르면 예시 값이 들어갑니다. 상담접수 폼에서 고친 값은 현행 상담접수 폼 로직 그대로라 회원 정보를 덮어쓰지 않습니다.'
 };
 var TOAST_T = null;
 function toastFo(msg) { S.toast = msg; if (TOAST_T) clearTimeout(TOAST_T); TOAST_T = setTimeout(function () { S.toast = ''; render(); }, 3000); }
@@ -868,12 +868,12 @@ var VIEWS = [
   ['bo11', 'BO-CH-11 알리페이 회원']
 ];
 var CAPS = {
-  fo09: '권한 창은 알리페이 앱이 그립니다. 우리 화면에 합칠 수 없습니다. 알리페이에서 식별자를 받은 직후 한 번 뜹니다. 회원을 만들기 전이라 뒤 화면은 비어 있고 어둡게만 깔립니다. 이용 약관, 개인정보 처리방침, 알리페이 프로필 제공 셋이 필수라 셋을 다 체크해야 동의 버튼이 켜집니다. 권한 창의 연락처는 필수 권한이라 끄고 허용하면 진입 차단 화면으로 갑니다. 휴대폰 번호 원본은 알리페이가 승인한 경우에만 요청하고 필수라 끄고 허용하면 진입 차단 화면으로 갑니다. 마케팅 정보 수신은 선택입니다. 동의를 누르면 알리페이가 권한 창을 한 번 더 띄웁니다. 권한 창에서 허용한 뒤 회원을 만들기 전에 생년월일을 봅니다. 생년월일이 없는 회원에게는 만 14세 확인 창이 뜨고, 만 14세 이상입니다를 체크해야 확인하고 시작하기 버튼이 켜지고 회원이 만들어집니다. 확인 창을 닫으면 진입 차단 화면으로 가고, 다시 동의하기를 누르면 확인 창이 다시 뜹니다. 생년월일로 만 14세 미만이 확인되면 진입 차단 화면으로 갑니다(상단 생년월일 바꾸기로 확인).',
-  fo08: '상단 상태의 차단 이유 버튼으로 네 가지(동의 창 닫기 / 프로필 거부 / 식별 실패 / 만 14세 미만)를 바꿔 볼 수 있습니다. 헤더, 메뉴, 검색이 없습니다. 동의 창을 닫았을 때, 알리페이 권한 창에서 필수 권한(프로필)을 거부했을 때, 식별에 실패했을 때, 생년월일로 만 14세 미만이 확인됐을 때 머무는 화면입니다. 둘러보기는 없습니다. 버튼은 하나이고, 만 14세 미만 화면에는 버튼이 없습니다. 식별 실패의 다시 시도는 계정 식별부터 다시 진행하고, 동의 창에서 동의하고 시작하기를 이미 눌렀으면 알리페이 권한 창부터, 아니면 동의 창부터 다시 띄웁니다.',
-  fo10: '알리페이 식별이 로그인을 대신합니다. 로그인 주소로 직접 들어오면 마이페이지로 보냅니다. 알리페이 채널에서는 자체 로그인 경로를 숨깁니다. 점선 박스가 웹 채널에는 있고 알리페이 채널에는 없는 자리입니다. 진입 관문을 통과해야 들어오므로 비로그인 상태 자체가 없습니다.',
-  fo11: '마이페이지는 현행 화면과 같은 구성입니다. 닉네임과 가입일, 알리페이 계정 안내, 예약 내역, 내 활동, 둘러보기, 고객센터가 있고 계정 정보 변경 버튼으로 계정 설정에 들어갑니다. 계정 설정에서는 칸을 눌러 예시 값으로 바꾸고 저장을 눌러야 회원 정보에 저장됩니다(알리페이 회원 탭에서 확인). 휴대폰 번호는 원본 권한이 승인되면 채워지고, 다른 번호 사용으로 바꾼 뒤 문자 인증을 마치면 바로 저장됩니다. 이메일, 비밀번호 변경, 로그아웃 자리가 없습니다. 마케팅 정보 수신은 여기서 켜고 끕니다. 알리페이 계정에 닉네임이 없으면 닉네임 자리에 알리페이 회원이 보입니다(회원이 되기 전에 상단 닉네임 비우기로 확인). 만 14세 미만이 되는 생년월일로 고치면 저장하지 않고 칸 아래 안내가 보입니다.',
-  fo12: '마이페이지 > 계정 설정의 기존 탈퇴 경로를 그대로 씁니다. 알리페이 연결과 권한이 끊기고 다시 들어오면 새 회원이 되어 진입 관문을 다시 거칩니다.',
-  fo13: '회원 정보에서 채운 값은 고칠 수 있고 고친 값은 회원 정보에 저장됩니다. 이메일 칸이 없습니다. 원본 휴대폰 번호가 온 회원은 번호가 채워진 채 문자 인증을 건너뛰고, 고치면 그때 인증합니다. 원본이 없으면 직접 입력하고 인증합니다. 여권 영문명은 직접 입력합니다. 예약 요청은 웹 예약과 같은 필수값(이메일 제외)이 모두 차야 켜집니다. 클리닉 스토어(피부과·성형외과·치과·메디컬체크)는 방문 예정일 기준 만 18세 이상만 예약할 수 있어, 만 18세 미만이면 예약 요청을 눌렀을 때 요청을 보내지 않고 알림 창이 뜹니다(상단 클리닉 스토어로 바꿔 확인). 입력한 값은 그대로 남습니다. 만 14세 미만이 되는 생년월일로 고치면 회원 정보에 저장하지 않고 칸 아래 안내가 보이며 예약 요청이 꺼집니다. 국적·성별·생년월일은 칸을 벗어나는 순간 회원 정보에 들어가고, 휴대폰 번호·연락 메신저·여권 영문명은 요청 전에 나가면 남지 않습니다. 상단 상담접수 폼 보기로 알리페이 채널 상담접수 폼을 볼 수 있습니다.',
+  fo09: '권한 창은 알리페이 앱이 그립니다. 우리 화면에 합칠 수 없습니다. 알리페이에서 식별자를 받은 직후 한 번 뜹니다. 회원을 만들기 전이라 뒤 화면은 비어 있고 어둡게만 깔립니다. 이용 약관, 개인정보 처리방침, 알리페이 프로필 제공 셋이 필수라 셋을 다 체크해야 동의 버튼이 켜집니다. 권한 창의 연락처는 필수 권한이라 끄고 허용하면 진입 차단 화면으로 갑니다. 휴대폰 번호 원본은 알리페이가 승인한 경우에만 요청하고 필수라 끄고 허용하면 진입 차단 화면으로 갑니다. 마케팅 정보 수신은 선택입니다. 동의를 누르면 알리페이가 권한 창을 한 번 더 띄웁니다. 권한 창에서 허용하면 회원이 만들어집니다.',
+  fo08: '상단 상태의 차단 이유 버튼으로 세 가지(동의 창 닫기 / 프로필 거부 / 식별 실패)를 바꿔 볼 수 있습니다. 헤더, 메뉴, 검색이 없습니다. 동의 창을 닫았을 때, 알리페이 권한 창에서 필수 권한(프로필)을 거부했을 때, 식별에 실패했을 때 머무는 화면입니다. 둘러보기는 없습니다. 버튼은 하나입니다. 식별 실패의 다시 시도는 계정 식별부터 다시 진행하고, 동의 창에서 동의하고 시작하기를 이미 눌렀으면 알리페이 권한 창부터, 아니면 동의 창부터 다시 띄웁니다.',
+  fo10: '알리페이 식별이 로그인을 대신합니다. 로그인 주소로 직접 들어오면 My Page로 보냅니다. 알리페이 채널에서는 자체 로그인 경로를 숨깁니다. 점선 박스가 웹 채널에는 있고 알리페이 채널에는 없는 자리입니다. 진입 관문을 통과해야 들어오므로 비로그인 상태 자체가 없습니다.',
+  fo11: 'My Page는 현행 화면과 같은 구성입니다. Nickname과 Joined, 알리페이 계정 안내, Booking History, My Activity, Explore, Customer Center가 있고 Change account information 버튼으로 Account Settings에 들어갑니다. Account Settings에서는 칸을 눌러 예시 값으로 바꾸고 Save를 눌러야 회원 정보에 저장됩니다(알리페이 회원 탭에서 확인). Phone Number는 원본 권한이 승인되면 채워지고, Use a different number로 바꾼 뒤 Get verification code로 문자 인증을 마치면 바로 저장됩니다. 이메일, 비밀번호 변경, 로그아웃 자리가 없습니다. Marketing messages는 여기서 켜고 끕니다. 알리페이 계정에 닉네임이 없으면 Nickname 자리에 알리페이 회원이 보입니다(회원이 되기 전에 상단 닉네임 비우기로 확인).',
+  fo12: 'My Page > Account Settings의 기존 탈퇴 경로를 그대로 씁니다. 알리페이 연결과 권한이 끊기고 다시 들어오면 새 회원이 되어 진입 관문을 다시 거칩니다.',
+  fo13: '회원 정보에서 채운 값은 고칠 수 있고 고친 값은 회원 정보에 저장됩니다. 이메일 칸이 없습니다. 원본 휴대폰 번호가 온 회원은 번호가 채워진 채 문자 인증을 건너뛰고, 고치면 그때 인증합니다. 원본이 없으면 직접 입력하고 인증합니다. Passport name은 직접 입력합니다. Book은 웹 예약과 같은 필수값(이메일 제외)이 모두 차야 켜집니다. 클리닉 스토어(피부과·성형외과·치과·메디컬체크)는 방문 예정일 기준 만 18세 이상만 예약할 수 있어, 만 18세 미만이면 Book을 눌렀을 때 요청을 보내지 않고 알림 창이 뜹니다(상단 클리닉 스토어로 바꿔 확인). 입력한 값은 그대로 남습니다. Nationality·Gender·Date of birth는 칸을 벗어나는 순간 회원 정보에 들어가고, Mobile phone number·Messenger contact·Passport name은 요청 전에 나가면 남지 않습니다. 상단 상담접수 폼 보기로 알리페이 채널 상담접수 폼을 볼 수 있습니다.',
   bo11: '검색어는 알리페이 식별자, 닉네임, 이름, 연락처를 봅니다. 식별자는 완전 일치로 찾습니다. 빈 값은 알리페이 계정에 값이 없던 항목입니다. 회원 메뉴 아래에 새로 두는 화면입니다. 칼럼은 알리페이가 주는 항목에 맞춘 19개입니다. 이메일과 프로필 동의 여부 칼럼이 없습니다. 회원이면 프로필 제공에 항상 동의한 상태입니다.'
 };
 
@@ -883,19 +883,19 @@ function dash(v) { return v ? h(v) : '<span class="dash">-</span>'; }
 function reset13() { S.userSet = {}; S.done13 = false; S.age18 = false; S.passport = ''; S.minor13 = ''; S.rmsg = ''; S.cd = null; S.doneC = false; S.tel = S.mtel; S.telVerified = !!S.mtel; S.telSrc = S.mtelSrc; S.telEdited = false; S.telSaved = S.mtelSaved; }
 function go(v) { if (v === 'fo11') S.sub = 'home'; if ((S.view === 'fo13' && v !== 'fo13') || (v === 'fo13' && (S.view !== 'fo13' || S.done13 || S.doneC))) reset13(); S.view = v; render(); }
 function setF13(m) { S.f13 = m; if (S.view === 'fo13') reset13(); render(); }
-/* 시안 오늘 2026-10-08 기준 만 14세 미만인가 */
+
 /* 클리닉 스토어 예약 나이: 방문 예정일 기준 만 18세 이상 */
 var VISIT13 = '2026-10-20';
 function adult18(b) { if (!b) return false; var q = b.split('-'), v = VISIT13.split('-'), age = (+v[0]) - (+q[0]); if (+q[1] > +v[1] || (+q[1] === +v[1] && +q[2] > +v[2])) age--; return age >= 18; }
 function submit13() { if (S.clinic13 && !adult18(S.prof.birth)) { S.age18 = true; render(); return; } S.passportSaved = S.passport; S.passport = ''; S.booked = (S.booked || 0) + 1; S.telSaved = true; S.telEdited = false; S.mtel = S.tel; S.mtelSrc = S.telSrc; S.mtelSaved = true; S.mtelDraft = ''; S.userSet = {}; S.done13 = true; render(); }
-function minor14(b) { if (!b) return false; var q = b.split('-'), age = 2026 - (+q[0]); if (+q[1] > 10 || (+q[1] === 10 && +q[2] > 8)) age--; return age < 14; }
+
 /* 예시 값 순환: 지금 값의 다음 값. 목록에 없으면 첫 값 */
 function nextEx(e, cur) { return e[(e.indexOf(cur) + 1) % e.length]; }
-/* 권한 창에서 허용. 연락처를 끄거나 승인된 휴대폰 번호 원본을 끄면 차단, 생년월일로 만 14세 미만이면 차단, 생년월일이 없으면 만 14세 확인 창 */
+/* 권한 창에서 허용. 연락처를 끄거나 승인된 휴대폰 번호 원본을 끄면 차단, 아니면 바로 회원을 만든다 */
 function allowPerm() {
   if (!S.contactGranted || (S.plaintext && !S.phoneGranted)) { S.step = 'blocked'; S.blocked = 'prof'; S.view = 'fo08'; return; }
-  if (S.birthMode === 'minor') { S.step = 'blocked'; S.blocked = 'minor'; S.view = 'fo08'; return; }
-  if (S.birthMode === 'none') { S.step = 'age'; S.agAge = false; return; }
+  
+  
   joinNow();
 }
 function joinNow() {
@@ -934,14 +934,6 @@ function fo09() {
       (S.plaintext ? '<div class="tg"><span>휴대폰 번호 원본 (필수)</span><span class="sw ' + (S.phoneGranted ? 'on' : '') + '" onclick="S.phoneGranted=!S.phoneGranted;render()"><i></i></span></div>' : '') +
       '<div class="row2" style="margin-top:14px"><div class="ab" onclick="S.step=\'blocked\';S.blocked=\'prof\';S.view=\'fo08\';render()">거부</div><div class="ab pri" onclick="allowPerm();render()">허용</div></div>' +
       '</div></div>';
-  } else if (S.step === 'age') {
-    /* 생년월일이 없는 회원만. 체크해야 회원이 만들어진다 */
-    overlay = '<div class="dim"><div class="mdl">' +
-      '<h3>만 14세 확인</h3><p class="d">알리페이 계정에 생년월일이 없어 한 번 더 확인합니다.</p>' +
-      '<label class="ck"><input type="checkbox" ' + (S.agAge ? 'checked' : '') + ' onchange="S.agAge=this.checked;render()"><span class="tt">만 14세 이상입니다 <span class="rq">필수</span></span></label>' +
-      '<div class="cta ' + (S.agAge ? '' : 'dis') + '" ' + (S.agAge ? 'onclick="joinNow();render()"' : '') + '>확인하고 시작하기</div>' +
-      '<div class="esc" onclick="S.step=\'blocked\';S.blocked=\'age\';S.view=\'fo08\';render()">닫기</div>' +
-      '</div></div>';
   } else if (S.joined) {
     overlay = '';
   } else {
@@ -965,8 +957,8 @@ function fo08() {
 function blockPage(b) {
   var t, d, btn, act;
   if (b === 'prof') { t = '이용 동의가 필요합니다'; d = '알리페이 프로필 제공에 동의해야 K-Beauty Station을 이용할 수 있습니다.'; btn = '다시 동의하기'; act = "S.contactGranted=true;S.phoneGranted=true;S.step='perm';S.blocked='';S.view='fo09';render()"; }
-  else if (b === 'minor') { t = '이용할 수 없습니다'; d = '만 14세 미만은 K-Beauty Station을 이용할 수 없습니다.'; btn = ''; }
-  else if (b === 'age') { t = '이용 동의가 필요합니다'; d = '필수 항목에 동의해야 K-Beauty Station을 이용할 수 있습니다.'; btn = '다시 동의하기'; act = "S.step='age';S.agAge=false;S.blocked='';S.view='fo09';render()"; }
+  
+  
   else if (b === 'fail') { t = '알리페이 계정을 확인할 수 없습니다'; d = '잠시 후 다시 시도해 주세요.'; btn = '다시 시도'; act = "if(S.agreed){S.contactGranted=true;S.phoneGranted=true;S.step='perm';}else{S.step='consent';}S.blocked='';S.view='fo09';render()"; }
   else { t = '이용 동의가 필요합니다'; d = '필수 항목에 동의해야 K-Beauty Station을 이용할 수 있습니다.'; btn = '다시 동의하기'; act = "S.step='consent';S.blocked='';S.view='fo09';render()"; }
   return '<div class="blockpage"><div class="logo">K-Beauty Station</div><h3>' + t + '</h3><p>' + d + '</p>' + (btn ? '<div class="cta" onclick="' + act + '">' + btn + '</div>' : '') + '</div>';
@@ -997,14 +989,14 @@ function setTelNext() {
 }
 function edit(key) {
   var e = EX[key];
-  /* 예약 입력의 생년월일: 만 14세 미만이 되는 값은 회원 정보에 저장하지 않고 칸에만 둔다 */
-  if (S.view === 'fo13' && key === 'birth') { var nb = nextEx(e, S.minor13 || S.prof.birth); S.userSet.birth = true; if (minor14(nb)) S.minor13 = nb; else { S.minor13 = ''; S.prof.birth = nb; } render(); return; }
+  
+  
   S.prof[key] = nextEx(e, S.prof[key]); if (S.view === 'fo13') S.userSet[key] = true; render();
 }
 /* 계정 설정: 칸을 누르면 예시 값이 들어가고, 저장을 눌러야 회원 정보에 들어간다. 휴대폰 번호는 문자 인증을 마치면 바로 저장된다 */
 function openAcct() { S.view = 'fo11'; S.sub = 'acct'; S.draft = { passport: S.passportSaved, nation: S.prof.nation, sex: S.prof.sex, birth: S.prof.birth, msg: S.msg }; S.mtelDraft = ''; render(); }
 function dedit(key) { var e = EX[key]; if (!e) return; S.draft[key] = nextEx(e, S.draft[key]); render(); }
-function saveAcct() { var d = S.draft; S.prof.nation = d.nation; S.prof.sex = d.sex; if (!minor14(d.birth)) S.prof.birth = d.birth; S.passportSaved = d.passport; S.msg = d.msg; render(); }
+function saveAcct() { var d = S.draft; S.prof.nation = d.nation; S.prof.sex = d.sex; S.prof.birth = d.birth; S.passportSaved = d.passport; S.msg = d.msg; render(); }
 function toggleMkt() { S.agMkt = !S.agMkt; S.mktDate = clk(28).replace('2026-09-15', '2026-09-15 (화)'); render(); }
 function nextMtel() { S.mtelDraft = nextTel(S.mtelDraft || S.mtel, S.mtelSrc === 'ali'); if (S.mtelDraft === S.mtel) S.mtelDraft = ''; render(); }
 function fo11() {
@@ -1030,7 +1022,7 @@ function myHome(top) {
 function fo11acct() {
   var p = S.prof; if (!S.draft) S.draft = { passport: S.passportSaved, nation: p.nation, sex: p.sex, birth: p.birth, msg: S.msg };
   var d = S.draft;
-  function f(label, key, ph) { var v = d[key]; return '<div class="fld"><div class="l">' + label + '</div><div class="in ' + (v ? '' : 'plc') + '" onclick="dedit(\'' + key + '\')">' + (v || ph) + '</div>' + (key === 'birth' && minor14(v) ? '<div class="err">만 14세 미만은 이용할 수 없습니다.</div>' : '') + '</div>'; }
+  function f(label, key, ph) { var v = d[key]; return '<div class="fld"><div class="l">' + label + '</div><div class="in ' + (v ? '' : 'plc') + '" onclick="dedit(\'' + key + '\')">' + (v || ph) + '</div>' + '' + '</div>'; }
   var tel;
   if (S.mtelDraft) {
     tel = '<div class="fld"><div class="l">휴대폰 번호</div><div class="vrow"><div class="in" onclick="nextMtel()">' + S.mtelDraft + '</div>' +
@@ -1077,7 +1069,7 @@ function fo13() {
   if (S.done13) { ANNO_OFF = true; var dn = phone('', '<div style="padding:32px 16px 6px;text-align:center"><div style="font-size:16px;font-weight:700">Your booking is complete</div><div id="doneMsg" style="font-size:12px;color:#666;margin-top:6px">We sent the confirmation details by text message</div></div><div class="gone" style="margin:16px">(시안 주석) 현행 예약 완료 화면을 그대로 쓰고, 이메일로 보냈다는 문장(We sent the confirmation details to your email)만 문자로 보냈다는 문장으로 바꿉니다. 예약자 설문도 그대로 보입니다.</div><table data-test="done-sum" style="margin:0 16px 16px;width:calc(100% - 32px);font-size:12px;border-collapse:collapse"><tr><td style="color:#888;padding:6px 12px 6px 0;width:110px;white-space:nowrap">Store</td><td style="padding:6px 0">Abijou Clinic Myeongdong</td></tr><tr><td style="color:#888;padding:6px 0">Product</td><td style="padding:6px 0">Abijou 肉毒杆菌</td></tr><tr><td style="color:#888;padding:6px 0">Visit date</td><td style="padding:6px 0">Tue, 10/20/2026 14:00 (KST)</td></tr><tr><td style="color:#888;padding:6px 0">Booking number</td><td style="padding:6px 0">261012009CN02</td></tr></table>', '', '', false, true); ANNO_OFF = false; return dn; }
   var p = S.prof;
   function auto(label, key, ph) { var mn = key === 'birth' && S.minor13, v = mn ? S.minor13 : p[key]; return '<div class="fld"><div class="l">' + label + (v && !S.userSet[key] ? '<span class="autotag">회원 정보에서 채웠습니다</span>' : '') + '</div>' +
-    '<div class="in ' + (v ? 'auto' : 'plc') + '" onclick="edit(\'' + key + '\')">' + (v || ph) + '</div>' + (mn ? '<div class="err">만 14세 미만은 이용할 수 없습니다.</div>' : '') + '</div>'; }
+    '<div class="in ' + (v ? 'auto' : 'plc') + '" onclick="edit(\'' + key + '\')">' + (v || ph) + '</div>' + '' + '</div>'; }
   function tap(label, key, ph, ex) { var v = S[key]; return '<div class="fld"><div class="l">' + label + '</div><div class="in ' + (v ? '' : 'plc') + '" onclick="S.' + key + '=S.' + key + '||\'' + ex + '\';render()">' + (v || ph) + '</div></div>'; }
   var tel;
   if (S.telSrc === 'ali' && S.tel && S.telVerified && !S.telEdited) {
@@ -1213,16 +1205,16 @@ function render() {
     '<span class="kv">마케팅 <em>' + (S.agMkt ? '동의' : '미동의') + '</em></span>' +
     '<span class="kv">원본 휴대폰 권한 <em>' + (S.plaintext ? '승인' : '미승인') + '</em></span>' +
     '<span class="kv">들어온 앱 <em>' + (S.wallet === 'CN' ? '알리페이 중국' : '알리페이 홍콩') + '</em></span>' +
-    '<span class="kv">생년월일 <em>' + ({ adult: '있음', none: '없음', minor: '만 14세 미만' })[S.birthMode] + '</em></span>' +
+    '<span class="kv">생년월일 <em>' + ({ adult: '있음', none: '없음' })[S.birthMode] + '</em></span>' +
     '<span class="kv">닉네임 <em>' + (S.noNick ? '없음' : '있음') + '</em></span>' +
     '<button' + (S.joined ? ' disabled' : '') + ' onclick="S.plaintext=!S.plaintext;if(S.joined){S.tel=S.plaintext?ALI.phone:\'\';S.telVerified=S.plaintext;S.telEdited=false;S.telSrc=S.plaintext?\'ali\':\'\';S.mtel=S.tel;S.mtelSrc=S.telSrc;S.mtelDraft=\'\';S.mtelSaved=false;S.telSaved=false;}render()">원본 휴대폰 ' + (S.plaintext ? '미승인으로' : '승인으로') + '</button>' +
     '<button' + (S.joined ? ' disabled' : '') + ' onclick="S.wallet=(S.wallet===\'CN\'?\'HK\':\'CN\');render()">' + (S.wallet === 'CN' ? '홍콩 앱으로 들어온 경우 보기' : '중국 앱으로 들어온 경우 보기') + '</button>' +
-    '<button onclick="if(!S.joined){S.birthMode=({adult:\'none\',none:\'minor\',minor:\'adult\'})[S.birthMode];S.agAge=false;if(S.step===\'age\')S.step=\'perm\';}render()"' + (S.joined ? ' disabled' : '') + '>생년월일 바꾸기</button>' +
+    '<button onclick="if(!S.joined){S.birthMode=(S.birthMode===\'none\'?\'adult\':\'none\');}render()"' + (S.joined ? ' disabled' : '') + '>생년월일 바꾸기</button>' +
     '<button onclick="if(!S.joined){S.noNick=!S.noNick;}render()"' + (S.joined ? ' disabled' : '') + '>' + (S.noNick ? '닉네임 채우기' : '닉네임 비우기') + '</button>' +
     '<button onclick="S.blocked=\'fail\';S.step=\'blocked\';S.view=\'fo08\';render()"' + (S.joined ? ' disabled' : '') + '>식별 실패</button>' +
     '<button onclick="S.agTerms=true;S.agPriv=true;S.agProf=true;S.agreed=true;S.blocked=\'prof\';S.step=\'blocked\';S.view=\'fo08\';render()"' + (S.joined ? ' disabled' : '') + '>프로필 거부</button>' +
     '<button onclick="S.agTerms=false;S.agPriv=false;S.agProf=false;S.agreed=false;S.blocked=\'consent\';S.step=\'blocked\';S.view=\'fo08\';render()"' + (S.joined ? ' disabled' : '') + '>동의 창 닫기</button>' +
-    '<button onclick="S.birthMode=\'minor\';S.agAge=false;S.blocked=\'minor\';S.step=\'blocked\';S.view=\'fo08\';render()"' + (S.joined ? ' disabled' : '') + '>만 14세 미만</button>' +
+    
     (S.view === 'fo13' ? '<span class="kv">FO-CH-13 화면 <em>' + (S.f13 === 'consult' ? '상담접수 폼' : '예약 입력') + '</em></span>' +
       '<button onclick="setF13(S.f13===\'consult\'?\'book\':\'consult\')">' + (S.f13 === 'consult' ? '예약 입력 보기' : '상담접수 폼 보기') + '</button>' +
       (S.f13 === 'consult' ? '' : '<span class="kv">스토어 <em>' + (S.clinic13 ? '클리닉' : '클리닉 아님') + '</em></span><span class="kv">방문 예정일 <em>' + VISIT13 + '</em></span>' +
@@ -1315,7 +1307,7 @@ function phoneNote(title, note, noHead) {
 /* 원본의 phone()을 부르는 곳이 남아 있어도 새 틀로 그린다 */
 function phone(title, body, overlay) { return rPhone(rHeader(RF_NOTE[title] ? RF_NOTE[title][0] : title, "go('fo11')", 'home') + (body || ''), overlay || ''); }
 
-/* ─────────── FO-CH-09 진입 동의 창 · 권한 창 · 만 14세 확인 창 ─────────── */
+/* ─────────── FO-CH-09 진입 동의 창 · 권한 창 ─────────── */
 function rAgreeRow(k, name, req, full, desc, toggle) {
   var on = !!S[k], open = !!S.open[k];
   return '<div class="' + RBI + 'agreementRow" data-test="al-ag-' + k + '"><label onclick="event.preventDefault();' + (toggle || 'S.' + k + '=!S.' + k + ';render()') + '"><input type="checkbox"' + (on ? ' checked' : '') + '>' + (on ? RIC.chk : RIC.box) +
@@ -1334,11 +1326,6 @@ function fo09() {
       '<div class="rf-sheet__tg"><span>연락처 (필수)</span><button type="button" class="rf-sheet__sw' + (S.contactGranted ? ' on' : '') + '" data-test="al-perm-contact" onclick="S.contactGranted=!S.contactGranted;render()"><span></span></button></div>' +
       (S.plaintext ? '<div class="rf-sheet__tg"><span>휴대폰 번호 원본 (필수)</span><button type="button" class="rf-sheet__sw' + (S.phoneGranted ? ' on' : '') + '" data-test="al-perm-phone" onclick="S.phoneGranted=!S.phoneGranted;render()"><span></span></button></div>' : '') +
       '<div class="rf-sheet__row"><button type="button" data-test="al-perm-deny" onclick="S.step=\'blocked\';S.blocked=\'prof\';S.view=\'fo08\';render()">거부</button><button type="button" class="pri" data-test="al-perm-allow" onclick="allowPerm();render()">허용</button></div></div></div>';
-  } else if (S.step === 'age') {
-    /* 생년월일이 없는 회원만. 체크해야 회원이 만들어진다 */
-    ov = '<div class="rf-dim"><div class="rf-modal mdl" data-test="al-age"><div class="rf-modal__content"><h2>만 14세 확인</h2><p class="rf-modal__desc">알리페이 계정에 생년월일이 없어 한 번 더 확인합니다.</p>' +
-      '<div class="' + RBI + 'agreements rf-agree">' + rAgreeRow('agAge', '만 14세 이상입니다', true, '', '') + '</div>' +
-      '<div class="rf-modal__actions"><button type="button" class="rf-modal__close" data-test="al-age-close" onclick="S.step=\'blocked\';S.blocked=\'age\';S.view=\'fo08\';render()">닫기</button><button type="button" class="rf-modal__primary" data-test="al-age-ok"' + (S.agAge ? ' onclick="joinNow();render()"' : ' disabled') + '>확인하고 시작하기</button></div></div></div></div>';
   } else {
     var ready = S.agTerms && S.agPriv && S.agProf;
     ov = '<div class="rf-dim"><div class="rf-modal mdl" data-test="al-consent"><div class="rf-modal__content"><h2>서비스 이용에 동의해 주세요</h2><p class="rf-modal__desc">필수 항목에 동의해야 이용할 수 있습니다.</p>' +
@@ -1360,8 +1347,6 @@ function fo08() {
 function blockPage(b) {
   var t, d, btn, act;
   if (b === 'prof') { t = '이용 동의가 필요합니다'; d = '알리페이 프로필 제공에 동의해야 K-Beauty Station을 이용할 수 있습니다.'; btn = '다시 동의하기'; act = "S.contactGranted=true;S.phoneGranted=true;S.step='perm';S.blocked='';S.view='fo09';render()"; }
-  else if (b === 'minor') { t = '이용할 수 없습니다'; d = '만 14세 미만은 K-Beauty Station을 이용할 수 없습니다.'; btn = ''; }
-  else if (b === 'age') { t = '이용 동의가 필요합니다'; d = '필수 항목에 동의해야 K-Beauty Station을 이용할 수 있습니다.'; btn = '다시 동의하기'; act = "S.step='age';S.agAge=false;S.blocked='';S.view='fo09';render()"; }
   else if (b === 'fail') { t = '알리페이 계정을 확인할 수 없습니다'; d = '잠시 후 다시 시도해 주세요.'; btn = '다시 시도'; act = "if(S.agreed){S.contactGranted=true;S.phoneGranted=true;S.step='perm';}else{S.step='consent';}S.blocked='';S.view='fo09';render()"; }
   else { t = '이용 동의가 필요합니다'; d = '필수 항목에 동의해야 K-Beauty Station을 이용할 수 있습니다.'; btn = '다시 동의하기'; act = "S.step='consent';S.blocked='';S.view='fo09';render()"; }
   return '<main class="' + RUP + 'page" data-test="al-block" data-kind="' + b + '"><div class="' + RUP + 'notice"><span class="rf-logo" role="img" aria-label="K-Beauty Station">' + RF_LOGO + '</span><div class="' + RUP + 'message"><h1>' + t + '</h1><p>' + d + '</p></div>' +
@@ -1418,15 +1403,14 @@ function fo11acct() {
   nm = rMsg(d.msg);
   var msg = '<div class="' + RAC + 'messengerFormItem" data-test="al-acct-msg"><label>Messenger</label><div class="' + RAC + 'messengerInputRow"><div class="' + RAC + 'messengerTypeSelect">' + rSel('Messenger Type', nm[0], 'Select', '') + '</div>' +
     '<input readonly value="' + rEsc(nm[1]) + '" placeholder="메신저 아이디를 직접 입력해 주세요" onclick="dedit(\'msg\')"></div></div>';
-  var birthErr = minor14(d.birth) ? '<p class="rf-err" data-test="al-acct-birtherr">만 14세 미만은 이용할 수 없습니다.</p>' : '';
-  var mk = '<div class="' + RAC + 'marketingFormItem" data-test="al-mkt-row"><div class="' + RAC + 'marketingFormItemCopy"><span class="' + RAC + 'marketingFormItemLabel">마케팅 정보 수신</span>' +
+  var mk = '<div class="' + RAC + 'marketingFormItem" data-test="al-mkt-row"><div class="' + RAC + 'marketingFormItemCopy"><span class="' + RAC + 'marketingFormItemLabel" data-test="al-mkt-label">Marketing messages</span>' +
     (S.mktDate ? '<span class="' + RAC + 'marketingConsentDate" data-test="al-mkt-date">' + (S.agMkt ? '동의일' : '거부일') + ': ' + S.mktDate + '</span>' : '') + '</div>' +
     '<button type="button" class="' + RAC + 'switch' + (S.agMkt ? ' ' + RAC + 'switchOn' : '') + '" data-test="al-mkt" aria-pressed="' + (S.agMkt ? 'true' : 'false') + '" onclick="toggleMkt()"><span></span></button></div>';
   return rPhone(rHeader('Account Settings', "go('fo11')", 'home') + '<main class="' + RAC + 'page" data-test="al-acct"><div>' +
     '<h2>Profile</h2><div class="' + RAC + 'profileSection">' +
     fld('Name (as in passport)', inp('passport', ''), 'al-acct-pass') +
     '<div class="' + RAC + 'twoColumns">' + fld('Nationality', rSel('Nationality', rEn(d.nation), 'Select', "dedit('nation')"), 'al-acct-nation') + fld('Gender', rSel('Gender', rEn(d.sex), 'Select', "dedit('sex')"), 'al-acct-sex') + '</div>' +
-    fld('Date of Birth', inp('birth', 'YYYY-MM-DD') + birthErr, 'al-acct-birth') + tel + msg +
+    fld('Date of Birth', inp('birth', 'YYYY-MM-DD'), 'al-acct-birth') + tel + msg +
     '<button type="button" class="' + RAC + 'saveButton" data-test="al-acct-save" onclick="saveAcct()">Save</button></div>' +
     '<h2>Account</h2><div class="rf-gap">' + rGone('알리페이 채널에서는 이 자리가 없습니다<br>이메일') + rGone('알리페이 채널에서는 이 자리가 없습니다<br>비밀번호 변경') + '</div>' + mk +
     '<div class="rf-acspacer"></div></div>' +
@@ -1459,8 +1443,8 @@ function fo13() {
   var p = S.prof;
   /* 회원 정보에서 채운 칸(국적 · 성별 · 생년월일): 값이 있고 이용자가 아직 안 고쳤으면 채움 표시 */
   var selF = function (label, key, ph) { var v = p[key], tg = v && !S.userSet[key]; return '<div class="' + RBI + 'informationField" data-test="al-bk-' + key + '">' + rLabel(label, 1, tg ? rTag('회원 정보에서 채웠습니다') : '') + rSel(label, rEn(v), ph, "edit('" + key + "')") + '</div>'; };
-  var mn = S.minor13, bv = mn ? S.minor13 : p.birth, btag = bv && !S.userSet.birth;
-  var birth = '<div class="' + RBI + 'informationField" data-test="al-bk-birth">' + rLabel('Date of birth', 1, btag ? rTag('회원 정보에서 채웠습니다') : '') + '<input readonly name="birthDate" placeholder="YYYY-MM-DD" value="' + rEsc(bv || '') + '" onclick="edit(\'birth\')">' + (mn ? '<p class="rf-err" data-test="al-bk-birtherr">만 14세 미만은 이용할 수 없습니다.</p>' : '') + '</div>';
+  var bv = p.birth, btag = bv && !S.userSet.birth;
+  var birth = '<div class="' + RBI + 'informationField" data-test="al-bk-birth">' + rLabel('Date of birth', 1, btag ? rTag('회원 정보에서 채웠습니다') : '') + '<input readonly name="birthDate" placeholder="YYYY-MM-DD" value="' + rEsc(bv || '') + '" onclick="edit(\'birth\')">' + '</div>';
   var pass = '<div class="' + RBI + 'informationField" data-test="al-bk-pass">' + rLabel('Passport name', 1) + '<input readonly name="passportName" value="' + rEsc(S.passport) + '" onclick="S.passport=S.passport||\'WANG XIAOMEI\';render()"></div>';
   var head = function (tg) { return '<div class="' + RBI + 'informationFieldHeading">' + rLabel('Mobile phone number', 1, tg ? rTag(tg) : '') + '<p>Booking confirmations and reminders will be sent to this number.</p></div>'; };
   var verified = function (t) { var c = rTel(t); return '<div class="' + RBI + 'verifiedPhoneForm"><div class="' + RBI + 'verifiedPhoneRow"><span class="' + RBI + 'verifiedCountryCode">' + c[0] + '</span><span class="' + RBI + 'verifiedPhoneNumber" data-test="al-bk-telno">' + rEsc(c[1]) + ' (Verified)</span></div><button type="button" class="' + RBI + 'changePhoneButton" data-test="al-bk-change" onclick="setTelNext()">Use a different number</button></div>'; };
@@ -1477,7 +1461,7 @@ function fo13() {
     '<button type="button" class="' + RBI + 'qrUploadButton">Upload ID with a QR code <span aria-hidden="true">›</span></button>' + rGone('알리페이 채널에서는<br>앱 열기 버튼이 없습니다') + '</div>';
   var req = '<div class="' + RBI + 'informationField"><div class="' + RBI + 'informationFieldHeading">' + rLabel('Requests', 0) + '<p>Tell us about questions, preferred treatments, or interpretation needs. More detail helps the store prepare.</p></div><textarea name="customerRequest" rows="3" maxlength="1000" placeholder="e.g. I would like a consultation. Is English interpretation available I am also curious about recovery time."></textarea></div>';
   /* 웹 예약과 같은 필수값. 이메일만 뺀다 */
-  var ready = S.passport && p.nation && p.sex && p.birth && !S.minor13 && S.tel && S.telVerified && S.rmsg;
+  var ready = S.passport && p.nation && p.sex && p.birth && S.tel && S.telVerified && S.rmsg;
   var ov = S.age18 ? '<div class="pb-alert-dim" data-test="fo-age18"><div class="pb-alert" role="alertdialog" aria-modal="true"><h3>Booking unavailable</h3><p>This store accepts bookings only from guests aged 18 or older on the visit date.</p><button type="button" data-test="fo-age18-ok" onclick="S.age18=false;render()">OK</button></div></div>' : '';
   return rPhone(rHeader('Book', "go('fo11')", 'home') + '<main class="' + RBI + 'page ' + RBI + 'informationPage" data-test="al-book-page"><form class="' + RBI + 'informationForm" onsubmit="return false">' +
     '<div class="' + RBI + 'bookingNotice" data-test="bk-sum"><span class="' + RBI + 'bookingNoticeDot" aria-hidden="true"></span><strong data-test="fo-info-prod">Abijou 肉毒杆菌</strong><span class="pb-fnote-hi2">at Abijou Clinic Myeongdong · 99,000 KRW</span><span class="pb-fnote">Selected time: Tue, Oct 20, 2026 14:00 (KST)</span></div>' +
