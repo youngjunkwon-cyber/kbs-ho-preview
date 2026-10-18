@@ -83,7 +83,7 @@ function seedBookings(P){
  function mk(a,i){
   var p=a[9]?byId[a[9]]:null,snap=p?snapOf(p):null;if(snap&&a[10])snap.price=a[10];
   var d=a[1].slice(2,10).replace(/-/g,'');
-  return {no:i+1,visit:a[0],recv:a[1],name:a[2],nation:a[3],lang:a[4],contact:a[5],status:a[6],owner:a[7],route:a[8],prodId:a[9],snap:snap,need:a[11],ch:a[12],req:a[13],phone:({'중국':'+86 138000001','홍콩':'+852 600001','일본':'+81 9000001','러시아':'+7 9000001','카자흐스탄':'+7 7000001','말레이시아':'+60 120001','싱가포르':'+65 80001'}[a[3]]||'+1 41655501')+(10+i),rno:null,chg:a[6]==='변경요청'?'2026-10-17 13:00':null,cancelBy:a[6]==='고객취소'?'고객':a[6]==='매장취소'?'매장':null,cancelAt:/취소/.test(a[6])?a[1].slice(0,10)===a[0].slice(0,10)?a[1]+':40':(function(){var t=new Date(a[0].slice(0,10)+'T00:00:00Z');t.setUTCDate(t.getUTCDate()-2);return t.toISOString().slice(0,10)+' 18:51:12';})():null,cancelReason:a[6]==='고객취소'?'고객 직접 취소':a[6]==='매장취소'?'매장 사정':null};
+  return {no:i+1,visit:a[0],recv:a[1],name:a[2],nation:a[3],lang:a[4],contact:a[5],status:a[6],owner:a[7],route:a[8],prodId:a[9],snap:snap,need:a[11],ch:a[12],req:a[13],phone:a[2]==='Wang Siyu'?'+86 13800000099'/* 알리페이 회원: 예약 입력에 채워지는 알리페이 번호와 같게(7차 감사) */:(({'중국':'+86 138000001','홍콩':'+852 600001','일본':'+81 9000001','러시아':'+7 9000001','카자흐스탄':'+7 7000001','말레이시아':'+60 120001','싱가포르':'+65 80001'}[a[3]]||'+1 41655501')+(10+i)),rno:null,chg:a[6]==='변경요청'?'2026-10-17 13:00':null,cancelBy:a[6]==='고객취소'?'고객':a[6]==='매장취소'?'매장':null,cancelAt:/취소/.test(a[6])?a[1].slice(0,10)===a[0].slice(0,10)?a[1]+':40':(function(){var t=new Date(a[0].slice(0,10)+'T00:00:00Z');t.setUTCDate(t.getUTCDate()-2);return t.toISOString().slice(0,10)+' 18:51:12';})():null,cancelReason:a[6]==='고객취소'?'고객 직접 취소':a[6]==='매장취소'?'매장 사정':null};
  }
 }
 function seedCollections(){return [
@@ -102,7 +102,6 @@ function freshState(){return {surf:'HOST',mark:true,
 function prodById(id){return DB.prods.filter(function(p){return p.id===+id;})[0]||null;}
 function storeBookBtn(ch){var s=DB.store;return !!(s.bookingSetting&&s.btn[ch]);}
 /* 상품 예약 버튼: 예약 설정에만 묶임. 기본 설정이면 스토어 예약 버튼 값을 따름 */
-/* 스토어의 "상품 예약 사용"이 꺼져 있으면 그 스토어 상품은 전부 꺼짐 (배포 때 전 스토어 꺼 둠, BO가 켬) */
 function prodBookBtn(p,ch){
  if(!DB.store.bookingSetting)return false;
  if(ch==='ali'&&(p.exposeCh==='web'||['zh','en'].indexOf(p.lang)<0))return false; /* 알리페이 열: 노출 채널 웹 · 대상 외 언어는 잠김 */

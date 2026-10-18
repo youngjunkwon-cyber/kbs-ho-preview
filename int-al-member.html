@@ -778,7 +778,7 @@ td.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;letter-
 var S;
 var GEN = 0;   // 탈퇴 뒤 다시 들어온 횟수. 다시 들어오면 회원번호·가입일이 새로 매겨진다
 /* 시안 시각. 회원이 새로 만들어질 때마다 한 시간 뒤로 민다 (off = 가입 시각에서 몇 분 뒤) */
-function clk(off) { var t = 542 + GEN * 60 + (off || 0); return '2026-09-15 ' + ('0' + Math.floor(t / 60)).slice(-2) + ':' + ('0' + t % 60).slice(-2); }
+function clk(off) { var t = 542 + GEN * 60 + (off || 0); return '2026-10-12 ' + ('0' + Math.floor(t / 60)).slice(-2) + ':' + ('0' + t % 60).slice(-2); }
 /* keepRows: 탈퇴 때만 true. 탈퇴로 남긴 회원 행과 다시 들어온 횟수를 지우지 않는다 */
 function resetDB(keepRows) {
   if (!keepRows) { GEN = 0; if (MEM) MEM = MEM.filter(function (m) { return !m.snap; }); }
@@ -850,7 +850,7 @@ var LANG = { CN: '중국어(간체)', HK: '중국어(번체)' };
 var EX = { passport: ['WANG XIAOMEI', 'WANG MEI'], name: ['왕샤오메이', '왕메이'], nick: ['xiaomei_w', 'xiaomei_02'], sex: ['여성', '남성'], birth: ['1996-03-12', '1996-03-21'], nation: ['중국', '홍콩(중국 특별행정구)'], addr: ['상하이시 징안구', '상하이시 푸둥신구'], msg: ['위챗 wxid_alipay01', '위챗 wxid_alipay02'] };
 /* 시안 조작 힌트. 휴대폰 화면 밖 점선 상자로 둔다 (화면 문구가 아님) */
 var ANNO = {
-  fo11: 'Change account information 버튼만 눌러 볼 수 있습니다. 나머지 메뉴는 현행 화면 그대로라 눌러도 반응이 없습니다.',
+  fo11: 'Change account information 버튼만 눌러 볼 수 있습니다. 나머지 메뉴는 현행 화면 그대로라 눌러도 "Not available in this mockup" 토스트만 뜹니다.',
   fo11b: 'Name (as in passport), Nationality, Gender, Date of Birth, Messenger 칸을 누르면 예시 값이 들어갑니다. Save를 눌러야 회원 정보에 저장됩니다. Phone Number는 Use a different number로 바꾸고 Get verification code로 문자 인증을 마치면 바로 저장됩니다. 번호가 없으면 빈 칸을 눌러 입력합니다.',
   fo13: 'Passport name, Nationality부터 Date of birth까지, Mobile phone number, Messenger contact 칸을 누르면 예시 값이 들어갑니다. Date of birth 예시 값에는 방문 예정일(2026-10-20)에 만 17세인 2009-05-01, 그날 만 18세가 되는 2008-10-20도 있습니다.',
   fo13c: 'Name, Mobile number, Social media ID 칸을 누르면 예시 값이 들어갑니다. 상담접수 폼에서 고친 값은 현행 상담접수 폼 로직 그대로라 회원 정보를 덮어쓰지 않습니다.'
@@ -880,7 +880,7 @@ var CAPS = {
 function h(s) { return s == null ? '' : String(s); }
 function dash(v) { return v ? h(v) : '<span class="dash">-</span>'; }
 /* FO-CH-13을 떠나거나 새로 열 때: 예약 요청·상담접수 전에 넣은 값은 남기지 않는다 */
-function reset13() { S.userSet = {}; S.done13 = false; S.age18 = false; S.passport = ''; S.minor13 = ''; S.rmsg = ''; S.cd = null; S.doneC = false; S.tel = S.mtel; S.telVerified = !!S.mtel; S.telSrc = S.mtelSrc; S.telEdited = false; S.telSaved = S.mtelSaved; }
+function reset13() { S.userSet = {}; S.done13 = false; S.age18 = false; S.passport = ''; S.minor13 = ''; S.rmsg = ''; S.rchip = ''; S.cd = null; S.doneC = false; S.tel = S.mtel; S.telVerified = !!S.mtel; S.telSrc = S.mtelSrc; S.telEdited = false; S.telSaved = S.mtelSaved; }
 function go(v) { if (v === 'fo11') S.sub = 'home'; if ((S.view === 'fo13' && v !== 'fo13') || (v === 'fo13' && (S.view !== 'fo13' || S.done13 || S.doneC))) reset13(); S.view = v; render(); }
 function setF13(m) { S.f13 = m; if (S.view === 'fo13') reset13(); render(); }
 
@@ -901,7 +901,7 @@ function allowPerm() {
 function joinNow() {
   S.joined = true; S.step = 'done'; S.blocked = '';
   S.prof = { name: ALI.name, nick: S.noNick ? '' : ALI.nick, sex: ALI.sex, birth: S.birthMode === 'none' ? '' : ALI.birth, nation: ALI.nation, addr: ALI.addr };
-  S.mktDate = clk(0).replace('2026-09-15', '2026-09-15 (화)');
+  S.mktDate = clk(0).replace('2026-10-12', '2026-10-12 (월)');
   if (S.plaintext && S.phoneGranted) { S.tel = ALI.phone; S.telVerified = true; S.telEdited = false; S.telSrc = 'ali'; S.mtel = ALI.phone; S.mtelSrc = 'ali'; }
   S.view = 'fo11';
 }
@@ -997,7 +997,7 @@ function edit(key) {
 function openAcct() { S.view = 'fo11'; S.sub = 'acct'; S.draft = { passport: S.passportSaved, nation: S.prof.nation, sex: S.prof.sex, birth: S.prof.birth, msg: S.msg }; S.mtelDraft = ''; render(); }
 function dedit(key) { var e = EX[key]; if (!e) return; S.draft[key] = nextEx(e, S.draft[key]); render(); }
 function saveAcct() { var d = S.draft; S.prof.nation = d.nation; S.prof.sex = d.sex; S.prof.birth = d.birth; S.passportSaved = d.passport; S.msg = d.msg; render(); }
-function toggleMkt() { S.agMkt = !S.agMkt; S.mktDate = clk(28).replace('2026-09-15', '2026-09-15 (화)'); render(); }
+function toggleMkt() { S.agMkt = !S.agMkt; S.mktDate = clk(28).replace('2026-10-12', '2026-10-12 (월)'); render(); }
 function nextMtel() { S.mtelDraft = nextTel(S.mtelDraft || S.mtel, S.mtelSrc === 'ali'); if (S.mtelDraft === S.mtel) S.mtelDraft = ''; render(); }
 function fo11() {
   if (!S.joined || !S.prof) return phoneNote('마이페이지', '회원이 만들어진 뒤에 보이는 화면입니다. 위쪽 처음으로를 누른 뒤 진입 동의 창에서 동의를 마쳐 주세요.');
@@ -1012,7 +1012,7 @@ function myHome(top) {
   var book = bk ? '<div data-test="my-bk" style="border:1px solid #eee;border-radius:10px;padding:12px 14px;margin:8px 0"><div style="font-size:14px;font-weight:700">Abijou Clinic Myeongdong (D-8)</div><div style="font-size:15px;font-weight:700;margin-top:4px">Abijou 肉毒杆菌</div><div style="font-size:12px;color:#666;margin-top:4px">2026-10-20 (Tue) 14:00</div></div>' + (bk > 1 ? '<div class="sub" style="font-size:12px;color:#888">외 ' + (bk - 1) + '건</div>' : '') :
     '<div class="empty"><b>진행 중인 예약이 아직 없습니다</b><span>예약이 생기면 여기에 나타납니다.</span><div class="bt">매장 둘러보기</div></div>';
   return phone('마이페이지', top +
-    '<div class="who"><div class="l">닉네임</div><div class="nm2">' + (h(p.nick) || '알리페이 회원') + '</div><div class="sub">가입일 2026. 09. 15</div></div>' +
+    '<div class="who"><div class="l">닉네임</div><div class="nm2">' + (h(p.nick) || '알리페이 회원') + '</div><div class="sub">가입일 2026. 10. 12</div></div>' +
     '<div class="note" style="margin-top:6px">알리페이 계정으로 로그인했습니다. K-Beauty Station 계정과는 별개입니다.</div>' +
     '<div class="line"><span>예약 내역</span><span class="lk off">전체 보기 ›</span></div>' + book +
     '<div class="grp">내 활동</div>' + rows(['채팅 내역', '북마크', '내 리뷰', '쿠폰 목록']) +
@@ -1128,18 +1128,18 @@ function fo13c() {
 /* ─────────── BO-CH-11 알리페이 회원 ─────────── */
 var BOW = 'all', BOQ = false, BOQF = 'in', BOM = true, BOMF = 'all';
 var MEM = [
-  { no: 'A-1041', join: '2026-09-15 09:02', quit: '', last: '2026-09-15 09:02', self: true },
-  { no: 'A-1040', join: '2026-09-15 08:41', quit: '', last: '2026-09-15 08:41', aid: '2088041663827450', wallet: 'HK', nick: 'meiling_c', name: '천메이링', sex: '여성', birth: '1993-11-02', nat: '홍콩(중국 특별행정구)', addr: '홍콩 완차이', lang: '중국어(번체)', tel: '+852 91234567', pp: '', bk: 0, ns: 0, profd: '2026-09-15 08:41', mkt: '동의', mktd: '2026-09-15 08:41' },
-  { no: 'A-1039', join: '2026-09-15 07:55', quit: '', last: '2026-09-15 08:10', aid: '2088926610334872', wallet: 'CN', nick: 'liuting88', name: '리우팅', sex: '여성', birth: '1990-05-21', nat: '중국', addr: '베이징시 차오양구', lang: '중국어(간체)', tel: '+86 13755556666', pp: 'LIU TING', bk: 1, ns: 0, profd: '2026-09-15 07:55', mkt: '미동의', mktd: '2026-09-15 07:55' },
-  { no: 'A-1036', join: '2026-09-14 21:12', quit: '2026-09-15 10:40', last: '2026-09-14 21:20', aid: '2088350417726693', wallet: 'CN', nick: 'zz_lee', name: '리쯔치', sex: '', birth: '', nat: '중국', addr: '', lang: '중국어(간체)', tel: '', pp: '', bk: 0, ns: 0, profd: '2026-09-14 21:12', mkt: '미동의', mktd: '2026-09-14 21:12' },
-  { no: 'A-1033', join: '2026-09-13 18:27', quit: '', last: '2026-09-14 09:05', aid: '2088174902265318', wallet: 'HK', nick: 'zw.huang', name: '황즈웨이', sex: '남성', birth: '1988-02-14', nat: '홍콩(중국 특별행정구)', addr: '홍콩 몽콕', lang: '영어', tel: '+852 61234788', pp: 'HUANG ZHIWEI', bk: 2, ns: 1, profd: '2026-09-13 18:27', mkt: '동의', mktd: '2026-09-13 18:27' }
+  { no: 'A-1041', join: '2026-10-12 09:02', quit: '', last: '2026-10-12 09:02', self: true },
+  { no: 'A-1040', join: '2026-10-12 08:41', quit: '', last: '2026-10-12 08:41', aid: '2088041663827450', wallet: 'HK', nick: 'meiling_c', name: '천메이링', sex: '여성', birth: '1993-11-02', nat: '홍콩(중국 특별행정구)', addr: '홍콩 완차이', lang: '중국어(번체)', tel: '+852 91234567', pp: '', bk: 0, ns: 0, profd: '2026-10-12 08:41', mkt: '동의', mktd: '2026-10-12 08:41' },
+  { no: 'A-1039', join: '2026-10-12 07:55', quit: '', last: '2026-10-12 08:10', aid: '2088926610334872', wallet: 'CN', nick: 'liuting88', name: '리우팅', sex: '여성', birth: '1990-05-21', nat: '중국', addr: '베이징시 차오양구', lang: '중국어(간체)', tel: '+86 13755556666', pp: 'LIU TING', bk: 1, ns: 0, profd: '2026-10-12 07:55', mkt: '미동의', mktd: '2026-10-12 07:55' },
+  { no: 'A-1036', join: '2026-10-11 21:12', quit: '2026-10-12 10:40', last: '2026-10-11 21:20', aid: '2088350417726693', wallet: 'CN', nick: 'zz_lee', name: '리쯔치', sex: '', birth: '', nat: '중국', addr: '', lang: '중국어(간체)', tel: '', pp: '', bk: 0, ns: 0, profd: '2026-10-11 21:12', mkt: '미동의', mktd: '2026-10-11 21:12' },
+  { no: 'A-1033', join: '2026-10-10 18:27', quit: '', last: '2026-10-11 09:05', aid: '2088174902265318', wallet: 'HK', nick: 'zw.huang', name: '황즈웨이', sex: '남성', birth: '1988-02-14', nat: '홍콩(중국 특별행정구)', addr: '홍콩 몽콕', lang: '영어', tel: '+852 61234788', pp: 'HUANG ZHIWEI', bk: 2, ns: 1, profd: '2026-10-10 18:27', mkt: '동의', mktd: '2026-10-10 18:27' }
 ];
 function syncMe() {
   var me = MEM[0]; var p = S.prof || {};
-  me.no = 'A-' + (1041 + GEN); me.join = clk(0); me.last = clk(0);
+  me.no = 'A-' + (1041 + GEN); me.join = clk(0); me.last = S.booked ? clk(30) : clk(0);
   me.aid = S.wallet === 'CN' ? '2088712034559781' : '2088558801247390'; me.wallet = S.wallet; me.lang = LANG[S.wallet];
   me.nick = S.joined ? p.nick : ''; me.name = S.joined ? p.name : ''; me.sex = S.joined ? p.sex : ''; me.birth = S.joined ? p.birth : ''; me.nat = S.joined ? p.nation : ''; me.addr = S.joined ? p.addr : '';
-  me.tel = S.mtel; me.pp = S.passportSaved || ''; me.bk = S.booked || 0; me.ns = 0; me.profd = S.joined ? clk(0) : ''; me.mkt = S.agMkt ? '동의' : '미동의'; me.mktd = (S.joined && S.agMkt && S.mktDate) ? S.mktDate.replace(' (화)', '') : '';
+  me.tel = S.mtel; me.pp = S.passportSaved || ''; me.bk = S.booked || 0; me.ns = 0; me.profd = S.joined ? clk(0) : ''; me.mkt = S.agMkt ? '동의' : '미동의'; me.mktd = (S.joined && S.agMkt && S.mktDate) ? S.mktDate.replace(' (월)', '') : '';
 }
 /* 탈퇴: 지금 회원 행을 탈퇴로 남긴다. 다시 들어오면 같은 알리페이 식별자로 새 회원번호·가입일의 새 행이 생긴다 */
 function withdraw() {
@@ -1269,6 +1269,9 @@ var RIC = {
 var RF_CHIPICON = { WhatsApp: 'whatsapp.0hq-eh2chewsx.png', LINE: 'line.3qblh4j4u4rrq.png', WeChat: 'wechat.38ybbwvm7ncvr.png', KakaoTalk: 'kakaotalk.0y3rqbtj5gp03.png' };
 /* 회원 정보 값(한국어 저장값)을 영어 화면 표시값으로. 저장값 · 어드민 표시는 그대로 */
 var RF_EN = { '중국': 'China', '홍콩(중국 특별행정구)': 'Hong Kong', '여성': 'Female', '남성': 'Male' };
+/* 반응 없는 컨트롤: 통합 시안 고객 화면과 같은 토스트 */
+function rNA() { toastFo('Not available in this mockup'); render(); }
+var RNA = ' onclick="rNA()"';
 function rEsc(s) { return s == null ? '' : String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 function rEn(v) { return RF_EN[v] || v; }
 function rTel(t) { var m = /^(\+\d+)\s*(.*)$/.exec(t || ''); return m ? [m[1], m[2]] : ['', t || '']; }
@@ -1279,14 +1282,14 @@ function rGone(html, cls) { return '<div class="gone' + (cls ? ' ' + cls : '') +
 /* 실화면 헤더(Header 부품): 왼쪽 뒤로, 가운데 제목, 오른쪽 아이콘. back/right 는 onclick 글(''이면 동작 없음) */
 function rHeader(title, back, right, rightAct) {
   var rIcon = right === 'globe' ? RIC.globe : right === 'none' ? '' : RIC.home;
-  return '<header class="' + RH + 'header" data-test="rf-header"><div class="' + RH + 'navigation"><button type="button" class="' + RHB + '" aria-label="Go Back"' + (back ? ' onclick="' + back + '"' : '') + '><span class="' + RHB + '__icon" aria-hidden="true">' + RIC.back + '</span></button></div>' +
+  return '<header class="' + RH + 'header" data-test="rf-header"><div class="' + RH + 'navigation"><button type="button" class="' + RHB + '" aria-label="Go Back"' + (back ? ' onclick="' + back + '"' : RNA) + '><span class="' + RHB + '__icon" aria-hidden="true">' + RIC.back + '</span></button></div>' +
     '<div class="' + RH + 'title ' + RH + 'titleAlign-center"><div class="' + RHT + '" data-test="rf-title">' + title + '</div></div>' +
-    '<div class="' + RH + 'actions">' + (rIcon ? '<button type="button" class="' + RHB + (right === 'homeActive' ? ' ' + RHB + '--active' : '') + '" aria-label="' + (right === 'globe' ? 'Language' : 'Go Home') + '"' + (rightAct ? ' onclick="' + rightAct + '"' : '') + '><span class="' + RHB + '__icon" aria-hidden="true">' + (right === 'homeActive' ? RIC.home.split('#2d2d2d').join('currentColor') : rIcon) + '</span></button>' : '') + '</div></header>';
+    '<div class="' + RH + 'actions">' + (rIcon ? '<button type="button" class="' + RHB + (right === 'homeActive' ? ' ' + RHB + '--active' : '') + '" aria-label="' + (right === 'globe' ? 'Language' : 'Go Home') + '"' + (rightAct ? ' onclick="' + rightAct + '"' : RNA) + '><span class="' + RHB + '__icon" aria-hidden="true">' + (right === 'homeActive' ? RIC.home.split('#2d2d2d').join('currentColor') : rIcon) + '</span></button>' : '') + '</div></header>';
 }
 /* 실화면 홈 헤더(분홍 바 + 흰 로고) */
 function rHomeHeader() { return '<header class="' + RHH + ' rf-home" data-test="rf-homeheader"><div class="' + RHH + '__inner"><span class="' + RHH + '__inner__logo" role="img" aria-label="K-Beauty Station">' + RF_LOGO + '</span><div class="' + RHH + '__inner__extra"></div></div></header>'; }
 /* 하단 탭(통합 시안 마이페이지 탭 줄) */
-function rTabbar() { return '<nav class="pb-mp-tab" data-test="rf-tabbar"><a>' + RIC.thome + 'HOME</a><a>' + RIC.pin + 'STORE</a><a>' + RIC.wand + 'PRODUCT</a><a class="on">' + RIC.user + 'MY PAGE</a></nav>'; }
+function rTabbar() { return '<nav class="pb-mp-tab" data-test="rf-tabbar"><a' + RNA + '>' + RIC.thome + 'HOME</a><a' + RNA + '>' + RIC.pin + 'STORE</a><a' + RNA + '>' + RIC.wand + 'PRODUCT</a><a class="on"' + RNA + '>' + RIC.user + 'MY PAGE</a></nav>'; }
 /* 폰 틀. inner = 스크롤 영역(헤더 포함), ov = 창(폰 기준 fixed) */
 function rPhone(inner, ov, opt) {
   opt = opt || {};
@@ -1360,21 +1363,21 @@ function fo10() {
 }
 
 /* ─────────── FO-CH-11 마이페이지 (통합 시안 마이페이지 그대로) ─────────── */
-function rRow(ic, t) { return '<div class="pb-mp-row">' + ic + '<span>' + t + '</span>' + RIC.right + '</div>'; }
+function rRow(ic, t) { return '<div class="pb-mp-row"' + RNA + '>' + ic + '<span>' + t + '</span>' + RIC.right + '</div>'; }
 function rCard() {
   return '<div class="pb-card"><span class="pb-badge ok">Booked</span><div class="pb-card-n">Abijou Clinic Myeongdong (D-8)</div><div class="pb-card-p pb-hiA" data-test="fo-card-prod">Abijou 肉毒杆菌</div>' +
-    '<div class="pb-hr"></div><div class="pb-card-dt"><div><span>Date</span><b>2026-10-20 (TUE)</b></div><div><span>TIME</span><b>14:00 (KST)</b></div></div><button type="button" class="pb-pk sm">View details</button></div>';
+    '<div class="pb-hr"></div><div class="pb-card-dt"><div><span>Date</span><b>2026-10-20 (TUE)</b></div><div><span>TIME</span><b>14:00 (KST)</b></div></div><button type="button" class="pb-pk sm"' + RNA + '>View details</button></div>';
 }
 function myHome(top) {
   var p = S.prof, bk = S.booked || 0;
   var book = bk ? '<div class="pb-mp-card" data-test="my-bk">' + rCard() + '</div>' + (bk > 1 ? '<div class="rf-more">외 ' + (bk - 1) + '건</div>' : '') :
-    '<div class="' + RMP + 'bookingEmpty" data-test="my-empty"><div class="' + RMP + 'bookingEmpty__text"><strong>You don\'t have any active bookings yet</strong><span>Your bookings will appear here.</span></div><button type="button">Browse stores</button></div>';
+    '<div class="' + RMP + 'bookingEmpty" data-test="my-empty"><div class="' + RMP + 'bookingEmpty__text"><strong>You don\'t have any active bookings yet</strong><span>Your bookings will appear here.</span></div><button type="button"' + RNA + '>Browse stores</button></div>';
   return rPhone(rHeader('My Page', '', 'globe') + '<main class="pb-mp" data-test="al-mypage">' + (top || '') +
-    '<div class="pb-mp-name" data-test="fo-ali-nick"><span>Nickname</span><b>' + (rEsc(p.nick) || '알리페이 회원') + '</b><em>Joined 2026. 09. 15</em></div>' +
+    '<div class="pb-mp-name" data-test="fo-ali-nick"><span>Nickname</span><b>' + (rEsc(p.nick) || '알리페이 회원') + '</b><em>Joined 2026. 10. 12</em></div>' +
     '<p class="pb-mp-alinote" data-test="fo-ali-note">알리페이 계정으로 로그인했습니다. K-Beauty Station 계정과는 별개입니다.</p>' +
-    '<div class="pb-mp-bh"><div class="pb-mp-bht"><span>' + RIC.cal + ' Booking History</span><button type="button">View list ' + RIC.right + '</button></div>' + book + '</div>' +
+    '<div class="pb-mp-bh"><div class="pb-mp-bht"><span>' + RIC.cal + ' Booking History</span><button type="button"' + RNA + '>View list ' + RIC.right + '</button></div>' + book + '</div>' +
     '<div class="pb-mp-sec">My Activity</div>' + rRow(RIC.chat, 'Chat History') + rRow(RIC.mark, 'Bookmarks') + rRow(RIC.star, 'My Reviews') + rRow(RIC.coupon, 'Coupon List') +
-    '<div class="pb-mp-sec">Explore</div><div class="pb-mp-ex"><div><small>Looking for curated Korean beauty content?</small><b class="mag">K-BEAUTY MAGAZINES</b></div>' + RIC.right + '</div><div class="pb-mp-ex"><div><small>K-beauty guides written by experts</small><b>Expert Guide</b></div>' + RIC.right + '</div>' +
+    '<div class="pb-mp-sec">Explore</div><div class="pb-mp-ex"' + RNA + '><div><small>Looking for curated Korean beauty content?</small><b class="mag">K-BEAUTY MAGAZINES</b></div>' + RIC.right + '</div><div class="pb-mp-ex"' + RNA + '><div><small>K-beauty guides written by experts</small><b>Expert Guide</b></div>' + RIC.right + '</div>' +
     '<div class="pb-mp-gap"></div>' + rRow(RIC.head, 'Customer Center') + '<div class="pb-mp-acc"><button type="button" data-test="al-acct-open" onclick="openAcct()">Change account information</button></div>' + rTabbar() + '</main>', '');
 }
 function fo11home() { return myHome(''); }
@@ -1391,17 +1394,17 @@ function fo11acct() {
   var tel, cc, nm;
   if (S.mtelDraft) {
     cc = rTel(S.mtelDraft);
-    tel = fld('Phone Number', '<div class="' + RAC + 'phoneVerificationForm"><div class="' + RAC + 'phoneInputRow"><div class="' + RAC + 'countryCallingCode">' + rSel('Calling code', cc[0], 'Select', '') + '</div><input readonly value="' + rEsc(cc[1]) + '" placeholder="Phone number" onclick="nextMtel()"></div>' +
+    tel = fld('Phone Number', '<div class="' + RAC + 'phoneVerificationForm"><div class="' + RAC + 'phoneInputRow"><div class="' + RAC + 'countryCallingCode">' + rSel('Calling code', cc[0], 'Select', 'rNA()') + '</div><input readonly value="' + rEsc(cc[1]) + '" placeholder="Phone number" onclick="nextMtel()"></div>' +
       '<button type="button" class="' + RAC + 'verificationButton" data-test="al-acct-verify" onclick="S.mtel=S.mtelDraft;S.mtelDraft=\'\';S.mtelSrc=\'user\';S.mtelSaved=true;render()">Get verification code</button></div>' + rHint('입력한 번호로 문자 인증을 합니다.'), 'al-acct-tel');
   } else if (S.mtel) {
     cc = rTel(S.mtel);
     tel = fld('Phone Number' + (S.mtelSrc === 'ali' ? rTag('알리페이 계정에서 채웠습니다') : ''), '<div class="' + RAC + 'verifiedPhoneForm"><div class="' + RAC + 'verifiedPhoneRow"><span class="' + RAC + 'verifiedCountryCode">' + cc[0] + '</span><span class="' + RAC + 'verifiedPhoneNumber" data-test="al-acct-telno">' + rEsc(cc[1]) + ' (Verified)</span></div>' +
       '<button type="button" class="' + RAC + 'changePhoneButton" data-test="al-acct-change" onclick="nextMtel()">Use a different number</button></div>' + rHint('고치면 문자 인증을 다시 합니다.'), 'al-acct-tel');
   } else {
-    tel = fld('Phone Number', '<div class="' + RAC + 'phoneVerificationForm"><div class="' + RAC + 'phoneInputRow"><div class="' + RAC + 'countryCallingCode">' + rSel('Calling code', '', 'Select', '') + '</div><input readonly value="" placeholder="Phone number" onclick="nextMtel()"></div></div>' + rHint('입력한 번호로 문자 인증을 합니다.'), 'al-acct-tel');
+    tel = fld('Phone Number', '<div class="' + RAC + 'phoneVerificationForm"><div class="' + RAC + 'phoneInputRow"><div class="' + RAC + 'countryCallingCode">' + rSel('Calling code', '', 'Select', 'rNA()') + '</div><input readonly value="" placeholder="Phone number" onclick="nextMtel()"></div></div>' + rHint('입력한 번호로 문자 인증을 합니다.'), 'al-acct-tel');
   }
   nm = rMsg(d.msg);
-  var msg = '<div class="' + RAC + 'messengerFormItem" data-test="al-acct-msg"><label>Messenger</label><div class="' + RAC + 'messengerInputRow"><div class="' + RAC + 'messengerTypeSelect">' + rSel('Messenger Type', nm[0], 'Select', '') + '</div>' +
+  var msg = '<div class="' + RAC + 'messengerFormItem" data-test="al-acct-msg"><label>Messenger</label><div class="' + RAC + 'messengerInputRow"><div class="' + RAC + 'messengerTypeSelect">' + rSel('Messenger Type', nm[0], 'Select', 'rNA()') + '</div>' +
     '<input readonly value="' + rEsc(nm[1]) + '" placeholder="메신저 아이디를 직접 입력해 주세요" onclick="dedit(\'msg\')"></div></div>';
   var mk = '<div class="' + RAC + 'marketingFormItem" data-test="al-mkt-row"><div class="' + RAC + 'marketingFormItemCopy"><span class="' + RAC + 'marketingFormItemLabel" data-test="al-mkt-label">Marketing messages</span>' +
     (S.mktDate ? '<span class="' + RAC + 'marketingConsentDate" data-test="al-mkt-date">' + (S.agMkt ? '동의일' : '거부일') + ': ' + S.mktDate + '</span>' : '') + '</div>' +
@@ -1428,13 +1431,13 @@ function fo12() {
 
 /* ─────────── FO-CH-13 예약 입력 (통합 시안 알리페이 채널 정보 입력 화면 그대로) ─────────── */
 function rLabel(t, req, extra) { return '<span class="' + RBI + 'informationLabel">' + t + (req ? '<em>*</em>' : '') + (extra || '') + '</span>'; }
-function rChips(sel) { return '<div class="' + RBI + 'messengerChips" role="radiogroup" aria-label="Messenger contact">' + ['WhatsApp', 'LINE', 'WeChat', 'KakaoTalk'].map(function (n) { return '<button type="button" role="radio" aria-checked="' + (n === sel ? 'true' : 'false') + '" class="' + RBI + 'messengerChip' + (n === sel ? ' ' + RBI + 'messengerChipSelected' : '') + '"><img alt="" width="16" height="16" src="' + RF_MEDIA + RF_CHIPICON[n] + '">' + n + '</button>'; }).join('') + '</div>'; }
+function rChips(sel, act) { return '<div class="' + RBI + 'messengerChips" role="radiogroup" aria-label="Messenger contact">' + ['WhatsApp', 'LINE', 'WeChat', 'KakaoTalk'].map(function (n) { return '<button type="button" role="radio" data-test="al-chip-' + n + '" onclick="' + act + '=\'' + n + '\';render()" aria-checked="' + (n === sel ? 'true' : 'false') + '" class="' + RBI + 'messengerChip' + (n === sel ? ' ' + RBI + 'messengerChipSelected' : '') + '"><img alt="" width="16" height="16" src="' + RF_MEDIA + RF_CHIPICON[n] + '">' + n + '</button>'; }).join('') + '</div>'; }
 function rDone() {
   return rPhone(rHeader('', '', 'home') + '<main class="pb-done" data-test="al-done"><section class="pb-dn-hero"><span class="pb-dn-ic">' + RIC.okc + '</span><div><h1>Your booking is complete</h1><p id="doneMsg">We sent the confirmation details by text message</p></div></section>' +
     '<section class="pb-dn-sum" data-test="done-sum"><dl><div><dt>Store</dt><dd>Abijou Clinic Myeongdong</dd></div><div data-test="fo-done-prod"><dt>Product</dt><dd>Abijou 肉毒杆菌</dd></div><div><dt>Visit date</dt><dd>Tue, 10/20/2026 14:00 (KST)</dd></div><div><dt>Booking number</dt><dd>261012009CN02</dd></div></dl>' +
-    '<button type="button">View booking details</button></section>' +
+    '<button type="button"' + RNA + '>View booking details</button></section>' +
     '<div style="padding:0 16px 16px">' + rGone('현행 예약 완료 화면을 그대로 쓰고, 이메일로 보냈다는 문장(We sent the confirmation details to your email)만 문자로 보냈다는 문장으로 바꿉니다. 예약자 설문도 그대로 보입니다.') + '</div>' +
-    '<section class="pb-dn-sv"><button type="button">' + RIC.info + '<div class="pb-dn-msg"><strong>Tell us what K-beauty interests you before your visit</strong><small>We\'ll share information and benefits that match your interests</small></div><span class="pb-dn-det">View details</span></button></section></main>', '');
+    '<section class="pb-dn-sv"><button type="button"' + RNA + '>' + RIC.info + '<div class="pb-dn-msg"><strong>Tell us what K-beauty interests you before your visit</strong><small>We\'ll share information and benefits that match your interests</small></div><span class="pb-dn-det">View details</span></button></section></main>', '');
 }
 function fo13() {
   if (!S.joined || !S.prof) return phoneNote('예약하기', '회원이 만들어진 뒤에 보이는 화면입니다. 위쪽 처음으로를 누른 뒤 진입 동의 창에서 동의를 마쳐 주세요.');
@@ -1448,7 +1451,7 @@ function fo13() {
   var pass = '<div class="' + RBI + 'informationField" data-test="al-bk-pass">' + rLabel('Passport name', 1) + '<input readonly name="passportName" value="' + rEsc(S.passport) + '" onclick="S.passport=S.passport||\'WANG XIAOMEI\';render()"></div>';
   var head = function (tg) { return '<div class="' + RBI + 'informationFieldHeading">' + rLabel('Mobile phone number', 1, tg ? rTag(tg) : '') + '<p>Booking confirmations and reminders will be sent to this number.</p></div>'; };
   var verified = function (t) { var c = rTel(t); return '<div class="' + RBI + 'verifiedPhoneForm"><div class="' + RBI + 'verifiedPhoneRow"><span class="' + RBI + 'verifiedCountryCode">' + c[0] + '</span><span class="' + RBI + 'verifiedPhoneNumber" data-test="al-bk-telno">' + rEsc(c[1]) + ' (Verified)</span></div><button type="button" class="' + RBI + 'changePhoneButton" data-test="al-bk-change" onclick="setTelNext()">Use a different number</button></div>'; };
-  var unver = function (t) { var c = rTel(t); return '<div class="' + RBI + 'verifiedPhoneForm"><div class="' + RBI + 'phoneInputRow"><div class="' + RBI + 'countryCallingCode">' + rSel('Calling code', c[0], 'Select', '') + '</div><input readonly placeholder="Phone number" value="' + rEsc(c[1]) + '" onclick="setTelNext()"></div>' + (t && !S.telVerified ? '<button type="button" class="' + RBI + 'verificationButton" data-test="al-bk-verify" onclick="S.telVerified=true;render()">Get verification code</button>' : '') + '</div>'; };
+  var unver = function (t) { var c = rTel(t); return '<div class="' + RBI + 'verifiedPhoneForm"><div class="' + RBI + 'phoneInputRow"><div class="' + RBI + 'countryCallingCode">' + rSel('Calling code', c[0], 'Select', 'rNA()') + '</div><input readonly placeholder="Phone number" value="' + rEsc(c[1]) + '" onclick="setTelNext()"></div>' + (t && !S.telVerified ? '<button type="button" class="' + RBI + 'verificationButton" data-test="al-bk-verify" onclick="S.telVerified=true;render()">Get verification code</button>' : '') + '</div>'; };
   var tel;
   if (S.telSrc === 'ali' && S.tel && S.telVerified && !S.telEdited) tel = head('알리페이 계정에서 채웠습니다') + verified(S.tel) + rHint('고치면 문자 인증을 다시 합니다.');
   else {
@@ -1456,9 +1459,9 @@ function fo13() {
     tel = (S.tel && S.telVerified ? head(fromMember ? '회원 정보에서 채웠습니다' : '') + verified(S.tel) : head('') + unver(S.tel)) + rHint(S.telVerified ? '고치면 문자 인증을 다시 합니다.' : '입력한 번호로 문자 인증을 합니다.');
   }
   var mm = rMsg(S.rmsg);
-  var msg = '<div class="' + RBI + 'informationField" data-test="al-bk-msg"><div class="' + RBI + 'informationFieldHeading">' + rLabel('Messenger contact', 1) + '<p>The store will contact you here if they need to discuss your booking.</p></div>' + rChips(mm[0] || 'WhatsApp') +
-    '<input readonly name="messengerId" data-test="fo-msgid" placeholder="메신저 아이디를 직접 입력해 주세요" value="' + rEsc(mm[1]) + '" onclick="S.rmsg=S.rmsg||\'위챗 wxid_alipay01\';render()">' +
-    '<button type="button" class="' + RBI + 'qrUploadButton">Upload ID with a QR code <span aria-hidden="true">›</span></button>' + rGone('알리페이 채널에서는<br>앱 열기 버튼이 없습니다') + '</div>';
+  var msg = '<div class="' + RBI + 'informationField" data-test="al-bk-msg"><div class="' + RBI + 'informationFieldHeading">' + rLabel('Messenger contact', 1) + '<p>The store will contact you here if they need to discuss your booking.</p></div>' + rChips(S.rchip || mm[0] || 'WhatsApp', 'S.rchip') +
+    '<input readonly name="messengerId" data-test="fo-msgid" placeholder="메신저 아이디를 직접 입력해 주세요" value="' + rEsc(mm[1]) + '" onclick="S.rmsg=S.rmsg||\'위챗 wxid_alipay01\';S.rchip=\'\';render()">' +
+    '<button type="button" class="' + RBI + 'qrUploadButton"' + RNA + '>Upload ID with a QR code <span aria-hidden="true">›</span></button>' + rGone('알리페이 채널에서는<br>앱 열기 버튼이 없습니다') + '</div>';
   var req = '<div class="' + RBI + 'informationField"><div class="' + RBI + 'informationFieldHeading">' + rLabel('Requests', 0) + '<p>Tell us about questions, preferred treatments, or interpretation needs. More detail helps the store prepare.</p></div><textarea name="customerRequest" rows="3" maxlength="1000" placeholder="e.g. I would like a consultation. Is English interpretation available I am also curious about recovery time."></textarea></div>';
   /* 웹 예약과 같은 필수값. 이메일만 뺀다 */
   var ready = S.passport && p.nation && p.sex && p.birth && S.tel && S.telVerified && S.rmsg;
@@ -1480,11 +1483,11 @@ function fo13c() {
   var telTag = S.mtelSrc === 'ali' && c.tel === ALI.phone ? '알리페이 계정에서 채웠습니다' : '회원 정보에서 채웠습니다';
   var grp = function (title, req, desc, tag, inner, dt) { return '<div class="' + RZ + '__form__group" data-test="' + dt + '"><div class="' + RZ + '__form__group__header"><div class="' + RZ + '__form__group__header__title">' + title + (req ? ' <span>*</span>' : '') + '</div>' + (tag ? rTag(tag) : '') + '<div class="' + RZ + '__form__group__header__description">' + desc + '</div></div>' + inner + '</div>'; };
   var ready = c.name && c.tel && c.msg;
-  var store = '<div style="margin-top:24px"><article class="' + RSC + 'root"><a class="' + RSC + 'link"><figure class="' + RSC + 'figure"><div class="' + RSC + 'thumbnail"><img alt="Abijou Clinic Myeongdong" width="76" height="76" class="' + RSC + 'image" src="' + RF_ORIGIN + '/_next/image?url=https%3A%2F%2Fimage.kbstations.com%2F2025%2F06%2F25%2Fe3de94ab-8ed5-4ac8-8f32-af57daafc04b&amp;w=256&amp;q=75"><span class="' + RSC + 'statusDot" aria-hidden="true"></span></div>' +
+  var store = '<div style="margin-top:24px"><article class="' + RSC + 'root"><a class="' + RSC + 'link"' + RNA + '><figure class="' + RSC + 'figure"><div class="' + RSC + 'thumbnail"><img alt="Abijou Clinic Myeongdong" width="76" height="76" class="' + RSC + 'image" src="' + RF_ORIGIN + '/_next/image?url=https%3A%2F%2Fimage.kbstations.com%2F2025%2F06%2F25%2Fe3de94ab-8ed5-4ac8-8f32-af57daafc04b&amp;w=256&amp;q=75"><span class="' + RSC + 'statusDot" aria-hidden="true"></span></div>' +
     '<figcaption class="' + RSC + 'content"><h3 class="' + RSC + 'name">Abijou Clinic Myeongdong</h3><ul class="' + RSC + 'meta"><li class="' + RSC + 'metaItem">Open</li></ul><footer class="' + RSC + 'footer"><div class="' + RSC + 'review"><svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M4 .5l1.06 2.15 2.37.35-1.71 1.67.4 2.36L4 5.91 1.88 7.03l.4-2.36L.57 3l2.37-.35z" fill="#F89300"/></svg><span class="' + RSC + 'rating">4.9</span><span>(5,000+)</span></div>' +
     '<address class="' + RSC + 'location"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 12.5s4-3.6 4-7a4 4 0 0 0-8 0c0 3.4 4 7 4 7z" stroke="#FB6F92" stroke-width="1.2"/><circle cx="7" cy="5.5" r="1.4" stroke="#FB6F92" stroke-width="1.2"/></svg><span>Myeong-dong</span></address></footer></figcaption></figure></a></article></div>';
-  var form = '<div class="' + RZ + '__form"><div class="' + RZ + '__form__tab"><div class="' + RZ + '__form__tab__content"><label class="' + RZ + '__form__tab__content__label">Contact Method <span>*</span></label><div class="' + RTB + 'List" role="tablist"><button type="button" class="' + RTB + '" role="tab" aria-selected="false">Mobile</button><button type="button" class="' + RTB + ' ' + RTB + '__selected" role="tab" aria-selected="true">Social media</button></div></div>' +
-    '<div class="' + RCH + 'tabList" role="tablist">' + ['WeChat', 'LINE', 'WhatsApp', 'KakaoTalk'].map(function (n) { return '<button type="button" class="' + RCH + 'tab' + (n === mm[0] ? ' ' + RCH + 'active' : '') + '" role="tab">' + n + '</button>'; }).join('') + '</div></div>' +
+  var form = '<div class="' + RZ + '__form"><div class="' + RZ + '__form__tab"><div class="' + RZ + '__form__tab__content"><label class="' + RZ + '__form__tab__content__label">Contact Method <span>*</span></label><div class="' + RTB + 'List" role="tablist"><button type="button" class="' + RTB + '" role="tab" aria-selected="false"' + RNA + '>Mobile</button><button type="button" class="' + RTB + ' ' + RTB + '__selected" role="tab" aria-selected="true"' + RNA + '>Social media</button></div></div>' +
+    '<div class="' + RCH + 'tabList" role="tablist">' + ['WeChat', 'LINE', 'WhatsApp', 'KakaoTalk'].map(function (n) { return '<button type="button" class="' + RCH + 'tab' + (n === (c.chip || mm[0]) ? ' ' + RCH + 'active' : '') + '" role="tab" data-test="al-cchip-' + n + '" onclick="S.cd.chip=\'' + n + '\';render()">' + n + '</button>'; }).join('') + '</div></div>' +
     '<div style="display:flex;flex-direction:column;gap:20px">' +
     grp('Name', 1, 'Please enter your name as it appears on your passport.', c.name && !c.set.name ? '회원 정보에서 채웠습니다' : '', '<input type="text" readonly class="' + RTI + '" placeholder="Enter your full name" value="' + rEsc(c.name || '') + '" onclick="cedit(\'name\')">', 'al-c-name') +
     grp('Mobile number', 1, 'Enter your country code and mobile number.', c.tel && !c.set.tel ? telTag : '', '<div class="' + RZ + '__form__group__content" style="position:relative"><div class="' + RCC + '"><div class="' + RCC + '__select" style="height:55px">' + (tn[0] ? '<div class="' + RCC + '__select__value">' + tn[0] + '</div>' : '<div class="' + RCC + '__select__placeholder">Country</div>') + '<div class="' + RCC + '__select__arrow"><img alt="" width="24" height="24" src="' + RF_MEDIA + 'keyboard_arrow_down_24px.1wej5xsxtr_s6.svg"></div></div></div>' +

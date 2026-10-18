@@ -3370,7 +3370,8 @@ function pSinq() {
   var rg = sinqRange(b.sper); $$('.ant-picker input').forEach(function (i, n) { i.value = rg[n] || ''; });
   var tl = $$('span').filter(function (e) { return e.textContent === '전체 문의 건수'; })[0]; if (tl) { tl.nextElementSibling.textContent = tot; tl.nextElementSibling.setAttribute('data-test', 'sinq-all'); }
   $$('[class*=chartArea], .ant-card-body > [data-chart-source-type]').forEach(function (c) { if (c.closest('[class*=donutChart]')) return; c.style.height = (/chartArea/.test(c.className) ? 480 : 340) + 'px'; /* 라이브 실측 그래프 높이 */ c.innerHTML = '<div class="pb-chartnote">그래프는 시안에서 그리지 않습니다. 아래 카드·표와 같은 기준으로 셉니다.</div>'; });
-  /* TOP 10 */
+  /* TOP 10: 스냅샷의 다른 스토어 줄은 지우고 우리 스토어 한 줄만(집계 · 상세 보기 탭 같음, 7차 감사) */
+  $$('[class*=topStoreItem]').slice(1).forEach(function (x) { x.remove(); });
   var ti = $('[class*=topStoreItem]'); if (ti) { $('[class*=topStoreName]', ti).textContent = PB.DB.store.name; $('[class*=topStoreCount]', ti).textContent = tot; var bar = $('[class*=topStoreBar] > div', ti); if (bar) bar.style.width = (tot ? 100 : 0) + '%'; if (!tot) { var em = document.createElement('div'); em.setAttribute('data-test', 'sinq-top-empty'); em.style.cssText = 'padding:24px 0;text-align:center;color:rgba(0,0,0,.25)'; em.textContent = '조회된 문의 통계가 없습니다.'; ti.after(mark(em)); ti.remove(); } }
   /* 카드 */
   var panels = function (n) { return $$('[class*=summaryPanel]').filter(function (p) { var s = $('strong', p); return s && s.textContent === n; }); };
