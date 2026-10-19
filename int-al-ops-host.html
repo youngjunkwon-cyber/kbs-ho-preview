@@ -708,7 +708,7 @@ function viewConsult(){
  h+='<div class="fb"><div class="fr">'
   +sel('consult.st',[['','상태 선택'],['상담대기','상담대기'],['고객부재중','고객부재중'],['고객취소','고객취소'],['상품예약','상품예약'],['스토어취소','스토어취소']])
   +sel('consult.lang',[['','언어 선택'],['영어','영어'],['일본어','일본어'],['중국어(간체)','중국어(간체)'],['중국어(번체)','중국어(번체)']])
-  +sel('consult.route',[['','유입경로'],['스토어','스토어'],['상품','상품']])
+  
   +sel('consult.ch',CHOPT,'new')
   +sel('consult.member',[['','회원구분'],['회원','회원'],['비회원','비회원']])
   +sel('consult.sns',[['','SNS'],['wechat','wechat'],['line','line'],['없음','SNS 없음']])
@@ -716,8 +716,8 @@ function viewConsult(){
   +['전체','1주일','1개월','3개월','6개월'].map(function(p){return '<button class="btn'+(v.per===p?' on':'')+'" data-act="cper" data-v="'+p+'"'+(v.per===p&&p==='전체'?' style="background:var(--pk);border-color:var(--pk);color:#fff"':'')+'>'+p+'</button>';}).join('')
   +drange('consult')+'<button class="btn pk" data-act="search">검색</button></div></div>';
  var STS=['상담대기','고객부재중','고객취소','상품예약','스토어취소'];
- h+='<div class="pagecard"><div class="pc-h">상담접수 목록 ('+a.length+')</div><div class="tw"><table><thead><tr><th>No.</th><th>회원구분</th><th>접수상태</th><th>언어</th><th>유입경로</th><th class="new">유입 채널</th><th>상품명</th><th>고객메모</th><th>가격</th><th>부가세 포함</th><th>연락수단</th><th>휴대폰번호</th><th>SNS</th><th>SNS ID</th><th>이름</th><th>닉네임</th><th>접수일시</th><th>QR</th></tr></thead><tbody>'
-  +(a.length?a.map(function(r){return '<tr><td>'+r.no+'</td><td>'+r.member+'</td><td><select class="rs" data-st="'+r.no+'" style="height:24px">'+STS.map(function(s){return '<option'+(s===r.status?' selected':'')+'>'+s+'</option>';}).join('')+'</select></td><td>'+r.lang+'</td><td>'+r.route+'</td><td>'+dch(r.ch)+'</td><td class="lnk">'+(r.prod?esc(r.prod):'<span style="color:#333">-</span>')+'</td><td>'+(r.memo?'<span class="lnk" data-act="nop">보기</span>':'-')+'</td><td>'+(r.price||'-')+'</td><td>'+(r.price?'포함':'-')+'</td><td>'+r.contact+'</td><td>'+(r.phone||'-')+'</td><td>'+(r.sns||'-')+'</td><td>'+(r.snsid||'-')+'</td><td>'+esc(r.name)+'</td><td>'+esc(r.nick)+'</td><td>'+r.at+'</td><td>-</td></tr>';}).join(''):'<tr><td colspan="18" class="empty">조건에 맞는 상담접수가 없어요.</td></tr>')
+ h+='<div class="pagecard"><div class="pc-h">상담접수 목록 ('+a.length+')</div><div class="tw"><table><thead><tr><th>No.</th><th>회원구분</th><th>접수상태</th><th>언어</th><th class="new">유입 채널</th><th>상품명</th><th>고객메모</th><th>가격</th><th>부가세 포함</th><th>연락수단</th><th>휴대폰번호</th><th>SNS</th><th>SNS ID</th><th>이름</th><th>닉네임</th><th>접수일시</th><th>QR</th></tr></thead><tbody>'
+  +(a.length?a.map(function(r){return '<tr><td>'+r.no+'</td><td>'+r.member+'</td><td><select class="rs" data-st="'+r.no+'" style="height:24px">'+STS.map(function(s){return '<option'+(s===r.status?' selected':'')+'>'+s+'</option>';}).join('')+'</select></td><td>'+r.lang+'</td><td>'+dch(r.ch)+'</td><td class="lnk">'+(r.prod?esc(r.prod):'<span style="color:#333">-</span>')+'</td><td>'+(r.memo?'<span class="lnk" data-act="nop">보기</span>':'-')+'</td><td>'+(r.price||'-')+'</td><td>'+(r.price?'포함':'-')+'</td><td>'+r.contact+'</td><td>'+(r.phone||'-')+'</td><td>'+(r.sns||'-')+'</td><td>'+(r.snsid||'-')+'</td><td>'+esc(r.name)+'</td><td>'+esc(r.nick)+'</td><td>'+r.at+'</td><td>-</td></tr>';}).join(''):'<tr><td colspan="17" class="empty">조건에 맞는 상담접수가 없어요.</td></tr>')
   +'</tbody></table></div><div class="pager"><span class="d">&lsaquo;</span><b>1</b><span class="d">&rsaquo;</span></div></div>';
  return h;
 }
