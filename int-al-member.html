@@ -1506,5 +1506,29 @@ function fo13c() {
 
 render();
 </script>
+<script>
+/* ===== 반응 없는 컨트롤 알림(9차 감사, 2026-10-19) =====
+   그리지 않은 메뉴 · 버튼 · 링크 · 탭을 눌러 화면이 하나도 바뀌지 않으면(글 · 모양 · 스크롤 · 주소 · 입력칸 포커스 모두 그대로) 그 시안이 쓰는 토스트를 띄운다.
+   이미 동작하는 컨트롤은 화면이 바뀌므로 이 알림이 뜨지 않는다. 새 동작은 더하지 않는다 */
+(function () {
+  if (window.__deadClick) return; window.__deadClick = true;
+  var SEL = 'button, a, [role=tab], [role=button], [onclick], .ant-tabs-tab, .ant-radio-button-wrapper, .ant-switch, .ant-select-selector, .ant-dropdown-trigger, .mi, .nav, .anchor, .chip, .sw, [class*=btn], [class*=Btn]';
+  var muts = 0, scrolls = 0;
+  try { new MutationObserver(function (l) { muts += l.length; }).observe(document, { subtree: true, childList: true, attributes: true, characterData: true }); } catch (e) {}
+  document.addEventListener('scroll', function () { scrolls++; }, true);
+  document.addEventListener('click', function (e) {
+    var t = e.target && e.target.closest ? e.target.closest(SEL) : null; if (!t) return;
+    if (t.disabled || t.closest('[disabled]') || t.getAttribute('aria-disabled') === 'true') return;
+    if (t.closest('input, select, textarea, option')) return;
+    var m0 = muts, s0 = scrolls, u0 = location.href, a0 = document.activeElement;
+    setTimeout(function () {
+      var a1 = document.activeElement, focused = a1 !== a0 && a1 && /^(INPUT|SELECT|TEXTAREA)$/.test(a1.tagName);
+      if (muts === m0 && scrolls === s0 && location.href === u0 && !focused) window.__deadToast(t);
+    }, 120);
+  }, false);
+})();
+
+window.__deadToast = function (t) { if (t.closest('.rph')) { toastFo('Not available in this mockup'); render(); return; } var d = document.getElementById('bo-toast'); if (!d) { d = document.createElement('div'); d.id = 'bo-toast'; d.style.cssText = 'position:fixed;left:50%;top:24px;transform:translateX(-50%);z-index:9999;background:#fff;color:rgba(0,0,0,.88);font-size:14px;padding:9px 14px;border-radius:8px;box-shadow:0 6px 16px rgba(0,0,0,.08),0 3px 6px -4px rgba(0,0,0,.12),0 9px 28px 8px rgba(0,0,0,.05)'; document.body.appendChild(d); } d.textContent = '시안에서는 동작하지 않습니다'; d.style.display = 'block'; clearTimeout(window.__boT); window.__boT = setTimeout(function () { d.style.display = 'none'; }, 2000); };
+</script>
 </body>
 </html>
