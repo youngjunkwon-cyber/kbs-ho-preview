@@ -1000,11 +1000,21 @@ function restoreScroll() { SC_SEL.forEach(function (s) { $$(s).forEach(function 
 /* 실제 이동·제출은 막는다 */
 document.addEventListener('submit', function (e) { e.preventDefault(); }, true);
 document.addEventListener('click', function (e) { var a = e.target.closest('a[href]'); if (a) e.preventDefault(); }, true);
+/* 그리지 않은 동작: 화면마다 지정한 컨트롤(NA_LIST: [선택자, 글자 정규식])에만 안내 토스트. 이미 동작이 있는 것은 건드리지 않음 */
+function naBind(list, msg) {
+  list.forEach(function (it) {
+    $$(it[0]).filter(function (e) { return !it[1] || it[1].test(e.textContent.replace(/\s+/g, ' ').trim()); }).forEach(function (el) {
+      if (el.onclick || el.disabled) return;
+      el.onclick = function (e) { e.preventDefault(); e.stopPropagation(); toast(msg); };
+    });
+  });
+}
 /* 렌더 진입점: 화면별 draw 를 감싸 스크롤·표시 상태를 처리 */
 function frameDraw(key, build) {
   var same = LASTKEY === key; if (same) saveScroll(); closeDD();
   document.body.classList.toggle('pb-mark', !!PB.S.mark);
   build();
+  if (typeof NA_LIST === 'function') naBind(NA_LIST(), NA_MSG);
   if (same) restoreScroll(); else window.scrollTo(0, 0);
   LASTKEY = key;
 }
@@ -1462,27 +1472,35 @@ function fillProdSlots(w) {
 function bindLinks(w) { fillProdSlots(w); $$('[data-pid]', w).forEach(function (a) { a.onclick = function () { F().back = { screen: F().screen }; F().pid = +a.getAttribute('data-pid'); nav('product'); }; }); }
 window.draw = draw;
 PB.ready('FO');
-
-/* ===== 반응 없는 컨트롤 알림(9차 감사, 2026-10-19) =====
-   그리지 않은 메뉴 · 버튼 · 링크 · 탭을 눌러 화면이 하나도 바뀌지 않으면(글 · 모양 · 스크롤 · 주소 · 입력칸 포커스 모두 그대로) 그 시안이 쓰는 토스트를 띄운다.
-   이미 동작하는 컨트롤은 화면이 바뀌므로 이 알림이 뜨지 않는다. 새 동작은 더하지 않는다 */
-(function () {
-  if (window.__deadClick) return; window.__deadClick = true;
-  var SEL = 'button, a, [role=tab], [role=button], [onclick], .ant-tabs-tab, .ant-radio-button-wrapper, .ant-switch, .ant-select-selector, .ant-dropdown-trigger, .mi, .nav, .anchor, .chip, .sw, [class*=btn], [class*=Btn]';
-  var muts = 0, scrolls = 0;
-  try { new MutationObserver(function (l) { muts += l.length; }).observe(document, { subtree: true, childList: true, attributes: true, characterData: true }); } catch (e) {}
-  document.addEventListener('scroll', function () { scrolls++; }, true);
-  document.addEventListener('click', function (e) {
-    var t = e.target && e.target.closest ? e.target.closest(SEL) : null; if (!t) return;
-    if (t.disabled || t.closest('[disabled]') || t.getAttribute('aria-disabled') === 'true') return;
-    if (t.closest('input, select, textarea, option')) return;
-    var m0 = muts, s0 = scrolls, u0 = location.href, a0 = document.activeElement;
-    setTimeout(function () {
-      var a1 = document.activeElement, focused = a1 !== a0 && a1 && /^(INPUT|SELECT|TEXTAREA)$/.test(a1.tagName);
-      if (muts === m0 && scrolls === s0 && location.href === u0 && !focused) window.__deadToast(t);
-    }, 120);
-  }, false);
-})();
-
-window.__deadToast = function () { toast('Not available in this mockup'); };
+/* 2026-10-19 10차: 실화면에서 가져왔지만 시안에서 그리지 않은 컨트롤(9차 감사 5번 목록)에만 안내 토스트 */
+var NA_MSG = 'Not available in this mockup';
+function NA_LIST() {
+  var s = F().screen;
+  if (s === 'store') return [
+    ['[class*=StoreDetailHeader-module__Z4HdZa__headerBar] button[aria-label="Go Back"]'],
+    ['button[class*=StoreDetailHeader-module__Z4HdZa__anchorNavButton]'],
+    ['button[class*=heroOpenButton]'],
+    ['button[class*=readMoreDescription]'],
+    ['button[class*=StoreDetailContactSection-module-scss-module__PNCana__messengerCard]'],
+    ['a', /^Store Features$/],
+    ['a[class*=StoreReviewSummarySection-module-scss-module__oOOYMq__reviewSummary]'],
+    ['a[class*=beforeAfterTitleLink]'], ['a[class*=beforeAfterItem]'],
+    ['a[class*=sectionHeaderMoreLink][aria-label="view more gallery images"]'], ['a[class*=galleryGridItem]']
+  ];
+  if (s === 'product') return [
+    ['a[class*=ProductSummary-module-scss-module__rNoPbq__top__content__store]'],
+    ['a[class*=StoreSummary-module-scss-module__jMpxzG__store__header]'],
+    ['button[class*=ProductTabs-module-scss-module__L1j04q__productTabs__tab]', /^Detail page$/],
+    ['button[class*=ProductImageContent-module-scss-module__3Yyf_a__detailViewImage__button]'],
+    ['button[class*=StoreSummaryAddressCopyButton-module__moD9sG__button]']
+  ];
+  if (s === 'book') return [['button[class*=BookingCalendar-module-scss-module__LzH2OW__monthButton][aria-label="Next month"]']];
+  if (s === 'info') return [
+    ['button[class*=Select-module-scss-module__1G91Ha__trigger][aria-label="Nationality"]'],
+    ['button[class*=Select-module-scss-module__1G91Ha__trigger][aria-label="Gender"]'],
+    ['button[class*=changePhoneButton]', /^Use a different number$/],
+    ['button[class*=qrUploadButton]']
+  ];
+  return [];
+}
 </script></body></html>

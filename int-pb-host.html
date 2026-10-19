@@ -2425,11 +2425,21 @@ function restoreScroll() { SC_SEL.forEach(function (s) { $$(s).forEach(function 
 /* 실제 이동·제출은 막는다 */
 document.addEventListener('submit', function (e) { e.preventDefault(); }, true);
 document.addEventListener('click', function (e) { var a = e.target.closest('a[href]'); if (a) e.preventDefault(); }, true);
+/* 그리지 않은 동작: 화면마다 지정한 컨트롤(NA_LIST: [선택자, 글자 정규식])에만 안내 토스트. 이미 동작이 있는 것은 건드리지 않음 */
+function naBind(list, msg) {
+  list.forEach(function (it) {
+    $$(it[0]).filter(function (e) { return !it[1] || it[1].test(e.textContent.replace(/\s+/g, ' ').trim()); }).forEach(function (el) {
+      if (el.onclick || el.disabled) return;
+      el.onclick = function (e) { e.preventDefault(); e.stopPropagation(); toast(msg); };
+    });
+  });
+}
 /* 렌더 진입점: 화면별 draw 를 감싸 스크롤·표시 상태를 처리 */
 function frameDraw(key, build) {
   var same = LASTKEY === key; if (same) saveScroll(); closeDD();
   document.body.classList.toggle('pb-mark', !!PB.S.mark);
   build();
+  if (typeof NA_LIST === 'function') naBind(NA_LIST(), NA_MSG);
   if (same) restoreScroll(); else window.scrollTo(0, 0);
   LASTKEY = key;
 }
@@ -2536,7 +2546,7 @@ function hostMenu(v) {
   var leaf = $('li.ant-menu-item', chat);
   subs.forEach(function (s) { if (s !== chat && /상담 관리|예약 관리/.test($('.ant-menu-submenu-title', s).textContent)) s.remove(); });
   chat.className = 'ant-menu-submenu ant-menu-submenu-inline ant-menu-submenu-open' + (/res|manual/.test(v) ? ' ant-menu-submenu-selected' : '');
-  $('.ant-menu-submenu-title .ant-menu-title-content', chat).textContent = '문의·예약'; mark($('.ant-menu-submenu-title', chat)); chat.setAttribute('data-test', 'host-menu-inq');
+  $('.ant-menu-submenu-title .ant-menu-title-content', chat).textContent = '문의 · 방문 예약'; mark($('.ant-menu-submenu-title', chat)); chat.setAttribute('data-test', 'host-menu-inq');
   var ul = $('ul.ant-menu-sub', chat); ul.innerHTML = '';
   ['실시간 채팅', '채팅내역조회', '메신저상담', '상담접수', '예약 현황', '예약 시간 설정'].forEach(function (n) { var li = leaf.cloneNode(true); li.className = 'ant-menu-item ant-menu-item-only-child' + (n === '예약 현황' && /res|manual/.test(v) ? ' ant-menu-item-selected' : ''); $('.ant-menu-title-content', li).textContent = n; ul.appendChild(li); });
   $$(':scope > li.ant-menu-item', mn).forEach(function (li) { var t = li.textContent.trim(); li.classList.toggle('ant-menu-item-selected', (t === '대시보드' && v === 'dash') || (t === '상품 관리' && /prod|pstat|pedit/.test(v))); });
@@ -2577,7 +2587,7 @@ function pDash() {
   var ps = PB.DB.prods.filter(function (p) { return !p.deleted; }), mb = $('[class*=managementBlock]');
   if (mb) { $('[class*=managementTitle]', mb).textContent = '상품 ' + ps.length + '개'; var cnt = { '승인': ps.filter(function (p) { return p.status === 'approved'; }).length, '대기': ps.filter(function (p) { return p.status === 'pending'; }).length, '반려': ps.filter(function (p) { return p.status === 'rejected'; }).length };
     $$('[class*=managementStatusLinks] button', mb).forEach(function (x) { var k = $('span', x).textContent.trim(); if (k in cnt) $('strong', x).textContent = cnt[k]; }); }
-  /* 통계 칸: 스토어 방문·상품 방문은 항상, 메신저 문의·채팅 문의·예약 확정·방문 완료는 값이 있을 때만 보인다 */
+  /* 통계 칸: 스토어 방문·상품 방문은 항상, 메신저 문의, 채팅 문의, 예약 확정, 방문 완료는 값이 있을 때만 보인다 */
   var PER = { '이번 주': ['2026-10-12', '2026-10-18'], '지난주': ['2026-10-05', '2026-10-11'], '1개월': ['2026-09-13', '2026-10-12'], '3개월': ['2026-07-14', '2026-10-12'], '전체': ['0000', '9999'] };
   h.per = h.per || '이번 주'; var pr = PER[h.per], inR = function (d) { return d >= pr[0] && d <= pr[1]; };
   /* 메신저 · 채팅 문의는 BO 스토어 문의 통계와 같은 표본(PB.SINQ_BASE)에서 셈 */
@@ -2783,27 +2793,13 @@ function pEdit() {
 }
 window.draw = draw;
 PB.ready('HOST');
-
-/* ===== 반응 없는 컨트롤 알림(9차 감사, 2026-10-19) =====
-   그리지 않은 메뉴 · 버튼 · 링크 · 탭을 눌러 화면이 하나도 바뀌지 않으면(글 · 모양 · 스크롤 · 주소 · 입력칸 포커스 모두 그대로) 그 시안이 쓰는 토스트를 띄운다.
-   이미 동작하는 컨트롤은 화면이 바뀌므로 이 알림이 뜨지 않는다. 새 동작은 더하지 않는다 */
-(function () {
-  if (window.__deadClick) return; window.__deadClick = true;
-  var SEL = 'button, a, [role=tab], [role=button], [onclick], .ant-tabs-tab, .ant-radio-button-wrapper, .ant-switch, .ant-select-selector, .ant-dropdown-trigger, .mi, .nav, .anchor, .chip, .sw, [class*=btn], [class*=Btn]';
-  var muts = 0, scrolls = 0;
-  try { new MutationObserver(function (l) { muts += l.length; }).observe(document, { subtree: true, childList: true, attributes: true, characterData: true }); } catch (e) {}
-  document.addEventListener('scroll', function () { scrolls++; }, true);
-  document.addEventListener('click', function (e) {
-    var t = e.target && e.target.closest ? e.target.closest(SEL) : null; if (!t) return;
-    if (t.disabled || t.closest('[disabled]') || t.getAttribute('aria-disabled') === 'true') return;
-    if (t.closest('input, select, textarea, option')) return;
-    var m0 = muts, s0 = scrolls, u0 = location.href, a0 = document.activeElement;
-    setTimeout(function () {
-      var a1 = document.activeElement, focused = a1 !== a0 && a1 && /^(INPUT|SELECT|TEXTAREA)$/.test(a1.tagName);
-      if (muts === m0 && scrolls === s0 && location.href === u0 && !focused) window.__deadToast(t);
-    }, 120);
-  }, false);
-})();
-
-window.__deadToast = function () { toast('시안에서는 동작하지 않습니다'); };
+/* 2026-10-19 10차: 그리지 않은 HOST 컨트롤(9차 감사 6번 목록)에만 안내 토스트 */
+var NA_MSG = '시안에서는 동작하지 않습니다';
+function NA_LIST() {
+  var v = H().view, L = [['button[class*=_sidebar__logoButton_]'], ['button.ant-dropdown-trigger[class*=_appLayout__header__userBtn_]']];
+  if (v === 'dash') L = L.concat([['[class*=_todoItem_] > button.ant-btn', /^(답장하기|수정하기|확인하기)$/], ['button[class*=_managementTitle_]'], ['[class*=_managementStatusLinks_] > button'], ['[class*=_sectionHeader_] button.ant-btn', /^채팅 전체 보기$/], ['[class*=_chatTable_] > button']]);
+  if (v === 'res') L.push(['.ant-flex > button.ant-btn', /^(1주일|1개월|3개월|6개월)$/]);
+  if (v === 'prod') L.push(['.ant-space-item > button.ant-btn-primary', /^상품등록$/]);
+  return L;
+}
 </script></body></html>

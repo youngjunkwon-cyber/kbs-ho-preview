@@ -263,7 +263,7 @@ var CHS=['웹','알리페이 중국','알리페이 홍콩'];
 var CHOPT=[['전체','유입 채널 전체'],['웹','유입 채널 웹'],['알리페이','유입 채널 알리페이']];
 var PERIODS=['이번 주','지난주','1개월','3개월','전체'];
 var PRANGE={'이번 주':['2026-10-05','2026-10-11'],'지난주':['2026-09-28','2026-10-04'],'1개월':['2026-09-07','2026-10-07'],'3개월':['2026-07-07','2026-10-07'],'전체':['0000-00-00','9999-99-99']};
-/* 방문 숫자 [스토어 방문, 상품 방문] 기간 x 채널. 메신저 문의는 MSG 시드, 채팅 문의·예약 확정(취소 제외)·방문 완료는 채팅내역·예약 목록에서 센다 */
+/* 방문 숫자 [스토어 방문, 상품 방문] 기간 x 채널. 메신저 문의는 MSG 시드, 채팅 문의, 예약 확정(취소 제외), 방문 완료는 채팅내역·예약 목록에서 센다 */
 var KPI={
  '이번 주':{'웹':[65,139],'알리페이 중국':[12,31],'알리페이 홍콩':[8,19]},
  '지난주':{'웹':[88,171],'알리페이 중국':[15,40],'알리페이 홍콩':[9,22]},
@@ -486,7 +486,7 @@ function pager(page,total,size,path){
 /* ===== 셸 ===== */
 var NAV=[
  {t:'대시보드',ic:'home'},
- {g:'qa',t:'문의·예약',ic:'chat',nw:1,sub:[{t:'실시간 채팅',go:'live'},{t:'채팅내역조회',go:'chatlog'},{t:'메신저상담'},{t:'상담접수',go:'consult'},{t:'예약 현황'},{t:'예약 시간 설정'}]},
+ {g:'qa',t:'문의 · 방문 예약',ic:'chat',nw:1,sub:[{t:'실시간 채팅',go:'live'},{t:'채팅내역조회',go:'chatlog'},{t:'메신저상담'},{t:'상담접수',go:'consult'},{t:'예약 현황'},{t:'예약 시간 설정'}]},
  {t:'상품 관리',ic:'grid'},
  {t:'리뷰 관리',ic:'star',go:'rev'},
  {t:'스토어 칼럼 관리',ic:'book'},
@@ -498,10 +498,10 @@ function bsPanel(){return '';}
 function shell(){
  var h='';
  NAV.forEach(function(n){
-  if(!n.g){h+='<div class="mi'+(n.go?(S.view===n.go?' act':''):' dis')+'"'+(n.go?' data-act="go" data-v="'+n.go+'"':'')+'>'+ic(n.ic)+n.t+'</div>';return;}
+  if(!n.g){h+='<div class="mi'+(n.go?(S.view===n.go?' act':''):' dis')+'"'+(n.go?' data-act="go" data-v="'+n.go+'"':' data-act="nop"')+'>'+ic(n.ic)+n.t+'</div>';return;}
   var op=S.open[n.g];
   h+='<div class="mi grp'+(op?' open':'')+(n.nw?' new':'')+'"'+(n.nw?' title="이번에 새로 묶은 메뉴"':'')+' data-act="tg" data-v="'+n.g+'">'+ic(n.ic)+n.t+'<span class="chev">'+ic(op?'up':'down')+'</span></div>';
-  if(op){h+='<div class="subs">'+n.sub.map(function(s){return '<div class="mi'+(s.go?(S.view===s.go?' act':''):' dis')+'"'+(s.go?' data-act="go" data-v="'+s.go+'"':'')+'>'+s.t+'</div>';}).join('')+'</div>';}
+  if(op){h+='<div class="subs">'+n.sub.map(function(s){return '<div class="mi'+(s.go?(S.view===s.go?' act':''):' dis')+'"'+(s.go?' data-act="go" data-v="'+s.go+'"':' data-act="nop"')+'>'+s.t+'</div>';}).join('')+'</div>';}
  });
  return '<div class="top"><div class="logo"><i>K</i>Beauty Station</div><div class="nb">시안 표시: 분홍 점선은 이번에 새로 더한 요소입니다 (라이브 화면에는 없고, 실제 배지는 중립 회색 윤곽선)</div><div class="user"><i></i>리버스클리닉 홍대점</div></div>'
   +'<div class="body"><aside class="side"><div class="nav">'+h+'</div><div class="copy">Copyright &copy; 2026 Eight International All rights reserved.</div></aside><main id="main"></main></div>'+bsPanel();
@@ -829,30 +829,6 @@ document.addEventListener('change',function(e){
 document.addEventListener('input',function(e){var t=e.target;if(t.hasAttribute('data-d'))setP(t.getAttribute('data-d'),t.value);});
 document.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.hasAttribute&&e.target.hasAttribute('data-d')){var b=document.querySelector('[data-act="search"]');if(b)b.click();}});
 freshDB();S=freshState();render();
-</script>
-<script>
-/* ===== 반응 없는 컨트롤 알림(9차 감사, 2026-10-19) =====
-   그리지 않은 메뉴 · 버튼 · 링크 · 탭을 눌러 화면이 하나도 바뀌지 않으면(글 · 모양 · 스크롤 · 주소 · 입력칸 포커스 모두 그대로) 그 시안이 쓰는 토스트를 띄운다.
-   이미 동작하는 컨트롤은 화면이 바뀌므로 이 알림이 뜨지 않는다. 새 동작은 더하지 않는다 */
-(function () {
-  if (window.__deadClick) return; window.__deadClick = true;
-  var SEL = 'button, a, [role=tab], [role=button], [onclick], .ant-tabs-tab, .ant-radio-button-wrapper, .ant-switch, .ant-select-selector, .ant-dropdown-trigger, .mi, .nav, .anchor, .chip, .sw, [class*=btn], [class*=Btn]';
-  var muts = 0, scrolls = 0;
-  try { new MutationObserver(function (l) { muts += l.length; }).observe(document, { subtree: true, childList: true, attributes: true, characterData: true }); } catch (e) {}
-  document.addEventListener('scroll', function () { scrolls++; }, true);
-  document.addEventListener('click', function (e) {
-    var t = e.target && e.target.closest ? e.target.closest(SEL) : null; if (!t) return;
-    if (t.disabled || t.closest('[disabled]') || t.getAttribute('aria-disabled') === 'true') return;
-    if (t.closest('input, select, textarea, option')) return;
-    var m0 = muts, s0 = scrolls, u0 = location.href, a0 = document.activeElement;
-    setTimeout(function () {
-      var a1 = document.activeElement, focused = a1 !== a0 && a1 && /^(INPUT|SELECT|TEXTAREA)$/.test(a1.tagName);
-      if (muts === m0 && scrolls === s0 && location.href === u0 && !focused) window.__deadToast(t);
-    }, 120);
-  }, false);
-})();
-
-window.__deadToast = function () { toast('시안에서는 동작하지 않습니다'); };
 </script>
 </body>
 </html>

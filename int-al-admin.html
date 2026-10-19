@@ -565,7 +565,7 @@ function renderSide() {
       if (open) h += '<div class="subs">' + kids.map(k => { const t = k[1];
         return t ? '<div class="sub ' + (t === VIEW.name || (t === 's-list' && VIEW.name === 's-edit') || (t === 'p-list' && VIEW.name === 'p-edit') ? 'on' : '') + '" onclick="go(\'' + t + '\')">' + k[0] + '</div>' : '<div class="sub dim">' + k[0] + '</div>'; }).join('') + '</div>';
     } else if (leafTarget) h += '<div class="nav ' + ((leafTarget === VIEW.name || (leafTarget === 'col-list' && VIEW.name === 'col-edit')) ? 'on' : '') + '" onclick="go(\'' + leafTarget + '\')">' + name + '</div>';
-    else h += '<div class="nav dim">' + name + '</div>';
+    else h += '<div class="nav dim" onclick="toast(\'시안에서는 동작하지 않습니다\')">' + name + '</div>';
   });
   return h;
 }
@@ -573,7 +573,7 @@ function renderSide() {
 
 /* ------------------------------ 호스트 셸 ------------------------------ */
 const HOSTMENU = [
-  ['대시보드', 'home'], ['문의·예약', 'chat', ['실시간 채팅', '채팅내역조회', '메신저상담', '상담접수', '예약 현황', '예약 시간 설정']], ['상품 관리', 'grid', 'on'], ['리뷰 관리', 'star'],
+  ['대시보드', 'home'], ['문의 · 방문 예약', 'chat', ['실시간 채팅', '채팅내역조회', '메신저상담', '상담접수', '예약 현황', '예약 시간 설정']], ['상품 관리', 'grid', 'on'], ['리뷰 관리', 'star'],
   ['스토어 칼럼 관리', 'book'], ['갤러리 관리', 'img', ['전/후 사진', '일반 사진']], ['마이페이지', 'user'], ['공지사항', 'mega']
 ];
 const HICON = {
@@ -718,7 +718,7 @@ function screen_pList() {
   const head = '<tr><th>상태</th><th>활성화</th><th>히든 여부</th><th>노출 채널</th>' + P_COLS.slice(3).map(c => '<th>' + c + '</th>').join('') + '</tr>';
   const body = rows.map(p => { const eff = effChProduct(p); if (!passFilter(eff)) return '';
     const st = S(p.store);
-    return '<tr><td>' + p.status + ' ⌄</td><td>' + swch(p.active) + '</td><td>' + swch(p.hidden) + '</td><td class="c">' + chCell(eff) + '</td>' +
+    return '<tr><td>' + p.status + ' ⌄</td><td>' + swch(p.active).replace('<span ', '<span onclick="toast(\'시안에서는 동작하지 않습니다\')" ') + '</td><td>' + swch(p.hidden) + '</td><td class="c">' + chCell(eff) + '</td>' +
       '<td>' + p.lang + '</td><td>' + esc(st.code) + '</td><td>' + esc(p.name) + '</td><td>' + p.cat + '</td><td>' + p.sub + '</td><td>' + p.price + '</td><td>' + p.vat + '</td>' +
       '<td class="tblnote">-</td><td>0</td><td>' + (st.messenger.length ? st.messenger[0].base : '미사용') + '</td><td>0</td><td>0</td><td>0</td>' + '<td>0</td><td>0</td><td class="c" data-test="pbk-' + p.id + '">' + (p.bk || 0) + '</td><td class="c">' + (p.bclk || 0) + '</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td class="c" data-test="pclk-' + p.id + '">' + (p.bclk || 0) + '</td>' +
       '<td class="tblnote">-</td><td class="tblnote">-</td><td class="tblnote">-</td><td>2026-09-01</td><td>2026-09-05</td><td class="tblnote">-</td>' +
@@ -805,10 +805,10 @@ function screen_sEdit() {
     const im = st.channel !== ALLCH && st.channel !== VIEW.savedCh && storeHasTargetLang(st) ? impactOfStoreCh(st, st.channel) : null;
     bd = '<div class="bd">' +
       fld('카테고리', true, fbox(st.cat, true)) +
-      fld('지원언어', false, '<div class="chkrow">' + STLANG.map(L => '<label class="chkit" style="cursor:pointer"><input type="checkbox"' + (has(L) ? ' checked' : '') + ' onclick="toggleLang(\'' + L + '\')"> ' + L + '</label>').join('') + '</div>') +
       fld('노출 채널', false, chRadio('sch', effChStore(st), 'store', !storeHasTargetLang(st)) +
         '<div class="hint">' + MSG.storeAll + '</div>' +
         (im && (im.N || im.M) ? '<div class="notice">' + MSG.storeChange(st.channel, im.N, im.M) + '</div>' : '')) +
+      fld('지원언어', false, '<div class="chkrow">' + STLANG.map(L => '<label class="chkit" style="cursor:pointer"><input type="checkbox"' + (has(L) ? ' checked' : '') + ' onclick="toggleLang(\'' + L + '\')"> ' + L + '</label>').join('') + '</div>') +
       fld('대표번호', true, fbox(st.tel)) + fld('사업자명', true, fbox(st.biz)) + fld('사업자번호', true, fbox(st.bizno)) + fld('이메일', true, fbox(st.email)) + '</div>';
   } else if (i === 8) {
     bd = '<div class="bd"><div class="row"><div class="lbl">예약 사용</div><div class="val">' + onoff('sbk', st.bookingEnabled, 'setBooking(%V%)', false, ['사용', '미사용']) +
@@ -824,7 +824,7 @@ function screen_sEdit() {
   } else bd = '<div class="bd"></div>';
   return '<div class="phd"><div><h2 class="page">스토어 정보 수정</h2><div class="pdesc">' + esc(st.name) + '</div><div class="pdesc">스토어 기본 정보와 운영 설정을 수정합니다.</div></div></div>' +
     '<div class="anchors" style="justify-content:space-between;align-items:center"><div style="display:flex;flex-wrap:wrap;gap:6px;flex:1">' +
-    SECTS.map((s, k) => '<div class="anchor ' + (k === i ? 'on' : SECT_IN_SCOPE.indexOf(k) === -1 ? 'dim' : '') + '"' + (SECT_IN_SCOPE.indexOf(k) === -1 ? '' : ' onclick="VIEW.sect=' + k + ';render()"') + '>' + s + '</div>').join('') + '</div>' +
+    SECTS.map((s, k) => '<div class="anchor ' + (k === i ? 'on' : SECT_IN_SCOPE.indexOf(k) === -1 ? 'dim' : '') + '"' + (SECT_IN_SCOPE.indexOf(k) === -1 ? (k === i ? '' : ' onclick="toast(\'시안에서는 동작하지 않습니다\')"') : ' onclick="VIEW.sect=' + k + ';render()"') + '>' + s + '</div>').join('') + '</div>' +
     '<div style="display:flex;gap:8px;margin-left:12px"><button class="btn" onclick="go(\'s-list\')">취소</button><button class="btn" style="background:#1F1F1F;border-color:#1F1F1F;color:#fff" onclick="save(\'store\')">저장</button></div></div>' +
     '<div class="card"><div class="hd">' + SECTS[i] + '<button class="btn" onclick="save(\'store\')">저장</button></div>' + bd + '</div>';
 }
@@ -1307,30 +1307,6 @@ window.effChProduct = effChProduct; window.effChStore = effChStore; window.effCh
 window.visProduct = visProduct; window.visStore = visStore; window.judgeAd = judgeAd; window.judgeCollection = judgeCollection; window.reasonsAd = reasonsAd; window.reasonsColl = reasonsColl;
 window.WEB = WEB; window.ALI = ALI; window.ALLCH = ALLCH;
 render();
-</script>
-<script>
-/* ===== 반응 없는 컨트롤 알림(9차 감사, 2026-10-19) =====
-   그리지 않은 메뉴 · 버튼 · 링크 · 탭을 눌러 화면이 하나도 바뀌지 않으면(글 · 모양 · 스크롤 · 주소 · 입력칸 포커스 모두 그대로) 그 시안이 쓰는 토스트를 띄운다.
-   이미 동작하는 컨트롤은 화면이 바뀌므로 이 알림이 뜨지 않는다. 새 동작은 더하지 않는다 */
-(function () {
-  if (window.__deadClick) return; window.__deadClick = true;
-  var SEL = 'button, a, [role=tab], [role=button], [onclick], .ant-tabs-tab, .ant-radio-button-wrapper, .ant-switch, .ant-select-selector, .ant-dropdown-trigger, .mi, .nav, .anchor, .chip, .sw, [class*=btn], [class*=Btn]';
-  var muts = 0, scrolls = 0;
-  try { new MutationObserver(function (l) { muts += l.length; }).observe(document, { subtree: true, childList: true, attributes: true, characterData: true }); } catch (e) {}
-  document.addEventListener('scroll', function () { scrolls++; }, true);
-  document.addEventListener('click', function (e) {
-    var t = e.target && e.target.closest ? e.target.closest(SEL) : null; if (!t) return;
-    if (t.disabled || t.closest('[disabled]') || t.getAttribute('aria-disabled') === 'true') return;
-    if (t.closest('input, select, textarea, option')) return;
-    var m0 = muts, s0 = scrolls, u0 = location.href, a0 = document.activeElement;
-    setTimeout(function () {
-      var a1 = document.activeElement, focused = a1 !== a0 && a1 && /^(INPUT|SELECT|TEXTAREA)$/.test(a1.tagName);
-      if (muts === m0 && scrolls === s0 && location.href === u0 && !focused) window.__deadToast(t);
-    }, 120);
-  }, false);
-})();
-
-window.__deadToast = function () { toast('시안에서는 동작하지 않습니다'); };
 </script>
 </body>
 </html>
