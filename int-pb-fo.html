@@ -1004,9 +1004,24 @@ document.addEventListener('click', function (e) { var a = e.target.closest('a[hr
 function naBind(list, msg) {
   list.forEach(function (it) {
     $$(it[0]).filter(function (e) { return !it[1] || it[1].test(e.textContent.replace(/\s+/g, ' ').trim()); }).forEach(function (el) {
-      if (el.onclick || el.disabled) return;
-      el.onclick = function (e) { e.preventDefault(); e.stopPropagation(); toast(msg); };
+      if (el.onclick || el.disabled || el.__na) return;
+      /* 이미 동작이 걸린 바깥 · 안쪽 요소가 있으면 건드리지 않는다 */
+      for (var p = el.parentElement; p && p !== document.body; p = p.parentElement) if (p.onclick) return;
+      var rows = it[2] === 'rows'; /* 표 행: 행 안의 버튼 · 스위치 · 링크는 각자 동작하고, 그 밖의 자리를 누르면 안내 */
+      if (!rows && $$('*', el).some(function (q) { return q.onclick || q.onmousedown; })) return;
+      el.__na = true;
+      el.onclick = function (e) { var inner = rows && e.target.closest('button, a, input, .ant-switch, .ant-select, .ant-checkbox-wrapper'); if (inner && inner !== el && el.contains(inner)) return; e.preventDefault(); e.stopPropagation(); toast(msg); };
     });
+  });
+}
+/* 한 쪽뿐인 목록의 페이지 줄: 다음 페이지 화살표는 끈 모양, 페이지 크기 표시는 지금 행이 한 쪽에 다 들어가는 값(10 · 20 · 50 · 100) */
+function pageFit() {
+  $$('.ant-pagination').forEach(function (pg) {
+    if ($('.ant-pagination-jump-next', pg) || $$('.ant-pagination-item', pg).length > 1) return;
+    var nx = $('.ant-pagination-next', pg); if (nx) { nx.classList.add('ant-pagination-disabled'); nx.setAttribute('aria-disabled', 'true'); var bt = $('button', nx); if (bt) bt.disabled = true; }
+    var tbl = pg.closest('.ant-table-wrapper') || pg.parentElement; var n = tbl ? $$('tbody tr.ant-table-row', tbl).length : 0;
+    var lab = $$('.ant-pagination-options *', pg).filter(function (e) { return !e.children.length && /^\d+ \/ 페이지$/.test(e.textContent.trim()); })[0];
+    if (lab && n) { var cur = parseInt(lab.textContent, 10), want = [10, 20, 50, 100].filter(function (k) { return k >= n; })[0] || 100; if (cur < n) { lab.textContent = want + ' / 페이지'; var tt = lab.closest('[title]'); if (tt) tt.setAttribute('title', want + ' / 페이지'); } }
   });
 }
 /* 렌더 진입점: 화면별 draw 를 감싸 스크롤·표시 상태를 처리 */
@@ -1014,6 +1029,7 @@ function frameDraw(key, build) {
   var same = LASTKEY === key; if (same) saveScroll(); closeDD();
   document.body.classList.toggle('pb-mark', !!PB.S.mark);
   build();
+  pageFit();
   if (typeof NA_LIST === 'function') naBind(NA_LIST(), NA_MSG);
   if (same) restoreScroll(); else window.scrollTo(0, 0);
   LASTKEY = key;
@@ -1485,21 +1501,27 @@ function NA_LIST() {
     ['a', /^Store Features$/],
     ['a[class*=StoreReviewSummarySection-module-scss-module__oOOYMq__reviewSummary]'],
     ['a[class*=beforeAfterTitleLink]'], ['a[class*=beforeAfterItem]'],
-    ['a[class*=sectionHeaderMoreLink][aria-label="view more gallery images"]'], ['a[class*=galleryGridItem]']
+    ['a[class*=sectionHeaderMoreLink][aria-label="view more gallery images"]'], ['a[class*=galleryGridItem]'],
+    /* 11차 감사 10번: 머리글 언어(지구본) 버튼. 회원 사본 마이페이지 Language 버튼과 같이 안내 토스트 */
+    ['button[class*=languageDropdown__button]'], ['button[class*=languageDropdown__popover__item]']
   ];
   if (s === 'product') return [
-    ['a[class*=ProductSummary-module-scss-module__rNoPbq__top__content__store]'],
+    ['a[class*=ProductSummary-module-scss-module__rNoPbq__top__content__store]', null, 'rows'], /* 안쪽 별점 버튼은 따로 동작 */
     ['a[class*=StoreSummary-module-scss-module__jMpxzG__store__header]'],
     ['button[class*=ProductTabs-module-scss-module__L1j04q__productTabs__tab]', /^Detail page$/],
     ['button[class*=ProductImageContent-module-scss-module__3Yyf_a__detailViewImage__button]'],
-    ['button[class*=StoreSummaryAddressCopyButton-module__moD9sG__button]']
+    ['button[class*=StoreSummaryAddressCopyButton-module__moD9sG__button]'],
+    /* 11차 감사 10번: Review 탭, 추천 상품 제목 옆 화살표, 머리글 언어 버튼 */
+    ['button[class*=ProductTabs-module-scss-module__L1j04q__productTabs__tab]', /^Review$/], ['a[class*=productDetailPage__recommended__title__arrow]'], ['button[class*=languageDropdown__button]']
   ];
   if (s === 'book') return [['button[class*=BookingCalendar-module-scss-module__LzH2OW__monthButton][aria-label="Next month"]']];
   if (s === 'info') return [
     ['button[class*=Select-module-scss-module__1G91Ha__trigger][aria-label="Nationality"]'],
     ['button[class*=Select-module-scss-module__1G91Ha__trigger][aria-label="Gender"]'],
     ['button[class*=changePhoneButton]', /^Use a different number$/],
-    ['button[class*=qrUploadButton]']
+    ['button[class*=qrUploadButton]'],
+    /* 11차 감사 10번: 동의 항목 오른쪽 내용 보기(›) */
+    ['button[class*=agreementDetailsButton]']
   ];
   return [];
 }

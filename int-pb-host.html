@@ -2429,9 +2429,24 @@ document.addEventListener('click', function (e) { var a = e.target.closest('a[hr
 function naBind(list, msg) {
   list.forEach(function (it) {
     $$(it[0]).filter(function (e) { return !it[1] || it[1].test(e.textContent.replace(/\s+/g, ' ').trim()); }).forEach(function (el) {
-      if (el.onclick || el.disabled) return;
-      el.onclick = function (e) { e.preventDefault(); e.stopPropagation(); toast(msg); };
+      if (el.onclick || el.disabled || el.__na) return;
+      /* 이미 동작이 걸린 바깥 · 안쪽 요소가 있으면 건드리지 않는다 */
+      for (var p = el.parentElement; p && p !== document.body; p = p.parentElement) if (p.onclick) return;
+      var rows = it[2] === 'rows'; /* 표 행: 행 안의 버튼 · 스위치 · 링크는 각자 동작하고, 그 밖의 자리를 누르면 안내 */
+      if (!rows && $$('*', el).some(function (q) { return q.onclick || q.onmousedown; })) return;
+      el.__na = true;
+      el.onclick = function (e) { var inner = rows && e.target.closest('button, a, input, .ant-switch, .ant-select, .ant-checkbox-wrapper'); if (inner && inner !== el && el.contains(inner)) return; e.preventDefault(); e.stopPropagation(); toast(msg); };
     });
+  });
+}
+/* 한 쪽뿐인 목록의 페이지 줄: 다음 페이지 화살표는 끈 모양, 페이지 크기 표시는 지금 행이 한 쪽에 다 들어가는 값(10 · 20 · 50 · 100) */
+function pageFit() {
+  $$('.ant-pagination').forEach(function (pg) {
+    if ($('.ant-pagination-jump-next', pg) || $$('.ant-pagination-item', pg).length > 1) return;
+    var nx = $('.ant-pagination-next', pg); if (nx) { nx.classList.add('ant-pagination-disabled'); nx.setAttribute('aria-disabled', 'true'); var bt = $('button', nx); if (bt) bt.disabled = true; }
+    var tbl = pg.closest('.ant-table-wrapper') || pg.parentElement; var n = tbl ? $$('tbody tr.ant-table-row', tbl).length : 0;
+    var lab = $$('.ant-pagination-options *', pg).filter(function (e) { return !e.children.length && /^\d+ \/ 페이지$/.test(e.textContent.trim()); })[0];
+    if (lab && n) { var cur = parseInt(lab.textContent, 10), want = [10, 20, 50, 100].filter(function (k) { return k >= n; })[0] || 100; if (cur < n) { lab.textContent = want + ' / 페이지'; var tt = lab.closest('[title]'); if (tt) tt.setAttribute('title', want + ' / 페이지'); } }
   });
 }
 /* 렌더 진입점: 화면별 draw 를 감싸 스크롤·표시 상태를 처리 */
@@ -2439,6 +2454,7 @@ function frameDraw(key, build) {
   var same = LASTKEY === key; if (same) saveScroll(); closeDD();
   document.body.classList.toggle('pb-mark', !!PB.S.mark);
   build();
+  pageFit();
   if (typeof NA_LIST === 'function') naBind(NA_LIST(), NA_MSG);
   if (same) restoreScroll(); else window.scrollTo(0, 0);
   LASTKEY = key;
@@ -2719,6 +2735,8 @@ function pManual() {
   var name = $('input[placeholder*="영문명"]'); if (name) { name.value = m.name; name.oninput = function () { m.name = name.value; }; name.setAttribute('data-m', 'name'); }
   var ls = $('.ant-select', langItem); setSelect(ls, m.lang ? langLabel(m.lang) : '', '언어를 선택해주세요');
   ls.onclick = function () { dropdown(ls, Object.keys(PB.LANGS).map(function (k) { return [k, PB.LANGS[k]]; }), m.lang, function (v) { if (v !== m.lang) { var cp = m.pid ? PB.prodById(m.pid) : null; if (cp && cp.lang !== v) m.pid = ''; } m.lang = v; PB.render(); }, ACC); };
+  /* 정보 저장 동의 체크: 누르면 체크 모양이 바뀌고 값이 남는다(11차 감사 9번) */
+  var cw = $('label.ant-checkbox-wrapper'); if (cw) { var ci = $('input.ant-checkbox-input', cw), cbx = $('.ant-checkbox', cw); var paint = function () { cw.classList.toggle('ant-checkbox-wrapper-checked', !!m.consent); if (cbx) cbx.classList.toggle('ant-checkbox-checked', !!m.consent); if (ci) ci.checked = !!m.consent; }; paint(); if (ci) ci.onchange = function () { m.consent = ci.checked; paint(); }; }
 }
 
 /* ---------- 상품 관리 ---------- */
@@ -2793,13 +2811,18 @@ function pEdit() {
 }
 window.draw = draw;
 PB.ready('HOST');
-/* 2026-10-19 10차: 그리지 않은 HOST 컨트롤(9차 감사 6번 목록)에만 안내 토스트 */
+/* 2026-10-19 10차 · 11차: 실화면 스냅샷에서 가져왔지만 시안에서 동작을 그리지 않은 HOST 컨트롤에 안내 토스트.
+   화면마다 대상을 적어 두고, 이미 동작이 걸린 것은 naBind 가 건너뛴다 */
 var NA_MSG = '시안에서는 동작하지 않습니다';
+var NA_PAGE = [['.ant-pagination-item:not(.ant-pagination-item-active)'], ['.ant-pagination-next:not(.ant-pagination-disabled)'], ['.ant-pagination-jump-next'], ['.ant-pagination-options .ant-select']];
 function NA_LIST() {
   var v = H().view, L = [['button[class*=_sidebar__logoButton_]'], ['button.ant-dropdown-trigger[class*=_appLayout__header__userBtn_]']];
   if (v === 'dash') L = L.concat([['[class*=_todoItem_] > button.ant-btn', /^(답장하기|수정하기|확인하기)$/], ['button[class*=_managementTitle_]'], ['[class*=_managementStatusLinks_] > button'], ['[class*=_sectionHeader_] button.ant-btn', /^채팅 전체 보기$/], ['[class*=_chatTable_] > button']]);
-  if (v === 'res') L.push(['.ant-flex > button.ant-btn', /^(1주일|1개월|3개월|6개월)$/]);
-  if (v === 'prod') L.push(['.ant-space-item > button.ant-btn-primary', /^상품등록$/]);
+  if (v === 'res') L = L.concat(NA_PAGE, [['tr.ant-table-row', null, 'rows'], ['.ant-flex > button.ant-btn', /^(1주일|1개월|3개월|6개월)$/], ['.ant-select'], ['.ant-picker:not(.ant-picker-disabled)']]);
+  if (v === 'manual') L = L.concat([['.ant-select']]); /* 생년월일 칸은 직접 입력하는 칸이라 안내를 걸지 않음 */
+  if (v === 'prod') L = L.concat(NA_PAGE, [['.ant-space-item > button.ant-btn-primary', /^상품등록$/], ['form .ant-select'], ['button.ant-btn', /^검색$/], ['th.ant-table-column-has-sorters'], ['.ant-table-tbody .ant-switch'], ['tr.ant-table-row', null, 'rows']]);
+  if (v === 'pstat') L = L.concat(NA_PAGE, [['form .ant-select'], ['button.ant-btn', /^검색$/], ['th.ant-table-column-has-sorters'], ['tr.ant-table-row', null, 'rows']]);
+  if (v === 'pedit') L = L.concat([['form .ant-select'], ['.ant-switch'], ['.ant-upload'], ['button.ant-btn', /^연결하기$/], ['.ant-radio-wrapper:not(.ant-radio-wrapper-checked)']]);
   return L;
 }
 </script></body></html>
