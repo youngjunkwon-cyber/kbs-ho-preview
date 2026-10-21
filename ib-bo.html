@@ -1851,6 +1851,7 @@ function init(){
   +'[class*=_context_] .ed{cursor:text;border-bottom:1px dashed #c4c9d1;text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}[class*=_context_] .ph{color:#b0b7c0;font-weight:400}[class*=_context_] .ed small{color:#8c8c8c;font-weight:400;font-size:11px}'
   +'.edin{width:60%;font:13px Pretendard,sans-serif;border:1px solid #1677ff;border-radius:4px;padding:2px 6px;text-align:right}.tagc{display:inline-block;border:1px solid #d9dde3;border-radius:3px;padding:0 6px;font-size:11px;font-weight:500;margin-left:4px;cursor:pointer;background:#fff}.tagc.add{color:#8c8c8c}'
   +'.bgh{font-size:11px;color:#98a2b3;margin:6px 0 2px}.bnote{font-size:12px;color:#98a2b3;padding:4px 0 6px}a.bk{display:block;font-size:12px;color:#1d2939;padding:5px 0;border-bottom:1px solid #f0f2f5;text-decoration:none}a.bk span{display:block;font-size:11px;color:#667085}a.bk:hover{color:#1677ff}'
+  +'#ptabs{display:flex;gap:2px;margin:0 14px;padding:3px;background:#f0f2f5;border-radius:6px;flex-shrink:0}#ptabs button{flex:1;border:0;background:transparent;border-radius:4px;padding:5px 0;font:12px/18px Pretendard,sans-serif;color:#666;cursor:pointer;white-space:nowrap}#ptabs button.on{background:#fff;color:#222;font-weight:700;box-shadow:0 1px 2px rgba(0,0,0,.08)}#ptabs .dot{display:inline-block;width:6px;height:6px;border-radius:3px;background:#1677ff;margin-left:4px;vertical-align:middle}'
   +'#sumBand{display:flex;gap:14px;align-items:center;padding:8px 16px;border-bottom:1px solid #e3e6ea;background:#fafbfc;font-size:13px;color:#555;flex-wrap:wrap}#sumBand b{color:#222;font-weight:600;margin-left:4px}#sumBand a{margin-left:auto}';
  document.head.appendChild(st);
  layout();
@@ -1991,37 +1992,42 @@ function draw(){
  EL.ta.placeholder=lang!=='ko'?'한국어로 쓰면 '+(LN[lang]||lang)+'로 번역되어 나갑니다':'답장 입력';
  EL.langTxt.textContent='고객 언어: '+(LN[lang]||lang);
  if(EL.push)EL.push.style.display=r.ch==='LINE'?'':'none';
- /* ===== 상담 정보 패널: 고객 카드(수정) / 예약 내역 / 연결된 상담 / 접힌 상담 정보 / (아래) 추천 답변 ===== */
- var ctx=Q('[class*=_context_]');ctx.innerHTML='';var c=r.card;
- var H=function(t,sub,open){var h=TPL.h4.cloneNode(true);h.innerHTML=esc(t)+(sub?'<small>'+esc(sub)+'</small>':'')+(open!==undefined?'<i>'+(open?'접기 ▴':'펼치기 ▾')+'</i>':'');h.setAttribute('data-new','');return h;};
+ /* ===== 상담 정보 패널: 탭(고객 / 예약 N / 상담 정보) + 아래 고정 AI 추천 답변 ===== */
+ var ctx=Q('[class*=_context_]');ctx.innerHTML='';var c=r.card,pt=S.bo.ptab||'cust';
+ var bks=(c.bookings||[]).slice(),today=S.now.slice(0,10),upN=bks.filter(function(x){return x.d>=today;}).length;
+ var tabs=Q('#ptabs');if(!tabs){tabs=document.createElement('div');tabs.id='ptabs';tabs.setAttribute('data-new','');tabs.setAttribute('data-click','');Q('[class*=_panelHeader_]',EL.aside).after(tabs);
+  tabs.addEventListener('click',function(e){var b=e.target.closest('[data-p]');if(b){P.S.bo.ptab=b.getAttribute('data-p');draw();}});}
+ tabs.innerHTML=[['cust','고객'],['book','예약'+(bks.length?' '+bks.length:'')+(upN?'<i class="dot" title="다가오는 예약 있음"></i>':'')],['info','상담 정보']].map(function(t){return '<button data-p="'+t[0]+'" class="'+(pt===t[0]?'on':'')+'">'+t[1]+'</button>';}).join('');
+ var H=function(t,sub){var h=TPL.h4.cloneNode(true);h.innerHTML=esc(t)+(sub?'<small>'+esc(sub)+'</small>':'');h.setAttribute('data-new','');return h;};
  var KV=function(label,key,val,ph){var f=TPL.fact.cloneNode(true);f.innerHTML=esc(label)+'<b class="ed" data-k="'+key+'" data-click title="누르면 바로 고칩니다">'+(val?esc(val):'<span class="ph">'+esc(ph||'입력')+'</span>')+'</b>';f.setAttribute('data-new','');return f;};
- ctx.appendChild(H('고객 카드','칸을 누르면 바로 고칩니다'));
- ctx.appendChild(KV('이름','name',c.name));ctx.appendChild(KV('연락처','phone',c.phone,'전화번호 입력'));ctx.appendChild(KV('이메일','email',c.email,'이메일 입력'));
- var tg=TPL.fact.cloneNode(true);tg.innerHTML='태그<b class="tags">'+(c.tags||[]).map(function(t){return '<span class="tagc" data-click data-t="'+esc(t)+'" title="누르면 뺍니다">'+esc(t)+'</span>';}).join('')+'<span class="tagc add" data-click title="VIP, 재방문, 노쇼, 민원 순으로 더합니다">+</span></b>';tg.setAttribute('data-new','');ctx.appendChild(tg);
- ctx.appendChild(KV('메모','memo',c.memo,'상담사 메모'));
- var ow=TPL.fact.cloneNode(true);ow.innerHTML='담당자<b class="ed" data-k="owner" data-click>'+(c.owner?esc(c.owner)+(r.agentAt?' <small>(상담 시작 '+esc(relTs(r.agentAt))+')</small>':''):'<span class="ph">미배정</span>')+'</b>';ow.setAttribute('data-new','');ctx.appendChild(ow);
- /* 예약 내역 (연락처 기준, 전부) */
- ctx.appendChild(H('예약 내역','연락처 기준 · 누르면 예약 상세'));
- var bks=(c.bookings||[]).slice(),today=S.now.slice(0,10);
- if(!c.phone&&!c.email&&!bks.length){var nb=document.createElement('div');nb.className='bnote';nb.textContent='연락처가 등록되면 예약 내역이 보입니다';ctx.appendChild(nb);}
- else if(!bks.length){var nb2=document.createElement('div');nb2.className='bnote';nb2.textContent='예약 내역이 없습니다';ctx.appendChild(nb2);}
- else{var up=bks.filter(function(x){return x.d>=today;}).sort(function(x,y){return x.d<y.d?-1:1;}),past=bks.filter(function(x){return x.d<today;}).sort(function(x,y){return x.d<y.d?1:-1;});
-  [['다가오는 예약',up],['지난 예약',past]].forEach(function(g){if(!g[1].length)return;var gh=document.createElement('div');gh.className='bgh';gh.textContent=g[0];ctx.appendChild(gh);
-   g[1].forEach(function(x){var d=document.createElement('a');d.href='#';d.className='bk';d.setAttribute('data-click','');d.innerHTML=esc(P.fmtDay(x.d,'ko')+' '+x.t+' · '+x.p+' · '+x.n+'명 · '+x.st)+(x.memo?'<span>메모: '+esc(x.memo)+'</span>':'');ctx.appendChild(d);});});}
- /* 연결된 상담 */
- ctx.appendChild(H('연결된 상담','같은 고객 카드의 다른 대화'));
- if(!(c.links||[]).length){var nl=document.createElement('div');nl.className='bnote';nl.textContent='다른 대화가 없습니다';ctx.appendChild(nl);}
- (c.links||[]).forEach(function(l){var d=document.createElement('a');d.href='#';d.className='bk';d.setAttribute('data-click','');d.textContent=l.ch+' · '+P.fmtDay(l.d,'ko')+' · '+l.st;ctx.appendChild(d);});
- /* 상담 정보 (접힘) */
- var ih=H('상담 정보',null,!!S.bo.infoOpen);ih.id='infoH';ih.setAttribute('data-click','');ctx.appendChild(ih);
- if(S.bo.infoOpen){
+ var note=function(t){var d=document.createElement('div');d.className='bnote';d.textContent=t;return d;};
+ var link=function(html){var d=document.createElement('a');d.href='#';d.className='bk';d.setAttribute('data-click','');d.innerHTML=html;return d;};
+ if(pt==='cust'){
+  ctx.appendChild(H('고객 카드','칸을 누르면 바로 고칩니다'));
+  ctx.appendChild(KV('이름','name',c.name));ctx.appendChild(KV('연락처','phone',c.phone,'전화번호 입력'));ctx.appendChild(KV('이메일','email',c.email,'이메일 입력'));
+  var tg=TPL.fact.cloneNode(true);tg.innerHTML='태그<b class="tags">'+(c.tags||[]).map(function(t){return '<span class="tagc" data-click data-t="'+esc(t)+'" title="누르면 뺍니다">'+esc(t)+'</span>';}).join('')+'<span class="tagc add" data-click title="VIP, 재방문, 노쇼, 민원 순으로 더합니다">+</span></b>';tg.setAttribute('data-new','');ctx.appendChild(tg);
+  ctx.appendChild(KV('메모','memo',c.memo,'상담사 메모'));
+  var ow=TPL.fact.cloneNode(true);ow.innerHTML='담당자<b class="ed" data-k="owner" data-click>'+(c.owner?esc(c.owner)+(r.agentAt?' <small>(상담 시작 '+esc(relTs(r.agentAt))+')</small>':''):'<span class="ph">미배정</span>')+'</b>';ow.setAttribute('data-new','');ctx.appendChild(ow);
+  ctx.appendChild(H('연결된 상담','같은 고객 카드의 다른 대화'));
+  if(!(c.links||[]).length)ctx.appendChild(note('다른 대화가 없습니다'));
+  (c.links||[]).forEach(function(l){ctx.appendChild(link(esc(l.ch+' · '+P.fmtDay(l.d,'ko')+' · '+l.st)));});
+ }
+ if(pt==='book'){
+  ctx.appendChild(H('예약 내역','연락처 기준 · 누르면 예약 상세'));
+  if(!c.phone&&!c.email&&!bks.length)ctx.appendChild(note('연락처가 등록되면 예약 내역이 보입니다'));
+  else if(!bks.length)ctx.appendChild(note('예약 내역이 없습니다'));
+  else{var up=bks.filter(function(x){return x.d>=today;}).sort(function(x,y){return x.d<y.d?-1:1;}),past=bks.filter(function(x){return x.d<today;}).sort(function(x,y){return x.d<y.d?1:-1;});
+   [['다가오는 예약',up],['지난 예약',past]].forEach(function(g){if(!g[1].length)return;var gh=document.createElement('div');gh.className='bgh';gh.textContent=g[0];ctx.appendChild(gh);
+    g[1].forEach(function(x){ctx.appendChild(link(esc(P.fmtDay(x.d,'ko')+' '+x.t+' · '+x.p+' · '+x.n+'명 · '+x.st)+(x.memo?'<span>메모: '+esc(x.memo)+'</span>':'')));});});}
+ }
+ if(pt==='info'){
+  ctx.appendChild(H('상담 정보'));
   ctx.appendChild(fact('입점사',r.store?P.storeLabel(r)+' (#'+r.store+')':'K-Beauty Station'));ctx.appendChild(fact('채널 ID',r.cid));ctx.appendChild(fact('연결 상태',r.chState));
   ctx.appendChild(fact('상담 횟수',r.session+'회'));ctx.appendChild(fact('첫 대화',P.fmtTs(r.first)));
-  var hh=document.createElement('div');hh.className='bgh';hh.textContent='상담 이력 · 누르면 그 회차로 이동';ctx.appendChild(hh);
-  var n=0;r.msgs.forEach(function(m,i){if(i===0||m.newSession){n++;var last=n===r.session;var d=document.createElement('a');d.href='#';d.className='bk';d.setAttribute('data-click','');d.textContent=n+'차 상담 · '+(last?(T==='done'?'완료':'진행 중'):'완료')+' · '+P.fmtTs(m.at);ctx.appendChild(d);}});
+  ctx.appendChild(H('상담 이력','누르면 그 회차로 이동'));
+  var n=0;r.msgs.forEach(function(m,i){if(i===0||m.newSession){n++;var last=n===r.session;ctx.appendChild(link(esc(n+'차 상담 · '+(last?(T==='done'?'완료':'진행 중'):'완료')+' · '+P.fmtTs(m.at))));}});
  }
- ctx.onclick=function(e){var t=e.target.closest('[data-k],[data-t],.add,#infoH');if(!t)return;e.preventDefault();
-  if(t.id==='infoH'){S.bo.infoOpen=!S.bo.infoOpen;draw();return;}
+ ctx.onclick=function(e){var t=e.target.closest('[data-k],[data-t],.add');if(!t)return;e.preventDefault();
   if(t.classList.contains('add')){var all=['VIP','재방문','노쇼','민원'],cur=c.tags||[],nx=all.filter(function(x){return cur.indexOf(x)<0;})[0];if(nx)P.updateCard(r.id,'tags',cur.concat([nx]));return;}
   if(t.hasAttribute('data-t')){P.updateCard(r.id,'tags',(c.tags||[]).filter(function(x){return x!==t.getAttribute('data-t');}));return;}
   var k=t.getAttribute('data-k'),inp=document.createElement('input');inp.className='edin';inp.value=c[k]||'';t.replaceWith(inp);inp.focus();

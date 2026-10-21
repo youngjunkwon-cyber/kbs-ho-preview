@@ -100,7 +100,7 @@ function storeLabel(r){return r.store?DB.store.name:'K-Beauty Station';}
 /* 상담함·상담창은 확정안으로 고정. 아래 안은 상담 정보 패널 배치만 다름 */
 var LAYOUTS=[['R','3단 · 추천 답변 오른쪽 패널 (확정)']];
 var LAYOUT=window.top!==window?'R':(function(){try{var v=localStorage.getItem('ib-layout');return LAYOUTS.some(function(x){return x[0]===v;})?v:'R';}catch(e){return 'R';}})();
-function freshState(){return {surf:'BOTH',mark:window.top!==window,hint:true,now:CLOCKS[0][0],ch:'LINE',layout:LAYOUT,bo:{room:'r3',filter:null,q:'',tr:true,drawer:false},cust:{sheet:null}};}
+function freshState(){return {surf:'BOTH',mark:window.top!==window,hint:true,now:CLOCKS[0][0],ch:'LINE',layout:LAYOUT,bo:{room:'r3',filter:null,q:'',tr:true,ptab:'cust',drawer:false},cust:{sheet:null}};}
 function room(id){return DB.rooms.filter(function(r){return r.id===id;})[0];}
 function isClinic(){return DB.store.clinic;}
 
@@ -392,8 +392,8 @@ function swHTML(){
 }
 function frame(s){return document.getElementById('f-'+s);}
 /* 뷰티톡은 실화면 폭 1440px 그대로 두고, 남은 자리에 맞춰 비율로 줄인다 (넓으면 그대로) */
-function fitBO(){var fr=document.getElementById('frames'),bo=frame('BO'),left=S.surf==='BOTH'?412:0,aw=fr.clientWidth-left,ah=fr.clientHeight,k=Math.min(1,aw/1440);
- bo.style.left=left+'px';bo.style.width=(k<1?1440:aw)+'px';bo.style.transform='scale('+k+')';bo.style.height=(ah/k)+'px';}
+function fitBO(){var fr=document.getElementById('frames'),bo=frame('BO'),left=S.surf==='BOTH'?412:0,aw=fr.clientWidth-left,ah=fr.clientHeight,k=Math.min(1,aw/1440),w=k<1?1440:Math.min(aw,1920); /* 최대 1920, 남으면 가운데 */
+ bo.style.left=(left+(k<1?0:Math.floor((aw-w)/2)))+'px';bo.style.width=w+'px';bo.style.transform='scale('+k+')';bo.style.height=(ah/k)+'px';}
 addEventListener('resize',function(){if(S)fitBO();});
 function render(){
  document.getElementById('sw').innerHTML=swHTML();
