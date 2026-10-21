@@ -1841,6 +1841,7 @@ function init(){
   /* 추천 답변 (입력창 바로 위, 가로 3개) */
   +'#sug{display:none;flex-direction:column;gap:6px;padding:8px 12px;background:#f7f2fb;border-top:1px solid #ece3f5}#sug.on{display:flex}#sug .sh{font-size:12px;font-weight:700;color:#6b4c8a}#sug .sh span{font-weight:400;color:#8a6aa8;margin-left:6px}#sug .sl{display:flex;gap:8px}'
   +'#sug button.sc{flex:1;min-width:0;text-align:left;background:#fff;border:1px solid #d9cfe6;border-radius:8px;padding:6px 9px;font:13px/1.4 Pretendard,sans-serif;color:#333;cursor:pointer}#sug button.sc b{display:block;font-size:11px;color:#8a6aa8;margin-bottom:2px}#sug button.sc span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}'
+  +'#sug.v{border-top:1px solid #ece3f5;padding:10px 14px 14px;flex:0 0 auto;max-height:46%;overflow:auto}#sug.v .sl{flex-direction:column;gap:6px}#sug.v button.sc span{-webkit-line-clamp:2}'
   /* 입력창 */
   +'[class*=_composeTools_]{flex-wrap:nowrap!important;overflow-x:auto}[class*=_composeTools_] button{flex:none}'
   +'#pv{margin-top:6px;padding:6px 10px;background:#f6f7f9;border:1px dashed #cfd4dc;border-radius:6px;font-size:12px;color:#555}#cnote{display:none;margin-bottom:6px;padding:6px 10px;border-radius:6px;font-size:12px}#cnote.warn{display:block;background:#fff7e6;border:1px solid #ffd591;color:#ad4e00}#cnote.done{display:block;background:#f5f5f5;border:1px solid #e3e6ea;color:#667085;text-align:center}'
@@ -1892,6 +1893,10 @@ function fact(label,val,isNew){var f=TPL.fact.cloneNode(true);f.innerHTML=esc(la
 /* ===== 레이아웃: now = 3단(상담 정보 열) / L4 = 2단 + 요약 띠(상담 정보는 서랍) ===== */
 function layout(){
  var L=P.S.layout||'now';EL.L=L;
+ if(L==='R'){ /* 추천 답변을 오른쪽 상담 정보 패널 아래로 (세로 3개) */
+  EL.aside.appendChild(EL.sug);EL.sug.classList.add('v');
+  
+ }
  if(L==='L4'){
   EL.ws.style.gridTemplateColumns='340px minmax(0,1fr)';
   EL.sum=document.createElement('div');EL.sum.id='sumBand';EL.sum.setAttribute('data-new','');EL.conv.insertBefore(EL.sum,EL.band);

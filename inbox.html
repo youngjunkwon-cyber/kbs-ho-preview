@@ -98,7 +98,7 @@ function unans(r){var n=0;for(var i=r.msgs.length-1;i>=0;i--){var m=r.msgs[i];if
 function storeLabel(r){return r.store?DB.store.name:'K-Beauty Station';}
 /* 큰 틀(머리글 / 필터 줄 / 상담함 | 상담창 | 정보패널) 단위 안 */
 /* 상담함·상담창은 확정안으로 고정. 아래 안은 상담 정보 패널 배치만 다름 */
-var LAYOUTS=[['now','3단 (상담 정보 열)'],['L4','2단 + 요약 띠']];
+var LAYOUTS=[['now','3단 · 추천 답변 입력창 위'],['R','3단 · 추천 답변 오른쪽 패널'],['L4','2단 + 요약 띠']];
 var LAYOUT=window.top!==window?'now':(function(){try{var v=localStorage.getItem('ib-layout');return LAYOUTS.some(function(x){return x[0]===v;})?v:'now';}catch(e){return 'now';}})();
 function freshState(){return {surf:'BOTH',mark:window.top!==window,hint:true,now:CLOCKS[0][0],ch:'LINE',layout:LAYOUT,bo:{room:'r3',filter:null,q:'',tr:true,drawer:false},cust:{sheet:null}};}
 function room(id){return DB.rooms.filter(function(r){return r.id===id;})[0];}
