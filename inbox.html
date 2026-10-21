@@ -84,11 +84,11 @@ var CARD={r1:{cid:'Ua1f3····e2711',chState:'친구 추가',card:{name:'고�
 function seedRooms(){return [
  {id:'r1',name:'고객 A',ch:'LINE',type:'스토어 문의',store:1,lang:null,msgs:[],session:1,status:'상담중',aiOn:true,need:null,handler:'ai',noticeAt:null,aiIntroDone:false,req:{},asked:null,first:'2026-10-21 13:50',agentAt:null},
  {id:'r2',name:'Emma Lee',ch:'WhatsApp',type:'스토어 문의',store:1,lang:'en',msgs:[
-   {who:'cust',text:'Hi, how much is Rejuran?',at:'2026-10-21 11:20',answered:true},
-   {who:'ai',text:'Hello, this is the K-Beauty Station AI assistant. Rejuran Skin Booster at k-beauty Clinic is KRW 260,000 (VAT included).',at:'2026-10-21 11:20'}],session:1,status:'상담중',aiOn:true,need:null,handler:'ai',noticeAt:null,aiIntroDone:true,req:{},asked:null,first:'2026-10-21 11:20',agentAt:null},
+   {who:'cust',text:'Hi, how much is Rejuran?',ko:'안녕하세요, 리쥬란은 얼마예요?',at:'2026-10-21 11:20',answered:true},
+   {who:'ai',text:'Hello, this is the K-Beauty Station AI assistant. Rejuran Skin Booster at k-beauty Clinic is KRW 260,000 (VAT included).',ko:'안녕하세요, K-Beauty Station AI 상담 도우미입니다. k-beauty의원의 리쥬란 스킨부스터는 260,000원(VAT 포함)입니다.',at:'2026-10-21 11:20'}],session:1,status:'상담중',aiOn:true,need:null,handler:'ai',noticeAt:null,aiIntroDone:true,req:{},asked:null,first:'2026-10-21 11:20',agentAt:null},
  {id:'r3',name:'王丽',ch:'WeChat',type:'스토어 문의',store:1,lang:'zh',msgs:[
-   {who:'cust',text:'怀孕可以做丽珠兰吗？',at:'2026-10-21 10:05',answered:true,stopped:true},
-   {who:'ai',text:'您好，这里是K-Beauty Station AI咨询助手。我们确认后会回复您。',at:'2026-10-21 10:05',notice:true}],session:1,status:'상담중',aiOn:false,need:{reason:'시술 상담(의료 판단 필요)',at:'2026-10-21 10:05'},handler:'ai',noticeAt:'2026-10-21 10:05',aiIntroDone:true,req:{},asked:null,first:'2026-10-21 10:05',agentAt:null},
+   {who:'cust',text:'怀孕可以做丽珠兰吗？',ko:'임신 중에 리쥬란 해도 되나요?',at:'2026-10-21 10:05',answered:true,stopped:true},
+   {who:'ai',text:'您好，这里是K-Beauty Station AI咨询助手。我们确认后会回复您。',ko:'안녕하세요, K-Beauty Station AI 상담 도우미입니다. 확인 후 답변드릴게요.',at:'2026-10-21 10:05',notice:true}],session:1,status:'상담중',aiOn:false,need:{reason:'시술 상담(의료 판단 필요)',at:'2026-10-21 10:05'},handler:'ai',noticeAt:'2026-10-21 10:05',aiIntroDone:true,req:{},asked:null,first:'2026-10-21 10:05',agentAt:null},
  {id:'r4',name:'게스트 8b58f990',ch:'플랫폼',type:'고객지원',store:null,lang:null,msgs:[],session:1,status:'상담중',aiOn:true,need:null,handler:'ai',noticeAt:null,aiIntroDone:false,req:{},asked:null,first:'2026-10-21 13:55',agentAt:null}
 ];}
 var CH_ROOM={LINE:'r1',WhatsApp:'r2',WeChat:'r3','CS채팅':'r4'};
@@ -97,11 +97,10 @@ function freshDB(){DB={store:seedStore(),rooms:seedRooms()};DB.rooms.forEach(fun
 function unans(r){var n=0;for(var i=r.msgs.length-1;i>=0;i--){var m=r.msgs[i];if(m.who!=='cust')break;if(!m.answered)n++;}return n;} /* U8: 마지막 고객 메시지들 중 아직 답이 없는 수 */
 function storeLabel(r){return r.store?DB.store.name:'K-Beauty Station';}
 /* 큰 틀(머리글 / 필터 줄 / 상담함 | 상담창 | 정보패널) 단위 안 */
-/* 상담함(검색·탭·카드)은 확정안으로 고정. 아래 안은 상담창·정보패널 배치만 다름 */
-var LAYOUTS=[['now','상담창·정보 현재'],['L2','AI 도우미 열'],['L3','상담창 좌우 분할'],['L4','2단 + 요약 띠']];
-/* 단독으로 열면 마지막에 고른 레이아웃, 검수 콘솔 안에서는 검수 기준인 현재 시안 */
-var LAYOUT=window.top!==window?'now':(function(){try{var v=localStorage.getItem('ib-layout');return LAYOUTS.some(function(x){return x[0]===v;})?v:'L2';}catch(e){return 'L2';}})();
-function freshState(){return {surf:'BOTH',mark:window.top!==window,hint:true,now:CLOCKS[0][0],ch:'LINE',layout:LAYOUT,bo:{room:'r3',filter:null,q:'',aiHelp:false,tab:'AI',side:true,drawer:false},cust:{sheet:null}};}
+/* 상담함·상담창은 확정안으로 고정. 아래 안은 상담 정보 패널 배치만 다름 */
+var LAYOUTS=[['now','3단 (상담 정보 열)'],['L4','2단 + 요약 띠']];
+var LAYOUT=window.top!==window?'now':(function(){try{var v=localStorage.getItem('ib-layout');return LAYOUTS.some(function(x){return x[0]===v;})?v:'now';}catch(e){return 'now';}})();
+function freshState(){return {surf:'BOTH',mark:window.top!==window,hint:true,now:CLOCKS[0][0],ch:'LINE',layout:LAYOUT,bo:{room:'r3',filter:null,q:'',tr:true,drawer:false},cust:{sheet:null}};}
 function room(id){return DB.rooms.filter(function(r){return r.id===id;})[0];}
 function isClinic(){return DB.store.clinic;}
 
@@ -133,7 +132,8 @@ var TX={
 var R_UNAV={sun:{ko:'일요일은 예약을 받지 않아요',en:'we do not take bookings on Sundays',ja:'日曜日は予約を受け付けていません',zh:'周日不接受预约'},block:{ko:'이날은 예약을 받지 않아요',en:'we do not take bookings on this day',ja:'この日は予約を受け付けていません',zh:'当天不接受预约'},cut:{ko:'예약은 방문 3시간 전에 마감돼요',en:'bookings close 3 hours before the visit',ja:'予約は来店3時間前に締め切られます',zh:'预约在到店前3小时截止'},range:{ko:'예약 가능 시간이 아니에요',en:'it is outside booking hours',ja:'予約可能な時間ではありません',zh:'不在可预约时间内'},grid:{ko:'예약은 30분 단위로 받아요',en:'bookings are in 30-minute slots',ja:'予約は30分単位です',zh:'预约以30分钟为单位'},full:{ko:'그 시간은 이미 예약이 찼어요',en:'that slot is already full',ja:'その時間はすでに予約が埋まっています',zh:'该时段已约满'},past:{ko:'이미 지난 시간이에요',en:'that time has already passed',ja:'すでに過ぎた時間です',zh:'该时间已过'}};
 function altText(a,lang){if(!a.list.length)return '';var days={};a.list.forEach(function(o){days[o.d]=1;});var one=Object.keys(days).length===1,x=a.list.map(function(o,i){return (!a.same&&(!one||i===0)?fmtDay(o.d,lang)+' ':'')+o.t;}).join(', ');return T(a.same?'altSame':'altNext',lang,{x:x});}
 var FIELDS={name:{ko:'이름',en:'Name',ja:'お名前',zh:'姓名'},phone:{ko:'연락처(국가번호 포함)',en:'Phone (with country code)',ja:'連絡先（国番号含む）',zh:'联系方式（含国家区号）'},people:{ko:'인원',en:'Number of people',ja:'人数',zh:'人数'},treat:{ko:'희망 시술',en:'Desired treatment',ja:'ご希望の施術',zh:'希望项目'},when:{ko:'희망 일시',en:'Preferred date and time',ja:'ご希望の日時',zh:'希望日期和时间'},gender:{ko:'성별',en:'Gender',ja:'性別',zh:'性别'},nation:{ko:'국적',en:'Nationality',ja:'国籍',zh:'国籍'},birth:{ko:'생년월일',en:'Date of birth',ja:'生年月日',zh:'出生日期'}};
-function T(key,lang,v){var s=(TX[key][lang]||TX[key].ko);v=v||{};return s.replace(/\{(\w+)\}/g,function(m,k){return v[k]!=null?v[k]:'';});}
+var KOBUF=[]; /* 고객 언어로 만든 문장의 한국어 원문을 모아 두었다가 aiSay가 번역 줄(m.ko)로 붙인다 */
+function T(key,lang,v){v=v||{};var fill=function(s){return s.replace(/\{(\w+)\}/g,function(m,k){return v[k]!=null?v[k]:'';});};if(lang!=='ko'&&TX[key].ko)KOBUF.push(fill(TX[key].ko));return fill(TX[key][lang]||TX[key].ko);}
 function L(o,lang){return o[lang]||o.ko;}
 function fmtDay(d,lang){var m=+d.slice(5,7),dd=+d.slice(8,10),w=wd(d);if(lang==='en')return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][w]+', '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m-1]+' '+dd;if(lang==='ja')return m+'月'+dd+'日('+['日','月','火','水','木','金','土'][w]+')';if(lang==='zh')return m+'月'+dd+'日(周'+['日','一','二','三','四','五','六'][w]+')';return m+'월 '+dd+'일('+WD[w]+')';}
 
@@ -242,8 +242,10 @@ function push(r,m){m.at=m.at||S.now;r.msgs.push(m);}
 function lastLangOf(r,t){var l=detectLang(t);if(l)r.lang=l;return r.lang||'ko';}
 function aiSay(r,text,extra){
  var lang=r.lang||'ko',pre='';
- if(!r.aiIntroDone){pre=T('intro',lang)+' ';r.aiIntroDone=true;} /* P7 1번: 첫 AI 답장 앞에 1회 */
- var m={who:'ai',text:pre+text};if(extra)for(var k in extra)m[k]=extra[k];push(r,m);
+ if(!r.aiIntroDone){pre=T('intro',lang)+' ';r.aiIntroDone=true;if(lang!=='ko')KOBUF.unshift(KOBUF.pop());} /* P7 1번: 첫 AI 답장 앞에 1회 (한국어 줄도 앞으로) */
+ var m={who:'ai',text:pre+text};if(extra)for(var k in extra)m[k]=extra[k];
+ if(lang!=='ko'&&KOBUF.length)m.ko=KOBUF.join(' ');KOBUF.length=0;
+ push(r,m);
 }
 function stopAI(r,reason,msg,noNotice){
  var lang=r.lang||'ko';
