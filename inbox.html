@@ -96,7 +96,10 @@ var DB,S,SLACK;
 function freshDB(){DB={store:seedStore(),rooms:seedRooms()};DB.rooms.forEach(function(r){var c=CARD[r.id];r.cid=c.cid;r.chState=c.chState;r.card=JSON.parse(JSON.stringify(c.card));});SLACK=[];}
 function unans(r){var n=0;for(var i=r.msgs.length-1;i>=0;i--){var m=r.msgs[i];if(m.who!=='cust')break;if(!m.answered)n++;}return n;} /* U8: 마지막 고객 메시지들 중 아직 답이 없는 수 */
 function storeLabel(r){return r.store?DB.store.name:'K-Beauty Station';}
-function freshState(){return {surf:'BOTH',mark:true,hint:true,now:CLOCKS[0][0],ch:'LINE',bo:{room:'r1',filter:null,aiHelp:false},cust:{sheet:null}};}
+var LAYOUTS=[['now','현재 시안 (U1~U14)'],['A','A 영역 구분'],['B','B 오른쪽 AI 탭'],['C','C 입력창 결합'],['D','D 2단 + 서랍'],['E','E 상태 탭 (C+E, 추천)']];
+/* 단독으로 열면 마지막에 고른 레이아웃(처음은 추천 E), 검수 콘솔 안에서는 검수 기준인 현재 시안 */
+var LAYOUT=window.top!==window?'now':(function(){try{return localStorage.getItem('ib-layout')||'E';}catch(e){return 'E';}})();
+function freshState(){return {surf:'BOTH',mark:window.top!==window,hint:true,now:CLOCKS[0][0],ch:'LINE',layout:LAYOUT,bo:{room:'r3',filter:null,aiHelp:false,tab:'AI',side:true,drawer:false},cust:{sheet:null}};}
 function room(id){return DB.rooms.filter(function(r){return r.id===id;})[0];}
 function isClinic(){return DB.store.clinic;}
 
@@ -305,6 +308,27 @@ function collect(r,msg){ /* 방향결정 Q4·Q5, 정책 P5: 빠진 것만 한 �
  r.asked=null;aiSay(r,T('reqDone',lang));
  stopAI(r,'예약 요청 접수 (예약 기능 OFF 매장)',null,true); /* 접수 안내(P7 5번)만 보냄 */
 }
+/* AI 추천 답변 (상담사용 초안 3개, 시안용 예시 문구) */
+var SUGX={soft:{ko:'문의 감사합니다. ',en:'Thank you for reaching out. ',ja:'お問い合わせありがとうございます。',zh:'感谢您的咨询。'},
+ ask:{ko:'원하시는 시술과 방문 희망 날짜를 함께 알려 주시면 더 정확히 안내해 드릴게요.',en:'If you let me know the treatment and the date you would like, I can give you more exact information.',ja:'ご希望の施術とご来店日をお知らせいただければ、より詳しくご案内いたします。',zh:'如果告诉我您想要的项目和到店日期，我可以为您提供更准确的信息。'},
+ med:{ko:'문의하신 내용은 시술 전 의료진 상담이 필요해요. 방문하시면 원장님이 직접 확인해 드립니다.',en:'This needs a consultation with our doctor before the treatment. The doctor will check it directly when you visit.',ja:'こちらは施術前に医師の診察が必要です。ご来店時に院長が直接確認いたします。',zh:'这需要在治疗前由医生面诊。到店后院长会直接为您确认。'},
+ chk:{ko:'매장에 확인해 보고 바로 안내해 드릴게요.',en:"I'll check with the store and get back to you shortly.",ja:'店舗に確認してすぐにご案内いたします。',zh:'我向店铺确认后马上回复您。'},
+ res:{ko:'확인 결과를 알려 드려요: (확인한 내용 입력)',en:'Here is what we confirmed: (enter details)',ja:'確認結果をお知らせします：（内容を入力）',zh:'确认结果如下：（请输入内容）'}};
+function lastCust(r){for(var i=r.msgs.length-1;i>=0;i--)if(r.msgs[i].who==='cust')return r.msgs[i];return null;}
+function suggest(r){
+ var m=lastCust(r);if(!m)return [];var lang=r.lang||'ko',base;
+ if(r.need){var med=/의료/.test(r.need.reason);return [{k:'간단 안내',t:med?L(SUGX.med,lang):L(SUGX.chk,lang)},{k:'확인 결과 안내',t:L(SUGX.res,lang)},{k:'재질문',t:L(SUGX.ask,lang)}];}
+ var c=classify(m.text,r),s=DB.store,sn=lang==='ko'?s.name:s.nameEn;
+ if(c.kind==='hours')base=T('hours',lang,{s:sn,h:L(s.hoursText,lang)});
+ else if(c.kind==='loc')base=T('loc',lang,{s:sn,a:L(s.addr,lang),p:s.phone});
+ else if(c.kind==='price')base=T('price',lang,{n:lang==='ko'?c.prod.ko:c.prod.name,v:c.prod.price.toLocaleString('en-US')});
+ else if(c.kind==='faqTime')base=T('faqTime',lang,{x:L(s.faqTime,lang)});
+ else if(c.kind==='pay')base=T('pay',lang,{x:L(s.payment,lang)});
+ else if(c.kind==='book'&&c.date&&c.time){var j=judgeSlot(c.date,c.time,S.now);base=j.ok?T('link',lang,{d:fmtDay(c.date,lang),t:c.time}):T('unav',lang,{d:fmtDay(c.date,lang),t:c.time,r:L(R_UNAV[j.reason],lang),alt:altText(altSlots(c.date,c.time,S.now,3),lang)});}
+ else if(c.kind==='book')base=T('askDT',lang);
+ else base=T('greet',lang);
+ return [{k:'간단 안내',t:base},{k:'부드러운 안내',t:L(SUGX.soft,lang)+base},{k:'재질문',t:L(SUGX.ask,lang)}];
+}
 /* 고객 메시지 수신 */
 function custSend(id,text,kind){
  var r=room(id),m={who:'cust',text:text,kind:kind||'text'};push(r,m);
@@ -350,7 +374,8 @@ function setClock(ts){
 
 /* ================= 렌더 ================= */
 function swHTML(){
- return '<b>통합인박스 시안</b>'+[['BOTH','고객 + 운영사 함께'],['CUST','고객 메신저'],['BO','운영사 (BO) 뷰티톡']].map(function(x){return '<button class="s'+(S.surf===x[0]?' on':'')+'" data-surf="'+x[0]+'">'+x[1]+'</button>';}).join('')
+ return '<b>통합인박스 시안</b>'
+ +'<span style="margin-left:4px">레이아웃</span><select data-sw="layout" style="background:#e8537a;border-color:#e8537a;color:#fff;font-weight:700">'+LAYOUTS.map(function(x){return '<option value="'+x[0]+'"'+(S.layout===x[0]?' selected':'')+'>'+x[1]+'</option>';}).join('')+'</select><span style="width:8px"></span>'+[['BOTH','고객 + 운영사 함께'],['CUST','고객 메신저'],['BO','운영사 (BO) 뷰티톡']].map(function(x){return '<button class="s'+(S.surf===x[0]?' on':'')+'" data-surf="'+x[0]+'">'+x[1]+'</button>';}).join('')
  +'<span class="sp"></span>'
  +'<span>고객 채널</span><select data-sw="ch">'+Object.keys(CH_ROOM).map(function(k){return '<option'+(S.ch===k?' selected':'')+'>'+k+'</option>';}).join('')+'</select>'
  +'<span>기준 시각</span><select data-sw="now">'+CLOCKS.map(function(c){return '<option value="'+c[0]+'"'+(S.now===c[0]?' selected':'')+'>'+c[1]+'</option>';}).join('')+'</select>'
@@ -372,7 +397,7 @@ function render(){
  ['CUST','BO'].forEach(function(s){var w=frame(s).contentWindow;if(w&&typeof w.draw==='function')w.draw();});
 }
 window.IB={get DB(){return DB;},get S(){return S;},get SLACK(){return SLACK;},CH_ROOM:CH_ROOM,
- room:room,fmtTs:fmtTs,unans:unans,storeLabel:storeLabel,inHours:inHours,fmtDay:fmtDay,custSend:custSend,agentSend:agentSend,complete:complete,setAI:setAI,aiAllowed:aiAllowed,render:render,
+ room:room,fmtTs:fmtTs,unans:unans,storeLabel:storeLabel,suggest:function(r){return suggest(r);},inHours:inHours,fmtDay:fmtDay,custSend:custSend,agentSend:agentSend,complete:complete,setAI:setAI,aiAllowed:aiAllowed,render:render,
  openRoom:function(id){S.bo.room=id;render();},
  ready:function(){render();}};
 /* ===== 검수 콘솔용 전역 ===== */
@@ -394,6 +419,7 @@ Object.defineProperty(window,'STATE',{get:function(){return S;}});
 Object.defineProperty(window,'SLACKLOG',{get:function(){return SLACK;}});
 document.addEventListener('click',function(e){var t=e.target.closest('[data-surf]');if(t){S.surf=t.getAttribute('data-surf');render();}});
 document.addEventListener('change',function(e){var t=e.target;if(!t.hasAttribute('data-sw'))return;var k=t.getAttribute('data-sw');
+ if(k==='layout'){S.layout=LAYOUT=t.value;try{localStorage.setItem('ib-layout',LAYOUT);}catch(_){}S.bo.drawer=false;S.bo.side=true;frame('BO').contentWindow.location.reload();render();return;} /* 레이아웃은 화면 골격을 바꾸므로 뷰티톡 프레임을 다시 그림 */
  if(k==='mark')S.mark=t.checked;else if(k==='hint')S.hint=t.checked;else if(k==='ch'){S.ch=t.value;S.bo.room=CH_ROOM[t.value];}else if(k==='now'){setClock(t.value);return;}else if(k==='booking')DB.store.booking=t.checked;else if(k==='pilot')DB.store.aiPilot=t.checked;render();});
 freshDB();S=freshState();render();
 </script>
