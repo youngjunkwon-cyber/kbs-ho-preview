@@ -79,6 +79,8 @@ var CS_GUIDE={ /* 플랫폼 CS 안내 문구 (방향결정 Q12, 문안은 작성
  signup:{keys:['회원가입','가입','sign up','signup','会員登録','注册'],ko:'회원가입은 K-Beauty Station 웹사이트 오른쪽 위 Sign up에서 이메일로 할 수 있어요',en:'You can sign up with your email from Sign up at the top right of the K-Beauty Station website'},
  howbook:{keys:['어떻게 예약','예약 방법','how to book','how do i book'],ko:'원하는 스토어 페이지의 예약 버튼에서 날짜와 시간을 골라 바로 예약할 수 있어요',en:'You can book directly by choosing a date and time from the booking button on the store page'}
 };
+/* 채널 ID·고객 카드는 시안용 예시 값 */
+var CARD={r1:{cid:'Ua1f3····e2711',chState:'친구 추가',card:{name:'고객 A',phone:'미등록',tags:'없음',memo:'',owner:'미배정'}},r2:{cid:'+1 4165550188',chState:'24시간 창 열림',card:{name:'Emma Lee',phone:'+1 4165550188',tags:'영어',memo:'',owner:'미배정'}},r3:{cid:'oX9k····QkN30',chState:'구독 중',card:{name:'王丽',phone:'미등록',tags:'중국어',memo:'',owner:'미배정'}},r4:{cid:'게스트 8b58f990',chState:'인앱 채팅',card:{name:'게스트',phone:'미등록',tags:'없음',memo:'',owner:'미배정'}}};
 function seedRooms(){return [
  {id:'r1',name:'고객 A',ch:'LINE',type:'스토어 문의',store:1,lang:null,msgs:[],session:1,status:'상담중',aiOn:true,need:null,handler:'ai',noticeAt:null,aiIntroDone:false,req:{},asked:null,first:'2026-10-21 13:50',agentAt:null},
  {id:'r2',name:'Emma Lee',ch:'WhatsApp',type:'스토어 문의',store:1,lang:'en',msgs:[
@@ -91,8 +93,10 @@ function seedRooms(){return [
 ];}
 var CH_ROOM={LINE:'r1',WhatsApp:'r2',WeChat:'r3','CS채팅':'r4'};
 var DB,S,SLACK;
-function freshDB(){DB={store:seedStore(),rooms:seedRooms()};SLACK=[];}
-function freshState(){return {surf:'BOTH',mark:true,hint:true,now:CLOCKS[0][0],ch:'LINE',bo:{room:'r1',onlyNeed:false},cust:{sheet:null}};}
+function freshDB(){DB={store:seedStore(),rooms:seedRooms()};DB.rooms.forEach(function(r){var c=CARD[r.id];r.cid=c.cid;r.chState=c.chState;r.card=JSON.parse(JSON.stringify(c.card));});SLACK=[];}
+function unans(r){var n=0;for(var i=r.msgs.length-1;i>=0;i--){var m=r.msgs[i];if(m.who!=='cust')break;if(!m.answered)n++;}return n;} /* U8: 마지막 고객 메시지들 중 아직 답이 없는 수 */
+function storeLabel(r){return r.store?DB.store.name:'K-Beauty Station';}
+function freshState(){return {surf:'BOTH',mark:true,hint:true,now:CLOCKS[0][0],ch:'LINE',bo:{room:'r1',filter:null,aiHelp:false},cust:{sheet:null}};}
 function room(id){return DB.rooms.filter(function(r){return r.id===id;})[0];}
 function isClinic(){return DB.store.clinic;}
 
@@ -368,7 +372,7 @@ function render(){
  ['CUST','BO'].forEach(function(s){var w=frame(s).contentWindow;if(w&&typeof w.draw==='function')w.draw();});
 }
 window.IB={get DB(){return DB;},get S(){return S;},get SLACK(){return SLACK;},CH_ROOM:CH_ROOM,
- room:room,fmtTs:fmtTs,inHours:inHours,fmtDay:fmtDay,custSend:custSend,agentSend:agentSend,complete:complete,setAI:setAI,aiAllowed:aiAllowed,render:render,
+ room:room,fmtTs:fmtTs,unans:unans,storeLabel:storeLabel,inHours:inHours,fmtDay:fmtDay,custSend:custSend,agentSend:agentSend,complete:complete,setAI:setAI,aiAllowed:aiAllowed,render:render,
  openRoom:function(id){S.bo.room=id;render();},
  ready:function(){render();}};
 /* ===== 검수 콘솔용 전역 ===== */
