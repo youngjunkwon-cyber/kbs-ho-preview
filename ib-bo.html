@@ -1827,6 +1827,7 @@ function layout(){
  EL.sug.addEventListener('click',function(e){var b=e.target.closest('button.sc');if(!b)return;EL.ta.value=b.getAttribute('data-t');EL.ta.focus();});
  var doneBtn=Q('#doneBtn');
  if(L==='now'){EL.sug=null;return;}
+ if(/^L/.test(L))return frameLayout(L,doneBtn);
  if(L==='A'){Q('.ant-card-body',EL.card).appendChild(EL.sug);EL.sug.style.margin='8px -12px 0';return;}
  if(L==='B'){
   EL.ws.style.gridTemplateColumns='320px minmax(0,1fr) 340px';
@@ -1861,7 +1862,70 @@ function layout(){
   EL.band=document.createElement('div');EL.band.id='band';EL.band.setAttribute('data-new','');EL.conv.insertBefore(EL.band,EL.msgs);
  }
 }
+/* ===== 큰 틀 레이아웃: 1 필터를 상담함 안으로 / 2 4단 / 3 상담창 좌우 분할 / 4 2단 + 요약 띠 / 1+2 ===== */
+function panelHeadClass(){return Q('[class*=_panelHeader_]',EL.listPanel).className;}
+function frameLayout(L,doneBtn){
+ var st=document.createElement('style');st.textContent=
+  '.ftb{display:flex!important;flex-wrap:wrap;gap:6px;padding:10px 12px;border-bottom:1px solid #eef1f5}.ftb>*{margin:0!important}.ftb .ant-input-search{flex:1 1 100%;width:100%!important}.ftb .ant-select{flex:1 1 30%;min-width:0;width:auto!important}'
+  +'.aicol{display:flex;flex-direction:column;min-height:0}.aicol .bd{flex:1;overflow:auto;padding:0 12px 12px}.aicol [class*=_aiTools_]{background:transparent!important;border:0!important;padding:0!important}'
+  +'.split{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 300px}.split>[class*=_messages_]{min-height:0}.split .rt{border-left:1px solid #e3e6ea;background:#fafbfc;overflow:auto;padding:0 12px 12px}.split .rt [class*=_aiTools_]{background:transparent!important;border:0!important;padding:0!important}'
+  +'#sumBand{display:flex;gap:14px;align-items:center;padding:8px 16px;border-bottom:1px solid #e3e6ea;background:#fafbfc;font-size:13px;color:#555;flex-wrap:wrap}#sumBand b{color:#222;font-weight:600;margin-left:4px}#sumBand a{margin-left:auto}'
+  +'.ttl{font-size:16px;font-weight:700}.aicol [class*=_aiTools_],.split .rt [class*=_aiTools_]{max-height:none!important;overflow:visible!important}';
+ document.head.appendChild(st);
+ var useFilterIn=(L==='L1'||L==='L12'),useAiCol=(L==='L2'||L==='L12');
+ /* 1: 필터 줄(PUBLIC ITEM)을 상담함 안으로 */
+ if(useFilterIn){var tb=Q('[class*=_toolbar_]');tb.classList.add('ftb');tb.setAttribute('data-new','');Q('[class*=_panelHeader_]',EL.listPanel).after(tb);}
+ /* 2: AI 도우미 열 (넓으면 4단, 좁으면 정보패널과 탭으로 합침) */
+ if(useAiCol){
+  var col=document.createElement('section');col.className=EL.listPanel.className.replace(/\s*_hideMobile_\S+/,'')+' aicol';col.setAttribute('data-new','');
+  col.innerHTML='<div class="'+panelHeadClass()+'"><span class="ttl">AI 도우미</span></div><div class="bd"></div>';
+  Q('.bd',col).appendChild(EL.aiSec);Q('.ant-card-body',EL.card).appendChild(EL.sug);EL.sug.className='v';
+  EL.ws.insertBefore(col,EL.aside);EL.aiCol=col;
+  [Q('[class*=_panelHeader_]',col),Q('[class*=_panelHeader_]',EL.aside)].forEach(function(h){var t=document.createElement('div');t.className='atabs';t.innerHTML='<button data-tab="AI" data-click>AI 도우미</button><button data-tab="INFO" data-click>상담 정보</button>';h.appendChild(t);h.addEventListener('click',function(e){var b=e.target.closest('[data-tab]');if(b){P.S.bo.tab=b.getAttribute('data-tab');draw();}});});
+  addEventListener('resize',function(){draw();});
+  return;
+ }
+ /* 3: 상담창 좌우 분할 (대화 | AI·추천), 정보패널은 접힘 */
+ if(L==='L3'){
+  var sp=document.createElement('div');sp.className='split';sp.setAttribute('data-new','');EL.conv.insertBefore(sp,EL.composer);sp.appendChild(EL.msgs);
+  var rt=document.createElement('div');rt.className='rt';sp.appendChild(rt);rt.appendChild(EL.aiSec);Q('.ant-card-body',EL.card).appendChild(EL.sug);EL.sug.className='v';
+  EL.sideBtn=mkBtn('상담 정보 열기','sideBtn');EL.sideBtn.style.marginRight='8px';doneBtn.parentElement.insertBefore(EL.sideBtn,doneBtn);
+  EL.sideBtn.addEventListener('click',function(){P.S.bo.side=!P.S.bo.side;draw();});P.S.bo.side=false;
+  return;
+ }
+ /* 1만: 상담창 안은 입력창 결합형(머리 칩 + 입력창 위 추천) */
+ /* 4: 2단 + 요약 띠, 자세한 정보는 서랍 */
+ EL.aiSec.style.display='none';
+ EL.chip=mkBtn('AI','aiChip');EL.chip.style.marginRight='8px';doneBtn.parentElement.insertBefore(EL.chip,doneBtn);
+ EL.chip.addEventListener('click',function(){var r=P.room(P.S.bo.room);P.setAI(r.id,!r.aiOn);});
+ EL.conv.insertBefore(EL.sug,EL.composer);
+ if(L==='L4'){
+  EL.ws.style.gridTemplateColumns='340px minmax(0,1fr)';
+  EL.sum=document.createElement('div');EL.sum.id='sumBand';EL.sum.setAttribute('data-new','');EL.conv.insertBefore(EL.sum,EL.msgs);
+  EL.sum.addEventListener('click',function(e){if(e.target.closest('a')){e.preventDefault();P.S.bo.drawer=!P.S.bo.drawer;draw();}});
+  EL.aside.style.cssText+=';position:fixed;top:120px;right:20px;bottom:20px;width:340px;z-index:30;box-shadow:-8px 0 24px rgba(0,0,0,.18)';
+  var ah=Q('[class*=_panelHeader_]',EL.aside),x=document.createElement('a');x.href='#';x.textContent='닫기 ✕';x.setAttribute('data-click','');x.style.fontSize='13px';ah.style.display='flex';ah.style.justifyContent='space-between';ah.appendChild(x);
+  x.addEventListener('click',function(e){e.preventDefault();P.S.bo.drawer=false;draw();});
+ }
+}
+function drawFrame(r){
+ var L=EL.L,S=P.S,allowed=P.aiAllowed(r),on=allowed&&r.aiOn;
+ if(EL.sug){var sg=P.suggest(r),sl=Q('.sl',EL.sug);sl.innerHTML=sg.map(function(s){return '<button class="sc" data-click data-t="'+esc(s.t)+'" title="'+esc(s.t)+'"><b>'+esc(s.k)+'</b><span>'+esc(s.t)+'</span></button>';}).join('');EL.sug.style.display=sg.length?'':'none';}
+ if(EL.chip){var txt=!allowed?'AI 미적용 · 추천 답변만':on?'AI ON · 새 문의 대기':r.need?'AI OFF · 확인 필요':r.handler==='agent'?'AI OFF · 상담사 응대 중':'AI OFF';
+  EL.chip.innerHTML='<span>'+esc(txt)+'</span>';EL.chip.style.background=on?'#e6f4ff':r.need?'#fff1f0':'#f5f5f5';EL.chip.style.borderColor=on?'#91caff':r.need?'#ffa39e':'#d9d9d9';EL.chip.style.color=on?'#0958d9':r.need?'#cf1322':'#595959';EL.chip.title=r.need?'사유: '+r.need.reason:'누르면 이 방 AI 자동응대를 켜고 끕니다';}
+ if(EL.aiCol){
+  var wide=EL.ws.clientWidth>=1250,ai=S.bo.tab!=='INFO';
+  EL.ws.style.gridTemplateColumns=wide?'330px minmax(0,1fr) 320px 280px':'330px minmax(0,1fr) 330px';
+  EL.aiCol.style.display=wide||ai?'':'none';EL.aside.style.display=wide||!ai?'':'none';
+  [EL.aiCol,EL.aside].forEach(function(p){var h=Q('[class*=_panelHeader_]',p),t=Q('.atabs',h);t.style.display=wide?'none':'flex';QA('button',t).forEach(function(b){b.classList.toggle('on',b.getAttribute('data-tab')===(ai?'AI':'INFO'));});var ttl=Q('.ttl,strong',h);if(ttl)ttl.style.display=wide?'':'none';});
+ }
+ if(L==='L1'){EL.ws.style.gridTemplateColumns='320px minmax(0,1fr) 300px';}
+ if(L==='L3'){EL.aside.style.display=S.bo.side?'':'none';EL.ws.style.gridTemplateColumns=S.bo.side?'330px minmax(0,1fr) 280px':'330px minmax(0,1fr)';QA('span',EL.sideBtn).pop().textContent=S.bo.side?'상담 정보 닫기':'상담 정보 열기';}
+ if(L==='L4'){EL.aside.style.display=S.bo.drawer?'':'none';var c=r.card;
+  EL.sum.innerHTML='<span>매장<b>'+esc(P.storeLabel(r))+'</b></span><span>채널<b>'+esc(r.ch)+'</b></span><span>고객<b>'+esc(c.name)+'</b></span><span>연락처<b>'+esc(c.phone)+'</b></span><span>담당자<b>'+esc(c.owner)+'</b></span><a href="#" data-click>'+(S.bo.drawer?'정보 닫기':'자세히 ›')+'</a>';}
+}
 function drawLayout(r){
+ if(EL.L&&/^L/.test(EL.L))return drawFrame(r);
  var L=EL.L,S=P.S;if(!L||L==='now')return;
  var allowed=P.aiAllowed(r),on=allowed&&r.aiOn;
  if(EL.sug){var sg=P.suggest(r),sl=Q('.sl',EL.sug);sl.innerHTML=sg.map(function(s){return '<button class="sc" data-click data-t="'+esc(s.t)+'" title="'+esc(s.t)+'"><b>'+esc(s.k)+'</b><span>'+esc(s.t)+'</span></button>';}).join('');EL.sug.style.display=sg.length?'':'none';}

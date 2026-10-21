@@ -96,9 +96,10 @@ var DB,S,SLACK;
 function freshDB(){DB={store:seedStore(),rooms:seedRooms()};DB.rooms.forEach(function(r){var c=CARD[r.id];r.cid=c.cid;r.chState=c.chState;r.card=JSON.parse(JSON.stringify(c.card));});SLACK=[];}
 function unans(r){var n=0;for(var i=r.msgs.length-1;i>=0;i--){var m=r.msgs[i];if(m.who!=='cust')break;if(!m.answered)n++;}return n;} /* U8: 마지막 고객 메시지들 중 아직 답이 없는 수 */
 function storeLabel(r){return r.store?DB.store.name:'K-Beauty Station';}
-var LAYOUTS=[['now','현재 시안 (U1~U14)'],['A','A 영역 구분'],['B','B 오른쪽 AI 탭'],['C','C 입력창 결합'],['D','D 2단 + 서랍'],['E','E 상태 탭 (C+E, 추천)']];
-/* 단독으로 열면 마지막에 고른 레이아웃(처음은 추천 E), 검수 콘솔 안에서는 검수 기준인 현재 시안 */
-var LAYOUT=window.top!==window?'now':(function(){try{return localStorage.getItem('ib-layout')||'E';}catch(e){return 'E';}})();
+/* 큰 틀(머리글 / 필터 줄 / 상담함 | 상담창 | 정보패널) 단위 안 */
+var LAYOUTS=[['now','현재 시안 (U1~U14)'],['L1','1 필터를 상담함 안으로'],['L2','2 4단 (AI 도우미 열)'],['L3','3 상담창 좌우 분할'],['L4','4 2단 + 요약 띠'],['L12','1+2 조합 (추천)']];
+/* 단독으로 열면 마지막에 고른 레이아웃(처음은 추천 1+2), 검수 콘솔 안에서는 검수 기준인 현재 시안 */
+var LAYOUT=window.top!==window?'now':(function(){try{var v=localStorage.getItem('ib-layout');return LAYOUTS.some(function(x){return x[0]===v;})?v:'L12';}catch(e){return 'L12';}})();
 function freshState(){return {surf:'BOTH',mark:window.top!==window,hint:true,now:CLOCKS[0][0],ch:'LINE',layout:LAYOUT,bo:{room:'r3',filter:null,aiHelp:false,tab:'AI',side:true,drawer:false},cust:{sheet:null}};}
 function room(id){return DB.rooms.filter(function(r){return r.id===id;})[0];}
 function isClinic(){return DB.store.clinic;}
