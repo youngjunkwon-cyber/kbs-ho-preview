@@ -841,5 +841,6 @@ document.addEventListener('click',e=>{
 OPEN['예약']=true;
 render();
 </script>
+<script id="superseded-note">/* 통합 전 단독본 안내. int-* 로 복사된 사본에서는 뜨지 않는다 */(function(){if(//int-/.test(location.pathname))return;function go(){var d=document.createElement('div');d.setAttribute('data-note','superseded');d.style.cssText='position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:2147483647;background:#fff8e1;border:1px solid #f0c36d;border-radius:6px;padding:8px 12px;font:13px/1.5 "Noto Sans KR","Malgun Gothic",sans-serif;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.12);white-space:nowrap';d.innerHTML='통합 전 단독본입니다. 최신 기준은 통합본입니다.<a href="int-al-ops-admin.html" style="margin-left:10px;color:#1677ff">통합 시안 열기</a><a href="qa-integrated.html" style="margin-left:10px;color:#1677ff">통합 검수 콘솔</a><button type="button" aria-label="닫기" style="margin-left:10px;border:0;background:none;cursor:pointer;font-size:14px;color:#666">✕</button>';d.querySelector('button').onclick=function(){d.remove();};document.body.appendChild(d);}if(document.body)go();else document.addEventListener('DOMContentLoaded',go);})();</script>
 </body>
 </html>
