@@ -38,13 +38,15 @@ body{font-family:Pretendard,"Noto Sans KR","Malgun Gothic",sans-serif;font-size:
 .sheet p{font-size:11.5px;color:#888;margin-top:10px;line-height:1.5}
 .sheet button{margin-top:12px;width:100%;height:40px;border:0;border-radius:8px;background:#e8537a;color:#fff;font:inherit;font-weight:700}
 .mk [data-new]{outline:2px dashed #e91e63;outline-offset:2px}
+.hl [data-click]{box-shadow:0 0 0 3px rgba(22,163,74,.75);cursor:pointer}
+.hl [data-click]:hover{box-shadow:0 0 0 3px #16a34a,0 0 0 7px rgba(22,163,74,.18)}
 </style>
 </head>
 <body>
 <div class="top"><div class="av">KBS</div><div><b id="title">K-Beauty Station</b><small id="sub"></small></div></div>
 <div class="note">고객 메신저 (모의 화면). 실제 메신저 앱 화면이 아닙니다.</div>
 <div class="log" id="log"></div>
-<div class="in"><button class="ph" id="photo" title="사진 보내기">사진</button><textarea id="tx" placeholder="메시지 입력 (Enter 보내기, Shift+Enter 줄바꿈)"></textarea><button id="send">보내기</button></div>
+<div class="in"><button class="ph" id="photo" title="사진 보내기" data-click>사진</button><textarea id="tx" placeholder="메시지 입력 (Enter 보내기, Shift+Enter 줄바꿈)" data-click></textarea><button id="send" data-click>보내기</button></div>
 <script>
 'use strict';
 var P=parent.IB;
@@ -53,7 +55,7 @@ function hm(ts){return ts.slice(11,16);}
 function draw(){
  if(!P||!P.DB)return;
  var S=P.S,r=P.room(P.CH_ROOM[S.ch]);
- document.body.classList.toggle('mk',!!S.mark);
+ document.body.classList.toggle('mk',!!S.mark);document.body.classList.toggle('hl',!!S.hint);
  document.getElementById('sub').textContent=S.ch==='CS채팅'?'고객지원 채팅 (인앱)':S.ch+' 공식 계정';
  var h='',sess=0;
  r.msgs.forEach(function(m,i){
@@ -61,7 +63,7 @@ function draw(){
   if(m.who==='cust'){h+='<div class="r me">'+(m.kind==='image'?'<div class="img">사진</div>':'<div class="b">'+esc(m.text)+'</div>')+'<div class="t">'+hm(m.at)+'</div></div>';}
   else{
    h+='<div class="r biz"><div class="nm">K-Beauty Station</div><div class="b">'+esc(m.text)
-    +(m.link?'<div class="lk" data-new data-link="'+i+'"><div class="h">예약하기</div><div class="u">'+esc(m.link.url)+'</div></div>':'')
+    +(m.link?'<div class="lk" data-new data-click data-link="'+i+'"><div class="h">예약하기</div><div class="u">'+esc(m.link.url)+'</div></div>':'')
     +'</div><div class="t">'+hm(m.at)+'</div></div>';
   }
  });
@@ -70,7 +72,7 @@ function draw(){
  if(S.cust.sheet!=null&&r.msgs[S.cust.sheet]&&r.msgs[S.cust.sheet].link){
   var L=r.msgs[S.cust.sheet].link,d=document.createElement('div');d.className='sheet';d.setAttribute('data-new','');
   d.innerHTML='<h3>예약 화면 (링크로 열림)</h3><dl><dt>스토어</dt><dd>'+esc(P.DB.store.name)+'</dd><dt>날짜</dt><dd>'+esc(P.fmtDay(L.date,'ko'))+'</dd><dt>시간</dt><dd>'+esc(L.time)+' (선택됨)</dd><dt>요청사항</dt><dd>'+esc(L.memo)+'</dd></dl>'
-   +'<p>정책 P2: 날짜·시간이 선택되고 요청사항(메모)이 채워진 상태로 열립니다. FO 예약 화면이 이 링크를 지원하는지는 개발 확인이 필요해, 실제 FO 화면 대신 담기는 값만 보여 줍니다.</p><button type="button" id="closeSheet">닫기</button>';
+   +'<p>정책 P2: 날짜·시간이 선택되고 요청사항(메모)이 채워진 상태로 열립니다. FO 예약 화면이 이 링크를 지원하는지는 개발 확인이 필요해, 실제 FO 화면 대신 담기는 값만 보여 줍니다.</p><button type="button" id="closeSheet" data-click>닫기</button>';
   document.body.appendChild(d);
  }
  log.scrollTop=log.scrollHeight;

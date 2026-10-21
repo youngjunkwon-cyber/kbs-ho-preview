@@ -92,7 +92,7 @@ function seedRooms(){return [
 var CH_ROOM={LINE:'r1',WhatsApp:'r2',WeChat:'r3','CS채팅':'r4'};
 var DB,S,SLACK;
 function freshDB(){DB={store:seedStore(),rooms:seedRooms()};SLACK=[];}
-function freshState(){return {surf:'BOTH',mark:true,now:CLOCKS[0][0],ch:'LINE',bo:{room:'r1',onlyNeed:false},cust:{sheet:null}};}
+function freshState(){return {surf:'BOTH',mark:true,hint:true,now:CLOCKS[0][0],ch:'LINE',bo:{room:'r1',onlyNeed:false},cust:{sheet:null}};}
 function room(id){return DB.rooms.filter(function(r){return r.id===id;})[0];}
 function isClinic(){return DB.store.clinic;}
 
@@ -352,7 +352,8 @@ function swHTML(){
  +'<span>기준 시각</span><select data-sw="now">'+CLOCKS.map(function(c){return '<option value="'+c[0]+'"'+(S.now===c[0]?' selected':'')+'>'+c[1]+'</option>';}).join('')+'</select>'
  +'<label><input type="checkbox" data-sw="booking"'+(DB.store.booking?' checked':'')+'>예약 기능 ON</label>'
  +'<label><input type="checkbox" data-sw="pilot"'+(DB.store.aiPilot?' checked':'')+'>AI 시범 입점사</label>'
- +'<label><input type="checkbox" data-sw="mark"'+(S.mark?' checked':'')+'>이번에 추가한 요소 표시</label>';
+ +'<label><input type="checkbox" data-sw="mark"'+(S.mark?' checked':'')+'>이번에 추가한 요소 표시</label>'
+ +'<label><input type="checkbox" data-sw="hint"'+(S.hint?' checked':'')+'><span style="display:inline-block;width:10px;height:10px;border-radius:2px;box-shadow:0 0 0 2px #16a34a;margin-right:2px"></span>클릭 가능한 곳 표시</label>';
 }
 function frame(s){return document.getElementById('f-'+s);}
 /* 뷰티톡은 실화면 폭 1440px 그대로 두고, 남은 자리에 맞춰 비율로 줄인다 (넓으면 그대로) */
@@ -389,7 +390,7 @@ Object.defineProperty(window,'STATE',{get:function(){return S;}});
 Object.defineProperty(window,'SLACKLOG',{get:function(){return SLACK;}});
 document.addEventListener('click',function(e){var t=e.target.closest('[data-surf]');if(t){S.surf=t.getAttribute('data-surf');render();}});
 document.addEventListener('change',function(e){var t=e.target;if(!t.hasAttribute('data-sw'))return;var k=t.getAttribute('data-sw');
- if(k==='mark')S.mark=t.checked;else if(k==='ch'){S.ch=t.value;S.bo.room=CH_ROOM[t.value];}else if(k==='now'){setClock(t.value);return;}else if(k==='booking')DB.store.booking=t.checked;else if(k==='pilot')DB.store.aiPilot=t.checked;render();});
+ if(k==='mark')S.mark=t.checked;else if(k==='hint')S.hint=t.checked;else if(k==='ch'){S.ch=t.value;S.bo.room=CH_ROOM[t.value];}else if(k==='now'){setClock(t.value);return;}else if(k==='booking')DB.store.booking=t.checked;else if(k==='pilot')DB.store.aiPilot=t.checked;render();});
 freshDB();S=freshState();render();
 </script>
 </body>
