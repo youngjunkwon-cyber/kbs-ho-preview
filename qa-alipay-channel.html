@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>알리페이 채널 분기 시안 검수 (v3.7)</title>
+<title>알리페이 채널 분기 시안 검수 (v3.8)</title>
 <style>
 *{box-sizing:border-box}
 html,body{height:100%}
@@ -248,20 +248,18 @@ dialog textarea{width:100%;height:320px;font-family:ui-monospace,Menlo,monospace
 <p>알리페이 사용자 인증 안내(중국, 홍콩 공통)의 "미니프로그램을 열 때 의도적으로 권한 허용을 유도하지 말 것" 지침을 확인했습니다. 당사는 알리페이 채널에 들어올 때 필수 항목(이용 약관, 개인정보 처리방침, 알리페이 프로필 제공) 동의를 받고, 이어서 회원 생성에 필요한 권한(getAuthCode)을 요청하는 구조를 검토하고 있습니다. 이 구조가 지침에 어긋나는지, 어긋난다면 예약처럼 회원이 필요한 시점에 권한을 요청하는 방식으로 바꿔야 하는지 확인 부탁드립니다.</p></li>
 <li><b>출시 심사 기간</b><span class="alTag">진입 관문을 열기 전에 답이 필요합니다</span>
 <p>출시 안내 문서상 월렛마다, 새 버전마다 출시 심사를 받는 것으로 이해했습니다. 심사 기간이 보통 얼마나 걸리는지 알려 주세요.</p></li>
-<li><b>authClientId</b><span class="alTag">진입 관문을 열기 전에 답이 필요합니다</span>
-<p>회원 정보 조회(applyToken)에는 월렛이 발급하는 authClientId가 필요한 것으로 확인했습니다. 콘솔에서 보니 홍콩 버전 설정의 Client ID 칸이 비어 있고, 중국 버전 설정에는 해당 칸이 없습니다. 중국·홍콩 월렛별 authClientId를 어떻게 받으면 되는지 알려 주세요.</p></li>
 <li><b>휴대폰 번호 원본</b>
 <p>웹뷰에서도 회원 정보를 받을 수 있고, 제공 범위는 월렛마다 다를 수 있다고 안내해 주셨습니다. 가리지 않은 휴대폰 번호(PLAINTEXT_MOBILE_PHONE)를 받으려면 별도 승인이 필요한지, 필요하다면 절차를 알려 주세요. 중국·홍콩 월렛 각각에서 지원되는지도 확인 부탁드립니다.</p></li>
 <li><b>휴대폰 번호의 마케팅 사용</b>
 <p>알리페이에서 받은 휴대폰 번호를, 마케팅 수신에 동의한 회원에게 당사가 보내는 마케팅 문자에 사용해도 되는지 확인 부탁드립니다.</p></li>
 </ol></div>
 <div class="alGrp" data-grp="중국 월렛"><div class="alGh">중국 월렛</div>
-<ol class="alList" start="6">
+<ol class="alList" start="5">
 <li><b>호출 권한 개통</b><span class="alTag">진입 관문을 열기 전에 답이 필요합니다</span>
 <p>알리페이 중국 사용자 인증 안내에 getAuthCode와 getSiteInfo 호출 권한은 솔루션 아키텍트에게 요청하도록 되어 있습니다. 미니프로그램 韩美站(ID 2102020206420316)에 이 권한을 열어 주세요.</p></li>
 </ol></div>
 <div class="alGrp" data-grp="홍콩 월렛"><div class="alGh">홍콩 월렛</div>
-<ol class="alList" start="7">
+<ol class="alList" start="6">
 <li><b>테스트 계정</b>
 <p>콘솔상 홍콩 월렛에는 v1.0.5가 2025년 7월 8일 정식 출시되어 있습니다. 홍콩 앱에서 실제로 어떻게 열리는지 확인하려면 홍콩 알리페이 계정이 필요한데, 당사에는 홍콩 계정이 없습니다. 안내해 주신 QR 방식으로 테스트할 수 있도록 테스트 계정을 받을 수 있는지 알려 주세요.</p></li>
 <li><b>검색 키워드</b>
@@ -273,6 +271,7 @@ dialog textarea{width:100%;height:320px;font-family:ui-monospace,Menlo,monospace
 <tr><td>웹뷰에서 계정 권한 요청(getAuthCode)을 쓸 수 있는지</td><td>쓸 수 있습니다. 월렛마다 주는 사용자 정보가 다를 수 있어 userId로 회원을 식별하라고 권했습니다.</td><td>2026년 8월 19일 사공명 부장 회신</td></tr>
 <tr><td>권한 창에서 거부한 권한 목록이 응답에 오는지</td><td>허용된 권한(authSuccessScopes)과 거부된 권한(authErrorScopes)이 응답에 따로 옵니다.</td><td>알리페이 개발자 문서(my.getAuthCode)</td></tr>
 <tr><td>어느 월렛에서 열렸는지 알 수 있는지</td><td>my.getSystemInfo의 app 값으로 알 수 있습니다. 중국은 alipay, 홍콩은 alipayHK입니다.</td><td>2026년 7월 10일 사공명 부장 회신</td></tr>
+<tr><td>회원 정보 조회(applyToken)에 쓰는 Client ID</td><td>콘솔의 개발 설정(Development Configuration)에 Client ID 2102020206420316이 이미 발급되어 있습니다.</td><td>알리페이 콘솔(개발 설정)</td></tr>
 <tr><td>미니프로그램 설정·출시를 누가 하는지</td><td>우리가 받은 콘솔 계정이 워크스페이스(주식회사 더매스크리에이티브) Owner라 직접 수정·업로드·출시합니다. 유형이 DSL이라 진입 주소는 코드의 web-view 주소로 바꾸고, alipay-app.kbstations.com은 허용 목록에 이미 있습니다.</td><td>알리페이 콘솔(2026년 10월 13일 확인)</td></tr>
 <tr><td>권한 해제(revoke) API가 있는지</td><td>홍콩은 있고, 중국은 지원하지 않습니다. 지원하지 않거나 실패해도 탈퇴는 진행합니다.</td><td>알리페이 개발자 문서(Add features)</td></tr>
 <tr><td>현재 출시 상태</td><td>미니프로그램 韩美站(ID 2102020206420316). 중국은 v1.0.3이 2024년 10월 8일, 홍콩은 v1.0.5가 2025년 7월 8일 정식 출시되어 있습니다.</td><td>알리페이 콘솔(2026년 10월 13일 확인)</td></tr>
@@ -283,7 +282,7 @@ dialog textarea{width:100%;height:320px;font-family:ui-monospace,Menlo,monospace
 <li><b>가맹점 공개 키 등록</b><p>콘솔의 개발 설정(Development Configuration)에 가맹점 공개 키를 등록합니다. 지금은 미등록입니다.</p></li>
 <li><b>중국 월렛 API 호출 위임</b><p>콘솔 상태가 "Authorization Required"입니다. 같은 계정으로 알리페이 중국에 로그인해 승인합니다.</p></li>
 </ol></div>
-<div class="ioLog">자세한 처리 기준은 PRD v3.7 16장에 있습니다.</div>
+<div class="ioLog">자세한 처리 기준은 PRD v3.8 16장에 있습니다.</div>
 </div></div>
 
 <div class="pinLayer" id="pinLayer"></div>
