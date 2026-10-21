@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>통합인박스 시안 | K-Beauty Station</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:Pretendard,"Noto Sans KR","Malgun Gothic",sans-serif;font-size:12px;background:#fff;overflow:hidden}
+#app{height:100vh;display:flex;flex-direction:column}
+#sw{min-height:36px;flex:none;flex-wrap:wrap;row-gap:4px;padding:6px 12px;background:#1f1f1f;color:#ddd;display:flex;align-items:center;gap:6px;font-size:11.5px}
+#sw b{color:#fff;margin-right:4px}
+#sw .s{height:24px;padding:0 10px;border:1px solid #444;border-radius:4px;background:transparent;color:#ccc;cursor:pointer;font:inherit}
+#sw .s.on{background:#fff;color:#111;border-color:#fff;font-weight:700}
+#sw .sp{flex:1}
+#sw select{height:24px;background:#2b2b2b;color:#eee;border:1px solid #444;border-radius:4px;padding:0 6px;font:inherit}
+#sw label{display:flex;align-items:center;gap:4px;cursor:pointer;white-space:nowrap}
+#sw span,#sw b{white-space:nowrap}
+#frames{flex:1;min-height:0;position:relative;background:#e9eaee}
+#frames iframe{position:absolute;border:0;display:none;background:#fff}
+#frames iframe.on{display:block}
+#f-CUST{width:380px;top:16px;height:calc(100% - 32px);border-radius:18px;box-shadow:0 0 0 1px #d4d4d8}
+#f-BO{top:0;left:0;width:1440px;transform-origin:0 0}
+#frames.cust #f-CUST{left:50%;transform:translateX(-50%)}
+#frames.both #f-CUST{left:16px}
+</style>
+</head>
+<body>
+<div id="app"><div id="sw"></div><div id="frames">
+<iframe id="f-CUST" src="ib-cust.html" title="고객 메신저"></iframe>
+<iframe id="f-BO" src="ib-bo.html" title="운영사 뷰티톡"></iframe>
+</div></div>
+<script>
+'use strict';
+/* ================= 기준 값 ================= */
+var CLOCKS=[
+ ['2026-10-21 14:00','10/21(수) 14:00 · 운영시간 안'],
+ ['2026-10-21 21:00','10/21(수) 21:00 · 운영시간 밖'],
+ ['2026-10-22 10:00','10/22(목) 10:00 · 다음 영업일 시작'],
+ ['2026-10-23 10:00','10/23(금) 10:00 · 이틀 뒤']
+];
+var CS_HOURS={from:'10:00',to:'19:00'}; /* 상담 운영시간: 평일 10:00~19:00 (방향결정 Q9) */
+var WD=['일','월','화','수','목','금','토'];
+function pad(n){return (n<10?'0':'')+n;}
+function dOf(ts){return ts.slice(0,10);}
+function tOf(ts){return ts.slice(11,16);}
+function dt(d){return new Date(d+'T00:00:00Z');}
+function addDays(d,n){var x=dt(d);x.setUTCDate(x.getUTCDate()+n);return x.toISOString().slice(0,10);}
+function wd(d){return dt(d).getUTCDay();}
+function mins(t){var a=t.split(':');return (+a[0])*60+(+a[1]);}
+function tsMin(ts){return Math.round(dt(dOf(ts)).getTime()/60000)+mins(tOf(ts));}
+function fmtTs(ts){var h=+ts.slice(11,13),m=ts.slice(14,16);return (+ts.slice(5,7))+'. '+(+ts.slice(8,10))+'. '+(h<12?'오전 ':'오후 ')+pad(h%12===0?12:h%12)+':'+m;}
+function inHours(ts){var w=wd(dOf(ts)),t=tOf(ts);return w>=1&&w<=5&&t>=CS_HOURS.from&&t<CS_HOURS.to;}
+function nextOpen(ts){var d=dOf(ts);if(inHours(ts))return ts;if(tOf(ts)<CS_HOURS.from&&wd(d)>=1&&wd(d)<=5)return d+' '+CS_HOURS.from;do{d=addDays(d,1);}while(wd(d)===0||wd(d)===6);return d+' '+CS_HOURS.from;}
+
+/* ================= 시드: dev 스토어 #1 실측 (2026-10-20~21) ================= */
+function seedStore(){return {
+ id:1,name:'k-beauty의원',nameEn:'k-beauty Clinic',cat:'피부과',clinic:true,
+ booking:true,       /* 예약 설정 ON (실측) */
+ aiPilot:true,       /* 시범 입점사 (방향결정 Q11) */
+ cap:1,cutoffH:3,blocked:['2026-12-25'],
+ slots:{wk:['10:00','18:30'],sat:['10:00','16:30'],sun:null},
+ hoursText:{ko:'평일 10:00~19:00, 토요일 10:00~17:00이고 일요일·공휴일은 휴무입니다',en:'weekdays 10:00 to 19:00 and Saturdays 10:00 to 17:00. We are closed on Sundays and public holidays',ja:'平日10:00~19:00、土曜10:00~17:00で、日曜・祝日は休業です',zh:'工作日10:00~19:00，周六10:00~17:00，周日及公休日休息'},
+ addr:{ko:'서울 강남구 강남역 인근',en:'near Gangnam Station, Gangnam-gu, Seoul',ja:'ソウル江南区の江南駅近く',zh:'首尔江南区江南站附近'},
+ phone:'02-0000-0000',
+ payment:{ko:'결제는 방문 후 현장에서 하고, 예약금이 필요하면 미리 알려드립니다',en:'payment is made on site after your visit, and we will let you know in advance if a deposit is required',ja:'お支払いはご来店後に現地で行い、予約金が必要な場合は事前にご案内します',zh:'付款在到店后现场进行，如需预约金会提前告知'},
+ faqTime:{ko:'시술마다 다르지만 보통 30분~2시간 정도 걸려요',en:'it depends on the treatment, but usually takes about 30 minutes to 2 hours',ja:'施術により異なりますが、通常30分~2時間ほどです',zh:'因项目而异，通常需要30分钟~2小时'},
+ parking:null,
+ products:[
+  {id:1,name:'Rejuran Skin Booster',ko:'리쥬란 스킨부스터',keys:['리쥬란','rejuran','リジュラン','丽珠兰'],price:260000},
+  {id:2,name:'Juvelook Skin Booster 2cc',ko:'쥬베룩 스킨부스터 2cc',keys:['쥬베룩','juvelook','ジュベルック','乔雅露'],price:220000},
+  {id:3,name:'Skinvive Long Lasting Skin Booster',ko:'스킨바이브',keys:['스킨바이브','skinvive','スキンバイブ'],price:400000}
+ ],
+ taken:['2026-10-24 15:00']
+};}
+var CS_GUIDE={ /* 플랫폼 CS 안내 문구 (방향결정 Q12, 문안은 작성 예정. 시안용 최소 내용) */
+ signup:{keys:['회원가입','가입','sign up','signup','会員登録','注册'],ko:'회원가입은 K-Beauty Station 웹사이트 오른쪽 위 Sign up에서 이메일로 할 수 있어요',en:'You can sign up with your email from Sign up at the top right of the K-Beauty Station website'},
+ howbook:{keys:['어떻게 예약','예약 방법','how to book','how do i book'],ko:'원하는 스토어 페이지의 예약 버튼에서 날짜와 시간을 골라 바로 예약할 수 있어요',en:'You can book directly by choosing a date and time from the booking button on the store page'}
+};
+function seedRooms(){return [
+ {id:'r1',name:'고객 A',ch:'LINE',type:'스토어 문의',store:1,lang:null,msgs:[],session:1,status:'상담중',aiOn:true,need:null,handler:'ai',noticeAt:null,aiIntroDone:false,req:{},asked:null,first:'2026-10-21 13:50',agentAt:null},
+ {id:'r2',name:'Emma Lee',ch:'WhatsApp',type:'스토어 문의',store:1,lang:'en',msgs:[
+   {who:'cust',text:'Hi, how much is Rejuran?',at:'2026-10-21 11:20',answered:true},
+   {who:'ai',text:'Hello, this is the K-Beauty Station AI assistant. Rejuran Skin Booster at k-beauty Clinic is KRW 260,000 (VAT included).',at:'2026-10-21 11:20'}],session:1,status:'상담중',aiOn:true,need:null,handler:'ai',noticeAt:null,aiIntroDone:true,req:{},asked:null,first:'2026-10-21 11:20',agentAt:null},
+ {id:'r3',name:'王丽',ch:'WeChat',type:'스토어 문의',store:1,lang:'zh',msgs:[
+   {who:'cust',text:'怀孕可以做丽珠兰吗？',at:'2026-10-21 10:05',answered:true,stopped:true},
+   {who:'ai',text:'您好，这里是K-Beauty Station AI咨询助手。我们确认后会回复您。',at:'2026-10-21 10:05',notice:true}],session:1,status:'상담중',aiOn:false,need:{reason:'시술 상담(의료 판단 필요)',at:'2026-10-21 10:05'},handler:'ai',noticeAt:'2026-10-21 10:05',aiIntroDone:true,req:{},asked:null,first:'2026-10-21 10:05',agentAt:null},
+ {id:'r4',name:'게스트 8b58f990',ch:'플랫폼',type:'고객지원',store:null,lang:null,msgs:[],session:1,status:'상담중',aiOn:true,need:null,handler:'ai',noticeAt:null,aiIntroDone:false,req:{},asked:null,first:'2026-10-21 13:55',agentAt:null}
+];}
+var CH_ROOM={LINE:'r1',WhatsApp:'r2',WeChat:'r3','CS채팅':'r4'};
+var DB,S,SLACK;
+function freshDB(){DB={store:seedStore(),rooms:seedRooms()};SLACK=[];}
+function freshState(){return {surf:'BOTH',mark:true,now:CLOCKS[0][0],ch:'LINE',bo:{room:'r1',onlyNeed:false},cust:{sheet:null}};}
+function room(id){return DB.rooms.filter(function(r){return r.id===id;})[0];}
+function isClinic(){return DB.store.clinic;}
+
+/* ================= 언어 ================= */
+function detectLang(t){if(/[぀-ヿ]/.test(t))return 'ja';if(/[가-힯ㄱ-ㆎ]/.test(t))return 'ko';if(/[一-鿿]/.test(t))return 'zh';if(/[a-zA-Z]/.test(t))return 'en';return null;}
+var TX={
+ intro:{ko:'안녕하세요, K-Beauty Station AI 상담 도우미입니다.',en:'Hello, this is the K-Beauty Station AI assistant.',ja:'こんにちは、K-Beauty Station AIアシスタントです。',zh:'您好，这里是K-Beauty Station AI咨询助手。'},
+ stopIn:{ko:'확인 후 답변드릴게요.',en:"We'll check and get back to you.",ja:'確認のうえご回答いたします。',zh:'我们确认后会回复您。'},
+ stopOut:{ko:'확인 후 답변드릴게요. 상담은 평일 10:00~19:00(한국 시간)에 순서대로 진행됩니다.',en:"We'll check and get back to you. Consultations are handled in order on weekdays, 10:00 to 19:00 (Korea time).",ja:'確認のうえご回答いたします。相談は平日10:00~19:00（韓国時間）に順番に対応いたします。',zh:'我们确认后会回复您。咨询时间为工作日10:00~19:00（韩国时间），将按顺序处理。'},
+ link:{ko:'{d} {t}은 예약 가능합니다. 아래 링크에서 내용을 확인하고 예약을 완료해 주세요. 링크에서 완료해야 예약이 확정됩니다.',en:'{d} at {t} is available. Please check the details and complete your booking at the link below. Your booking is confirmed only after you complete it there.',ja:'{d} {t}はご予約いただけます。下のリンクで内容を確認し、予約を完了してください。リンクで完了すると予約が確定します。',zh:'{d} {t}可以预约。请在下方链接确认内容并完成预约。在链接中完成后预约才会确定。'},
+ reqDone:{ko:'알려 주셔서 감사합니다. 매장에 예약 가능 여부를 확인한 뒤 연락드릴게요.',en:'Thank you for the details. We will check availability with the store and contact you.',ja:'ご連絡ありがとうございます。店舗に予約可否を確認のうえご連絡いたします。',zh:'感谢您提供信息。我们向店铺确认是否可预约后会联系您。'},
+ greet:{ko:'무엇을 도와드릴까요? 예약 가능 시간, 위치, 가격 등을 안내해 드려요.',en:'How can I help you? I can help with available times, location, prices and more.',ja:'ご用件をお聞かせください。予約可能な時間、場所、料金などをご案内します。',zh:'请问有什么可以帮您？可以为您介绍可预约时间、位置、价格等。'},
+ hours:{ko:'{s} 운영시간은 {h}.',en:'{s} is open {h}.',ja:'{s}の営業時間は{h}。',zh:'{s}的营业时间为{h}。'},
+ loc:{ko:'{s}은 {a}에 있어요. 대표번호는 {p}입니다.',en:'{s} is located {a}. The phone number is {p}.',ja:'{s}は{a}にあります。代表番号は{p}です。',zh:'{s}位于{a}。电话是{p}。'},
+ price:{ko:'{n} 가격은 {v}원(VAT 포함)입니다.',en:'{n} is KRW {v} (VAT included).',ja:'{n}は{v}ウォン（VAT込み）です。',zh:'{n}的价格为{v}韩元（含增值税）。'},
+ faqTime:{ko:'{x}.',en:'{x}.',ja:'{x}。',zh:'{x}。'},
+ pay:{ko:'{x}.',en:'{x}.',ja:'{x}。',zh:'{x}。'},
+ askDT:{ko:'원하시는 날짜와 시간을 알려 주세요.',en:'Please let me know your preferred date and time.',ja:'ご希望の日時を教えてください。',zh:'请告诉我您希望的日期和时间。'},
+ askT:{ko:'{d} 몇 시를 원하세요?',en:'What time would you like on {d}?',ja:'{d}は何時をご希望ですか？',zh:'{d}您希望几点？'},
+ askD:{ko:'{t}에 원하시는 날짜를 알려 주세요.',en:'Which date would you like at {t}?',ja:'{t}をご希望の日付を教えてください。',zh:'请告诉我您希望{t}的日期。'},
+ unav:{ko:'{d} {t}은 예약할 수 없어요. {r}. {alt}',en:'{d} at {t} cannot be booked: {r}. {alt}',ja:'{d} {t}はご予約いただけません。{r}。{alt}',zh:'{d} {t}无法预约。{r}。{alt}'},
+ unavDay:{ko:'{d}은 예약할 수 없어요. {r}. {alt}',en:'{d} cannot be booked: {r}. {alt}',ja:'{d}はご予約いただけません。{r}。{alt}',zh:'{d}无法预约。{r}。{alt}'},
+ altSame:{ko:'같은 날 가능한 시간은 {x}입니다.',en:'Available times that day: {x}.',ja:'同日の空き時間は{x}です。',zh:'当天可预约时间：{x}。'},
+ altNext:{ko:'가장 가까운 가능 시간은 {x}입니다.',en:'The nearest available times: {x}.',ja:'最も近い空き時間は{x}です。',zh:'最近的可预约时间：{x}。'},
+ ask:{ko:'예약 요청을 위해 아래 정보를 알려 주세요.',en:'To request a booking, please send the following:',ja:'予約リクエストのため、以下をお知らせください。',zh:'为提交预约请求，请提供以下信息：'},
+ refuse:{ko:'그 내용은 안내해 드리기 어려워요. 예약이나 시술 관련 문의를 도와드릴게요.',en:"I'm not able to help with that. I can help with bookings and treatment inquiries.",ja:'その内容はご案内が難しいです。予約や施術に関するお問い合わせをお手伝いします。',zh:'这方面无法为您提供帮助。我可以协助您预约及项目咨询。'},
+ cs:{ko:'{x}.',en:'{x}.',ja:'{x}。',zh:'{x}。'}
+};
+var R_UNAV={sun:{ko:'일요일은 예약을 받지 않아요',en:'we do not take bookings on Sundays',ja:'日曜日は予約を受け付けていません',zh:'周日不接受预约'},block:{ko:'이날은 예약을 받지 않아요',en:'we do not take bookings on this day',ja:'この日は予約を受け付けていません',zh:'当天不接受预约'},cut:{ko:'예약은 방문 3시간 전에 마감돼요',en:'bookings close 3 hours before the visit',ja:'予約は来店3時間前に締め切られます',zh:'预约在到店前3小时截止'},range:{ko:'예약 가능 시간이 아니에요',en:'it is outside booking hours',ja:'予約可能な時間ではありません',zh:'不在可预约时间内'},grid:{ko:'예약은 30분 단위로 받아요',en:'bookings are in 30-minute slots',ja:'予約は30分単位です',zh:'预约以30分钟为单位'},full:{ko:'그 시간은 이미 예약이 찼어요',en:'that slot is already full',ja:'その時間はすでに予約が埋まっています',zh:'该时段已约满'},past:{ko:'이미 지난 시간이에요',en:'that time has already passed',ja:'すでに過ぎた時間です',zh:'该时间已过'}};
+function altText(a,lang){if(!a.list.length)return '';var days={};a.list.forEach(function(o){days[o.d]=1;});var one=Object.keys(days).length===1,x=a.list.map(function(o,i){return (!a.same&&(!one||i===0)?fmtDay(o.d,lang)+' ':'')+o.t;}).join(', ');return T(a.same?'altSame':'altNext',lang,{x:x});}
+var FIELDS={name:{ko:'이름',en:'Name',ja:'お名前',zh:'姓名'},phone:{ko:'연락처(국가번호 포함)',en:'Phone (with country code)',ja:'連絡先（国番号含む）',zh:'联系方式（含国家区号）'},people:{ko:'인원',en:'Number of people',ja:'人数',zh:'人数'},treat:{ko:'희망 시술',en:'Desired treatment',ja:'ご希望の施術',zh:'希望项目'},when:{ko:'희망 일시',en:'Preferred date and time',ja:'ご希望の日時',zh:'希望日期和时间'},gender:{ko:'성별',en:'Gender',ja:'性別',zh:'性别'},nation:{ko:'국적',en:'Nationality',ja:'国籍',zh:'国籍'},birth:{ko:'생년월일',en:'Date of birth',ja:'生年月日',zh:'出生日期'}};
+function T(key,lang,v){var s=(TX[key][lang]||TX[key].ko);v=v||{};return s.replace(/\{(\w+)\}/g,function(m,k){return v[k]!=null?v[k]:'';});}
+function L(o,lang){return o[lang]||o.ko;}
+function fmtDay(d,lang){var m=+d.slice(5,7),dd=+d.slice(8,10),w=wd(d);if(lang==='en')return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][w]+', '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m-1]+' '+dd;if(lang==='ja')return m+'月'+dd+'日('+['日','月','火','水','木','金','土'][w]+')';if(lang==='zh')return m+'月'+dd+'日(周'+['日','一','二','三','四','五','六'][w]+')';return m+'월 '+dd+'일('+WD[w]+')';}
+
+/* ================= 문장 해석 (시안용 규칙 기반) ================= */
+var KW={
+ inject:/무시하고|지시.*무시|ignore (all )?previous|system prompt|시스템 프롬프트|개발자 모드|忽略|指示を無視/i,
+ medical:/임신|부작용|뭐가 (더 )?나아|어떤 게 (더 )?나아|차이가|다른 ?거|괜찮을까|받아도 (돼|되)|약을 먹|pregnan|side effect|which is better|difference|妊娠|副作用|怀孕|副作用/i,
+ complaint:/이상해|아파요|불만|화나|환불해|컴플레인|complain|terrible|worst|痛い|投诉/i,
+ collab:/협찬|콜라보|제휴|collab|sponsor|partnership|コラボ|合作/i,
+ outScope:/날씨|코드 짜|코딩|weather|write code|天気|天气|다른 (매장|병원|피부과) 추천|recommend (another|other)/i,
+ cancelAsk:/취소하려면|취소 방법|환불 규정|cancel policy|how (do i|to) cancel|キャンセル方法|取消政策/i,
+ cancelDo:/취소해 ?주|예약 취소해|cancel my|キャンセルして|帮我取消/i,
+ confirmDo:/예약 (잡아|확정해|해 ?주)|book it for me|予約して|帮我预约/i,
+ hours:/몇 시|영업|운영시간|문 (열|닫)|open|close|hours|営業|营业/i,
+ loc:/어디|위치|주소|가는 ?길|where|location|address|場所|どこ|在哪|地址/i,
+ parking:/주차|parking|駐車|停车/i,
+ price:/얼마|가격|비용|how much|price|cost|料金|いくら|多少钱|价格/i,
+ dur:/얼마나 걸|소요 ?시간|how long|時間はどれ|多长时间/i,
+ pay:/결제|카드|예약금|현금|pay|card|deposit|支払|カード|付款|定金/i,
+ book:/예약|book|appointment|reserve|予約|预约/i,
+ greet:/^(hi|hello|hey|안녕|ㅎㅇ|こんにちは|你好|您好)\b|^(hi|hello|안녕하세요|ㅎㅇ)[!.~ ]*$/i
+};
+function findProd(t){var s=DB.store,low=t.toLowerCase();return s.products.filter(function(p){return p.keys.some(function(k){return low.indexOf(k.toLowerCase())>=0;});})[0]||null;}
+var WDK={'일':0,'월':1,'화':2,'수':3,'목':4,'금':5,'토':6},WDE={sun:0,mon:1,tue:2,wed:3,thu:4,fri:5,sat:6};
+function parseDate(t,today){
+ var m;
+ if(/오늘|today|今日|今天/i.test(t))return today;
+ if(/내일|tomorrow|明日|明天/i.test(t))return addDays(today,1);
+ if(/모레|day after tomorrow|明後日|后天/i.test(t))return addDays(today,2);
+ if((m=t.match(/(\d{1,2})\s*(?:월|\/|月)\s*(\d{1,2})\s*(?:일|日)?/)))return '2026-'+pad(+m[1])+'-'+pad(+m[2]);
+ var w=null,nextWeek=/다음 ?주|next week|next (sun|mon|tue|wed|thu|fri|sat)|来週|下周/i.test(t),thisWeek=/이번 ?주|this week|今週|这周|本周/i.test(t);
+ if((m=t.match(/([일월화수목금토])요일/)))w=WDK[m[1]];
+ else if((m=t.match(/\b(sun|mon|tue|wed|thu|fri|sat)[a-z]*/i)))w=WDE[m[1].toLowerCase()];
+ else if((m=t.match(/([日月火水木金土])曜/)))w={日:0,月:1,火:2,水:3,木:4,金:5,土:6}[m[1]];
+ else if((m=t.match(/周([日一二三四五六])/)))w={日:0,一:1,二:2,三:3,四:4,五:5,六:6}[m[1]];
+ if(w===null)return null;
+ var tw=wd(today),monday=addDays(today,-((tw+6)%7)); /* 주 = 월~일 (정책 P8 3번) */
+ var off=(w+6)%7;
+ if(nextWeek)return addDays(monday,7+off);
+ if(thisWeek)return addDays(monday,off);
+ var d=addDays(monday,off);if(d<today)d=addDays(d,7);return d; /* 요일만: 가장 가까운 그 요일 */
+}
+function parseTime(t){
+ var m,h,mi=0,pm=/오후|저녁|pm|p\.m\.|午後|下午|晚上/i.test(t),am=/오전|아침|am|a\.m\.|午前|上午/i.test(t);
+ if((m=t.match(/(\d{1,2}):(\d{2})/))){h=+m[1];mi=+m[2];}
+ else if((m=t.match(/(\d{1,2})\s*(?:시|時|点|pm|am|o'?clock)/i))){h=+m[1];if(/반|半/.test(t.slice(t.indexOf(m[0]))))mi=30;else{var mm=t.slice(t.indexOf(m[0])).match(/(\d{1,2})\s*분/);if(mm)mi=+mm[1];}}
+ else return null;
+ if(pm&&h<12)h+=12;if(!pm&&!am&&h>=1&&h<=8)h+=12; /* "2시"처럼 오전·오후가 없으면 영업시간대로 본다 */
+ return pad(h)+':'+pad(mi);
+}
+function parsePeople(t){var all=t.match(/\d+\s*(?:명|people|persons|pax|ppl|名|人|位)/gi);if(all)return Math.max.apply(null,all.map(function(x){return parseInt(x,10);}));if(/친구(랑|와|하고)|같이|with (my )?(friend|mom|sister|husband|wife)|友達と|和朋友/i.test(t))return 2;return null;}
+function classify(t,r){
+ if(r.ch==='플랫폼'&&r.type==='고객지원'){for(var k in CS_GUIDE){if(CS_GUIDE[k].keys.some(function(x){return t.toLowerCase().indexOf(x.toLowerCase())>=0;}))return {kind:'cs',key:k};}}
+ if(KW.inject.test(t))return {kind:'refuse'};
+ if(KW.medical.test(t))return {kind:'stop',reason:'시술 상담(의료 판단 필요)'};
+ if(KW.complaint.test(t))return {kind:'stop',reason:'불만·클레임'};
+ if(KW.collab.test(t))return {kind:'stop',reason:'협찬·제휴 문의'};
+ if(KW.outScope.test(t))return {kind:'refuse'};
+ if(KW.cancelDo.test(t))return {kind:'stop',reason:'예약 취소 처리 요청'};
+ if(KW.cancelAsk.test(t))return {kind:'stop',reason:'취소·환불 정책 (등록 정보 없음)'};
+ var date=parseDate(t,dOf(S.now)),time=parseTime(t),prod=findProd(t),ppl=parsePeople(t);
+ if(KW.book.test(t)||KW.confirmDo.test(t)||(date&&time)||r.asked||(r.pending&&(date||time)))return {kind:'book',date:date,time:time,prod:prod,ppl:ppl};
+ if(KW.parking.test(t))return {kind:'stop',reason:'주차 (등록 정보 없음)'};
+ if(KW.dur.test(t))return {kind:'faqTime'};
+ if(KW.price.test(t))return prod?{kind:'price',prod:prod}:{kind:'stop',reason:'가격 (등록된 상품을 찾지 못함)'};
+ if(KW.pay.test(t))return {kind:'pay'};
+ if(KW.hours.test(t))return {kind:'hours'};
+ if(KW.loc.test(t))return {kind:'loc'};
+ if(KW.greet.test(t.trim())||/^[\s\p{Emoji}?!.ㅋㅎ~]+$/u.test(t))return {kind:'greet'};
+ if(prod)return {kind:'price',prod:prod};
+ return {kind:'stop',reason:'등록 정보로 답할 수 없는 문의'};
+}
+
+/* ================= 예약 판정 (순수 함수) ================= */
+function slotRange(d){var s=DB.store.slots,w=wd(d);return w===0?s.sun:w===6?s.sat:s.wk;}
+function judgeSlot(d,t,now){
+ var r=slotRange(d),conds=[];
+ if(wd(d)===0&&!r)return {ok:false,reason:'sun'};
+ if(DB.store.blocked.indexOf(d)>=0)return {ok:false,reason:'block'};
+ if(!r||t<r[0]||t>r[1])return {ok:false,reason:'range'};
+ if(mins(t)%30)return {ok:false,reason:'grid'};
+ var at=d+' '+t;if(tsMin(at)<=tsMin(now))return {ok:false,reason:'past'};
+ if(tsMin(at)-tsMin(now)<DB.store.cutoffH*60)return {ok:false,reason:'cut'};
+ if(DB.store.taken.filter(function(x){return x===at;}).length>=DB.store.cap)return {ok:false,reason:'full'};
+ return {ok:true};
+}
+function altSlots(d,t,now,n){
+ var out=[],r=slotRange(d);
+ if(r){for(var m=mins(r[0]);m<=mins(r[1]);m+=30){var tt=pad(Math.floor(m/60))+':'+pad(m%60);if(judgeSlot(d,tt,now).ok)out.push({d:d,t:tt});}}
+ if(t){out.sort(function(a,b){return Math.abs(mins(a.t)-mins(t))-Math.abs(mins(b.t)-mins(t));});}
+ if(out.length)return {same:true,list:out.slice(0,n).sort(function(a,b){return a.t<b.t?-1:1;})};
+ for(var i=1;i<14&&out.length<n;i++){var dd=addDays(d,i),rr=slotRange(dd);if(!rr)continue;for(var m2=mins(rr[0]);m2<=mins(rr[1])&&out.length<n;m2+=30){var t2=pad(Math.floor(m2/60))+':'+pad(m2%60);if(judgeSlot(dd,t2,now).ok)out.push({d:dd,t:t2});}}
+ return {same:false,list:out};
+}
+function memoFor(r,c){ /* 정책 P2·P3·P4: 고객이 말한 것만, 건강 정보 제외, 일행은 대표 1건 */
+ var q=r.req,lines=[],lang=r.lang||'ko',LN={ko:'한국어',en:'영어',ja:'일본어',zh:'중국어',mn:'몽골어',id:'인도네시아어'};
+ var p=c.prod||q.prod;if(p)lines.push('희망 시술: '+p.ko);
+ var n=c.ppl||q.ppl;if(n&&n>1)lines.push('일행 '+n+'명');
+ lines.push('언어: '+(LN[lang]||lang));
+ lines.push('출처: 통합인박스 '+r.ch+' 상담');
+ return lines.join(' / ');
+}
+
+/* ================= 응대 흐름 ================= */
+function push(r,m){m.at=m.at||S.now;r.msgs.push(m);}
+function lastLangOf(r,t){var l=detectLang(t);if(l)r.lang=l;return r.lang||'ko';}
+function aiSay(r,text,extra){
+ var lang=r.lang||'ko',pre='';
+ if(!r.aiIntroDone){pre=T('intro',lang)+' ';r.aiIntroDone=true;} /* P7 1번: 첫 AI 답장 앞에 1회 */
+ var m={who:'ai',text:pre+text};if(extra)for(var k in extra)m[k]=extra[k];push(r,m);
+}
+function stopAI(r,reason,msg,noNotice){
+ var lang=r.lang||'ko';
+ if(msg)msg.stopped=true;
+ r.aiOn=false;r.handler='ai';
+ r.need={reason:reason,at:S.now};
+ /* 멈출 때마다 그 질문에 안내 1회 (P7 2·3번). 다시 켜질 때 이미 멈췄던 질문은 다시 처리하지 않으므로 안내도 중복되지 않음 (P9 경계 1) */
+ if(!noNotice){aiSay(r,inHours(S.now)?T('stopIn',lang):T('stopOut',lang),{notice:true});r.noticeAt=S.now;}
+ notifySlack(r,reason);
+}
+function notifySlack(r,reason){
+ var e={room:r.id,name:r.name,ch:r.ch,reason:reason,at:S.now,sent:inHours(S.now)?S.now:null,due:inHours(S.now)?null:nextOpen(S.now)};
+ SLACK.push(e); /* 방향결정 Q8·Q9: 운영시간 안 즉시, 밖은 다음 영업일 10:00 묶음 */
+}
+function handle(r,msg){
+ var t=msg.text,lang=lastLangOf(r,t);
+ if(msg.kind==='image'){stopAI(r,'사진·파일',msg);return;}
+ var c=classify(t,r);msg.answered=true;msg.intent=c.kind;
+ if(c.kind==='cs'){aiSay(r,T('cs',lang,{x:L(CS_GUIDE[c.key],lang)}));return;}
+ if(c.kind==='refuse'){aiSay(r,T('refuse',lang));return;}
+ if(c.kind==='stop'){stopAI(r,c.reason,msg);return;}
+ if(c.kind==='greet'){aiSay(r,T('greet',lang));return;}
+ var s=DB.store,sn=lang==='ko'?s.name:s.nameEn;
+ if(c.kind==='hours'){aiSay(r,T('hours',lang,{s:sn,h:L(s.hoursText,lang)}));return;}
+ if(c.kind==='loc'){aiSay(r,T('loc',lang,{s:sn,a:L(s.addr,lang),p:s.phone}));return;}
+ if(c.kind==='price'){aiSay(r,T('price',lang,{n:lang==='ko'?c.prod.ko:c.prod.name,v:c.prod.price.toLocaleString('en-US')}));return;}
+ if(c.kind==='faqTime'){aiSay(r,T('faqTime',lang,{x:L(s.faqTime,lang)}));return;}
+ if(c.kind==='pay'){aiSay(r,T('pay',lang,{x:L(s.payment,lang)}));return;}
+ if(c.kind==='book')return handleBook(r,c,msg);
+}
+function handleBook(r,c,msg){
+ var lang=r.lang||'ko',q=r.req;
+ if(c.prod)q.prod=c.prod;if(c.ppl)q.ppl=c.ppl;
+ if(c.date)q.date=c.date;if(c.time)q.time=c.time;
+ if(!DB.store.booking)return collect(r,msg);
+ if(q.date&&!q.time){var dayR=wd(q.date)===0&&!slotRange(q.date)?'sun':DB.store.blocked.indexOf(q.date)>=0?'block':null;
+  if(dayR){var a0=altSlots(q.date,null,S.now,3);aiSay(r,T('unavDay',lang,{d:fmtDay(q.date,lang),r:L(R_UNAV[dayR],lang),alt:altText(a0,lang)}));q.date=null;r.pending=true;return;}} /* 그날 전체가 불가면 시간을 묻지 않고 바로 이유와 대안 */
+ if(!q.date||!q.time){r.pending=true;aiSay(r,q.date?T('askT',lang,{d:fmtDay(q.date,lang)}):q.time?T('askD',lang,{t:q.time}):T('askDT',lang));return;} /* P8 4번: 이미 받은 것은 다시 묻지 않음 */
+ var j=judgeSlot(q.date,q.time,S.now),dTxt=fmtDay(q.date,lang);
+ if(!j.ok){
+  var a=altSlots(q.date,q.time,S.now,3);
+  aiSay(r,T('unav',lang,{d:dTxt,t:q.time,r:L(R_UNAV[j.reason],lang),alt:altText(a,lang)}));
+  q.time=null;r.pending=true;return; /* P8 5번: 이유와 대안 */
+ }
+ var memo=memoFor(r,c),url='https://www.k-beautystation.com/'+lang+'/stores/'+DB.store.id+'/bookings?date='+q.date+'&time='+q.time;
+ aiSay(r,T('link',lang,{d:dTxt,t:q.time}),{link:{url:url,date:q.date,time:q.time,memo:memo,lang:lang}});
+ r.pending=false;r.req={};
+}
+function collect(r,msg){ /* 방향결정 Q4·Q5, 정책 P5: 빠진 것만 한 번에, 일부만 오면 남은 것만 다시 */
+ var lang=r.lang||'ko',q=r.req,t=msg.text;
+ if(r.asked){
+  var lines=t.split(/\n|(?=\b\d\.\s)/).map(function(s){return s.replace(/^\s*\d+[.)]\s*/,'').trim();}).filter(Boolean);
+  if(lines.length>=2)r.asked.forEach(function(f,i){if(lines[i]&&!q[f])q[f]=lines[i];});
+ }
+ var m;
+ if(!q.name&&(m=t.match(/(?:이름|name|名前|姓名)\s*[:：]?\s*([^\n,/]+)/i)))q.name=m[1].trim();
+ if(!q.phone&&(m=t.match(/\+?\d[\d\s-]{7,}\d/)))q.phone=m[0];
+ if(!q.people&&q.ppl)q.people=q.ppl;
+ if(!q.treat&&q.prod)q.treat=q.prod.ko;
+ if(!q.when&&q.date&&q.time)q.when=q.date+' '+q.time;
+ var need=['name','phone','people','treat','when'].concat(isClinic()?['gender','nation','birth']:[]);
+ var miss=need.filter(function(f){return !q[f];});
+ if(miss.length){r.asked=miss;aiSay(r,T('ask',lang)+'\n'+miss.map(function(f,i){return (i+1)+'. '+L(FIELDS[f],lang);}).join('\n'));return;}
+ r.asked=null;aiSay(r,T('reqDone',lang));
+ stopAI(r,'예약 요청 접수 (예약 기능 OFF 매장)',null,true); /* 접수 안내(P7 5번)만 보냄 */
+}
+/* 고객 메시지 수신 */
+function custSend(id,text,kind){
+ var r=room(id),m={who:'cust',text:text,kind:kind||'text'};push(r,m);
+ if(r.status==='상담종료'){r.status='상담중';r.session++;m.newSession=true;}
+ if(aiActive(r))handle(r,m);
+ render();
+}
+function aiActive(r){
+ if(!aiAllowed(r))return false;
+ return r.aiOn;
+}
+function aiAllowed(r){return r.type==='고객지원'?true:!!DB.store.aiPilot;} /* Q11 시범 입점사, Q12 CS채팅 */
+/* AI가 켜질 때: 그 전에 답하지 않은 메시지부터 (정책 P9). 멈췄던 질문은 상담사 몫으로 남김 */
+function aiResume(r){
+ r.aiOn=true;
+ var q=r.msgs.filter(function(m){return m.who==='cust'&&!m.answered;});
+ for(var i=0;i<q.length;i++){
+  var m=q[i];
+  if(r.ch==='WhatsApp'&&tsMin(S.now)-tsMin(m.at)>24*60){r.need={reason:'WhatsApp 24시간 경과 (자유 답장 불가)',at:S.now};r.aiOn=false;notifySlack(r,'WhatsApp 24시간 경과');return;}
+  if(!r.aiOn)break;
+  handle(r,m);
+ }
+}
+/* 상담사 */
+function agentSend(id,text){var r=room(id);if(!text.trim())return;push(r,{who:'agent',text:text.trim()});r.msgs.forEach(function(m){if(m.who==='cust')m.answered=true;});r.handler='agent';r.agentAt=S.now;r.aiOn=false;render();}
+function complete(id){ /* P10 상담 완료 = 확인 완료 + 상담 종료 */
+ var r=room(id);r.need=null;r.noticeAt=null;r.handler='ai';r.status='상담종료';r.pending=false;r.asked=null;
+ aiResume(r);render();
+}
+function setAI(id,on){var r=room(id);if(on){aiResume(r);}else{r.aiOn=false;}render();}
+/* 시계 */
+function setClock(ts){
+ var before=S.now;S.now=ts;
+ if(inHours(before)&&!inHours(ts)){ /* 운영시간이 끝나면 자동 ON, 상담사 진행 중 상담은 유지 (P9) */
+  DB.rooms.forEach(function(r){if(!r.aiOn&&aiAllowed(r)&&!(r.handler==='agent'&&r.status!=='상담종료'))aiResume(r);});
+ }
+ if(!inHours(before)&&inHours(ts)){ /* 다음 영업일 10:00: 밤사이 확인 필요 묶음 알림 (Q9) */
+  var due=SLACK.filter(function(e){return !e.sent;});
+  if(due.length){due.forEach(function(e){e.sent=ts;e.digest=true;});SLACK.push({digest:true,count:due.length,at:ts,sent:ts,items:due.map(function(e){return e.name+' ('+e.ch+') '+e.reason;})});}
+ }
+ render();
+}
+
+/* ================= 렌더 ================= */
+function swHTML(){
+ return '<b>통합인박스 시안</b>'+[['BOTH','고객 + 운영사 함께'],['CUST','고객 메신저'],['BO','운영사 (BO) 뷰티톡']].map(function(x){return '<button class="s'+(S.surf===x[0]?' on':'')+'" data-surf="'+x[0]+'">'+x[1]+'</button>';}).join('')
+ +'<span class="sp"></span>'
+ +'<span>고객 채널</span><select data-sw="ch">'+Object.keys(CH_ROOM).map(function(k){return '<option'+(S.ch===k?' selected':'')+'>'+k+'</option>';}).join('')+'</select>'
+ +'<span>기준 시각</span><select data-sw="now">'+CLOCKS.map(function(c){return '<option value="'+c[0]+'"'+(S.now===c[0]?' selected':'')+'>'+c[1]+'</option>';}).join('')+'</select>'
+ +'<label><input type="checkbox" data-sw="booking"'+(DB.store.booking?' checked':'')+'>예약 기능 ON</label>'
+ +'<label><input type="checkbox" data-sw="pilot"'+(DB.store.aiPilot?' checked':'')+'>AI 시범 입점사</label>'
+ +'<label><input type="checkbox" data-sw="mark"'+(S.mark?' checked':'')+'>이번에 추가한 요소 표시</label>';
+}
+function frame(s){return document.getElementById('f-'+s);}
+/* 뷰티톡은 실화면 폭 1440px 그대로 두고, 남은 자리에 맞춰 비율로 줄인다 (넓으면 그대로) */
+function fitBO(){var fr=document.getElementById('frames'),bo=frame('BO'),left=S.surf==='BOTH'?412:0,aw=fr.clientWidth-left,ah=fr.clientHeight,k=Math.min(1,aw/1440);
+ bo.style.left=left+'px';bo.style.width=(k<1?1440:aw)+'px';bo.style.transform='scale('+k+')';bo.style.height=(ah/k)+'px';}
+addEventListener('resize',function(){if(S)fitBO();});
+function render(){
+ document.getElementById('sw').innerHTML=swHTML();
+ var fr=document.getElementById('frames');fr.className=S.surf==='BOTH'?'both':S.surf==='CUST'?'cust':'';
+ frame('CUST').classList.toggle('on',S.surf!=='BO');frame('BO').classList.toggle('on',S.surf!=='CUST');
+ fitBO();
+ ['CUST','BO'].forEach(function(s){var w=frame(s).contentWindow;if(w&&typeof w.draw==='function')w.draw();});
+}
+window.IB={get DB(){return DB;},get S(){return S;},get SLACK(){return SLACK;},CH_ROOM:CH_ROOM,
+ room:room,fmtTs:fmtTs,inHours:inHours,fmtDay:fmtDay,custSend:custSend,agentSend:agentSend,complete:complete,setAI:setAI,aiAllowed:aiAllowed,render:render,
+ openRoom:function(id){S.bo.room=id;render();},
+ ready:function(){render();}};
+/* ===== 검수 콘솔용 전역 ===== */
+window.render=render;
+window.resetDB=function(){freshDB();S=freshState();render();};
+window.go=function(s){S.surf=s;render();};
+window.setChannel=function(ch){S.ch=ch;S.bo.room=CH_ROOM[ch];render();};
+window.cust=function(text,kind){custSend(CH_ROOM[S.ch],text,kind);}; /* 지금 채널 고객이 보냄 */
+window.custTo=function(ch,text,kind){custSend(CH_ROOM[ch],text,kind);};
+window.agent=function(text){agentSend(S.bo.room,text);};
+window.completeRoom=function(id){complete(id||S.bo.room);};
+window.aiSwitch=function(on,id){setAI(id||S.bo.room,on);};
+window.setClock=setClock;
+window.setStore=function(p){Object.assign(DB.store,p);render();};
+window.openRoom=function(id){S.bo.room=id;render();};
+window.classifyText=function(t){return classify(t,room(CH_ROOM[S.ch]));};
+Object.defineProperty(window,'DBX',{get:function(){return DB;}});
+Object.defineProperty(window,'STATE',{get:function(){return S;}});
+Object.defineProperty(window,'SLACKLOG',{get:function(){return SLACK;}});
+document.addEventListener('click',function(e){var t=e.target.closest('[data-surf]');if(t){S.surf=t.getAttribute('data-surf');render();}});
+document.addEventListener('change',function(e){var t=e.target;if(!t.hasAttribute('data-sw'))return;var k=t.getAttribute('data-sw');
+ if(k==='mark')S.mark=t.checked;else if(k==='ch'){S.ch=t.value;S.bo.room=CH_ROOM[t.value];}else if(k==='now'){setClock(t.value);return;}else if(k==='booking')DB.store.booking=t.checked;else if(k==='pilot')DB.store.aiPilot=t.checked;render();});
+freshDB();S=freshState();render();
+</script>
+</body>
+</html>
