@@ -363,6 +363,7 @@ function complete(id){ /* P10 상담 완료 = 확인 완료 + 상담 종료 */
  aiResume(r);render();
 }
 function setAI(id,on){var r=room(id);if(on){aiResume(r);}else{r.aiOn=false;}render();}
+function takeOver(id){var r=room(id);r.aiOn=false;r.handler='agent';r.agentAt=S.now;render();} /* 상담 시작 = 상담사가 잡음 (AI 끄기와 같은 동작, 답장 전에도 진행으로) */
 /* 시계 */
 function setClock(ts){
  var before=S.now;S.now=ts;
@@ -401,7 +402,7 @@ function render(){
  ['CUST','BO'].forEach(function(s){var w=frame(s).contentWindow;if(w&&typeof w.draw==='function')w.draw();});
 }
 window.IB={get DB(){return DB;},get S(){return S;},get SLACK(){return SLACK;},CH_ROOM:CH_ROOM,
- room:room,fmtTs:fmtTs,unans:unans,storeLabel:storeLabel,suggest:function(r){return suggest(r);},inHours:inHours,fmtDay:fmtDay,custSend:custSend,agentSend:agentSend,complete:complete,setAI:setAI,aiAllowed:aiAllowed,render:render,
+ room:room,fmtTs:fmtTs,unans:unans,storeLabel:storeLabel,suggest:function(r){return suggest(r);},inHours:inHours,fmtDay:fmtDay,custSend:custSend,agentSend:agentSend,complete:complete,setAI:setAI,takeOver:takeOver,aiAllowed:aiAllowed,render:render,
  openRoom:function(id){S.bo.room=id;render();},
  ready:function(){render();}};
 /* ===== 검수 콘솔용 전역 ===== */
