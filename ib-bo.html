@@ -1843,10 +1843,14 @@ function init(){
   /* 추천 답변 (입력창 바로 위, 가로 3개) */
   +'#sug{display:none;flex-direction:column;gap:6px;padding:8px 12px;background:#f7f2fb;border-top:1px solid #ece3f5}#sug.on{display:flex}#sug .sh{font-size:12px;font-weight:700;color:#6b4c8a}#sug .sh span{font-weight:400;color:#8a6aa8;margin-left:6px}#sug .sl{display:flex;gap:8px}'
   +'#sug button.sc{flex:1;min-width:0;text-align:left;background:#fff;border:1px solid #d9cfe6;border-radius:8px;padding:6px 9px;font:13px/1.4 Pretendard,sans-serif;color:#333;cursor:pointer}#sug button.sc b{display:block;font-size:11px;color:#8a6aa8;margin-bottom:2px}#sug button.sc span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}'
-  +'#sug.v{border-top:1px solid #ece3f5;padding:10px 14px 14px;flex:0 0 auto;max-height:52%;overflow:auto}#sug.v .sl{flex-direction:column;gap:6px}#sug.v button.sc span{-webkit-line-clamp:2}'
+  +'#sug.v{border-top:1px solid #ece3f5;padding:10px 14px 14px;flex:0 0 auto;max-height:42%;overflow:auto}#sug.v .sl{flex-direction:column;gap:6px}#sug.v button.sc span{-webkit-line-clamp:2}'
   /* 입력창 */
   +'[class*=_composeTools_]{flex-wrap:nowrap!important;overflow-x:auto}[class*=_composeTools_] button{flex:none}'
   +'#pv{margin-top:6px;padding:6px 10px;background:#f6f7f9;border:1px dashed #cfd4dc;border-radius:6px;font-size:12px;color:#555}#cnote{display:none;margin-bottom:6px;padding:6px 10px;border-radius:6px;font-size:12px}#cnote.warn{display:block;background:#fff7e6;border:1px solid #ffd591;color:#ad4e00}#cnote.done{display:block;background:#f5f5f5;border:1px solid #e3e6ea;color:#667085;text-align:center}'
+  +'[class*=_context_] h4 small{font-weight:400;color:#98a2b3;font-size:11px;margin-left:6px}[class*=_context_] h4 i{float:right;font-style:normal;font-weight:400;color:#8c8c8c;font-size:12px;cursor:pointer}#infoH{cursor:pointer}'
+  +'[class*=_context_] .ed{cursor:text;border-bottom:1px dashed #c4c9d1;text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}[class*=_context_] .ph{color:#b0b7c0;font-weight:400}[class*=_context_] .ed small{color:#8c8c8c;font-weight:400;font-size:11px}'
+  +'.edin{width:60%;font:13px Pretendard,sans-serif;border:1px solid #1677ff;border-radius:4px;padding:2px 6px;text-align:right}.tagc{display:inline-block;border:1px solid #d9dde3;border-radius:3px;padding:0 6px;font-size:11px;font-weight:500;margin-left:4px;cursor:pointer;background:#fff}.tagc.add{color:#8c8c8c}'
+  +'.bgh{font-size:11px;color:#98a2b3;margin:6px 0 2px}.bnote{font-size:12px;color:#98a2b3;padding:4px 0 6px}a.bk{display:block;font-size:12px;color:#1d2939;padding:5px 0;border-bottom:1px solid #f0f2f5;text-decoration:none}a.bk span{display:block;font-size:11px;color:#667085}a.bk:hover{color:#1677ff}'
   +'#sumBand{display:flex;gap:14px;align-items:center;padding:8px 16px;border-bottom:1px solid #e3e6ea;background:#fafbfc;font-size:13px;color:#555;flex-wrap:wrap}#sumBand b{color:#222;font-weight:600;margin-left:4px}#sumBand a{margin-left:auto}';
  document.head.appendChild(st);
  layout();
@@ -1987,15 +1991,41 @@ function draw(){
  EL.ta.placeholder=lang!=='ko'?'한국어로 쓰면 '+(LN[lang]||lang)+'로 번역되어 나갑니다':'답장 입력';
  EL.langTxt.textContent='고객 언어: '+(LN[lang]||lang);
  if(EL.push)EL.push.style.display=r.ch==='LINE'?'':'none';
- /* ===== 상담 정보 ===== */
- var ctx=Q('[class*=_context_]');ctx.innerHTML='';
- var h1=TPL.h4.cloneNode(true);h1.textContent='상담 정보';ctx.appendChild(h1);
- ctx.appendChild(fact('문의 유형',TYPE[r.type]||r.type));ctx.appendChild(fact('채널',chLabel(r)));
- ctx.appendChild(fact('입점사',r.store?P.storeLabel(r)+' (#'+r.store+')':'K-Beauty Station',true));
- ctx.appendChild(fact('채널 ID',r.cid,true));ctx.appendChild(fact('연결 상태',r.chState,true));
- ctx.appendChild(fact('상담 횟수',r.session+'회'));ctx.appendChild(fact('첫 대화',P.fmtTs(r.first)));
- var h2=TPL.h4.cloneNode(true);h2.textContent='고객 카드';h2.setAttribute('data-new','');ctx.appendChild(h2);
- var c=r.card;[['고객명',c.name],['연락처',c.phone],['태그',c.tags],['메모',c.memo||'없음'],['담당자',c.owner]].forEach(function(x){ctx.appendChild(fact(x[0],x[1],true));});
+ /* ===== 상담 정보 패널: 고객 카드(수정) / 예약 내역 / 연결된 상담 / 접힌 상담 정보 / (아래) 추천 답변 ===== */
+ var ctx=Q('[class*=_context_]');ctx.innerHTML='';var c=r.card;
+ var H=function(t,sub,open){var h=TPL.h4.cloneNode(true);h.innerHTML=esc(t)+(sub?'<small>'+esc(sub)+'</small>':'')+(open!==undefined?'<i>'+(open?'접기 ▴':'펼치기 ▾')+'</i>':'');h.setAttribute('data-new','');return h;};
+ var KV=function(label,key,val,ph){var f=TPL.fact.cloneNode(true);f.innerHTML=esc(label)+'<b class="ed" data-k="'+key+'" data-click title="누르면 바로 고칩니다">'+(val?esc(val):'<span class="ph">'+esc(ph||'입력')+'</span>')+'</b>';f.setAttribute('data-new','');return f;};
+ ctx.appendChild(H('고객 카드','칸을 누르면 바로 고칩니다'));
+ ctx.appendChild(KV('이름','name',c.name));ctx.appendChild(KV('연락처','phone',c.phone,'전화번호 입력'));ctx.appendChild(KV('이메일','email',c.email,'이메일 입력'));
+ var tg=TPL.fact.cloneNode(true);tg.innerHTML='태그<b class="tags">'+(c.tags||[]).map(function(t){return '<span class="tagc" data-click data-t="'+esc(t)+'" title="누르면 뺍니다">'+esc(t)+'</span>';}).join('')+'<span class="tagc add" data-click title="VIP, 재방문, 노쇼, 민원 순으로 더합니다">+</span></b>';tg.setAttribute('data-new','');ctx.appendChild(tg);
+ ctx.appendChild(KV('메모','memo',c.memo,'상담사 메모'));
+ var ow=TPL.fact.cloneNode(true);ow.innerHTML='담당자<b class="ed" data-k="owner" data-click>'+(c.owner?esc(c.owner)+(r.agentAt?' <small>(상담 시작 '+esc(relTs(r.agentAt))+')</small>':''):'<span class="ph">미배정</span>')+'</b>';ow.setAttribute('data-new','');ctx.appendChild(ow);
+ /* 예약 내역 (연락처 기준, 전부) */
+ ctx.appendChild(H('예약 내역','연락처 기준 · 누르면 예약 상세'));
+ var bks=(c.bookings||[]).slice(),today=S.now.slice(0,10);
+ if(!c.phone&&!c.email&&!bks.length){var nb=document.createElement('div');nb.className='bnote';nb.textContent='연락처가 등록되면 예약 내역이 보입니다';ctx.appendChild(nb);}
+ else if(!bks.length){var nb2=document.createElement('div');nb2.className='bnote';nb2.textContent='예약 내역이 없습니다';ctx.appendChild(nb2);}
+ else{var up=bks.filter(function(x){return x.d>=today;}).sort(function(x,y){return x.d<y.d?-1:1;}),past=bks.filter(function(x){return x.d<today;}).sort(function(x,y){return x.d<y.d?1:-1;});
+  [['다가오는 예약',up],['지난 예약',past]].forEach(function(g){if(!g[1].length)return;var gh=document.createElement('div');gh.className='bgh';gh.textContent=g[0];ctx.appendChild(gh);
+   g[1].forEach(function(x){var d=document.createElement('a');d.href='#';d.className='bk';d.setAttribute('data-click','');d.innerHTML=esc(P.fmtDay(x.d,'ko')+' '+x.t+' · '+x.p+' · '+x.n+'명 · '+x.st)+(x.memo?'<span>메모: '+esc(x.memo)+'</span>':'');ctx.appendChild(d);});});}
+ /* 연결된 상담 */
+ ctx.appendChild(H('연결된 상담','같은 고객 카드의 다른 대화'));
+ if(!(c.links||[]).length){var nl=document.createElement('div');nl.className='bnote';nl.textContent='다른 대화가 없습니다';ctx.appendChild(nl);}
+ (c.links||[]).forEach(function(l){var d=document.createElement('a');d.href='#';d.className='bk';d.setAttribute('data-click','');d.textContent=l.ch+' · '+P.fmtDay(l.d,'ko')+' · '+l.st;ctx.appendChild(d);});
+ /* 상담 정보 (접힘) */
+ var ih=H('상담 정보',null,!!S.bo.infoOpen);ih.id='infoH';ih.setAttribute('data-click','');ctx.appendChild(ih);
+ if(S.bo.infoOpen){
+  ctx.appendChild(fact('입점사',r.store?P.storeLabel(r)+' (#'+r.store+')':'K-Beauty Station'));ctx.appendChild(fact('채널 ID',r.cid));ctx.appendChild(fact('연결 상태',r.chState));
+  ctx.appendChild(fact('상담 횟수',r.session+'회'));ctx.appendChild(fact('첫 대화',P.fmtTs(r.first)));
+  var hh=document.createElement('div');hh.className='bgh';hh.textContent='상담 이력 · 누르면 그 회차로 이동';ctx.appendChild(hh);
+  var n=0;r.msgs.forEach(function(m,i){if(i===0||m.newSession){n++;var last=n===r.session;var d=document.createElement('a');d.href='#';d.className='bk';d.setAttribute('data-click','');d.textContent=n+'차 상담 · '+(last?(T==='done'?'완료':'진행 중'):'완료')+' · '+P.fmtTs(m.at);ctx.appendChild(d);}});
+ }
+ ctx.onclick=function(e){var t=e.target.closest('[data-k],[data-t],.add,#infoH');if(!t)return;e.preventDefault();
+  if(t.id==='infoH'){S.bo.infoOpen=!S.bo.infoOpen;draw();return;}
+  if(t.classList.contains('add')){var all=['VIP','재방문','노쇼','민원'],cur=c.tags||[],nx=all.filter(function(x){return cur.indexOf(x)<0;})[0];if(nx)P.updateCard(r.id,'tags',cur.concat([nx]));return;}
+  if(t.hasAttribute('data-t')){P.updateCard(r.id,'tags',(c.tags||[]).filter(function(x){return x!==t.getAttribute('data-t');}));return;}
+  var k=t.getAttribute('data-k'),inp=document.createElement('input');inp.className='edin';inp.value=c[k]||'';t.replaceWith(inp);inp.focus();
+  var done=function(){P.updateCard(r.id,k,inp.value.trim());};inp.addEventListener('blur',done);inp.addEventListener('keydown',function(ev){if(ev.key==='Enter')inp.blur();});};
  if(EL.L==='L4'){EL.aside.style.display=S.bo.drawer?'':'none';
   EL.sum.innerHTML='<span>입점사<b>'+esc(P.storeLabel(r))+'</b></span><span>채널<b>'+esc(chLabel(r))+'</b></span><span>고객<b>'+esc(c.name)+'</b></span><span>연락처<b>'+esc(c.phone)+'</b></span><span>담당자<b>'+esc(c.owner)+'</b></span><a href="#" data-click>'+(S.bo.drawer?'정보 닫기':'자세히 ›')+'</a>';}
  requestAnimationFrame(function(){box.scrollTop=box.scrollHeight;}); /* 추천 답변·입력창 크기가 정해진 뒤 맨 아래로 */
