@@ -73,7 +73,12 @@ function seedStore(){return {
   {id:2,name:'Juvelook Skin Booster 2cc',ko:'쥬베룩 스킨부스터 2cc',keys:['쥬베룩','juvelook','ジュベルック','乔雅露'],price:220000},
   {id:3,name:'Skinvive Long Lasting Skin Booster',ko:'스킨바이브',keys:['스킨바이브','skinvive','スキンバイブ'],price:400000}
  ],
- taken:['2026-10-24 15:00']
+ taken:['2026-10-24 15:00'],
+ /* 상품 카드 모달용 (시안 더미): 언어마다 따로 등록된 상품 */
+ catalog:(function(){var base=[['Rejuran Skin Booster','リジュラン スキンブースター','丽珠兰 水光针','麗珠蘭 水光針','Rejuran скин бустер','Rejuran Skin Booster','รีจูรัน สกินบูสเตอร์',260000],['Juvelook Skin Booster 2cc','ジュベルック スキンブースター 2cc','乔雅露 皮肤增强剂 2cc','喬雅露 皮膚增強劑 2cc','Juvelook коллаген skin booster 2cc','Juvelook Skin Booster 2cc','จูเวลุค สกินบูสเตอร์ 2cc',220000],['Skinvive Long Lasting Skin Booster','スキンバイブ ロングラスティング','Skinvive 长效水光','Skinvive 長效水光','Skinvive long lasting skin booster','Skinvive Long Lasting Skin Booster','สกินไวฟ์ ลองลาสติ้ง',400000],['Oligio Kiss RF Lifting','オリジオ キス RFリフティング','Oligio Kiss 射频提升','Oligio Kiss 射頻提升','Oligio Kiss RF Lifting','Oligio Kiss RF Lifting','โอลิจิโอ คิส RF ลิฟติ้ง',199000],['Oligio Kiss Ultrasound Lifting','オリジオ キス 超音波リフティング','Oligio Kiss 超声提升','Oligio Kiss 超音波提升','Oligio Kiss Ultrasound Lifting','Oligio Kiss Ultrasound Lifting','โอลิจิโอ คิส อัลตราซาวด์','85000'],['Juvelook Collagen Filler 4cc','ジュベルック コラーゲンフィラー 4cc','乔雅露 胶原填充 4cc','喬雅露 膠原填充 4cc','Juvelook коллаген филлер 4cc','Juvelook Collagen Filler 4cc','จูเวลุค คอลลาเจน ฟิลเลอร์ 4cc',330000],['Fillroad Regenerating Skin Booster','フィルロード 再生スキンブースター','Fillroad 再生水光','Fillroad 再生水光','Fillroad нөхөн төлжүүлэх skin booster','Fillroad Regenerating Skin Booster','ฟิลโรด สกินบูสเตอร์',99000],['Botox (Forehead)','ボトックス（額）','肉毒（额头）','肉毒（額頭）','Ботокс (дух)','Botox (Dahi)','โบท็อกซ์ (หน้าผาก)',70000],['Shrink Universe 300 shots','シュリンク ユニバース 300ショット','Shrink Universe 300发','Shrink Universe 300發','Shrink Universe 300 удаа','Shrink Universe 300 shot','ชริงค์ ยูนิเวิร์ส 300 ช็อต',350000],['Potenza Pore Care','ポテンツァ 毛穴ケア','Potenza 毛孔护理','Potenza 毛孔護理','Potenza нүх сүв арчилгаа','Potenza Perawatan Pori','โพเทนซา ดูแลรูขุมขน',450000]];
+  var langs=['en','ja','zh','zh-TW','mn','id','th'],out=[],n=3200;
+  base.forEach(function(b,bi){langs.forEach(function(l,li){if(bi>=7&&(l==='th'||l==='mn'))return;out.push({id:n++,base:bi,lang:l,name:b[li],price:+b[7],img:bi%3});});});
+  return out;})()
 };}
 var CS_GUIDE={ /* 플랫폼 CS 안내 문구 (방향결정 Q12, 문안은 작성 예정. 시안용 최소 내용) */
  signup:{keys:['회원가입','가입','sign up','signup','会員登録','注册'],ko:'회원가입은 K-Beauty Station 웹사이트 오른쪽 위 Sign up에서 이메일로 할 수 있어요',en:'You can sign up with your email from Sign up at the top right of the K-Beauty Station website'},
@@ -319,6 +324,28 @@ var SUGX={soft:{ko:'문의 감사합니다. ',en:'Thank you for reaching out. ',
  chk:{ko:'매장에 확인해 보고 바로 안내해 드릴게요.',en:"I'll check with the store and get back to you shortly.",ja:'店舗に確認してすぐにご案内いたします。',zh:'我向店铺确认后马上回复您。'},
  res:{ko:'확인 결과를 알려 드려요: (확인한 내용 입력)',en:'Here is what we confirmed: (enter details)',ja:'確認結果をお知らせします：（内容を入力）',zh:'确认结果如下：（请输入内容）'}};
 function lastCust(r){for(var i=r.msgs.length-1;i>=0;i--)if(r.msgs[i].who==='cust')return r.msgs[i];return null;}
+/* AI 요약 (시안: 대화를 규칙으로 읽어 문장 생성). 1줄 = 문의 요지, 2줄 = 조건과 처리 상태 */
+function eun(w){var c=w.charCodeAt(w.length-1);if(c<0xAC00||c>0xD7A3)return w+'는';return w+(((c-0xAC00)%28)?'은':'는');} /* 은/는 */
+function summarize(r){
+ var cs=r.msgs.filter(function(m){return m.who==='cust'&&m.kind!=='image';});if(!cs.length)return null;
+ var topics=[],cond=[],done=[],open=[],seen={};
+ var TK={hours:'운영시간',loc:'위치·연락처',faqTime:'시술 시간',pay:'결제 방법',greet:null,refuse:null};
+ cs.forEach(function(m,i){var c=classify(m.text,r);var k=c.kind;
+  if(k==='price'){var n=c.prod?(c.prod.ko||c.prod.name):'시술';if(!seen['p'+n]){seen['p'+n]=1;topics.push(n+' 가격');}}
+  else if(k==='book'){if(!seen.book){seen.book=1;topics.push('예약 가능 여부');}if(c.date)cond.push(fmtDay(c.date,'ko'));if(c.time)cond.push(c.time);if(c.ppl)cond.push(c.ppl+'명');if(c.prod)cond.push(c.prod.ko||c.prod.name);}
+  else if(k==='cs'){if(!seen.cs){seen.cs=1;topics.push('고객지원('+(c.key||'일반')+')');}}
+  else if(k==='stop'){if(!seen['s'+c.reason]){seen['s'+c.reason]=1;topics.push(c.reason.replace(/\s*\(.*\)/,''));open.push(c.reason);}}
+  else if(TK[k]&&!seen[k]){seen[k]=1;topics.push(TK[k]);}
+  var next=r.msgs[r.msgs.indexOf(m)+1];if(next&&next.who==='ai'&&!next.notice&&k!=='stop')done.push(topics[topics.length-1]);
+ });
+ var q=r.req||{};if(q.people)cond.push(q.people+'명');if(q.treat)cond.push(q.treat);if(q.when)cond.push(q.when);
+ cond=cond.filter(function(x,i){return x&&cond.indexOf(x)===i;});done=done.filter(function(x,i){return x&&done.indexOf(x)===i;});
+ var l1=(topics.length?topics.join(', '):'일반')+' 문의'+(cond.length?' ('+cond.join(', ')+')':'')+'.';
+ var parts=[];if(done.length)parts.push(eun(done.join(', '))+' AI가 안내함');
+ if(r.need)parts.push(eun(r.need.reason.replace(/\s*\(.*\)/,''))+' 상담사 확인 필요');else if(open.length)parts.push(eun(open.join(', '))+' 상담사 확인 필요');
+ if(!parts.length)parts.push(r.handler==='agent'?'상담사가 응대 중':'AI가 응대 중');
+ return {l1:l1,l2:parts.join('. ')+'.',at:cs[cs.length-1].at};
+}
 function suggest(r){
  var m=lastCust(r);if(!m)return [];var lang=r.lang||'ko',base;
  if(r.need){var med=/의료/.test(r.need.reason);return [{k:'간단 안내',t:med?L(SUGX.med,lang):L(SUGX.chk,lang)},{k:'확인 결과 안내',t:L(SUGX.res,lang)},{k:'재질문',t:L(SUGX.ask,lang)}];}
@@ -365,6 +392,8 @@ function complete(id){ /* P10 상담 완료 = 확인 완료 + 상담 종료 */
 function setAI(id,on){var r=room(id);if(on){aiResume(r);}else{r.aiOn=false;}render();}
 function takeOver(id){var r=room(id);r.aiOn=false;r.handler='agent';r.agentAt=S.now;if(!r.card.owner)r.card.owner='김상담';render();} /* I4: 잡은 사람이 담당자 */
 function updateCard(id,k,v){var r=room(id);r.card[k]=v;render();}
+function sendProduct(id,pid){var r=room(id),p=DB.store.catalog.filter(function(x){return x.id===pid;})[0];if(!p)return;push(r,{who:'agent',kind:'product',text:'[상품 카드] '+p.name+' · '+p.price.toLocaleString('en-US')+' KRW',prod:p});r.msgs.forEach(function(m){if(m.who==='cust')m.answered=true;});r.handler='agent';r.agentAt=S.now;r.aiOn=false;if(!r.card.owner)r.card.owner='김상담';RECENT=[pid].concat(RECENT.filter(function(x){return x!==pid;})).slice(0,3);render();}
+var RECENT=[];
 function addNote(id,text){var r=room(id);if(!text.trim())return;push(r,{who:'note',text:text.trim(),by:r.card.owner||'김상담'});render();} /* 상담 메모: 대화 안 내부 글, 고객에게 안 감 */ /* 상담 시작 = 상담사가 잡음 (AI 끄기와 같은 동작, 답장 전에도 진행으로) */
 /* 시계 */
 function setClock(ts){
@@ -404,7 +433,7 @@ function render(){
  ['CUST','BO'].forEach(function(s){var w=frame(s).contentWindow;if(w&&typeof w.draw==='function')w.draw();});
 }
 window.IB={get DB(){return DB;},get S(){return S;},get SLACK(){return SLACK;},CH_ROOM:CH_ROOM,
- room:room,fmtTs:fmtTs,unans:unans,storeLabel:storeLabel,suggest:function(r){return suggest(r);},inHours:inHours,fmtDay:fmtDay,custSend:custSend,agentSend:agentSend,complete:complete,setAI:setAI,takeOver:takeOver,updateCard:updateCard,addNote:addNote,aiAllowed:aiAllowed,render:render,
+ room:room,fmtTs:fmtTs,unans:unans,storeLabel:storeLabel,suggest:function(r){return suggest(r);},inHours:inHours,fmtDay:fmtDay,custSend:custSend,agentSend:agentSend,complete:complete,setAI:setAI,takeOver:takeOver,updateCard:updateCard,addNote:addNote,sendProduct:sendProduct,get RECENT(){return RECENT;},summary:function(r){return summarize(r);},aiAllowed:aiAllowed,render:render,
  openRoom:function(id){S.bo.room=id;render();},
  ready:function(){render();}};
 /* ===== 검수 콘솔용 전역 ===== */
