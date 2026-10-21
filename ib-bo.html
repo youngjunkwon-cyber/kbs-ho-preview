@@ -1765,6 +1765,8 @@ function init(){
  TPL.h4=Q('[class*=_context_] h4').cloneNode(true);
  var panels=QA('section[class*=_panel_]');EL.listPanel=panels[0];EL.conv=panels[1];EL.hd=EL.conv.children[0];
  EL.ws=Q('[class*=_workspace_]');EL.aside=Q('aside[class*=_contextPanel_]');EL.composer=Q('[class*=_composer_]');
+ /* 어드민 LNB는 접힌 것으로 본다 */
+ var sider=Q('.ant-layout-sider');if(sider)sider.style.display='none';
  /* 상단 버튼 문구 */
  var chset=btnByText('입점사 채널 설정');if(chset){QA('span',chset).pop().textContent='채널 연결';}EL.chset=chset;
  var aiset=btnByText('AI 자동응대 설정');if(aiset){QA('span',aiset).pop().textContent='AI 응대 설정';}
@@ -1894,9 +1896,10 @@ function fact(label,val,isNew){var f=TPL.fact.cloneNode(true);f.innerHTML=esc(la
 function layout(){
  var L=P.S.layout||'now';EL.L=L;
  if(L==='R'){ /* 추천 답변을 오른쪽 상담 정보 패널 아래로 (세로 3개) */
-  EL.aside.appendChild(EL.sug);EL.sug.classList.add('v');var fitR=function(){EL.ws.style.gridTemplateColumns=EL.ws.clientWidth>=1400?'320px minmax(0,1fr) 400px':'300px minmax(0,1fr) 360px';};fitR();addEventListener('resize',fitR);
+  EL.aside.appendChild(EL.sug);EL.sug.classList.add('v');var fitR=function(){EL.ws.style.gridTemplateColumns=EL.ws.clientWidth>=1600?'360px minmax(0,1fr) 440px':'340px minmax(0,1fr) 420px';};fitR();addEventListener('resize',fitR);
   
  }
+ if(L==='now'){EL.ws.style.gridTemplateColumns='340px minmax(0,1fr) 340px';}
  if(L==='L4'){
   EL.ws.style.gridTemplateColumns='340px minmax(0,1fr)';
   EL.sum=document.createElement('div');EL.sum.id='sumBand';EL.sum.setAttribute('data-new','');EL.conv.insertBefore(EL.sum,EL.band);
