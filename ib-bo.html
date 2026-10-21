@@ -1851,7 +1851,7 @@ function init(){
   +'[class*=_context_] .ed{cursor:text;border-bottom:1px dashed #c4c9d1;text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}[class*=_context_] .ph{color:#b0b7c0;font-weight:400}[class*=_context_] .ed small{color:#8c8c8c;font-weight:400;font-size:11px}'
   +'.edin{width:60%;font:13px Pretendard,sans-serif;border:1px solid #1677ff;border-radius:4px;padding:2px 6px;text-align:right}.tagc{display:inline-block;border:1px solid #d9dde3;border-radius:3px;padding:0 6px;font-size:11px;font-weight:500;margin-left:4px;cursor:pointer;background:#fff}.tagc.add{color:#8c8c8c}'
   +'.bgh{font-size:11px;color:#98a2b3;margin:6px 0 2px}.bnote{font-size:12px;color:#98a2b3;padding:4px 0 6px}a.bk{display:block;font-size:12px;color:#1d2939;padding:5px 0;border-bottom:1px solid #f0f2f5;text-decoration:none}a.bk span{display:block;font-size:11px;color:#667085}a.bk:hover{color:#1677ff}'
-  +'#ptabs{display:flex;gap:2px;margin:0 14px;padding:3px;background:#f0f2f5;border-radius:6px;flex-shrink:0}#ptabs button{flex:1;border:0;background:transparent;border-radius:4px;padding:5px 0;font:12px/18px Pretendard,sans-serif;color:#666;cursor:pointer;white-space:nowrap}#ptabs button.on{background:#fff;color:#222;font-weight:700;box-shadow:0 1px 2px rgba(0,0,0,.08)}#ptabs .dot{display:inline-block;width:6px;height:6px;border-radius:3px;background:#1677ff;margin-left:4px;vertical-align:middle}'
+  +'#ptabs{display:flex;gap:2px;margin:0 14px;padding:3px;background:#f0f2f5;border-radius:6px;flex-shrink:0}#ptabs button{flex:1;border:0;background:transparent;border-radius:4px;padding:5px 0;font:12px/18px Pretendard,sans-serif;color:#666;cursor:pointer;white-space:nowrap}#ptabs button.on{background:#fff;color:#222;font-weight:700;box-shadow:0 1px 2px rgba(0,0,0,.08)}#ptabs .dot{display:inline-block;width:6px;height:6px;border-radius:3px;background:#1677ff;margin-left:4px;vertical-align:middle}#ptabs .dot.red{background:#ff4d4f}#sug.intab{max-height:none;border-top:0;padding:4px 0 8px;background:transparent;margin:0}#sug.intab .sh{color:#6b4c8a}#sug.intab button.sc span{-webkit-line-clamp:3}'
   +'#sumBand{display:flex;gap:14px;align-items:center;padding:8px 16px;border-bottom:1px solid #e3e6ea;background:#fafbfc;font-size:13px;color:#555;flex-wrap:wrap}#sumBand b{color:#222;font-weight:600;margin-left:4px}#sumBand a{margin-left:auto}';
  document.head.appendChild(st);
  layout();
@@ -1980,7 +1980,7 @@ function draw(){
  /* 추천 답변: 대기·진행에서만 */
  var sg=(T==='wait'||T==='prog')?P.suggest(r):[];
  Q('.sl',EL.sug).innerHTML=sg.map(function(s){return '<button class="sc" data-click data-t="'+esc(s.t)+'" title="'+esc(s.t)+'"><b>'+esc(s.k)+'</b><span>'+esc(s.t)+'</span></button>';}).join('');
- EL.sug.classList.toggle('on',sg.length>0);
+ EL.sug.classList.toggle('on',sg.length>0&&(S.bo.ptab||'ai')==='ai');
  /* 입력창 */
  var waOver=r.ch==='WhatsApp'&&(function(){for(var i=r.msgs.length-1;i>=0;i--)if(r.msgs[i].who==='cust')return tsMin(S.now)-tsMin(r.msgs[i].at)>24*60;return false;})();
  EL.composer.classList.remove('off');
@@ -1997,28 +1997,36 @@ function draw(){
  var bks=(c.bookings||[]).slice(),today=S.now.slice(0,10),upN=bks.filter(function(x){return x.d>=today;}).length;
  var tabs=Q('#ptabs');if(!tabs){tabs=document.createElement('div');tabs.id='ptabs';tabs.setAttribute('data-new','');tabs.setAttribute('data-click','');Q('[class*=_panelHeader_]',EL.aside).after(tabs);
   tabs.addEventListener('click',function(e){var b=e.target.closest('[data-p]');if(b){P.S.bo.ptab=b.getAttribute('data-p');draw();}});}
- tabs.innerHTML=[['cust','고객'],['book','예약'+(bks.length?' '+bks.length:'')+(upN?'<i class="dot" title="다가오는 예약 있음"></i>':'')],['info','상담 정보']].map(function(t){return '<button data-p="'+t[0]+'" class="'+(pt===t[0]?'on':'')+'">'+t[1]+'</button>';}).join('');
+ tabs.innerHTML=[['ai','AI'+(T==='wait'&&r.need?'<i class="dot red" title="상담사 확인 필요"></i>':'')],['cust','고객'+(upN?'<i class="dot" title="다가오는 예약 있음"></i>':'')],['info','상담 정보']].map(function(t){return '<button data-p="'+t[0]+'" class="'+(pt===t[0]?'on':'')+'">'+t[1]+'</button>';}).join('');
  var H=function(t,sub){var h=TPL.h4.cloneNode(true);h.innerHTML=esc(t)+(sub?'<small>'+esc(sub)+'</small>':'');h.setAttribute('data-new','');return h;};
  var KV=function(label,key,val,ph){var f=TPL.fact.cloneNode(true);f.innerHTML=esc(label)+'<b class="ed" data-k="'+key+'" data-click title="누르면 바로 고칩니다">'+(val?esc(val):'<span class="ph">'+esc(ph||'입력')+'</span>')+'</b>';f.setAttribute('data-new','');return f;};
  var note=function(t){var d=document.createElement('div');d.className='bnote';d.textContent=t;return d;};
  var link=function(html){var d=document.createElement('a');d.href='#';d.className='bk';d.setAttribute('data-click','');d.innerHTML=html;return d;};
+ if(pt==='ai'){
+  ctx.appendChild(H('AI 응대'));
+  ctx.appendChild(fact('이 대화',!allowed?'적용 대상 아님 (시범 입점사 아님)':on?'AI 응대 중':T==='prog'?'상담사 응대 중 (AI 꺼짐)':T==='done'?'완료 (다음 문의부터 AI 응대)':'AI 멈춤 · 상담사 확인 필요'));
+  ctx.appendChild(fact('적용 기준',P.inHours(S.now)?'운영시간 안 · 상담사가 직접 켜고 끔':'운영시간 밖 · 자동으로 켜짐'));
+  if(r.need){var wy=document.createElement('div');wy.className='why';wy.style.whiteSpace='normal';wy.style.margin='2px 0 6px';wy.textContent='멈춘 이유: '+r.need.reason+' · '+relTs(r.need.at);ctx.appendChild(wy);}
+  var rq=r.req||{},rqRows=[['이름',rq.name],['연락처',rq.phone],['인원',rq.people||rq.ppl],['희망 시술',rq.treat||(rq.prod&&(rq.prod.ko||rq.prod.name))],['희망 일시',rq.when||[rq.date,rq.time].filter(Boolean).join(' ')]].filter(function(x){return x[1];});
+  if(rqRows.length){ctx.appendChild(H('AI가 정리한 요청','고객이 말한 것만'));rqRows.forEach(function(x){ctx.appendChild(fact(x[0],x[1]));});}
+  ctx.appendChild(EL.sug);EL.sug.classList.add('intab');
+  if(!(T==='wait'||T==='prog')){ctx.appendChild(note(T==='done'?'완료된 상담이라 추천 답변이 없습니다':'AI가 응대 중이라 추천 답변이 없습니다. 상담 시작을 누르면 초안이 생깁니다'));}
+ }
  if(pt==='cust'){
   ctx.appendChild(H('고객 카드','칸을 누르면 바로 고칩니다'));
   ctx.appendChild(KV('이름','name',c.name));ctx.appendChild(KV('연락처','phone',c.phone,'전화번호 입력'));ctx.appendChild(KV('이메일','email',c.email,'이메일 입력'));
   var tg=TPL.fact.cloneNode(true);tg.innerHTML='태그<b class="tags">'+(c.tags||[]).map(function(t){return '<span class="tagc" data-click data-t="'+esc(t)+'" title="누르면 뺍니다">'+esc(t)+'</span>';}).join('')+'<span class="tagc add" data-click title="VIP, 재방문, 노쇼, 민원 순으로 더합니다">+</span></b>';tg.setAttribute('data-new','');ctx.appendChild(tg);
   ctx.appendChild(KV('메모','memo',c.memo,'상담사 메모'));
   var ow=TPL.fact.cloneNode(true);ow.innerHTML='담당자<b class="ed" data-k="owner" data-click>'+(c.owner?esc(c.owner)+(r.agentAt?' <small>(상담 시작 '+esc(relTs(r.agentAt))+')</small>':''):'<span class="ph">미배정</span>')+'</b>';ow.setAttribute('data-new','');ctx.appendChild(ow);
-  ctx.appendChild(H('연결된 상담','같은 고객 카드의 다른 대화'));
-  if(!(c.links||[]).length)ctx.appendChild(note('다른 대화가 없습니다'));
-  (c.links||[]).forEach(function(l){ctx.appendChild(link(esc(l.ch+' · '+P.fmtDay(l.d,'ko')+' · '+l.st)));});
- }
- if(pt==='book'){
   ctx.appendChild(H('예약 내역','연락처 기준 · 누르면 예약 상세'));
   if(!c.phone&&!c.email&&!bks.length)ctx.appendChild(note('연락처가 등록되면 예약 내역이 보입니다'));
   else if(!bks.length)ctx.appendChild(note('예약 내역이 없습니다'));
   else{var up=bks.filter(function(x){return x.d>=today;}).sort(function(x,y){return x.d<y.d?-1:1;}),past=bks.filter(function(x){return x.d<today;}).sort(function(x,y){return x.d<y.d?1:-1;});
    [['다가오는 예약',up],['지난 예약',past]].forEach(function(g){if(!g[1].length)return;var gh=document.createElement('div');gh.className='bgh';gh.textContent=g[0];ctx.appendChild(gh);
     g[1].forEach(function(x){ctx.appendChild(link(esc(P.fmtDay(x.d,'ko')+' '+x.t+' · '+x.p+' · '+x.n+'명 · '+x.st)+(x.memo?'<span>메모: '+esc(x.memo)+'</span>':'')));});});}
+  ctx.appendChild(H('연결된 상담','같은 고객 카드의 다른 대화'));
+  if(!(c.links||[]).length)ctx.appendChild(note('다른 대화가 없습니다'));
+  (c.links||[]).forEach(function(l){ctx.appendChild(link(esc(l.ch+' · '+P.fmtDay(l.d,'ko')+' · '+l.st)));});
  }
  if(pt==='info'){
   ctx.appendChild(H('상담 정보'));
