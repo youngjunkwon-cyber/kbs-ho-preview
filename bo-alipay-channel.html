@@ -176,9 +176,9 @@ body.host{background:#f5f5f5;font-family:Inter,"Noto Sans KR","Malgun Gothic",sa
 
 <script>
 /* =========================================================================
-   알리페이 채널 분기 어드민 동작 시안 (v3.3)
+   알리페이 채널 분기 어드민 동작 시안 (v3.4)
    화면 골격은 admin.k-beautystation.com 실측(2026-09-08) 기준
-   규칙은 알리페이/ 폴더의 PRD v3.3·기능정의서 v3.3 기준
+   규칙은 알리페이/ 폴더의 PRD v3.4·기능정의서 v3.4 기준
    ========================================================================= */
 const ALI_LANGS = ['중국어(간체)', '중국어(번체)', '영어'];
 const TODAY = '2026-09-13';
@@ -814,10 +814,10 @@ function screen_sEdit() {
     const im = st.channel !== ALLCH && st.channel !== VIEW.savedCh && storeHasTargetLang(st) ? impactOfStoreCh(st, st.channel) : null;
     bd = '<div class="bd">' +
       fld('카테고리', true, fbox(st.cat, true)) +
-      fld('지원언어', false, '<div class="chkrow">' + STLANG.map(L => '<span class="chkit"><input type="checkbox"' + (has(L) ? ' checked' : '') + ' onclick="toggleLang(\'' + L + '\')"> ' + L + '</span>').join('') + '</div>') +
       fld('노출 채널', false, chRadio('sch', effChStore(st), 'store', !storeHasTargetLang(st)) +
         '<div class="hint">' + MSG.storeAll + '</div>' +
         (im && (im.N || im.M) ? '<div class="notice">' + MSG.storeChange(st.channel, im.N, im.M) + '</div>' : '')) +
+      fld('지원언어', false, '<div class="chkrow">' + STLANG.map(L => '<span class="chkit"><input type="checkbox"' + (has(L) ? ' checked' : '') + ' onclick="toggleLang(\'' + L + '\')"> ' + L + '</span>').join('') + '</div>') +
       fld('대표번호', true, fbox(st.tel)) + fld('사업자명', true, fbox(st.biz)) + fld('사업자번호', true, fbox(st.bizno)) + fld('이메일', true, fbox(st.email)) + '</div>';
   } else if (i === 8) {
     bd = '<div class="bd"><div class="row"><div class="lbl">예약 사용</div><div class="val">' + onoff('sbk', st.bookingEnabled, 'setBooking(%V%)', false, ['사용', '미사용']) +
