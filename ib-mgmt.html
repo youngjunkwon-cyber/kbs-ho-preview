@@ -2196,7 +2196,7 @@ var P=parent.IB,EL={},Q=function(s,r){return (r||document).querySelector(s);},QA
 var CSS_H='css-19u5a7b css-var-root';
 var LONG_MIN=30,LIM_MSG=20;
 var LN={ko:'한국어',en:'영어',ja:'일본어',zh:'중국어(간체)','zh-TW':'중국어(번체)',th:'태국어',mn:'몽골어',id:'인도네시아어'};
-var ST={wait:['대기','red'],prog:['진행','blue'],ai:['AI 응대',''],done:['완료','']};
+var ST={wait:['대기',''],prog:['진행',''],ai:['AI 응대',''],done:['완료','']};
 var WHO=['AI','CS팀','입점사'];
 var CHS=['CS채팅','스토어채팅','상품채팅','WhatsApp','LINE','WeChat'];
 var M={dtab:'info',preset:'week',f:{},store:'',q:'',quick:null,open:null,pop:null,more:false};
@@ -2333,7 +2333,7 @@ function draw(){
  var on=function(k,v){return sel(k).length===1&&sel(k)[0]===v;};
  EL.sum.innerHTML=group('총',[tag(String(b.length),'',' data-q="all" data-click')])
   +group('상태',['wait','prog','done','ai'].map(function(t){return tag(ST[t][0]+' '+cnt(function(w){return w.tab===t;}),on('st',t)?'blue':'',' data-q="st:'+t+'" data-click');}))
-  +'<span data-new>'+group('응답지연',[tag(String(cnt(function(w){return w.long;}))+'',M.quick==='long'?'blue':(cnt(function(w){return w.long;})?'red':''),' data-q="long" data-click title="운영시간 기준 '+LONG_MIN+'분 이상 미응답"')])+'</span>'
+  +'<span data-new>'+group('응답지연',[tag(String(cnt(function(w){return w.long;}))+'',M.quick==='long'?'blue':'',' data-q="long" data-click title="운영시간 기준 '+LONG_MIN+'분 이상 미응답"')])+'</span>'
   +'<span data-new>'+group('AI 단독처리',[tag(String(cnt(function(w){return w.aiOnly;})),M.quick==='aionly'?'blue':'',' data-q="aionly" data-click')])+'</span>'
   +'<span data-new>'+group('불만',[tag(String(cnt(function(w){return w.complaint;})),on('tp','불만')?'blue':'',' data-q="complaint" data-click')])+'</span>'
   +group('언어별',Object.keys(LN).filter(function(l){return l!=='ko';}).map(function(l){return tag(LN[l]+' '+cnt(function(w){return w.lang===l;}),on('lang',l)?'blue':'',' data-q="lang:'+l+'" data-click');}));
@@ -2351,13 +2351,13 @@ function draw(){
  EL.cardTitle.textContent='전체 채팅 목록';
  EL.table.classList.toggle('ant-table-empty',!rows.length);
  EL.tbody.innerHTML=rows.length?rows.map(function(w,i){
-  var st=tag(ST[w.tab][0],ST[w.tab][1])+(w.long?'<span class="mg-long" title="운영시간 기준 미응답 시간">'+dur(w.wait)+' 지연</span>':'');
-  return '<tr class="ant-table-row ant-table-row-level-0'+(M.open===w.id?' mg-sel':'')+(w.long?' mg-lrow':'')+'" data-row="'+w.id+'" data-click>'
-   +td(String(rows.length-i))+td(esc(P.fmtTs(w.lastAt)),'nw')+td(st,'nw')+td(w.who?esc(w.who):'<span class="mg-dim">-</span>','nw')
+  var st=tag(ST[w.tab][0],ST[w.tab][1]);
+  return '<tr class="ant-table-row ant-table-row-level-0'+(M.open===w.id?' mg-sel':'')+'" data-row="'+w.id+'" data-click>'
+   +td(String(rows.length-i))+td(esc(P.fmtTs(w.lastAt)),'nw')+td(st,'nw')+td(w.tab==='wait'&&w.wait!=null?esc(dur(w.wait)):'<span class="mg-dim">-</span>','nw')+td(w.who?esc(w.who):'<span class="mg-dim">-</span>','nw')
    +td(esc(w.store||'K-Beauty Station'),'nw')+td(esc(w.ch),'nw')+td(esc(LN[w.lang]||w.lang),'nw')+td(esc(w.name),'nw')
    +td(w.topics.length?esc(w.topics.join(', ')):'<span class="mg-dim">-</span>','nw')+td('<div class="mg-last">'+esc(w.last)+'</div>')
    +td(w.owner?esc(w.owner):'<span class="mg-dim">-</span>','nw')+td(esc(dur(w.first)),'nw')+td(w.session+'차','nw')+'</tr>';}).join('')
-  :'<tr class="ant-table-placeholder"><td class="ant-table-cell" colspan="13"><div class="mg-empty">데이터 없음</div></td></tr>';
+  :'<tr class="ant-table-placeholder"><td class="ant-table-cell" colspan="14"><div class="mg-empty">데이터 없음</div></td></tr>';
  drawPop();drawDrawer();
 }
 function td(h,cls){return '<td class="ant-table-cell'+(cls?' mg-'+cls:'')+'">'+h+'</td>';}
@@ -2400,18 +2400,18 @@ function drawDrawer(){
   var notes=w.notes.length?w.notes.map(function(n){return '<div class="mg-note"><b>'+esc(n[0])+' · '+esc(P.fmtTs(n[1]))+'</b>'+esc(n[2])+'</div>';}).join(''):'<div class="mg-dim">없음</div>';
   var mg=STORE_MGR[w.store],tgt=w.prod?esc(w.prod.name)+' #'+w.prod.no:(w.ch==='스토어채팅'?esc(w.store)+' 스토어':'-');
   var meta='<div class="mg-kvgrid">'+kv('입점사',w.store?esc(w.store)+(w.cat?' · '+esc(w.cat):''):'K-Beauty Station (CS채팅)')+kv('스토어 담당',mg?esc(mg[0])+' '+esc(mg[1]):'-')
-   +kv('문의 대상',tgt)+kv('회원여부',esc(w.member))+kv('채널 ID',esc(w.cid||'-'))+kv('연결 상태',esc(w.chState||'-'))+kv('유입경로',esc(w.src||'-'))+kv('첫 대화',esc(P.fmtTs(w.msgs[0][3])))+'</div>';
+   +kv('문의 대상',tgt)+kv('접수 일시',esc(P.fmtTs(groups[groups.length-1].at)))+kv('채널 ID',esc(w.cid||'-'))+kv('연결 상태',esc(w.chState||'-'))+kv('유입경로',esc(w.src||'-'))+'</div>';
   var tl=[];groups.forEach(function(g){tl.push([g.n,g.at,'문의 접수']);g.evs.forEach(function(e){if(e[0]==='ev')tl.push([g.n,e[2],e[1]]);});});
   var hist='<div class="mg-tl">'+tl.map(function(t){return '<div><span>'+t[0]+'차</span><i>'+esc(P.fmtTs(t[1]))+'</i><b>'+esc(t[2])+'</b></div>';}).join('')+'</div>';
-  pane=sec('요약','',kv('상담 분류',w.topics.length?esc(w.topics.join(', '))+(w.topicEd?' (수정됨)':''):'-')+kv('AI 요약',esc(sumTxt))+(w.need?kv('AI 중단사유',esc(w.need)):''))
-   +sec('메모','',notes)+sec('접수 정보','',meta)+sec('처리 이력','',hist);
+  pane=sec('상담 내용','',kv('상담 분류',w.topics.length?esc(w.topics.join(', '))+(w.topicEd?' (수정됨)':''):'-')+kv('AI 요약',esc(sumTxt))+(w.need?kv('AI 중단사유',esc(w.need)):''))
+   +sec('상담 메모','',notes)+sec('접수 정보','',meta)+sec('처리 이력','',hist);
  }
  if(dt==='cust'){
   var c=w.card||{};
   var bk=w.bookings.length?w.bookings.map(function(x){return '<div class="mg-li">'+esc(P.fmtDay(x.d,'ko')+' '+x.t+' · '+x.p+' · '+x.n+'명 · '+x.st)+'</div>';}).join(''):'<div class="mg-dim">'+(c.phone||c.email?'없음':'없음 (연락처 미등록)')+'</div>';
   var ln=w.links.length?w.links.map(function(l){return '<div class="mg-li">'+esc(l.ch+' · '+P.fmtDay(l.d,'ko')+' · '+l.st)+'</div>';}).join(''):'<div class="mg-dim">없음</div>';
-  pane=sec('기본 정보','',kv('이름',esc(c.name||w.name))+kv('연락처',c.phone?esc(c.phone):'-')+kv('이메일',c.email?esc(c.email):'-')+kv('메모',c.memo?esc(c.memo):'-'))
-   +sec('예약 내역','',bk)+sec('다른 상담','',ln);
+  pane=sec('기본 정보','',kv('이름',esc(c.name||w.name))+kv('연락처',c.phone?esc(c.phone):'-')+kv('이메일',c.email?esc(c.email):'-')+kv('회원여부',esc(w.member))+kv('첫 상담일',esc(P.fmtDay(w.msgs[0][3].slice(0,10),'ko')))+kv('고객 메모',c.memo?esc(c.memo):'-'))
+   +sec('예약 내역','',bk)+sec('다른 채널 상담','',ln);
  }
  /* 상담 내역: 회차마다 한 줄(최신 위), 누르면 그 회차 대화. 진행 중 회차는 실시간 반영 */
  EL.cOpen=EL.cOpen||{};EL.cMore=EL.cMore||{};EL.cSeen=EL.cSeen||{};
@@ -2497,8 +2497,8 @@ function init(){
  /* 표 */
  var cards=QA('.ant-card');var tc=cards[cards.length-1];EL.cardTitle=Q('.ant-card-head-title',tc);
  EL.table=Q('.ant-table',tc);
- var cols=['No','마지막대화','상태','응대주체','입점사','채널','언어','고객명','상담 분류','마지막메시지','담당자','첫응답','회차'];
- var newCols={'상태':1,'응대주체':1,'상담 분류':1,'마지막메시지':1,'담당자':0,'첫응답':1,'회차':1};
+ var cols=['No','마지막대화','상태','응답지연','응대주체','입점사','채널','언어','고객명','상담 분류','마지막메시지','담당자','첫응답','회차'];
+ var newCols={'상태':1,'응답지연':1,'응대주체':1,'상담 분류':1,'마지막메시지':1,'담당자':0,'첫응답':1,'회차':1};
  Q('thead',tc).innerHTML='<tr>'+cols.map(function(c){return '<th class="ant-table-cell'+(c==='마지막대화'?' ant-table-column-has-sorters ant-table-column-sort':'')+'" scope="col"'+(newCols[c]?' data-new':'')+'>'+(c==='마지막대화'?'<div class="ant-table-column-sorters"><span class="ant-table-column-title">마지막대화날짜</span><span class="mg-sort">▼</span></div>':c)+'</th>';}).join('')+'</tr>';
  QA('colgroup',tc).forEach(function(g){g.remove();});
  EL.tbody=Q('tbody',tc);
