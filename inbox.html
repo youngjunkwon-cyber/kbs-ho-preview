@@ -422,8 +422,8 @@ function swHTML(){
 }
 function frame(s){return document.getElementById('f-'+s);}
 /* 뷰티톡은 실화면 폭 1440px 그대로 두고, 남은 자리에 맞춰 비율로 줄인다 (넓으면 그대로) */
-function fitBO(){var fr=document.getElementById('frames'),bo=frame('BO'),left=S.surf==='BOTH'?412:0,aw=fr.clientWidth-left,ah=fr.clientHeight,k=Math.min(1,aw/1440),w=k<1?1440:Math.min(aw,1920); /* 최대 1920, 남으면 가운데 */
- bo.style.left=(left+(k<1?0:Math.floor((aw-w)/2)))+'px';bo.style.width=w+'px';bo.style.transform='scale('+k+')';bo.style.height=(ah/k)+'px';}
+function fitBO(){var fr=document.getElementById('frames'),bo=frame('BO'),left=S.surf==='BOTH'?412:0,aw=fr.clientWidth-left,ah=fr.clientHeight,k=Math.min(1,aw/1440),w=k<1?1440:aw; /* 창 전체 폭. 넓어지면 상담창이 늘어남 */
+ bo.style.left=left+'px';bo.style.width=w+'px';bo.style.transform='scale('+k+')';bo.style.height=(ah/k)+'px';}
 addEventListener('resize',function(){if(S)fitBO();});
 function render(){
  document.getElementById('sw').innerHTML=swHTML();
