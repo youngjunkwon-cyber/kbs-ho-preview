@@ -1966,7 +1966,7 @@ function fact(label,val,isNew){var f=TPL.fact.cloneNode(true);f.innerHTML=esc(la
 function layout(){
  var L=P.S.layout||'now';EL.L=L;
  if(L==='R'){ /* 추천 답변을 오른쪽 상담 정보 패널 아래로 (세로 3개) */
-  EL.aside.appendChild(EL.sug);EL.sug.classList.add('v');var fitR=function(){EL.ws.style.gridTemplateColumns=EL.ws.clientWidth>=1600?'360px minmax(0,1fr) 440px':'340px minmax(0,1fr) 420px';};fitR();addEventListener('resize',fitR);
+  EL.aside.appendChild(EL.sug);EL.sug.classList.add('v');EL.ws.style.gridTemplateColumns='minmax(320px,22fr) minmax(520px,48fr) minmax(400px,30fr)'; /* 폭 비율 22 : 48 : 30, 좁아지면 최소 폭 */
   
  }
  if(L==='now'){EL.ws.style.gridTemplateColumns='340px minmax(0,1fr) 340px';}
