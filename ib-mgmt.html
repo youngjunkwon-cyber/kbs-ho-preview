@@ -2197,7 +2197,7 @@ var CSS_H='css-19u5a7b css-var-root';
 var LONG_MIN=30;
 var LN={ko:'한국어',en:'영어',ja:'일본어',zh:'중국어(간체)','zh-TW':'중국어(번체)',th:'태국어',mn:'몽골어',id:'인도네시아어'};
 var ST={wait:['대기','red'],prog:['진행','blue'],ai:['AI 응대',''],done:['완료','']};
-var WHO=['AI','우리 CS','입점사'];
+var WHO=['AI','CS팀','입점사'];
 var CHS=['CS채팅','스토어채팅','상품채팅','WhatsApp','LINE','WeChat'];
 var M={preset:'week',f:{},store:'',q:'',quick:null,open:null,pop:null,more:false};
 var CATS=['피부과','치과','성형외과','헤어·메이크업','사진관','에스테틱'];
@@ -2206,18 +2206,18 @@ function uniq(fn){var o=[];allRows().forEach(function(w){var v=fn(w);if(v&&o.ind
 var FL=[
  {k:'st',id:'mode',label:'상태',w:80,get:function(w){return w.tab;},opts:function(){return ['wait','prog','done','ai'].map(function(t){return [t,ST[t][0]];});}},
  {k:'ch',id:'channel',label:'채널',w:80,multi:1,get:function(w){return w.ch;},opts:function(){return CHS.map(function(x){return [x,x];});}},
- {k:'cat',id:'f-cat',label:'카테고리',w:100,multi:1,get:function(w){return w.cat||'none';},opts:function(){return CATS.map(function(x){return [x,x];}).concat([['none','없음 (CS채팅)']]);}},
+ {k:'cat',id:'f-cat',label:'카테고리',w:100,multi:1,get:function(w){return w.cat||'none';},opts:function(){return CATS.map(function(x){return [x,x];}).concat([['none','CS채팅']]);}},
  {k:'tp',id:'topic',label:'상담 분류',w:104,multi:1,get:function(w){return w.topics;},opts:function(){return P.TOPICS.map(function(t){return [t,t];});}},
  {k:'lang',id:'languageId',label:'언어',w:80,multi:1,get:function(w){return w.lang;},opts:function(){return Object.keys(LN).filter(function(l){return l!=='ko';}).map(function(l){return [l,LN[l]];});}},
- {k:'who',id:'isAnswered',label:'답한 쪽',more:1,get:function(w){return w.who||'none';},opts:function(){return WHO.map(function(x){return [x,x];}).concat([['none','아직 없음 (대기)']]);}},
- {k:'sub',id:'f-sub',label:'상품 세부분류',w:140,more:1,multi:1,get:function(w){return w.sub;},opts:function(){return uniq(function(w){return w.sub;}).map(function(x){return [x,x];});}},
- {k:'src',id:'f-src',label:'유입 경로',w:120,more:1,get:function(w){return w.src;},opts:function(){return [['웹','웹'],['알리페이','알리페이 앱'],['메신저','메신저']];}},
+ {k:'who',id:'isAnswered',label:'응대주체',more:1,get:function(w){return w.who||'none';},opts:function(){return WHO.map(function(x){return [x,x];}).concat([['none','미응대']]);}},
+ {k:'sub',id:'f-sub',label:'세부분류',w:140,more:1,multi:1,get:function(w){return w.sub;},opts:function(){return uniq(function(w){return w.sub;}).map(function(x){return [x,x];});}},
+ {k:'src',id:'f-src',label:'유입경로',w:120,more:1,get:function(w){return w.src;},opts:function(){return [['웹','웹'],['알리페이','알리페이 앱'],['메신저','메신저']];}},
  {k:'owner',id:'f-owner',label:'담당자',more:1,get:function(w){return w.owner||'none';},opts:function(){return uniq(function(w){return w.owner;}).map(function(x){return [x,x];}).concat([['none','미배정']]);}},
- {k:'reason',id:'f-reason',label:'AI 멈춘 이유',w:132,more:1,multi:1,get:function(w){return w.need;},opts:function(){return uniq(function(w){return w.need;}).map(function(x){return [x,x];});}},
- {k:'member',id:'f-member',label:'회원 구분',more:1,get:function(w){return w.member;},opts:function(){return [['회원','회원'],['비회원','비회원']];}},
- {k:'rep',id:'f-rep',label:'재문의',w:150,more:1,get:function(w){return w.session>1?'re':'first';},opts:function(){return [['first','첫 상담 (1차)'],['re','재문의 (2차 이상)']];}},
- {k:'bk',id:'f-bk',label:'예약',more:1,get:function(w){return w.bookings.length?'y':'n';},opts:function(){return [['y','예약 있음'],['n','예약 없음']];}},
- {k:'memo',id:'f-memo',label:'상담 메모',more:1,get:function(w){return w.notes.length?'y':'n';},opts:function(){return [['y','메모 있음'],['n','메모 없음']];}}
+ {k:'reason',id:'f-reason',label:'AI 중단사유',w:132,more:1,multi:1,get:function(w){return w.need;},opts:function(){return uniq(function(w){return w.need;}).map(function(x){return [x,x];});}},
+ {k:'member',id:'f-member',label:'회원여부',more:1,get:function(w){return w.member;},opts:function(){return [['회원','회원'],['비회원','비회원']];}},
+ {k:'rep',id:'f-rep',label:'재문의여부',w:150,more:1,get:function(w){return w.session>1?'re':'first';},opts:function(){return [['first','1차'],['re','2차 이상']];}},
+ {k:'bk',id:'f-bk',label:'예약여부',more:1,get:function(w){return w.bookings.length?'y':'n';},opts:function(){return [['y','있음'],['n','없음']];}},
+ {k:'memo',id:'f-memo',label:'메모여부',more:1,get:function(w){return w.notes.length?'y':'n';},opts:function(){return [['y','있음'],['n','없음']];}}
 ];
 function def(k){return FL.filter(function(d){return d.k===k;})[0];}
 function vals(d,w){var v=d.get(w);return Array.isArray(v)?v:[v];}
@@ -2246,7 +2246,7 @@ var EX=[
  {id:'x4',cat:'사진관',sub:'프로필 촬영',src:'알리페이',member:'회원',name:'林小姐',ch:'상품채팅',store:'C스튜디오 성수',lang:'zh-TW',tab:'done',who:'AI',owner:'',session:1,topics:['위치·운영시간'],aiOnly:true,first:0,
   msgs:[['cust','請問營業時間到幾點？','영업시간 몇 시까지예요?','2026-10-20 16:10'],['ai','營業時間為上午10點至晚上8點。','영업시간은 오전 10시부터 저녁 8시까지입니다.','2026-10-20 16:10']],
   sum:{l1:'운영시간 문의.',l2:'운영시간은 AI가 안내함.'},card:{name:'林小姐',phone:'',email:''}},
- {id:'x5',member:'회원',name:'Mina Park',ch:'CS채팅',store:'',lang:'en',tab:'done',who:'우리 CS',owner:'김상담',session:1,topics:['결제'],aiOnly:false,first:6,
+ {id:'x5',member:'회원',name:'Mina Park',ch:'CS채팅',store:'',lang:'en',tab:'done',who:'CS팀',owner:'김상담',session:1,topics:['결제'],aiOnly:false,first:6,
   msgs:[['cust','Can I pay with Alipay?','알리페이로 결제할 수 있나요?','2026-10-20 15:00'],['agent','Yes, you can pay with Alipay at the store.','네, 매장에서 알리페이로 결제할 수 있습니다.','2026-10-20 15:06']],
   sum:{l1:'결제 방법 문의.',l2:'상담사가 응대함.'},card:{name:'Mina Park',phone:'',email:'mina.park@example.com'},notes:[['김상담','2026-10-20 15:07','알리페이 매장 결제 가능 여부 안내함']]},
  {id:'x6',cat:'성형외과',name:'Chen Wei',ch:'WeChat',store:'D의원 압구정',lang:'zh',tab:'ai',who:'AI',owner:'',session:1,topics:['가격'],aiOnly:false,first:0,
@@ -2266,7 +2266,7 @@ function rowLive(r){
  var T=tabOf(r),ms=r.msgs.filter(function(m){return m.who!=='note';}),last=ms[ms.length-1],c=r.card||{};
  var fc=null,fr=null;ms.forEach(function(m){if(!fc&&m.who==='cust')fc=m;if(fc&&!fr&&(m.who==='agent'||(m.who==='ai'&&!m.notice))&&m.at>=fc.at)fr=m;});
  var agentIn=ms.some(function(m){return m.who==='agent';});
- var who=T==='ai'?'AI':T==='prog'?'우리 CS':T==='done'?(agentIn?'우리 CS':'AI'):null;
+ var who=T==='ai'?'AI':T==='prog'?'CS팀':T==='done'?(agentIn?'CS팀':'AI'):null;
  var since=null;if(T==='wait'){for(var i=ms.length-1;i>=0;i--){var m=ms[i];if(m.who==='cust')since=m.at;else if(!m.notice)break;}}
  var notes=r.msgs.filter(function(m){return m.who==='note';}).map(function(m){return [m.by||'상담사',m.at,m.text];});
  return {id:r.id,live:true,r:r,name:c.name||r.name,ch:chLabel(r),store:r.store?P.storeLabel(r):'',lang:r.lang||'ko',tab:T,who:who,owner:c.owner||'',session:r.session,
@@ -2311,31 +2311,31 @@ function draw(){
  var on=function(k,v){return sel(k).length===1&&sel(k)[0]===v;};
  EL.sum.innerHTML=group('총',[tag(String(b.length),'',' data-q="all" data-click')])
   +group('상태',['wait','prog','done','ai'].map(function(t){return tag(ST[t][0]+' '+cnt(function(w){return w.tab===t;}),on('st',t)?'blue':'',' data-q="st:'+t+'" data-click');}))
-  +'<span data-new>'+group('오래 기다림',[tag(cnt(function(w){return w.long;})+'건 · '+LONG_MIN+'분 이상',M.quick==='long'?'blue':(cnt(function(w){return w.long;})?'red':''),' data-q="long" data-click title="대기 중이면서 운영시간 기준 '+LONG_MIN+'분 넘게 답이 없는 대화"')])+'</span>'
-  +'<span data-new>'+group('AI만으로 끝남',[tag(String(cnt(function(w){return w.aiOnly;})),M.quick==='aionly'?'blue':'',' data-q="aionly" data-click')])+'</span>'
+  +'<span data-new>'+group('응답지연',[tag(String(cnt(function(w){return w.long;}))+'',M.quick==='long'?'blue':(cnt(function(w){return w.long;})?'red':''),' data-q="long" data-click title="운영시간 기준 '+LONG_MIN+'분 이상 미응답"')])+'</span>'
+  +'<span data-new>'+group('AI 단독처리',[tag(String(cnt(function(w){return w.aiOnly;})),M.quick==='aionly'?'blue':'',' data-q="aionly" data-click')])+'</span>'
   +'<span data-new>'+group('불만',[tag(String(cnt(function(w){return w.complaint;})),on('tp','불만')?'blue':'',' data-q="complaint" data-click')])+'</span>'
   +group('언어별',Object.keys(LN).filter(function(l){return l!=='ko';}).map(function(l){return tag(LN[l]+' '+cnt(function(w){return w.lang===l;}),on('lang',l)?'blue':'',' data-q="lang:'+l+'" data-click');}));
  /* 필터 칸 표시 */
  FL.forEach(function(d){var sv=sel(d.k);setSel(EL.sel[d.k],d.label,sv.length?(sv.length===1?optLabel(d,sv[0]):d.label+' '+sv.length):null);});
  var moreN=FL.filter(function(d){return d.more&&sel(d.k).length;}).length;
- EL.moreBtn.innerHTML='<span>상세 필터'+(moreN?' '+moreN:'')+' '+(M.more?'▴':'▾')+'</span>';EL.moreBtn.classList.toggle('mg-on',!!moreN);EL.more.style.display=M.more?'':'none';
+ EL.moreBtn.innerHTML='<span>상세검색'+(moreN?' '+moreN:'')+' '+(M.more?'▴':'▾')+'</span>';EL.moreBtn.classList.toggle('mg-on',!!moreN);EL.more.style.display=M.more?'':'none';
  var chips=[];FL.forEach(function(d){sel(d.k).forEach(function(v){chips.push('<span class="mg-fchip">'+esc(d.label)+': '+esc(optLabel(d,v))+'<a data-rm="'+d.k+'|'+esc(v)+'" data-click title="빼기">✕</a></span>');});});
- if(M.quick)chips.push('<span class="mg-fchip">'+(M.quick==='long'?'오래 기다림':'AI만으로 끝남')+'<a data-rm="quick|" data-click title="빼기">✕</a></span>');
+ if(M.quick)chips.push('<span class="mg-fchip">'+(M.quick==='long'?'응답지연':'AI 단독처리')+'<a data-rm="quick|" data-click title="빼기">✕</a></span>');
  if(M.store.trim())chips.push('<span class="mg-fchip">입점사: '+esc(M.store)+'<a data-rm="store|" data-click title="빼기">✕</a></span>');
- EL.chips.innerHTML=chips.length?'<span class="mg-fl">적용된 필터</span>'+chips.join('')+'<a class="mg-reset" data-rm="*|" data-click>전체 초기화</a>':'';EL.chips.style.display=chips.length?'':'none';
+ EL.chips.innerHTML=chips.length?'<span class="mg-fl">선택 조건</span>'+chips.join('')+'<a class="mg-reset" data-rm="*|" data-click>초기화</a>':'';EL.chips.style.display=chips.length?'':'none';
  var r=range();EL.d1.value=r[0];EL.d2.value=r[1];
  QA('#datePreset label').forEach(function(l){var v=Q('input',l).value,ck={day:'day',yesterday:'yday',week:'week',month:'month'}[v]===M.preset;l.classList.toggle('ant-radio-button-wrapper-checked',ck);Q('.ant-radio-button',l).classList.toggle('ant-radio-button-checked',ck);});
  /* 표 */
- EL.cardTitle.textContent='상담 목록 '+rows.length+'건';
+ EL.cardTitle.textContent='전체 채팅 목록';
  EL.table.classList.toggle('ant-table-empty',!rows.length);
  EL.tbody.innerHTML=rows.length?rows.map(function(w,i){
-  var st=tag(ST[w.tab][0],ST[w.tab][1])+(w.long?'<span class="mg-long" title="운영시간 기준 '+dur(w.wait)+'째 답 없음">'+dur(w.wait)+'째</span>':'');
+  var st=tag(ST[w.tab][0],ST[w.tab][1])+(w.long?'<span class="mg-long" title="운영시간 기준 미응답 시간">'+dur(w.wait)+' 지연</span>':'');
   return '<tr class="ant-table-row ant-table-row-level-0'+(M.open===w.id?' mg-sel':'')+(w.long?' mg-lrow':'')+'" data-row="'+w.id+'" data-click>'
    +td(String(rows.length-i))+td(esc(P.fmtTs(w.lastAt)),'nw')+td(st,'nw')+td(w.who?esc(w.who):'<span class="mg-dim">-</span>','nw')
    +td(esc(w.store||'K-Beauty Station'),'nw')+td(esc(w.ch),'nw')+td(esc(LN[w.lang]||w.lang),'nw')+td(esc(w.name),'nw')
    +td(w.topics.length?esc(w.topics.join(', ')):'<span class="mg-dim">-</span>','nw')+td('<div class="mg-last">'+esc(w.last)+'</div>')
    +td(w.owner?esc(w.owner):'<span class="mg-dim">-</span>','nw')+td(esc(dur(w.first)),'nw')+td(w.session+'차','nw')+'</tr>';}).join('')
-  :'<tr class="ant-table-placeholder"><td class="ant-table-cell" colspan="13"><div class="mg-empty">조건에 맞는 대화가 없습니다</div></td></tr>';
+  :'<tr class="ant-table-placeholder"><td class="ant-table-cell" colspan="13"><div class="mg-empty">데이터 없음</div></td></tr>';
  drawPop();drawDrawer();
 }
 function td(h,cls){return '<td class="ant-table-cell'+(cls?' mg-'+cls:'')+'">'+h+'</td>';}
@@ -2347,7 +2347,7 @@ function opts(k){var d=def(k),b=base().filter(function(w){return pass(w,k);});
  return d.opts().map(function(o){return [o[0],o[1],b.filter(function(w){return vals(d,w).indexOf(o[0])>=0;}).length];});}
 function drawPop(){var p=EL.pop;if(!M.pop){p.style.display='none';return;}var k=M.pop,d=def(k),multi=!!d.multi,el=EL.sel[k];
  var cur=sel(k);var o=opts(k);
- p.innerHTML='<div class="mg-ph">'+esc(d.label)+(multi?' <small>여러 개 고를 수 있습니다</small>':'')+'<a data-o="*" data-click>'+(multi?'전체 해제':'전체')+'</a></div>'
+ p.innerHTML='<div class="mg-ph">'+esc(d.label)+(multi?' <small>복수 선택</small>':'')+'<a data-o="*" data-click>'+'초기화'+'</a></div>'
   +o.map(function(x){var on=cur.indexOf(x[0])>=0;return '<button data-o="'+esc(x[0])+'" class="'+(on?'on':'')+(x[2]?'':' zero')+'" data-click><i>'+(on?'✓':'')+'</i>'+esc(x[1])+'<small>'+x[2]+'</small></button>';}).join('');
  var rc=el.getBoundingClientRect();p.style.left=rc.left+'px';p.style.top=(rc.bottom+4+window.scrollY)+'px';p.style.display='block';}
 
@@ -2357,23 +2357,23 @@ function kv(k,v){return '<div class="mg-kv2"><span>'+esc(k)+'</span><b>'+v+'</b>
 function drawDrawer(){
  var w=M.open?allRows().filter(function(x){return x.id===M.open;})[0]:null;
  EL.dw.style.display=w?'':'none';if(!w)return;
- Q('.ant-drawer-title',EL.dw).innerHTML='<div class="mg-t1">'+esc(w.name)+' '+tag(ST[w.tab][0],ST[w.tab][1])+(w.long?'<span class="mg-long">'+dur(w.wait)+'째 답 없음</span>':'')+'</div><div class="mg-sub">'+esc(w.ch)+' · '+esc(w.store||'K-Beauty Station')+' · '+esc(LN[w.lang]||w.lang)+' · '+w.session+'차 상담</div>';
+ Q('.ant-drawer-title',EL.dw).innerHTML='<div class="mg-t1">'+esc(w.name)+' '+tag(ST[w.tab][0],ST[w.tab][1])+(w.long?'<span class="mg-long">'+dur(w.wait)+' 지연</span>':'')+'</div><div class="mg-sub">'+esc(w.ch)+' · '+esc(w.store||'K-Beauty Station')+' · '+esc(LN[w.lang]||w.lang)+' · '+w.session+'차</div>';
  var who=w.who||'-',lang=LN[w.lang]||w.lang;
  var cell=function(k,v){return '<div class="mg-cell"><span>'+esc(k)+'</span><b>'+v+'</b></div>';};
- var info='<div class="mg-grid">'+cell('답한 쪽',esc(who))+cell('담당자',w.owner?esc(w.owner):'-')+cell('첫 응답',esc(dur(w.first)))+cell('마지막 대화',esc(P.fmtTs(w.lastAt)))+'</div>'
-  +(w.need?'<div class="mg-need">상담사 확인 필요: '+esc(w.need)+'</div>':'');
- var tp=w.topics.length?w.topics.map(function(t){return '<span class="mg-chip">'+esc(t)+'</span>';}).join(''):'<span class="mg-dim">분류할 고객 메시지가 없습니다</span>';
- var sm=w.sum?'<div class="mg-sum"><b>'+esc(w.sum.l1)+'</b><div>'+esc(w.sum.l2)+'</div></div>':'<div class="mg-dim">'+(w.tab==='ai'?'AI가 응대 중인 대화는 요약하지 않습니다':'요약할 고객 메시지가 없습니다')+'</div>';
+ var info='<div class="mg-grid">'+cell('응대주체',esc(who))+cell('담당자',w.owner?esc(w.owner):'-')+cell('첫응답',esc(dur(w.first)))+cell('마지막대화',esc(P.fmtTs(w.lastAt)))+'</div>'
+  +(w.need?'<div class="mg-need">AI 중단사유: '+esc(w.need)+'</div>':'');
+ var tp=w.topics.length?w.topics.map(function(t){return '<span class="mg-chip">'+esc(t)+'</span>';}).join(''):'<span class="mg-dim">-</span>';
+ var sm=w.sum?'<div class="mg-sum"><b>'+esc(w.sum.l1)+'</b><div>'+esc(w.sum.l2)+'</div></div>':'<div class="mg-dim">'+(w.tab==='ai'?'AI 응대 중':'-')+'</div>';
  var sess=0,conv=w.msgs.map(function(m,i){var h='';if(i===0){sess=1;h='<div class="mg-sep">1차 상담</div>';}
   var by=m[0]==='cust'?'고객':m[0]==='ai'?'AI':(w.who==='입점사'?'입점사':'상담사');
-  return h+'<div class="mg-msg '+(m[0]==='cust'?'in':'out')+'"><div class="mg-by">'+by+(m[4]?' · 자동 안내':'')+'</div><div class="mg-b">'+esc(m[1])+(m[2]&&m[2]!==m[1]?'<span class="mg-ko">'+esc(m[2])+'</span>':'')+'</div><div class="mg-at">'+esc(P.fmtTs(m[3]))+'</div></div>';}).join('');
- var notes=w.notes.length?w.notes.map(function(n){return '<div class="mg-note"><b>'+esc(n[0])+' · '+esc(P.fmtTs(n[1]))+'</b>'+esc(n[2])+'</div>';}).join(''):'<div class="mg-dim">메모가 없습니다</div>';
+  return h+'<div class="mg-msg '+(m[0]==='cust'?'in':'out')+'"><div class="mg-by">'+by+(m[4]?' (안내문)':'')+'</div><div class="mg-b">'+esc(m[1])+(m[2]&&m[2]!==m[1]?'<span class="mg-ko">'+esc(m[2])+'</span>':'')+'</div><div class="mg-at">'+esc(P.fmtTs(m[3]))+'</div></div>';}).join('');
+ var notes=w.notes.length?w.notes.map(function(n){return '<div class="mg-note"><b>'+esc(n[0])+' · '+esc(P.fmtTs(n[1]))+'</b>'+esc(n[2])+'</div>';}).join(''):'<div class="mg-dim">없음</div>';
  var c=w.card||{};
  var card=kv('이름',esc(c.name||w.name))+kv('연락처',c.phone?esc(c.phone):'-')+kv('이메일',c.email?esc(c.email):'-')+kv('메모',c.memo?esc(c.memo):'-');
- var bk=w.bookings.length?w.bookings.map(function(x){return '<div class="mg-li">'+esc(P.fmtDay(x.d,'ko')+' '+x.t+' · '+x.p+' · '+x.n+'명 · '+x.st)+'</div>';}).join(''):'<div class="mg-dim">'+(c.phone||c.email?'예약 내역이 없습니다':'연락처가 없어 예약 내역을 찾을 수 없습니다')+'</div>';
- var ln=w.links.length?w.links.map(function(l){return '<div class="mg-li">'+esc(l.ch+' · '+P.fmtDay(l.d,'ko')+' · '+l.st)+'</div>';}).join(''):'<div class="mg-dim">다른 대화가 없습니다</div>';
- Q('.ant-drawer-body',EL.dw).innerHTML=info+sec('AI 요약','','<div class="mg-tprow"><span>상담 분류</span>'+tp+'<small>'+(w.topicEd?'상담사가 고침':'AI 자동 분류')+'</small></div>'+sm)
-  +sec('대화','읽기 전용 · 원문과 한국어 번역','<div class="mg-conv">'+conv+'</div>')+sec('상담 메모','',notes)+sec('고객 카드','',card)+sec('예약 내역','연락처 기준',bk)+sec('연결된 상담','',ln);
+ var bk=w.bookings.length?w.bookings.map(function(x){return '<div class="mg-li">'+esc(P.fmtDay(x.d,'ko')+' '+x.t+' · '+x.p+' · '+x.n+'명 · '+x.st)+'</div>';}).join(''):'<div class="mg-dim">'+(c.phone||c.email?'없음':'없음 (연락처 미등록)')+'</div>';
+ var ln=w.links.length?w.links.map(function(l){return '<div class="mg-li">'+esc(l.ch+' · '+P.fmtDay(l.d,'ko')+' · '+l.st)+'</div>';}).join(''):'<div class="mg-dim">없음</div>';
+ Q('.ant-drawer-body',EL.dw).innerHTML=info+sec('AI 요약','','<div class="mg-tprow"><span>상담 분류</span>'+tp+'<small>'+(w.topicEd?'수정됨':'자동 분류')+'</small></div>'+sm)
+  +sec('대화 내역','','<div class="mg-conv">'+conv+'</div>')+sec('상담 메모','',notes)+sec('고객 카드','',card)+sec('예약 내역','',bk)+sec('연결된 상담','',ln);
 }
 
 /* ===== 처음 한 번: 실화면 부품 고치기 ===== */
@@ -2384,10 +2384,10 @@ function init(){
   if(t==='전체채팅조회'||t==='고객1:1문의'||t==='스토어채팅조회'||t==='상품채팅조회'){li.style.display='none';li.classList.remove('ant-menu-item-selected');}});
  /* 머리 */
  var h1=Q('[class*=_pageHeaderTopTitleText_]');h1.textContent='상담 관리';
- var sub=Q('[class*=_pageHeaderTopSubtitle_]');sub.textContent='우리 CS와 입점사의 모든 고객 대화를 한곳에서 봅니다. 답장은 CSM(우리 CS)과 HOST(입점사)에서 합니다.';
+ var sub=Q('[class*=_pageHeaderTopSubtitle_]');sub.textContent='우리 CS와 입점사의 전체 채팅 상담 내역을 확인할 수 있습니다.';
  var top=Q('[class*=_pageHeaderTop_]');top.style.display='flex';top.style.justifyContent='space-between';top.style.alignItems='flex-start';
  var bx=document.createElement('div');bx.setAttribute('data-new','');bx.style.cssText='display:flex;gap:8px';
- ['채널 연결','AI 응대 설정'].forEach(function(t){var b=document.createElement('button');b.type='button';b.className='ant-btn '+CSS_H+' ant-btn-default ant-btn-color-default ant-btn-variant-outlined';b.innerHTML='<span>'+t+'</span>';b.setAttribute('data-click','');b.addEventListener('click',function(){toast(t+' 창은 dev 화면 그대로 씁니다 (시안에서는 생략)');});bx.appendChild(b);});
+ ['채널 연결','AI 응대 설정'].forEach(function(t){var b=document.createElement('button');b.type='button';b.className='ant-btn '+CSS_H+' ant-btn-default ant-btn-color-default ant-btn-variant-outlined';b.innerHTML='<span>'+t+'</span>';b.setAttribute('data-click','');b.addEventListener('click',function(){toast(t+' 화면은 시안에 포함하지 않았습니다');});bx.appendChild(b);});
  top.appendChild(bx);
  /* 필터 */
  var form=Q('form.ant-form');form.addEventListener('submit',function(e){e.preventDefault();});
@@ -2401,7 +2401,7 @@ function init(){
  var mk=function(d){var it=tplItem.cloneNode(true);it.setAttribute('data-new','');Q('input',it).id=d.id;return it;};
  var catItem=mk(def('cat')),tpItem=mk(def('tp'));chItem.after(catItem);catItem.after(tpItem);tpItem.after(lgItem);
  EL.more=document.createElement('div');EL.more.className='mg-more';EL.more.setAttribute('data-new','');
- EL.more.innerHTML='<span class="mg-fl">상세 필터</span>';
+ EL.more.innerHTML='<span class="mg-fl">상세검색</span>';
  FL.filter(function(d){return d.more;}).forEach(function(d){EL.more.appendChild(d.k==='who'?whoItem:mk(d));});
  EL.moreBtn=document.createElement('button');EL.moreBtn.type='button';EL.moreBtn.id='moreBtn';EL.moreBtn.className='ant-btn '+CSS_H+' ant-btn-default ant-btn-color-default ant-btn-variant-outlined';EL.moreBtn.setAttribute('data-click','');EL.moreBtn.setAttribute('data-new','');
  var mbItem=document.createElement('div');mbItem.className='ant-form-item ant-form-item-inline '+CSS_H;mbItem.appendChild(EL.moreBtn);lgItem.after(mbItem);
@@ -2417,7 +2417,7 @@ function init(){
   var cur=sel(k).slice();if(v==='*')cur=[];else if(def(k).multi){var i=cur.indexOf(v);if(i<0)cur.push(v);else cur.splice(i,1);}else{cur=cur[0]===v?[]:[v];M.pop=null;}M.f[k]=cur;draw();});
  document.addEventListener('mousedown',function(e){if(M.pop&&!e.target.closest('#mgpop')&&!e.target.closest('.mg-on,.ant-select')){M.pop=null;drawPop();}});
  var store=Q('#storeName');store.placeholder='입점사 선택';store.closest('.ant-input-affix-wrapper').style.width='130px';EL.store=store;
- var kw=Q('#keyword');kw.placeholder='고객, 연락처, 메시지 검색';kw.style.width='190px';EL.kw=kw;
+ var kw=Q('#keyword');kw.placeholder='검색어';kw.style.width='190px';EL.kw=kw;
  var go=function(){M.q=kw.value;M.store=store.value;draw();};
  QA('button[type=submit]',form).forEach(function(b){b.setAttribute('data-click','');b.addEventListener('click',function(e){e.preventDefault();go();});});
  [kw,store].forEach(function(i){i.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();go();}});});
@@ -2432,8 +2432,8 @@ function init(){
  /* 표 */
  var cards=QA('.ant-card');var tc=cards[cards.length-1];EL.cardTitle=Q('.ant-card-head-title',tc);
  EL.table=Q('.ant-table',tc);
- var cols=['No','마지막대화','상태','답한 쪽','입점사','채널','언어','고객','상담 분류','마지막 메시지','담당자','첫 응답','회차'];
- var newCols={'상태':1,'답한 쪽':1,'상담 분류':1,'마지막 메시지':1,'담당자':0,'첫 응답':1,'회차':1};
+ var cols=['No','마지막대화','상태','응대주체','입점사','채널','언어','고객명','상담 분류','마지막메시지','담당자','첫응답','회차'];
+ var newCols={'상태':1,'응대주체':1,'상담 분류':1,'마지막메시지':1,'담당자':0,'첫응답':1,'회차':1};
  Q('thead',tc).innerHTML='<tr>'+cols.map(function(c){return '<th class="ant-table-cell'+(c==='마지막대화'?' ant-table-column-has-sorters ant-table-column-sort':'')+'" scope="col"'+(newCols[c]?' data-new':'')+'>'+(c==='마지막대화'?'<div class="ant-table-column-sorters"><span class="ant-table-column-title">마지막대화날짜</span><span class="mg-sort">▼</span></div>':c)+'</th>';}).join('')+'</tr>';
  QA('colgroup',tc).forEach(function(g){g.remove();});
  EL.tbody=Q('tbody',tc);
@@ -2443,7 +2443,7 @@ function init(){
  dw.innerHTML='<div class="ant-drawer-mask" style="position:absolute;inset:0;background:rgba(0,0,0,.45);z-index:0"></div><div class="ant-drawer-content-wrapper" style="position:absolute;top:0;right:0;bottom:0;width:720px;z-index:1;pointer-events:auto"><div class="ant-drawer-content" style="height:100%"><div class="ant-drawer-wrapper-body" style="display:flex;flex-direction:column;height:100%">'
   +'<div class="ant-drawer-header"><div class="ant-drawer-header-title"><button type="button" class="ant-drawer-close" data-click aria-label="Close">✕</button><div class="ant-drawer-title"></div></div></div>'
   +'<div class="ant-drawer-body" style="flex:1;overflow:auto"></div>'
-  +'<div class="ant-drawer-footer"><div class="mg-foot"><span>보기 전용입니다. 답장과 담당 변경은 CSM(우리 CS)이나 HOST(입점사)에서 합니다.</span><button type="button" class="ant-btn '+CSS_H+' ant-btn-default ant-btn-color-default ant-btn-variant-outlined mg-close" data-click><span>닫기</span></button></div></div>'
+  +'<div class="ant-drawer-footer"><div class="mg-foot"><span>조회 전용</span><button type="button" class="ant-btn '+CSS_H+' ant-btn-default ant-btn-color-default ant-btn-variant-outlined mg-close" data-click><span>닫기</span></button></div></div>'
   +'</div></div></div>';
  document.body.appendChild(dw);EL.dw=dw;
  dw.addEventListener('click',function(e){if(e.target.closest('.ant-drawer-close,.mg-close')||e.target.classList.contains('ant-drawer-mask')){M.open=null;draw();}});
