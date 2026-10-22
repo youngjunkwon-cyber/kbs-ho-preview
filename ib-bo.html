@@ -1932,9 +1932,9 @@ function buildListHead(){
  inp.addEventListener('input',function(){P.S.bo.q=inp.value;draw();});
  if(clr)clr.addEventListener('click',function(){inp.value='';P.S.bo.q='';draw();});
  EL.qClear=clr;
- var names=['주제','채널','응대'];
+ var names=['분류','채널','응대'];
  sels.forEach(function(s,i){if(i>2)return;var ph=Q('.ant-select-placeholder',s);if(ph)ph.textContent=names[i];Q('.lh-f',head).appendChild(s);});
- /* 주제 필터: 복수 선택 팝업 */
+ /* 분류 필터: 복수 선택 팝업 */
  var tsel=sels[0];EL.tsel=tsel;tsel.setAttribute('data-click','');tsel.style.cursor='pointer';
  var pop=document.createElement('div');pop.id='tpop';pop.setAttribute('data-new','');pop.style.display='none';head.appendChild(pop);EL.tpop=pop;
  tsel.addEventListener('mousedown',function(e){e.preventDefault();e.stopPropagation();pop.style.display=pop.style.display==='none'?'block':'none';draw();},true);
@@ -1957,8 +1957,8 @@ function searchHit(r,q){
  if(has(r.name)||has(c.name)||has(c.phone)||has(r.cid)||has(P.storeLabel(r)))return {hit:true};
  if(P.topics(r).list.some(function(t){return has(t);}))return {hit:true};
  var last=r.msgs[r.msgs.length-1];
- if(last&&(has(last.text)||has(last.ko)))return {hit:true};
- for(var i=r.msgs.length-2;i>=0;i--){if(has(r.msgs[i].text)||has(r.msgs[i].ko))return {hit:true,msg:r.msgs[i]};}
+ if(last&&last.who!=='note'&&(has(last.text)||has(last.ko)))return {hit:true};
+ for(var i=r.msgs.length-1;i>=0;i--){var mi=r.msgs[i];if(mi.who==='note'){if(has(mi.text))return {hit:true,memo:mi.text.split(/\n/)[0]};continue;}if(i<r.msgs.length-1&&(has(mi.text)||has(mi.ko)))return {hit:true,msg:mi};}
  var sm0=P.summary(r);if(sm0&&(has(sm0.l1)||has(sm0.l2)))return {hit:true,sum:sm0.l1};
  if(has(c.memo))return {hit:true,memo:c.memo};
  return {hit:false};
@@ -1996,10 +1996,10 @@ function draw(){
  if(EL.qClear)EL.qClear.classList.toggle('ant-input-clear-icon-hidden',!q);
  var tf=S.bo.topicF||[];
  var hits={},found=DB.rooms.filter(function(r){var h=searchHit(r,q);hits[r.id]=h;if(!h.hit)return false;if(!tf.length)return true;var tl=P.topics(r).list;return tf.some(function(x){return tl.indexOf(x)>=0;});});
- /* 주제 팝업: 검색 결과 기준 건수 */
+ /* 분류 팝업: 검색 결과 기준 건수 */
  if(EL.tpop){var base=DB.rooms.filter(function(r){return searchHit(r,q).hit;});
-  EL.tpop.innerHTML='<div class="tp-h">주제 <small>여러 개 고를 수 있습니다</small><a data-t="*" data-click>전체 해제</a></div>'+P.TOPICS.map(function(t){var n=base.filter(function(r){return P.topics(r).list.indexOf(t)>=0;}).length,on=tf.indexOf(t)>=0;return '<button data-t="'+t+'" class="'+(on?'on':'')+(n?'':' zero')+'" data-click><i>'+(on?'✓':'')+'</i>'+t+'<small>'+n+'</small></button>';}).join('');
-  var ph=Q('.ant-select-placeholder',EL.tsel);if(ph){ph.textContent=tf.length?'주제 '+tf.length:'주제';ph.style.color=tf.length?'#0958d9':'';}EL.tsel.style.borderColor=tf.length?'#91caff':'';}
+  EL.tpop.innerHTML='<div class="tp-h">상담 분류 <small>여러 개 고를 수 있습니다</small><a data-t="*" data-click>전체 해제</a></div>'+P.TOPICS.map(function(t){var n=base.filter(function(r){return P.topics(r).list.indexOf(t)>=0;}).length,on=tf.indexOf(t)>=0;return '<button data-t="'+t+'" class="'+(on?'on':'')+(n?'':' zero')+'" data-click><i>'+(on?'✓':'')+'</i>'+t+'<small>'+n+'</small></button>';}).join('');
+  var ph=Q('.ant-select-placeholder',EL.tsel);if(ph){ph.textContent=tf.length?'분류 '+tf.length:'분류';ph.style.color=tf.length?'#0958d9':'';}EL.tsel.style.borderColor=tf.length?'#91caff':'';}
  var cnt={all:found.length,wait:0,prog:0,done:0,ai:0};found.forEach(function(r){cnt[tabOf(r)]++;});
  var rooms=found.filter(function(r){return tab==='all'||tabOf(r)===tab;}).sort(function(a,b){
   if(tab==='all'){var wa=tabOf(a)==='wait',wb=tabOf(b)==='wait';if(wa!==wb)return wa?-1:1;}
@@ -2060,7 +2060,7 @@ function draw(){
  /* 추천 답변: 대기·진행에서만 */
  var sg=(T==='wait'||T==='prog')?P.suggest(r):[];
  Q('.sl',EL.sug).innerHTML=sg.map(function(s){return '<button class="sc" data-click data-t="'+esc(s.t)+'" title="'+esc(s.t)+'"><b>'+esc(s.k)+'</b><span>'+esc(s.t)+'</span></button>';}).join('');
- EL.sug.classList.toggle('on',sg.length>0&&(S.bo.ptab||'ai')==='ai');
+ EL.sug.classList.toggle('on',sg.length>0&&(S.bo.ptab||'cust')==='ai');
  /* 입력창 */
  var waOver=r.ch==='WhatsApp'&&(function(){for(var i=r.msgs.length-1;i>=0;i--)if(r.msgs[i].who==='cust')return tsMin(S.now)-tsMin(r.msgs[i].at)>24*60;return false;})();
  EL.composer.classList.remove('off');
@@ -2108,9 +2108,9 @@ function draw(){
  var link=function(html){var d=document.createElement('a');d.href='#';d.className='bk';d.setAttribute('data-click','');d.innerHTML=html;return d;};
  if(pt==='ai'){
   var tp=P.topics(r);
-  ctx.appendChild(H('상담 주제',tp.edited?'상담사가 고침':'AI 자동 분류'));
+  ctx.appendChild(H('상담 분류',tp.edited?'상담사가 고침':'AI 자동 분류'));
   var tw=document.createElement('div');tw.className='tpw';tw.setAttribute('data-new','');
-  tw.innerHTML=(tp.list.length?tp.list.map(function(t){return '<span class="tpchip">'+esc(t)+'<a data-rm="'+esc(t)+'" data-click title="빼기">✕</a></span>';}).join(''):'<span class="tpnone">아직 분류할 고객 메시지가 없습니다</span>')+(tp.list.length<3?'<span class="tpadd" data-click>+ 주제</span>':'')+'<div class="tpmenu" style="display:none">'+P.TOPICS.filter(function(t){return tp.list.indexOf(t)<0;}).map(function(t){return '<button data-add="'+esc(t)+'" data-click>'+esc(t)+'</button>';}).join('')+'</div>';
+  tw.innerHTML=(tp.list.length?tp.list.map(function(t){return '<span class="tpchip">'+esc(t)+'<a data-rm="'+esc(t)+'" data-click title="빼기">✕</a></span>';}).join(''):'<span class="tpnone">아직 분류할 고객 메시지가 없습니다</span>')+(tp.list.length<3?'<span class="tpadd" data-click>+ 분류</span>':'')+'<div class="tpmenu" style="display:none">'+P.TOPICS.filter(function(t){return tp.list.indexOf(t)<0;}).map(function(t){return '<button data-add="'+esc(t)+'" data-click>'+esc(t)+'</button>';}).join('')+'</div>';
   tw.addEventListener('click',function(e){var a=e.target.closest('[data-rm]');if(a){P.editTopic(r.id,a.getAttribute('data-rm'),false);return;}var ad=e.target.closest('[data-add]');if(ad){P.editTopic(r.id,ad.getAttribute('data-add'),true);return;}if(e.target.closest('.tpadd')){var mm=tw.querySelector('.tpmenu');mm.style.display=mm.style.display==='none'?'flex':'none';}});
   ctx.appendChild(tw);
   var sm=(T==='ai')?null:P.summary(r);

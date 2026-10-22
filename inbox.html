@@ -325,7 +325,7 @@ var SUGX={soft:{ko:'문의 감사합니다. ',en:'Thank you for reaching out. ',
  res:{ko:'확인 결과를 알려 드려요: (확인한 내용 입력)',en:'Here is what we confirmed: (enter details)',ja:'確認結果をお知らせします：（内容を入力）',zh:'确认结果如下：（请输入内容）'}};
 function lastCust(r){for(var i=r.msgs.length-1;i>=0;i--)if(r.msgs[i].who==='cust')return r.msgs[i];return null;}
 /* AI 요약 (시안: 대화를 규칙으로 읽어 문장 생성). 1줄 = 문의 요지, 2줄 = 조건과 처리 상태 */
-/* 상담 주제 자동 분류: 이번 회차 고객 메시지를 AI 분류값으로 묶는다. 상담사가 고친 값(r.topicEd)이 우선 */
+/* 상담 분류 자동 분류: 이번 회차 고객 메시지를 AI 분류값으로 묶는다. 상담사가 고친 값(r.topicEd)이 우선 */
 var TOPICS=['가격','예약','취소·환불','시술 상담','위치·운영시간','결제','불만','제휴·협찬','기타'];
 function topicOf(c){var k=c.kind,rs=c.reason||'';
  if(k==='price'||/^가격/.test(rs))return '가격';
