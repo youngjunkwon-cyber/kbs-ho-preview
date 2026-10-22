@@ -22,7 +22,7 @@ body{font-family:Pretendard,"Noto Sans KR","Malgun Gothic",sans-serif;font-size:
 #frames iframe{position:absolute;border:0;display:none;background:#fff}
 #frames iframe.on{display:block}
 #f-CUST{width:380px;top:16px;height:calc(100% - 32px);border-radius:18px;box-shadow:0 0 0 1px #d4d4d8}
-#f-BO{top:0;left:0;width:1440px;transform-origin:0 0}
+#f-BO,#f-MGMT{top:0;left:0;width:1440px;transform-origin:0 0}
 #frames.cust #f-CUST{left:50%;transform:translateX(-50%)}
 #frames.both #f-CUST{left:16px}
 </style>
@@ -30,7 +30,8 @@ body{font-family:Pretendard,"Noto Sans KR","Malgun Gothic",sans-serif;font-size:
 <body>
 <div id="app"><div id="sw"></div><div id="frames">
 <iframe id="f-CUST" src="ib-cust.html" title="고객 메신저"></iframe>
-<iframe id="f-BO" src="ib-bo.html" title="운영사 뷰티톡"></iframe>
+<iframe id="f-BO" src="ib-bo.html" title="CSM 상담"></iframe>
+<iframe id="f-MGMT" src="ib-mgmt.html" title="어드민 상담 관리"></iframe>
 </div></div>
 <script>
 'use strict';
@@ -433,7 +434,7 @@ function setClock(ts){
 /* ================= 렌더 ================= */
 function swHTML(){
  return '<b>통합인박스 시안</b>'
- +(LAYOUTS.length>1?'<span style="margin-left:4px">레이아웃</span><select data-sw="layout" style="background:#e8537a;border-color:#e8537a;color:#fff;font-weight:700">'+LAYOUTS.map(function(x){return '<option value="'+x[0]+'"'+(S.layout===x[0]?' selected':'')+'>'+x[1]+'</option>';}).join('')+'</select><span style="width:8px"></span>':'')+[['BOTH','고객 + 운영사 함께'],['CUST','고객 메신저'],['BO','CSM 상담 (우리 CS)']].map(function(x){return '<button class="s'+(S.surf===x[0]?' on':'')+'" data-surf="'+x[0]+'">'+x[1]+'</button>';}).join('')
+ +(LAYOUTS.length>1?'<span style="margin-left:4px">레이아웃</span><select data-sw="layout" style="background:#e8537a;border-color:#e8537a;color:#fff;font-weight:700">'+LAYOUTS.map(function(x){return '<option value="'+x[0]+'"'+(S.layout===x[0]?' selected':'')+'>'+x[1]+'</option>';}).join('')+'</select><span style="width:8px"></span>':'')+[['BOTH','고객 + 운영사 함께'],['CUST','고객 메신저'],['BO','CSM 상담 (우리 CS)'],['MGMT','어드민 상담 관리']].map(function(x){return '<button class="s'+(S.surf===x[0]?' on':'')+'" data-surf="'+x[0]+'">'+x[1]+'</button>';}).join('')
  +'<span class="sp"></span>'
  +'<span>고객 채널</span><select data-sw="ch">'+Object.keys(CH_ROOM).map(function(k){return '<option'+(S.ch===k?' selected':'')+'>'+k+'</option>';}).join('')+'</select>'
  +'<span>기준 시각</span><select data-sw="now">'+CLOCKS.map(function(c){return '<option value="'+c[0]+'"'+(S.now===c[0]?' selected':'')+'>'+c[1]+'</option>';}).join('')+'</select>'
@@ -444,15 +445,15 @@ function swHTML(){
 }
 function frame(s){return document.getElementById('f-'+s);}
 /* 뷰티톡은 실화면 폭 1440px 그대로 두고, 남은 자리에 맞춰 비율로 줄인다 (넓으면 그대로) */
-function fitBO(){var fr=document.getElementById('frames'),bo=frame('BO'),left=S.surf==='BOTH'?412:0,aw=fr.clientWidth-left,ah=fr.clientHeight,k=Math.min(1,aw/1440),w=k<1?1440:aw; /* 창 전체 폭. 넓어지면 상담창이 늘어남 */
- bo.style.left=left+'px';bo.style.width=w+'px';bo.style.transform='scale('+k+')';bo.style.height=(ah/k)+'px';}
+function fitBO(){var fr=document.getElementById('frames'),left=S.surf==='BOTH'?412:0,aw=fr.clientWidth-left,ah=fr.clientHeight,k=Math.min(1,aw/1440),w=k<1?1440:aw; /* 창 전체 폭. 넓어지면 상담창이 늘어남 */
+ [frame('BO'),frame('MGMT')].forEach(function(bo,i){var l=i?0:left,a=i?fr.clientWidth:aw,kk=Math.min(1,a/1440),ww=kk<1?1440:a;bo.style.left=l+'px';bo.style.width=ww+'px';bo.style.transform='scale('+kk+')';bo.style.height=(ah/kk)+'px';});}
 addEventListener('resize',function(){if(S)fitBO();});
 function render(){
  document.getElementById('sw').innerHTML=swHTML();
  var fr=document.getElementById('frames');fr.className=S.surf==='BOTH'?'both':S.surf==='CUST'?'cust':'';
- frame('CUST').classList.toggle('on',S.surf!=='BO');frame('BO').classList.toggle('on',S.surf!=='CUST');
+ frame('CUST').classList.toggle('on',S.surf==='BOTH'||S.surf==='CUST');frame('BO').classList.toggle('on',S.surf==='BOTH'||S.surf==='BO');frame('MGMT').classList.toggle('on',S.surf==='MGMT');
  fitBO();
- ['CUST','BO'].forEach(function(s){var w=frame(s).contentWindow;if(w&&typeof w.draw==='function')w.draw();});
+ ['CUST','BO','MGMT'].forEach(function(s){var w=frame(s).contentWindow;if(w&&typeof w.draw==='function')w.draw();});
 }
 window.IB={get DB(){return DB;},get S(){return S;},get SLACK(){return SLACK;},CH_ROOM:CH_ROOM,
  room:room,fmtTs:fmtTs,unans:unans,storeLabel:storeLabel,suggest:function(r){return suggest(r);},inHours:inHours,fmtDay:fmtDay,custSend:custSend,agentSend:agentSend,complete:complete,setAI:setAI,takeOver:takeOver,updateCard:updateCard,addNote:addNote,sendProduct:sendProduct,get RECENT(){return RECENT;},summary:function(r){return summarize(r);},topics:function(r){return topics(r);},editTopic:editTopic,TOPICS:TOPICS,aiAllowed:aiAllowed,render:render,
