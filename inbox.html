@@ -106,7 +106,7 @@ function storeLabel(r){return r.store?DB.store.name:'K-Beauty Station';}
 /* 상담함·상담창은 확정안으로 고정. 아래 안은 상담 정보 패널 배치만 다름 */
 var LAYOUTS=[['R','3단 · 추천 답변 오른쪽 패널 (확정)']];
 var LAYOUT=window.top!==window?'R':(function(){try{var v=localStorage.getItem('ib-layout');return LAYOUTS.some(function(x){return x[0]===v;})?v:'R';}catch(e){return 'R';}})();
-function freshState(){return {surf:'BOTH',mark:window.top!==window,hint:true,now:CLOCKS[0][0],ch:'LINE',layout:LAYOUT,bo:{room:'r3',filter:null,q:'',tr:true,ptab:'ai',noteOpen:false,topicF:[],langF:null,drawer:false},cust:{sheet:null}};}
+function freshState(){return {surf:'BOTH',mark:window.top!==window,hint:false,now:CLOCKS[0][0],ch:'LINE',layout:LAYOUT,bo:{room:'r3',filter:null,q:'',tr:true,ptab:'ai',noteOpen:false,topicF:[],langF:null,drawer:false},cust:{sheet:null}};}
 function room(id){return DB.rooms.filter(function(r){return r.id===id;})[0];}
 function isClinic(){return DB.store.clinic;}
 
