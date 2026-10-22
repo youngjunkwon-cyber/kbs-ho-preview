@@ -1790,7 +1790,7 @@ function init(){
   var sw=Q('.ant-switch',holder);if(sw){sw.classList.add('ant-switch-checked');sw.setAttribute('aria-checked','true');sw.setAttribute('data-click','');sw.addEventListener('click',function(){var on=sw.classList.toggle('ant-switch-checked');sw.setAttribute('aria-checked',on?'true':'false');});} /* 자동번역 기본 ON */
   var push=QA('.ant-typography',sendRow).filter(function(x){return /Push/.test(x.textContent);})[0];EL.push=push;if(push){push.style.cssText+=';font-size:11px;color:#8c8c8c;margin-left:2px;min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis';push.title=push.textContent;holder.appendChild(push);holder.style.gap='8px';}
   EL.pvBtn=mkBtn('번역 미리보기','pvBtn');sendRow.insertBefore(EL.pvBtn,send);
-  EL.pvBtn.addEventListener('click',function(){var on=EL.pv.style.display==='none';EL.pv.style.display=on?'':'none';if(on)EL.pv.textContent=ta.value.trim()?'번역 미리보기 · '+(LN[P.room(P.S.bo.room).lang]||'고객 언어')+': (시안에서는 번역 결과 대신 이 자리만 보여 줍니다) '+ta.value.trim():'먼저 답장을 입력하세요';});
+  EL.pvBtn.addEventListener('click',function(){var on=EL.pv.style.display==='none';EL.pv.style.display=on?'':'none';if(on)EL.pv.textContent=ta.value.trim()?'번역 미리보기 · '+(LN[P.room(P.S.bo.room).lang]||'고객 언어')+': (시안: 번역 결과 자리) '+ta.value.trim():'메시지를 입력하세요';});
   EL.sendRow=sendRow;
  }
  /* 상품 카드 모달: 언어 탭 + 즉시 검색 + 최근 보낸 상품 + 미리보기 */
@@ -1808,7 +1808,7 @@ function init(){
  buildListHead();
  /* 상담창 머리: 친구 추가·차단 해제는 상담 정보로, 상담 종료 → 상담 완료, AI 켜기/끄기, 번역 스위치 */
  QA('button',EL.hd).forEach(function(b){if(/친구|차단/.test(b.textContent))(b.closest('.ant-space-item')||b).style.display='none';});
- var cb=btnByText('상담 종료');cb.id='doneBtn';QA('span',cb).pop().textContent='상담 완료';cb.addEventListener('click',function(){var r=P.room(P.S.bo.room);if(!hasNote(r)){var sm=P.summary(r);if(sm){if(confirm('이번 상담에 메모가 없습니다. AI 요약을 메모로 남기고 완료할까요?\n\n'+sm.l1+' '+sm.l2))P.addNote(r.id,'[AI 요약] '+sm.l1+' '+sm.l2);else return;}else if(!confirm('이번 상담에 메모가 없습니다. 메모 없이 완료할까요?'))return;}P.complete(r.id);});EL.done=cb;
+ var cb=btnByText('상담 종료');cb.id='doneBtn';QA('span',cb).pop().textContent='상담 완료';cb.addEventListener('click',function(){var r=P.room(P.S.bo.room);if(!hasNote(r)){var sm=P.summary(r);if(sm){if(confirm('메모가 없습니다. AI 요약을 메모로 저장하고 완료하시겠습니까?\n\n'+sm.l1+' '+sm.l2))P.addNote(r.id,'[AI 요약] '+sm.l1+' '+sm.l2);else return;}else if(!confirm('메모가 없습니다. 메모 없이 완료하시겠습니까?'))return;}P.complete(r.id);});EL.done=cb;
  EL.chip=mkBtn('AI 켜기','aiChip');cb.parentElement.insertBefore(EL.chip,cb);
  EL.chip.addEventListener('click',function(){var r=P.room(P.S.bo.room);if(tabOf(r)==='prog')P.setAI(r.id,true);else P.takeOver(r.id);});
  EL.tr=mkBtn('번역 ON','trBtn');cb.parentElement.insertBefore(EL.tr,EL.chip);
@@ -1816,7 +1816,7 @@ function init(){
  EL.hd.style.alignItems='flex-start';EL.hd.children[0].style.cssText+=';min-width:0;flex:1';var hr=cb.parentElement;hr.style.cssText+=';flex:none;flex-wrap:nowrap;white-space:nowrap';if(hr.parentElement!==EL.hd)hr.parentElement.style.cssText+=';flex:none;flex-wrap:nowrap';
  /* 확인 필요 띠, 추천 답변 */
  EL.band=document.createElement('div');EL.band.id='band';EL.band.setAttribute('data-new','');EL.conv.insertBefore(EL.band,EL.msgs);
- EL.sug=document.createElement('div');EL.sug.id='sug';EL.sug.setAttribute('data-new','');EL.sug.innerHTML='<div class="sh">AI 추천 답변 <span>누르면 입력창에 들어갑니다</span></div><div class="sl"></div>';
+ EL.sug=document.createElement('div');EL.sug.id='sug';EL.sug.setAttribute('data-new','');EL.sug.innerHTML='<div class="sh">AI 추천 답변</div><div class="sl"></div>';
  EL.sug.addEventListener('click',function(e){var b=e.target.closest('button.sc');if(!b)return;EL.ta.value=b.getAttribute('data-t');EL.ta.focus();});
  EL.conv.insertBefore(EL.sug,EL.composer);
  /* 채팅 메뉴 정리 */
@@ -1865,7 +1865,7 @@ function init(){
   +'.nt{flex:none;font-size:10px;color:#9a7b00;background:#fff8dc;border:1px solid #f3dd8a;border-radius:3px;padding:0 4px}.nd{flex:none;width:8px;height:8px;border-radius:4px;background:#fa8c16;margin-left:2px}'
   +'#ownbar{display:flex;align-items:center;gap:6px;margin:0 14px 8px;padding:8px 10px;background:#f7f8fa;border-radius:6px;font-size:12px;flex-shrink:0;min-width:0}#ownbar .ol{color:#667085}#ownbar .ed{cursor:text;border-bottom:1px dashed #c4c9d1;font-weight:600}#ownbar small{color:#8c8c8c;font-size:11px}#ownbar .os{margin-left:auto;font-size:11px;font-weight:600;padding:1px 6px;border-radius:3px;background:#eef1f5;color:#475467;white-space:nowrap}#ownbar .os.wait{background:#fff1f0;color:#cf1322}#ownbar .os.ai{background:#e6f4ff;color:#0958d9}'
   +'#notebox{margin:0;padding:8px 14px;background:#fff8dc;border-top:1px solid #f3dd8a;flex-shrink:0;max-height:55%;overflow:auto}#notebox .nc{display:flex;align-items:center;gap:8px;min-width:0}#notebox .ncl{flex:none;font-size:12px;font-weight:700;color:#7a5f00}#notebox .ncp{flex:1;min-width:0;font-size:12px;color:#6b5a10;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#notebox .nopen{flex:none;border:1px solid #d9b94a;background:#fff;border-radius:4px;padding:3px 10px;font:12px Pretendard,sans-serif;color:#7a5f00;cursor:pointer}'
-  +'#notebox .nh{display:flex;align-items:center;font-size:12px;font-weight:700;color:#7a5f00;margin-bottom:6px}#notebox .nh small{font-weight:400;color:#a88a1a;margin-left:6px;font-size:11px;flex:1}#notebox .nclose{font-size:12px;font-weight:400;color:#7a5f00}#notebox .ng{margin-top:8px}#notebox .ngt{font-size:11px;font-weight:700;color:#9a7b00;padding-bottom:2px;border-bottom:1px solid #f0dc9a}#notebox .ngt[data-g]{cursor:pointer;display:flex}#notebox .ngt i{margin-left:auto;font-style:normal;font-weight:400}#notebox .ng.cl .ngt{border-bottom:0;color:#b09a4a}#notebox .ni{font-size:12px;color:#4a3d00;padding:4px 0;border-top:1px dashed #f0dc9a;line-height:1.45;white-space:pre-wrap}#notebox .ni:first-of-type{border-top:0}#notebox .ni{cursor:pointer}#notebox .ni b{display:flex;font-size:11px;color:#9a7b00;font-weight:600}#notebox .ni b i{margin-left:auto;font-style:normal;font-weight:400;color:#b09a4a}#notebox .ni .nf{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#notebox .ni.on{background:#fffdf0;margin:0 -6px;padding:4px 6px;border-radius:4px}#notebox .ne{font-size:12px;color:#b09a4a;padding:3px 0}'
+  +'#notebox .nh{display:flex;align-items:center;font-size:12px;font-weight:700;color:#7a5f00;margin-bottom:6px}#notebox .nh small{font-weight:400;color:#a88a1a;margin-left:6px;font-size:11px;flex:1}#notebox .nclose{margin-left:auto;font-size:12px;font-weight:400;color:#7a5f00}#notebox .ng{margin-top:8px}#notebox .ngt{font-size:11px;font-weight:700;color:#9a7b00;padding-bottom:2px;border-bottom:1px solid #f0dc9a}#notebox .ngt[data-g]{cursor:pointer;display:flex}#notebox .ngt i{margin-left:auto;font-style:normal;font-weight:400}#notebox .ng.cl .ngt{border-bottom:0;color:#b09a4a}#notebox .ni{font-size:12px;color:#4a3d00;padding:4px 0;border-top:1px dashed #f0dc9a;line-height:1.45;white-space:pre-wrap}#notebox .ni:first-of-type{border-top:0}#notebox .ni{cursor:pointer}#notebox .ni b{display:flex;font-size:11px;color:#9a7b00;font-weight:600}#notebox .ni b i{margin-left:auto;font-style:normal;font-weight:400;color:#b09a4a}#notebox .ni .nf{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#notebox .ni.on{background:#fffdf0;margin:0 -6px;padding:4px 6px;border-radius:4px}#notebox .ne{font-size:12px;color:#b09a4a;padding:3px 0}'
   +'#notebox .nrow{display:flex;flex-direction:column;gap:6px;margin-bottom:4px}#notebox textarea{width:100%;min-height:96px;resize:vertical;border:1px solid #e8d48a;border-radius:4px;padding:6px 8px;font:12px/1.5 Pretendard,sans-serif;background:#fff;box-sizing:border-box}#notebox .nadd{align-self:flex-end;border:1px solid #d9b94a;background:#fff;border-radius:4px;padding:4px 12px;font:12px Pretendard,sans-serif;color:#7a5f00;cursor:pointer}'
   +'.aisum{background:#f0f5ff;border:1px solid #d6e4ff;border-radius:6px;padding:8px 10px;margin:2px 0 10px;font-size:12px;line-height:1.5}.aisum .l1{font-weight:600;color:#1d2939}.aisum .l2{color:#475467;margin-top:2px}.aisum .l2.ph{color:#98a2b3}.aisum .resum,.aisum .tomemo,.aisum .cpsum{display:inline-block;margin:4px 10px 0 0;font-size:11px;color:#1677ff}.aisum .tomemo{font-weight:600}'
   +'#pm{position:fixed;inset:0;z-index:1000;font-family:Pretendard,sans-serif}#pm .pm-bg{position:absolute;inset:0;background:rgba(0,0,0,.45)}#pm .pm-box{position:absolute;left:50%;top:6%;transform:translateX(-50%);width:760px;max-height:88%;background:#fff;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.25);display:flex;flex-direction:column;overflow:hidden}'
@@ -1890,7 +1890,7 @@ var PL={en:'영어',ja:'일본어',zh:'중국어(간체)','zh-TW':'중국어(번
 var CATS=['피부과','치과','성형외과','헤어·메이크업','사진관','에스테틱'];
 function openProdModal(){
  var r=P.room(P.S.bo.room);PM.q='';PM.sel=[];PM.cat='all';PM.sub=[];PM.lang=r.lang&&PL[r.lang]?r.lang:'all';
- var m=document.createElement('div');m.id='pm';m.setAttribute('data-new','');m.innerHTML='<div class="pm-bg"></div><div class="pm-box"><div class="pm-hd"><b>상품 카드 보내기</b><span class="pm-x" data-click>✕</span></div><div class="pm-s"><input placeholder="상품명, 번호로 바로 검색" data-click></div><div class="pm-tabs" data-click></div><div class="pm-cats" data-click></div><div class="pm-subs" data-click></div><div class="pm-body"></div><div class="pm-ft"></div></div>';
+ var m=document.createElement('div');m.id='pm';m.setAttribute('data-new','');m.innerHTML='<div class="pm-bg"></div><div class="pm-box"><div class="pm-hd"><b>상품 카드 보내기</b><span class="pm-x" data-click>✕</span></div><div class="pm-s"><input placeholder="상품명, 상품번호" data-click></div><div class="pm-tabs" data-click></div><div class="pm-cats" data-click></div><div class="pm-subs" data-click></div><div class="pm-body"></div><div class="pm-ft"></div></div>';
  document.body.appendChild(m);EL.pm=m;
  m.querySelector('.pm-bg').addEventListener('click',closeProdModal);m.querySelector('.pm-x').addEventListener('click',closeProdModal);
  m.querySelector('input').addEventListener('input',function(){PM.q=this.value;drawProd();});
@@ -1917,11 +1917,11 @@ function drawProd(){
  var subCnt={};subs.forEach(function(sb){subCnt[sb]=all.filter(function(p){return inLang(p)&&inCat(p)&&hit(p)&&p.sub===sb;}).length;});
  m.querySelector('.pm-subs').innerHTML='<span class="pm-lb">세부분류</span>'+[['all','전체']].concat(subs.map(function(x){return [x,x];})).map(function(t){return '<button data-s="'+t[0]+'" class="'+((t[0]==='all'?!PM.sub.length:PM.sub.indexOf(t[0])>=0)?'on':'')+'">'+t[1]+(t[0]==='all'?'':' <small>'+subCnt[t[0]]+'</small>')+'</button>';}).join('');
  var list=all.filter(function(p){return inLang(p)&&inCat(p)&&(!PM.sub.length||PM.sub.indexOf(p.sub)>=0)&&hit(p);});
- var card=function(p){var on=PM.sel.indexOf(p.id)>=0;return '<div class="pc'+(on?' on':'')+'" data-pid="'+p.id+'" data-click title="누르면 선택, 다시 누르면 해제"><i class="pc-chk">'+(on?'✓':'')+'</i><div class="pc-img i'+p.img+'"></div><div class="pc-t"><small>'+esc(PL[p.lang]||p.lang)+' · '+esc(p.sub)+' · #'+p.id+'</small><b>'+esc(p.name)+'</b><span>'+p.price.toLocaleString('en-US')+' KRW</span></div></div>';};
+ var card=function(p){var on=PM.sel.indexOf(p.id)>=0;return '<div class="pc'+(on?' on':'')+'" data-pid="'+p.id+'" data-click><i class="pc-chk">'+(on?'✓':'')+'</i><div class="pc-img i'+p.img+'"></div><div class="pc-t"><small>'+esc(PL[p.lang]||p.lang)+' · '+esc(p.sub)+' · #'+p.id+'</small><b>'+esc(p.name)+'</b><span>'+p.price.toLocaleString('en-US')+' KRW</span></div></div>';};
  var recent=P.RECENT.map(function(id){return all.filter(function(p){return p.id===id;})[0];}).filter(Boolean).filter(function(p){return !q&&(PM.lang==='all'||p.lang===PM.lang);});
- m.querySelector('.pm-body').innerHTML=(recent.length?'<div class="pm-gh">최근 보낸 상품</div><div class="pm-grid">'+recent.map(card).join('')+'</div><div class="pm-gh">전체</div>':'')+(list.length?'<div class="pm-grid">'+list.map(card).join('')+'</div>':'<div class="pm-empty">'+(q?'"'+esc(PM.q)+'"에 맞는 상품이 없습니다':'이 언어로 등록된 상품이 없습니다')+'</div>');
+ m.querySelector('.pm-body').innerHTML=(recent.length?'<div class="pm-gh">최근 보낸 상품</div><div class="pm-grid">'+recent.map(card).join('')+'</div><div class="pm-gh">전체</div>':'')+(list.length?'<div class="pm-grid">'+list.map(card).join('')+'</div>':'<div class="pm-empty">'+(q?'"'+esc(PM.q)+'" 검색 결과 없음':'데이터 없음')+'</div>');
  var sels=PM.sel.map(function(id){return all.filter(function(p){return p.id===id;})[0];}).filter(Boolean);
- m.querySelector('.pm-ft').innerHTML=sels.length?'<div class="pm-sels"><small>선택한 상품 '+sels.length+'개 · 카드가 순서대로 나갑니다</small><div class="pm-chips">'+sels.map(function(p){return '<span class="pm-chip"><i class="pc-img i'+p.img+'"></i>'+esc(p.name)+' <b>'+p.price.toLocaleString('en-US')+'</b><a data-rm="'+p.id+'" data-click title="빼기">✕</a></span>';}).join('')+'</div></div><button class="pm-send ant-btn ant-btn-primary" data-click>'+sels.length+'개 보내기</button>':'<span class="pm-hint">상품을 눌러 고르세요. 여러 개를 고르면 카드가 차례로 나갑니다. '+(P.room(P.S.bo.room).lang&&PL[P.room(P.S.bo.room).lang]?'고객 언어('+PL[P.room(P.S.bo.room).lang]+') 탭이 먼저 열렸습니다.':'')+'</span>';
+ m.querySelector('.pm-ft').innerHTML=sels.length?'<div class="pm-sels"><small>선택 '+sels.length+'개</small><div class="pm-chips">'+sels.map(function(p){return '<span class="pm-chip"><i class="pc-img i'+p.img+'"></i>'+esc(p.name)+' <b>'+p.price.toLocaleString('en-US')+'</b><a data-rm="'+p.id+'" data-click title="빼기">✕</a></span>';}).join('')+'</div></div><button class="pm-send ant-btn ant-btn-primary" data-click>'+sels.length+'개 보내기</button>':'<span class="pm-hint">선택한 상품 없음'+(P.room(P.S.bo.room).lang&&PL[P.room(P.S.bo.room).lang]?'고객 언어('+PL[P.room(P.S.bo.room).lang]+') 탭이 먼저 열렸습니다.':'')+'</span>';
 }
 /* ===== 상담함 머리 ===== */
 function buildListHead(){
@@ -2009,10 +2009,10 @@ function draw(){
  var hits={},found=DB.rooms.filter(function(r){var h=searchHit(r,q);hits[r.id]=h;if(!h.hit)return false;if(lf&&(r.lang||'ko')!==lf)return false;if(!tf.length)return true;var tl=P.topics(r).list;return tf.some(function(x){return tl.indexOf(x)>=0;});});
  /* 분류 팝업: 검색 결과 기준 건수 */
  if(EL.tpop){var base=DB.rooms.filter(function(r){return searchHit(r,q).hit;});
-  EL.tpop.innerHTML='<div class="tp-h">상담 분류 <small>여러 개 고를 수 있습니다</small><a data-t="*" data-click>전체 해제</a></div>'+P.TOPICS.map(function(t){var n=base.filter(function(r){return P.topics(r).list.indexOf(t)>=0;}).length,on=tf.indexOf(t)>=0;return '<button data-t="'+t+'" class="'+(on?'on':'')+(n?'':' zero')+'" data-click><i>'+(on?'✓':'')+'</i>'+t+'<small>'+n+'</small></button>';}).join('');
+  EL.tpop.innerHTML='<div class="tp-h">상담 분류 <small>복수 선택</small><a data-t="*" data-click>초기화</a></div>'+P.TOPICS.map(function(t){var n=base.filter(function(r){return P.topics(r).list.indexOf(t)>=0;}).length,on=tf.indexOf(t)>=0;return '<button data-t="'+t+'" class="'+(on?'on':'')+(n?'':' zero')+'" data-click><i>'+(on?'✓':'')+'</i>'+t+'<small>'+n+'</small></button>';}).join('');
   var ph=Q('.ant-select-placeholder',EL.tsel);if(ph){ph.textContent=tf.length?'분류 '+tf.length:'분류';ph.style.color=tf.length?'#0958d9':'';}EL.tsel.style.borderColor=tf.length?'#91caff':'';}
  if(EL.lpop){var lbase=DB.rooms.filter(function(r){if(!searchHit(r,q).hit)return false;if(!tf.length)return true;var tl=P.topics(r).list;return tf.some(function(x){return tl.indexOf(x)>=0;});});
-  EL.lpop.innerHTML='<div class="tp-h">언어 <small>고객이 쓰는 언어</small></div>'+[['*','전체',lbase.length]].concat(Object.keys(LN).filter(function(l){return l!=='ko';}).map(function(l){return [l,LN[l],lbase.filter(function(r){return (r.lang||'ko')===l;}).length];})).map(function(x){var on=(x[0]==='*'&&!lf)||x[0]===lf;return '<button data-l="'+x[0]+'" class="'+(on?'on':'')+(x[2]?'':' zero')+'" data-click><i>'+(on?'✓':'')+'</i>'+x[1]+'<small>'+x[2]+'</small></button>';}).join('');
+  EL.lpop.innerHTML='<div class="tp-h">언어</div>'+[['*','전체',lbase.length]].concat(Object.keys(LN).filter(function(l){return l!=='ko';}).map(function(l){return [l,LN[l],lbase.filter(function(r){return (r.lang||'ko')===l;}).length];})).map(function(x){var on=(x[0]==='*'&&!lf)||x[0]===lf;return '<button data-l="'+x[0]+'" class="'+(on?'on':'')+(x[2]?'':' zero')+'" data-click><i>'+(on?'✓':'')+'</i>'+x[1]+'<small>'+x[2]+'</small></button>';}).join('');
   var lph=Q('.ant-select-placeholder',EL.lsel)||Q('.ant-select-selection-item',EL.lsel);if(lph){lph.textContent=lf?LN[lf]:'언어';lph.style.color=lf?'#0958d9':'';}EL.lsel.style.borderColor=lf?'#91caff':'';}
  var cnt={all:found.length,wait:0,prog:0,done:0,ai:0};found.forEach(function(r){cnt[tabOf(r)]++;});
  var rooms=found.filter(function(r){return tab==='all'||tabOf(r)===tab;}).sort(function(a,b){
@@ -2026,7 +2026,7 @@ function draw(){
   var c1=document.createElement('div');c1.className='c1';
   var tg=null;if(t==='wait')tg=tag('대기','red',true);else if(t==='ai')tg=tag('AI','',true);else if(t==='done')tg=tag('완료','default',true);
   if(tg&&tab==='all')c1.appendChild(tg);
-  c1.insertAdjacentHTML('beforeend','<span class="nm" title="'+esc(r.name)+'">'+hiq(r.name,q)+'</span>'+(hasNote(r)?'<span class="nt" title="이번 상담에 메모 있음">메모</span>':'')+'<span class="tm">'+esc(relTs(lastAt(r)))+'</span>'+((t==='prog'&&n>0)?'<i class="nd" title="고객이 새 메시지를 보냈습니다"></i>':''));
+  c1.insertAdjacentHTML('beforeend','<span class="nm" title="'+esc(r.name)+'">'+hiq(r.name,q)+'</span>'+(hasNote(r)?'<span class="nt" title="메모 있음">메모</span>':'')+'<span class="tm">'+esc(relTs(lastAt(r)))+'</span>'+((t==='prog'&&n>0)?'<i class="nd" title="새 메시지"></i>':''));
   b.appendChild(c1);
   var c2=document.createElement('div');c2.className='c2';c2.innerHTML=h.msg?'<span style="color:#8c8c8c">(이전 메시지)</span> '+hiq(h.msg.text,q):hiq(lastMsg(r),q);b.appendChild(c2);
   if(t==='wait'&&r.need){var w=document.createElement('div');w.className='why';w.setAttribute('data-new','');w.textContent='상담사 확인 필요: '+r.need.reason;b.appendChild(w);}
@@ -2035,7 +2035,7 @@ function draw(){
   var c5=document.createElement('div');c5.className='c5';var tps=P.topics(r).list;c5.innerHTML=esc([chLabel(r),r.lang?LN[r.lang]||r.lang:null].filter(Boolean).join(' · '))+(tps.length?' · <span class="tpc">'+tps.map(function(t){return hiq(t,q);}).join(', ')+'</span>':'');b.appendChild(c5);
   list.appendChild(b);
  });
- if(!rooms.length){var em=document.createElement('div');em.className='lempty';em.textContent=(tab==='wait'&&!q)?'대기 중인 대화를 모두 확인했습니다':'조건에 맞는 대화가 없습니다';list.appendChild(em);}
+ if(!rooms.length){var em=document.createElement('div');em.className='lempty';em.textContent=(tab==='wait'&&!q)?'대기 없음':'데이터 없음';list.appendChild(em);}
  Q('[class*=_count_]').textContent=rooms.length+'개';
  /* ===== 상담창 ===== */
  var r=P.room(S.bo.room),T=tabOf(r),lang=r.lang||'ko',allowed=P.aiAllowed(r),on=allowed&&r.aiOn;
@@ -2045,13 +2045,13 @@ function draw(){
  hd.children[0].classList.add('hone');
  EL.done.style.display=T==='done'?'none':'';
  EL.chip.style.display=(T==='done'||(T==='prog'&&!allowed))?'none':'';QA('span',EL.chip).pop().textContent=T==='prog'?'AI 켜기':'상담 시작';
- EL.chip.title=T==='prog'?'누르면 AI가 이 대화를 다시 맡고, 밀린 고객 메시지부터 답합니다':'누르면 이 대화를 상담사가 맡습니다. AI는 꺼지고 진행 탭으로 갑니다';
- QA('span',EL.tr).pop().textContent=S.bo.tr===false?'번역 꺼짐':'번역';EL.tr.title='말풍선 아래 한국어 번역을 켜고 끕니다';
+ EL.chip.title=T==='prog'?'AI 응대 재개':'상담사 응대 시작 (AI OFF)';
+ QA('span',EL.tr).pop().textContent=S.bo.tr===false?'번역 꺼짐':'번역';EL.tr.title='한국어 번역 표시';
  /* 확인 필요 띠 */
  EL.band.style.display=(T==='wait'&&r.need)?'block':'none';if(r.need)EL.band.textContent='상담사 확인 필요: '+r.need.reason+' · '+relTs(r.need.at);
  /* 메시지: 원문 + 한국어 번역 */
  var box=EL.msgs;box.innerHTML='';var sess=1;
- var pv=document.createElement('div');pv.style.cssText='text-align:center;margin:0 0 10px';pv.innerHTML='<button class="ant-btn ant-btn-default ant-btn-sm" data-click data-new style="font-size:12px"><span>이전 대화 보기</span></button>';pv.querySelector('button').addEventListener('click',function(){this.outerHTML='<span style="font-size:12px;color:#98a2b3">더 불러올 이전 대화가 없습니다</span>';});box.appendChild(pv);
+ var pv=document.createElement('div');pv.style.cssText='text-align:center;margin:0 0 10px';pv.innerHTML='<button class="ant-btn ant-btn-default ant-btn-sm" data-click data-new style="font-size:12px"><span>이전 대화 보기</span></button>';pv.querySelector('button').addEventListener('click',function(){this.outerHTML='<span style="font-size:12px;color:#667085">이전 대화 없음</span>';});box.appendChild(pv);
  r.msgs.forEach(function(m,i){
   if(m.who==='note'){if(m.newSession)sess++;return;}
   var w=(m.who==='cust'?TPL.in:TPL.out).cloneNode(true);w.removeAttribute('id');
@@ -2060,9 +2060,9 @@ function draw(){
   metas[0].textContent=m.who==='cust'?'고객':m.who==='ai'?'AI':'상담사';
   var bub=Q('[class*=_bubble_]',br);bub.children[0].innerHTML=m.kind==='image'?'(사진)':m.kind==='product'?'<span class="pcard"><i class="pc-img i'+(m.prod?m.prod.img:0)+'"></i><span><small>상품 카드</small><b>'+esc(m.prod?m.prod.name:'')+'</b>'+(m.prod?m.prod.price.toLocaleString('en-US')+' KRW':'')+'</span></span>':esc(m.text).replace(/\n/g,'<br>');
   if(m.kind!=='image'&&m.kind!=='product'){var ml=detectLang(m.text),tr=null;
-   if(m.who==='cust'&&ml&&ml!=='ko'){tr=document.createElement('span');tr.className='tr'+(m.ko?'':' ph');tr.textContent=m.ko||'한국어 번역이 여기에 표시됩니다';}
+   if(m.who==='cust'&&ml&&ml!=='ko'){tr=document.createElement('span');tr.className='tr'+(m.ko?'':' ph');tr.textContent=m.ko||'번역 대기';}
    else if(m.who==='ai'&&m.ko&&ml!=='ko'){tr=document.createElement('span');tr.className='tr';tr.textContent=m.ko;}
-   else if(m.who==='agent'&&lang!=='ko'&&ml==='ko'){tr=document.createElement('span');tr.className='tr ph';tr.textContent='자동번역 · '+(LN[lang]||lang)+'로 보냄';}
+   else if(m.who==='agent'&&lang!=='ko'&&ml==='ko'){tr=document.createElement('span');tr.className='tr ph';tr.textContent='자동번역 ('+(LN[lang]||lang)+')';}
    if(tr)bub.appendChild(tr);
    QA('button',br).forEach(function(b){if(b.textContent.trim()!=='번역')return;if(!tr||tr.classList.contains('ph')){b.style.display='none';return;}b.textContent='다시 번역';b.setAttribute('data-new','');b.addEventListener('click',function(){tr.textContent=tr.textContent.replace(/ · 다시 번역함.*$/,'')+' · 다시 번역함 '+S.now.slice(11,16);});});}
   if(m.link){var a=document.createElement('span');a.className='lk';a.setAttribute('data-new','');a.textContent=m.link.url;bub.appendChild(a);var me=document.createElement('span');me.className='memo';me.setAttribute('data-new','');me.textContent='요청사항(메모): '+m.link.memo;bub.appendChild(me);}
@@ -2078,12 +2078,12 @@ function draw(){
  /* 입력창 */
  var waOver=r.ch==='WhatsApp'&&(function(){for(var i=r.msgs.length-1;i>=0;i--)if(r.msgs[i].who==='cust')return tsMin(S.now)-tsMin(r.msgs[i].at)>24*60;return false;})();
  EL.composer.classList.remove('off');
- if(T==='done'){EL.note.className='done';EL.note.textContent='완료된 상담입니다. 고객이 다시 문의하면 새 상담으로 시작됩니다';}
- else if(waOver){EL.note.className='warn';EL.note.textContent='마지막 고객 메시지 후 24시간이 지나 WhatsApp 답장을 보낼 수 없습니다';}
+ if(T==='done'){EL.note.className='done';EL.note.textContent='완료된 상담';}
+ else if(waOver){EL.note.className='warn';EL.note.textContent='WhatsApp 24시간 경과로 발송 불가';}
  else{EL.note.className='';}
  var lock=T==='done'||waOver;
  [EL.ta,EL.send,EL.pvBtn].forEach(function(e){e.disabled=lock;e.style.opacity=lock?'.5':'';});EL.tools.style.display=T==='done'?'none':'';EL.sendRow.style.display=T==='done'?'none':'flex';EL.ta.parentElement.style.display=T==='done'?'none':'';
- EL.ta.placeholder=lang!=='ko'?'한국어로 쓰면 '+(LN[lang]||lang)+'로 번역되어 나갑니다':'답장 입력';
+ EL.ta.placeholder=lang!=='ko'?'메시지 입력 ('+(LN[lang]||lang)+' 자동번역)':'메시지 입력';
  EL.langTxt.textContent='고객 언어: '+(LN[lang]||lang);
  if(EL.push)EL.push.style.display=r.ch==='LINE'?'':'none';
  /* ===== 상담 정보 패널: 탭(고객 / 예약 N / 상담 정보) + 아래 고정 AI 추천 답변 ===== */
@@ -2091,7 +2091,7 @@ function draw(){
  var bks=(c.bookings||[]).slice(),today=S.now.slice(0,10),upN=bks.filter(function(x){return x.d>=today;}).length;
  var ownBar=Q('#ownbar');if(!ownBar){ownBar=document.createElement('div');ownBar.id='ownbar';ownBar.setAttribute('data-new','');Q('[class*=_panelHeader_]',EL.aside).after(ownBar);
   ownBar.addEventListener('click',function(e){var t=e.target.closest('[data-k]');if(!t)return;var rr=P.room(P.S.bo.room),inp=document.createElement('input');inp.className='edin';inp.style.width='120px';inp.value=rr.card.owner||'';t.replaceWith(inp);inp.focus();var fin=function(){P.updateCard(rr.id,'owner',inp.value.trim());};inp.addEventListener('blur',fin);inp.addEventListener('keydown',function(ev){if(ev.key==='Enter')inp.blur();});});}
- ownBar.innerHTML='<span class="ol">담당자</span><b class="ed" data-k="owner" data-click title="누르면 바로 고칩니다">'+(c.owner?esc(c.owner):'<span class="ph">미배정</span>')+'</b>'+(c.owner&&r.agentAt?'<small>상담 시작 '+esc(relTs(r.agentAt))+'</small>':'')+'<span class="os '+T+'">'+esc(STATE[T])+'</span>';
+ ownBar.innerHTML='<span class="ol">담당자</span><b class="ed" data-k="owner" data-click title="수정">'+(c.owner?esc(c.owner):'<span class="ph">미배정</span>')+'</b>'+(c.owner&&r.agentAt?'<small>상담 시작 '+esc(relTs(r.agentAt))+'</small>':'')+'<span class="os '+T+'">'+esc(STATE[T])+'</span>';
  var nbx=Q('#notebox');if(!nbx){nbx=document.createElement('div');nbx.id='notebox';nbx.setAttribute('data-new','');EL.aside.appendChild(nbx); /* 패널 맨 아래 고정 */
   nbx.addEventListener('click',function(e){
    if(e.target.closest('.nadd')){var inp=nbx.querySelector('textarea');if(inp.value.trim()){P.addNote(P.S.bo.room,inp.value);inp.value='';}return;}
@@ -2106,57 +2106,57 @@ function draw(){
  var curG=groups[groups.length-1],allN=groups.reduce(function(a,g){return a+g.notes.length;},0),lastN=null,lastG=null;groups.forEach(function(g){if(g.notes.length){lastN=g.notes[g.notes.length-1];lastG=g;}});
  if(S.bo.noteOpen){
   nbx.className='open';
-  nbx.innerHTML='<div class="nh">상담 메모<small>회차별로 따로 남습니다 · 고객에게 보이지 않음</small><a href="#" class="nclose" data-click>접기 ▾</a></div>'
-   +(T==='done'?'':'<div class="nrow"><textarea rows="5" placeholder="이번 상담 메모 (엔터 줄바꿈, Ctrl+엔터로 추가)" data-click></textarea><button class="nadd" data-click>메모 추가</button></div>')
-   +groups.slice().reverse().map(function(g){var cur=g===curG,k=r.id+':'+g.n,op=cur||(EL.ngOpen&&EL.ngOpen[k]);return '<div class="ng'+(op?'':' cl')+'">'+(cur?'<div class="ngt">이번 상담 ('+g.n+'차)</div>':'<div class="ngt" data-g="'+k+'" data-click title="누르면 '+(op?'접힙니다':'펼쳐집니다')+'">'+g.n+'차 상담 · '+esc(P.fmtDay(g.at.slice(0,10),'ko'))+' · 메모 '+g.notes.length+'건<i>'+(op?'▴':'▾')+'</i></div>')+(op?(g.notes.length?g.notes.map(function(m,mi){var nk=k+':'+mi,no=EL.niOpen&&EL.niOpen[nk],first=m.text.split('\n')[0],more=m.text.indexOf('\n')>=0||m.text.length>40;return '<div class="ni'+(no?' on':'')+'" data-n="'+nk+'" data-click title="누르면 '+(no?'접힙니다':'펼쳐집니다')+'"><b>'+esc(m.by||'상담사')+' · '+esc(relTs(m.at))+(more&&!no?'<i>더 보기</i>':'')+'</b>'+(no?esc(m.text):'<span class="nf">'+esc(first)+'</span>')+'</div>';}).join(''):'<div class="ne">메모 없음</div>'):'')+'</div>';}).join('');
+  nbx.innerHTML='<div class="nh">상담 메모<a href="#" class="nclose" data-click>접기 ▾</a></div>'
+   +(T==='done'?'':'<div class="nrow"><textarea rows="5" placeholder="메모 입력 (Ctrl+Enter 등록)" data-click></textarea><button class="nadd" data-click>등록</button></div>')
+   +groups.slice().reverse().map(function(g){var cur=g===curG,k=r.id+':'+g.n,op=cur||(EL.ngOpen&&EL.ngOpen[k]);return '<div class="ng'+(op?'':' cl')+'">'+(cur?'<div class="ngt">'+g.n+'차 (현재)</div>':'<div class="ngt" data-g="'+k+'" data-click title="누르면 '+(op?'접힙니다':'펼쳐집니다')+'">'+g.n+'차 상담 · '+esc(P.fmtDay(g.at.slice(0,10),'ko'))+' · 메모 '+g.notes.length+'건<i>'+(op?'▴':'▾')+'</i></div>')+(op?(g.notes.length?g.notes.map(function(m,mi){var nk=k+':'+mi,no=EL.niOpen&&EL.niOpen[nk],first=m.text.split('\n')[0],more=m.text.indexOf('\n')>=0||m.text.length>40;return '<div class="ni'+(no?' on':'')+'" data-n="'+nk+'" data-click title="누르면 '+(no?'접힙니다':'펼쳐집니다')+'"><b>'+esc(m.by||'상담사')+' · '+esc(relTs(m.at))+(more&&!no?'<i>더 보기</i>':'')+'</b>'+(no?esc(m.text):'<span class="nf">'+esc(first)+'</span>')+'</div>';}).join(''):'<div class="ne">메모 없음</div>'):'')+'</div>';}).join('');
  }else{
   nbx.className='';
-  nbx.innerHTML='<div class="nc"><span class="ncl">상담 메모'+(allN?' '+allN:'')+'</span><span class="ncp">'+(lastN?((lastG===curG?'':lastG.n+'차 · ')+esc(lastN.text.split('\n')[0])):(T==='done'?'이 상담에 메모가 없습니다':'아직 메모가 없습니다'))+'</span>'+(T==='done'&&!allN?'':'<button class="nopen" data-click>'+(T==='done'?'보기':'+ 메모')+'</button>')+'</div>';
+  nbx.innerHTML='<div class="nc"><span class="ncl">상담 메모'+(allN?' '+allN:'')+'</span><span class="ncp">'+(lastN?((lastG===curG?'':lastG.n+'차 · ')+esc(lastN.text.split('\n')[0])):(T==='done'?'없음':'없음'))+'</span>'+(T==='done'&&!allN?'':'<button class="nopen" data-click>'+(T==='done'?'보기':'+ 메모')+'</button>')+'</div>';
  }
  var tabs=Q('#ptabs');if(!tabs){tabs=document.createElement('div');tabs.id='ptabs';tabs.setAttribute('data-new','');tabs.setAttribute('data-click','');ownBar.after(tabs);
   tabs.addEventListener('click',function(e){var b=e.target.closest('[data-p]');if(b){P.S.bo.ptab=b.getAttribute('data-p');draw();}});}
- tabs.innerHTML=[['ai','AI'+(T==='wait'&&r.need?'<i class="dot red" title="상담사 확인 필요"></i>':'')],['cust','고객'+(upN?'<i class="dot" title="다가오는 예약 있음"></i>':'')],['info','상담 정보']].map(function(t){return '<button data-p="'+t[0]+'" class="'+(pt===t[0]?'on':'')+'">'+t[1]+'</button>';}).join('');
+ tabs.innerHTML=[['ai','AI'+(T==='wait'&&r.need?'<i class="dot red" title="AI 중단"></i>':'')],['cust','고객'+(upN?'<i class="dot" title="예정 예약"></i>':'')],['info','상담 정보']].map(function(t){return '<button data-p="'+t[0]+'" class="'+(pt===t[0]?'on':'')+'">'+t[1]+'</button>';}).join('');
  var H=function(t,sub){var h=TPL.h4.cloneNode(true);h.innerHTML=esc(t)+(sub?'<small>'+esc(sub)+'</small>':'');h.setAttribute('data-new','');return h;};
- var KV=function(label,key,val,ph){var f=TPL.fact.cloneNode(true);f.innerHTML=esc(label)+'<b class="ed" data-k="'+key+'" data-click title="누르면 바로 고칩니다">'+(val?esc(val):'<span class="ph">'+esc(ph||'입력')+'</span>')+'</b>';f.setAttribute('data-new','');return f;};
+ var KV=function(label,key,val,ph){var f=TPL.fact.cloneNode(true);f.innerHTML=esc(label)+'<b class="ed" data-k="'+key+'" data-click title="수정">'+(val?esc(val):'<span class="ph">'+esc(ph||'입력')+'</span>')+'</b>';f.setAttribute('data-new','');return f;};
  var note=function(t){var d=document.createElement('div');d.className='bnote';d.textContent=t;return d;};
  var link=function(html){var d=document.createElement('a');d.href='#';d.className='bk';d.setAttribute('data-click','');d.innerHTML=html;return d;};
  if(pt==='ai'){
   var tp=P.topics(r);
-  ctx.appendChild(H('상담 분류',tp.edited?'상담사가 고침':'AI 자동 분류'));
+  ctx.appendChild(H('상담 분류',tp.edited?'수정됨':'자동 분류'));
   var tw=document.createElement('div');tw.className='tpw';tw.setAttribute('data-new','');
-  tw.innerHTML=(tp.list.length?tp.list.map(function(t){return '<span class="tpchip">'+esc(t)+'<a data-rm="'+esc(t)+'" data-click title="빼기">✕</a></span>';}).join(''):'<span class="tpnone">아직 분류할 고객 메시지가 없습니다</span>')+(tp.list.length<3?'<span class="tpadd" data-click>+ 분류</span>':'')+'<div class="tpmenu" style="display:none">'+P.TOPICS.filter(function(t){return tp.list.indexOf(t)<0;}).map(function(t){return '<button data-add="'+esc(t)+'" data-click>'+esc(t)+'</button>';}).join('')+'</div>';
+  tw.innerHTML=(tp.list.length?tp.list.map(function(t){return '<span class="tpchip">'+esc(t)+'<a data-rm="'+esc(t)+'" data-click title="빼기">✕</a></span>';}).join(''):'<span class="tpnone">-</span>')+(tp.list.length<3?'<span class="tpadd" data-click>+ 분류</span>':'')+'<div class="tpmenu" style="display:none">'+P.TOPICS.filter(function(t){return tp.list.indexOf(t)<0;}).map(function(t){return '<button data-add="'+esc(t)+'" data-click>'+esc(t)+'</button>';}).join('')+'</div>';
   tw.addEventListener('click',function(e){var a=e.target.closest('[data-rm]');if(a){P.editTopic(r.id,a.getAttribute('data-rm'),false);return;}var ad=e.target.closest('[data-add]');if(ad){P.editTopic(r.id,ad.getAttribute('data-add'),true);return;}if(e.target.closest('.tpadd')){var mm=tw.querySelector('.tpmenu');mm.style.display=mm.style.display==='none'?'flex':'none';}});
   ctx.appendChild(tw);
   var sm=(T==='ai')?null:P.summary(r);
-  var sh=H('AI 요약',sm?'고객 메시지 기준 · '+relTs(sm.at):null);ctx.appendChild(sh);
-  var sd=document.createElement('div');sd.className='aisum';sd.setAttribute('data-new','');sd.innerHTML=sm?'<div class="l1">'+esc(sm.l1)+'</div><div class="l2">'+esc(sm.l2)+'</div><a href="#" class="resum" data-click>다시 요약</a><a href="#" class="tomemo" data-click title="요약 문장을 메모 입력칸에 채웁니다. 고쳐서 메모 추가를 누르면 됩니다">메모에 넣기</a><a href="#" class="cpsum" data-click>복사</a>':'<div class="l2 ph">'+(T==='ai'?'AI가 응대 중인 대화는 요약하지 않습니다. 상담사가 맡으면 만들어집니다':'고객 메시지가 아직 없습니다')+'</div>';ctx.appendChild(sd);
+  var sh=H('AI 요약',sm?'기준 '+relTs(sm.at):null);ctx.appendChild(sh);
+  var sd=document.createElement('div');sd.className='aisum';sd.setAttribute('data-new','');sd.innerHTML=sm?'<div class="l1">'+esc(sm.l1)+'</div><div class="l2">'+esc(sm.l2)+'</div><a href="#" class="resum" data-click>다시 요약</a><a href="#" class="tomemo" data-click>메모에 넣기</a><a href="#" class="cpsum" data-click>복사</a>':'<div class="l2 ph">'+(T==='ai'?'AI 응대 중':'-')+'</div>';ctx.appendChild(sd);
   sd.addEventListener('click',function(e){var txt=sm?sm.l1+' '+sm.l2:'';if(e.target.closest('.resum')){e.preventDefault();draw();return;}if(e.target.closest('.tomemo')){e.preventDefault();P.S.bo.noteOpen=true;draw();var ta2=Q('#notebox textarea');if(ta2){ta2.value='[AI 요약] '+txt;ta2.focus();ta2.scrollIntoView({block:'nearest'});}return;}if(e.target.closest('.cpsum')){e.preventDefault();try{navigator.clipboard.writeText(txt);}catch(_){}var a=e.target.closest('.cpsum');a.textContent='복사됨';setTimeout(function(){a.textContent='복사';},1200);}});
   ctx.appendChild(H('AI 응대'));
-  ctx.appendChild(fact('이 대화',!allowed?'적용 대상 아님 (시범 입점사 아님)':on?'AI 응대 중':T==='prog'?'상담사 응대 중 (AI 꺼짐)':T==='done'?'완료 (다음 문의부터 AI 응대)':'AI 멈춤 · 상담사 확인 필요'));
-  ctx.appendChild(fact('적용 기준',P.inHours(S.now)?'운영시간 안 · 상담사가 직접 켜고 끔':'운영시간 밖 · 자동으로 켜짐'));
-  if(r.need){var wy=document.createElement('div');wy.className='why';wy.style.whiteSpace='normal';wy.style.margin='2px 0 6px';wy.textContent='멈춘 이유: '+r.need.reason+' · '+relTs(r.need.at);ctx.appendChild(wy);}
+  ctx.appendChild(fact('이 대화',!allowed?'미적용 (시범 입점사 아님)':on?'AI 응대 중':T==='prog'?'상담사 응대 (AI OFF)':T==='done'?'완료':'AI 중단'));
+  ctx.appendChild(fact('운영시간',P.inHours(S.now)?'운영시간 내 (수동 ON/OFF)':'운영시간 외 (자동 ON)'));
+  if(r.need){var wy=document.createElement('div');wy.className='why';wy.style.whiteSpace='normal';wy.style.margin='2px 0 6px';wy.textContent='AI 중단사유: '+r.need.reason+' · '+relTs(r.need.at);ctx.appendChild(wy);}
   ctx.appendChild(EL.sug);EL.sug.classList.add('intab');
-  if(!(T==='wait'||T==='prog')){ctx.appendChild(note(T==='done'?'완료된 상담이라 추천 답변이 없습니다':'AI가 응대 중이라 추천 답변이 없습니다. 상담 시작을 누르면 초안이 생깁니다'));}
+  if(!(T==='wait'||T==='prog')){ctx.appendChild(note(T==='done'?'완료된 상담':'AI 응대 중'));}
  }
  if(pt==='cust'){
-  ctx.appendChild(H('고객 카드','칸을 누르면 바로 고칩니다'));
+  ctx.appendChild(H('고객 카드',''));
   ctx.appendChild(KV('이름','name',c.name));ctx.appendChild(KV('연락처','phone',c.phone,'전화번호 입력'));ctx.appendChild(KV('이메일','email',c.email,'이메일 입력'));
-  ctx.appendChild(KV('메모','memo',c.memo,'상담사 메모'));
-  ctx.appendChild(H('예약 내역','연락처 기준 · 누르면 예약 상세'));
-  if(!c.phone&&!c.email&&!bks.length)ctx.appendChild(note('연락처가 등록되면 예약 내역이 보입니다'));
-  else if(!bks.length)ctx.appendChild(note('예약 내역이 없습니다'));
+  ctx.appendChild(KV('메모','memo',c.memo,'메모 입력'));
+  ctx.appendChild(H('예약 내역',''));
+  if(!c.phone&&!c.email&&!bks.length)ctx.appendChild(note('없음 (연락처 미등록)'));
+  else if(!bks.length)ctx.appendChild(note('없음'));
   else{var up=bks.filter(function(x){return x.d>=today;}).sort(function(x,y){return x.d<y.d?-1:1;}),past=bks.filter(function(x){return x.d<today;}).sort(function(x,y){return x.d<y.d?1:-1;});
    [['다가오는 예약',up],['지난 예약',past]].forEach(function(g){if(!g[1].length)return;var gh=document.createElement('div');gh.className='bgh';gh.textContent=g[0];ctx.appendChild(gh);
     g[1].forEach(function(x){ctx.appendChild(link(esc(P.fmtDay(x.d,'ko')+' '+x.t+' · '+x.p+' · '+x.n+'명 · '+x.st)+(x.memo?'<span>메모: '+esc(x.memo)+'</span>':'')));});});}
-  ctx.appendChild(H('연결된 상담','같은 고객 카드의 다른 대화'));
-  if(!(c.links||[]).length)ctx.appendChild(note('다른 대화가 없습니다'));
+  ctx.appendChild(H('연결된 상담',''));
+  if(!(c.links||[]).length)ctx.appendChild(note('없음'));
   (c.links||[]).forEach(function(l){ctx.appendChild(link(esc(l.ch+' · '+P.fmtDay(l.d,'ko')+' · '+l.st)));});
  }
  if(pt==='info'){
   ctx.appendChild(H('상담 정보'));
   ctx.appendChild(fact('입점사',r.store?P.storeLabel(r)+' (#'+r.store+')':'K-Beauty Station'));ctx.appendChild(fact('채널 ID',r.cid));ctx.appendChild(fact('연결 상태',r.chState));
   ctx.appendChild(fact('상담 횟수',r.session+'회'));ctx.appendChild(fact('첫 대화',P.fmtTs(r.first)));
-  ctx.appendChild(H('상담 이력','누르면 그 회차로 이동'));
+  ctx.appendChild(H('상담 이력',''));
   var n=0;r.msgs.forEach(function(m,i){if(i===0||m.newSession){n++;var last=n===r.session;ctx.appendChild(link(esc(n+'차 상담 · '+(last?(T==='done'?'완료':'진행 중'):'완료')+' · '+P.fmtTs(m.at))));}});
  }
  ctx.onclick=function(e){var t=e.target.closest('[data-k]');if(!t)return;e.preventDefault();
