@@ -105,7 +105,7 @@ function storeLabel(r){return r.store?DB.store.name:'K-Beauty Station';}
 /* 상담함·상담창은 확정안으로 고정. 아래 안은 상담 정보 패널 배치만 다름 */
 var LAYOUTS=[['R','3단 · 추천 답변 오른쪽 패널 (확정)']];
 var LAYOUT=window.top!==window?'R':(function(){try{var v=localStorage.getItem('ib-layout');return LAYOUTS.some(function(x){return x[0]===v;})?v:'R';}catch(e){return 'R';}})();
-function freshState(){return {surf:'BOTH',mark:window.top!==window,hint:true,now:CLOCKS[0][0],ch:'LINE',layout:LAYOUT,bo:{room:'r3',filter:null,q:'',tr:true,ptab:'ai',noteOpen:false,drawer:false},cust:{sheet:null}};}
+function freshState(){return {surf:'BOTH',mark:window.top!==window,hint:true,now:CLOCKS[0][0],ch:'LINE',layout:LAYOUT,bo:{room:'r3',filter:null,q:'',tr:true,ptab:'ai',noteOpen:false,topicF:[],drawer:false},cust:{sheet:null}};}
 function room(id){return DB.rooms.filter(function(r){return r.id===id;})[0];}
 function isClinic(){return DB.store.clinic;}
 
@@ -325,6 +325,28 @@ var SUGX={soft:{ko:'문의 감사합니다. ',en:'Thank you for reaching out. ',
  res:{ko:'확인 결과를 알려 드려요: (확인한 내용 입력)',en:'Here is what we confirmed: (enter details)',ja:'確認結果をお知らせします：（内容を入力）',zh:'确认结果如下：（请输入内容）'}};
 function lastCust(r){for(var i=r.msgs.length-1;i>=0;i--)if(r.msgs[i].who==='cust')return r.msgs[i];return null;}
 /* AI 요약 (시안: 대화를 규칙으로 읽어 문장 생성). 1줄 = 문의 요지, 2줄 = 조건과 처리 상태 */
+/* 상담 주제 자동 분류: 이번 회차 고객 메시지를 AI 분류값으로 묶는다. 상담사가 고친 값(r.topicEd)이 우선 */
+var TOPICS=['가격','예약','취소·환불','시술 상담','위치·운영시간','결제','불만','제휴·협찬','기타'];
+function topicOf(c){var k=c.kind,rs=c.reason||'';
+ if(k==='price'||/^가격/.test(rs))return '가격';
+ if(k==='book'||(k==='cs'&&c.key==='howbook'))return '예약';
+ if(/취소/.test(rs))return '취소·환불';
+ if(/시술 상담/.test(rs)||k==='faqTime')return '시술 상담';
+ if(k==='hours'||k==='loc'||/주차/.test(rs))return '위치·운영시간';
+ if(k==='pay')return '결제';
+ if(/불만/.test(rs))return '불만';
+ if(/협찬|제휴/.test(rs))return '제휴·협찬';
+ return '기타';}
+function topics(r){
+ var start=0;r.msgs.forEach(function(m,i){if(m.newSession)start=i;});
+ var auto=[];r.msgs.slice(start).forEach(function(m){if(m.who!=='cust'||m.kind==='image')return;var t=topicOf(classify(m.text,r));if(auto.indexOf(t)<0)auto.push(t);});
+ if(auto.length>1)auto=auto.filter(function(x){return x!=='기타';});
+ var ed=(r.topicEd&&r.topicEd.s===r.session)?r.topicEd:{add:[],rm:[]};
+ var out=ed.add.slice();auto.forEach(function(x){if(ed.rm.indexOf(x)<0&&out.indexOf(x)<0)out.push(x);});
+ return {list:out.slice(0,3),auto:auto,edited:ed.add.length>0||ed.rm.length>0};
+}
+function editTopic(id,t,on){var r=room(id);if(!r.topicEd||r.topicEd.s!==r.session)r.topicEd={s:r.session,add:[],rm:[]};var e=r.topicEd;
+ if(on){e.rm=e.rm.filter(function(x){return x!==t;});if(e.add.indexOf(t)<0)e.add.push(t);}else{e.add=e.add.filter(function(x){return x!==t;});if(e.rm.indexOf(t)<0)e.rm.push(t);}render();}
 function eun(w){var c=w.charCodeAt(w.length-1);if(c<0xAC00||c>0xD7A3)return w+'는';return w+(((c-0xAC00)%28)?'은':'는');} /* 은/는 */
 function summarize(r){
  var cs=r.msgs.filter(function(m){return m.who==='cust'&&m.kind!=='image';});if(!cs.length)return null;
@@ -433,7 +455,7 @@ function render(){
  ['CUST','BO'].forEach(function(s){var w=frame(s).contentWindow;if(w&&typeof w.draw==='function')w.draw();});
 }
 window.IB={get DB(){return DB;},get S(){return S;},get SLACK(){return SLACK;},CH_ROOM:CH_ROOM,
- room:room,fmtTs:fmtTs,unans:unans,storeLabel:storeLabel,suggest:function(r){return suggest(r);},inHours:inHours,fmtDay:fmtDay,custSend:custSend,agentSend:agentSend,complete:complete,setAI:setAI,takeOver:takeOver,updateCard:updateCard,addNote:addNote,sendProduct:sendProduct,get RECENT(){return RECENT;},summary:function(r){return summarize(r);},aiAllowed:aiAllowed,render:render,
+ room:room,fmtTs:fmtTs,unans:unans,storeLabel:storeLabel,suggest:function(r){return suggest(r);},inHours:inHours,fmtDay:fmtDay,custSend:custSend,agentSend:agentSend,complete:complete,setAI:setAI,takeOver:takeOver,updateCard:updateCard,addNote:addNote,sendProduct:sendProduct,get RECENT(){return RECENT;},summary:function(r){return summarize(r);},topics:function(r){return topics(r);},editTopic:editTopic,TOPICS:TOPICS,aiAllowed:aiAllowed,render:render,
  openRoom:function(id){S.bo.room=id;render();},
  ready:function(){render();}};
 /* ===== 검수 콘솔용 전역 ===== */
