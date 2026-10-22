@@ -2401,7 +2401,7 @@ function drawDrawer(){
  var conv=groups.slice().reverse().map(function(g){var k=w.id+':'+g.n,last=g===groups[groups.length-1],live=last&&w.tab!=='done',solo=groups.length===1,open=solo||((k in EL.cOpen)?EL.cOpen[k]:last);
   var st=last?tag(ST[w.tab][0],ST[w.tab][1]):tag('완료','');
   var rng=esc(P.fmtTs(g.at))+' ~ '+(live?'':esc(g.end.slice(0,10)===g.at.slice(0,10)?hm(g.end):P.fmtTs(g.end)));
-  var head='<div class="mg-hrow'+(open?' on':'')+(solo?' solo':'')+'"'+(solo?'':' data-g="'+k+'" data-click')+'><b>'+g.n+'차 상담</b>'+st+(live?'<span class="mg-live">실시간</span>':'')+'<span class="mg-rng">'+rng+'</span><span class="mg-cnt">'+g.list.length+'건'+(solo?'':(open?' ▴':' ▾'))+'</span></div>';
+  var head='<div class="mg-hrow'+(open?' on':'')+(solo?' solo':'')+'"'+(solo?'':' data-g="'+k+'" data-click')+'><b>'+g.n+'차 상담</b>'+st+(live?'<span class="mg-live">실시간</span>':'')+'<span class="mg-rng">'+rng+'</span>'+(solo?'':'<span class="mg-cnt">'+(open?'▴':'▾')+'</span>')+'</div>';
   if(!open)return '<div class="mg-hist">'+head+'</div>';
   var openCls=' open';
   var evs=[],agentSeen=false,who=w.owner||'상담사';
