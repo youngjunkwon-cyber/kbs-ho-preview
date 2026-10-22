@@ -2240,7 +2240,7 @@ var EX=[
  {id:'x2',cat:'헤어·메이크업',member:'회원',name:'Anna Kim',ch:'스토어채팅',store:'B헤어 명동점',lang:'en',tab:'wait',who:null,owner:'',session:2,topics:['불만'],aiOnly:false,
   msgs:[['cust','I waited 40 minutes past my booking time yesterday. This is unacceptable.','어제 예약 시간보다 40분을 기다렸어요. 받아들일 수 없습니다.','2026-10-21 11:40'],['ai','We are sorry for the inconvenience. A staff member will check and reply shortly.','불편을 드려 죄송합니다. 담당자가 확인 후 곧 답변드리겠습니다.','2026-10-21 11:40',1]],
   sum:{l1:'불만 문의.',l2:'불만은 상담사 확인 필요.'},card:{name:'Anna Kim',phone:'+1 2125550147',email:''},need:'불만'},
- {id:'x3',cat:'피부과',name:'Bat-Erdene',ch:'WhatsApp',store:'A피부과 강남점',lang:'mn',tab:'prog',who:'입점사',owner:'A피부과 강남점',session:1,topics:['가격','시술 상담'],aiOnly:false,first:4,
+ {id:'x3',cat:'피부과',name:'Bat-Erdene',ch:'WhatsApp',store:'A피부과 강남점',lang:'mn',tab:'prog',who:'입점사',owner:'박지은',session:1,topics:['가격','시술 상담'],aiOnly:false,first:4,
   msgs:[['cust','Ботокс хэд вэ?','보톡스 얼마예요?','2026-10-21 12:02'],['agent','Ботокс 99,000 вон.','보톡스는 99,000원입니다.','2026-10-21 12:06'],['cust','Өвдөлттэй юу?','아픈가요?','2026-10-21 12:10']],
   sum:{l1:'보톡스 가격, 시술 상담 문의.',l2:'입점사가 응대 중.'},card:{name:'Bat-Erdene',phone:'+976 99112233',email:''}},
  {id:'x4',cat:'사진관',sub:'프로필 촬영',src:'알리페이',member:'회원',name:'林小姐',ch:'상품채팅',store:'C스튜디오 성수',lang:'zh-TW',tab:'done',who:'AI',owner:'',session:1,topics:['위치·운영시간'],aiOnly:true,first:0,
@@ -2252,7 +2252,7 @@ var EX=[
  {id:'x6',cat:'성형외과',name:'Chen Wei',ch:'WeChat',store:'D의원 압구정',lang:'zh',tab:'ai',who:'AI',owner:'',session:1,topics:['가격'],aiOnly:false,first:0,
   msgs:[['cust','水光针多少钱？','물광주사 얼마예요?','2026-10-21 13:40'],['ai','水光针价格为150,000韩元（含增值税）。','물광주사는 150,000원(VAT 포함)입니다.','2026-10-21 13:40']],
   sum:null,card:{name:'Chen Wei',phone:'',email:''}},
- {id:'x7',cat:'헤어·메이크업',bookings:[{d:'2026-10-21',t:'11:00',p:'커트',n:1,st:'취소'}],name:'Ploy',ch:'LINE',store:'B헤어 명동점',lang:'th',tab:'done',who:'입점사',owner:'B헤어 명동점',session:1,topics:['취소·환불'],aiOnly:false,first:22,
+ {id:'x7',cat:'헤어·메이크업',bookings:[{d:'2026-10-21',t:'11:00',p:'커트',n:1,st:'취소'}],name:'Ploy',ch:'LINE',store:'B헤어 명동점',lang:'th',tab:'done',who:'입점사',owner:'이수진',session:1,topics:['취소·환불'],aiOnly:false,first:22,
   msgs:[['cust','ขอยกเลิกการจองพรุ่งนี้ค่ะ','내일 예약 취소하고 싶어요','2026-10-20 10:30'],['agent','ยกเลิกเรียบร้อยแล้วค่ะ','취소 처리했습니다.','2026-10-20 10:52']],
   sum:{l1:'취소 문의.',l2:'입점사가 응대함.'},card:{name:'Ploy',phone:'+66 812345678',email:''}},
  {id:'x8',cat:'피부과',name:'Kenji T.',ch:'스토어채팅',store:'A피부과 강남점',lang:'ja',tab:'wait',who:null,owner:'',session:1,topics:['시술 상담'],aiOnly:false,
@@ -2383,25 +2383,41 @@ function drawDrawer(){
   +(w.need?'<div class="mg-need">AI 중단사유: '+esc(w.need)+'</div>':'');
  var tp=w.topics.length?w.topics.map(function(t){return '<span class="mg-chip">'+esc(t)+'</span>';}).join(''):'<span class="mg-dim">-</span>';
  var sm=w.sum?'<div class="mg-sum"><b>'+esc(w.sum.l1)+'</b><div>'+esc(w.sum.l2)+'</div></div>':'<div class="mg-dim">'+(w.tab==='ai'?'AI 응대 중':'-')+'</div>';
- /* 대화: 회차별 묶음. 마지막 회차만 펼치고, 한 회차가 길면 최근 LIM건 + 이전 더보기 */
- var groups=[];w.msgs.forEach(function(m){var n=m[5]||1,g=groups[groups.length-1];if(!g||g.n!==n){g={n:n,at:m[3],list:[]};groups.push(g);}g.list.push(m);});
- EL.cOpen=EL.cOpen||{};EL.cMore=EL.cMore||{};
- var bubble=function(m){var by=m[0]==='cust'?'고객':m[0]==='ai'?'AI':(w.who==='입점사'?'입점사':'상담사');
+ /* 상담 내역: 회차마다 한 줄(회차 · 상태 · 기간 · 건수). 누르면 그 회차 대화가 열린다.
+    마지막 회차가 완료 전이면 "실시간" = 새 메시지가 오는 대로 반영 */
+ var groups=[];w.msgs.forEach(function(m){var n=m[5]||1,g=groups[groups.length-1];if(!g||g.n!==n){g={n:n,at:m[3],end:m[3],list:[]};groups.push(g);}g.list.push(m);g.end=m[3];});
+ EL.cOpen=EL.cOpen||{};EL.cMore=EL.cMore||{};EL.cSeen=EL.cSeen||{};
+ var bubble=function(m){var by=m[0]==='cust'?'고객':m[0]==='ai'?'AI':(w.owner||'상담사')+(w.who==='입점사'?' (입점사)':''); /* 답한 사람 이름 */
   return '<div class="mg-msg '+(m[0]==='cust'?'in':'out')+'"><div class="mg-by">'+by+(m[4]?' (안내문)':'')+'</div><div class="mg-b">'+esc(m[1])+(m[2]&&m[2]!==m[1]?'<span class="mg-ko">'+esc(m[2])+'</span>':'')+'</div><div class="mg-at">'+esc(P.fmtTs(m[3]))+'</div></div>';};
- var conv=groups.map(function(g,gi){var k=w.id+':'+g.n,last=gi===groups.length-1,open=last||!!EL.cOpen[k];
-  var head='<div class="mg-sep'+(last?'':' mg-gt')+'"'+(last?'':' data-g="'+k+'" data-click')+'>'+g.n+'차 상담 · '+esc(P.fmtDay(g.at.slice(0,10),'ko'))+' · '+g.list.length+'건'+(last?'':(open?' ▴':' ▾'))+'</div>';
-  if(!open)return head;
+ var hm=function(ts){return ts.slice(11,16);};
+ var conv=groups.slice().reverse().map(function(g){var k=w.id+':'+g.n,last=g===groups[groups.length-1],live=last&&w.tab!=='done',open=(k in EL.cOpen)?EL.cOpen[k]:last;
+  var st=last?tag(ST[w.tab][0],ST[w.tab][1]):tag('완료','');
+  var rng=esc(P.fmtTs(g.at))+' ~ '+(live?'':esc(g.end.slice(0,10)===g.at.slice(0,10)?hm(g.end):P.fmtTs(g.end)));
+  var head='<div class="mg-hrow'+(open?' on':'')+'" data-g="'+k+'" data-click><b>'+g.n+'차 상담</b>'+st+(live?'<span class="mg-live">실시간</span>':'')+'<span class="mg-rng">'+rng+'</span><span class="mg-cnt">'+g.list.length+'건 '+(open?'▴':'▾')+'</span></div>';
+  if(!open)return '<div class="mg-hist">'+head+'</div>';
+  var openCls=' open';
   var list=g.list,more='';if(list.length>LIM_MSG&&!EL.cMore[k]){more='<button type="button" class="mg-morebtn" data-more="'+k+'" data-click>이전 메시지 '+(list.length-LIM_MSG)+'건 더보기</button>';list=list.slice(-LIM_MSG);}
-  return head+more+list.map(bubble).join('');}).join('');
+  var nw=live&&EL.cSeen[k]!=null&&g.list.length>EL.cSeen[k];
+  return '<div class="mg-hist'+openCls+'">'+head+'<div class="mg-conv" data-conv="'+k+'">'+more+list.map(bubble).join('')+'</div>'+(live?'<button type="button" class="mg-newpill" data-jump="'+k+'" data-click style="display:none">새 메시지 ↓</button>':'')+'</div>';}).join('');
  EL.scrollConv=EL.lastOpen!==w.id;EL.lastOpen=w.id;
+ /* 다시 그리기 전 스크롤 위치 기억: 맨 아래였으면 새 메시지를 따라 내려가고, 아니면 제자리 + "새 메시지" 표시 */
+ var keep={};QA('.mg-conv[data-conv]',EL.dw).forEach(function(cv){keep[cv.getAttribute('data-conv')]={top:cv.scrollTop,bottom:cv.scrollTop+cv.clientHeight>=cv.scrollHeight-4};});
+ var bodyTop=Q('.ant-drawer-body',EL.dw).scrollTop;
  var notes=w.notes.length?w.notes.map(function(n){return '<div class="mg-note"><b>'+esc(n[0])+' · '+esc(P.fmtTs(n[1]))+'</b>'+esc(n[2])+'</div>';}).join(''):'<div class="mg-dim">없음</div>';
  var c=w.card||{};
  var card=kv('이름',esc(c.name||w.name))+kv('연락처',c.phone?esc(c.phone):'-')+kv('이메일',c.email?esc(c.email):'-')+kv('메모',c.memo?esc(c.memo):'-');
- var bk=w.bookings.length?w.bookings.map(function(x){return '<div class="mg-li">'+esc(P.fmtDay(x.d,'ko')+' '+x.t+' · '+x.p+' · '+x.n+'명 · '+x.st)+'</div>';}).join(''):'<div class="mg-dim">'+(c.phone||c.email?'없음':'없음 (연락처 미등록)')+'</div>';
- var ln=w.links.length?w.links.map(function(l){return '<div class="mg-li">'+esc(l.ch+' · '+P.fmtDay(l.d,'ko')+' · '+l.st)+'</div>';}).join(''):'<div class="mg-dim">없음</div>';
- Q('.ant-drawer-body',EL.dw).innerHTML=info+sec('AI 요약','','<div class="mg-tprow"><span>상담 분류</span>'+tp+'<small>'+(w.topicEd?'수정됨':'자동 분류')+'</small></div>'+sm)
-  +sec('상담 메모','',notes)+sec('고객 카드','',card)+sec('예약 내역','',bk)+sec('연결된 상담','',ln)+sec('대화 내역',w.msgs.length+'건','<div class="mg-conv">'+conv+'</div>');
- if(EL.scrollConv){var cv=Q('.mg-conv',EL.dw);if(cv)cv.scrollTop=cv.scrollHeight;Q('.ant-drawer-body',EL.dw).scrollTop=0;}
+ var two=function(arr){return arr.length>2?arr.slice(0,2).concat(['<div class="mg-li mg-dim">외 '+(arr.length-2)+'건</div>']):arr;}; /* 칸이 좁아 2건까지만 */
+ var bk=w.bookings.length?two(w.bookings.map(function(x){return '<div class="mg-li">'+esc(P.fmtDay(x.d,'ko')+' '+x.t+' · '+x.p+' · '+x.n+'명 · '+x.st)+'</div>';})).join(''):'<div class="mg-dim">'+(c.phone||c.email?'없음':'없음 (연락처 미등록)')+'</div>';
+ var ln=w.links.length?two(w.links.map(function(l){return '<div class="mg-li">'+esc(l.ch+' · '+P.fmtDay(l.d,'ko')+' · '+l.st)+'</div>';})).join(''):'<div class="mg-dim">없음</div>';
+ Q('.ant-drawer-body',EL.dw).innerHTML=info
+  +'<div class="mg-two"><div>'+sec('AI 요약','','<div class="mg-tprow"><span>상담 분류</span>'+tp+'<small>'+(w.topicEd?'수정됨':'자동 분류')+'</small></div>'+sm)+'</div><div>'+sec('고객 카드','',card)+'</div></div>'
+  +'<div class="mg-three">'+sec('상담 메모','',notes)+sec('예약 내역','',bk)+sec('연결된 상담','',ln)+'</div>'
+  +'<div class="mg-sec mg-histsec"><h4>상담 내역<small>'+groups.length+'회</small></h4><div class="mg-hlist">'+conv+'</div></div>'; /* 상담 내역이 남은 높이를 채우고 대화만 안에서 스크롤 */
+ var body=Q('.ant-drawer-body',EL.dw);body.scrollTop=EL.scrollConv?0:bodyTop;
+ groups.forEach(function(g){var k=w.id+':'+g.n,cv=Q('.mg-conv[data-conv="'+k+'"]',EL.dw);if(!cv)return;var kp=keep[k],pill=Q('[data-jump="'+k+'"]',EL.dw);
+  var grew=EL.cSeen[k]!=null&&g.list.length>EL.cSeen[k];
+  if(EL.scrollConv||!kp||kp.bottom){cv.scrollTop=cv.scrollHeight;}else{cv.scrollTop=kp.top;if(grew&&pill)pill.style.display='';}
+  if(!kp||kp.bottom||EL.scrollConv)EL.cSeen[k]=g.list.length;});
 }
 
 /* ===== 처음 한 번: 실화면 부품 고치기 ===== */
@@ -2474,9 +2490,11 @@ function init(){
   +'<div class="ant-drawer-footer"><div class="mg-foot"><span>조회 전용</span><button type="button" class="ant-btn '+CSS_H+' ant-btn-default ant-btn-color-default ant-btn-variant-outlined mg-close" data-click><span>닫기</span></button></div></div>'
   +'</div></div></div>';
  document.body.appendChild(dw);EL.dw=dw;
+ dw.addEventListener('scroll',function(e){var cv=e.target;if(!cv.classList||!cv.classList.contains('mg-conv'))return;if(cv.scrollTop+cv.clientHeight>=cv.scrollHeight-4){var k=cv.getAttribute('data-conv'),pl=Q('[data-jump="'+k+'"]',EL.dw);if(pl)pl.style.display='none';var w=allRows().filter(function(x){return x.id===M.open;})[0];if(w)EL.cSeen[k]=w.msgs.filter(function(m){return (m[5]||1)+''===k.split(':')[1];}).length;}},true);
  dw.addEventListener('click',function(e){
-  var g=e.target.closest('[data-g]');if(g){var k=g.getAttribute('data-g');EL.cOpen[k]=!EL.cOpen[k];drawDrawer();return;}
-  var mo=e.target.closest('[data-more]');if(mo){var cv=Q('.mg-conv',EL.dw),h0=cv.scrollHeight,t0=cv.scrollTop;EL.cMore[mo.getAttribute('data-more')]=true;drawDrawer();cv=Q('.mg-conv',EL.dw);cv.scrollTop=t0+(cv.scrollHeight-h0);return;}
+  var g=e.target.closest('[data-g]');if(g){var k=g.getAttribute('data-g'),was=!!Q('.mg-conv[data-conv="'+k+'"]',EL.dw);EL.cOpen[k]=!was;drawDrawer();return;}
+  var jp=e.target.closest('[data-jump]');if(jp){var jk=jp.getAttribute('data-jump'),jc=Q('.mg-conv[data-conv="'+jk+'"]',EL.dw);jc.scrollTop=jc.scrollHeight;jp.style.display='none';return;}
+  var mo=e.target.closest('[data-more]');if(mo){var cv=Q('.mg-conv[data-conv="'+mo.getAttribute('data-more')+'"]',EL.dw),h0=cv.scrollHeight,t0=cv.scrollTop;EL.cMore[mo.getAttribute('data-more')]=true;drawDrawer();cv=Q('.mg-conv[data-conv="'+mo.getAttribute('data-more')+'"]',EL.dw);cv.scrollTop=t0+(cv.scrollHeight-h0);return;}
   if(e.target.closest('.mg-csm')){var w=allRows().filter(function(x){return x.id===M.open;})[0];if(w&&w.live){M.open=null;draw();parent.go('BO');P.openRoom(w.id);}else toast('시안 예시 데이터 (CSM 연결 없음)');return;}if(e.target.closest('.ant-drawer-close,.mg-close')||e.target.classList.contains('ant-drawer-mask')){M.open=null;draw();}});
  var st=document.createElement('style');st.textContent=
   'body.mk [data-new]{outline:2px dashed #e8537a;outline-offset:1px}body.hl [data-click]{box-shadow:0 0 0 2px #16a34a!important}'
@@ -2503,6 +2521,13 @@ function init(){
   +'.mg-more{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-top:10px;padding:10px 12px;background:#f7f8fa;border:1px solid #d0d5dd;border-radius:8px}.mg-more .ant-form-item{margin:0}.mg-fl{font-size:13px;font-weight:600;color:#344054;margin-right:4px}'
   +'.mg-chips{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:10px}.mg-fchip{display:inline-flex;align-items:center;gap:6px;border:1px solid #9dbcf5;background:#f5f8ff;color:#0b4fc4;border-radius:14px;padding:2px 6px 2px 10px;font-size:13px}.mg-fchip a{color:#475467;cursor:pointer;font-size:12px}.mg-reset{margin-left:6px;font-size:13px;color:#475467;text-decoration:underline;cursor:pointer}'
   +'.ant-drawer .mg-csm{margin-left:auto;flex:none}.mg-gt{cursor:pointer;background:#fff;border:1px solid #d0d5dd;border-radius:6px;padding:6px 10px;color:#344054!important;font-weight:600}.mg-gt:hover{border-color:#9dbcf5}.mg-morebtn{display:block;margin:0 auto 10px;border:1px solid #c4cad3;background:#fff;border-radius:14px;padding:3px 14px;font-size:12px;color:#344054;cursor:pointer}.mg-morebtn:hover{border-color:#9dbcf5}'
+  +'.mg-hlist{display:flex;flex-direction:column;gap:8px}.mg-hist{border:1px solid #d0d5dd;border-radius:8px;overflow:hidden;position:relative}.mg-hrow{display:flex;align-items:center;gap:8px;padding:10px 12px;background:#fff;cursor:pointer;font-size:13px;color:#101828}.mg-hrow:hover{background:#f5f8ff}.mg-hrow.on{border-bottom:1px solid #d0d5dd}.mg-hrow b{font-weight:700}.mg-hrow .ant-tag{margin:0}.mg-rng{color:#475467}.mg-cnt{margin-left:auto;color:#344054;white-space:nowrap}'
+  +'.mg-live{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:#067647}.mg-live:before{content:"";width:6px;height:6px;border-radius:3px;background:#12b76a}'
+  +'.mg-hist .mg-conv{border:0;border-radius:0}.mg-newpill{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);border:0;background:#1677ff;color:#fff;border-radius:14px;padding:4px 14px;font-size:12px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.2)}'
+  +'.ant-drawer .ant-drawer-body{display:flex;flex-direction:column;overflow-y:auto}.mg-sec{padding:12px 0}.mg-grid{flex:none}.mg-two{flex:none;display:grid;grid-template-columns:3fr 2fr;gap:0 24px;border-bottom:1px solid #d0d5dd}.mg-two .mg-sec{border-bottom:0;padding:10px 0}.mg-two .mg-kv2{grid-template-columns:56px 1fr;padding:2px 0;font-size:13px}.mg-two .mg-kv2 b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mg-two .mg-sum{padding:8px 10px;font-size:13px}.mg-two .mg-tprow{margin-bottom:8px}'
+  +'.mg-three{flex:none;display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 20px;border-bottom:1px solid #d0d5dd}.mg-three .mg-sec{border-bottom:0;padding:10px 0;min-width:0}.mg-three .mg-sec>*:not(h4){font-size:13px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;padding:0}.mg-three .mg-note b{display:inline;margin-right:6px}.mg-three .mg-sec>.mg-li{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:1px 0}'
+  +'.ant-drawer .ant-drawer-header{padding:12px 24px}.mg-grid{margin-bottom:8px}.mg-cell{padding:7px 12px}.mg-cell b{font-size:14px}.mg-need{margin:0 0 4px;padding:5px 10px}.mg-sec h4{margin:0 0 6px;font-size:14px}'
+  +'.mg-histsec{flex:1 1 auto;min-height:220px;display:flex;flex-direction:column;border-bottom:0;padding-bottom:0}.mg-hlist{flex:1;min-height:0}.mg-hist{flex:none}.mg-hist.open{flex:1;min-height:0;display:flex;flex-direction:column}.mg-hist.open .mg-conv{height:auto;flex:1;min-height:140px}'
   +'#mgtoast{position:fixed;left:50%;top:80px;transform:translateX(-50%);background:#1d2939;color:#fff;font-size:13px;padding:8px 14px;border-radius:6px;z-index:1200;display:none}';
  document.head.appendChild(st);
  var t=document.createElement('div');t.id='mgtoast';document.body.appendChild(t);EL.toast=t;
