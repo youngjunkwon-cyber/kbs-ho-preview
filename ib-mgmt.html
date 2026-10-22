@@ -2403,15 +2403,15 @@ function drawDrawer(){
    +kv('문의 대상',tgt)+kv('회원여부',esc(w.member))+kv('채널 ID',esc(w.cid||'-'))+kv('연결 상태',esc(w.chState||'-'))+kv('유입경로',esc(w.src||'-'))+kv('첫 대화',esc(P.fmtTs(w.msgs[0][3])))+'</div>';
   var tl=[];groups.forEach(function(g){tl.push([g.n,g.at,'문의 접수']);g.evs.forEach(function(e){if(e[0]==='ev')tl.push([g.n,e[2],e[1]]);});});
   var hist='<div class="mg-tl">'+tl.map(function(t){return '<div><span>'+t[0]+'차</span><i>'+esc(P.fmtTs(t[1]))+'</i><b>'+esc(t[2])+'</b></div>';}).join('')+'</div>';
-  pane=sec('상담 요약','',kv('상담 분류',w.topics.length?esc(w.topics.join(', '))+(w.topicEd?' (수정됨)':''):'-')+kv('AI 요약',esc(sumTxt))+(w.need?kv('AI 중단사유',esc(w.need)):''))
-   +sec('상담 메모','',notes)+sec('상담 정보','',meta)+sec('처리 이력','',hist);
+  pane=sec('요약','',kv('상담 분류',w.topics.length?esc(w.topics.join(', '))+(w.topicEd?' (수정됨)':''):'-')+kv('AI 요약',esc(sumTxt))+(w.need?kv('AI 중단사유',esc(w.need)):''))
+   +sec('메모','',notes)+sec('접수 정보','',meta)+sec('처리 이력','',hist);
  }
  if(dt==='cust'){
   var c=w.card||{};
   var bk=w.bookings.length?w.bookings.map(function(x){return '<div class="mg-li">'+esc(P.fmtDay(x.d,'ko')+' '+x.t+' · '+x.p+' · '+x.n+'명 · '+x.st)+'</div>';}).join(''):'<div class="mg-dim">'+(c.phone||c.email?'없음':'없음 (연락처 미등록)')+'</div>';
   var ln=w.links.length?w.links.map(function(l){return '<div class="mg-li">'+esc(l.ch+' · '+P.fmtDay(l.d,'ko')+' · '+l.st)+'</div>';}).join(''):'<div class="mg-dim">없음</div>';
-  pane=sec('고객 카드','',kv('이름',esc(c.name||w.name))+kv('연락처',c.phone?esc(c.phone):'-')+kv('이메일',c.email?esc(c.email):'-')+kv('메모',c.memo?esc(c.memo):'-'))
-   +sec('예약 내역','',bk)+sec('연결된 상담','',ln);
+  pane=sec('기본 정보','',kv('이름',esc(c.name||w.name))+kv('연락처',c.phone?esc(c.phone):'-')+kv('이메일',c.email?esc(c.email):'-')+kv('메모',c.memo?esc(c.memo):'-'))
+   +sec('예약 내역','',bk)+sec('다른 상담','',ln);
  }
  /* 상담 내역: 회차마다 한 줄(최신 위), 누르면 그 회차 대화. 진행 중 회차는 실시간 반영 */
  EL.cOpen=EL.cOpen||{};EL.cMore=EL.cMore||{};EL.cSeen=EL.cSeen||{};
@@ -2428,14 +2428,13 @@ function drawDrawer(){
    if(!open)return '<div class="mg-hist">'+head+'</div>';
    var list=g.evs,more='',nMsg=g.list.length;if(nMsg>LIM_MSG&&!EL.cMore[k]){var cut=0,c=0;for(var j=list.length-1;j>=0;j--){if(list[j][0]!=='ev')c++;if(c===LIM_MSG){cut=j;break;}}more='<button type="button" class="mg-morebtn" data-more="'+k+'" data-click>이전 메시지 '+(nMsg-LIM_MSG)+'건 더보기</button>';list=list.slice(cut);}
    return '<div class="mg-hist open">'+head+'<div class="mg-conv" data-conv="'+k+'">'+more+list.map(bubble).join('')+'</div>'+(g.live?'<button type="button" class="mg-newpill" data-jump="'+k+'" data-click style="display:none">새 메시지 ↓</button>':'')+'</div>';}).join('');
-  pane='<div class="mg-sec mg-histsec"><h4>상담 내역<small>'+groups.length+'회</small></h4><div class="mg-hlist">'+conv+'</div></div>';
+  pane='<div class="mg-sec mg-histsec"><div class="mg-hlist">'+conv+'</div></div>';
  }
  var live=w.tab!=='done';
- var tabs='<div class="mg-tabs" data-new>'+[['info','상담 정보'],['cust','고객'],['hist','상담 내역']].map(function(t){return '<button type="button" data-dt="'+t[0]+'" class="'+(dt===t[0]?'on':'')+'" data-click>'+t[1]+(t[0]==='hist'&&live?'<i class="mg-dot" title="실시간"></i>':'')+'</button>';}).join('')+'</div>';
+ var tabs='<div class="mg-tabs" data-new>'+[['info','상담 개요'],['cust','고객 정보'],['hist','상담 내역']].map(function(t){return '<button type="button" data-dt="'+t[0]+'" class="'+(dt===t[0]?'on':'')+'" data-click>'+t[1]+(t[0]==='hist'&&live?'<i class="mg-dot" title="실시간"></i>':'')+'</button>';}).join('')+'</div>';
  var paneEl=Q('.mg-tabpane',EL.dw),paneTop=paneEl&&EL.lastPaneOf===w.id+dt?paneEl.scrollTop:0;
  Q('.ant-drawer-body',EL.dw).innerHTML=top+tabs+'<div class="mg-tabpane'+(dt==='hist'?' hist':'')+'">'+pane+'</div>';
  EL.lastPaneOf=w.id+dt;Q('.mg-tabpane',EL.dw).scrollTop=paneTop;
- Q('.mg-links',EL.dw).innerHTML=[w.store?['store','스토어 상세']:null,['rec','고객 기록'],w.member==='회원'?['member','회원 상세']:null].filter(Boolean).map(function(x){return '<a data-link="'+x[0]+'" data-click>'+x[1]+'</a>';}).join('');
  if(dt==='hist')groups.forEach(function(g){var k=w.id+':'+g.n,cv=Q('.mg-conv[data-conv="'+k+'"]',EL.dw);if(!cv)return;var kp=keep[k],pill=Q('[data-jump="'+k+'"]',EL.dw);
   var grew=EL.cSeen[k]!=null&&g.list.length>EL.cSeen[k];
   if(EL.scrollConv||!kp||kp.bottom){cv.scrollTop=cv.scrollHeight;}else{cv.scrollTop=kp.top;if(grew&&pill)pill.style.display='';}
@@ -2509,7 +2508,6 @@ function init(){
  dw.innerHTML='<div class="ant-drawer-mask" style="position:absolute;inset:0;background:rgba(0,0,0,.45);z-index:0"></div><div class="ant-drawer-content-wrapper" style="position:absolute;top:0;right:0;bottom:0;width:720px;z-index:1;pointer-events:auto"><div class="ant-drawer-content" style="height:100%"><div class="ant-drawer-wrapper-body" style="display:flex;flex-direction:column;height:100%">'
   +'<div class="ant-drawer-header"><div class="ant-drawer-header-title"><button type="button" class="ant-drawer-close" data-click aria-label="Close">✕</button><div class="ant-drawer-title"></div><button type="button" class="ant-btn '+CSS_H+' ant-btn-primary ant-btn-color-primary ant-btn-variant-solid mg-csm" data-click data-new title="CSM 응대 화면에서 이 대화 열기"><span>CSM에서 열기</span></button></div></div>'
   +'<div class="ant-drawer-body" style="flex:1;overflow:auto"></div>'
-  +'<div class="ant-drawer-footer"><div class="mg-foot"><span>조회 전용</span><span class="mg-links" data-new></span><span style="flex:1"></span><button type="button" class="ant-btn '+CSS_H+' ant-btn-default ant-btn-color-default ant-btn-variant-outlined mg-close" data-click><span>닫기</span></button></div></div>'
   +'</div></div></div>';
  document.body.appendChild(dw);EL.dw=dw;
  dw.addEventListener('scroll',function(e){var cv=e.target;if(!cv.classList||!cv.classList.contains('mg-conv'))return;if(cv.scrollTop+cv.clientHeight>=cv.scrollHeight-4){var k=cv.getAttribute('data-conv'),pl=Q('[data-jump="'+k+'"]',EL.dw);if(pl)pl.style.display='none';var w=allRows().filter(function(x){return x.id===M.open;})[0];if(w)EL.cSeen[k]=w.msgs.filter(function(m){return (m[5]||1)+''===k.split(':')[1];}).length;}},true);
@@ -2518,8 +2516,7 @@ function init(){
   var g=e.target.closest('[data-g]');if(g){var k=g.getAttribute('data-g'),was=!!Q('.mg-conv[data-conv="'+k+'"]',EL.dw);EL.cOpen[k]=!was;drawDrawer();return;}
   var jp=e.target.closest('[data-jump]');if(jp){var jk=jp.getAttribute('data-jump'),jc=Q('.mg-conv[data-conv="'+jk+'"]',EL.dw);jc.scrollTop=jc.scrollHeight;jp.style.display='none';return;}
   var mo=e.target.closest('[data-more]');if(mo){var cv=Q('.mg-conv[data-conv="'+mo.getAttribute('data-more')+'"]',EL.dw),h0=cv.scrollHeight,t0=cv.scrollTop;EL.cMore[mo.getAttribute('data-more')]=true;drawDrawer();cv=Q('.mg-conv[data-conv="'+mo.getAttribute('data-more')+'"]',EL.dw);cv.scrollTop=t0+(cv.scrollHeight-h0);return;}
-  var lk=e.target.closest('[data-link]');if(lk){toast(lk.innerText+' 화면은 시안에 포함하지 않았습니다');return;}
-  if(e.target.closest('.mg-csm')){var w=allRows().filter(function(x){return x.id===M.open;})[0];if(w&&w.live){M.open=null;draw();parent.go('BO');P.openRoom(w.id);}else toast('시안 예시 데이터 (CSM 연결 없음)');return;}if(e.target.closest('.ant-drawer-close,.mg-close')||e.target.classList.contains('ant-drawer-mask')){M.open=null;draw();}});
+  if(e.target.closest('.mg-csm')){var w=allRows().filter(function(x){return x.id===M.open;})[0];if(w&&w.live){M.open=null;draw();parent.go('BO');P.openRoom(w.id);}else toast('시안 예시 데이터 (CSM 연결 없음)');return;}if(e.target.closest('.ant-drawer-close')||e.target.classList.contains('ant-drawer-mask')){M.open=null;draw();}});
  var st=document.createElement('style');st.textContent=
   'body.mk [data-new]{outline:2px dashed #e8537a;outline-offset:1px}body.hl [data-click]{box-shadow:0 0 0 2px #16a34a!important}'
   +'.mg-nw{white-space:nowrap}.mg-dim{color:#667085}.mg-last{max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#475467}'
@@ -2554,7 +2551,6 @@ function init(){
   +'.mg-histsec{flex:1 1 auto;min-height:220px;display:flex;flex-direction:column;border-bottom:0;padding-bottom:0}.mg-hlist{flex:1;min-height:0}.mg-hist{flex:none}.mg-hist.open{flex:1;min-height:0;display:flex;flex-direction:column}.mg-hist.open .mg-conv{height:auto;flex:1;min-height:140px}'
   +'.mg-meta{flex:none;margin:0 0 8px;padding:6px 12px;background:#f7f8fa;border-radius:6px;font-size:12px;line-height:1.7}.mg-meta>div{display:flex;flex-wrap:wrap;gap:0 18px}.mg-m{white-space:nowrap;min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis}.mg-m i{font-style:normal;color:#475467;margin-right:6px}.mg-m b{font-weight:500;color:#101828}'
   +'.mg-ev{text-align:center;margin:2px 0 10px}.mg-ev span{display:inline-block;font-size:12px;color:#344054;background:#e1e4e8;border-radius:10px;padding:2px 10px}.mg-hrow.solo{cursor:default}.mg-hrow.solo:hover{background:#fff}'
-  +'.mg-links{display:flex;gap:14px}.mg-links a{color:#1668dc;cursor:pointer;font-size:13px}'
   +'.mg-tabs{flex:none;display:flex;border-bottom:1px solid #d0d5dd;margin:2px 0 0}.mg-tabs button{border:0;background:none;padding:10px 18px;font-size:14px;font-family:inherit;color:#475467;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}.mg-tabs button.on{color:#1668dc;border-bottom-color:#1668dc;font-weight:600}.mg-dot{display:inline-block;width:6px;height:6px;border-radius:3px;background:#12b76a;margin-left:6px;vertical-align:middle}'
   +'.mg-tabpane{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column}.mg-tabpane.hist{overflow:hidden}.mg-tabpane>.mg-sec:last-child{border-bottom:0}.mg-kvgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 28px}.mg-kvgrid .mg-kv2{grid-template-columns:76px 1fr}'
   +'.mg-tl>div{display:grid;grid-template-columns:36px 150px 1fr;gap:8px;font-size:13px;padding:4px 0;border-top:1px solid #f0f2f5}.mg-tl>div:first-child{border-top:0}.mg-tl span{color:#475467}.mg-tl i{font-style:normal;color:#475467}.mg-tl b{font-weight:500;color:#101828}'
