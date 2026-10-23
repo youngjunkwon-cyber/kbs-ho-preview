@@ -1991,7 +1991,7 @@ function fact(label,val,isNew){var f=TPL.fact.cloneNode(true);f.innerHTML=esc(la
 function layout(){
  var L=P.S.layout||'now';EL.L=L;
  if(L==='R'){ /* 추천 답변을 오른쪽 상담 정보 패널 아래로 (세로 3개) */
-  EL.aside.appendChild(EL.sug);EL.sug.classList.add('v');EL.ws.style.gridTemplateColumns='clamp(320px,22%,420px) minmax(520px,1fr) clamp(400px,30%,560px)'; /* 상담함·패널은 비율이되 상한, 남는 폭은 상담창 */
+  EL.aside.appendChild(EL.sug);EL.sug.classList.add('v');EL.ws.style.gridTemplateColumns='clamp(320px,22%,420px) minmax(520px,1fr) clamp(320px,22%,420px)'; /* 상담함·패널은 비율이되 상한, 남는 폭은 상담창 */
   
  }
  if(L==='now'){EL.ws.style.gridTemplateColumns='340px minmax(0,1fr) 340px';}
