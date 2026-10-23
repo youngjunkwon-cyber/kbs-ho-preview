@@ -350,24 +350,29 @@ function editTopic(id,t,on){var r=room(id);if(!r.topicEd||r.topicEd.s!==r.sessio
  if(on){e.rm=e.rm.filter(function(x){return x!==t;});if(e.add.indexOf(t)<0)e.add.push(t);}else{e.add=e.add.filter(function(x){return x!==t;});if(e.rm.indexOf(t)<0)e.rm.push(t);}render();}
 function eun(w){var c=w.charCodeAt(w.length-1);if(c<0xAC00||c>0xD7A3)return w+'는';return w+(((c-0xAC00)%28)?'은':'는');} /* 은/는 */
 function summarize(r){
- var cs=r.msgs.filter(function(m){return m.who==='cust'&&m.kind!=='image';});if(!cs.length)return null;
- var topics=[],cond=[],done=[],open=[],seen={};
- var TK={hours:'운영시간',loc:'위치·연락처',faqTime:'시술 시간',pay:'결제 방법',greet:null,refuse:null};
- cs.forEach(function(m,i){var c=classify(m.text,r);var k=c.kind;
-  if(k==='price'){var n=c.prod?(c.prod.ko||c.prod.name):'시술';if(!seen['p'+n]){seen['p'+n]=1;topics.push(n+' 가격');}}
-  else if(k==='book'){if(!seen.book){seen.book=1;topics.push('예약 가능 여부');}if(c.date)cond.push(fmtDay(c.date,'ko'));if(c.time)cond.push(c.time);if(c.ppl)cond.push(c.ppl+'명');if(c.prod)cond.push(c.prod.ko||c.prod.name);}
-  else if(k==='cs'){if(!seen.cs){seen.cs=1;topics.push('고객지원('+(c.key||'일반')+')');}}
-  else if(k==='stop'){if(!seen['s'+c.reason]){seen['s'+c.reason]=1;topics.push(c.reason.replace(/\s*\(.*\)/,''));open.push(c.reason);}}
-  else if(TK[k]&&!seen[k]){seen[k]=1;topics.push(TK[k]);}
-  var next=r.msgs[r.msgs.indexOf(m)+1];if(next&&next.who==='ai'&&!next.notice&&k!=='stop')done.push(topics[topics.length-1]);
- });
- var q=r.req||{};if(q.people)cond.push(q.people+'명');if(q.treat)cond.push(q.treat);if(q.when)cond.push(q.when);
- cond=cond.filter(function(x,i){return x&&cond.indexOf(x)===i;});done=done.filter(function(x,i){return x&&done.indexOf(x)===i;});
- var l1=(topics.length?topics.join(', '):'일반')+' 문의'+(cond.length?' ('+cond.join(', ')+')':'')+'.';
- var parts=[];if(done.length)parts.push(eun(done.join(', '))+' AI가 안내함');
- if(r.need)parts.push(eun(r.need.reason.replace(/\s*\(.*\)/,''))+' 상담사 확인 필요');else if(open.length)parts.push(eun(open.join(', '))+' 상담사 확인 필요');
- if(!parts.length)parts.push(r.handler==='agent'?'상담사가 응대 중':'AI가 응대 중');
- return {l1:l1,l2:parts.join('. ')+'.',at:cs[cs.length-1].at};
+ /* AI 요약: 이번 회차에서 고객이 실제로 물은 것 + 결과를 한 줄로 (틀 문장 대신 내용) */
+ var start=0;r.msgs.forEach(function(m,i){if(m.newSession)start=i;});
+ var ms=r.msgs.slice(start),cs=ms.filter(function(m){return m.who==='cust'&&m.kind!=='image';});if(!cs.length)return null;
+ var ko=function(m){var t=(m.ko||m.text).trim();return /[가-힯]/.test(t)?t:null;};
+ var bare=function(t){t=t.replace(/^(안녕하세요|저기요|혹시)[,.\s]*/,'').replace(/[?？!.。\s]+$/,'').replace(/(인가요|일까요|되나요|돼요|있나요|있어요|해요|예요|이에요|나요|요)$/,'').trim();
+  t=t.replace(/\s*(을|를)?\s*해도$/,' 가능 여부').replace(/(은|는)?\s*어떻게$/,' 방법').replace(/중에\s/,'중 ');return t.trim();};
+ var ro=function(w){var b=w.replace(/\s*\([^)]*\)$/,''),c=b.charCodeAt(b.length-1);if(c<0xAC00||c>0xD7A3)return w+'로';var j=(c-0xAC00)%28;return w+(j&&j!==8?'으로':'로');}; /* 으로/로 */
+ var asks=[],prices=[],seen={};
+ cs.forEach(function(m){var c=classify(m.text,r),k=c.kind,a;
+  var next=ms[ms.indexOf(m)+1],aiAns=next&&next.who==='ai'&&!next.notice?(next.ko||next.text):null;
+  if(k==='greet'||k==='refuse')return;
+  if(k==='price'&&c.prod){var n=c.prod.ko||c.prod.name;a=n+' 가격';var pr=aiAns&&aiAns.match(/[\d,]+원(\(VAT 포함\))?/);if(pr)prices.push([n,pr[0]]);}
+  else if(k==='book'){var w=[c.date?fmtDay(c.date,'ko'):null,c.time,c.ppl?c.ppl+'명':null,c.prod?(c.prod.ko||c.prod.name):null].filter(Boolean).join(' ');a=(w?w+' ':'')+'예약 가능 여부';}
+  else{var t=ko(m);a=t?bare(t):({hours:'운영시간',loc:'위치',faqTime:'시술 시간',pay:'결제 방법',cs:'이용 방법'}[k]||null);} /* 한국어 번역 없는 중단 문의는 결과(중단 사유)에서 드러남 */
+  if(a&&!seen[a]){seen[a]=1;asks.push(a);}});
+ var res=prices.map(function(p){return ro((prices.length>1?p[0]+' ':'')+p[1])+' 안내';});
+ var out;
+ if(r.need)out=(/의료/.test(r.need.reason)?'의료 판단 필요':ro(r.need.reason.replace(/\s*\(.*\)/,'')).replace(/(으로|로)$/,''))+(/의료/.test(r.need.reason)?'로':(/[가-힯]$/.test(r.need.reason.replace(/\s*\(.*\)/,''))?ro(r.need.reason.replace(/\s*\(.*\)/,'')).slice(r.need.reason.replace(/\s*\(.*\)/,'').length):'로'))+' AI 중단'+(r.handler==='agent'?', 상담사 응대 중':', 미응대');
+ else if(r.handler==='agent')out=(res.length?'AI가 '+res.join(', ')+', ':'')+'상담사 응대 중';
+ else out=res.length?'AI가 '+res.join(', '):'AI 응대 중';
+ if(r.status==='상담종료')out=out.replace(/(응대 중|미응대)$/,'완료');
+ var l1=(asks.length?asks.join(', ')+' 문의':'문의')+', '+out;
+ return {l1:l1,l2:'',at:cs[cs.length-1].at};
 }
 function suggest(r){
  var m=lastCust(r);if(!m)return [];var lang=r.lang||'ko',base;
