@@ -343,6 +343,7 @@ function handle(r,msg){
  var c=msg.kind==='image'?{kind:'stop',reason:'사진·파일'}:classify(t,r);msg.answered=true;msg.intent=c.kind;
  if(c.kind==='refuse'){aiSay(r,T('refuse',lang));return;} /* 범위 밖·지시 무시 요청은 시나리오보다 먼저 */
  var it=intentOf(c,msg);msg.scnIntent=it;
+ if(r.flow&&!scnNode(r.flow.node))r.flow=null; /* 기다리던 단계가 저장한 시나리오에서 지워졌으면 새로 판단 */
  if(r.flow&&c.kind==='book')return scnRun(r,r.flow.node,msg,c); /* 정보 받기 중: 날짜·시간이나 물어본 항목의 답이면 그 단계로, 다른 질문이면 아래에서 따로 처리 */
  var fl=scnFlowFor(it);
  if(fl)return scnRun(r,fl.id,msg,c);
