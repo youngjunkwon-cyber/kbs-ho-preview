@@ -170,7 +170,8 @@ function seedExtra(){return EX.map(function(x){
   card:{name:x.card&&x.card.name||'',phone:x.card&&x.card.phone||'',email:x.card&&x.card.email||'',tags:[],memo:'',owner:x.owner||'',bookings:x.bookings||[],links:[]}};});}
 var CH_ROOM={LINE:'r1',WhatsApp:'r2',WeChat:'r3','CS채팅':'r4'};
 var DB,S,SLACK;
-function freshDB(){DB={store:seedStore(),rooms:seedRooms().concat(window.NO_EXTRA?[]:seedExtra())};DB.rooms.forEach(function(r){var c=CARD[r.id];if(!c)return;r.cid=c.cid;r.chState=c.chState;r.card=JSON.parse(JSON.stringify(c.card));});SLACK=[];}
+function loadScn(){try{var v=JSON.parse(localStorage.getItem('ib-scn')||'null');if(v&&v.ver===1&&v.nodes)return v;}catch(e){}return null;}
+function freshDB(){var keep=(window.DB&&DB.scn)||null;DB={scn:keep||loadScn()||defaultScn(),store:seedStore(),rooms:seedRooms().concat(window.NO_EXTRA?[]:seedExtra())};DB.rooms.forEach(function(r){var c=CARD[r.id];if(!c)return;r.cid=c.cid;r.chState=c.chState;r.card=JSON.parse(JSON.stringify(c.card));});SLACK=[];}
 function unans(r){var n=0;for(var i=r.msgs.length-1;i>=0;i--){var m=r.msgs[i];if(m.who==='note')continue;if(m.who!=='cust')break;if(!m.answered)n++;}return n;} /* U8: 마지막 고객 메시지들 중 아직 답이 없는 수 */
 function storeLabel(r){return r.storeName||(r.store?DB.store.name:'K-Beauty Station');}
 /* 큰 틀(머리글 / 필터 줄 / 상담함 | 상담창 | 정보패널) 단위 안 */
@@ -339,56 +340,127 @@ function notifySlack(r,reason){
 }
 function handle(r,msg){
  var t=msg.text,lang=lastLangOf(r,t);
- if(msg.kind==='image'){stopAI(r,'사진·파일',msg);return;}
- var c=classify(t,r);msg.answered=true;msg.intent=c.kind;
- if(c.kind==='cs'){aiSay(r,T('cs',lang,{x:L(CS_GUIDE[c.key],lang)}));return;}
- if(c.kind==='refuse'){aiSay(r,T('refuse',lang));return;}
- if(c.kind==='stop'){stopAI(r,c.reason,msg);return;}
- if(c.kind==='greet'){aiSay(r,T('greet',lang));return;}
+ var c=msg.kind==='image'?{kind:'stop',reason:'사진·파일'}:classify(t,r);msg.answered=true;msg.intent=c.kind;
+ if(c.kind==='refuse'){aiSay(r,T('refuse',lang));return;} /* 범위 밖·지시 무시 요청은 시나리오보다 먼저 */
+ var it=intentOf(c,msg);msg.scnIntent=it;
+ if(r.flow&&c.kind==='book')return scnRun(r,r.flow.node,msg,c); /* 정보 받기 중: 날짜·시간이나 물어본 항목의 답이면 그 단계로, 다른 질문이면 아래에서 따로 처리 */
+ var fl=scnFlowFor(it);
+ if(fl)return scnRun(r,fl.id,msg,c);
+ /* 시나리오가 없는 의도: 안내형은 매장 정보로 답하고, 나머지는 상담사에게 */
  var s=DB.store,sn=lang==='ko'?s.name:s.nameEn;
+ if(c.kind==='cs'){aiSay(r,T('cs',lang,{x:L(CS_GUIDE[c.key],lang)}));return;}
+ if(c.kind==='greet'){aiSay(r,T('greet',lang));return;}
  if(c.kind==='hours'){aiSay(r,T('hours',lang,{s:sn,h:L(s.hoursText,lang)}));return;}
  if(c.kind==='loc'){aiSay(r,T('loc',lang,{s:sn,a:L(s.addr,lang),p:s.phone}));return;}
  if(c.kind==='price'){aiSay(r,T('price',lang,{n:lang==='ko'?c.prod.ko:c.prod.name,v:c.prod.price.toLocaleString('en-US')}));return;}
  if(c.kind==='faqTime'){aiSay(r,T('faqTime',lang,{x:L(s.faqTime,lang)}));return;}
  if(c.kind==='pay'){aiSay(r,T('pay',lang,{x:L(s.payment,lang)}));return;}
- if(c.kind==='book')return handleBook(r,c,msg);
+ stopAI(r,c.reason||(it+' (시나리오 없음)'),msg);
 }
-function handleBook(r,c,msg){
- var lang=r.lang||'ko',q=r.req;
- if(c.prod)q.prod=c.prod;if(c.ppl)q.ppl=c.ppl;
- if(c.date)q.date=c.date;if(c.time)q.time=c.time;
- if(!DB.store.booking)return collect(r,msg);
- if(q.date&&!q.time){var dayR=wd(q.date)===0&&!slotRange(q.date)?'sun':DB.store.blocked.indexOf(q.date)>=0?'block':null;
-  if(dayR){var a0=altSlots(q.date,null,S.now,3);aiSay(r,T('unavDay',lang,{d:fmtDay(q.date,lang),r:L(R_UNAV[dayR],lang),alt:altText(a0,lang)}));q.date=null;r.pending=true;return;}} /* 그날 전체가 불가면 시간을 묻지 않고 바로 이유와 대안 */
- if(!q.date||!q.time){r.pending=true;aiSay(r,q.date?T('askT',lang,{d:fmtDay(q.date,lang)}):q.time?T('askD',lang,{t:q.time}):T('askDT',lang));return;} /* P8 4번: 이미 받은 것은 다시 묻지 않음 */
- var j=judgeSlot(q.date,q.time,S.now),dTxt=fmtDay(q.date,lang);
- if(!j.ok){
-  var a=altSlots(q.date,q.time,S.now,3);
-  aiSay(r,T('unav',lang,{d:dTxt,t:q.time,r:L(R_UNAV[j.reason],lang),alt:altText(a,lang)}));
-  q.time=null;r.pending=true;return; /* P8 5번: 이유와 대안 */
- }
- var memo=memoFor(r,c),url='https://www.k-beautystation.com/'+lang+'/stores/'+DB.store.id+'/bookings?date='+q.date+'&time='+q.time;
- aiSay(r,T('link',lang,{d:dTxt,t:q.time}),{link:{url:url,date:q.date,time:q.time,memo:memo,lang:lang}});
- r.pending=false;r.req={};
-}
-function collect(r,msg){ /* 방향결정 Q4·Q5, 정책 P5: 빠진 것만 한 번에, 일부만 오면 남은 것만 다시 */
- var lang=r.lang||'ko',q=r.req,t=msg.text;
- if(r.asked){
-  var lines=t.split(/\n|(?=\b\d\.\s)/).map(function(s){return s.replace(/^\s*\d+[.)]\s*/,'').trim();}).filter(Boolean);
-  if(lines.length>=2)r.asked.forEach(function(f,i){if(lines[i]&&!q[f])q[f]=lines[i];});
- }
- var m;
+/* ================= 상담 시나리오 (BO 상담 설정 > 시나리오에서 그린 흐름대로 AI가 응대) =================
+   노드: trigger(시작 조건) say(AI 안내) ask(정보 받기) check(예약 가능 확인) link(예약 링크) branch(조건) record(기록) handoff(담당 배정) end(AI 응대로)
+   출구: next · fail(ask) · ok/no(check) · yes/no(branch). 기본 시나리오는 시나리오 도입 전 AI 동작과 같다 */
+var INTENTS=['예약','가격','위치·운영시간','결제','시술 소요시간','인사','플랫폼 이용 안내','시술 상담(의료)','불만','제휴·협찬','취소 요청','취소·환불 문의','사진·파일','답할 수 없는 문의'];
+var INFO_INTENTS=['가격','위치·운영시간','결제','시술 소요시간','인사','플랫폼 이용 안내']; /* 시나리오가 없으면 AI가 매장 정보로 바로 답함 */
+var SLOT={date:{ko:'방문 희망일',en:'Preferred date',ja:'ご希望の日付',zh:'希望日期'},time:{ko:'방문 시간',en:'Preferred time',ja:'ご希望の時間',zh:'希望时间'}};
+function slotName(f,lang){return L(FIELDS[f]||SLOT[f],lang||'ko');}
+function intentOf(c,msg){
+ if(msg&&msg.kind==='image')return '사진·파일';
+ var k=c.kind,rs=c.reason||'';
+ if(k==='book')return '예약';if(k==='price')return '가격';if(k==='hours'||k==='loc')return '위치·운영시간';if(k==='pay')return '결제';if(k==='faqTime')return '시술 소요시간';if(k==='greet')return '인사';if(k==='cs')return '플랫폼 이용 안내';
+ if(/시술 상담/.test(rs))return '시술 상담(의료)';if(/불만/.test(rs))return '불만';if(/협찬|제휴/.test(rs))return '제휴·협찬';if(/취소 처리/.test(rs))return '취소 요청';if(/취소·환불/.test(rs))return '취소·환불 문의';
+ return '답할 수 없는 문의';}
+function defaultScn(){return {ver:1,nodes:[
+ {id:'t1',type:'trigger',x:40,y:20,intents:['예약'],out:{next:'b1'}},
+ {id:'b1',type:'branch',x:40,y:160,cond:'booking',out:{yes:'a1',no:'a2'}},
+ {id:'a1',type:'ask',x:40,y:300,fields:['date','time'],clinic:false,retry:0,out:{next:'c1',fail:''}},
+ {id:'c1',type:'check',x:40,y:440,out:{ok:'l1',no:'a1'}},
+ {id:'l1',type:'link',x:40,y:580,out:{next:'e1'}},
+ {id:'e1',type:'end',x:40,y:720,out:{}},
+ {id:'a2',type:'ask',x:300,y:300,fields:['name','phone','people','treat','when'],clinic:true,retry:0,out:{next:'s1',fail:''}},
+ {id:'s1',type:'say',x:300,y:440,text:{ko:TX.reqDone.ko,en:TX.reqDone.en,ja:TX.reqDone.ja,zh:TX.reqDone.zh},out:{next:'h1'}},
+ {id:'h1',type:'handoff',x:300,y:580,to:'CS팀',reason:'예약 요청 접수 (예약 기능 OFF 매장)',notice:'none',out:{}},
+ {id:'t2',type:'trigger',x:300,y:20,intents:['시술 상담(의료)','불만','제휴·협찬','취소 요청','취소·환불 문의','사진·파일','답할 수 없는 문의'],out:{next:'h2'}},
+ {id:'h2',type:'handoff',x:300,y:160,to:'CS팀',reason:'',notice:'auto',out:{}}
+]};}
+var SCN_EXITS={trigger:['next'],say:['next'],ask:['next','fail'],check:['ok','no'],link:['next'],branch:['yes','no'],record:['next'],handoff:[],end:[]};
+function scnNode(id){return id?DB.scn.nodes.filter(function(n){return n.id===id;})[0]||null:null;}
+function scnFlowFor(intent){return DB.scn.nodes.filter(function(n){return n.type==='trigger'&&n.intents.indexOf(intent)>=0;})[0]||null;}
+/* 정보 받기: 고객 말에서 빈칸 채우기 (번호 붙인 줄 답, 날짜·시간·인원·시술·이름·연락처) */
+function fillSlots(r,t,fields){
+ var q=r.req,m;
+ if(r.asked&&r.asked.length>1){var lines=t.split(/\n|(?=\b\d\.\s)/).map(function(s){return s.replace(/^\s*\d+[.)]\s*/,'').trim();}).filter(Boolean);if(lines.length>=2)r.asked.forEach(function(f,i){if(lines[i]&&!q[f])q[f]=lines[i];});}
+ var d=parseDate(t,dOf(S.now)),tm=parseTime(t),p=findProd(t),n=parsePeople(t);
+ if(d)q.date=d;if(tm)q.time=tm;if(p)q.prod=p;if(n)q.ppl=n;
  if(!q.name&&(m=t.match(/(?:이름|name|名前|姓名)\s*[:：]?\s*([^\n,/]+)/i)))q.name=m[1].trim();
  if(!q.phone&&(m=t.match(/\+?\d[\d\s-]{7,}\d/)))q.phone=m[0];
  if(!q.people&&q.ppl)q.people=q.ppl;
  if(!q.treat&&q.prod)q.treat=q.prod.ko;
  if(!q.when&&q.date&&q.time)q.when=q.date+' '+q.time;
- var need=['name','phone','people','treat','when'].concat(isClinic()?['gender','nation','birth']:[]);
- var miss=need.filter(function(f){return !q[f];});
- if(miss.length){r.asked=miss;aiSay(r,T('ask',lang)+'\n'+miss.map(function(f,i){return (i+1)+'. '+L(FIELDS[f],lang);}).join('\n'));return;}
- r.asked=null;aiSay(r,T('reqDone',lang));
- stopAI(r,'예약 요청 접수 (예약 기능 OFF 매장)',null,true); /* 접수 안내(P7 5번)만 보냄 */
 }
+function askFields(n){return n.fields.concat(n.clinic&&isClinic()?['gender','nation','birth'].filter(function(f){return n.fields.indexOf(f)<0;}):[]);}
+function scnText(n,lang){var t=n.text||{};if(lang!=='ko'&&t.ko){KOBUF.push(t.ko);}return t[lang]||t.ko||'';}
+function scnMemo(r){var q=r.req,LN={ko:'한국어',en:'영어',ja:'일본어',zh:'중국어(간체)','zh-TW':'중국어(번체)',th:'태국어',mn:'몽골어',id:'인도네시아어'},out=[];
+ if(q.date)out.push('희망일 '+fmtDay(q.date,'ko'));if(q.time)out.push('시간 '+q.time);if(q.when&&!q.date)out.push('희망 일시 '+q.when);
+ if(q.people||q.ppl)out.push('인원 '+(q.people||q.ppl));if(q.treat||q.prod)out.push('시술 '+(q.treat||q.prod.ko));if(q.name)out.push('이름 '+q.name);if(q.phone)out.push('연락처 '+q.phone);
+ ['gender','nation','birth'].forEach(function(f){if(q[f])out.push(FIELDS[f].ko+' '+q[f]);});
+ out.push('언어 '+(LN[r.lang||'ko']||r.lang));return out.join(' / ');}
+function branchTest(n,r){var v=n.val;
+ if(n.cond==='booking')return !!DB.store.booking;
+ if(n.cond==='hours')return inHours(S.now);
+ if(n.cond==='lang')return (v||[]).indexOf(r.lang||'ko')>=0;
+ if(n.cond==='channel')return (v||[]).indexOf(r.ch==='플랫폼'?'인앱채팅':r.ch)>=0;
+ if(n.cond==='member')return r.member==='회원';
+ if(n.cond==='field')return !!r.req[v];
+ return false;}
+/* 실행: 기다리는 정보 받기 단계가 나올 때까지 진행 (한 번에 최대 30단계, 고리 방지) */
+function scnRun(r,id,msg,c){
+ var lang=r.lang||'ko',steps=0;r.trace=r.trace||[];
+ while(id&&steps++<30){
+  var n=scnNode(id);if(!n)break;r.trace.push(n.id);
+  if(n.type==='trigger'){if(msg&&msg.kind!=='image')fillSlots(r,msg.text,[]);id=n.out.next;continue;} /* 시작 메시지에 있는 정보부터 채움 (조건 분기에서 씀) */
+  if(n.type==='say'){aiSay(r,scnText(n,lang));id=n.out.next;continue;}
+  if(n.type==='branch'){id=branchTest(n,r)?n.out.yes:n.out.no;continue;}
+  if(n.type==='record'){
+   if(n.topic){if(!r.topicEd||r.topicEd.s!==r.session)r.topicEd={s:r.session,add:[],rm:[]};if(r.topicEd.add.indexOf(n.topic)<0)r.topicEd.add.push(n.topic);}
+   if(n.memo)push(r,{who:'note',text:'[시나리오] '+scnMemo(r),by:'AI'});
+   id=n.out.next;continue;}
+  if(n.type==='ask'){
+   var F=askFields(n),q=r.req,first=!(r.flow&&r.flow.node===n.id);
+   if(msg)fillSlots(r,msg.text,F);
+   if(F.indexOf('date')>=0&&q.date&&!q.time){var dayR=wd(q.date)===0&&!slotRange(q.date)?'sun':DB.store.blocked.indexOf(q.date)>=0?'block':null;
+    if(dayR){var a0=altSlots(q.date,null,S.now,3);aiSay(r,T('unavDay',lang,{d:fmtDay(q.date,lang),r:L(R_UNAV[dayR],lang),alt:altText(a0,lang)}));q.date=null;r.pending=true;r.flow={node:n.id,tries:0};return;}}
+   var miss=F.filter(function(f){return !q[f];});
+   if(!miss.length){r.asked=null;r.pending=false;id=n.out.next;msg=null;continue;}
+   var tries=first?0:(r.flow.tries||0)+1;
+   if(n.retry&&tries>n.retry){r.asked=null;r.pending=false;id=n.out.fail;msg=null;if(!id){r.flow=null;stopAI(r,'정보 받기 실패 ('+miss.map(function(f){return slotName(f);}).join(', ')+')',null);return;}continue;}
+   r.flow={node:n.id,tries:tries};r.pending=true;
+   var onlyDT=F.every(function(f){return f==='date'||f==='time';});
+   if(onlyDT)aiSay(r,q.date?T('askT',lang,{d:fmtDay(q.date,lang)}):q.time?T('askD',lang,{t:q.time}):T('askDT',lang));
+   else{r.asked=miss;aiSay(r,T('ask',lang)+'\n'+miss.map(function(f,i){return (i+1)+'. '+slotName(f,lang);}).join('\n'));}
+   return;}
+  if(n.type==='check'){var q2=r.req;
+   if(!q2.date||!q2.time){id=n.out.no;msg=null;continue;}
+   var j=judgeSlot(q2.date,q2.time,S.now);
+   if(j.ok){id=n.out.ok;continue;}
+   var a=altSlots(q2.date,q2.time,S.now,3);aiSay(r,T('unav',lang,{d:fmtDay(q2.date,lang),t:q2.time,r:L(R_UNAV[j.reason],lang),alt:altText(a,lang)}));
+   q2.time=null;r.flow={node:n.out.no,tries:0};r.pending=true;return;} /* 대안을 보낸 뒤 고객 답을 기다림 */
+  if(n.type==='link'){var q3=r.req,dT=fmtDay(q3.date,lang),url='https://www.k-beautystation.com/'+lang+'/stores/'+DB.store.id+'/bookings?date='+q3.date+'&time='+q3.time;
+   aiSay(r,T('link',lang,{d:dT,t:q3.time}),{link:{url:url,date:q3.date,time:q3.time,memo:memoFor(r,c||{}),lang:lang}});
+   r.req={};id=n.out.next;continue;}
+  if(n.type==='handoff'){r.flow=null;r.asked=null;r.pending=false;
+   var why=n.reason||(c&&c.reason)||(msg&&msg.kind==='image'?'사진·파일':'')||'시나리오 담당 배정';
+   if(n.to==='입점사')r.byStore=true;
+   stopAI(r,why,msg,n.notice==='none');return;}
+  if(n.type==='end'){break;}
+ }
+ if(steps>=30){r.flow=null;stopAI(r,'시나리오 오류 (끝나지 않는 고리)',msg);return;}
+ r.flow=null;
+}
+
+/* 시험 대화: 실제 대화 목록과 별개인 방 하나로 시나리오를 돌려 본다 */
+function scnTest(text,o){o=o||{};var r=window.__scnT;if(!r||o.fresh){r=window.__scnT={id:'test',name:'시험',ch:o.ch||'WhatsApp',type:'스토어 문의',store:1,lang:o.lang||null,msgs:[],session:1,status:'상담중',aiOn:true,need:null,handler:'ai',aiIntroDone:false,req:{},asked:null,first:S.now,agentAt:null,member:o.member||'비회원',trace:[]};}
+   if(text==null)return r;var n0=r.msgs.length;r.trace=[];var m={who:'cust',text:text,kind:'text'};push(r,m);if(r.aiOn)handle(r,m);return {msgs:r.msgs.slice(n0),trace:r.trace.slice(),flow:r.flow,need:r.need,aiOn:r.aiOn,req:JSON.parse(JSON.stringify(r.req)),byStore:!!r.byStore};}
 /* AI 추천 답변 (상담사용 초안 3개, 시안용 예시 문구) */
 var SUGX={soft:{ko:'문의 감사합니다. ',en:'Thank you for reaching out. ',ja:'お問い合わせありがとうございます。',zh:'感谢您的咨询。'},
  ask:{ko:'원하시는 시술과 방문 희망 날짜를 함께 알려 주시면 더 정확히 안내해 드릴게요.',en:'If you let me know the treatment and the date you would like, I can give you more exact information.',ja:'ご希望の施術とご来店日をお知らせいただければ、より詳しくご案内いたします。',zh:'如果告诉我您想要的项目和到店日期，我可以为您提供更准确的信息。'},
@@ -490,13 +562,13 @@ function aiResume(r){
  }
 }
 /* 상담사 */
-function agentSend(id,text){var r=room(id);if(!text.trim())return;push(r,{who:'agent',text:text.trim()});r.msgs.forEach(function(m){if(m.who==='cust')m.answered=true;});r.handler='agent';r.agentAt=S.now;r.aiOn=false;if(!r.card.owner)r.card.owner='김상담';render();}
+function agentSend(id,text){var r=room(id);if(!text.trim())return;r.flow=null;push(r,{who:'agent',text:text.trim()});r.msgs.forEach(function(m){if(m.who==='cust')m.answered=true;});r.handler='agent';r.agentAt=S.now;r.aiOn=false;if(!r.card.owner)r.card.owner='김상담';render();}
 function complete(id){ /* P10 상담 완료 = 확인 완료 + 상담 종료 */
- var r=room(id);r.need=null;r.noticeAt=null;r.handler='ai';r.status='상담종료';r.pending=false;r.asked=null;
+ var r=room(id);r.need=null;r.noticeAt=null;r.handler='ai';r.status='상담종료';r.pending=false;r.asked=null;r.flow=null;r.req={};
  aiResume(r);render();
 }
 function setAI(id,on){var r=room(id);if(on){aiResume(r);}else{r.aiOn=false;}render();}
-function takeOver(id){var r=room(id);r.aiOn=false;r.handler='agent';r.agentAt=S.now;if(!r.card.owner)r.card.owner='김상담';render();} /* I4: 잡은 사람이 담당자 */
+function takeOver(id){var r=room(id);r.flow=null;r.aiOn=false;r.handler='agent';r.agentAt=S.now;if(!r.card.owner)r.card.owner='김상담';render();} /* I4: 잡은 사람이 담당자 */
 function updateCard(id,k,v){var r=room(id);if(k==='owner'&&r.card.owner&&v&&r.card.owner!==v)(r.ownerLog=r.ownerLog||[]).push([S.now,r.card.owner,v]); /* 담당 변경은 처리 이력에 */r.card[k]=v;render();}
 function sendProduct(id,pid){var r=room(id),p=DB.store.catalog.filter(function(x){return x.id===pid;})[0];if(!p)return;push(r,{who:'agent',kind:'product',text:'[상품 카드] '+p.name+' · '+p.price.toLocaleString('en-US')+' KRW',prod:p});r.msgs.forEach(function(m){if(m.who==='cust')m.answered=true;});r.handler='agent';r.agentAt=S.now;r.aiOn=false;if(!r.card.owner)r.card.owner='김상담';RECENT=[pid].concat(RECENT.filter(function(x){return x!==pid;})).slice(0,3);render();}
 var RECENT=[];
@@ -539,7 +611,10 @@ function render(){
  ['CUST','BO','MGMT'].forEach(function(s){var w=frame(s).contentWindow;if(w&&typeof w.draw==='function')w.draw();});
 }
 window.IB={get DB(){return DB;},get S(){return S;},get SLACK(){return SLACK;},CH_ROOM:CH_ROOM,
- room:room,fmtTs:fmtTs,unans:unans,storeLabel:storeLabel,suggest:function(r){return suggest(r);},inHours:inHours,fmtDay:fmtDay,custSend:custSend,agentSend:agentSend,complete:complete,setAI:setAI,takeOver:takeOver,updateCard:updateCard,addNote:addNote,sendProduct:sendProduct,get RECENT(){return RECENT;},summary:function(r){return summarize(r);},topics:function(r){return topics(r);},editTopic:editTopic,TOPICS:TOPICS,NOASK:NOASK,aiAllowed:aiAllowed,render:render,
+ room:room,fmtTs:fmtTs,unans:unans,storeLabel:storeLabel,suggest:function(r){return suggest(r);},inHours:inHours,fmtDay:fmtDay,custSend:custSend,agentSend:agentSend,complete:complete,setAI:setAI,takeOver:takeOver,updateCard:updateCard,addNote:addNote,sendProduct:sendProduct,get RECENT(){return RECENT;},summary:function(r){return summarize(r);},topics:function(r){return topics(r);},editTopic:editTopic,TOPICS:TOPICS,NOASK:NOASK,
+ scn:{get:function(){return JSON.parse(JSON.stringify(DB.scn));},save:function(v){DB.scn=JSON.parse(JSON.stringify(v));try{localStorage.setItem('ib-scn',JSON.stringify(DB.scn));}catch(e){}render();},defaults:function(){return defaultScn();},reset:function(){DB.scn=defaultScn();try{localStorage.removeItem('ib-scn');}catch(e){}render();return JSON.parse(JSON.stringify(DB.scn));},INTENTS:INTENTS,EXITS:SCN_EXITS,FIELDS:FIELDS,SLOT:SLOT,
+  test:function(text,o){o=o||{};var keep=DB.scn;if(o.scn)DB.scn=o.scn;try{return scnTest(text,o);}finally{DB.scn=keep;}}},
+aiAllowed:aiAllowed,render:render,
  openRoom:function(id){S.bo.room=id;render();},
  ready:function(){render();}};
 /* ===== 검수 콘솔용 전역 ===== */
