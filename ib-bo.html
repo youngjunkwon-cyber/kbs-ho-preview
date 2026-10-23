@@ -1813,7 +1813,7 @@ function init(){
  /* 상담창 머리: 친구 추가·차단 해제는 상담 정보로, 상담 종료 → 상담 완료, AI 켜기/끄기, 번역 스위치 */
  QA('button',EL.hd).forEach(function(b){if(/친구|차단/.test(b.textContent))(b.closest('.ant-space-item')||b).style.display='none';});
  var cb=btnByText('상담 종료');cb.id='doneBtn';QA('span',cb).pop().textContent='상담 완료';cb.addEventListener('click',function(){var r=P.room(P.S.bo.room);if(!hasNote(r)){var sm=P.summary(r);if(sm){if(confirm('메모가 없습니다. AI 요약을 메모로 저장하고 완료하시겠습니까?\n\n'+sm.l1+' '+sm.l2))P.addNote(r.id,'[AI 요약] '+sm.l1+' '+sm.l2);else return;}else if(!confirm('메모가 없습니다. 메모 없이 완료하시겠습니까?'))return;}P.complete(r.id);});EL.done=cb;
- EL.chip=mkBtn('AI 켜기','aiChip');cb.parentElement.insertBefore(EL.chip,cb);
+ EL.chip=mkBtn('AI 재개','aiChip');cb.parentElement.insertBefore(EL.chip,cb);
  EL.chip.addEventListener('click',function(){var r=P.room(P.S.bo.room);if(tabOf(r)==='prog')P.setAI(r.id,true);else P.takeOver(r.id);});
  EL.tr=mkBtn('번역 ON','trBtn');cb.parentElement.insertBefore(EL.tr,EL.chip);
  EL.tr.addEventListener('click',function(){P.S.bo.tr=!P.S.bo.tr;draw();});
@@ -1928,7 +1928,7 @@ function drawProd(){
  var recent=P.RECENT.map(function(id){return all.filter(function(p){return p.id===id;})[0];}).filter(Boolean).filter(function(p){return !q&&(PM.lang==='all'||p.lang===PM.lang);});
  m.querySelector('.pm-body').innerHTML=(recent.length?'<div class="pm-gh">최근 보낸 상품</div><div class="pm-grid">'+recent.map(card).join('')+'</div><div class="pm-gh">전체</div>':'')+(list.length?'<div class="pm-grid">'+list.map(card).join('')+'</div>':'<div class="pm-empty">'+(q?'"'+esc(PM.q)+'" 검색 결과 없음':'데이터 없음')+'</div>');
  var sels=PM.sel.map(function(id){return all.filter(function(p){return p.id===id;})[0];}).filter(Boolean);
- m.querySelector('.pm-ft').innerHTML=sels.length?'<div class="pm-sels"><small>선택 '+sels.length+'개</small><div class="pm-chips">'+sels.map(function(p){return '<span class="pm-chip"><i class="pc-img i'+p.img+'"></i>'+esc(p.name)+' <b>'+p.price.toLocaleString('en-US')+'</b><a data-rm="'+p.id+'" data-click title="빼기">✕</a></span>';}).join('')+'</div></div><button class="pm-send ant-btn ant-btn-primary" data-click>'+sels.length+'개 보내기</button>':'<span class="pm-hint">선택한 상품 없음'+(P.room(P.S.bo.room).lang&&PL[P.room(P.S.bo.room).lang]?'고객 언어('+PL[P.room(P.S.bo.room).lang]+') 탭이 먼저 열렸습니다.':'')+'</span>';
+ m.querySelector('.pm-ft').innerHTML=sels.length?'<div class="pm-sels"><small>선택 '+sels.length+'개</small><div class="pm-chips">'+sels.map(function(p){return '<span class="pm-chip"><i class="pc-img i'+p.img+'"></i>'+esc(p.name)+' <b>'+p.price.toLocaleString('en-US')+'</b><a data-rm="'+p.id+'" data-click title="빼기">✕</a></span>';}).join('')+'</div></div><button class="pm-send ant-btn ant-btn-primary" data-click>'+sels.length+'개 보내기</button>':'<span class="pm-hint">선택한 상품 없음</span>';
 }
 /* ===== 상담함 머리 ===== */
 function buildListHead(){
@@ -2052,9 +2052,9 @@ function draw(){
  sub.innerHTML=[r.lang?esc(LN[r.lang]||r.lang):null,esc(P.storeLabel(r)),esc(chLabel(r))].filter(Boolean).join(' · ');
  hd.children[0].classList.add('hone');
  EL.done.style.display=T==='done'?'none':'';
- EL.chip.style.display=(T==='done'||(T==='prog'&&!allowed))?'none':'';QA('span',EL.chip).pop().textContent=T==='prog'?'AI 켜기':'상담 시작';
- EL.chip.title=T==='prog'?'AI 응대 재개':'상담사 응대 시작 (AI OFF)';
- QA('span',EL.tr).pop().textContent=S.bo.tr===false?'번역 꺼짐':'번역';EL.tr.title='한국어 번역 표시';
+ EL.chip.style.display=(T==='done'||(T==='prog'&&!allowed))?'none':'';QA('span',EL.chip).pop().textContent=T==='prog'?'AI 재개':'상담 시작';
+ EL.chip.title=T==='prog'?'AI 응대 재개':'상담사 응대 시작, AI OFF';
+ QA('span',EL.tr).pop().textContent=S.bo.tr===false?'번역 OFF':'번역 ON';EL.tr.title='한국어 번역 표시';
  /* 확인 필요 띠 */
  EL.band.style.display=(T==='wait'&&r.need)?'block':'none';if(r.need)EL.band.textContent='상담사 확인 필요: '+r.need.reason+' · '+relTs(r.need.at);
  /* 메시지: 원문 + 한국어 번역 */
@@ -2070,10 +2070,10 @@ function draw(){
   if(m.kind!=='image'&&m.kind!=='product'){var ml=detectLang(m.text),tr=null;
    if(m.who==='cust'&&ml&&ml!=='ko'){tr=document.createElement('span');tr.className='tr'+(m.ko?'':' ph');tr.textContent=m.ko||'번역 대기';}
    else if((m.who==='ai'||m.who==='agent')&&m.ko&&ml&&ml!=='ko'){tr=document.createElement('span');tr.className='tr';tr.textContent=m.ko;}
-   else if(m.who==='agent'&&lang!=='ko'&&ml==='ko'){tr=document.createElement('span');tr.className='tr ph';tr.textContent='자동번역 ('+(LN[lang]||lang)+')';}
+   else if(m.who==='agent'&&lang!=='ko'&&ml==='ko'){tr=document.createElement('span');tr.className='tr ph';tr.textContent=(LN[lang]||lang)+' 번역 발송';}
    if(tr)bub.appendChild(tr);
-   QA('button',br).forEach(function(b){if(b.textContent.trim()!=='번역')return;if(!tr||tr.classList.contains('ph')){b.style.display='none';return;}b.textContent='다시 번역';b.setAttribute('data-new','');b.addEventListener('click',function(){tr.textContent=tr.textContent.replace(/ · 다시 번역함.*$/,'')+' · 다시 번역함 '+S.now.slice(11,16);});});}
-  if(m.link){var a=document.createElement('span');a.className='lk';a.setAttribute('data-new','');a.textContent=m.link.url;bub.appendChild(a);var me=document.createElement('span');me.className='memo';me.setAttribute('data-new','');me.textContent='요청사항(메모): '+m.link.memo;bub.appendChild(me);}
+   QA('button',br).forEach(function(b){if(b.textContent.trim()!=='번역')return;if(!tr||tr.classList.contains('ph')){b.style.display='none';return;}b.textContent='다시 번역';b.setAttribute('data-new','');b.addEventListener('click',function(){tr.textContent=tr.textContent.replace(/ · dd:dd 재번역$/,'')+' · '+S.now.slice(11,16)+' 재번역';});});}
+  if(m.link){var a=document.createElement('span');a.className='lk';a.setAttribute('data-new','');a.textContent=m.link.url;bub.appendChild(a);var me=document.createElement('span');me.className='memo';me.setAttribute('data-new','');me.textContent='요청사항: '+m.link.memo;bub.appendChild(me);}
   if(m.notice)bub.setAttribute('data-new','');
   var tm=metas[metas.length-1];tm.childNodes[0].nodeValue=P.fmtTs(m.at)+(m.who==='cust'?'':' · 전송됨');
   box.appendChild(w);
@@ -2101,7 +2101,7 @@ function draw(){
  var bks=(c.bookings||[]).slice(),today=S.now.slice(0,10),upN=bks.filter(function(x){return x.d>=today;}).length;
  var ownBar=Q('#ownbar');if(!ownBar){ownBar=document.createElement('div');ownBar.id='ownbar';ownBar.setAttribute('data-new','');Q('[class*=_panelHeader_]',EL.aside).after(ownBar);
   ownBar.addEventListener('click',function(e){var t=e.target.closest('[data-k]');if(!t)return;var rr=P.room(P.S.bo.room),inp=document.createElement('input');inp.className='edin';inp.style.width='120px';inp.value=rr.card.owner||'';t.replaceWith(inp);inp.focus();var fin=function(){P.updateCard(rr.id,'owner',inp.value.trim());};inp.addEventListener('blur',fin);inp.addEventListener('keydown',function(ev){if(ev.key==='Enter')inp.blur();});});}
- ownBar.innerHTML='<span class="ol">담당자</span><b class="ed" data-k="owner" data-click title="수정">'+(c.owner?esc(c.owner):'<span class="ph">미배정</span>')+'</b>'+(c.owner&&r.agentAt?'<small>상담 시작 '+esc(relTs(r.agentAt))+'</small>':'')+'<span class="os '+T+'">'+esc(T==='prog'&&r.byStore?'입점사 응대 중':STATE[T])+'</span>';
+ ownBar.innerHTML='<span class="ol">담당자</span><b class="ed" data-k="owner" data-click title="수정">'+(c.owner?esc(c.owner):'<span class="ph">미배정</span>')+'</b>'+(c.owner&&r.agentAt?'<small>'+esc(relTs(r.agentAt))+' 시작</small>':'')+'<span class="os '+T+'">'+esc(T==='prog'&&r.byStore?'입점사 응대 중':STATE[T])+'</span>';
  var nbx=Q('#notebox');if(!nbx){nbx=document.createElement('div');nbx.id='notebox';nbx.setAttribute('data-new','');EL.aside.appendChild(nbx); /* 패널 맨 아래 고정 */
   nbx.addEventListener('click',function(e){
    if(e.target.closest('.nadd')){var inp=nbx.querySelector('textarea');if(inp.value.trim()){P.addNote(P.S.bo.room,inp.value);inp.value='';}return;}
@@ -2117,11 +2117,11 @@ function draw(){
  if(S.bo.noteOpen){
   nbx.className='open';
   nbx.innerHTML='<div class="nh">상담 메모<a href="#" class="nclose" data-click>접기 ▾</a></div>'
-   +(T==='done'?'':'<div class="nrow"><textarea rows="5" placeholder="메모 입력 (Ctrl+Enter 등록)" data-click></textarea><button class="nadd" data-click>등록</button></div>')
+   +'<div class="nrow"><textarea rows="5" placeholder="메모 입력 (Ctrl+Enter 등록)" data-click></textarea><button class="nadd" data-click>등록</button></div>'
    +groups.slice().reverse().map(function(g){var cur=g===curG,k=r.id+':'+g.n,op=cur||(EL.ngOpen&&EL.ngOpen[k]);return '<div class="ng'+(op?'':' cl')+'">'+(cur?'<div class="ngt">'+g.n+'차 (현재)</div>':'<div class="ngt" data-g="'+k+'" data-click title="누르면 '+(op?'접힙니다':'펼쳐집니다')+'">'+g.n+'차 상담 · '+esc(P.fmtDay(g.at.slice(0,10),'ko'))+' · 메모 '+g.notes.length+'건<i>'+(op?'▴':'▾')+'</i></div>')+(op?(g.notes.length?g.notes.map(function(m,mi){var nk=k+':'+mi,no=EL.niOpen&&EL.niOpen[nk],first=m.text.split('\n')[0],more=m.text.indexOf('\n')>=0||m.text.length>40;return '<div class="ni'+(no?' on':'')+'" data-n="'+nk+'" data-click title="누르면 '+(no?'접힙니다':'펼쳐집니다')+'"><b>'+esc(m.by||'상담사')+' · '+esc(relTs(m.at))+(more&&!no?'<i>더 보기</i>':'')+'</b>'+(no?esc(m.text):'<span class="nf">'+esc(first)+'</span>')+'</div>';}).join(''):'<div class="ne">메모 없음</div>'):'')+'</div>';}).join('');
  }else{
   nbx.className='';
-  nbx.innerHTML='<div class="nc"><span class="ncl">상담 메모'+(allN?' '+allN:'')+'</span><span class="ncp">'+(lastN?((lastG===curG?'':lastG.n+'차 · ')+esc(lastN.text.split('\n')[0])):(T==='done'?'없음':'없음'))+'</span>'+(T==='done'&&!allN?'':'<button class="nopen" data-click>'+(T==='done'?'보기':'+ 메모')+'</button>')+'</div>';
+  nbx.innerHTML='<div class="nc"><span class="ncl">상담 메모'+(allN?' '+allN:'')+'</span><span class="ncp">'+(lastN?((lastG===curG?'':lastG.n+'차 · ')+esc(lastN.text.split('\n')[0])):'없음')+'</span><button class="nopen" data-click>+ 메모</button></div>';
  }
  var tabs=Q('#ptabs');if(!tabs){tabs=document.createElement('div');tabs.id='ptabs';tabs.setAttribute('data-new','');tabs.setAttribute('data-click','');ownBar.after(tabs);
   tabs.addEventListener('click',function(e){var b=e.target.closest('[data-p]');if(b){P.S.bo.ptab=b.getAttribute('data-p');draw();}});}
@@ -2134,19 +2134,19 @@ function draw(){
   var tp=P.topics(r);
   ctx.appendChild(H('상담 분류',tp.edited?'수정됨':'자동 분류'));
   var tw=document.createElement('div');tw.className='tpw';tw.setAttribute('data-new','');
-  tw.innerHTML=(tp.none?'<span class="tpnone">'+esc(P.NOASK)+'</span>':tp.list.length?tp.list.map(function(t){return '<span class="tpchip">'+esc(t)+'<a data-rm="'+esc(t)+'" data-click title="빼기">✕</a></span>';}).join(''):'<span class="tpnone">-</span>')+(tp.none||tp.list.length<3?'<span class="tpadd" data-click>+ 분류</span>':'')+'<div class="tpmenu" style="display:none">'+P.TOPICS.filter(function(t){return tp.list.indexOf(t)<0;}).map(function(t){return '<button data-add="'+esc(t)+'" data-click>'+esc(t)+'</button>';}).join('')+'</div>';
+  tw.innerHTML=(tp.none?'<span class="tpnone">'+esc(P.NOASK)+'</span>':tp.list.length?tp.list.map(function(t){return '<span class="tpchip">'+esc(t)+'<a data-rm="'+esc(t)+'" data-click title="빼기">✕</a></span>';}).join(''):'<span class="tpnone">-</span>')+(tp.none||tp.list.length<P.TOPICS.length?'<span class="tpadd" data-click>+ 분류</span>':'')+'<div class="tpmenu" style="display:none">'+P.TOPICS.filter(function(t){return tp.list.indexOf(t)<0;}).map(function(t){return '<button data-add="'+esc(t)+'" data-click>'+esc(t)+'</button>';}).join('')+'</div>';
   tw.addEventListener('click',function(e){var a=e.target.closest('[data-rm]');if(a){P.editTopic(r.id,a.getAttribute('data-rm'),false);return;}var ad=e.target.closest('[data-add]');if(ad){P.editTopic(r.id,ad.getAttribute('data-add'),true);return;}if(e.target.closest('.tpadd')){var mm=tw.querySelector('.tpmenu');mm.style.display=mm.style.display==='none'?'flex':'none';}});
   ctx.appendChild(tw);
   var sm=(T==='ai')?null:P.summary(r);
-  var sh=H('AI 요약',sm?'기준 '+relTs(sm.at):null);ctx.appendChild(sh);
-  var sd=document.createElement('div');sd.className='aisum';sd.setAttribute('data-new','');sd.innerHTML=sm?'<div class="l1">'+esc(sm.l1)+'</div><div class="l2">'+esc(sm.l2)+'</div><a href="#" class="resum" data-click>다시 요약</a><a href="#" class="tomemo" data-click>메모에 넣기</a><a href="#" class="cpsum" data-click>복사</a>':'<div class="l2 ph">'+(T==='ai'?'AI 응대 중':'-')+'</div>';ctx.appendChild(sd);
+  var sh=H('AI 요약',sm?relTs(sm.at)+' 기준':null);ctx.appendChild(sh);
+  var sd=document.createElement('div');sd.className='aisum';sd.setAttribute('data-new','');sd.innerHTML=sm?'<div class="l1">'+esc(sm.l1)+'</div><div class="l2">'+esc(sm.l2)+'</div><a href="#" class="resum" data-click>다시 요약</a><a href="#" class="tomemo" data-click>메모로 저장</a><a href="#" class="cpsum" data-click>복사</a>':'<div class="l2 ph">'+(T==='ai'?'AI 응대 중':'-')+'</div>';ctx.appendChild(sd);
   sd.addEventListener('click',function(e){var txt=sm?sm.l1+' '+sm.l2:'';if(e.target.closest('.resum')){e.preventDefault();draw();return;}if(e.target.closest('.tomemo')){e.preventDefault();P.S.bo.noteOpen=true;draw();var ta2=Q('#notebox textarea');if(ta2){ta2.value='[AI 요약] '+txt;ta2.focus();ta2.scrollIntoView({block:'nearest'});}return;}if(e.target.closest('.cpsum')){e.preventDefault();try{navigator.clipboard.writeText(txt);}catch(_){}var a=e.target.closest('.cpsum');a.textContent='복사됨';setTimeout(function(){a.textContent='복사';},1200);}});
   ctx.appendChild(H('접수 정보'));
   ctx.appendChild(fact('입점사',r.store?P.storeLabel(r)+' (#'+r.store+')':'K-Beauty Station'));ctx.appendChild(fact('채널 ID',r.cid));ctx.appendChild(fact('연결 상태',r.chState));
   ctx.appendChild(fact('접수 일시',P.fmtTs((function(){var a=r.first;r.msgs.forEach(function(m){if(m.newSession)a=m.at;});return a;})())));
   ctx.appendChild(H('AI 응대'));
-  ctx.appendChild(fact('이 대화',!allowed?'미적용 (시범 입점사 아님)':on?'AI 응대 중':T==='prog'?(r.byStore?'입점사 응대 (AI OFF)':'상담사 응대 (AI OFF)'):T==='done'?'완료':'AI 중단'));
-  ctx.appendChild(fact('운영시간',P.inHours(S.now)?'운영시간 내 (수동 ON/OFF)':'운영시간 외 (자동 ON)'));
+  ctx.appendChild(fact('AI 상태',!allowed?'미사용 매장':on?'응대 중':T==='prog'?(r.byStore?'OFF · 입점사 응대':'OFF · 상담사 응대'):T==='done'?'상담 완료':'중단'));
+  ctx.appendChild(fact('운영시간',P.inHours(S.now)?'운영 중':'운영 외 · AI 자동 ON'));
   var ss=P.scnState(r);if(ss){ctx.appendChild(fact('시나리오',ss.flow+(ss.step?' · '+ss.step:''),true));ss.got.forEach(function(g){ctx.appendChild(fact(g[0],g[1],true));});}
   if(r.need){var wy=document.createElement('div');wy.className='why';wy.style.whiteSpace='normal';wy.style.margin='2px 0 6px';wy.textContent='AI 중단사유: '+r.need.reason+' · '+relTs(r.need.at);ctx.appendChild(wy);}
   ctx.appendChild(EL.sug);EL.sug.classList.add('intab');
@@ -2179,7 +2179,7 @@ function draw(){
 }
 window.draw=draw;
 function drawMe(){var mp=EL.mepop;if(!mp)return;var a=P.S.bo.readLangs||[];
- mp.innerHTML='<div class="mp-h">내 설정 · 읽는 언어</div><div class="mp-s">고른 언어 대화는 번역 없이 원문으로 보고, 자동번역 OFF로 시작</div>'+Object.keys(LN).filter(function(l){return l!=='ko';}).map(function(l){var on=a.indexOf(l)>=0;return '<button type="button" data-rl="'+l+'" class="'+(on?'on':'')+'" data-click><i>'+(on?'✓':'')+'</i>'+LN[l]+'</button>';}).join('');}
+ mp.innerHTML='<div class="mp-h">번역 없이 볼 언어</div>'+Object.keys(LN).filter(function(l){return l!=='ko';}).map(function(l){var on=a.indexOf(l)>=0;return '<button type="button" data-rl="'+l+'" class="'+(on?'on':'')+'" data-click><i>'+(on?'✓':'')+'</i>'+LN[l]+'</button>';}).join('');}
 function start(){try{init();}catch(e){console.error(e);}if(P&&P.ready)P.ready();else draw();}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();

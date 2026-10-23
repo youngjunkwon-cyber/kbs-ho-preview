@@ -178,7 +178,7 @@ function storeLabel(r){return r.storeName||(r.store?DB.store.name:'K-Beauty Stat
 /* 상담함·상담창은 확정안으로 고정. 아래 안은 상담 정보 패널 배치만 다름 */
 var LAYOUTS=[['R','3단 · 추천 답변 오른쪽 패널 (확정)']];
 var LAYOUT=window.top!==window?'R':(function(){try{var v=localStorage.getItem('ib-layout');return LAYOUTS.some(function(x){return x[0]===v;})?v:'R';}catch(e){return 'R';}})();
-function freshState(){return {surf:'BOTH',mark:window.top!==window,hint:false,now:CLOCKS[0][0],ch:'LINE',layout:LAYOUT,bo:{room:'r3',filter:null,q:'',tr:true,ptab:'ai',noteOpen:false,topicF:[],langF:null,drawer:false},cust:{sheet:null}};}
+function freshState(){return {surf:'BO',mark:window.top!==window,hint:false,now:CLOCKS[0][0],ch:'LINE',layout:LAYOUT,bo:{room:'r3',filter:null,q:'',tr:true,ptab:'ai',noteOpen:false,topicF:[],langF:null,drawer:false},cust:{sheet:null}};}
 function room(id){return DB.rooms.filter(function(r){return r.id===id;})[0];}
 function isClinic(){return DB.store.clinic;}
 
@@ -271,18 +271,18 @@ function classify(t,r){
  if(KW.collab.test(t))return {kind:'stop',reason:'협찬·제휴 문의'};
  if(KW.outScope.test(t))return {kind:'refuse'};
  if(KW.cancelDo.test(t))return {kind:'stop',reason:'예약 취소 처리 요청'};
- if(KW.cancelAsk.test(t))return {kind:'stop',reason:'취소·환불 정책 (등록 정보 없음)'};
+ if(KW.cancelAsk.test(t))return {kind:'stop',reason:'취소·환불 정책 (정보 없음)'};
  var date=parseDate(t,dOf(S.now)),time=parseTime(t),prod=findProd(t),ppl=parsePeople(t);
  if(KW.book.test(t)||KW.confirmDo.test(t)||(date&&time)||r.asked||(r.pending&&(date||time)))return {kind:'book',date:date,time:time,prod:prod,ppl:ppl};
- if(KW.parking.test(t))return {kind:'stop',reason:'주차 (등록 정보 없음)'};
+ if(KW.parking.test(t))return {kind:'stop',reason:'주차 (정보 없음)'};
  if(KW.dur.test(t))return {kind:'faqTime'};
- if(KW.price.test(t))return prod?{kind:'price',prod:prod}:{kind:'stop',reason:'가격 (등록된 상품을 찾지 못함)'};
+ if(KW.price.test(t))return prod?{kind:'price',prod:prod}:{kind:'stop',reason:'가격 (상품 미등록)'};
  if(KW.pay.test(t))return {kind:'pay'};
  if(KW.hours.test(t))return {kind:'hours'};
  if(KW.loc.test(t))return {kind:'loc'};
  if(KW.greet.test(t.trim())||/^[\s\p{Emoji}?!.ㅋㅎ~]+$/u.test(t))return {kind:'greet'};
  if(prod)return {kind:'price',prod:prod};
- return {kind:'stop',reason:'등록 정보로 답할 수 없는 문의'};
+ return {kind:'stop',reason:'답변 정보 없음'};
 }
 
 /* ================= 예약 판정 (순수 함수) ================= */
@@ -434,7 +434,7 @@ function scnRun(r,id,msg,c){
    var miss=F.filter(function(f){return !q[f];});
    if(!miss.length){r.asked=null;r.pending=false;id=n.out.next;msg=null;continue;}
    var tries=first?0:(r.flow.tries||0)+1;
-   if(n.retry&&tries>n.retry){r.asked=null;r.pending=false;id=n.out.fail;msg=null;if(!id){r.flow=null;stopAI(r,'정보 받기 실패 ('+miss.map(function(f){return slotName(f);}).join(', ')+')',null);return;}continue;}
+   if(n.retry&&tries>n.retry){r.asked=null;r.pending=false;id=n.out.fail;msg=null;if(!id){r.flow=null;stopAI(r,'정보 미수신 ('+miss.map(function(f){return slotName(f);}).join(', ')+')',null);return;}continue;}
    r.flow={node:n.id,tries:tries};r.pending=true;
    var onlyDT=F.every(function(f){return f==='date'||f==='time';});
    if(onlyDT)aiSay(r,q.date?T('askT',lang,{d:fmtDay(q.date,lang)}):q.time?T('askD',lang,{t:q.time}):T('askDT',lang));
@@ -455,14 +455,14 @@ function scnRun(r,id,msg,c){
    stopAI(r,why,msg,n.notice==='none');return;}
   if(n.type==='end'){break;}
  }
- if(steps>=30){r.flow=null;stopAI(r,'시나리오 오류 (끝나지 않는 고리)',msg);return;}
+ if(steps>=30){r.flow=null;stopAI(r,'시나리오 오류 (반복)',msg);return;}
  r.flow=null;
 }
 
 /* CSM 상담 개요: 진행 중인 시나리오와 받은 정보 */
 function scnGot(r){var q=r.req||{},out=[];if(q.date)out.push(['방문 희망일',fmtDay(q.date,'ko')]);if(q.time)out.push(['방문 시간',q.time]);if(q.when&&!q.date)out.push(['희망 일시',q.when]);if(q.people||q.ppl)out.push(['인원',String(q.people||q.ppl)]);if(q.treat||q.prod)out.push(['희망 시술',q.treat||q.prod.ko]);if(q.name)out.push(['이름',q.name]);if(q.phone)out.push(['연락처',q.phone]);['gender','nation','birth'].forEach(function(k){if(q[k])out.push([FIELDS[k].ko,q[k]]);});return out;}
 function scnState(r){if(!r.flow)return null;var n=scnNode(r.flow.node),t=scnNode(r.flowTrig),nm=t?(t.intents.length===1?t.intents[0]:t.intents[0]+' 외'):'';
- var step=!n?'':n.type==='ask'?askFields(n).filter(function(k){return !r.req[k];}).map(function(k){return slotName(k);}).join(', ')+' 받는 중':n.type==='check'?'예약 가능 확인 중':'진행 중';return {flow:nm,step:step,got:scnGot(r)};}
+ var step=!n?'':n.type==='ask'?askFields(n).filter(function(k){return !r.req[k];}).map(function(k){return slotName(k);}).join(', ')+' 요청 중':n.type==='check'?'예약 가능 확인 중':'진행 중';return {flow:nm,step:step,got:scnGot(r)};}
 /* 처리 이력: 회차마다 문의 접수 · 시나리오 · 상담 시작 · AI 중단 · 담당 변경 · 상담 완료 (BO 상담 관리 서랍과 같은 말) */
 function hist(r){var out=[],gi=0,groups=[];r.msgs.forEach(function(m,i){if(i===0||m.newSession){groups.push({n:++gi,at:m.at,list:[]});}groups[groups.length-1].list.push(m);});
  var who=r.card&&r.card.owner||'상담사';
@@ -508,7 +508,7 @@ function topics(r){
  var ed=(r.topicEd&&r.topicEd.s===r.session)?r.topicEd:{add:[],rm:[]};
  var out=ed.add.slice();auto.forEach(function(x){if(ed.rm.indexOf(x)<0&&out.indexOf(x)<0)out.push(x);});
  if(none&&!out.length)return {list:[NOASK],auto:[],none:true,edited:false};
- return {list:out.slice(0,3),auto:auto,edited:ed.add.length>0||ed.rm.length>0};
+ return {list:out,auto:auto,edited:ed.add.length>0||ed.rm.length>0};
 }
 function editTopic(id,t,on){var r=room(id);if(!r.topicEd||r.topicEd.s!==r.session)r.topicEd={s:r.session,add:[],rm:[]};var e=r.topicEd;
  if(on){e.rm=e.rm.filter(function(x){return x!==t;});if(e.add.indexOf(t)<0)e.add.push(t);}else{e.add=e.add.filter(function(x){return x!==t;});if(e.rm.indexOf(t)<0)e.rm.push(t);}render();}
@@ -572,7 +572,7 @@ function aiResume(r){
  var q=r.msgs.filter(function(m){return m.who==='cust'&&!m.answered;});
  for(var i=0;i<q.length;i++){
   var m=q[i];
-  if(r.ch==='WhatsApp'&&tsMin(S.now)-tsMin(m.at)>24*60){r.need={reason:'WhatsApp 24시간 경과 (자유 답장 불가)',at:S.now};r.aiOn=false;notifySlack(r,'WhatsApp 24시간 경과');return;}
+  if(r.ch==='WhatsApp'&&tsMin(S.now)-tsMin(m.at)>24*60){r.need={reason:'WhatsApp 24시간 경과',at:S.now};r.aiOn=false;notifySlack(r,'WhatsApp 24시간 경과');return;}
   if(!r.aiOn)break;
   handle(r,m);
  }
@@ -605,7 +605,7 @@ function setClock(ts){
 /* ================= 렌더 ================= */
 function swHTML(){
  return '<b>통합인박스 시안</b>'
- +(LAYOUTS.length>1?'<span style="margin-left:4px">레이아웃</span><select data-sw="layout" style="background:#e8537a;border-color:#e8537a;color:#fff;font-weight:700">'+LAYOUTS.map(function(x){return '<option value="'+x[0]+'"'+(S.layout===x[0]?' selected':'')+'>'+x[1]+'</option>';}).join('')+'</select><span style="width:8px"></span>':'')+[['BOTH','고객 + 운영사 함께'],['CUST','고객 메신저'],['BO','CSM 상담 (우리 CS)'],['MGMT','어드민 상담 관리']].map(function(x){return '<button class="s'+(S.surf===x[0]?' on':'')+'" data-surf="'+x[0]+'">'+x[1]+'</button>';}).join('')
+ +(LAYOUTS.length>1?'<span style="margin-left:4px">레이아웃</span><select data-sw="layout" style="background:#e8537a;border-color:#e8537a;color:#fff;font-weight:700">'+LAYOUTS.map(function(x){return '<option value="'+x[0]+'"'+(S.layout===x[0]?' selected':'')+'>'+x[1]+'</option>';}).join('')+'</select><span style="width:8px"></span>':'')+[['BO','CSM 상담 (우리 CS)'],['MGMT','어드민 상담 관리']].map(function(x){return '<button class="s'+(S.surf===x[0]?' on':'')+'" data-surf="'+x[0]+'">'+x[1]+'</button>';}).join('')
  +'<span class="sp"></span>'
  +'<span>고객 채널</span><select data-sw="ch">'+Object.keys(CH_ROOM).map(function(k){return '<option'+(S.ch===k?' selected':'')+'>'+k+'</option>';}).join('')+'</select>'
  +'<span>기준 시각</span><select data-sw="now">'+CLOCKS.map(function(c){return '<option value="'+c[0]+'"'+(S.now===c[0]?' selected':'')+'>'+c[1]+'</option>';}).join('')+'</select>'
