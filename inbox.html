@@ -419,7 +419,7 @@ function scnRun(r,id,msg,c){
  var lang=r.lang||'ko',steps=0;r.trace=r.trace||[];
  while(id&&steps++<30){
   var n=scnNode(id);if(!n)break;r.trace.push(n.id);
-  if(n.type==='trigger'){if(msg&&msg.kind!=='image')fillSlots(r,msg.text,[]);id=n.out.next;continue;} /* 시작 메시지에 있는 정보부터 채움 (조건 분기에서 씀) */
+  if(n.type==='trigger'){if(msg&&msg.kind!=='image')fillSlots(r,msg.text,[]);r.flowTrig=n.id;(r.scnLog=r.scnLog||[]).push([S.now,'시나리오 · '+(n.intents.indexOf(msg&&msg.scnIntent)>=0?msg.scnIntent:n.intents[0])]);id=n.out.next;continue;} /* 시작 메시지에 있는 정보부터 채움 (조건 분기에서 씀) */
   if(n.type==='say'){aiSay(r,scnText(n,lang));id=n.out.next;continue;}
   if(n.type==='branch'){id=branchTest(n,r)?n.out.yes:n.out.no;continue;}
   if(n.type==='record'){
@@ -459,6 +459,21 @@ function scnRun(r,id,msg,c){
  r.flow=null;
 }
 
+/* CSM 상담 개요: 진행 중인 시나리오와 받은 정보 */
+function scnGot(r){var q=r.req||{},out=[];if(q.date)out.push(['방문 희망일',fmtDay(q.date,'ko')]);if(q.time)out.push(['방문 시간',q.time]);if(q.when&&!q.date)out.push(['희망 일시',q.when]);if(q.people||q.ppl)out.push(['인원',String(q.people||q.ppl)]);if(q.treat||q.prod)out.push(['희망 시술',q.treat||q.prod.ko]);if(q.name)out.push(['이름',q.name]);if(q.phone)out.push(['연락처',q.phone]);['gender','nation','birth'].forEach(function(k){if(q[k])out.push([FIELDS[k].ko,q[k]]);});return out;}
+function scnState(r){if(!r.flow)return null;var n=scnNode(r.flow.node),t=scnNode(r.flowTrig),nm=t?(t.intents.length===1?t.intents[0]:t.intents[0]+' 외'):'';
+ var step=!n?'':n.type==='ask'?askFields(n).filter(function(k){return !r.req[k];}).map(function(k){return slotName(k);}).join(', ')+' 받는 중':n.type==='check'?'예약 가능 확인 중':'진행 중';return {flow:nm,step:step,got:scnGot(r)};}
+/* 처리 이력: 회차마다 문의 접수 · 시나리오 · 상담 시작 · AI 중단 · 담당 변경 · 상담 완료 (BO 상담 관리 서랍과 같은 말) */
+function hist(r){var out=[],gi=0,groups=[];r.msgs.forEach(function(m,i){if(i===0||m.newSession){groups.push({n:++gi,at:m.at,list:[]});}groups[groups.length-1].list.push(m);});
+ var who=r.card&&r.card.owner||'상담사';
+ groups.forEach(function(g,k){var last=k===groups.length-1,next=groups[k+1],end=g.list[g.list.length-1].at,agent=false,ev=[[g.at,'문의 접수']];
+  (r.scnLog||[]).forEach(function(x){if(x[0]>=g.at&&(!next||x[0]<next.at))ev.push([x[0],x[1]]);});
+  g.list.forEach(function(m){if(m.who==='agent'&&!agent){agent=true;ev.push([m.at,'상담 시작 · '+who+(r.byStore?' (입점사)':'')]);}if(m.stopped)ev.push([m.at,'AI 중단'+(last&&r.need?' · '+r.need.reason:'')]);});
+  if(last&&!agent&&r.agentAt&&r.agentAt>=g.at){agent=true;ev.push([r.agentAt,'상담 시작 · '+who]);}
+  (r.ownerLog||[]).forEach(function(o){if(o[0]>=g.at&&(!next||o[0]<next.at))ev.push([o[0],'담당 변경 · '+o[1]+' → '+o[2]]);});
+  if(!last||r.status==='상담종료')ev.push([end,'상담 완료'+(agent?' · '+who:' (AI 단독)')]);
+  ev.sort(function(a,b){return a[0]<b[0]?-1:a[0]>b[0]?1:0;});ev.forEach(function(e){out.push({n:g.n,at:e[0],t:e[1]});});});
+ return out;}
 /* 시험 대화: 실제 대화 목록과 별개인 방 하나로 시나리오를 돌려 본다 */
 function scnTest(text,o){o=o||{};var r=window.__scnT;if(!r||o.fresh){r=window.__scnT={id:'test',name:'시험',ch:o.ch||'WhatsApp',type:'스토어 문의',store:1,lang:o.lang||null,msgs:[],session:1,status:'상담중',aiOn:true,need:null,handler:'ai',aiIntroDone:false,req:{},asked:null,first:S.now,agentAt:null,member:o.member||'비회원',trace:[]};}
    if(text==null)return r;var n0=r.msgs.length;r.trace=[];var m={who:'cust',text:text,kind:'text'};push(r,m);if(r.aiOn)handle(r,m);return {msgs:r.msgs.slice(n0),trace:r.trace.slice(),flow:r.flow,need:r.need,aiOn:r.aiOn,req:JSON.parse(JSON.stringify(r.req)),byStore:!!r.byStore};}
@@ -612,7 +627,7 @@ function render(){
  ['CUST','BO','MGMT'].forEach(function(s){var w=frame(s).contentWindow;if(w&&typeof w.draw==='function')w.draw();});
 }
 window.IB={get DB(){return DB;},get S(){return S;},get SLACK(){return SLACK;},CH_ROOM:CH_ROOM,
- room:room,fmtTs:fmtTs,unans:unans,storeLabel:storeLabel,suggest:function(r){return suggest(r);},inHours:inHours,fmtDay:fmtDay,custSend:custSend,agentSend:agentSend,complete:complete,setAI:setAI,takeOver:takeOver,updateCard:updateCard,addNote:addNote,sendProduct:sendProduct,get RECENT(){return RECENT;},summary:function(r){return summarize(r);},topics:function(r){return topics(r);},editTopic:editTopic,TOPICS:TOPICS,NOASK:NOASK,
+ room:room,fmtTs:fmtTs,unans:unans,storeLabel:storeLabel,suggest:function(r){return suggest(r);},inHours:inHours,fmtDay:fmtDay,custSend:custSend,agentSend:agentSend,complete:complete,setAI:setAI,takeOver:takeOver,updateCard:updateCard,addNote:addNote,sendProduct:sendProduct,get RECENT(){return RECENT;},summary:function(r){return summarize(r);},topics:function(r){return topics(r);},editTopic:editTopic,TOPICS:TOPICS,NOASK:NOASK,scnState:scnState,hist:hist,
  scn:{get:function(){return JSON.parse(JSON.stringify(DB.scn));},save:function(v){DB.scn=JSON.parse(JSON.stringify(v));try{localStorage.setItem('ib-scn',JSON.stringify(DB.scn));}catch(e){}render();},defaults:function(){return defaultScn();},reset:function(){DB.scn=defaultScn();try{localStorage.removeItem('ib-scn');}catch(e){}render();return JSON.parse(JSON.stringify(DB.scn));},INTENTS:INTENTS,EXITS:SCN_EXITS,FIELDS:FIELDS,SLOT:SLOT,
   test:function(text,o){o=o||{};var keep=DB.scn;if(o.scn)DB.scn=o.scn;try{return scnTest(text,o);}finally{DB.scn=keep;}}},
 aiAllowed:aiAllowed,render:render,
