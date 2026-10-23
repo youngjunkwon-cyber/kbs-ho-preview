@@ -2095,7 +2095,7 @@ function draw(){
  EL.langTxt.textContent='고객 언어: '+(LN[lang]||lang);
  if(EL.push)EL.push.style.display='none'; /* 상담사에게 필요 없는 기술 안내 */
  if(EL.trSpace)EL.trSpace.style.display=lang==='ko'?'none':'';
- var emo=QA('button',EL.tools).filter(function(b){return /LINE 이모지/.test(b.title||b.textContent);})[0];if(emo)(emo.closest('.ant-space-item')||emo).style.display=r.ch==='LINE'?'':'none'; /* 2. LINE 대화에서만 */
+ QA('button',EL.tools).filter(function(b){return /^LINE (이모지|스티커)$/.test(b.title||b.textContent.trim());}).forEach(function(b){(b.closest('.ant-space-item')||b).style.display=r.ch==='LINE'?'':'none';}); /* LINE 스티커·이모지는 LINE 대화에서만 */
  /* ===== 상담 정보 패널: 탭(고객 / 예약 N / 상담 정보) + 아래 고정 AI 추천 답변 ===== */
  var ctx=Q('[class*=_context_]');ctx.innerHTML='';var c=r.card,pt=S.bo.ptab||'ai';
  var bks=(c.bookings||[]).slice(),today=S.now.slice(0,10),upN=bks.filter(function(x){return x.d>=today;}).length;
