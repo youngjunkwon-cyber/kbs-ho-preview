@@ -2405,10 +2405,13 @@ function init(){
  /* 머리 */
  var h1=Q('[class*=_pageHeaderTopTitleText_]');h1.textContent='상담 관리';
  var sub=Q('[class*=_pageHeaderTopSubtitle_]');sub.textContent='우리 CS와 입점사의 전체 채팅 상담 내역을 확인할 수 있습니다.';
- var top=Q('[class*=_pageHeaderTop_]');top.style.display='flex';top.style.justifyContent='space-between';top.style.alignItems='flex-start';
- var bx=document.createElement('div');bx.setAttribute('data-new','');bx.style.cssText='display:flex;gap:8px';
- ['채널 연결','AI 응대 설정'].forEach(function(t){var b=document.createElement('button');b.type='button';b.className='ant-btn '+CSS_H+' ant-btn-default ant-btn-color-default ant-btn-variant-outlined';b.innerHTML='<span>'+t+'</span>';b.setAttribute('data-click','');b.addEventListener('click',function(){toast(t+' 화면은 시안에 포함하지 않았습니다');});bx.appendChild(b);});
- top.appendChild(bx);
+ /* 상담 설정 메뉴 (상담 관리 바로 아래) */
+ var mLi=QA('.ant-layout-sider li.ant-menu-item').filter(function(li){return li.textContent.trim()==='상담 관리';})[0];
+ var sLi=mLi.cloneNode(true);sLi.classList.remove('ant-menu-item-selected');sLi.setAttribute('data-new','');sLi.setAttribute('data-click','');
+ var sSp=QA('span',sLi).filter(function(x){return x.textContent.trim()==='상담 관리'&&!x.children.length;})[0];sSp.textContent='상담 설정';mLi.after(sLi);mLi.setAttribute('data-click','');
+ EL.mLi=mLi;EL.sLi=sLi;EL.h1=h1;EL.sub=sub;
+ mLi.addEventListener('click',function(e){e.preventDefault();M.page='list';drawPage();});
+ sLi.addEventListener('click',function(e){e.preventDefault();M.page='set';M.open=null;drawPage();draw();});
  /* 필터 */
  var form=Q('form.ant-form');form.addEventListener('submit',function(e){e.preventDefault();});
  var ord=Q('#dateOrder').parentElement;ord.firstChild.nodeValue='마지막대화날짜기준';ord.title='마지막대화날짜기준';
@@ -2472,6 +2475,14 @@ function init(){
   var jp=e.target.closest('[data-jump]');if(jp){var jk=jp.getAttribute('data-jump'),jc=Q('.mg-conv[data-conv="'+jk+'"]',EL.dw);jc.scrollTop=jc.scrollHeight;jp.style.display='none';return;}
   var mo=e.target.closest('[data-more]');if(mo){var cv=Q('.mg-conv[data-conv="'+mo.getAttribute('data-more')+'"]',EL.dw),h0=cv.scrollHeight,t0=cv.scrollTop;EL.cMore[mo.getAttribute('data-more')]=true;drawDrawer();cv=Q('.mg-conv[data-conv="'+mo.getAttribute('data-more')+'"]',EL.dw);cv.scrollTop=t0+(cv.scrollHeight-h0);return;}
   if(e.target.closest('.mg-csm')){var w=allRows().filter(function(x){return x.id===M.open;})[0];if(w&&w.live){M.open=null;draw();parent.go('BO');P.openRoom(w.id);}else toast('시안 예시 데이터 (CSM 연결 없음)');return;}if(e.target.closest('.ant-drawer-close')||e.target.classList.contains('ant-drawer-mask')){M.open=null;draw();}});
+ var ph=Q('[class*=_pageHeader_]'),bottom=Q('[class*=_pageHeaderBottom_]');EL.listParts=[bottom,ph.nextElementSibling];
+ EL.setp=document.createElement('div');EL.setp.id='setp';EL.setp.setAttribute('data-new','');EL.setp.style.display='none';ph.parentNode.appendChild(EL.setp);
+ EL.setp.addEventListener('click',function(e){var t=e.target.closest('[data-st]');if(t){SET.tab=t.getAttribute('data-st');drawPage();return;}
+  var rv=e.target.closest('[data-rv]');if(rv){e.preventDefault();var g=rv.closest('[data-rg]').getAttribute('data-rg'),v=rv.getAttribute('data-rv');if(g.indexOf('ch:')===0)SET.chAi[g.slice(3)]=v;else SET[g]=v;drawPage();return;}
+  var a=e.target.closest('[data-act]');if(!a)return;var act=a.getAttribute('data-act');
+  if(act==='save')toast('저장했습니다');else if(act==='add')toast('계정 추가 창은 dev 화면 그대로 씁니다');else if(act==='edit'||act==='guide')toast(a.innerText+' 창은 dev 화면 그대로 씁니다');});
+ EL.setp.addEventListener('input',function(e){if(e.target.getAttribute('data-act')==='cstext'){SET.csText=e.target.value;var c=Q('.sp-cnt',EL.setp);if(c)c.textContent=SET.csText.length+' / 12000';}});
+ EL.setp.addEventListener('change',function(e){if(e.target.getAttribute('data-act')==='store'){SET.store=e.target.value;drawPage();}});
  var st=document.createElement('style');st.textContent=
   'body.mk [data-new]{outline:2px dashed #e8537a;outline-offset:1px}body.hl [data-click]{box-shadow:0 0 0 2px #16a34a!important}'
   +'.mg-nw{white-space:nowrap}.mg-dim{color:#667085}.mg-last{max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#475467}'
@@ -2510,14 +2521,48 @@ function init(){
   +'.mg-tabpane{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column}.mg-tabpane.hist{overflow:hidden}.mg-tabpane>.mg-sec:last-child{border-bottom:0}.mg-kvgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 28px}.mg-kvgrid .mg-kv2{grid-template-columns:76px 1fr}'
   +'.mg-tl>div{display:grid;grid-template-columns:36px 150px 1fr;gap:8px;font-size:13px;padding:4px 0;border-top:1px solid #f0f2f5}.mg-tl>div:first-child{border-top:0}.mg-tl span{color:#475467}.mg-tl i{font-style:normal;color:#475467}.mg-tl b{font-weight:500;color:#101828}'
   +'.mg-tabpane .mg-kv2{grid-template-columns:96px 1fr}.mg-kvgrid .mg-kv2{grid-template-columns:76px 1fr}'
+  +'#setp{padding:16px 24px 24px}.sp-tabs{margin:0 0 16px}.sp-desc{font-size:13px;color:#475467;margin-bottom:12px}.sp-desc.top{margin:0 0 12px}.sp-row{display:flex;align-items:center;gap:16px;padding:8px 0}.sp-row.top{align-items:flex-start}.sp-lb{flex:none;width:120px;font-size:14px;color:#344054}.sp-fl{flex:1;min-width:0;max-width:760px}.sp-fl textarea{width:100%;font-family:inherit}.sp-cnt{text-align:right;font-size:12px;color:#667085;margin-top:4px}.sp-act{display:flex;justify-content:flex-end;padding-top:8px}.sp-sel{height:32px;min-width:220px;border:1px solid #d9d9d9;border-radius:6px;padding:0 8px;font:14px inherit}'
   +'#mgtoast{position:fixed;left:50%;top:80px;transform:translateX(-50%);background:#1d2939;color:#fff;font-size:13px;padding:8px 14px;border-radius:6px;z-index:1200;display:none}';
  document.head.appendChild(st);
  var t=document.createElement('div');t.id='mgtoast';document.body.appendChild(t);EL.toast=t;
 }
+/* ===== 상담 설정 페이지 ===== */
+var SET={tab:'ch',cs:'on',csText:'',sugg:'on',store:'k-beauty의원',storeAi:'on',chAi:{LINE:'def',WhatsApp:'def',WeChat:'def','인앱채팅':'def'}};
+var ACC=[['LINE','hoiuhoiuhoiuh','k-beauty의원','활성'],['WeChat','kbs_wechat_test','k-beauty의원','활성']];
+function radios(name,cur,opts){return '<div class="ant-radio-group ant-radio-group-outline '+CSS_H+' ant-radio-css-var" data-rg="'+name+'">'+opts.map(function(o){var on=cur===o[0];return '<label class="ant-radio-button-wrapper '+CSS_H+' ant-radio-css-var'+(on?' ant-radio-button-wrapper-checked':'')+'" data-rv="'+o[0]+'" data-click><span class="ant-radio-button'+(on?' ant-radio-button-checked':'')+'"><input class="ant-radio-button-input" type="radio"></span><span class="ant-radio-button-label">'+o[1]+'</span></label>';}).join('')+'</div>';}
+function btn(t,primary,attr){return '<button type="button" class="ant-btn '+CSS_H+(primary?' ant-btn-primary ant-btn-color-primary ant-btn-variant-solid':' ant-btn-default ant-btn-color-default ant-btn-variant-outlined')+'" data-click '+(attr||'')+'><span>'+t+'</span></button>';}
+function tbl(cols,rows){return '<div class="ant-table-css-var ant-table-wrapper '+CSS_H+'"><div class="ant-table '+CSS_H+' ant-table-css-var"><div class="ant-table-container"><div class="ant-table-content"><table style="table-layout:auto"><thead class="ant-table-thead"><tr>'+cols.map(function(c){return '<th class="ant-table-cell">'+c+'</th>';}).join('')+'</tr></thead><tbody class="ant-table-tbody">'+rows.map(function(r){return '<tr class="ant-table-row">'+r.map(function(c){return '<td class="ant-table-cell">'+c+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table></div></div></div></div>';}
+function drawPage(){
+ var set=M.page==='set';EL.mLi.classList.toggle('ant-menu-item-selected',!set);EL.sLi.classList.toggle('ant-menu-item-selected',set);
+ EL.h1.textContent=set?'상담 설정':'상담 관리';EL.sub.textContent=set?'메신저 채널 연결과 AI 응대 기준을 관리합니다.':'우리 CS와 입점사의 전체 채팅 상담 내역을 확인할 수 있습니다.';
+ EL.listParts.forEach(function(x){x.style.display=set?'none':'';});EL.setp.style.display=set?'':'none';if(!set)return;
+ var body='';
+ if(SET.tab==='ch'){
+  body='<div class="ant-card ant-card-bordered '+CSS_H+'"><div class="ant-card-head"><div class="ant-card-head-wrapper"><div class="ant-card-head-title">연결 계정</div><div class="ant-card-extra">'+btn('계정 추가',true,'data-act="add"')+'</div></div></div><div class="ant-card-body">'
+   +'<div class="sp-desc">입점사별 공식 메신저 계정을 연결하고 인증정보와 수신 상태를 관리합니다.</div>'
+   +tbl(['채널','계정','입점사','상태','관리'],ACC.map(function(a){return [esc(a[0]),esc(a[1]),esc(a[2]),'<span class="ant-tag ant-tag-filled '+CSS_H+'">'+esc(a[3])+'</span>','<a data-act="edit" data-click>설정</a> / <a data-act="guide" data-click>연결 안내</a>'];}))+'</div></div>';
+ }else{
+  var chRows=Object.keys(SET.chAi).map(function(c){return [esc(c),radios('ch:'+c,SET.chAi[c],[['def','기본값 따름'],['on','ON'],['off','OFF']])];});
+  body='<div class="sp-desc top">저장 후 새 문의부터 적용됩니다. 운영시간(평일 10:00~19:00) 외에는 자동 ON.</div>'
+   +'<div class="ant-card ant-card-bordered '+CSS_H+'"><div class="ant-card-head"><div class="ant-card-head-wrapper"><div class="ant-card-head-title">플랫폼 CS</div></div></div><div class="ant-card-body">'
+   +'<div class="sp-row"><span class="sp-lb">CS 자동응대</span>'+radios('cs',SET.cs,[['on','ON'],['off','OFF']])+'</div>'
+   +'<div class="sp-row top"><span class="sp-lb">안내 문구</span><div class="sp-fl"><textarea class="ant-input '+CSS_H+' ant-input-outlined" rows="5" maxlength="12000" placeholder="플랫폼 고객지원 안내 (AI가 이 내용을 근거로 답변)" data-click data-act="cstext">'+esc(SET.csText)+'</textarea><div class="sp-cnt">'+SET.csText.length+' / 12000</div></div></div>'
+   +'<div class="sp-act">'+btn('저장',true,'data-act="save"')+'</div></div></div>'
+   +'<div class="ant-card ant-card-bordered '+CSS_H+'" style="margin-top:16px"><div class="ant-card-head"><div class="ant-card-head-wrapper"><div class="ant-card-head-title">입점사</div></div></div><div class="ant-card-body">'
+   +'<div class="sp-row"><span class="sp-lb">입점사 선택</span><select class="sp-sel" data-act="store">'+Object.keys(STORE_MGR).map(function(n){return '<option'+(n===SET.store?' selected':'')+'>'+esc(n)+'</option>';}).join('')+'</select></div>'
+   +'<div class="sp-row"><span class="sp-lb">입점사 기본값</span>'+radios('storeAi',SET.storeAi,[['on','ON'],['off','OFF']])+'</div>'
+   +'<div class="sp-row top"><span class="sp-lb">채널별 설정</span><div class="sp-fl">'+tbl(['채널','AI 응대'],chRows)+'</div></div>'
+   +'<div class="sp-act">'+btn('저장',true,'data-act="save"')+'</div></div></div>'
+   +'<div class="ant-card ant-card-bordered '+CSS_H+'" style="margin-top:16px"><div class="ant-card-head"><div class="ant-card-head-wrapper"><div class="ant-card-head-title">AI 추천 답변</div></div></div><div class="ant-card-body">'
+   +'<div class="sp-row"><span class="sp-lb">추천 답변 사용</span>'+radios('sugg',SET.sugg,[['on','ON'],['off','OFF']])+'</div>'
+   +'<div class="sp-act">'+btn('저장',true,'data-act="save"')+'</div></div></div>';
+ }
+ EL.setp.innerHTML='<div class="mg-tabs sp-tabs">'+[['ch','채널 연결'],['ai','AI 응대']].map(function(t){return '<button type="button" data-st="'+t[0]+'" class="'+(SET.tab===t[0]?'on':'')+'" data-click>'+t[1]+'</button>';}).join('')+'</div><div class="sp-body">'+body+'</div>';
+}
 function toast(s){EL.toast.textContent=s;EL.toast.style.display='block';clearTimeout(EL.tt);EL.tt=setTimeout(function(){EL.toast.style.display='none';},1800);}
 window.draw=draw;
 window.MG={state:M,rows:function(){return base().filter(function(w){return pass(w);});},open:function(id){M.open=id;draw();}};
-function start(){try{init();}catch(e){console.error(e);}draw();}
+function start(){try{init();}catch(e){console.error(e);}draw();drawPage();}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();
 </script></body></html>
