@@ -125,7 +125,15 @@ var EX=[
   msgs:[['cust','妊娠中でもレーザーはできますか？','임신 중에도 레이저 가능한가요?','2026-10-21 13:45'],['ai','確認してご案内いたします。','확인 후 안내드리겠습니다.','2026-10-21 13:45',1]],
   sum:{l1:'임신 중 레이저 시술 가능 여부 문의, 의료 판단 필요로 AI 중단',l2:''},card:{name:'Kenji T.',phone:'',email:''},need:'시술 상담(의료 판단 필요)'}
 ];
-var EX_META={x1:['U3f9····a12c','친구 추가됨'],x2:['chat-20114','-'],x3:['+976 99112233','24시간 창 열림'],x4:['chat-20131','-',{name:'프로필 촬영 베이직',no:3021}],x5:['chat-20087','-'],x6:['oQ7v····Lm2','구독 중'],x7:['U77a····0e1','친구 추가됨'],x8:['chat-20140','-']};
+EX.push(
+ {id:'x9',cat:'피부과',name:'',ch:'WeChat',store:'A피부과 강남점',lang:'zh',tab:'done',who:'AI',owner:'',session:1,aiOnly:true,first:0,
+  msgs:[['cust','你好','안녕하세요','2026-10-21 09:12'],['ai','您好！请问有什么可以帮您？可以为您介绍可预约时间、位置、价格等。','안녕하세요! 예약 가능 시간, 위치, 가격 등을 안내해 드려요.','2026-10-21 09:12']],
+  sum:{l1:'인사만 하고 문의 없이 종료',l2:''},card:{name:'',phone:'',email:''}},
+ {id:'x10',cat:'헤어·메이크업',name:'Emily R.',ch:'WhatsApp',store:'B헤어 명동점',lang:'en',tab:'prog',who:'CS팀',owner:'김상담',session:1,topics:['이벤트·혜택'],aiOnly:false,first:5,
+  msgs:[['cust','Is the 50% head spa event still available this month?','이번 달에도 헤드스파 50% 이벤트 하나요?','2026-10-21 13:30'],['agent','Let me check with the salon and get back to you.','매장에 확인 후 안내드리겠습니다.','2026-10-21 13:35']],
+  sum:{l1:'헤드스파 50% 이벤트 진행 여부 문의, 매장 확인 중',l2:''},card:{name:'Emily R.',phone:'+44 7700900123',email:''}}
+);
+var EX_META={x9:['oP3k····Zt8','구독 중'],x10:['+44 7700900123','24시간 창 열림'],x1:['U3f9····a12c','친구 추가됨'],x2:['chat-20114','-'],x3:['+976 99112233','24시간 창 열림'],x4:['chat-20131','-',{name:'프로필 촬영 베이직',no:3021}],x5:['chat-20087','-'],x6:['oQ7v····Lm2','구독 중'],x7:['U77a····0e1','친구 추가됨'],x8:['chat-20140','-']};
 /* 긴 대화 예시: Mina Park 1차 40건, Anna Kim 2회차(1차 10. 14.) */
 (function(){
  var QA=[['Hi, I am visiting Seoul next week.','안녕하세요, 다음 주에 서울 방문해요.','Welcome! How can we help you?','환영합니다! 무엇을 도와드릴까요?'],
@@ -223,7 +231,7 @@ var KW={
  dur:/얼마나 걸|소요 ?시간|how long|時間はどれ|多长时间/i,
  pay:/결제|카드|예약금|현금|pay|card|deposit|支払|カード|付款|定金/i,
  book:/예약|book|appointment|reserve|予約|预约/i,
- greet:/^(hi|hello|hey|안녕|ㅎㅇ|こんにちは|你好|您好)\b|^(hi|hello|안녕하세요|ㅎㅇ)[!.~ ]*$/i
+ greet:/^(hi|hello|hey|안녕|ㅎㅇ|こんにちは|你好|您好)\b|^(hi|hello|hey|안녕하세요|ㅎㅇ|こんにちは|你好|您好|สวัสดี(ค่ะ|ครับ)?|сайн байна уу)[!.~！。 ]*$/i
 };
 function findProd(t){var s=DB.store,low=t.toLowerCase();return s.products.filter(function(p){return p.keys.some(function(k){return low.indexOf(k.toLowerCase())>=0;});})[0]||null;}
 var WDK={'일':0,'월':1,'화':2,'수':3,'목':4,'금':5,'토':6},WDE={sun:0,mon:1,tue:2,wed:3,thu:4,fri:5,sat:6};
@@ -390,8 +398,11 @@ var SUGX={soft:{ko:'문의 감사합니다. ',en:'Thank you for reaching out. ',
 function lastCust(r){for(var i=r.msgs.length-1;i>=0;i--)if(r.msgs[i].who==='cust')return r.msgs[i];return null;}
 /* AI 요약 (시안: 대화를 규칙으로 읽어 문장 생성). 1줄 = 문의 요지, 2줄 = 조건과 처리 상태 */
 /* 상담 분류 자동 분류: 이번 회차 고객 메시지를 AI 분류값으로 묶는다. 상담사가 고친 값(r.topicEd)이 우선 */
-var TOPICS=['가격','예약','취소·환불','시술 상담','위치·운영시간','결제','불만','제휴·협찬','기타'];
-function topicOf(c){var k=c.kind,rs=c.reason||'';
+var TOPICS=['가격','이벤트·혜택','예약','취소·환불','시술 상담','위치·운영시간','결제','불만','제휴·협찬','기타'];
+var NOASK='문의 없음'; /* 이번 회차 고객 메시지가 인사·이모지뿐: 분류 대신 이 값, 통계 분포에서 뺀다 */
+var KW_EVENT=/이벤트|할인|쿠폰|프로모션|혜택|discount|coupon|promo|event|deal|优惠|折扣|活动|優惠|折價|活動|割引|クーポン|キャンペーン|ส่วนลด|โปรโมชั่น|хямдрал|урамшуулал/i;
+function topicOf(c,t){var k=c.kind,rs=c.reason||'';
+ if(t&&KW_EVENT.test(t))return '이벤트·혜택';
  if(k==='price'||/^가격/.test(rs))return '가격';
  if(k==='book'||(k==='cs'&&c.key==='howbook'))return '예약';
  if(/취소/.test(rs))return '취소·환불';
@@ -403,10 +414,12 @@ function topicOf(c){var k=c.kind,rs=c.reason||'';
  return '기타';}
 function topics(r){
  var start=0;r.msgs.forEach(function(m,i){if(m.newSession)start=i;});
- var auto=r.topicFix?r.topicFix.slice():[];if(!r.topicFix)r.msgs.slice(start).forEach(function(m){if(m.who!=='cust'||m.kind==='image')return;var t=topicOf(classify(m.text,r));if(auto.indexOf(t)<0)auto.push(t);});
+ var auto=r.topicFix?r.topicFix.slice():[],greet=0,said=0;if(!r.topicFix)r.msgs.slice(start).forEach(function(m){if(m.who!=='cust'||m.kind==='image')return;said++;var c=classify(m.text,r);if(c.kind==='greet'){greet++;return;}var t=topicOf(c,(m.ko||'')+' '+m.text);if(auto.indexOf(t)<0)auto.push(t);});
+ var none=!r.topicFix&&said>0&&greet===said;
  if(auto.length>1)auto=auto.filter(function(x){return x!=='기타';});
  var ed=(r.topicEd&&r.topicEd.s===r.session)?r.topicEd:{add:[],rm:[]};
  var out=ed.add.slice();auto.forEach(function(x){if(ed.rm.indexOf(x)<0&&out.indexOf(x)<0)out.push(x);});
+ if(none&&!out.length)return {list:[NOASK],auto:[],none:true,edited:false};
  return {list:out.slice(0,3),auto:auto,edited:ed.add.length>0||ed.rm.length>0};
 }
 function editTopic(id,t,on){var r=room(id);if(!r.topicEd||r.topicEd.s!==r.session)r.topicEd={s:r.session,add:[],rm:[]};var e=r.topicEd;
@@ -526,7 +539,7 @@ function render(){
  ['CUST','BO','MGMT'].forEach(function(s){var w=frame(s).contentWindow;if(w&&typeof w.draw==='function')w.draw();});
 }
 window.IB={get DB(){return DB;},get S(){return S;},get SLACK(){return SLACK;},CH_ROOM:CH_ROOM,
- room:room,fmtTs:fmtTs,unans:unans,storeLabel:storeLabel,suggest:function(r){return suggest(r);},inHours:inHours,fmtDay:fmtDay,custSend:custSend,agentSend:agentSend,complete:complete,setAI:setAI,takeOver:takeOver,updateCard:updateCard,addNote:addNote,sendProduct:sendProduct,get RECENT(){return RECENT;},summary:function(r){return summarize(r);},topics:function(r){return topics(r);},editTopic:editTopic,TOPICS:TOPICS,aiAllowed:aiAllowed,render:render,
+ room:room,fmtTs:fmtTs,unans:unans,storeLabel:storeLabel,suggest:function(r){return suggest(r);},inHours:inHours,fmtDay:fmtDay,custSend:custSend,agentSend:agentSend,complete:complete,setAI:setAI,takeOver:takeOver,updateCard:updateCard,addNote:addNote,sendProduct:sendProduct,get RECENT(){return RECENT;},summary:function(r){return summarize(r);},topics:function(r){return topics(r);},editTopic:editTopic,TOPICS:TOPICS,NOASK:NOASK,aiAllowed:aiAllowed,render:render,
  openRoom:function(id){S.bo.room=id;render();},
  ready:function(){render();}};
 /* ===== 검수 콘솔용 전역 ===== */

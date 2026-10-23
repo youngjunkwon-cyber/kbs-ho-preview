@@ -2207,7 +2207,7 @@ var FL=[
  {k:'st',id:'mode',label:'상태',w:80,get:function(w){return w.tab;},opts:function(){return ['wait','prog','done','ai'].map(function(t){return [t,ST[t][0]];});}},
  {k:'ch',id:'channel',label:'채널',w:80,multi:1,get:function(w){return w.ch;},opts:function(){return CHS.map(function(x){return [x,x];});}},
  {k:'cat',id:'f-cat',label:'카테고리',w:100,multi:1,get:function(w){return w.cat||'none';},opts:function(){return CATS.map(function(x){return [x,x];}).concat([['none','CS채팅']]);}},
- {k:'tp',id:'topic',label:'상담 분류',w:104,multi:1,get:function(w){return w.topics;},opts:function(){return P.TOPICS.map(function(t){return [t,t];});}},
+ {k:'tp',id:'topic',label:'상담 분류',w:104,multi:1,get:function(w){return w.topics;},opts:function(){return P.TOPICS.concat([P.NOASK]).map(function(t){return [t,t];});}},
  {k:'lang',id:'languageId',label:'언어',w:80,multi:1,get:function(w){return w.lang;},opts:function(){return Object.keys(LN).filter(function(l){return l!=='ko';}).map(function(l){return [l,LN[l]];});}},
  {k:'who',id:'isAnswered',label:'응대주체',more:1,get:function(w){return w.who||'none';},opts:function(){return WHO.map(function(x){return [x,x];}).concat([['none','미응대']]);}},
  {k:'sub',id:'f-sub',label:'세부분류',w:140,more:1,multi:1,get:function(w){return w.sub;},opts:function(){return uniq(function(w){return w.sub;}).map(function(x){return [x,x];});}},

@@ -6006,18 +6006,19 @@ div.ck.ck-balloon-panel.ck-mention-balloon { z-index: calc(var(--ck-z-dialog) + 
 'use strict';
 var Q=function(s,r){return (r||document).querySelector(s);},QA=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));};
 var CSS_H='css-19u5a7b css-var-root';
-var TOPICS=['가격','예약','취소·환불','시술 상담','위치·운영시간','결제','불만','제휴·협찬','기타'];
-/* 문의 1건 = 상담 완료 때 확정된 분류 기록(SYS-CHAT-06) */
+var TOPICS=['가격','이벤트·혜택','예약','취소·환불','시술 상담','위치·운영시간','결제','불만','제휴·협찬','기타'],NOASK='문의 없음';
+/* 문의 1건 = 상담 완료 때 확정된 분류 기록(SYS-CHAT-06). booked = 예약 전환 */
 var REC=[
- {d:'2026-10-16',store:'에이바이봄',kind:'상품문의',lang:'영어',ch:'입점사왓츠앱',topics:['예약'],who:'입점사'},
- {d:'2026-10-20',store:'아비쥬 홍대점',kind:'스토어문의',lang:'영어',ch:'채팅문의',topics:['가격'],who:'AI'}
+ {d:'2026-10-16',store:'에이바이봄',kind:'상품문의',lang:'영어',ch:'입점사왓츠앱',topics:['예약'],who:'입점사',booked:true},
+ {d:'2026-10-20',store:'아비쥬 홍대점',kind:'스토어문의',lang:'영어',ch:'채팅문의',topics:['가격'],who:'AI',booked:false}
 ];
-var PAL=['#1783FF','#00C9C9','#F0884D','#D580FF','#7863FF','#60C42D','#BD8F24','#FF80CA','#2491B3'];
+var PAL=['#1783FF','#00C9C9','#F0884D','#D580FF','#7863FF','#60C42D','#BD8F24','#FF80CA','#2491B3','#9E9E9E'];
 var F={tp:[]};
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 function recs(){return REC.filter(function(r){return !F.tp.length||F.tp.some(function(t){return r.topics.indexOf(t)>=0;});});}
+function conv(list){var L=list.filter(function(r){return r.topics.indexOf(NOASK)<0;});return L.length?Math.round(L.filter(function(r){return r.booked;}).length/L.length*100)+'%':'-';}
 function cnt(list,t){return list.filter(function(r){return r.topics.indexOf(t)>=0;}).length;}
-function mainTopics(list){var c={};list.forEach(function(r){r.topics.forEach(function(t){c[t]=(c[t]||0)+1;});});return Object.keys(c).sort(function(a,b){return c[b]-c[a]||TOPICS.indexOf(a)-TOPICS.indexOf(b);}).slice(0,3);}
+function mainTopics(list){var c={};list.forEach(function(r){r.topics.forEach(function(t){if(t!==NOASK)c[t]=(c[t]||0)+1;});});return Object.keys(c).sort(function(a,b){return c[b]-c[a]||TOPICS.indexOf(a)-TOPICS.indexOf(b);}).slice(0,1);}
 function donut(vals){var tot=vals.reduce(function(a,b){return a+b;},0),a0=-Math.PI/2,s='<svg width="150" height="180" viewBox="0 0 150 180">';
  if(!tot)return s+'<circle cx="75" cy="90" r="50" fill="none" stroke="#f0f0f0" stroke-width="22"/></svg>';
  vals.forEach(function(v,i){if(!v)return;var a1=a0+v/tot*Math.PI*2;if(v===tot){s+='<circle cx="75" cy="90" r="50" fill="none" stroke="'+PAL[i]+'" stroke-width="22"/>';a0=a1;return;}
@@ -6034,16 +6035,16 @@ function initSI(){
  sel.addEventListener('mousedown',function(e){e.preventDefault();e.stopPropagation();var r=sel.getBoundingClientRect();pop.style.left=r.left+'px';pop.style.top=(r.bottom+4+window.scrollY)+'px';pop.style.display=pop.style.display==='none'?'block':'none';drawPop();},true);
  pop.addEventListener('click',function(e){e.stopPropagation();var b=e.target.closest('[data-o]');if(!b)return;var v=b.getAttribute('data-o');if(v==='*')F.tp=[];else{var i=F.tp.indexOf(v);if(i<0)F.tp.push(v);else F.tp.splice(i,1);}drawSI();drawPop();});
  document.addEventListener('mousedown',function(e){if(!e.target.closest('#tppop'))pop.style.display='none';});
- function drawPop(){pop.innerHTML='<div class="tp-h">상담 분류 <small>복수 선택</small><a data-o="*" data-click>초기화</a></div>'+TOPICS.map(function(t){var on=F.tp.indexOf(t)>=0,n=cnt(REC,t);return '<button data-o="'+t+'" class="'+(on?'on':'')+(n?'':' zero')+'" data-click><i>'+(on?'✓':'')+'</i>'+t+'<small>'+n+'</small></button>';}).join('');}
+ function drawPop(){pop.innerHTML='<div class="tp-h">상담 분류 <small>복수 선택</small><a data-o="*" data-click>초기화</a></div>'+TOPICS.concat([NOASK]).map(function(t){var on=F.tp.indexOf(t)>=0,n=cnt(REC,t);return '<button data-o="'+t+'" class="'+(on?'on':'')+(n?'':' zero')+'" data-click><i>'+(on?'✓':'')+'</i>'+t+'<small>'+n+'</small></button>';}).join('');}
  EL.si={sel:sel,cont:cont};
  /* 분포: 상담분류 도넛 한 장 */
  var panels=QA('[class*=_summaryPanel_]'),mg=panels.filter(function(p){return /메신저구분/.test(p.textContent);})[0];
  var np=mg.cloneNode(true);np.setAttribute('data-new','');np.id='tpPanel';mg.after(np);Q('strong',np).textContent='상담분류';EL.si.panel=np;
  /* 스토어별 집계: 주요 분류 칸 */
  var card=QA('.ant-card').filter(function(c){return /스토어별 집계/.test(c.textContent)&&Q('table',c);})[0];EL.si.card=card;
- QA('table',card).forEach(function(tb){var cg=Q('colgroup',tb);if(cg)cg.appendChild(document.createElement('col'));
-  var tr=Q('thead tr',tb);if(tr){var th=document.createElement('th');th.className='ant-table-cell';th.setAttribute('scope','col');th.setAttribute('rowspan','2');th.setAttribute('data-new','');th.textContent='주요 분류';tr.appendChild(th);}
-  QA('tbody tr.ant-table-row',tb).forEach(function(r){var td=document.createElement('td');td.className='ant-table-cell sx-mt';td.setAttribute('data-new','');r.appendChild(td);});});
+ QA('table',card).forEach(function(tb){var cg=Q('colgroup',tb);if(cg){[110,100].forEach(function(w){var c=document.createElement('col');c.style.width=w+'px';cg.appendChild(c);});var tw=parseInt(tb.style.width,10);if(tw)tb.style.width=(tw+210)+'px';}
+  var tr=Q('thead tr',tb);if(tr){var th=document.createElement('th');th.className='ant-table-cell';th.setAttribute('scope','col');th.setAttribute('rowspan','2');th.setAttribute('data-new','');th.textContent='주요 분류';tr.appendChild(th);var th2=th.cloneNode(true);th2.textContent='예약 전환율';tr.appendChild(th2);}
+  QA('tbody tr.ant-table-row',tb).forEach(function(r){var td=document.createElement('td');td.className='ant-table-cell sx-mt';td.setAttribute('data-new','');r.appendChild(td);var td2=td.cloneNode();td2.className='ant-table-cell sx-cv';r.appendChild(td2);});});
  /* 상세 보기 탭: 일별 스토어 문의 상세 (STG 실화면 칼럼) + 상담 분류 · 분류 건수 */
  var tabs=QA('.ant-tabs-tab',card),pane=Q('.ant-tabs-content',card)||Q('.ant-tabs',card).nextElementSibling;
  var det=document.createElement('div');det.id='sxDetail';det.setAttribute('data-new','');det.style.display='none';
@@ -6057,7 +6058,7 @@ function drawSI(){var L=recs(),e=EL.si;
  Q('[class*=_donutChart_]',e.panel).innerHTML=donut(vals);
  var leg=Q('[class*=_donutLegend_]',e.panel),tpl=Q('[class*=_donutLegendItem_]',leg).cloneNode(true);leg.innerHTML='';
  TOPICS.forEach(function(t,i){var it=tpl.cloneNode(true);it.querySelector('span').textContent=t;it.querySelector('strong').textContent=vals[i];it.querySelector('em').textContent=tot?Math.round(vals[i]/tot*100)+'%':'0%';leg.appendChild(it);});
- QA('tbody tr.ant-table-row',e.card).forEach(function(r){var nm=(r.cells[0]||{}).textContent||'',m=mainTopics(REC.filter(function(x){return nm.indexOf(x.store)>=0;}));var td=Q('.sx-mt',r);if(td)td.textContent=m.length?m.join(', '):'-';});
+ QA('tbody tr.ant-table-row',e.card).forEach(function(r){var nm=(r.cells[0]||{}).textContent||'',m=mainTopics(REC.filter(function(x){return nm.indexOf(x.store)>=0;}));var td=Q('.sx-mt',r);if(td)td.textContent=m.length?m.join(', '):'-';var cv=Q('.sx-cv',r);if(cv)cv.textContent=conv(REC.filter(function(x){return nm.indexOf(x.store)>=0;}));});
  var det=e.mode==='det';e.sum.forEach(function(w){w.style.display=det?'none':'';});e.det.style.display=det?'':'none';
  var hdT=Q('[class*=_tabSectionHeader_] strong',e.card);if(hdT)hdT.textContent=det?'일별 스토어 문의 상세':'스토어별 집계';
  var ink=Q('.ant-tabs-ink-bar',e.card),act=QA('.ant-tabs-tab',e.card).filter(function(t){return t.classList.contains('ant-tabs-tab-active');})[0];if(ink&&act){ink.style.left=act.offsetLeft+'px';ink.style.width=act.offsetWidth+'px';ink.style.transform='none';}
@@ -6078,18 +6079,21 @@ function initCC(){
  box.innerHTML='<div class="ant-card-head"><div class="ant-card-head-wrapper"><div class="ant-card-head-title">상담 분류별 처리</div></div></div><div class="ant-card-body"></div>';
  anchor.parentNode.insertBefore(box,anchor);EL.cc={box:box};drawCC();
 }
-function drawCC(){var b=Q('.ant-card-body',EL.cc.box),rows=TOPICS.map(function(t){var L=REC.filter(function(r){return r.topics.indexOf(t)>=0;}),n=L.length,ai=L.filter(function(r){return r.who==='AI';}).length,cs=L.filter(function(r){return r.who==='CS팀';}).length,st=L.filter(function(r){return r.who==='입점사';}).length;return [t,n,ai,cs,st,n?Math.round(ai/n*100)+'%':'-'];});
- var tot=['합계',REC.length,REC.filter(function(r){return r.who==='AI';}).length,REC.filter(function(r){return r.who==='CS팀';}).length,REC.filter(function(r){return r.who==='입점사';}).length,REC.length?Math.round(REC.filter(function(r){return r.who==='AI';}).length/REC.length*100)+'%':'-'];
+function drawCC(){var b=Q('.ant-card-body',EL.cc.box);
+ var line=function(name,L){var n=L.length,w=function(x){return L.filter(function(r){return r.who===x;}).length;},bk=L.filter(function(r){return r.booked;}).length,no=name===NOASK;
+  return [name,n,w('AI'),w('CS팀'),w('입점사'),n?Math.round(w('AI')/n*100)+'%':'-',no?'-':bk,no?'-':(n?Math.round(bk/n*100)+'%':'-')];};
+ var rows=TOPICS.map(function(t){return line(t,REC.filter(function(r){return r.topics.indexOf(t)>=0;}));});
+ var tot=line('합계',REC.filter(function(r){return r.topics.indexOf(NOASK)<0;})),no=line(NOASK,REC.filter(function(r){return r.topics.indexOf(NOASK)>=0;}));
  var ct=(Q('table[class*=_collapseTable_]')||{}).className||'';
- b.innerHTML='<table class="'+ct+' sx-tt"><thead><tr>'+['상담 분류','건수','AI 단독','CS팀 처리','입점사 처리','AI 단독 비율'].map(function(c){return '<th>'+c+'</th>';}).join('')+'</tr></thead><tbody>'
-  +rows.concat([tot]).map(function(r,i){return '<tr'+(i===rows.length?' class="sx-tot"':'')+'>'+r.map(function(v){return '<td>'+esc(v)+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table><div class="sx-note">상담 완료 시점에 확정된 상담 분류 기준. 한 상담에 분류가 여러 개면 각 분류에 1건씩 셉니다.</div>';}
+ b.innerHTML='<table class="'+ct+' sx-tt"><thead><tr>'+['상담 분류','건수','AI 단독','CS팀 처리','입점사 처리','AI 단독 비율','예약 전환','전환율'].map(function(c){return '<th>'+c+'</th>';}).join('')+'</tr></thead><tbody>'
+  +rows.concat([tot,no]).map(function(r,i){return '<tr'+(i===rows.length?' class="sx-tot"':i>rows.length?' class="sx-no"':'')+'>'+r.map(function(v){return '<td>'+esc(v)+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table><div class="sx-note">상담 완료 시 확정된 분류 기준. 분류가 여럿이면 각 1건. 합계와 전환율에서 문의 없음 제외</div>';}
 
 var EL={};
 function init(){var st=document.createElement('style');st.textContent=
  'body.mk [data-new]{outline:2px dashed #e8537a;outline-offset:1px}'
  +'#tppop{position:absolute;z-index:1100;width:230px;background:#fff;border:1px solid #e3e6ea;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.12);padding:8px;font-family:inherit}#tppop .tp-h{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:2px 4px 6px}#tppop .tp-h small{font-weight:400;color:#667085}#tppop .tp-h a{margin-left:auto;font-weight:400;font-size:11px;color:#1677ff;cursor:pointer}#tppop button{display:flex;align-items:center;gap:8px;width:100%;border:0;background:none;padding:6px;border-radius:4px;font:13px inherit;color:#1d2939;cursor:pointer;text-align:left}#tppop button:hover{background:#f5f7fa}#tppop button i{width:16px;height:16px;border:1px solid #d9d9d9;border-radius:3px;font-style:normal;font-size:11px;line-height:14px;text-align:center;color:#fff;flex:none}#tppop button.on i{background:#1677ff;border-color:#1677ff}#tppop button small{margin-left:auto;color:#667085}#tppop button.zero{color:#98a2b3}'
  +'.sx-val{color:#0958d9}.sx-dot{display:inline-block;width:8px;height:8px;border-radius:4px;margin-right:6px;vertical-align:middle}.sx-dh{padding:4px 0 12px;font-size:14px}'
- +'table[class*=_collapseTable_] th{white-space:nowrap;padding:8px 4px}.sx-tt{max-width:760px}.sx-tt td:first-child{text-align:left}#sxTopic{margin:0 0 16px}#sxTopic .sx-tot td{font-weight:600;background:#fafafa}#sxTopic .sx-note{margin-top:8px;font-size:12px;color:#667085}';
+ +'table[class*=_collapseTable_] th{white-space:nowrap;padding:8px 4px}.sx-tt{max-width:900px}#sxTopic .sx-no td{color:#667085}.sx-tt td:first-child{text-align:left}.sx-cv{text-align:right}#sxTopic{margin:0 0 16px}#sxTopic .sx-tot td{font-weight:600;background:#fafafa}#sxTopic .sx-note{margin-top:8px;font-size:12px;color:#667085}';
  document.head.appendChild(st);
  try{document.body.classList.toggle('mk',new URLSearchParams(location.search).has('mark'));}catch(e){}
  if(pageSI)initSI();else initCC();}
