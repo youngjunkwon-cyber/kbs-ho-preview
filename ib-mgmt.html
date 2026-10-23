@@ -2346,6 +2346,7 @@ function drawDrawer(){
    evs.push(m);
    if(m[4])evs.push(['ev','AI 중단'+(last&&w.need?' · '+w.need:''),m[3]]);});
   if(last&&!agentSeen&&w.agentAt&&w.agentAt>=g.at)evs.push(['ev','상담 시작 · '+who,w.agentAt]);
+  var rr=P.room(w.id);((rr&&rr.scnLog)||[]).forEach(function(x){if(x[0]>=g.at&&(gi===groups.length-1||x[0]<groups[gi+1].at)){var at=evs.findIndex(function(e){return e[0]==='ev'?e[2]>x[0]:e[3]>x[0];});var row=['ev',x[1],x[0]];if(at<0)evs.push(row);else evs.splice(at,0,row);}}); /* 시나리오 흐름 시작 (CSM 처리 이력과 같은 줄) */
   (w.ownerLog||[]).forEach(function(o){if(o[0]>=g.at&&(gi===groups.length-1||o[0]<=groups[gi+1].at)){var at=evs.findIndex(function(e){return e[0]==='ev'?e[2]>o[0]:e[3]>o[0];});var row=['ev','담당 변경 · '+o[1]+' → '+o[2],o[0]];if(at<0)evs.push(row);else evs.splice(at,0,row);}});
   if(!live)evs.push(['ev','상담 완료'+(agentSeen?' · '+who:' (AI 단독)'),g.end]);
   g.evs=evs;g.last=last;g.live=live;});
