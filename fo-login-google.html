@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FO 로그인 시안 · 구글</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<style>
+:root{
+  --ink:#2D2D2D;--muted:#8E8E8E;--line:#E5E5E5;--bg:#EDEAE8;
+  --primary:#FB6F92;--primary-weak:#FFF1F5;--paper:#fff;--field:#FAFAFA
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Pretendard Variable",Pretendard,-apple-system,sans-serif;line-height:1.5}
+.page{max-width:1760px;margin:0 auto;padding:32px 24px 80px}
+.head h1{margin:0 0 4px;font-size:24px;font-weight:700;letter-spacing:-.02em}
+.head p{margin:0;color:#6b6b6b;font-size:13px}
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:20px 0 26px;
+  padding:12px 14px;background:var(--paper);border:1px solid var(--line);border-radius:8px;font-size:13px}
+.bar button{font:inherit;font-weight:700;font-size:13px;padding:7px 13px;border:1px solid var(--line);
+  background:#fff;color:var(--muted);border-radius:6px;cursor:pointer}
+.bar button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.bar .sp{flex:1}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(375px,375px));gap:30px 26px;justify-content:start}
+.cell{width:375px}
+.cap{margin:0 0 8px;font-size:12px;font-weight:700;color:#5d5d5d}
+.cap b{color:var(--ink);font-weight:800}
+.cap span{display:block;margin-top:2px;font-weight:500;color:#8a8a8a;font-size:11px}
+.ph{position:relative;width:375px;height:700px;background:var(--paper);
+  border:1px solid #D9D4D1;border-radius:14px;overflow:hidden}
+.hdr{height:56px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;border-bottom:1px solid var(--line)}
+.hdr i{width:24px;height:24px;display:block;opacity:.75}
+.hdr b{font-size:16px;font-weight:600}
+.body{padding:32px 20px 0;height:calc(100% - 56px);overflow:hidden}
+.lbl{font-size:16px;margin:0 0 8px}
+.lbl em{color:var(--primary);font-style:normal;margin-left:2px}
+.fld{height:44px;border:1px solid var(--line);border-radius:8px;background:var(--paper);
+  display:flex;align-items:center;padding:0 14px;color:#C4C4C4;font-size:14px;margin-bottom:20px}
+.fld.filled{color:var(--ink)}
+.chk{display:flex;align-items:center;gap:8px;font-size:14px;margin:0 0 20px}
+.chk i{width:20px;height:20px;border:1.5px solid #CFCFCF;border-radius:4px;display:block;flex:0 0 auto}
+.chk.on i{background:var(--primary);border-color:var(--primary)}
+.btn{height:44px;border-radius:8px;background:var(--primary);color:#fff;font-size:14px;font-weight:500;
+  display:flex;align-items:center;justify-content:center}
+.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.btn.dim{background:#F0F0F0;color:#B5B5B5}
+.links{display:flex;gap:12px;justify-content:center;align-items:center;margin-top:18px;font-size:13px;color:#6b6b6b}
+.links i{width:1px;height:11px;background:#D7D7D7;display:block}
+.or{display:flex;align-items:center;gap:10px;margin:26px 0 16px;color:#A9A9A9;font-size:12px}
+.or:before,.or:after{content:"";flex:1;height:1px;background:var(--line)}
+.sns{height:46px;border:1px solid #DADADA;border-radius:8px;display:flex;align-items:center;
+  justify-content:center;gap:9px;font-size:14px;font-weight:600;background:#fff;margin-bottom:10px}
+.sns svg{width:18px;height:18px;display:block}
+.sns.wx{display:none}
+body.showwx .sns.wx{display:flex}
+.note{font-size:12px;color:#9a9a9a;margin-top:14px;line-height:1.6}
+.dim-layer{position:absolute;inset:0;background:#00000059}
+.modal{position:absolute;left:20px;right:20px;top:50%;transform:translateY(-50%);
+  background:#fff;border-radius:12px;padding:22px 20px}
+.modal h4{margin:0 0 8px;font-size:16px;font-weight:700}
+.modal p{margin:0 0 18px;font-size:13px;color:#6b6b6b;line-height:1.6}
+.toast{position:absolute;left:20px;right:20px;bottom:26px;background:#2D2D2D;color:#fff;
+  border-radius:8px;padding:13px 15px;font-size:13px;line-height:1.5}
+.center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+.spin{width:34px;height:34px;border:3px solid var(--line);border-top-color:var(--primary);border-radius:50%;
+  animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.tick{width:56px;height:56px;border-radius:50%;background:var(--primary-weak);display:flex;align-items:center;justify-content:center}
+.tick svg{width:28px;height:28px}
+.agree{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:4px 0;margin:0 0 18px}
+.agree .row{display:flex;align-items:center;gap:9px;padding:12px 0;font-size:14px}
+.agree .row+.row{border-top:1px solid #F2F2F2}
+.agree .row.all{font-weight:700}
+.agree .row .arr{margin-left:auto;color:#BDBDBD;font-size:12px}
+.agree .row i{width:20px;height:20px;border:1.5px solid #CFCFCF;border-radius:50%;flex:0 0 auto}
+.agree .row.on i{background:var(--primary);border-color:var(--primary)}
+.opt{display:flex;gap:8px;margin-bottom:10px}
+.opt span{flex:1;height:40px;border:1px solid var(--line);border-radius:8px;display:flex;
+  align-items:center;justify-content:center;font-size:13px;color:#777}
+.opt span.on{border-color:var(--primary);background:var(--primary-weak);color:var(--primary);font-weight:600}
+.terms-body{font-size:12px;color:#777;line-height:1.8;height:430px;overflow:hidden}
+.code{display:flex;gap:8px;margin-bottom:18px}
+.code span{flex:1;height:52px;border:1px solid var(--line);border-radius:8px;display:flex;
+  align-items:center;justify-content:center;font-size:20px;font-weight:600}
+.code span.f{border-color:var(--primary)}
+.foot{margin-top:50px;padding-top:16px;border-top:1px solid #D9D4D1;color:#777;font-size:12px}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="head">
+  <h1>FO 로그인 시안 · 구글</h1>
+  <p>라이브 로그인 화면(/auth/login) 실측 기준. 2026-10-23</p>
+</div>
+
+<div class="bar">
+  <span>채널</span>
+  <button id="b1" class="on" onclick="mode(0)">구글 단독</button>
+  <button id="b2" onclick="mode(1)">구글 + 위챗</button>
+  <span class="sp"></span>
+  <span id="note" style="color:#8a8a8a">위챗 버튼을 숨겼습니다.</span>
+</div>
+
+<div class="grid">
+
+<!-- LGN-01 -->
+<div class="cell">
+  <p class="cap"><b>FO-LGN-01</b> 로그인 메인<span>라이브 화면에 간편로그인 영역만 추가</span></p>
+  <div class="ph">
+    <div class="hdr"><i>&#8592;</i><b>Login</b><i>&#9751;</i></div>
+    <div class="body">
+      <p class="lbl">Email <em>*</em></p>
+      <div class="fld">Email</div>
+      <p class="lbl">Password <em>*</em></p>
+      <div class="fld">Password</div>
+      <div class="chk"><i></i>Remember Email</div>
+      <div class="btn">Login</div>
+      <div class="links">Sign Up <i></i> Forgot Password</div>
+      <div class="or">or continue with</div>
+      <div class="sns"><svg viewBox="0 0 48 48"><path fill="#4285F4" d="M45 24c0-1.6-.1-2.7-.4-4H24v7.5h12c-.2 2-1.5 5-4.4 7l6.7 5.2C42.2 36 45 30.6 45 24z"/><path fill="#34A853" d="M24 46c5.9 0 10.9-2 14.5-5.3l-6.9-5.4C29.7 36.6 27.1 37.5 24 37.5c-5.8 0-10.7-3.9-12.5-9.1l-7.1 5.5C8 41.4 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.5 28.4c-.5-1.4-.7-2.9-.7-4.4s.3-3 .7-4.4l-7.1-5.5C2.9 17 2 20.4 2 24s.9 7 2.4 9.9l7.1-5.5z"/><path fill="#EA4335" d="M24 10.5c4.1 0 6.9 1.8 8.5 3.3l6.2-6C34.9 4.3 29.9 2 24 2 15.4 2 8 6.6 4.4 14.1l7.1 5.5c1.8-5.2 6.7-9.1 12.5-9.1z"/></svg>Continue with Google</div>
+      <div class="sns wx"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" fill="#09B83E"/></svg>Continue with WeChat</div>
+    </div>
+  </div>
+</div>
+
+<!-- LGN-01-e2 -->
+<div class="cell">
+  <p class="cap"><b>FO-LGN-01-e2</b> 외부 브라우저 유도<span>인앱 브라우저에서 구글 버튼을 눌렀을 때</span></p>
+  <div class="ph">
+    <div class="hdr"><i>&#8592;</i><b>Login</b><i>&#9751;</i></div>
+    <div class="body">
+      <p class="lbl">Email <em>*</em></p>
+      <div class="fld">Email</div>
+      <p class="lbl">Password <em>*</em></p>
+      <div class="fld">Password</div>
+      <div class="chk"><i></i>Remember Email</div>
+      <div class="btn">Login</div>
+    </div>
+    <div class="dim-layer"></div>
+    <div class="modal">
+      <h4>Open in your browser</h4>
+      <p>Google sign-in is not available in this app. Please open K-Beauty Station in Safari or Chrome to continue.</p>
+      <div class="btn" style="margin-bottom:8px">Open browser</div>
+      <div class="btn ghost">Close</div>
+    </div>
+  </div>
+</div>
+
+<!-- LGN-01-e3 -->
+<div class="cell">
+  <p class="cap"><b>FO-LGN-01-e3</b> OAuth 전환·복귀 로딩<span>구글로 넘어가고 돌아오는 사이</span></p>
+  <div class="ph">
+    <div class="hdr"><i>&#8592;</i><b>Login</b><i>&#9751;</i></div>
+    <div class="center">
+      <div class="spin"></div>
+      <p style="margin:0;font-size:13px;color:#8a8a8a">Connecting to Google</p>
+    </div>
+  </div>
+</div>
+
+<!-- LGN-01-e4 -->
+<div class="cell">
+  <p class="cap"><b>FO-LGN-01-e4</b> 취소·거부 복귀<span>구글 동의 화면에서 취소하고 돌아왔을 때</span></p>
+  <div class="ph">
+    <div class="hdr"><i>&#8592;</i><b>Login</b><i>&#9751;</i></div>
+    <div class="body">
+      <p class="lbl">Email <em>*</em></p>
+      <div class="fld">Email</div>
+      <p class="lbl">Password <em>*</em></p>
+      <div class="fld">Password</div>
+      <div class="chk"><i></i>Remember Email</div>
+      <div class="btn">Login</div>
+      <div class="links">Sign Up <i></i> Forgot Password</div>
+      <div class="or">or continue with</div>
+      <div class="sns"><svg viewBox="0 0 48 48"><path fill="#4285F4" d="M45 24c0-1.6-.1-2.7-.4-4H24v7.5h12c-.2 2-1.5 5-4.4 7l6.7 5.2C42.2 36 45 30.6 45 24z"/><path fill="#34A853" d="M24 46c5.9 0 10.9-2 14.5-5.3l-6.9-5.4C29.7 36.6 27.1 37.5 24 37.5c-5.8 0-10.7-3.9-12.5-9.1l-7.1 5.5C8 41.4 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.5 28.4c-.5-1.4-.7-2.9-.7-4.4s.3-3 .7-4.4l-7.1-5.5C2.9 17 2 20.4 2 24s.9 7 2.4 9.9l7.1-5.5z"/><path fill="#EA4335" d="M24 10.5c4.1 0 6.9 1.8 8.5 3.3l6.2-6C34.9 4.3 29.9 2 24 2 15.4 2 8 6.6 4.4 14.1l7.1 5.5c1.8-5.2 6.7-9.1 12.5-9.1z"/></svg>Continue with Google</div>
+    </div>
+    <div class="toast">Sign-in was cancelled. Please try again.</div>
+  </div>
+</div>
+
+<!-- LGN-01-e1 -->
+<div class="cell">
+  <p class="cap"><b>FO-LGN-01-e1</b> Provider 장애 토스트<span>구글 서버 오류. 어느 채널인지 밝히지 않음</span></p>
+  <div class="ph">
+    <div class="hdr"><i>&#8592;</i><b>Login</b><i>&#9751;</i></div>
+    <div class="body">
+      <p class="lbl">Email <em>*</em></p>
+      <div class="fld">Email</div>
+      <p class="lbl">Password <em>*</em></p>
+      <div class="fld">Password</div>
+      <div class="chk"><i></i>Remember Email</div>
+      <div class="btn">Login</div>
+      <div class="links">Sign Up <i></i> Forgot Password</div>
+      <div class="or">or continue with</div>
+      <div class="sns"><svg viewBox="0 0 48 48"><path fill="#4285F4" d="M45 24c0-1.6-.1-2.7-.4-4H24v7.5h12c-.2 2-1.5 5-4.4 7l6.7 5.2C42.2 36 45 30.6 45 24z"/><path fill="#34A853" d="M24 46c5.9 0 10.9-2 14.5-5.3l-6.9-5.4C29.7 36.6 27.1 37.5 24 37.5c-5.8 0-10.7-3.9-12.5-9.1l-7.1 5.5C8 41.4 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.5 28.4c-.5-1.4-.7-2.9-.7-4.4s.3-3 .7-4.4l-7.1-5.5C2.9 17 2 20.4 2 24s.9 7 2.4 9.9l7.1-5.5z"/><path fill="#EA4335" d="M24 10.5c4.1 0 6.9 1.8 8.5 3.3l6.2-6C34.9 4.3 29.9 2 24 2 15.4 2 8 6.6 4.4 14.1l7.1 5.5c1.8-5.2 6.7-9.1 12.5-9.1z"/></svg>Continue with Google</div>
+    </div>
+    <div class="toast">Sign-in is temporarily unavailable. Please try another way.</div>
+  </div>
+</div>
+
+<!-- LGN-07 -->
+<div class="cell">
+  <p class="cap"><b>FO-LGN-07</b> 다른 수단 선택<span>구글 로그인이 끝내 완료되지 않은 경우</span></p>
+  <div class="ph">
+    <div class="hdr"><i>&#8592;</i><b>Login</b><i>&#9751;</i></div>
+    <div class="body">
+      <p class="lbl">Email <em>*</em></p>
+      <div class="fld">Email</div>
+      <p class="lbl">Password <em>*</em></p>
+      <div class="fld">Password</div>
+    </div>
+    <div class="dim-layer"></div>
+    <div class="modal">
+      <h4>Couldn't finish Google sign-in</h4>
+      <p>You can try again, or sign up with your email address.</p>
+      <div class="btn" style="margin-bottom:8px">Try Google again</div>
+      <div class="btn ghost" style="margin-bottom:14px">Sign up with email</div>
+      <p style="margin:0;text-align:center;font-size:12px;color:#9a9a9a">Contact support</p>
+    </div>
+  </div>
+</div>
+
+<!-- LGN-01-e5 -->
+<div class="cell">
+  <p class="cap"><b>FO-LGN-01-e5</b> 로그인 잠금<span>이메일 로그인 5회 실패. 5분 잠금</span></p>
+  <div class="ph">
+    <div class="hdr"><i>&#8592;</i><b>Login</b><i>&#9751;</i></div>
+    <div class="body">
+      <p class="lbl">Email <em>*</em></p>
+      <div class="fld filled">guest@example.com</div>
+      <p class="lbl">Password <em>*</em></p>
+      <div class="fld">Password</div>
+    </div>
+    <div class="dim-layer"></div>
+    <div class="modal">
+      <h4>Your login is temporarily locked</h4>
+      <p>Too many failed attempts. Please try again in 04:52, or reset your password.</p>
+      <div class="btn" style="margin-bottom:8px">Reset password</div>
+      <div class="btn ghost">OK</div>
+    </div>
+  </div>
+</div>
+
+<!-- LGN-02 -->
+<div class="cell">
+  <p class="cap"><b>FO-LGN-02</b> 이메일 직접 입력<span>구글이 이메일을 주지 않은 예외 경로</span></p>
+  <div class="ph">
+    <div class="hdr"><i>&#8592;</i><b>Sign Up</b><i>&#9751;</i></div>
+    <div class="body">
+      <p style="margin:0 0 6px;font-size:20px;font-weight:700">Enter your email</p>
+      <p class="note" style="margin:0 0 24px">We'll send a 6-digit code to confirm it's you.</p>
+      <p class="lbl">Email <em>*</em></p>
+      <div class="fld">Email</div>
+      <div class="btn">Send code</div>
+    </div>
+  </div>
+</div>
+
+<!-- LGN-02-1 -->
+<div class="cell">
+  <p class="cap"><b>FO-LGN-02-1</b> 인증 코드 입력<span>직접 입력 경로에서만 노출</span></p>
+  <div class="ph">
+    <div class="hdr"><i>&#8592;</i><b>Sign Up</b><i>&#9751;</i></div>
+    <div class="body">
+      <p style="margin:0 0 6px;font-size:20px;font-weight:700">Enter the code</p>
+      <p class="note" style="margin:0 0 24px">Sent to guest@example.com</p>
+      <div class="code"><span class="f">4</span><span>2</span><span>8</span><span></span><span></span><span></span></div>
+      <div class="btn dim">Verify</div>
+      <p class="note" style="text-align:center">Resend in 04:21</p>
+    </div>
+  </div>
+</div>
+
+<!-- LGN-02-2 -->
+<div class="cell">
+  <p class="cap"><b>FO-LGN-02-2</b> 비밀번호 설정<span>이메일 가입 경로 전용</span></p>
+  <div class="ph">
+    <div class="hdr"><i>&#8592;</i><b>Sign Up</b><i>&#9751;</i></div>
+    <div class="body">
+      <p style="margin:0 0 24px;font-size:20px;font-weight:700">Set your password</p>
+      <p class="lbl">Password <em>*</em></p>
+      <div class="fld">Password</div>
+      <p class="lbl">Confirm password <em>*</em></p>
+      <div class="fld">Re-enter password</div>
+      <p class="note" style="margin:-8px 0 20px">8 characters or more, including a number</p>
+      <div class="btn dim">Continue</div>
+    </div>
+  </div>
+</div>
+
+<!-- LGN-04 -->
+<div class="cell">
+  <p class="cap"><b>FO-LGN-04</b> 약관 + 이름 + 선택 정보<span>구글 이름이 비면 빈 칸으로 열림</span></p>
+  <div class="ph">
+    <div class="hdr"><i>&#8592;</i><b>Sign Up</b><i>&#9751;</i></div>
+    <div class="body">
+      <p class="lbl">Name <em>*</em></p>
+      <div class="fld filled">Minji Kim</div>
+      <div class="agree">
+        <div class="row all on"><i></i>Agree to all</div>
+        <div class="row on"><i></i>Terms of Service (required)<span class="arr">&#8250;</span></div>
+        <div class="row on"><i></i>Privacy Policy (required)<span class="arr">&#8250;</span></div>
+        <div class="row"><i></i>Marketing messages (optional)<span class="arr">&#8250;</span></div>
+      </div>
+      <p class="lbl" style="font-size:14px;color:#8a8a8a">Gender (optional)</p>
+      <div class="opt"><span class="on">Female</span><span>Male</span><span>Prefer not to say</span></div>
+      <p class="lbl" style="font-size:14px;color:#8a8a8a;margin-top:14px">Age range (optional)</p>
+      <div class="opt"><span>10s</span><span class="on">20s</span><span>30s</span><span>40s+</span></div>
+      <div class="btn" style="margin-top:20px">Sign Up</div>
+    </div>
+  </div>
+</div>
+
+<!-- LGN-04-1 -->
+<div class="cell">
+  <p class="cap"><b>FO-LGN-04-1</b> 약관 본문<span>약관 행의 화살표를 눌렀을 때</span></p>
+  <div class="ph">
+    <div class="hdr"><i>&#8592;</i><b>Terms of Service</b><i>&#9751;</i></div>
+    <div class="body">
+      <div class="terms-body">
+        Article 1 (Purpose)<br>
+        These terms set out the conditions for using the services provided by K-Beauty Station, including booking, chat consultation and content.<br><br>
+        Article 2 (Definitions)<br>
+        "Member" means a person who has agreed to these terms and created an account.<br><br>
+        Article 3 (Effect and Amendment)<br>
+        These terms take effect when posted on the service. The company may amend them where necessary, and will give notice in advance.<br><br>
+        Article 4 (Account)<br>
+        A member may sign in with an email address or a connected Google account.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LGN-05 -->
+<div class="cell">
+  <p class="cap"><b>FO-LGN-05</b> 이메일 중복 본인확인<span>구글 이메일이 기존 계정과 같을 때</span></p>
+  <div class="ph">
+    <div class="hdr"><i>&#8592;</i><b>Sign Up</b><i>&#9751;</i></div>
+    <div class="body">
+      <p class="lbl">Name <em>*</em></p>
+      <div class="fld filled">Minji Kim</div>
+    </div>
+    <div class="dim-layer"></div>
+    <div class="modal">
+      <h4>This email is already registered</h4>
+      <p>An account with guest@example.com already exists. Enter your password to connect Google to it.</p>
+      <div class="fld" style="margin-bottom:14px">Password</div>
+      <div class="btn" style="margin-bottom:8px">Connect</div>
+      <div class="btn ghost">Cancel</div>
+    </div>
+  </div>
+</div>
+
+<!-- LGN-06 -->
+<div class="cell">
+  <p class="cap"><b>FO-LGN-06</b> 가입 완료<span>가입 처리 직후</span></p>
+  <div class="ph">
+    <div class="hdr"><i></i><b>Sign Up</b><i>&#9751;</i></div>
+    <div class="center" style="padding:0 28px">
+      <div class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="#FB6F92" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+      <p style="margin:4px 0 0;font-size:20px;font-weight:700">Welcome to K-Beauty Station</p>
+      <p style="margin:0;font-size:13px;color:#8a8a8a;text-align:center">Your account is ready. Explore clinics and book your first visit.</p>
+      <div class="btn" style="width:100%;margin-top:10px">Start exploring</div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<p class="foot">
+근거: 라이브 /auth/login 실측(2026-10-23), 회원·로그인 PRD v0.5 §5·§7, 회원·로그인·예약 PRD v0.23~v0.29 화면 체계.
+구글 이름이 빈 값으로 오는 경우는 FO-LGN-04의 Name 칸이 비어 열립니다.
+</p>
+
+</div>
+<script>
+function mode(m){
+  document.body.classList.toggle('showwx', m===1);
+  document.getElementById('b1').classList.toggle('on', m===0);
+  document.getElementById('b2').classList.toggle('on', m===1);
+  document.getElementById('note').textContent = m===1 ? '위챗 버튼을 함께 표시합니다.' : '위챗 버튼을 숨겼습니다.';
+}
+</script>
+</body>
+</html>
