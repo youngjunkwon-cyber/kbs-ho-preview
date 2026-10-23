@@ -86,7 +86,7 @@ var CS_GUIDE={ /* 플랫폼 CS 안내 문구 (방향결정 Q12, 문안은 작성
  howbook:{keys:['어떻게 예약','예약 방법','how to book','how do i book'],ko:'원하는 스토어 페이지의 예약 버튼에서 날짜와 시간을 골라 바로 예약할 수 있어요',en:'You can book directly by choosing a date and time from the booking button on the store page'}
 };
 /* 채널 ID·고객 카드는 시안용 예시 값 */
-var CARD={r1:{cid:'Ua1f3····e2711',chState:'친구 추가됨',card:{name:'고객 A',phone:'',email:'',tags:[],memo:'',owner:'',bookings:[],links:[]}},r2:{cid:'+1 4165550188',chState:'24시간 창 열림',card:{name:'Emma Lee',phone:'+1 4165550188',email:'emma.lee@example.com',tags:['재방문'],memo:'지난번 시술 후 붓기 문의 있었음',owner:'',bookings:[{d:'2026-10-30',t:'14:00',p:'Rejuran Skin Booster',n:2,st:'확정',memo:'친구와 함께, 연속 시간으로'},{d:'2026-09-12',t:'11:00',p:'Skinvive',n:1,st:'방문',memo:''},{d:'2026-08-02',t:'15:30',p:'Rejuran Skin Booster',n:1,st:'취소',memo:''}],links:[{ch:'스토어채팅',d:'2026-09-10',st:'완료'}]}},r3:{cid:'oX9k····QkN30',chState:'구독 중',card:{name:'王丽',phone:'',email:'',tags:[],memo:'',owner:'',bookings:[],links:[]}},r4:{cid:'게스트 8b58f990',chState:'인앱 채팅',card:{name:'게스트',phone:'',email:'',tags:[],memo:'',owner:'',bookings:[],links:[]}}};
+var CARD={r1:{cid:'Ua1f3····e2711',chState:'친구 추가됨',card:{name:'고객 A',phone:'',email:'',tags:[],memo:'',owner:'',bookings:[],links:[]}},r2:{cid:'+1 4165550188',chState:'24시간 창 열림',card:{name:'Emma Lee',phone:'+1 4165550188',email:'emma.lee@example.com',tags:['재방문'],memo:'지난번 시술 후 붓기 문의 있었음',owner:'',bookings:[{d:'2026-10-30',t:'14:00',p:'Rejuran Skin Booster',n:2,st:'확정',memo:'친구와 함께, 연속 시간으로'},{d:'2026-09-12',t:'11:00',p:'Skinvive',n:1,st:'방문',memo:''},{d:'2026-08-02',t:'15:30',p:'Rejuran Skin Booster',n:1,st:'취소',memo:''}],links:[{ch:'스토어채팅',d:'2026-09-10',st:'완료'}]}},r3:{cid:'oX9k····QkN30',chState:'구독 중',card:{name:'王丽',phone:'',email:'',tags:[],memo:'',owner:'',bookings:[],links:[]}},r4:{cid:'게스트 8b58f990',chState:'인앱 채팅',card:{name:'',phone:'',email:'',tags:[],memo:'',owner:'',bookings:[],links:[]}}};
 function seedRooms(){return [
  {id:'r1',name:'고객 A',ch:'LINE',type:'스토어 문의',store:1,lang:null,msgs:[],session:1,status:'상담중',aiOn:true,need:null,handler:'ai',noticeAt:null,aiIntroDone:false,req:{},asked:null,first:'2026-10-21 13:50',agentAt:null},
  {id:'r2',name:'Emma Lee',ch:'WhatsApp',type:'스토어 문의',store:1,lang:'en',msgs:[
@@ -95,7 +95,7 @@ function seedRooms(){return [
  {id:'r3',name:'王丽',ch:'WeChat',type:'스토어 문의',store:1,lang:'zh',msgs:[
    {who:'cust',text:'怀孕可以做丽珠兰吗？',ko:'임신 중에 리쥬란 해도 되나요?',at:'2026-10-21 10:05',answered:true,stopped:true},
    {who:'ai',text:'您好，这里是K-Beauty Station AI咨询助手。我们确认后会回复您。',ko:'안녕하세요, K-Beauty Station AI 상담 도우미입니다. 확인 후 답변드릴게요.',at:'2026-10-21 10:05',notice:true}],session:1,status:'상담중',aiOn:false,need:{reason:'시술 상담(의료 판단 필요)',at:'2026-10-21 10:05'},handler:'ai',noticeAt:'2026-10-21 10:05',aiIntroDone:true,req:{},asked:null,first:'2026-10-21 10:05',agentAt:null},
- {id:'r4',name:'게스트 8b58f990',ch:'플랫폼',type:'고객지원',store:null,lang:null,msgs:[],session:1,status:'상담중',aiOn:true,need:null,handler:'ai',noticeAt:null,aiIntroDone:false,req:{},asked:null,first:'2026-10-21 13:55',agentAt:null}
+ {id:'r4',name:'게스트 8b58',ch:'플랫폼',type:'고객지원',store:null,lang:null,msgs:[],session:1,status:'상담중',aiOn:true,need:null,handler:'ai',noticeAt:null,aiIntroDone:false,req:{},asked:null,first:'2026-10-21 13:55',agentAt:null}
 ];}
 var CH_ROOM={LINE:'r1',WhatsApp:'r2',WeChat:'r3','CS채팅':'r4'};
 var DB,S,SLACK;
@@ -419,7 +419,7 @@ function complete(id){ /* P10 상담 완료 = 확인 완료 + 상담 종료 */
 }
 function setAI(id,on){var r=room(id);if(on){aiResume(r);}else{r.aiOn=false;}render();}
 function takeOver(id){var r=room(id);r.aiOn=false;r.handler='agent';r.agentAt=S.now;if(!r.card.owner)r.card.owner='김상담';render();} /* I4: 잡은 사람이 담당자 */
-function updateCard(id,k,v){var r=room(id);r.card[k]=v;render();}
+function updateCard(id,k,v){var r=room(id);if(k==='owner'&&r.card.owner&&v&&r.card.owner!==v)(r.ownerLog=r.ownerLog||[]).push([S.now,r.card.owner,v]); /* 담당 변경은 처리 이력에 */r.card[k]=v;render();}
 function sendProduct(id,pid){var r=room(id),p=DB.store.catalog.filter(function(x){return x.id===pid;})[0];if(!p)return;push(r,{who:'agent',kind:'product',text:'[상품 카드] '+p.name+' · '+p.price.toLocaleString('en-US')+' KRW',prod:p});r.msgs.forEach(function(m){if(m.who==='cust')m.answered=true;});r.handler='agent';r.agentAt=S.now;r.aiOn=false;if(!r.card.owner)r.card.owner='김상담';RECENT=[pid].concat(RECENT.filter(function(x){return x!==pid;})).slice(0,3);render();}
 var RECENT=[];
 function addNote(id,text){var r=room(id);if(!text.trim())return;push(r,{who:'note',text:text.trim(),by:r.card.owner||'김상담'});render();} /* 상담 메모: 대화 안 내부 글, 고객에게 안 감 */ /* 상담 시작 = 상담사가 잡음 (AI 끄기와 같은 동작, 답장 전에도 진행으로) */

@@ -2194,7 +2194,7 @@ body { margin: 0px; }
 'use strict';
 var P=parent.IB,EL={},Q=function(s,r){return (r||document).querySelector(s);},QA=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));};
 var CSS_H='css-19u5a7b css-var-root';
-var LONG_MIN=30,LIM_MSG=20;
+var LONG_MIN=10,LIM_MSG=20;
 var LN={ko:'한국어',en:'영어',ja:'일본어',zh:'중국어(간체)','zh-TW':'중국어(번체)',th:'태국어',mn:'몽골어',id:'인도네시아어'};
 var ST={wait:['대기',''],prog:['진행',''],ai:['AI 응대',''],done:['완료','']};
 var WHO=['AI','CS팀','입점사'];
@@ -2228,8 +2228,11 @@ function pad(n){return (n<10?'0':'')+n;}
 function toD(ts){return new Date(ts.replace(' ','T')+':00');}
 function dstr(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
 /* 운영시간(평일 10:00~19:00) 안에서 흐른 분 */
-function bizMin(a,b){var s=toD(a),e=toD(b),n=0;if(e<=s)return 0;var d=new Date(s);d.setHours(0,0,0,0);
- while(d<=e){var w=d.getDay();if(w>=1&&w<=5){var o=new Date(d);o.setHours(10,0,0,0);var c=new Date(d);c.setHours(19,0,0,0);var x=Math.max(o,s),y=Math.min(c,e);if(y>x)n+=(y-x)/60000;}d.setDate(d.getDate()+1);}return Math.round(n);}
+var CS_HRS=[[10,19],null,null]; /* 우리 CS 운영시간: 평일 10~19 */
+var STORE_HRS={'k-beauty의원':[[10,19],[10,17],null],'A피부과 강남점':[[10,20],[10,20],[10,20]],'B헤어 명동점':[[10,21],[10,21],[10,21]],'C스튜디오 성수':[[10,20],[10,20],null],'D의원 압구정':[[10,19],[10,15],null]};
+function hrsOf(w){return w.store?(STORE_HRS[w.store]||CS_HRS):CS_HRS;}
+function bizMin(a,b,H){H=H||CS_HRS;var s=toD(a),e=toD(b),n=0;if(e<=s)return 0;var d=new Date(s);d.setHours(0,0,0,0);
+ while(d<=e){var w=d.getDay(),h=H[w===0?2:w===6?1:0];if(h){var o=new Date(d);o.setHours(h[0],0,0,0);var c=new Date(d);c.setHours(h[1],0,0,0);var x=Math.max(o,s),y=Math.min(c,e);if(y>x)n+=(y-x)/60000;}d.setDate(d.getDate()+1);}return Math.round(n);}
 function dur(m){if(m==null)return '-';if(m<1)return '즉시';if(m<60)return m+'분';var h=Math.floor(m/60),r=m%60;return h+'시간'+(r?' '+r+'분':'');}
 
 /* ===== 시안 데이터: 다른 화면과 이어진 대화 4개 + 표를 채우는 예시 대화 ===== */
@@ -2246,12 +2249,12 @@ var EX=[
  {id:'x4',cat:'사진관',sub:'프로필 촬영',src:'알리페이',member:'회원',name:'林小姐',ch:'상품채팅',store:'C스튜디오 성수',lang:'zh-TW',tab:'done',who:'AI',owner:'',session:1,topics:['위치·운영시간'],aiOnly:true,first:0,
   msgs:[['cust','請問營業時間到幾點？','영업시간 몇 시까지예요?','2026-10-20 16:10'],['ai','營業時間為上午10點至晚上8點。','영업시간은 오전 10시부터 저녁 8시까지입니다.','2026-10-20 16:10']],
   sum:{l1:'영업시간 문의, AI가 오후 8시까지로 안내',l2:''},card:{name:'林小姐',phone:'',email:''}},
- {id:'x5',member:'회원',name:'Mina Park',ch:'CS채팅',store:'',lang:'en',tab:'done',who:'CS팀',owner:'김상담',session:1,topics:['결제'],aiOnly:false,first:6,
+ {id:'x5',member:'회원',name:'Mina Park',ch:'CS채팅',store:'',lang:'en',tab:'done',who:'CS팀',owner:'김상담',ownerLog:[['2026-10-20 14:20','이상담','김상담']],session:1,topics:['결제'],aiOnly:false,first:6,
   msgs:[['cust','Can I pay with Alipay?','알리페이로 결제할 수 있나요?','2026-10-20 15:00'],['agent','Yes, you can pay with Alipay at the store.','네, 매장에서 알리페이로 결제할 수 있습니다.','2026-10-20 15:06']],
   sum:{l1:'알리페이 매장 결제 가능 여부 문의, 가능하다고 안내',l2:''},card:{name:'Mina Park',phone:'',email:'mina.park@example.com'},notes:[['김상담','2026-10-20 15:07','알리페이 매장 결제 가능 여부 안내함']]},
- {id:'x6',cat:'성형외과',name:'Chen Wei',ch:'WeChat',store:'D의원 압구정',lang:'zh',tab:'ai',who:'AI',owner:'',session:1,topics:['가격'],aiOnly:false,first:0,
+ {id:'x6',cat:'성형외과',name:'',ch:'WeChat',store:'D의원 압구정',lang:'zh',tab:'ai',who:'AI',owner:'',session:1,topics:['가격'],aiOnly:false,first:0,
   msgs:[['cust','水光针多少钱？','물광주사 얼마예요?','2026-10-21 13:40'],['ai','水光针价格为150,000韩元（含增值税）。','물광주사는 150,000원(VAT 포함)입니다.','2026-10-21 13:40']],
-  sum:null,card:{name:'Chen Wei',phone:'',email:''}},
+  sum:null,card:{name:'',phone:'',email:''}},
  {id:'x7',cat:'헤어·메이크업',bookings:[{d:'2026-10-21',t:'11:00',p:'커트',n:1,st:'취소'}],name:'Ploy',ch:'LINE',store:'B헤어 명동점',lang:'th',tab:'done',who:'입점사',owner:'이수진',session:1,topics:['취소·환불'],aiOnly:false,first:22,
   msgs:[['cust','ขอยกเลิกการจองพรุ่งนี้ค่ะ','내일 예약 취소하고 싶어요','2026-10-20 10:30'],['agent','ยกเลิกเรียบร้อยแล้วค่ะ','취소 처리했습니다.','2026-10-20 10:52']],
   sum:{l1:'내일 예약 취소 요청, 입점사가 취소 처리',l2:''},card:{name:'Ploy',phone:'+66 812345678',email:''}},
@@ -2281,6 +2284,7 @@ var EX_META={x1:['U3f9····a12c','친구 추가됨'],x2:['chat-20114','-'],x3
  var x2=EX.filter(function(x){return x.id==='x2';})[0];x2.msgs.forEach(function(m){m[4]=m[4]||0;m[5]=2;});
  x2.msgs=[['cust','Can I book a perm for Saturday?','토요일에 펌 예약할 수 있나요?','2026-10-14 15:10',0,1],['ai','Yes, Saturday 2 PM is available.','네, 토요일 오후 2시 가능합니다.','2026-10-14 15:10',0,1],['cust','Great, see you then.','좋아요, 그때 봬요.','2026-10-14 15:12',0,1]].concat(x2.msgs);
 })();
+function dispName(name,ch,cid,phone){if(name)return name;if(ch==='WhatsApp')return phone||cid;var t=String(cid||'').replace(/[^0-9A-Za-z]/g,'').slice(-4);if(ch==='LINE')return 'LINE ····'+t;if(ch==='WeChat')return 'WeChat ····'+t;return '게스트 '+t;}
 function chLabel(r){if(r.ch!=='플랫폼')return r.ch;return {'고객지원':'CS채팅','스토어 문의':'스토어채팅','상품 문의':'상품채팅'}[r.type]||'인앱채팅';}
 function tabOf(r){if(r.status==='상담종료')return 'done';if(P.aiAllowed(r)&&r.aiOn)return 'ai';if(r.handler==='agent')return 'prog';return 'wait';}
 /* 대화 하나 → 표 한 줄 */
@@ -2294,14 +2298,15 @@ function rowLive(r){
  return {id:r.id,live:true,r:r,name:c.name||r.name,ch:chLabel(r),store:r.store?P.storeLabel(r):'',lang:r.lang||'ko',tab:T,who:who,owner:c.owner||'',session:r.session,
   topics:P.topics(r).list,topicEd:P.topics(r).edited,sum:T==='ai'?null:P.summary(r),last:last?(last.kind==='image'?'사진':last.kind==='product'?'상품 카드':last.text):'',lastAt:last?last.at:r.first,
   first:fc&&fr?bizOrRaw(fc.at,fr.at):null,since:since,aiOnly:T==='done'&&!agentIn,need:r.need?r.need.reason:null,
-  cat:r.store?'피부과':null,sub:null,cid:r.cid,chState:r.chState,prod:null,agentAt:r.agentAt,src:r.ch==='플랫폼'?'웹':'메신저',member:r.ch==='플랫폼'&&!/^게스트/.test(r.name)?'회원':'비회원',
+  ownerLog:r.ownerLog||[],cat:r.store?'피부과':null,sub:null,cid:r.cid,chState:r.chState,prod:null,agentAt:r.agentAt,src:r.ch==='플랫폼'?'웹':'메신저',member:r.ch==='플랫폼'&&!/^게스트/.test(r.name)?'회원':'비회원',
   msgs:(function(){var sn=1;return ms.map(function(m,i){if(m.newSession&&i>0)sn++;return [m.who,m.kind==='product'?'[상품 카드] '+(m.prod?m.prod.name:''):m.text,m.ko||'',m.at,m.notice?1:0,sn];});})(),notes:notes,card:c,bookings:c.bookings||[],links:c.links||[]};}
 function bizOrRaw(a,b){return Math.round((toD(b)-toD(a))/60000);}
 function rowEx(x){var ms=x.msgs,last=ms[ms.length-1],since=null;
  if(x.tab==='wait'){for(var i=ms.length-1;i>=0;i--){if((ms[i][5]||x.session)!==x.session)break; /* 이번 회차 안에서만 */if(ms[i][0]==='cust')since=ms[i][3];else if(!ms[i][4])break;}}
- return {id:x.id,live:false,cid:(EX_META[x.id]||[])[0]||'-',chState:(EX_META[x.id]||[])[1]||'-',prod:(EX_META[x.id]||[])[2]||null,agentAt:null,name:x.name,ch:x.ch,store:x.store,cat:x.cat||null,sub:x.sub||null,src:x.src||(/채팅$/.test(x.ch)?'웹':'메신저'),member:x.member||'비회원',lang:x.lang,tab:x.tab,who:x.who,owner:x.owner,session:x.session,topics:x.topics,topicEd:false,sum:x.sum,last:last[1],lastAt:last[3],first:x.first==null?null:x.first,since:since,aiOnly:x.aiOnly,need:x.need||null,msgs:ms.map(function(m){return [m[0],m[1],m[2],m[3],m[4]||0,m[5]||x.session];}),notes:x.notes||[],card:x.card,bookings:x.bookings||[],links:[]};}
+ var nm=dispName(x.card&&x.card.name||x.name,x.ch,(EX_META[x.id]||[])[0],x.card&&x.card.phone);
+ return {id:x.id,live:false,cid:(EX_META[x.id]||[])[0]||'-',chState:(EX_META[x.id]||[])[1]||'-',prod:(EX_META[x.id]||[])[2]||null,agentAt:null,name:nm,ch:x.ch,store:x.store,cat:x.cat||null,sub:x.sub||null,src:x.src||(/채팅$/.test(x.ch)?'웹':'메신저'),member:x.member||'비회원',lang:x.lang,ownerLog:x.ownerLog||[],tab:x.tab,who:x.who,owner:x.owner,session:x.session,topics:x.topics,topicEd:false,sum:x.sum,last:last[1],lastAt:last[3],first:x.first==null?null:x.first,since:since,aiOnly:x.aiOnly,need:x.need||null,msgs:ms.map(function(m){return [m[0],m[1],m[2],m[3],m[4]||0,m[5]||x.session];}),notes:x.notes||[],card:x.card,bookings:x.bookings||[],links:[]};}
 function allRows(){var now=P.S.now;var rows=P.DB.rooms.filter(function(r){return r.msgs.some(function(m){return m.who==='cust';});}).map(rowLive).concat(EX.map(rowEx));
- rows.forEach(function(w){w.wait=w.since?bizMin(w.since,now):null;w.long=w.tab==='wait'&&w.wait!=null&&w.wait>=LONG_MIN;w.complaint=w.topics.indexOf('불만')>=0;});
+ rows.forEach(function(w){w.wait=w.since?bizMin(w.since,now,hrsOf(w)):null;w.long=w.tab==='wait'&&w.wait!=null&&w.wait>=LONG_MIN;w.complaint=w.topics.indexOf('불만')>=0;});
  return rows.sort(function(a,b){return a.lastAt<b.lastAt?1:-1;});}
 
 /* ===== 기간 ===== */
@@ -2327,13 +2332,13 @@ function group(title,inner){return '<span class="ant-tag ant-tag-filled '+CSS_H+
 function draw(){
  if(!P||!P.DB||!EL.tbody)return;
  document.body.classList.toggle('mk',!!P.S.mark);document.body.classList.toggle('hl',!!P.S.hint);
- var b=base(),rows=b.filter(function(w){return pass(w);});
+ var b0=base(),rows=b0.filter(function(w){return pass(w);}),b=rows; /* 요약 숫자도 모든 필터를 따른다 */
  /* 요약 */
  var cnt=function(f){return b.filter(f).length;};
  var on=function(k,v){return sel(k).length===1&&sel(k)[0]===v;};
  EL.sum.innerHTML=group('총',[tag(String(b.length),'',' data-q="all" data-click')])
   +group('상태',['wait','prog','done','ai'].map(function(t){return tag(ST[t][0]+' '+cnt(function(w){return w.tab===t;}),on('st',t)?'blue':'',' data-q="st:'+t+'" data-click');}))
-  +'<span data-new>'+group('응답지연',[tag(String(cnt(function(w){return w.long;}))+'',M.quick==='long'?'blue':'',' data-q="long" data-click title="운영시간 기준 '+LONG_MIN+'분 이상 미응답"')])+'</span>'
+  +'<span data-new>'+group('응답지연',[tag(String(cnt(function(w){return w.long;}))+'',M.quick==='long'?'blue':'',' data-q="long" data-click title="운영시간(우리 CS 건은 CS 운영시간, 입점사 건은 매장 영업시간) 기준 '+LONG_MIN+'분 이상 미응답"')])+'</span>'
   +'<span data-new>'+group('AI 단독처리',[tag(String(cnt(function(w){return w.aiOnly;})),M.quick==='aionly'?'blue':'',' data-q="aionly" data-click')])+'</span>'
   +'<span data-new>'+group('불만',[tag(String(cnt(function(w){return w.complaint;})),on('tp','불만')?'blue':'',' data-q="complaint" data-click')])+'</span>'
   +group('언어별',Object.keys(LN).filter(function(l){return l!=='ko';}).map(function(l){return tag(LN[l]+' '+cnt(function(w){return w.lang===l;}),on('lang',l)?'blue':'',' data-q="lang:'+l+'" data-click');}));
@@ -2392,6 +2397,7 @@ function drawDrawer(){
    evs.push(m);
    if(m[4])evs.push(['ev','AI 중단'+(last&&w.need?' · '+w.need:''),m[3]]);});
   if(last&&!agentSeen&&w.agentAt&&w.agentAt>=g.at)evs.push(['ev','상담 시작 · '+who,w.agentAt]);
+  (w.ownerLog||[]).forEach(function(o){if(o[0]>=g.at&&(gi===groups.length-1||o[0]<=groups[gi+1].at)){var at=evs.findIndex(function(e){return e[0]==='ev'?e[2]>o[0]:e[3]>o[0];});var row=['ev','담당 변경 · '+o[1]+' → '+o[2],o[0]];if(at<0)evs.push(row);else evs.splice(at,0,row);}});
   if(!live)evs.push(['ev','상담 완료'+(agentSeen?' · '+who:' (AI 단독)'),g.end]);
   g.evs=evs;g.last=last;g.live=live;});
  var dt=M.dtab||'info',pane='';
