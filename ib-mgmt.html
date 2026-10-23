@@ -2562,7 +2562,14 @@ function drawPage(){
 function toast(s){EL.toast.textContent=s;EL.toast.style.display='block';clearTimeout(EL.tt);EL.tt=setTimeout(function(){EL.toast.style.display='none';},1800);}
 window.draw=draw;
 window.MG={state:M,rows:function(){return base().filter(function(w){return pass(w);});},open:function(id){M.open=id;draw();}};
-function start(){try{init();}catch(e){console.error(e);}draw();drawPage();}
+
+/* 사이드바 하위 메뉴를 펼쳐 시안 페이지로 연결 */
+function subMenu(title,items,open){var t=QA('.ant-layout-sider .ant-menu-submenu-title').filter(function(x){return x.textContent.trim()===title;})[0];if(!t)return;var li=t.parentNode,ul=Q('ul.ant-menu-sub',li);
+ if(!ul){ul=document.createElement('ul');ul.className='ant-menu ant-menu-sub ant-menu-inline';ul.setAttribute('data-new','');items.forEach(function(it){var m=document.createElement('li');m.className='ant-menu-item ant-menu-item-only-child';m.style.paddingLeft='48px';m.innerHTML='<span class="ant-menu-title-content"></span>';m.firstChild.textContent=it[0];ul.appendChild(m);});li.appendChild(ul);}
+ QA('li.ant-menu-item',ul).forEach(function(m){var it=items.filter(function(x){return x[0]===m.textContent.trim();})[0];if(it&&it[1]){m.setAttribute('data-click','');m.style.cursor='pointer';m.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();location.href=new URL(it[1],location.href).href;},true);}});
+ function set(o){li.classList.toggle('ant-menu-submenu-open',o);t.setAttribute('aria-expanded',o?'true':'false');ul.style.display=o?'':'none';}
+ set(open);t.setAttribute('data-click','');t.addEventListener('click',function(e){e.preventDefault();set(!li.classList.contains('ant-menu-submenu-open'));},true);}
+function start(){try{init();subMenu('통계',[['상담ㆍ채팅 통계','ib-stat-cc.html'],['스토어 문의 통계','ib-stat-si.html'],['예약자 설문조사','']],true);if(location.hash==='#set')M.page='set';}catch(e){console.error(e);}draw();drawPage();}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();
 </script></body></html>

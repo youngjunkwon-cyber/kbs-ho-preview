@@ -6,9 +6,9 @@
     
     
     
-    <link rel="modulepreload" crossorigin="" href="/assets/react-dom-66hab0gy.js">
-    <link rel="modulepreload" crossorigin="" href="/assets/client-BxWe60S6.js">
-    <link rel="modulepreload" crossorigin="" href="/assets/jsx-runtime-BvWo54fC.js">
+    
+    
+    
     
   <style>.anticon { display: inline-flex; align-items: center; color: inherit; font-style: normal; line-height: 0; text-align: center; text-transform: none; vertical-align: -0.125em; text-rendering: optimizelegibility; -webkit-font-smoothing: antialiased; }
 .anticon > * { line-height: 1; }
@@ -6017,7 +6017,7 @@ var F={tp:[]};
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 function recs(){return REC.filter(function(r){return !F.tp.length||F.tp.some(function(t){return r.topics.indexOf(t)>=0;});});}
 function cnt(list,t){return list.filter(function(r){return r.topics.indexOf(t)>=0;}).length;}
-function mainTopics(list){var c={};list.forEach(function(r){r.topics.forEach(function(t){c[t]=(c[t]||0)+1;});});return Object.keys(c).sort(function(a,b){return c[b]-c[a];}).slice(0,3);}
+function mainTopics(list){var c={};list.forEach(function(r){r.topics.forEach(function(t){c[t]=(c[t]||0)+1;});});return Object.keys(c).sort(function(a,b){return c[b]-c[a]||TOPICS.indexOf(a)-TOPICS.indexOf(b);}).slice(0,3);}
 function donut(vals){var tot=vals.reduce(function(a,b){return a+b;},0),a0=-Math.PI/2,s='<svg width="150" height="180" viewBox="0 0 150 180">';
  if(!tot)return s+'<circle cx="75" cy="90" r="50" fill="none" stroke="#f0f0f0" stroke-width="22"/></svg>';
  vals.forEach(function(v,i){if(!v)return;var a1=a0+v/tot*Math.PI*2;if(v===tot){s+='<circle cx="75" cy="90" r="50" fill="none" stroke="'+PAL[i]+'" stroke-width="22"/>';a0=a1;return;}
@@ -6094,6 +6094,15 @@ function init(){var st=document.createElement('style');st.textContent=
  try{document.body.classList.toggle('mk',new URLSearchParams(location.search).has('mark'));}catch(e){}
  if(pageSI)initSI();else initCC();}
 window.SX={F:F,REC:REC,redraw:function(){if(pageSI)drawSI();else drawCC();}};
+
+/* 사이드바 하위 메뉴를 펼쳐 시안 페이지로 연결 */
+function subMenu(title,items,open){var t=QA('.ant-layout-sider .ant-menu-submenu-title').filter(function(x){return x.textContent.trim()===title;})[0];if(!t)return;var li=t.parentNode,ul=Q('ul.ant-menu-sub',li);
+ if(!ul){ul=document.createElement('ul');ul.className='ant-menu ant-menu-sub ant-menu-inline';ul.setAttribute('data-new','');items.forEach(function(it){var m=document.createElement('li');m.className='ant-menu-item ant-menu-item-only-child';m.style.paddingLeft='48px';m.innerHTML='<span class="ant-menu-title-content"></span>';m.firstChild.textContent=it[0];ul.appendChild(m);});li.appendChild(ul);}
+ QA('li.ant-menu-item',ul).forEach(function(m){var it=items.filter(function(x){return x[0]===m.textContent.trim();})[0];if(it&&it[1]){m.setAttribute('data-click','');m.style.cursor='pointer';m.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();location.href=new URL(it[1],location.href).href;},true);}});
+ function set(o){li.classList.toggle('ant-menu-submenu-open',o);t.setAttribute('aria-expanded',o?'true':'false');ul.style.display=o?'':'none';}
+ set(open);t.setAttribute('data-click','');t.addEventListener('click',function(e){e.preventDefault();set(!li.classList.contains('ant-menu-submenu-open'));},true);}
+function menus(){subMenu('채팅',[['상담 관리','ib-mgmt.html'],['상담 설정','ib-mgmt.html#set'],['입점사 고객 관리','']],false);subMenu('통계',[['상담ㆍ채팅 통계','ib-stat-cc.html'],['스토어 문의 통계','ib-stat-si.html'],['예약자 설문조사','']],true);}
+document.addEventListener('DOMContentLoaded',function(){try{menus();}catch(e){console.error(e);}});if(document.readyState!=='loading')try{menus();}catch(e){console.error(e);}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script></body></html>
