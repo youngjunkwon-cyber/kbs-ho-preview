@@ -607,8 +607,7 @@ function swHTML(){
  return '<b>통합인박스 시안</b>'
  +(LAYOUTS.length>1?'<span style="margin-left:4px">레이아웃</span><select data-sw="layout" style="background:#e8537a;border-color:#e8537a;color:#fff;font-weight:700">'+LAYOUTS.map(function(x){return '<option value="'+x[0]+'"'+(S.layout===x[0]?' selected':'')+'>'+x[1]+'</option>';}).join('')+'</select><span style="width:8px"></span>':'')+[['BO','CSM 상담 (우리 CS)'],['MGMT','어드민 상담 관리']].map(function(x){return '<button class="s'+(S.surf===x[0]?' on':'')+'" data-surf="'+x[0]+'">'+x[1]+'</button>';}).join('')
  +'<span class="sp"></span>'
- +'<span>고객 채널</span><select data-sw="ch">'+Object.keys(CH_ROOM).map(function(k){return '<option'+(S.ch===k?' selected':'')+'>'+k+'</option>';}).join('')+'</select>'
- +'<span>기준 시각</span><select data-sw="now">'+CLOCKS.map(function(c){return '<option value="'+c[0]+'"'+(S.now===c[0]?' selected':'')+'>'+c[1]+'</option>';}).join('')+'</select>'
+  +'<span>기준 시각</span><select data-sw="now">'+CLOCKS.map(function(c){return '<option value="'+c[0]+'"'+(S.now===c[0]?' selected':'')+'>'+c[1]+'</option>';}).join('')+'</select>'
  +'<label><input type="checkbox" data-sw="booking"'+(DB.store.booking?' checked':'')+'>예약 기능 ON</label>'
  +'<label><input type="checkbox" data-sw="pilot"'+(DB.store.aiPilot?' checked':'')+'>AI 시범 입점사</label>'
  +'<label><input type="checkbox" data-sw="mark"'+(S.mark?' checked':'')+'>이번에 추가한 요소 표시</label>'
