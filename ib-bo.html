@@ -1810,7 +1810,7 @@ function init(){
  EL.aiSec=Q('[class*=_aiTools_]');EL.aiSec.style.display='none';
  /* 상담함 머리 */
  buildListHead();
- /* 상담창 머리: 친구 추가·차단 해제는 상담 정보로, 상담 종료 → 상담 완료, AI 켜기/끄기, 번역 스위치 */
+ /* 상담창 머리: 친구 추가·차단 해제는 상담 정보로, 상담 종료 → 상담 완료, AI 재개, 번역 ON/OFF */
  QA('button',EL.hd).forEach(function(b){if(/친구|차단/.test(b.textContent))(b.closest('.ant-space-item')||b).style.display='none';});
  var cb=btnByText('상담 종료');cb.id='doneBtn';QA('span',cb).pop().textContent='상담 완료';cb.addEventListener('click',function(){var r=P.room(P.S.bo.room);if(!hasNote(r)){var sm=P.summary(r);if(sm){if(confirm('메모가 없습니다. AI 요약을 메모로 저장하고 완료하시겠습니까?\n\n'+sm.l1+' '+sm.l2))P.addNote(r.id,'[AI 요약] '+sm.l1+' '+sm.l2);else return;}else if(!confirm('메모가 없습니다. 메모 없이 완료하시겠습니까?'))return;}P.complete(r.id);});EL.done=cb;
  EL.chip=mkBtn('AI 재개','aiChip');cb.parentElement.insertBefore(EL.chip,cb);

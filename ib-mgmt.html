@@ -2236,7 +2236,7 @@ function bizMin(a,b,H){H=H||CS_HRS;var s=toD(a),e=toD(b),n=0;if(e<=s)return 0;va
 function dur(m){if(m==null)return '-';if(m<1)return '즉시';if(m<60)return m+'분';var h=Math.floor(m/60),r=m%60;return h+'시간'+(r?' '+r+'분':'');}
 
 /* ===== 시안 데이터: 다른 화면과 이어진 대화 4개 + 표를 채우는 예시 대화 ===== */
-/* 스토어 담당자 (dev 스토어 채팅 목록의 담당자 이름·연락처 칼럼) — 시안 예시 값 */
+/* 스토어 담당자 (dev 스토어 채팅 목록의 담당자 이름·연락처 칼럼), 시안 예시 값 */
 var STORE_MGR={'k-beauty의원':['최지원','02-555-0101'],'A피부과 강남점':['박지은','02-555-0102'],'B헤어 명동점':['이수진','02-555-0103'],'C스튜디오 성수':['정하늘','02-555-0104'],'D의원 압구정':['한도윤','02-555-0105']};
 function chLabel(r){if(r.ch!=='플랫폼')return r.ch;return {'고객지원':'CS채팅','스토어 문의':'스토어채팅','상품 문의':'상품채팅'}[r.type]||'인앱채팅';}
 function tabOf(r){if(r.status==='상담종료')return 'done';if(P.aiAllowed(r)&&r.aiOn)return 'ai';if(r.handler==='agent')return 'prog';return 'wait';}
@@ -2464,7 +2464,7 @@ function init(){
  /* 서랍 (antd Drawer 구조) */
  var dw=document.createElement('div');dw.className='ant-drawer ant-drawer-right ant-drawer-open '+CSS_H;dw.setAttribute('data-new','');dw.style.cssText='position:fixed;inset:0;z-index:1000;display:none';
  dw.innerHTML='<div class="ant-drawer-mask" style="position:absolute;inset:0;background:rgba(0,0,0,.45);z-index:0"></div><div class="ant-drawer-content-wrapper" style="position:absolute;top:0;right:0;bottom:0;width:720px;z-index:1;pointer-events:auto"><div class="ant-drawer-content" style="height:100%"><div class="ant-drawer-wrapper-body" style="display:flex;flex-direction:column;height:100%">'
-  +'<div class="ant-drawer-header"><div class="ant-drawer-header-title"><button type="button" class="ant-drawer-close" data-click aria-label="Close">✕</button><div class="ant-drawer-title"></div><button type="button" class="ant-btn '+CSS_H+' ant-btn-primary ant-btn-color-primary ant-btn-variant-solid mg-csm" data-click data-new title="CSM 응대 화면에서 이 대화 열기"><span>CSM에서 열기</span></button></div></div>'
+  +'<div class="ant-drawer-header"><div class="ant-drawer-header-title"><button type="button" class="ant-drawer-close" data-click aria-label="Close">✕</button><div class="ant-drawer-title"></div><button type="button" class="ant-btn '+CSS_H+' ant-btn-primary ant-btn-color-primary ant-btn-variant-solid mg-csm" data-click data-new title="CSM 응대 화면으로 이동"><span>CSM에서 열기</span></button></div></div>'
   +'<div class="ant-drawer-body" style="flex:1;overflow:auto"></div>'
   +'</div></div></div>';
  document.body.appendChild(dw);EL.dw=dw;
