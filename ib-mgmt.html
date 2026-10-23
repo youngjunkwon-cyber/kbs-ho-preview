@@ -2236,55 +2236,8 @@ function bizMin(a,b,H){H=H||CS_HRS;var s=toD(a),e=toD(b),n=0;if(e<=s)return 0;va
 function dur(m){if(m==null)return '-';if(m<1)return '즉시';if(m<60)return m+'분';var h=Math.floor(m/60),r=m%60;return h+'시간'+(r?' '+r+'분':'');}
 
 /* ===== 시안 데이터: 다른 화면과 이어진 대화 4개 + 표를 채우는 예시 대화 ===== */
-var EX=[
- {id:'x1',cat:'피부과',name:'Sato Yui',ch:'LINE',store:'A피부과 강남점',lang:'ja',tab:'wait',who:null,owner:'',session:1,topics:['예약'],aiOnly:false,
-  msgs:[['cust','来週の土曜日、2名で予約できますか？','다음 주 토요일 2명 예약 가능한가요?','2026-10-21 13:20']],
-  sum:{l1:'10월 31일(토) 2명 예약 가능 여부 문의, 입점사 미응대',l2:''},card:{name:'Sato Yui',phone:'',email:''},note:'입점사 직접 응대 매장'},
- {id:'x2',cat:'헤어·메이크업',member:'회원',name:'Anna Kim',ch:'스토어채팅',store:'B헤어 명동점',lang:'en',tab:'wait',who:null,owner:'',session:2,topics:['불만'],aiOnly:false,
-  msgs:[['cust','I waited 40 minutes past my booking time yesterday. This is unacceptable.','어제 예약 시간보다 40분을 기다렸어요. 받아들일 수 없습니다.','2026-10-21 11:40'],['ai','We are sorry for the inconvenience. A staff member will check and reply shortly.','불편을 드려 죄송합니다. 담당자가 확인 후 곧 답변드리겠습니다.','2026-10-21 11:40',1]],
-  sum:{l1:'어제 예약 시간보다 40분 기다린 데 대한 불만, AI 안내문 발송 후 미응대',l2:''},card:{name:'Anna Kim',phone:'+1 2125550147',email:''},need:'불만'},
- {id:'x3',cat:'피부과',name:'Bat-Erdene',ch:'WhatsApp',store:'A피부과 강남점',lang:'mn',tab:'prog',who:'입점사',owner:'박지은',session:1,topics:['가격','시술 상담'],aiOnly:false,first:4,
-  msgs:[['cust','Ботокс хэд вэ?','보톡스 얼마예요?','2026-10-21 12:02'],['agent','Ботокс 99,000 вон.','보톡스는 99,000원입니다.','2026-10-21 12:06'],['cust','Өвдөлттэй юу?','아픈가요?','2026-10-21 12:10']],
-  sum:{l1:'보톡스 가격 안내 후 통증 여부 추가 문의',l2:''},card:{name:'Bat-Erdene',phone:'+976 99112233',email:''}},
- {id:'x4',cat:'사진관',sub:'프로필 촬영',src:'알리페이',member:'회원',name:'林小姐',ch:'상품채팅',store:'C스튜디오 성수',lang:'zh-TW',tab:'done',who:'AI',owner:'',session:1,topics:['위치·운영시간'],aiOnly:true,first:0,
-  msgs:[['cust','請問營業時間到幾點？','영업시간 몇 시까지예요?','2026-10-20 16:10'],['ai','營業時間為上午10點至晚上8點。','영업시간은 오전 10시부터 저녁 8시까지입니다.','2026-10-20 16:10']],
-  sum:{l1:'영업시간 문의, AI가 오후 8시까지로 안내',l2:''},card:{name:'林小姐',phone:'',email:''}},
- {id:'x5',member:'회원',name:'Mina Park',ch:'CS채팅',store:'',lang:'en',tab:'done',who:'CS팀',owner:'김상담',ownerLog:[['2026-10-20 14:20','이상담','김상담']],session:1,topics:['결제'],aiOnly:false,first:6,
-  msgs:[['cust','Can I pay with Alipay?','알리페이로 결제할 수 있나요?','2026-10-20 15:00'],['agent','Yes, you can pay with Alipay at the store.','네, 매장에서 알리페이로 결제할 수 있습니다.','2026-10-20 15:06']],
-  sum:{l1:'알리페이 매장 결제 가능 여부 문의, 가능하다고 안내',l2:''},card:{name:'Mina Park',phone:'',email:'mina.park@example.com'},notes:[['김상담','2026-10-20 15:07','알리페이 매장 결제 가능 여부 안내함']]},
- {id:'x6',cat:'성형외과',name:'',ch:'WeChat',store:'D의원 압구정',lang:'zh',tab:'ai',who:'AI',owner:'',session:1,topics:['가격'],aiOnly:false,first:0,
-  msgs:[['cust','水光针多少钱？','물광주사 얼마예요?','2026-10-21 13:40'],['ai','水光针价格为150,000韩元（含增值税）。','물광주사는 150,000원(VAT 포함)입니다.','2026-10-21 13:40']],
-  sum:null,card:{name:'',phone:'',email:''}},
- {id:'x7',cat:'헤어·메이크업',bookings:[{d:'2026-10-21',t:'11:00',p:'커트',n:1,st:'취소'}],name:'Ploy',ch:'LINE',store:'B헤어 명동점',lang:'th',tab:'done',who:'입점사',owner:'이수진',session:1,topics:['취소·환불'],aiOnly:false,first:22,
-  msgs:[['cust','ขอยกเลิกการจองพรุ่งนี้ค่ะ','내일 예약 취소하고 싶어요','2026-10-20 10:30'],['agent','ยกเลิกเรียบร้อยแล้วค่ะ','취소 처리했습니다.','2026-10-20 10:52']],
-  sum:{l1:'내일 예약 취소 요청, 입점사가 취소 처리',l2:''},card:{name:'Ploy',phone:'+66 812345678',email:''}},
- {id:'x8',cat:'피부과',name:'Kenji T.',ch:'스토어채팅',store:'A피부과 강남점',lang:'ja',tab:'wait',who:null,owner:'',session:1,topics:['시술 상담'],aiOnly:false,
-  msgs:[['cust','妊娠中でもレーザーはできますか？','임신 중에도 레이저 가능한가요?','2026-10-21 13:45'],['ai','確認してご案内いたします。','확인 후 안내드리겠습니다.','2026-10-21 13:45',1]],
-  sum:{l1:'임신 중 레이저 시술 가능 여부 문의, 의료 판단 필요로 AI 중단',l2:''},card:{name:'Kenji T.',phone:'',email:''},need:'시술 상담(의료 판단 필요)'}
-];
 /* 스토어 담당자 (dev 스토어 채팅 목록의 담당자 이름·연락처 칼럼) — 시안 예시 값 */
 var STORE_MGR={'k-beauty의원':['최지원','02-555-0101'],'A피부과 강남점':['박지은','02-555-0102'],'B헤어 명동점':['이수진','02-555-0103'],'C스튜디오 성수':['정하늘','02-555-0104'],'D의원 압구정':['한도윤','02-555-0105']};
-var EX_META={x1:['U3f9····a12c','친구 추가됨'],x2:['chat-20114','-'],x3:['+976 99112233','24시간 창 열림'],x4:['chat-20131','-',{name:'프로필 촬영 베이직',no:3021}],x5:['chat-20087','-'],x6:['oQ7v····Lm2','구독 중'],x7:['U77a····0e1','친구 추가됨'],x8:['chat-20140','-']};
-/* 긴 대화 예시: Mina Park 1차 40건, Anna Kim 2회차(1차 10. 14.) */
-(function(){
- var QA=[['Hi, I am visiting Seoul next week.','안녕하세요, 다음 주에 서울 방문해요.','Welcome! How can we help you?','환영합니다! 무엇을 도와드릴까요?'],
-  ['Which area is good for skin clinics?','피부과는 어느 동네가 좋아요?','Gangnam and Sinsa have many partner clinics.','강남과 신사에 입점 피부과가 많습니다.'],
-  ['Do clinics have English-speaking staff?','영어 가능한 직원이 있나요?','Most partner clinics support English.','대부분의 입점 병원이 영어를 지원합니다.'],
-  ['How long does a skin booster take?','스킨부스터는 얼마나 걸려요?','Usually about 30 to 40 minutes.','보통 30~40분 정도 걸립니다.'],
-  ['Can I wear makeup after the treatment?','시술 후 화장해도 되나요?','Please follow the clinic\'s guidance after treatment.','시술 후에는 병원 안내를 따라 주세요.'],
-  ['Is there a cancellation fee?','취소 수수료가 있나요?','It depends on each store\'s policy.','스토어마다 정책이 다릅니다.'],
-  ['Can I book for two people?','두 명 예약할 수 있나요?','Yes, you can choose the number of people when booking.','네, 예약할 때 인원을 고를 수 있습니다.'],
-  ['How do I find the store?','매장은 어떻게 찾아가요?','The map is on each store page.','지도는 각 스토어 페이지에 있습니다.'],
-  ['Do I need a deposit?','예약금이 필요한가요?','No deposit is needed for most stores.','대부분의 스토어는 예약금이 없습니다.'],
-  ['Thank you, one more question.','감사해요, 하나만 더 물을게요.','Sure, go ahead.','네, 말씀하세요.']];
- var x5=EX.filter(function(x){return x.id==='x5';})[0],gen=[],t=new Date('2026-10-20T14:00:00');
- for(var i=0;i<19;i++){var q=QA[i%QA.length],a=new Date(t.getTime()+i*3*60000),b=new Date(a.getTime()+60000);
-  gen.push(['cust',q[0],q[1],dstr(a)+' '+pad(a.getHours())+':'+pad(a.getMinutes())]);gen.push(['agent',q[2],q[3],dstr(b)+' '+pad(b.getHours())+':'+pad(b.getMinutes())]);}
- x5.msgs=gen.concat(x5.msgs);
- var x2=EX.filter(function(x){return x.id==='x2';})[0];x2.msgs.forEach(function(m){m[4]=m[4]||0;m[5]=2;});
- x2.msgs=[['cust','Can I book a perm for Saturday?','토요일에 펌 예약할 수 있나요?','2026-10-14 15:10',0,1],['ai','Yes, Saturday 2 PM is available.','네, 토요일 오후 2시 가능합니다.','2026-10-14 15:10',0,1],['cust','Great, see you then.','좋아요, 그때 봬요.','2026-10-14 15:12',0,1]].concat(x2.msgs);
-})();
-function dispName(name,ch,cid,phone){if(name)return name;if(ch==='WhatsApp')return phone||cid;var t=String(cid||'').replace(/[^0-9A-Za-z]/g,'').slice(-4);if(ch==='LINE')return 'LINE ····'+t;if(ch==='WeChat')return 'WeChat ····'+t;return '게스트 '+t;}
 function chLabel(r){if(r.ch!=='플랫폼')return r.ch;return {'고객지원':'CS채팅','스토어 문의':'스토어채팅','상품 문의':'상품채팅'}[r.type]||'인앱채팅';}
 function tabOf(r){if(r.status==='상담종료')return 'done';if(P.aiAllowed(r)&&r.aiOn)return 'ai';if(r.handler==='agent')return 'prog';return 'wait';}
 /* 대화 하나 → 표 한 줄 */
@@ -2292,20 +2245,16 @@ function rowLive(r){
  var T=tabOf(r),ms=r.msgs.filter(function(m){return m.who!=='note';}),last=ms[ms.length-1],c=r.card||{};
  var fc=null,fr=null;ms.forEach(function(m){if(!fc&&m.who==='cust')fc=m;if(fc&&!fr&&(m.who==='agent'||(m.who==='ai'&&!m.notice))&&m.at>=fc.at)fr=m;});
  var agentIn=ms.some(function(m){return m.who==='agent';});
- var who=T==='ai'?'AI':T==='prog'?'CS팀':T==='done'?(agentIn?'CS팀':'AI'):null;
+ var who=T==='ai'?'AI':T==='prog'?(r.byStore?'입점사':'CS팀'):T==='done'?(agentIn?(r.byStore?'입점사':'CS팀'):'AI'):null;
  var since=null;if(T==='wait'){for(var i=ms.length-1;i>=0;i--){var m=ms[i];if(m.who==='cust')since=m.at;else if(!m.notice)break;if(m.newSession)break; /* 이번 회차 안에서만 */}}
  var notes=r.msgs.filter(function(m){return m.who==='note';}).map(function(m){return [m.by||'상담사',m.at,m.text];});
  return {id:r.id,live:true,r:r,name:c.name||r.name,ch:chLabel(r),store:r.store?P.storeLabel(r):'',lang:r.lang||'ko',tab:T,who:who,owner:c.owner||'',session:r.session,
   topics:P.topics(r).list,topicEd:P.topics(r).edited,sum:T==='ai'?null:P.summary(r),last:last?(last.kind==='image'?'사진':last.kind==='product'?'상품 카드':last.text):'',lastAt:last?last.at:r.first,
   first:fc&&fr?bizOrRaw(fc.at,fr.at):null,since:since,aiOnly:T==='done'&&!agentIn,need:r.need?r.need.reason:null,
-  ownerLog:r.ownerLog||[],cat:r.store?'피부과':null,sub:null,cid:r.cid,chState:r.chState,prod:null,agentAt:r.agentAt,src:r.ch==='플랫폼'?'웹':'메신저',member:r.ch==='플랫폼'&&!/^게스트/.test(r.name)?'회원':'비회원',
+  ownerLog:r.ownerLog||[],cat:r.cat||(r.store?'피부과':null),sub:r.sub||null,cid:r.cid,chState:r.chState,prod:r.prod||null,agentAt:r.agentAt,src:r.src||(r.ch==='플랫폼'?'웹':'메신저'),member:r.member||(r.ch==='플랫폼'&&!/^게스트/.test(r.name)?'회원':'비회원'),
   msgs:(function(){var sn=1;return ms.map(function(m,i){if(m.newSession&&i>0)sn++;return [m.who,m.kind==='product'?'[상품 카드] '+(m.prod?m.prod.name:''):m.text,m.ko||'',m.at,m.notice?1:0,sn];});})(),notes:notes,card:c,bookings:c.bookings||[],links:c.links||[]};}
 function bizOrRaw(a,b){return Math.round((toD(b)-toD(a))/60000);}
-function rowEx(x){var ms=x.msgs,last=ms[ms.length-1],since=null;
- if(x.tab==='wait'){for(var i=ms.length-1;i>=0;i--){if((ms[i][5]||x.session)!==x.session)break; /* 이번 회차 안에서만 */if(ms[i][0]==='cust')since=ms[i][3];else if(!ms[i][4])break;}}
- var nm=dispName(x.card&&x.card.name||x.name,x.ch,(EX_META[x.id]||[])[0],x.card&&x.card.phone);
- return {id:x.id,live:false,cid:(EX_META[x.id]||[])[0]||'-',chState:(EX_META[x.id]||[])[1]||'-',prod:(EX_META[x.id]||[])[2]||null,agentAt:null,name:nm,ch:x.ch,store:x.store,cat:x.cat||null,sub:x.sub||null,src:x.src||(/채팅$/.test(x.ch)?'웹':'메신저'),member:x.member||'비회원',lang:x.lang,ownerLog:x.ownerLog||[],tab:x.tab,who:x.who,owner:x.owner,session:x.session,topics:x.topics,topicEd:false,sum:x.sum,last:last[1],lastAt:last[3],first:x.first==null?null:x.first,since:since,aiOnly:x.aiOnly,need:x.need||null,msgs:ms.map(function(m){return [m[0],m[1],m[2],m[3],m[4]||0,m[5]||x.session];}),notes:x.notes||[],card:x.card,bookings:x.bookings||[],links:[]};}
-function allRows(){var now=P.S.now;var rows=P.DB.rooms.filter(function(r){return r.msgs.some(function(m){return m.who==='cust';});}).map(rowLive).concat(EX.map(rowEx));
+function allRows(){var now=P.S.now;var rows=P.DB.rooms.filter(function(r){return r.msgs.some(function(m){return m.who==='cust';});}).map(rowLive);
  rows.forEach(function(w){w.wait=w.since?bizMin(w.since,now,hrsOf(w)):null;w.long=w.tab==='wait'&&w.wait!=null&&w.wait>=LONG_MIN;w.complaint=w.topics.indexOf('불만')>=0;});
  return rows.sort(function(a,b){return a.lastAt<b.lastAt?1:-1;});}
 
