@@ -66,6 +66,7 @@ function seedStore(){return {
  hoursText:{ko:'평일 10:00~19:00, 토요일 10:00~17:00이고 일요일·공휴일은 휴무입니다',en:'weekdays 10:00 to 19:00 and Saturdays 10:00 to 17:00. We are closed on Sundays and public holidays',ja:'平日10:00~19:00、土曜10:00~17:00で、日曜・祝日は休業です',zh:'工作日10:00~19:00，周六10:00~17:00，周日及公休日休息'},
  addr:{ko:'서울 강남구 강남역 인근',en:'near Gangnam Station, Gangnam-gu, Seoul',ja:'ソウル江南区の江南駅近く',zh:'首尔江南区江南站附近'},
  phone:'02-0000-0000',
+ messengers:{ko:'카카오톡 @kbeautyclinic',en:'WhatsApp +82 2-0000-0000',ja:'LINE @kbeautyclinic_jp',zh:'WeChat kbeautyclinic_cn','zh-TW':'LINE @kbeautyclinic_tw'},
  payment:{ko:'결제는 방문 후 현장에서 하고, 예약금이 필요하면 미리 알려드립니다',en:'payment is made on site after your visit, and we will let you know in advance if a deposit is required',ja:'お支払いはご来店後に現地で行い、予約金が必要な場合は事前にご案内します',zh:'付款在到店后现场进行，如需预约金会提前告知'},
  faqTime:{ko:'시술마다 다르지만 보통 30분~2시간 정도 걸려요',en:'it depends on the treatment, but usually takes about 30 minutes to 2 hours',ja:'施術により異なりますが、通常30分~2時間ほどです',zh:'因项目而异，通常需要30分钟~2小时'},
  parking:null,
@@ -86,7 +87,7 @@ var CS_GUIDE={ /* 플랫폼 CS 안내 문구 (방향결정 Q12, 문안은 작성
  howbook:{keys:['어떻게 예약','예약 방법','how to book','how do i book'],ko:'원하는 스토어 페이지의 예약 버튼에서 날짜와 시간을 골라 바로 예약할 수 있어요',en:'You can book directly by choosing a date and time from the booking button on the store page'}
 };
 /* 채널 ID·고객 카드는 시안용 예시 값 */
-var CARD={r1:{cid:'Ua1f3····e2711',chState:'친구 추가됨',card:{name:'고객 A',phone:'',email:'',tags:[],memo:'',owner:'',bookings:[],links:[]}},r2:{cid:'+1 4165550188',chState:'24시간 창 열림',card:{name:'Emma Lee',phone:'+1 4165550188',email:'emma.lee@example.com',tags:['재방문'],memo:'지난번 시술 후 붓기 문의 있었음',owner:'',bookings:[{d:'2026-10-30',t:'14:00',p:'Rejuran Skin Booster',n:2,st:'확정',memo:'친구와 함께, 연속 시간으로'},{d:'2026-09-12',t:'11:00',p:'Skinvive',n:1,st:'방문',memo:''},{d:'2026-08-02',t:'15:30',p:'Rejuran Skin Booster',n:1,st:'취소',memo:''}],links:[{ch:'스토어채팅',d:'2026-09-10',st:'완료'}]}},r3:{cid:'oX9k····QkN30',chState:'구독 중',card:{name:'王丽',phone:'',email:'',tags:[],memo:'',owner:'',bookings:[],links:[]}},r4:{cid:'게스트 8b58f990',chState:'인앱 채팅',card:{name:'',phone:'',email:'',tags:[],memo:'',owner:'',bookings:[],links:[]}}};
+var CARD={r1:{cid:'Ua1f3····e2711',chState:'친구 추가됨',card:{name:'고객 A',phone:'',email:'',tags:[],memo:'',owner:'',bookings:[],links:[]}},r2:{cid:'+1 4165550188',chState:'24시간 창 열림',card:{name:'Emma Lee',phone:'+1 4165550188',email:'emma.lee@example.com',tags:['재방문'],memo:'지난번 시술 후 붓기 문의 있었음',owner:'',bookings:[{id:'B2610300014',d:'2026-10-30',t:'14:00',p:'Rejuran Skin Booster',n:2,st:'확정',memo:'친구와 함께, 연속 시간으로'},{d:'2026-09-12',t:'11:00',p:'Skinvive',n:1,st:'방문',memo:''},{d:'2026-08-02',t:'15:30',p:'Rejuran Skin Booster',n:1,st:'취소',memo:''}],links:[{ch:'스토어채팅',d:'2026-09-10',st:'완료'}]}},r3:{cid:'oX9k····QkN30',chState:'구독 중',card:{name:'王丽',phone:'',email:'',tags:[],memo:'',owner:'',bookings:[],links:[]}},r4:{cid:'게스트 8b58f990',chState:'인앱 채팅',card:{name:'',phone:'',email:'',tags:[],memo:'',owner:'',bookings:[],links:[]}}};
 function seedRooms(){return [
  {id:'r1',name:'고객 A',ch:'LINE',type:'스토어 문의',store:1,lang:null,msgs:[],session:1,status:'상담중',aiOn:true,need:null,handler:'ai',noticeAt:null,aiIntroDone:false,req:{},asked:null,first:'2026-10-21 13:50',agentAt:null},
  {id:'r2',name:'Emma Lee',ch:'WhatsApp',type:'스토어 문의',store:1,lang:'en',msgs:[
@@ -170,7 +171,7 @@ function seedExtra(){return EX.map(function(x){
   card:{name:x.card&&x.card.name||'',phone:x.card&&x.card.phone||'',email:x.card&&x.card.email||'',tags:[],memo:'',owner:x.owner||'',bookings:x.bookings||[],links:[]}};});}
 var CH_ROOM={LINE:'r1',WhatsApp:'r2',WeChat:'r3','CS채팅':'r4'};
 var DB,S,SLACK;
-function loadScn(){try{var v=JSON.parse(localStorage.getItem('ib-scn')||'null');if(v&&v.ver===1&&v.nodes)return v;}catch(e){}return null;}
+function loadScn(){try{var v=JSON.parse(localStorage.getItem('ib-scn')||'null');if(v&&v.ver===2&&v.nodes)return v;}catch(e){}return null;}
 function freshDB(){var keep=(window.DB&&DB.scn)||null;DB={scn:keep||loadScn()||defaultScn(),store:seedStore(),rooms:seedRooms().concat(window.NO_EXTRA?[]:seedExtra())};DB.rooms.forEach(function(r){var c=CARD[r.id];if(!c)return;r.cid=c.cid;r.chState=c.chState;r.card=JSON.parse(JSON.stringify(c.card));});SLACK=[];}
 function unans(r){var n=0;for(var i=r.msgs.length-1;i>=0;i--){var m=r.msgs[i];if(m.who==='note')continue;if(m.who!=='cust')break;if(!m.answered)n++;}return n;} /* U8: 마지막 고객 메시지들 중 아직 답이 없는 수 */
 function storeLabel(r){return r.storeName||(r.store?DB.store.name:'K-Beauty Station');}
@@ -205,7 +206,20 @@ var TX={
  altNext:{ko:'가장 가까운 가능 시간은 {x}입니다.',en:'The nearest available times: {x}.',ja:'最も近い空き時間は{x}です。',zh:'最近的可预约时间：{x}。'},
  ask:{ko:'예약 요청을 위해 아래 정보를 알려 주세요.',en:'To request a booking, please send the following:',ja:'予約リクエストのため、以下をお知らせください。',zh:'为提交预约请求，请提供以下信息：'},
  refuse:{ko:'그 내용은 안내해 드리기 어려워요. 예약이나 시술 관련 문의를 도와드릴게요.',en:"I'm not able to help with that. I can help with bookings and treatment inquiries.",ja:'その内容はご案内が難しいです。予約や施術に関するお問い合わせをお手伝いします。',zh:'这方面无法为您提供帮助。我可以协助您预约及项目咨询。'},
- cs:{ko:'{x}.',en:'{x}.',ja:'{x}。',zh:'{x}。'}
+ cs:{ko:'{x}.',en:'{x}.',ja:'{x}。',zh:'{x}。'},
+ askTreat:{ko:'어떤 시술을 원하세요?',en:'Which treatment would you like?',ja:'ご希望の施術は何ですか？',zh:'您想做什么项目？'},
+ askPeople:{ko:'몇 분이 방문하시나요?',en:'How many people will visit?',ja:'何名様でご来店ですか？',zh:'几位到店？'},
+ askName:{ko:'예약자 성함을 알려 주세요.',en:'May I have the name for the booking?',ja:'ご予約者のお名前を教えてください。',zh:'请告诉我预约人的姓名。'},
+ askPhone:{ko:'연락 가능한 번호를 국가번호와 함께 알려 주세요.',en:'Please share a phone number with the country code.',ja:'国番号付きの電話番号を教えてください。',zh:'请提供含国家区号的联系电话。'},
+ askLate:{ko:'몇 분 정도 늦으실까요? 매장에 전달해 드릴게요.',en:'About how many minutes late will you be? We will let the store know.',ja:'何分ほど遅れそうですか？店舗にお伝えします。',zh:'大概会晚到几分钟？我们会转告店铺。'},
+ askReason:{ko:'취소하시는 이유를 알려 주시면 함께 전달할게요.',en:'May I ask the reason for cancelling? We will pass it on.',ja:'キャンセルの理由を教えていただけますか？あわせてお伝えします。',zh:'方便告诉我取消的原因吗？我们会一并转达。'},
+ recommend:{ko:'이 시술이 가능한 매장이에요. 원하시는 곳을 번호로 알려 주세요.',en:'These stores offer that treatment. Please reply with the number of the one you like.',ja:'この施術ができる店舗です。ご希望の店舗を番号でお知らせください。',zh:'以下店铺可以做这个项目。请回复您想要的店铺编号。'},
+ whichBk:{ko:'어느 예약인가요? 번호로 알려 주세요.',en:'Which booking is it? Please reply with the number.',ja:'どのご予約ですか？番号でお知らせください。',zh:'是哪一个预约？请回复编号。'},
+ change:{ko:'{d} {t}로 변경할 수 있어요. 아래 링크에서 변경을 완료해 주세요.',en:'You can change it to {d} at {t}. Please complete the change at the link below.',ja:'{d} {t}に変更できます。下のリンクで変更を完了してください。',zh:'可以改到{d} {t}。请在下方链接完成修改。'},
+ msgid:{ko:'{s} 메신저로도 연락하실 수 있어요: {v}',en:'You can also contact {s} on messenger: {v}',ja:'{s}にはメッセンジャーでもご連絡いただけます: {v}',zh:'您也可以通过即时通讯联系{s}：{v}'},
+ partner:{ko:'입점·협업 문의는 아래 페이지에서 접수해 주세요.',en:'Please submit partnership inquiries on the page below.',ja:'出店・提携のお問い合わせは下のページからお願いします。',zh:'入驻及合作咨询请通过下方页面提交。'},
+ more:{ko:'더 궁금한 점이 있으면 편하게 말씀해 주세요.',en:'If you have any other questions, feel free to ask.',ja:'ほかにご不明な点があればお気軽にどうぞ。',zh:'如有其他问题，请随时告诉我。'},
+ nudge:{ko:'다시 여쭤볼게요.',en:'Just checking in again.',ja:'改めてお伺いします。',zh:'再跟您确认一下。'}
 };
 var R_UNAV={sun:{ko:'일요일은 예약을 받지 않아요',en:'we do not take bookings on Sundays',ja:'日曜日は予約を受け付けていません',zh:'周日不接受预约'},block:{ko:'이날은 예약을 받지 않아요',en:'we do not take bookings on this day',ja:'この日は予約を受け付けていません',zh:'当天不接受预约'},cut:{ko:'예약은 방문 3시간 전에 마감돼요',en:'bookings close 3 hours before the visit',ja:'予約は来店3時間前に締め切られます',zh:'预约在到店前3小时截止'},range:{ko:'예약 가능 시간이 아니에요',en:'it is outside booking hours',ja:'予約可能な時間ではありません',zh:'不在可预约时间内'},grid:{ko:'예약은 30분 단위로 받아요',en:'bookings are in 30-minute slots',ja:'予約は30分単位です',zh:'预约以30分钟为单位'},full:{ko:'그 시간은 이미 예약이 찼어요',en:'that slot is already full',ja:'その時間はすでに予約が埋まっています',zh:'该时段已约满'},past:{ko:'이미 지난 시간이에요',en:'that time has already passed',ja:'すでに過ぎた時間です',zh:'该时间已过'}};
 function altText(a,lang){if(!a.list.length)return '';var days={};a.list.forEach(function(o){days[o.d]=1;});var one=Object.keys(days).length===1,x=a.list.map(function(o,i){return (!a.same&&(!one||i===0)?fmtDay(o.d,lang)+' ':'')+o.t;}).join(', ');return T(a.same?'altSame':'altNext',lang,{x:x});}
@@ -220,7 +234,13 @@ var KW={
  inject:/무시하고|지시.*무시|ignore (all )?previous|system prompt|시스템 프롬프트|개발자 모드|忽略|指示を無視/i,
  medical:/임신|부작용|뭐가 (더 )?나아|어떤 게 (더 )?나아|차이가|다른 ?거|괜찮을까|받아도 (돼|되)|약을 먹|pregnan|side effect|which is better|difference|妊娠|副作用|怀孕|副作用/i,
  complaint:/이상해|아파요|불만|화나|환불해|컴플레인|complain|terrible|worst|痛い|投诉/i,
- collab:/협찬|콜라보|제휴|collab|sponsor|partnership|コラボ|合作/i,
+ collab:/협찬|콜라보|제휴|입점|협업|인플루언서|collab|sponsor|partnership|influencer|コラボ|合作|入驻|出店/i,
+ agent:/상담원|상담사|직원(이랑|과|하고|분)?\s*(연결|통화|대화)|사람(이랑|과)\s*(대화|얘기)|human|real person|live agent|talk to (an? )?(agent|staff|person)|人工|客服|担当者|オペレーター/i,
+ change:/변경|바꾸고|바꿔|옮기고|미루고|reschedule|change (my|the) (booking|reservation|appointment|time)|予約.*変更|改约|改时间|改期/i,
+ late:/늦을|늦어|늦게 도착|지각|running late|be late|late by|遅れ|迟到|晚到/i,
+ arrive:/입구|도착했|도착 했|건물 앞|어디로 (들어|가면)|arrived|i'?m here|entrance|入口|着きました|到了/i,
+ interp:/통역|interpreter|translator|通訳|翻译|翻譯|口译/i,
+ msgid:/(위챗|wechat|라인|line|인스타|instagram|카톡|kakao|微信|ライン)\s*(아이디|id|계정|account|号|알려|주소)|(아이디|계정).*(알려|주세요)/i,
  outScope:/날씨|코드 짜|코딩|weather|write code|天気|天气|다른 (매장|병원|피부과) 추천|recommend (another|other)/i,
  cancelAsk:/취소하려면|취소 방법|환불 규정|cancel policy|how (do i|to) cancel|キャンセル方法|取消政策/i,
  cancelDo:/취소해 ?주|예약 취소해|cancel my|キャンセルして|帮我取消/i,
@@ -268,9 +288,16 @@ function classify(t,r){
  if(KW.inject.test(t))return {kind:'refuse'};
  if(KW.medical.test(t))return {kind:'stop',reason:'시술 상담(의료 판단 필요)'};
  if(KW.complaint.test(t))return {kind:'stop',reason:'불만·클레임'};
- if(KW.collab.test(t))return {kind:'stop',reason:'협찬·제휴 문의'};
+ if(KW.collab.test(t))return {kind:'partner'};
+ if(KW.agent.test(t))return {kind:'agent'};
  if(KW.outScope.test(t))return {kind:'refuse'};
- if(KW.cancelDo.test(t))return {kind:'stop',reason:'예약 취소 처리 요청'};
+ if(KW.cancelDo.test(t))return {kind:'cancel'};
+ if(KW.change.test(t))return {kind:'change'};
+ if(KW.late.test(t))return {kind:'late'};
+ if(KW.arrive.test(t))return {kind:'arrive'};
+ if(KW.interp.test(t))return {kind:'interp'};
+ if(KW.msgid.test(t))return {kind:'msgid'};
+ if(KW_EVENT.test(t))return {kind:'event'};
  if(KW.cancelAsk.test(t))return {kind:'stop',reason:'취소·환불 정책 (정보 없음)'};
  var date=parseDate(t,dOf(S.now)),time=parseTime(t),prod=findProd(t),ppl=parsePeople(t);
  if(KW.book.test(t)||KW.confirmDo.test(t)||(date&&time)||r.asked||(r.pending&&(date||time)))return {kind:'book',date:date,time:time,prod:prod,ppl:ppl};
@@ -317,7 +344,7 @@ function memoFor(r,c){ /* 정책 P2·P3·P4: 고객이 말한 것만, 건강 정
 
 /* ================= 응대 흐름 ================= */
 function push(r,m){m.at=m.at||S.now;r.msgs.push(m);}
-function lastLangOf(r,t){var l=detectLang(t);if(l)r.lang=l;return r.lang||'ko';}
+function lastLangOf(r,t){var l=detectLang(t);if(l==='zh'&&r.lang==='ja'&&!/[぀-ヿ]/.test(t)&&t.replace(/[\s\d]/g,'').length<=6)l='ja';if(l)r.lang=l;return r.lang||'ko';}
 function aiSay(r,text,extra){
  var lang=r.lang||'ko',pre='';
  if(!r.aiIntroDone){pre=T('intro',lang)+' ';r.aiIntroDone=true;if(lang!=='ko')KOBUF.unshift(KOBUF.pop());} /* P7 1번: 첫 AI 답장 앞에 1회 (한국어 줄도 앞으로) */
@@ -342,70 +369,149 @@ function handle(r,msg){
  var t=msg.text,lang=lastLangOf(r,t);
  var c=msg.kind==='image'?{kind:'stop',reason:'사진·파일'}:classify(t,r);msg.answered=true;msg.intent=c.kind;
  if(c.kind==='refuse'){aiSay(r,T('refuse',lang));return;} /* 범위 밖·지시 무시 요청은 시나리오보다 먼저 */
- var it=intentOf(c,msg);msg.scnIntent=it;
+ var it=intentOf(c,msg,r);msg.scnIntent=it;
  if(r.flow&&!scnNode(r.flow.node))r.flow=null; /* 기다리던 단계가 저장한 시나리오에서 지워졌으면 새로 판단 */
- if(r.flow&&c.kind==='book')return scnRun(r,r.flow.node,msg,c); /* 정보 받기 중: 날짜·시간이나 물어본 항목의 답이면 그 단계로, 다른 질문이면 아래에서 따로 처리 */
+ if(r.flow&&scnNode(r.flow.node).type==='confirm'&&!YES.test(t.trim())&&!NO.test(t.trim()))r.flow=null; /* 예/아니오 대신 다른 질문이면 새로 판단 */
+ if(r.flow){
+  var wn=scnNode(r.flow.node);
+  if(TAKEOVER.indexOf(it)>=0&&!(wn.type==='ask'&&r.expect&&r.expect[0]==='reason')){r.flow=null;r.expect=null;} /* 상담사가 필요한 말이면 하던 흐름을 끊고 그 흐름으로 */
+  else if(SIDE.indexOf(it)>=0&&wn.type!=='confirm'){var sf=scnFlowFor(it);if(sf){var keep=r.flow;scnRun(r,sf.id,msg,c,true);r.flow=keep;return;}}  /* 짧은 안내 질문은 답하고 하던 흐름 유지 */
+  else return scnRun(r,r.flow.node,msg,c);
+ }
  var fl=scnFlowFor(it);
  if(fl)return scnRun(r,fl.id,msg,c);
- /* 시나리오가 없는 의도: 안내형은 매장 정보로 답하고, 나머지는 상담사에게 */
+ /* 시작 조건이 없는 의도: 안내형은 매장 정보로 답하고, 나머지는 상담사에게 */
  var s=DB.store,sn=lang==='ko'?s.name:s.nameEn;
  if(c.kind==='cs'){aiSay(r,T('cs',lang,{x:L(CS_GUIDE[c.key],lang)}));return;}
  if(c.kind==='greet'){aiSay(r,T('greet',lang));return;}
  if(c.kind==='hours'){aiSay(r,T('hours',lang,{s:sn,h:L(s.hoursText,lang)}));return;}
  if(c.kind==='loc'){aiSay(r,T('loc',lang,{s:sn,a:L(s.addr,lang),p:s.phone}));return;}
- if(c.kind==='price'){aiSay(r,T('price',lang,{n:lang==='ko'?c.prod.ko:c.prod.name,v:c.prod.price.toLocaleString('en-US')}));return;}
+ if(c.kind==='price'&&c.prod){aiSay(r,T('price',lang,{n:lang==='ko'?c.prod.ko:c.prod.name,v:c.prod.price.toLocaleString('en-US')}));return;}
  if(c.kind==='faqTime'){aiSay(r,T('faqTime',lang,{x:L(s.faqTime,lang)}));return;}
  if(c.kind==='pay'){aiSay(r,T('pay',lang,{x:L(s.payment,lang)}));return;}
  stopAI(r,c.reason||(it+' (시나리오 없음)'),msg);
 }
 /* ================= 상담 시나리오 (BO 상담 설정 > 시나리오에서 그린 흐름대로 AI가 응대) =================
-   노드: trigger(시작 조건) say(AI 안내) ask(정보 받기) check(예약 가능 확인) link(예약 링크) branch(조건) record(기록) handoff(담당 배정) end(AI 응대로)
-   출구: next · fail(ask) · ok/no(check) · yes/no(branch). 기본 시나리오는 시나리오 도입 전 AI 동작과 같다 */
-var INTENTS=['예약','가격','위치·운영시간','결제','시술 소요시간','인사','플랫폼 이용 안내','시술 상담(의료)','불만','제휴·협찬','취소 요청','취소·환불 문의','사진·파일','답할 수 없는 문의'];
-var INFO_INTENTS=['가격','위치·운영시간','결제','시술 소요시간','인사','플랫폼 이용 안내']; /* 시나리오가 없으면 AI가 매장 정보로 바로 답함 */
-var SLOT={date:{ko:'방문 희망일',en:'Preferred date',ja:'ご希望の日付',zh:'希望日期'},time:{ko:'방문 시간',en:'Preferred time',ja:'ご希望の時間',zh:'希望时间'}};
+   근거: CS 관리 시트 3,360건(2025-08~2026-10) + 2026-10-23 결정.
+   단계: trigger 시작 조건 · say AI 안내 · info 매장 정보로 답 · ask 정보 받기 · confirm 예/아니오 묻기 · recommend 매장 추천 · findBooking 예약 찾기
+        check 예약 가능 확인 · link 예약 링크 · changeLink 변경 링크 · branch 조건 · record 기록 · handoff 담당 배정 · end 마무리 */
+var INTENTS=['인사','매장 찾기','예약','가격·시술','이벤트·혜택','위치·운영시간','결제','시술 소요시간','예약 변경','예약 취소','취소·환불 규정','당일 지각','당일 도착·입구','통역','매장 메신저 ID','입점·협업','플랫폼 이용 안내','시술 상담(의료)','불만','상담원 요청','사진·파일','답할 수 없는 문의'];
+var TAKEOVER=['시술 상담(의료)','불만','상담원 요청','예약 취소','예약 변경','당일 지각','입점·협업','사진·파일'];
+var SIDE=['위치·운영시간','결제','시술 소요시간','매장 메신저 ID','당일 도착·입구'];
+var SLOT={date:{ko:'방문 희망일',en:'Preferred date',ja:'ご希望の日付',zh:'希望日期'},time:{ko:'방문 시간',en:'Preferred time',ja:'ご希望の時間',zh:'希望时间'},late:{ko:'늦는 시간',en:'Minutes late',ja:'遅れる時間',zh:'晚到时间'},reason:{ko:'취소 사유',en:'Reason',ja:'理由',zh:'原因'}};
+var ASKF={treat:'askTreat',people:'askPeople',name:'askName',phone:'askPhone',late:'askLate',reason:'askReason'};
 function slotName(f,lang){return L(FIELDS[f]||SLOT[f],lang||'ko');}
-function intentOf(c,msg){
+function intentOf(c,msg,r){
  if(msg&&msg.kind==='image')return '사진·파일';
  var k=c.kind,rs=c.reason||'';
- if(k==='book')return '예약';if(k==='price')return '가격';if(k==='hours'||k==='loc')return '위치·운영시간';if(k==='pay')return '결제';if(k==='faqTime')return '시술 소요시간';if(k==='greet')return '인사';if(k==='cs')return '플랫폼 이용 안내';
- if(/시술 상담/.test(rs))return '시술 상담(의료)';if(/불만/.test(rs))return '불만';if(/협찬|제휴/.test(rs))return '제휴·협찬';if(/취소 처리/.test(rs))return '취소 요청';if(/취소·환불/.test(rs))return '취소·환불 문의';
+ if(r&&!r.store&&!r.pick&&msg&&['book','price','loc','hours','stop'].indexOf(k)>=0&&!/시술 상담|불만/.test(rs)&&recommendFor(msg.text).length)return '매장 찾기'; /* 매장이 정해지지 않은 대화(CS채팅)에서 예약·시술을 물으면 */
+ var M={book:'예약',price:'가격·시술',event:'이벤트·혜택',hours:'위치·운영시간',loc:'위치·운영시간',pay:'결제',faqTime:'시술 소요시간',greet:'인사',cs:'플랫폼 이용 안내',change:'예약 변경',cancel:'예약 취소',late:'당일 지각',arrive:'당일 도착·입구',interp:'통역',msgid:'매장 메신저 ID',partner:'입점·협업',agent:'상담원 요청'};
+ if(M[k])return M[k];
+ if(/가격/.test(rs))return '가격·시술';if(/시술 상담/.test(rs))return '시술 상담(의료)';if(/불만/.test(rs))return '불만';if(/취소·환불/.test(rs))return '취소·환불 규정';if(/주차/.test(rs))return '위치·운영시간';
  return '답할 수 없는 문의';}
-function defaultScn(){return {ver:1,nodes:[
- {id:'t1',type:'trigger',x:40,y:20,intents:['예약'],out:{next:'b1'}},
- {id:'b1',type:'branch',x:40,y:160,cond:'booking',out:{yes:'a1',no:'a2'}},
- {id:'a1',type:'ask',x:40,y:300,fields:['date','time'],clinic:false,retry:0,out:{next:'c1',fail:''}},
- {id:'c1',type:'check',x:40,y:440,out:{ok:'l1',no:'a1'}},
- {id:'l1',type:'link',x:40,y:580,out:{next:'e1'}},
- {id:'e1',type:'end',x:40,y:720,out:{}},
- {id:'a2',type:'ask',x:300,y:300,fields:['name','phone','people','treat','when'],clinic:true,retry:0,out:{next:'s1',fail:''}},
- {id:'s1',type:'say',x:300,y:440,text:{ko:TX.reqDone.ko,en:TX.reqDone.en,ja:TX.reqDone.ja,zh:TX.reqDone.zh},out:{next:'h1'}},
- {id:'h1',type:'handoff',x:300,y:580,to:'CS팀',reason:'예약 요청 접수 (예약 기능 OFF 매장)',notice:'none',out:{}},
- {id:'t2',type:'trigger',x:300,y:20,intents:['시술 상담(의료)','불만','제휴·협찬','취소 요청','취소·환불 문의','사진·파일','답할 수 없는 문의'],out:{next:'h2'}},
- {id:'h2',type:'handoff',x:300,y:160,to:'CS팀',reason:'',notice:'auto',out:{}}
+var N_=function(id,type,x,y,o){o=o||{};o.id=id;o.type=type;o.x=x;o.y=y;o.out=o.out||{};return o;};
+function defaultScn(){var C=270,R=130;return {ver:2,nodes:[
+ /* S0 첫 응대 */
+ N_('s0','trigger',40,20,{intents:['인사'],out:{next:'s0i'}}),N_('s0i','info',40,20+R,{field:'greet',out:{next:'s0e',none:''}}),N_('s0e','end',40,20+R*2,{more:false,out:{}}),
+ /* S2·S3 예약 */
+ N_('s2','trigger',40+C,20,{intents:['예약'],out:{next:'s2a'}}),
+ N_('s2a','ask',40+C,20+R,{fields:['treat','date','time','people'],mode:'seq',clinic:false,retry:0,out:{next:'s2b',fail:''}}),
+ N_('s2b','branch',40+C,20+R*2,{cond:'booking',out:{yes:'s2c',no:'s3a'}}),
+ N_('s2c','check',40+C,20+R*3,{out:{ok:'s2l',no:'s2a'}}),
+ N_('s2l','link',40+C,20+R*4,{out:{next:'s2e'}}),N_('s2e','end',40+C,20+R*5,{more:true,out:{}}),
+ N_('s3a','ask',40+C*2,20+R*3,{fields:['name','phone'],mode:'seq',clinic:true,retry:0,out:{next:'s3s',fail:''}}),
+ N_('s3s','say',40+C*2,20+R*4,{text:{ko:TX.reqDone.ko,en:TX.reqDone.en,ja:TX.reqDone.ja,zh:TX.reqDone.zh},out:{next:'s3h'}}),
+ N_('s3h','handoff',40+C*2,20+R*5,{to:'CS팀',reason:'예약 요청 접수 (예약 기능 OFF)',notice:'none',priority:false,out:{}}),
+ /* S1 매장 찾기 */
+ N_('s1','trigger',40+C*3,20,{intents:['매장 찾기'],out:{next:'s1r'}}),
+ N_('s1r','recommend',40+C*3,20+R*1,{out:{pick:'s1g',none:'s1h'}}),N_('s1g','goto',40+C*2,20+R*2,{target:'s2',out:{}}),
+ N_('s1h','handoff',40+C*3,20+R*2,{to:'CS팀',reason:'매장 찾기 (추천 매장 없음)',notice:'auto',priority:false,out:{}}),
+ /* S4 가격·시술 */
+ N_('s4','trigger',40+C*4,20,{intents:['가격·시술'],out:{next:'s4i'}}),
+ N_('s4i','info',40+C*4,20+R*1,{field:'price',out:{next:'s4c',none:'s4h'}}),
+ N_('s4c','confirm',40+C*4,20+R*2,{text:{ko:'예약도 도와드릴까요?',en:'Would you like me to help you book?',ja:'ご予約もお手伝いしましょうか？',zh:'需要帮您预约吗？'},out:{yes:'s4g',no:'s4e'}}),
+ N_('s4g','goto',40+C*4,20+R*3,{target:'s2',out:{}}),N_('s4e','end',40+C*5,20+R*3,{more:true,out:{}}),
+ N_('s4h','handoff',40+C*5,20+R*2,{to:'CS팀',reason:'',notice:'auto',priority:false,out:{}}),
+ /* S6 위치·운영시간 */
+ N_('s6','trigger',40+C*6,20,{intents:['위치·운영시간','결제','시술 소요시간'],out:{next:'s6i'}}),
+ N_('s6i','info',40+C*6,20+R*1,{field:'auto',out:{next:'s6c',none:''}}),
+ N_('s6c','confirm',40+C*6,20+R*2,{text:{ko:'예약도 도와드릴까요?',en:'Would you like me to help you book?',ja:'ご予約もお手伝いしましょうか？',zh:'需要帮您预约吗？'},out:{yes:'s6g',no:'s6e'}}),N_('s6g','goto',40+C*6,20+R*3,{target:'s2',out:{}}),N_('s6e','end',40+C*7,20+R*3,{more:true,out:{}}),
+ /* S7 예약 변경 */
+ N_('s7','trigger',40,20+R*6+40,{intents:['예약 변경'],out:{next:'s7f'}}),
+ N_('s7f','findBooking',40,20+R*7+40,{scope:'upcoming',out:{found:'s7a',none:'s7h'}}),
+ N_('s7a','ask',40,20+R*8+40,{fields:['date','time'],mode:'seq',clinic:false,retry:0,out:{next:'s7c',fail:''}}),
+ N_('s7c','check',40,20+R*9+40,{out:{ok:'s7l',no:'s7a'}}),
+ N_('s7l','changeLink',40,20+R*10+40,{out:{next:'s7e'}}),N_('s7e','end',40,20+R*11+40,{more:true,out:{}}),
+ N_('s7h','handoff',40+C,20+R*8+40,{to:'CS팀',reason:'예약 변경 (예약 확인 안 됨)',notice:'auto',priority:false,out:{}}),
+ /* S7-1 예약 취소 */
+ N_('s71','trigger',40+C*2,20+R*6+40,{intents:['예약 취소'],out:{next:'s71f'}}),
+ N_('s71f','findBooking',40+C*2,20+R*7+40,{scope:'upcoming',out:{found:'s71a',none:'s71h'}}),
+ N_('s71a','ask',40+C*2,20+R*8+40,{fields:['reason'],mode:'seq',clinic:false,retry:0,out:{next:'s71h',fail:''}}),
+ N_('s71h','handoff',40+C*2,20+R*9+40,{to:'CS팀',reason:'예약 취소 요청',notice:'auto',priority:false,out:{}}),
+ /* S8 당일 연락 */
+ N_('s8','trigger',40+C*3,20+R*6+40,{intents:['당일 지각'],out:{next:'s8f'}}),
+ N_('s8f','findBooking',40+C*3,20+R*7+40,{scope:'today',out:{found:'s8a',none:'s8a'}}),
+ N_('s8a','ask',40+C*3,20+R*8+40,{fields:['late'],mode:'seq',clinic:false,retry:0,out:{next:'s8h',fail:''}}),
+ N_('s8h','handoff',40+C*3,20+R*9+40,{to:'CS팀',reason:'당일 지각 연락',notice:'auto',priority:true,out:{}}),
+ N_('s8b','trigger',40+C*4,20+R*6+40,{intents:['당일 도착·입구'],out:{next:'s8i'}}),
+ N_('s8i','info',40+C*4,20+R*7+40,{field:'loc',out:{next:'s8e',none:''}}),N_('s8e','end',40+C*4,20+R*8+40,{more:true,out:{}}),
+ /* S10 매장 메신저 ID */
+ N_('s10','trigger',40+C*5,20+R*6+40,{intents:['매장 메신저 ID'],out:{next:'s10i'}}),
+ N_('s10i','info',40+C*5,20+R*7+40,{field:'msgid',out:{next:'s10e',none:'s10h'}}),N_('s10e','end',40+C*5+0,20+R*9+40,{more:true,out:{}}),
+ N_('s10h','handoff',40+C*5,20+R*8+40,{to:'CS팀',reason:'매장 메신저 ID (정보 없음)',notice:'auto',priority:false,out:{}}),
+ /* S12 입점·협업 */
+ N_('s12','trigger',40+C*6,20+R*6+40,{intents:['입점·협업'],out:{next:'s12i'}}),
+ N_('s12i','info',40+C*6,20+R*7+40,{field:'partner',url:'',out:{next:'s12e',none:'s12h'}}),N_('s12e','end',40+C*6,20+R*9+40,{more:false,out:{}}),
+ N_('s12h','handoff',40+C*6,20+R*8+40,{to:'CS팀',reason:'입점·협업 문의',notice:'auto',priority:false,out:{}}),
+ /* S5·S9·S11 상담사 연결 (이벤트·통역은 근거 정보가 없어 CS로) */
+ N_('s11','trigger',40+C*8,20,{intents:['시술 상담(의료)','이벤트·혜택','통역','취소·환불 규정','상담원 요청','사진·파일','답할 수 없는 문의'],out:{next:'s11h'}}),
+ N_('s11h','handoff',40+C*8,20+R*1,{to:'CS팀',reason:'',notice:'auto',priority:false,out:{}}),
+ N_('s11b','trigger',40+C*9,20,{intents:['불만'],out:{next:'s11p'}}),
+ N_('s11p','handoff',40+C*9,20+R*1,{to:'CS팀',reason:'',notice:'auto',priority:true,out:{}})
 ]};}
-var SCN_EXITS={trigger:['next'],say:['next'],ask:['next','fail'],check:['ok','no'],link:['next'],branch:['yes','no'],record:['next'],handoff:[],end:[]};
+var SCN_EXITS={goto:[],trigger:['next'],say:['next'],info:['next','none'],ask:['next','fail'],confirm:['yes','no'],recommend:['pick','none'],findBooking:['found','none'],check:['ok','no'],link:['next'],changeLink:['next'],branch:['yes','no'],record:['next'],handoff:[],end:[]};
 function scnNode(id){return id?DB.scn.nodes.filter(function(n){return n.id===id;})[0]||null:null;}
 function scnFlowFor(intent){return DB.scn.nodes.filter(function(n){return n.type==='trigger'&&n.intents.indexOf(intent)>=0;})[0]||null;}
-/* 정보 받기: 고객 말에서 빈칸 채우기 (번호 붙인 줄 답, 날짜·시간·인원·시술·이름·연락처) */
+/* 매장 디렉터리 (시안 예시): 매장 찾기에서 시술·지역으로 추천 */
+var DIR=[{id:1,name:'k-beauty의원',area:'강남',cat:'피부과',keys:['리쥬란','rejuran','쥬베룩','juvelook','스킨바이브','skinvive','보톡스','botox','丽珠兰','リジュラン']},
+ {id:2,name:'A피부과 강남점',area:'강남',cat:'피부과',keys:['리쥬란','rejuran','보톡스','botox','레이저','laser','丽珠兰','リジュラン']},
+ {id:5,name:'D의원 압구정',area:'압구정',cat:'성형외과',keys:['물광','리쥬란','rejuran','필러','filler','水光','丽珠兰']},
+ {id:3,name:'B헤어 명동점',area:'명동',cat:'헤어·메이크업',keys:['커트','cut','염색','dye','헤드스파','head spa','剪发','カット']},
+ {id:4,name:'C스튜디오 성수',area:'성수',cat:'사진관',keys:['촬영','photo','프로필','profile','写真','拍照']}];
+var AREAS={강남:/강남|gangnam|江南/i,명동:/명동|myeong|明洞/i,압구정:/압구정|apgujeong|狎鸥亭/i,성수:/성수|seongsu|圣水/i,홍대:/홍대|hongdae|弘大/i};
+function recommendFor(t){var low=t.toLowerCase(),area=null;for(var a in AREAS)if(AREAS[a].test(t))area=a;
+ var hit=DIR.filter(function(d){return d.keys.some(function(k){return low.indexOf(k.toLowerCase())>=0;});});
+ if(area){var near=hit.filter(function(d){return d.area===area;});if(near.length)hit=near.concat(hit.filter(function(d){return d.area!==area;}));}
+ return hit.slice(0,3);}
+/* 정보 받기: 고객 말에서 빈칸 채우기. r.expect = 지금 묻고 있는 항목(맨 앞)이면 짧은 답도 그 칸으로 */
 function fillSlots(r,t,fields){
- var q=r.req,m;
+ var q=r.req,m,ex=(r.expect||[])[0];
  if(r.asked&&r.asked.length>1){var lines=t.split(/\n|(?=\b\d\.\s)/).map(function(s){return s.replace(/^\s*\d+[.)]\s*/,'').trim();}).filter(Boolean);if(lines.length>=2)r.asked.forEach(function(f,i){if(lines[i]&&!q[f])q[f]=lines[i];});}
  var d=parseDate(t,dOf(S.now)),tm=parseTime(t),p=findProd(t),n=parsePeople(t);
- if(d)q.date=d;if(tm)q.time=tm;if(p)q.prod=p;if(n)q.ppl=n;
+ if(d)q.date=d;if(tm&&ex!=='late')q.time=tm;if(p)q.prod=p;if(n)q.ppl=n;
  if(!q.name&&(m=t.match(/(?:이름|name|名前|姓名)\s*[:：]?\s*([^\n,/]+)/i)))q.name=m[1].trim();
  if(!q.phone&&(m=t.match(/\+?\d[\d\s-]{7,}\d/)))q.phone=m[0];
+ var raw=t.trim(),filler=/^(음+|으음|글쎄|몰라|모르|잘 모르|네+|예|아니|ㅇㅇ|ㅇㅋ|ok|okay|yes|no|hmm+|um+|uh+|idk|well|嗯|はい|えっと|うーん)[\s.!?~…]*$/i.test(raw)||/[?？]$/.test(raw);
+ if(ex==='people'&&!q.ppl&&(m=raw.match(/^(\d{1,2})\s*(명|people|persons|名|人|位)?$/i)))q.ppl=+m[1];
+ if(ex==='treat'&&!q.prod&&!q.treat&&raw.length<=40&&!d&&!tm&&!filler)q.treat=raw;
+ if(ex==='name'&&!q.name&&raw.length<=30&&!/\d{3,}/.test(raw)&&!filler)q.name=raw;
+ if(!q.late&&KW.late.test(t)&&(m=t.match(/(\d{1,3})\s*(분|min|minutes|分)/i)))q.late=m[1]+'분';
+ if(ex==='late'&&!q.late&&(m=raw.match(/(\d{1,3})\s*(분|min|minutes|分|分钟)?/i)))q.late=m[1]+'분';
+ if(ex==='reason'&&!q.reason&&raw&&!filler)q.reason=raw;
  if(!q.people&&q.ppl)q.people=q.ppl;
  if(!q.treat&&q.prod)q.treat=q.prod.ko;
  if(!q.when&&q.date&&q.time)q.when=q.date+' '+q.time;
 }
 function askFields(n){return n.fields.concat(n.clinic&&isClinic()?['gender','nation','birth'].filter(function(f){return n.fields.indexOf(f)<0;}):[]);}
 function scnText(n,lang){var t=n.text||{};if(lang!=='ko'&&t.ko){KOBUF.push(t.ko);}return t[lang]||t.ko||'';}
-function scnMemo(r){var q=r.req,LN={ko:'한국어',en:'영어',ja:'일본어',zh:'중국어(간체)','zh-TW':'중국어(번체)',th:'태국어',mn:'몽골어',id:'인도네시아어'},out=[];
- if(q.date)out.push('희망일 '+fmtDay(q.date,'ko'));if(q.time)out.push('시간 '+q.time);if(q.when&&!q.date)out.push('희망 일시 '+q.when);
- if(q.people||q.ppl)out.push('인원 '+(q.people||q.ppl));if(q.treat||q.prod)out.push('시술 '+(q.treat||q.prod.ko));if(q.name)out.push('이름 '+q.name);if(q.phone)out.push('연락처 '+q.phone);
+var LNK={ko:'한국어',en:'영어',ja:'일본어',zh:'중국어(간체)','zh-TW':'중국어(번체)',th:'태국어',mn:'몽골어',id:'인도네시아어'};
+function scnMemo(r,it){var q=r.req,out=[];if(it)out.push('의도 '+it);
+ if(r.pick)out.push('매장 '+r.pick.name);if(q.bk)out.push('예약 '+fmtDay(q.bk.d,'ko')+' '+q.bk.t+' '+q.bk.p);
+ if(q.treat||q.prod)out.push('시술 '+(q.treat||q.prod.ko));if(q.date)out.push('희망일 '+fmtDay(q.date,'ko'));if(q.time)out.push('시간 '+q.time);
+ if(q.people||q.ppl)out.push('인원 '+(q.people||q.ppl));if(q.name)out.push('이름 '+q.name);if(q.phone)out.push('연락처 '+q.phone);
  ['gender','nation','birth'].forEach(function(f){if(q[f])out.push(FIELDS[f].ko+' '+q[f]);});
- out.push('언어 '+(LN[r.lang||'ko']||r.lang));return out.join(' / ');}
+ if(q.late)out.push('늦음 '+q.late);if(q.reason)out.push('사유 '+q.reason);
+ out.push('언어 '+(LNK[r.lang||'ko']||r.lang));return out.join(' / ');}
 function branchTest(n,r){var v=n.val;
  if(n.cond==='booking')return !!DB.store.booking;
  if(n.cond==='hours')return inHours(S.now);
@@ -413,15 +519,31 @@ function branchTest(n,r){var v=n.val;
  if(n.cond==='channel')return (v||[]).indexOf(r.ch==='플랫폼'?'인앱채팅':r.ch)>=0;
  if(n.cond==='member')return r.member==='회원';
  if(n.cond==='field')return !!r.req[v];
+ if(n.cond==='store')return !!(r.store||r.pick);
  return false;}
-/* 실행: 기다리는 정보 받기 단계가 나올 때까지 진행 (한 번에 최대 30단계, 고리 방지) */
-function scnRun(r,id,msg,c){
- var lang=r.lang||'ko',steps=0;r.trace=r.trace||[];
+/* 기다리는 단계에서 AI가 물은 말 (30분 무응답 재촉 때 다시 보냄) */
+function waitSay(r,text,extra){aiSay(r,text,extra);r.waitAt=S.now;r.nudged=false;r.lastAsk=r.msgs[r.msgs.length-1];}
+function bookingsOf(r,scope){var today=dOf(S.now);return ((r.card&&r.card.bookings)||[]).filter(function(b){return b.st==='확정'&&(scope==='today'?b.d===today:b.d>=today);});}
+var YES=/^(네|예|응|좋아요|좋아|부탁|해\s?주세요|그래요|yes|yeah|yep|sure|ok|okay|please|はい|お願い|好的|好|可以|是的|ได้|тийм)/i,NO=/^(아니|괜찮|됐어|다음에|no\b|nope|not now|maybe later|いいえ|大丈夫|不用|不要|算了|ไม่|үгүй)/i;
+/* 실행: 고객 답을 기다리는 단계가 나올 때까지 진행 (한 번에 최대 30단계, 고리 방지). side=true면 하던 흐름 옆에서 짧게 답만 */
+function scnRun(r,id,msg,c,side){
+ var lang=r.lang||'ko',steps=0,s=DB.store,sn=lang==='ko'?s.name:s.nameEn;r.trace=r.trace||[];
  while(id&&steps++<30){
   var n=scnNode(id);if(!n)break;r.trace.push(n.id);
-  if(n.type==='trigger'){if(msg&&msg.kind!=='image')fillSlots(r,msg.text,[]);r.flowTrig=n.id;(r.scnLog=r.scnLog||[]).push([S.now,'시나리오 · '+(n.intents.indexOf(msg&&msg.scnIntent)>=0?msg.scnIntent:n.intents[0])]);id=n.out.next;continue;} /* 시작 메시지에 있는 정보부터 채움 (조건 분기에서 씀) */
+  if(n.type==='trigger'){if(msg&&msg.kind!=='image')fillSlots(r,msg.text,[]);if(!side){r.flowTrig=n.id;r.curIntent=(n.intents.indexOf(msg&&msg.scnIntent)>=0?msg.scnIntent:n.intents[0]);(r.scnLog=r.scnLog||[]).push([S.now,'시나리오 · '+(n.intents.indexOf(msg&&msg.scnIntent)>=0?msg.scnIntent:n.intents[0])]);}id=n.out.next;continue;}
+  if(n.type==='goto'){var tg=scnNode(n.target);if(!tg){id=null;continue;}r.flowTrig=tg.id;r.curIntent=tg.intents[0];(r.scnLog=r.scnLog||[]).push([S.now,'시나리오 · '+tg.intents[0]]);id=tg.out.next;continue;} /* 다른 흐름으로 */
   if(n.type==='say'){aiSay(r,scnText(n,lang));id=n.out.next;continue;}
-  if(n.type==='branch'){id=branchTest(n,r)?n.out.yes:n.out.no;continue;}
+  if(n.type==='info'){var f=n.field,ck=c&&c.kind,ok=true;
+   if(f==='auto')f=ck==='hours'?'hours':ck==='pay'?'pay':ck==='faqTime'?'faqTime':'loc';
+   if(f==='greet')aiSay(r,T('greet',lang));
+   else if(f==='hours')aiSay(r,T('hours',lang,{s:sn,h:L(s.hoursText,lang)}));
+   else if(f==='loc')aiSay(r,T('loc',lang,{s:sn,a:L(s.addr,lang),p:s.phone}));
+   else if(f==='pay')aiSay(r,T('pay',lang,{x:L(s.payment,lang)}));
+   else if(f==='faqTime')aiSay(r,T('faqTime',lang,{x:L(s.faqTime,lang)}));
+   else if(f==='price'){var pr=(c&&c.prod)||r.req.prod;if(pr){r.req.prod=pr;r.req.treat=pr.ko;aiSay(r,T('price',lang,{n:lang==='ko'?pr.ko:pr.name,v:pr.price.toLocaleString('en-US')}));}else ok=false;}
+   else if(f==='msgid'){var mv=s.messengers&&(s.messengers[lang]||s.messengers.en);if(mv)aiSay(r,T('msgid',lang,{s:sn,v:mv}));else ok=false;}
+   else if(f==='partner'){if(n.url)aiSay(r,T('partner',lang),{link:{url:n.url,lang:lang,kind:'partner'}});else ok=false;}
+   id=ok?n.out.next:n.out.none;if(side&&ok)return;continue;}
   if(n.type==='record'){
    if(n.topic){if(!r.topicEd||r.topicEd.s!==r.session)r.topicEd={s:r.session,add:[],rm:[]};if(r.topicEd.add.indexOf(n.topic)<0)r.topicEd.add.push(n.topic);}
    if(n.memo)push(r,{who:'note',text:'[시나리오] '+scnMemo(r),by:'AI'});
@@ -430,39 +552,71 @@ function scnRun(r,id,msg,c){
    var F=askFields(n),q=r.req,first=!(r.flow&&r.flow.node===n.id);
    if(msg)fillSlots(r,msg.text,F);
    if(F.indexOf('date')>=0&&q.date&&!q.time){var dayR=wd(q.date)===0&&!slotRange(q.date)?'sun':DB.store.blocked.indexOf(q.date)>=0?'block':null;
-    if(dayR){var a0=altSlots(q.date,null,S.now,3);aiSay(r,T('unavDay',lang,{d:fmtDay(q.date,lang),r:L(R_UNAV[dayR],lang),alt:altText(a0,lang)}));q.date=null;r.pending=true;r.flow={node:n.id,tries:0};return;}}
+    if(dayR){var a0=altSlots(q.date,null,S.now,3),um=T('unavDay',lang,{d:fmtDay(q.date,lang),r:L(R_UNAV[dayR],lang),alt:altText(a0,lang)});q.date=null;r.flow={node:n.id,tries:0};r.pending=true;r.expect=['date','time'];waitSay(r,um);return;}}
    var miss=F.filter(function(f){return !q[f];});
-   if(!miss.length){r.asked=null;r.pending=false;id=n.out.next;msg=null;continue;}
+   if(!miss.length){r.asked=null;r.expect=null;r.pending=false;id=n.out.next;msg=null;continue;}
    var tries=first?0:(r.flow.tries||0)+1;
-   if(n.retry&&tries>n.retry){r.asked=null;r.pending=false;id=n.out.fail;msg=null;if(!id){r.flow=null;stopAI(r,'정보 미수신 ('+miss.map(function(f){return slotName(f);}).join(', ')+')',null);return;}continue;}
+   if(n.retry&&tries>n.retry){r.asked=null;r.expect=null;r.pending=false;id=n.out.fail;msg=null;if(!id){r.flow=null;stopAI(r,'정보 미수신 ('+miss.map(function(f){return slotName(f);}).join(', ')+')',null);return;}continue;}
    r.flow={node:n.id,tries:tries};r.pending=true;
-   var onlyDT=F.every(function(f){return f==='date'||f==='time';});
-   if(onlyDT)aiSay(r,q.date?T('askT',lang,{d:fmtDay(q.date,lang)}):q.time?T('askD',lang,{t:q.time}):T('askDT',lang));
-   else{r.asked=miss;aiSay(r,T('ask',lang)+'\n'+miss.map(function(f,i){return (i+1)+'. '+slotName(f,lang);}).join('\n'));}
+   var nx=miss[0],grpDT=(nx==='date'||nx==='time'),grpCl=['gender','nation','birth'].indexOf(nx)>=0;
+   if(n.mode!=='list'&&grpDT){r.expect=['date','time'];r.asked=null;waitSay(r,q.date?T('askT',lang,{d:fmtDay(q.date,lang)}):q.time?T('askD',lang,{t:q.time}):T('askDT',lang));}
+   else if(n.mode!=='list'&&!grpCl&&ASKF[nx]){r.expect=[nx];r.asked=null;waitSay(r,T(ASKF[nx],lang));}
+   else{var lst=grpCl?miss.filter(function(f){return ['gender','nation','birth'].indexOf(f)>=0;}):miss;r.asked=lst;r.expect=null;waitSay(r,T('ask',lang)+'\n'+lst.map(function(f,i){return (i+1)+'. '+slotName(f,lang);}).join('\n'));}
    return;}
+  if(n.type==='confirm'){
+   if(r.flow&&r.flow.node===n.id&&msg){var tx=msg.text.trim();r.flow=null;id=YES.test(tx)?n.out.yes:n.out.no;msg=null;continue;}
+   r.flow={node:n.id,tries:0};waitSay(r,scnText(n,lang));return;}
+  if(n.type==='recommend'){
+   if(r.flow&&r.flow.node===n.id&&msg){var list=r.recList||[],tx2=msg.text.trim(),mm=tx2.match(/^\s*(\d)\s*(번|번째)?/),pk=null;
+    if(mm)pk=list[+mm[1]-1];if(!pk)pk=list.filter(function(d){return tx2.indexOf(d.name)>=0||d.name.indexOf(tx2)>=0;})[0];
+    if(pk){r.pick=pk;r.flow=null;r.recList=null;id=n.out.pick;continue;}
+    r.flow=null;r.recList=null;id=n.out.none;continue;}
+   var cand=recommendFor((msg&&msg.text)||'');
+   if(!cand.length){id=n.out.none;continue;}
+   r.recList=cand;r.flow={node:n.id,tries:0};
+   waitSay(r,T('recommend',lang)+'\n'+cand.map(function(d,i){return (i+1)+'. '+d.name+' ('+d.area+' · '+d.cat+')';}).join('\n'));return;}
+  if(n.type==='findBooking'){
+   if(r.flow&&r.flow.node===n.id&&msg){var bl=r.bkList||[],m3=msg.text.trim().match(/^\s*(\d)/),b0=m3?bl[+m3[1]-1]:null;r.flow=null;r.bkList=null;if(b0){r.req.bk=b0;id=n.out.found;}else id=n.out.none;msg=null;continue;}
+   var bs=bookingsOf(r,n.scope);
+   if(bs.length===1){r.req.bk=bs[0];id=n.out.found;continue;}
+   if(!bs.length){id=n.out.none;continue;}
+   r.bkList=bs;r.flow={node:n.id,tries:0};waitSay(r,T('whichBk',lang)+'\n'+bs.map(function(b,i){return (i+1)+'. '+fmtDay(b.d,lang)+' '+b.t+' · '+b.p;}).join('\n'));return;}
   if(n.type==='check'){var q2=r.req;
    if(!q2.date||!q2.time){id=n.out.no;msg=null;continue;}
    var j=judgeSlot(q2.date,q2.time,S.now);
    if(j.ok){id=n.out.ok;continue;}
-   var a=altSlots(q2.date,q2.time,S.now,3);aiSay(r,T('unav',lang,{d:fmtDay(q2.date,lang),t:q2.time,r:L(R_UNAV[j.reason],lang),alt:altText(a,lang)}));
-   q2.time=null;r.flow={node:n.out.no,tries:0};r.pending=true;return;} /* 대안을 보낸 뒤 고객 답을 기다림 */
-  if(n.type==='link'){var q3=r.req,dT=fmtDay(q3.date,lang),url='https://www.k-beautystation.com/'+lang+'/stores/'+DB.store.id+'/bookings?date='+q3.date+'&time='+q3.time;
+   var a=altSlots(q2.date,q2.time,S.now,3),um2=T('unav',lang,{d:fmtDay(q2.date,lang),t:q2.time,r:L(R_UNAV[j.reason],lang),alt:altText(a,lang)});q2.time=null;r.flow={node:n.out.no,tries:0};r.pending=true;r.expect=['date','time'];
+   waitSay(r,um2);return;} /* 대안을 보낸 뒤 고객 답을 기다림 */
+  if(n.type==='link'){var q3=r.req,sid=(r.pick&&r.pick.id)||s.id,dT=fmtDay(q3.date,lang),url='https://www.k-beautystation.com/'+lang+'/stores/'+sid+'/bookings?date='+q3.date+'&time='+q3.time+(q3.ppl?'&people='+q3.ppl:'')+(q3.prod?'&product='+q3.prod.id:'');
    aiSay(r,T('link',lang,{d:dT,t:q3.time}),{link:{url:url,date:q3.date,time:q3.time,memo:memoFor(r,c||{}),lang:lang}});
    r.req={};id=n.out.next;continue;}
-  if(n.type==='handoff'){r.flow=null;r.asked=null;r.pending=false;
-   var why=n.reason||(c&&c.reason)||(msg&&msg.kind==='image'?'사진·파일':'')||'시나리오 담당 배정';
-   if(n.to==='입점사')r.byStore=true;
+  if(n.type==='changeLink'){var q4=r.req,bk=q4.bk||{},url2='https://www.k-beautystation.com/'+lang+'/bookings/'+(bk.id||'0000')+'/change?date='+q4.date+'&time='+q4.time;
+   aiSay(r,T('change',lang,{d:fmtDay(q4.date,lang),t:q4.time}),{link:{url:url2,date:q4.date,time:q4.time,memo:'변경 전 '+(bk.d?fmtDay(bk.d,'ko')+' '+bk.t:''),lang:lang}});
+   r.req={};id=n.out.next;continue;}
+  if(n.type==='branch'){id=branchTest(n,r)?n.out.yes:n.out.no;continue;}
+  if(n.type==='handoff'){r.flow=null;r.asked=null;r.expect=null;r.pending=false;
+   var why=n.reason||(c&&c.reason)||(msg&&msg.kind==='image'?'사진·파일':'')||(msg&&msg.scnIntent)||'시나리오 담당 배정';
+   if(n.to==='입점사')r.byStore=true;if(n.priority)r.priority=true;
+   push(r,{who:'note',text:'[AI 요약] '+scnMemo(r,r.curIntent||(msg&&msg.scnIntent)),by:'AI'}); /* 넘길 때 받은 정보 요약을 상담 메모로 */
    stopAI(r,why,msg,n.notice==='none');return;}
-  if(n.type==='end'){break;}
+  if(n.type==='end'){if(n.more)aiSay(r,T('more',lang));break;}
  }
  if(steps>=30){r.flow=null;stopAI(r,'시나리오 오류 (반복)',msg);return;}
- r.flow=null;
+ if(!side)r.flow=null;
 }
+/* 30분 무응답: 한 번 다시 묻고, 그 뒤 30분 더 답이 없으면 AI 단독으로 마무리 */
+function scnTick(list){(list||DB.rooms.concat(window.__scnT?[window.__scnT]:[])).forEach(function(r){
+ if(!r.flow||!r.aiOn||!r.waitAt)return;var idle=tsMin(S.now)-tsMin(r.waitAt);if(idle<30)return;
+ if(!r.nudged){var la=r.lastAsk;aiSay(r,T('nudge',r.lang||'ko')+' '+(la?la.text.replace(/^안녕하세요, K-Beauty Station AI 상담 도우미입니다\. |^Hello, this is the K-Beauty Station AI assistant\. /,''):''));if(la&&la.ko&&r.msgs[r.msgs.length-1].ko)r.msgs[r.msgs.length-1].ko=T_KO('nudge')+' '+la.ko.replace(/^안녕하세요, K-Beauty Station AI 상담 도우미입니다\. /,'');r.nudged=true;r.waitAt=S.now;return;}
+ r.flow=null;r.expect=null;r.asked=null;r.pending=false;r.req={};(r.scnLog=r.scnLog||[]).push([S.now,'시나리오 · 무응답 종료']);r.status='상담종료';r.need=null;});}
+function T_KO(k){return TX[k].ko;}
+function idleTest(min){var r=window.__scnT;if(!r||!r.waitAt)return r;var back=new Date(dt(dOf(r.waitAt)).getTime()+((tsMin(r.waitAt)%1440)-min)*60000);r.waitAt=back.toISOString().slice(0,10)+' '+pad(back.getUTCHours())+':'+pad(back.getUTCMinutes());scnTick([r]);return r;}
+function tick(min){var d=new Date(dt(dOf(S.now)).getTime()+(tsMin(S.now)%1440+min)*60000);S.now=d.toISOString().slice(0,10)+' '+pad(d.getUTCHours())+':'+pad(d.getUTCMinutes());scnTick();render();}
 
 /* CSM 상담 개요: 진행 중인 시나리오와 받은 정보 */
-function scnGot(r){var q=r.req||{},out=[];if(q.date)out.push(['방문 희망일',fmtDay(q.date,'ko')]);if(q.time)out.push(['방문 시간',q.time]);if(q.when&&!q.date)out.push(['희망 일시',q.when]);if(q.people||q.ppl)out.push(['인원',String(q.people||q.ppl)]);if(q.treat||q.prod)out.push(['희망 시술',q.treat||q.prod.ko]);if(q.name)out.push(['이름',q.name]);if(q.phone)out.push(['연락처',q.phone]);['gender','nation','birth'].forEach(function(k){if(q[k])out.push([FIELDS[k].ko,q[k]]);});return out;}
+function scnGot(r){var q=r.req||{},out=[];if(r.pick)out.push(['매장',r.pick.name]);if(q.bk)out.push(['예약',fmtDay(q.bk.d,'ko')+' '+q.bk.t+' '+q.bk.p]);if(q.treat||q.prod)out.push(['희망 시술',q.treat||q.prod.ko]);if(q.date)out.push(['방문 희망일',fmtDay(q.date,'ko')]);if(q.time)out.push(['방문 시간',q.time]);if(q.when&&!q.date)out.push(['희망 일시',q.when]);if(q.people||q.ppl)out.push(['인원',String(q.people||q.ppl)]);if(q.name)out.push(['이름',q.name]);if(q.phone)out.push(['연락처',q.phone]);['gender','nation','birth'].forEach(function(k){if(q[k])out.push([FIELDS[k].ko,q[k]]);});if(q.late)out.push(['늦는 시간',q.late]);if(q.reason)out.push(['취소 사유',q.reason]);return out;}
 function scnState(r){if(!r.flow)return null;var n=scnNode(r.flow.node),t=scnNode(r.flowTrig),nm=t?(t.intents.length===1?t.intents[0]:t.intents[0]+' 외'):'';
- var step=!n?'':n.type==='ask'?askFields(n).filter(function(k){return !r.req[k];}).map(function(k){return slotName(k);}).join(', ')+' 요청 중':n.type==='check'?'예약 가능 확인 중':'진행 중';return {flow:nm,step:step,got:scnGot(r)};}
+ var step=!n?'':n.type==='ask'?(function(){var ms=askFields(n).filter(function(k){return !r.req[k];});return ms.length?slotName(ms[0])+(ms.length>1?' 외 '+(ms.length-1)+'개':'')+' 요청 중':'';})():n.type==='check'?'예약 가능 확인 중':n.type==='confirm'?'예약 여부 확인 중':n.type==='recommend'?'추천 매장 선택 대기':n.type==='findBooking'?'예약 선택 대기':'진행 중';return {flow:nm,step:step,got:scnGot(r)};}
 /* 처리 이력: 회차마다 문의 접수 · 시나리오 · 상담 시작 · AI 중단 · 담당 변경 · 상담 완료 (BO 상담 관리 서랍과 같은 말) */
 function hist(r){var out=[],gi=0,groups=[];r.msgs.forEach(function(m,i){if(i===0||m.newSession){groups.push({n:++gi,at:m.at,list:[]});}groups[groups.length-1].list.push(m);});
  var who=r.card&&r.card.owner||'상담사';
@@ -580,7 +734,7 @@ function aiResume(r){
 /* 상담사 */
 function agentSend(id,text){var r=room(id);if(!text.trim())return;r.flow=null;push(r,{who:'agent',text:text.trim()});r.msgs.forEach(function(m){if(m.who==='cust')m.answered=true;});r.handler='agent';r.agentAt=S.now;r.aiOn=false;if(!r.card.owner)r.card.owner='김상담';render();}
 function complete(id){ /* P10 상담 완료 = 확인 완료 + 상담 종료 */
- var r=room(id);r.need=null;r.noticeAt=null;r.handler='ai';r.status='상담종료';r.pending=false;r.asked=null;r.flow=null;r.req={};
+ var r=room(id);r.need=null;r.noticeAt=null;r.handler='ai';r.status='상담종료';r.pending=false;r.asked=null;r.flow=null;r.req={};r.priority=false;r.expect=null;r.pick=null;
  aiResume(r);render();
 }
 function setAI(id,on){var r=room(id);if(on){aiResume(r);}else{r.aiOn=false;}render();}
@@ -626,8 +780,8 @@ function render(){
  ['CUST','BO','MGMT'].forEach(function(s){var w=frame(s).contentWindow;if(w&&typeof w.draw==='function')w.draw();});
 }
 window.IB={get DB(){return DB;},get S(){return S;},get SLACK(){return SLACK;},CH_ROOM:CH_ROOM,
- room:room,fmtTs:fmtTs,unans:unans,storeLabel:storeLabel,suggest:function(r){return suggest(r);},inHours:inHours,fmtDay:fmtDay,custSend:custSend,agentSend:agentSend,complete:complete,setAI:setAI,takeOver:takeOver,updateCard:updateCard,addNote:addNote,sendProduct:sendProduct,get RECENT(){return RECENT;},summary:function(r){return summarize(r);},topics:function(r){return topics(r);},editTopic:editTopic,TOPICS:TOPICS,NOASK:NOASK,scnState:scnState,hist:hist,
- scn:{get:function(){return JSON.parse(JSON.stringify(DB.scn));},save:function(v){DB.scn=JSON.parse(JSON.stringify(v));try{localStorage.setItem('ib-scn',JSON.stringify(DB.scn));}catch(e){}render();},defaults:function(){return defaultScn();},reset:function(){DB.scn=defaultScn();try{localStorage.removeItem('ib-scn');}catch(e){}render();return JSON.parse(JSON.stringify(DB.scn));},INTENTS:INTENTS,EXITS:SCN_EXITS,FIELDS:FIELDS,SLOT:SLOT,
+ room:room,fmtTs:fmtTs,unans:unans,storeLabel:storeLabel,suggest:function(r){return suggest(r);},inHours:inHours,fmtDay:fmtDay,custSend:custSend,agentSend:agentSend,complete:complete,setAI:setAI,takeOver:takeOver,updateCard:updateCard,addNote:addNote,sendProduct:sendProduct,get RECENT(){return RECENT;},summary:function(r){return summarize(r);},topics:function(r){return topics(r);},editTopic:editTopic,TOPICS:TOPICS,NOASK:NOASK,tick:tick,scnState:scnState,hist:hist,
+ scn:{get:function(){return JSON.parse(JSON.stringify(DB.scn));},save:function(v){DB.scn=JSON.parse(JSON.stringify(v));try{localStorage.setItem('ib-scn',JSON.stringify(DB.scn));}catch(e){}render();},defaults:function(){return defaultScn();},idleTest:idleTest,reset:function(){DB.scn=defaultScn();try{localStorage.removeItem('ib-scn');}catch(e){}render();return JSON.parse(JSON.stringify(DB.scn));},INTENTS:INTENTS,EXITS:SCN_EXITS,FIELDS:FIELDS,SLOT:SLOT,
   test:function(text,o){o=o||{};var keep=DB.scn;if(o.scn)DB.scn=o.scn;try{return scnTest(text,o);}finally{DB.scn=keep;}}},
 aiAllowed:aiAllowed,render:render,
  openRoom:function(id){S.bo.room=id;render();},

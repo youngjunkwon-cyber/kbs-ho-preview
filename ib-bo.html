@@ -2025,6 +2025,7 @@ function draw(){
  var cnt={all:found.length,wait:0,prog:0,done:0,ai:0};found.forEach(function(r){cnt[tabOf(r)]++;});
  var rooms=found.filter(function(r){return tab==='all'||tabOf(r)===tab;}).sort(function(a,b){
   if(tab==='all'){var wa=tabOf(a)==='wait',wb=tabOf(b)==='wait';if(wa!==wb)return wa?-1:1;}
+  var pa=tabOf(a)==='wait'&&!!a.priority,pb=tabOf(b)==='wait'&&!!b.priority;if(pa!==pb)return pa?-1:1;
   return lastAt(a)<lastAt(b)?1:-1;});
  Q('#tabs').innerHTML=TABS.map(function(t){return '<button data-f="'+t[0]+'" class="'+(tab===t[0]?'on':'')+'">'+t[1]+' '+cnt[t[0]]+'</button>';}).join('');
  var list=EL.list;list.innerHTML='';
@@ -2034,7 +2035,7 @@ function draw(){
   var c1=document.createElement('div');c1.className='c1';
   var tg=null;if(t==='wait')tg=tag('대기','default',true);else if(t==='ai')tg=tag('AI','',true);else if(t==='done')tg=tag('완료','default',true);
   if(tg&&tab==='all')c1.appendChild(tg);
-  c1.insertAdjacentHTML('beforeend','<span class="nm" title="'+esc(r.name)+'">'+hiq(r.name,q)+'</span>'+(r.byStore?'<span class="nt" title="입점사가 응대하는 대화">입점사 응대</span>':'')+(hasNote(r)?'<span class="nt" title="메모 있음">메모</span>':'')+'<span class="tm">'+esc(relTs(lastAt(r)))+'</span>'+((t==='prog'&&n>0)?'<i class="nd" title="새 메시지"></i>':''));
+  c1.insertAdjacentHTML('beforeend','<span class="nm" title="'+esc(r.name)+'">'+hiq(r.name,q)+'</span>'+(t==='wait'&&r.priority?'<span class="nt" title="불만·당일 연락처럼 먼저 볼 대화">우선</span>':'')+(r.byStore?'<span class="nt" title="입점사가 응대하는 대화">입점사 응대</span>':'')+(hasNote(r)?'<span class="nt" title="메모 있음">메모</span>':'')+'<span class="tm">'+esc(relTs(lastAt(r)))+'</span>'+((t==='prog'&&n>0)?'<i class="nd" title="새 메시지"></i>':''));
   b.appendChild(c1);
   var c2=document.createElement('div');c2.className='c2';c2.innerHTML=h.msg?'<span style="color:#8c8c8c">(이전 메시지)</span> '+hiq(h.msg.text,q):hiq(lastMsg(r,t==='wait'),q);b.appendChild(c2);
   if(t==='wait'&&r.need){var w=document.createElement('div');w.className='why';w.setAttribute('data-new','');w.textContent='상담사 확인 필요: '+r.need.reason;b.appendChild(w);}
