@@ -22,7 +22,7 @@ body{margin:0;font-family:"Pretendard Variable",Pretendard,sans-serif;color:var(
 .main{display:flex;gap:20px;padding:20px;align-items:flex-start;max-width:1440px;margin:0 auto}
 .left{position:sticky;top:70px;flex:none;width:377px}
 .frame{width:377px;height:814px;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;position:relative}
-.frame iframe{width:375px;height:812px;border:0;display:block}
+.frame iframe{width:375px;height:100%;border:0;display:block}
 .cover{position:absolute;inset:0;background:#fff;overflow:auto;padding:16px;display:none;z-index:5}
 .cover.on{display:block}
 .cover h3{margin:0 0 10px;font-size:14px;display:flex;justify-content:space-between}
@@ -69,13 +69,13 @@ svg text{font-family:"Pretendard Variable",Pretendard,sans-serif}
   <button data-cv="mail" onclick="cover('mail')">발송함</button>
   <button data-cv="doc" onclick="cover('doc')">전달 문서</button>
   <button id="nwbtn" onclick="toggleNew()">새 요소 표시</button>
-  <button onclick="window.open('gl-proto.html?v=1792997394462','_blank')">새 창</button>
+  <button onclick="window.open('gl-proto.html?v=1792997762777','_blank')">새 창</button>
   <button onclick="copyResult()">결과 복사</button>
  </div>
 </div>
 <div class="main">
  <div class="left">
-  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1792997394462"></iframe>
+  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1792997762777"></iframe>
    <div class="cover" id="cv-flow"><h3>구글 로그인 판정 순서 <button onclick="cover(null)">닫기</button></h3><div id="flow"></div></div>
    <div class="cover" id="cv-db"><h3>회원 DB (시안 안 데이터, 1초마다 갱신) <button onclick="cover(null)">닫기</button></h3><div id="db"></div></div>
    <div class="cover" id="cv-mail"><h3>발송함 <button onclick="cover(null)">닫기</button></h3><div id="mail"></div></div>
@@ -174,7 +174,7 @@ const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(ST))}catch(e){}};
 let GRP='C',FIL='all';
 const W=()=>document.getElementById('fr').contentWindow;
 function toggleNew(){const b=W().document.body;b.classList.toggle('show-new');document.getElementById('nwbtn').classList.toggle('on',b.classList.contains('show-new'))}
-function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1792997394462?'+Date.now()}
+function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1792997762777?'+Date.now()}
 function open_(i){const c=CASES[i];const w=W();w.resetDB();try{w.eval(c[4])}catch(e){alert('세팅 실패: '+e.message)}cover(null);document.querySelectorAll('.case .open').forEach(b=>b.classList.remove('open'));const b=document.getElementById('o'+i);if(b)b.classList.add('open')}
 function mark(id,v){ST[id]=ST[id]||{};ST[id].s=ST[id].s===v?null:v;save();draw()}
 function memo(id,v){ST[id]=ST[id]||{};ST[id].m=v;save()}
@@ -215,6 +215,8 @@ window.addEventListener('message',e=>{if(e.data&&e.data.type==='gl-render'){docu
   if(/^### /.test(l))h+='<h3>'+l.slice(4)+'</h3>';else if(/^## /.test(l))h+='<h2>'+l.slice(3)+'</h2>';else if(/^# /.test(l))h+='<h1>'+l.slice(2)+'</h1>';else if(l.trim())h+='<p style="margin:6px 0">'+l+'</p>'}
  if(inT)h+='</table>';if(inL)h+='</ul>';document.getElementById('doc').innerHTML=h.replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>')})();
 draw();
+function fit(){const top=document.querySelector('.top').offsetHeight;const L=document.querySelector('.left');L.style.top=(top+12)+'px';document.querySelector('.frame').style.height=Math.max(480,Math.min(814,innerHeight-top-12-36))+'px'}
+fit();addEventListener('resize',fit);
 document.getElementById('fr').addEventListener('load',()=>{if(!window.__first){window.__first=1;open_(CASES.findIndex(c=>c[0]==='C-01'))}});
 </script>
 </body>
