@@ -1552,7 +1552,7 @@ function go(p,o={}){VIEW.page=p;VIEW.modal=null;VIEW.err={};Object.assign(VIEW,o
  if(p==='signup'||p==='forgot')VIEW.form={};render();window.scrollTo(0,0)}
 function afterLogin(m,msg){DB.session=m.id;if(msg)toast(msg);VIEW.page=DB.booking?'bookinfo':(VIEW.returnTo&&VIEW.returnTo!=='login'?VIEW.returnTo:'home');VIEW.modal=null;VIEW.err={};render()}
 const INAPP=['ig-ios','ig-android','fb'];
-function startGoogle(forWhat){VIEW.gFor=forWhat;if(forWhat==='login'&&VIEW.page!=='external')VIEW.gBack=VIEW.page==='myout'?'myout':'login';
+function startGoogle(forWhat){VIEW.gFor=forWhat;if(forWhat==='login'&&VIEW.page!=='external'){VIEW.gBack=VIEW.page==='myout'?'myout':'login';if(VIEW.gBack==='myout')VIEW.returnTo='account'}
  if(forWhat==='login'&&(DB.env==='line'||DB.env==='kakao')){DB.envFrom=DB.env;VIEW.page='external';render();setTimeout(()=>{DB.env='browser';VIEW.page=VIEW.gBack||'login';VIEW.expanded=!!DB.remembered;render()},1200);return}
  VIEW.page='google';VIEW.gStep=INAPP.includes(DB.env)?'email':'choose';VIEW.gEmail='';VIEW.gErr='';render()}
 const backOf=()=>({login:VIEW.gBack||'login',connect:'account',delete:'account'}[VIEW.gFor]);

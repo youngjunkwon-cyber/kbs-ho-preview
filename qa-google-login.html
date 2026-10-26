@@ -69,13 +69,13 @@ svg text{font-family:"Pretendard Variable",Pretendard,sans-serif}
   <button data-cv="mail" onclick="cover('mail')">발송함</button>
   <button data-cv="doc" onclick="cover('doc')">전달 문서</button>
   <button id="nwbtn" onclick="toggleNew()">새 요소 표시</button>
-  <button onclick="window.open('gl-proto.html','_blank')">새 창</button>
+  <button onclick="window.open('gl-proto.html?v=1792996168784','_blank')">새 창</button>
   <button onclick="copyResult()">결과 복사</button>
  </div>
 </div>
 <div class="main">
  <div class="left">
-  <div class="frame"><iframe id="fr" src="gl-proto.html"></iframe>
+  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1792996168784"></iframe>
    <div class="cover" id="cv-flow"><h3>구글 로그인 판정 순서 <button onclick="cover(null)">닫기</button></h3><div id="flow"></div></div>
    <div class="cover" id="cv-db"><h3>회원 DB (시안 안 데이터, 1초마다 갱신) <button onclick="cover(null)">닫기</button></h3><div id="db"></div></div>
    <div class="cover" id="cv-mail"><h3>발송함 <button onclick="cover(null)">닫기</button></h3><div id="mail"></div></div>
@@ -165,7 +165,7 @@ const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(ST))}catch(e){}};
 let GRP='A',FIL='all';
 const W=()=>document.getElementById('fr').contentWindow;
 function toggleNew(){const b=W().document.body;b.classList.toggle('show-new');document.getElementById('nwbtn').classList.toggle('on',b.classList.contains('show-new'))}
-function reloadFrame(){document.getElementById('fr').src='gl-proto.html?'+Date.now()}
+function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1792996168784?'+Date.now()}
 function open_(i){const c=CASES[i];const w=W();w.resetDB();try{w.eval(c[4])}catch(e){alert('세팅 실패: '+e.message)}cover(null);document.querySelectorAll('.case .open').forEach(b=>b.classList.remove('open'));const b=document.getElementById('o'+i);if(b)b.classList.add('open')}
 function mark(id,v){ST[id]=ST[id]||{};ST[id].s=ST[id].s===v?null:v;save();draw()}
 function memo(id,v){ST[id]=ST[id]||{};ST[id].m=v;save()}
