@@ -69,13 +69,13 @@ svg text{font-family:"Pretendard Variable",Pretendard,sans-serif}
   <button data-cv="mail" onclick="cover('mail')">발송함</button>
   <button data-cv="doc" onclick="cover('doc')">전달 문서</button>
   <button id="nwbtn" onclick="toggleNew()">새 요소 표시</button>
-  <button onclick="window.open('gl-proto.html?v=1792996800574','_blank')">새 창</button>
+  <button onclick="window.open('gl-proto.html?v=1792997394462','_blank')">새 창</button>
   <button onclick="copyResult()">결과 복사</button>
  </div>
 </div>
 <div class="main">
  <div class="left">
-  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1792996800574"></iframe>
+  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1792997394462"></iframe>
    <div class="cover" id="cv-flow"><h3>구글 로그인 판정 순서 <button onclick="cover(null)">닫기</button></h3><div id="flow"></div></div>
    <div class="cover" id="cv-db"><h3>회원 DB (시안 안 데이터, 1초마다 갱신) <button onclick="cover(null)">닫기</button></h3><div id="db"></div></div>
    <div class="cover" id="cv-mail"><h3>발송함 <button onclick="cover(null)">닫기</button></h3><div id="mail"></div></div>
@@ -96,7 +96,7 @@ svg text{font-family:"Pretendard Variable",Pretendard,sans-serif}
 </div>
 <script>
 const DOC="# 구글 로그인 개발 전달 v1.2\n\n- 기준일: 2026-10-26 (주간회의 결정: 간편로그인은 구글만 우선)\n- 화면 시안: https://youngjunkwon-cyber.github.io/kbs-ho-preview/fo-google-login-v2.html\n- 적용 범위: 웹 FO 전 언어. 알리페이 채널은 자체 로그인 경로가 숨겨져 있어 제외\n\n## 1. 요구사항\n\n### 가. 로그인 화면\n\n1) 구성 (구글 우선, 이메일은 접어 둠)\n- 처음 화면: Continue with Google 버튼 + 고지 문구 + \"Log in with email\" 링크만 표시\n- 구글 버튼: 핑크 바탕·흰 글씨, G 로고는 흰 동그라미 안에 원래 색 그대로, 크기는 기존 Login 버튼과 같음\n- 이메일·비밀번호 칸, Remember Email, Login, Sign Up, Forgot Password는 펼치기 전에는 숨김\n- 가입 화면(`/auth/signup`)에는 구글 버튼 두지 않음, 가입 화면 자체는 그대로\n\n2) 이메일 펼침\n- \"Log in with email\" 누르면 같은 화면에서 펼침 (화면 이동 없음)\n- 구글 버튼·고지 문구는 위에 남고, 아래에 구분선 \"or log in with email\" + 기존 이메일 로그인 칸\n- Login 버튼은 흰 바탕·회색 테두리로 낮춤 (핑크는 구글 버튼 하나만)\n- Sign Up 링크는 \"Sign up with email\"로 바꿔 펼친 영역 안에만, Forgot Password와 함께 작은 회색 글씨\n- Remember Email로 저장된 이메일이 있으면 처음부터 펼친 상태로 열고 이메일 칸 채움\n- 접는 버튼 없음, 로그인 실패 안내는 펼친 상태에서 표시\n\n3) 약관 고지\n- 약관 체크 화면 없음\n- 버튼 아래 한 줄 고지: \"By continuing with Google, you agree to our Terms of Service and Privacy Policy.\" (각각 게시 중인 약관·처리방침 링크)\n- 가입 시각을 이용약관·처리방침 동의 일시로 기록\n- 마케팅 수신은 미동의로 시작\n\n4) 예약 중 로그인\n- `source=booking-schedule` 진입 시 상단 안내 상자 유지, 그 아래 구성은 1)·2)와 같음\n- 구글 로그인 결과(가입·자동 연결·비밀번호 확인)와 관계없이 끝나면 `redirectUrl`(예약자 정보 입력)로 이동\n- 구글 화면에서 취소하고 돌아와도 고른 날짜·시간 유지\n\n5) 로그인 후 이동\n- 이메일 로그인과 같은 규칙(들어오기 전 화면)\n\n### 나. 구글 로그인 결과별 처리\n\n1) 같은 이메일 회원 없음: 바로 가입 후 로그인\n- 이메일 = 구글 이메일, 인증 완료로 저장\n- 닉네임 = 구글 이름 그대로. 비어 있으면 \"Member\" + 숫자 4자리\n- 비밀번호 없음\n- 프로필 항목(여권명·국적·성별·생년월일·휴대폰·메신저) 비움\n- 가입 경로 = 구글 (BO 회원 목록에 표시)\n- 별도 가입 완료 화면·안내 없음\n\n2) 같은 이메일 회원 있음 + 이메일 인증 완료: 자동 연결 후 로그인\n- 기존 닉네임·프로필·예약 내역 유지 (구글 이름으로 덮어쓰지 않음)\n- 연결된 첫 로그인 때 하단 안내 1회: \"Your Google account is now linked. You can log in with Google or your email and password.\"\n- 회원 이메일로 연결 안내 메일 1통 (본인이 아니면 고객센터 연락 문장 포함)\n\n3) 같은 이메일 회원 있음 + 이메일 미인증: 비밀번호 확인 후 연결\n- 대상 현재 276명 (전원 2025-04~07 가입, 탈퇴 14명 포함)\n- 확인 창에서 비밀번호 1회 입력 → 맞으면 연결·로그인, 회원 이메일을 인증 완료로 변경, 연결 안내 메일 발송\n- 오류 횟수 규칙은 이메일 로그인과 동일\n- Forgot Password 링크 제공, Cancel 시 연결·로그인 없음\n\n4) 실패\n- 사용자가 구글 화면에서 취소: 안내 없이 로그인 화면 복귀\n- 그 밖의 오류: \"Google login failed. Please try again.\"\n- 정지 회원: 이메일 로그인과 같은 안내\n\n### 다. 이메일 가입·비밀번호 찾기\n\n1) 구글로 가입한 이메일로 이메일 가입 시도\n- Get Verification Code 누를 때 막고 코드 미발송\n- 문구: \"This email is registered with Google. Please log in with Google.\"\n- 이메일 가입 회원 중복 안내는 지금 그대로\n\n2) 비밀번호 없는 회원의 비밀번호 찾기\n- Get Verification Code 누를 때 막음\n- 문구: \"This account uses Google login. Please log in with Google.\"\n- 비밀번호가 있는 회원은 구글 연결 여부와 관계없이 지금처럼 재설정\n\n### 라. 계정 설정 (Account 구역)\n\n1) Google 줄 추가\n- 미연결: Connect\n- 연결됨: Connected + Disconnect\n- 비밀번호 없는 회원은 Disconnect 비활성 + \"Set a password before disconnecting Google.\"\n\n2) 연결 (Connect)\n- 회원 이메일과 다른 구글 계정도 연결 가능 (회원 이메일은 그대로)\n- 구글 계정 선택 후 연결, 하단 안내 \"Your Google account is now linked.\" + 연결 안내 메일\n- 이미 다른 회원에 연결된 구글: \"This Google account is already linked to another K-Beauty Station account.\"\n\n3) 해제 (Disconnect)\n- 확인 창 \"Disconnect Google?\" → 해제, 하단 안내 \"Google has been disconnected.\" + 해제 안내 메일\n- 해제 후 같은 구글로 로그인하면 나-1)~3) 규칙 다시 적용\n\n4) Password 줄\n- 비밀번호 없는 회원: Change Password 대신 Set Password\n- Set Password = Change Password 화면에서 현재 비밀번호 칸만 뺀 형태, 비밀번호 규칙·오류 문구는 가입 화면과 동일\n- 저장 후 \"Your password has been set.\", Change Password로 전환, Disconnect 활성\n\n5) 탈퇴 (비밀번호 없는 회원)\n- 비밀번호 입력 대신 구글 재로그인으로 확인\n- 연결된 구글과 다른 계정을 고르면: \"Please log in with the Google account linked to this account.\"\n- 탈퇴 시 구글 연결 정보도 삭제, 같은 구글로 다시 오면 신규 가입\n- 인스타그램·페이스북 앱 안 브라우저에서의 탈퇴는 범위 밖\n\n### 마. 앱 안 브라우저(인앱)\n\n1) LINE·카카오톡\n- Continue with Google 누르면 기본 브라우저로 현재 로그인 화면 주소 그대로 열기 (LINE `openExternalBrowser=1`, 카카오톡 `kakaotalk://web/openExternal`)\n- 주소에 `redirectUrl`(날짜·시간 포함)이 있어 예약 맥락 유지\n- 기본 브라우저에서 구글 버튼 다시 누름\n\n2) 인스타그램·페이스북 및 그 밖의 앱\n- 넘기지 않고 앱 안에서 그대로 진행\n- 앱 안 구글 화면에서 이메일·비밀번호를 직접 입력하는 방식으로 진행 (아이폰 인스타그램 앱에서 다른 서비스들이 이 방식으로 구글 로그인되는 것 실사용 확인)\n\n### 바. 사전 준비 (구글 콘솔)\n\n1) OAuth 클라이언트 생성 (웹)\n- 승인된 도메인: k-beautystation.com\n- 리디렉션 주소: 운영·STG 각각 등록\n\n2) 동의 화면 설정\n- 앱 이름 K-Beauty Station, 로고, 개인정보처리방침·이용약관 주소\n- 요청 범위: 이름·이메일·프로필 사진·고유 번호만 (추가 권한 없음)\n- 게시 상태 Production 전환 + 브랜드 확인 (확인 전에는 앱 이름 대신 도메인 표시)\n\n### 사. 같이 바꿀 문서\n\n1) 개인정보처리방침\n- 수집 경로에 구글 로그인 추가, 구글로부터 받는 항목(이름·이메일·프로필 사진·고유 번호) 명시\n- 다음 개정 목록에 추가 예정\n\n## 2. 화면 목록\n\n| ID | 화면 | 구분 |\n|---|---|---|\n| G-01 | 로그인 (기본, 이메일 접힘) | 수정 |\n| G-01-1 | 로그인 (이메일 펼침) | 수정 |\n| G-02 | 로그인 (예약 중 진입) | 수정 |\n| G-03 | 구글 계정 선택 | 구글 화면 |\n| G-04 | 신규 가입 (로그인 상태로 복귀) | 처리만 |\n| G-05 | 기존 회원 자동 연결 안내 | 신규 |\n| G-06 | 비밀번호 확인 (미인증 회원) | 신규 |\n| G-07 | 실패 안내 | 신규 |\n| G-08 | 이메일 가입 시도 차단 | 수정 |\n| G-09 | 비밀번호 찾기 차단 | 수정 |\n| G-10 | 계정 설정 (구글 가입 회원) | 수정 |\n| G-11 | 계정 설정 (이메일 가입 회원) | 수정 |\n| G-12 | 비밀번호 만들기 | 신규 |\n| G-13 | 구글 연결 해제 확인 | 신규 |\n| G-14 | 탈퇴 확인 (비밀번호 없는 회원) | 신규 |\n\n";
-const GROUPS=[['A','로그인 화면'],['B','구글 로그인 결과'],['C','예약 중 로그인'],['D','이메일 가입·비밀번호 찾기'],['E','계정 설정'],['F','탈퇴'],['G','앱 안 브라우저']];
+const GROUPS=[['C','예약 흐름 (스토어 상세부터)'],['A','로그인 화면'],['B','구글 로그인 결과'],['D','이메일 가입·비밀번호 찾기'],['E','계정 설정'],['F','탈퇴'],['G','앱 안 브라우저']];
 const BK="DB.booking={store:'DDYOU',date:'2026-10-28',time:'17:00'};";
 const CASES=[
 ['A-01','처음 들어온 로그인 화면','로그인 화면을 봅니다.','핑크 Continue with Google 버튼, 그 아래 약관 고지 한 줄, Log in with email 링크만 보입니다.\n이메일·비밀번호 칸, Sign up, Forgot Password는 보이지 않습니다.',"go('login')"],
@@ -128,16 +128,18 @@ const CASES=[
 ['B-17','구글이 이메일을 확인하지 않은 계정 + 같은 이메일 회원','Mina Park (verified@example.com)을 고릅니다.','회원 1은 인증 회원이지만 구글 쪽 이메일이 확인되지 않은 계정이라 자동 연결하지 않고 비밀번호 확인 창이 뜹니다.',"DB.google.find(g=>g.sub==='g-ver').emailVerified=false;go('login');startGoogle('login')"],
 ['B-18','구글이 이메일을 확인하지 않은 계정 + 처음 가입','Alex Kim을 고릅니다.','가입은 되지만 회원 이메일은 미인증으로 저장됩니다(회원 DB 확인).',"DB.google.find(g=>g.sub==='g-new').emailVerified=false;go('login');startGoogle('login')"],
 ['B-15','같은 이메일 회원이 다른 구글에 이미 연결','Mina Park (verified@example.com)을 고릅니다.','회원 1은 Other Person 구글이 연결돼 있는 상태입니다. 연결하지 않고 "This email is already linked to a different Google account. Please log in with your email or the Google account linked to your account." 안내를 띄웁니다.',"DB.members[0].googleSub='g-other';DB.members[0].linkNoticeShown=true;go('login');startGoogle('login')"],
-['C-00','처음부터 예약 흐름','홈 하단 STORE → DDYOU → 하단 Book now → 날짜 28일 → 17:00 → 아래 날짜·시간 버튼 → Continue with Google → Alex Kim','실화면 그대로 이어지고, 로그인 화면 맨 위에 검은 안내 상자(DDYOU, 고른 날짜·시간), 구글 가입 뒤 예약자 정보 화면으로 갑니다.',"go('home')"],
-['C-07','로그인 화면에서 뒤로','날짜·시간 고른 뒤 로그인 화면 → 왼쪽 위 뒤로','날짜·시간 화면으로 돌아오고 고른 날짜·시간이 그대로 선택돼 있습니다.',"go('book')"],
-['C-08','이미 로그인한 상태로 예약','Book now → 날짜·시간 → 아래 버튼','로그인 화면 없이 예약자 정보 화면으로 바로 갑니다.',"DB.session=1;go('store')"],
-['C-09','구글로 갓 가입한 회원의 예약자 정보','Alex Kim을 고릅니다.','예약자 정보에 여권명·국적·성별·생년월일이 비어 있고, 전화번호는 인증 전 입력칸(국가번호 + 번호 + 인증 버튼)으로 나옵니다. Email은 구글 이메일 (Verified).',BK+"go('login',{returnTo:'bookinfo'});startGoogle('login')"],
-['C-01','날짜·시간 고른 뒤 로그인 화면','날짜(28일) → 시간 → 아래 날짜·시간 버튼','로그인 화면 맨 위 검은 안내 상자에 DDYOU, 고른 날짜·시간이 보입니다. 아래는 구글 버튼 + Log in with email.',"go('book')"],
-['C-02','예약 중 구글로 신규 가입','Alex Kim을 고릅니다.','예약자 정보 화면으로 바로 갑니다. 매장·날짜·시간 그대로, Email 칸 = alex.new@gmail.com (Verified).',BK+"go('login',{returnTo:'bookinfo'});startGoogle('login')"],
-['C-03','예약 중 자동 연결','Mina Park (verified@example.com)을 고릅니다.','예약자 정보 화면 + 연결 안내.',BK+"go('login',{returnTo:'bookinfo'});startGoogle('login')"],
-['C-04','예약 중 미인증 회원','Old User → pass1234 → Link and Log In','예약자 정보 화면으로 갑니다.',BK+"go('login',{returnTo:'bookinfo'});startGoogle('login')"],
-['C-05','예약 중 구글 취소','구글 화면 ✕','로그인 화면으로 돌아오고 검은 안내 상자와 날짜·시간이 그대로입니다.',BK+"go('login',{returnTo:'bookinfo'});startGoogle('login')"],
-['C-06','예약 중 이메일 펼침','Log in with email','안내 상자는 위에 남고 아래로 이메일 칸이 펼쳐집니다.',BK+"go('login',{returnTo:'bookinfo'})"],
+["C-01","스토어 상세에서 예약 시작","Book now → 날짜 28일 → 17:00 → 아래 날짜·시간 버튼","로그인 화면이 열리고 맨 위 검은 안내 상자에 DDYOU, October 28, 2026, 17:00이 보입니다. 그 아래 핑크 Continue with Google, 고지 문구, Log in with email.","go('store')"],
+["C-02","예약 중 구글로 처음 가입","Book now → 날짜 28일 → 17:00 → 아래 날짜·시간 버튼 → Continue with Google → Alex Kim","예약자 정보 화면으로 바로 갑니다. 상단에 DDYOU와 고른 시간, 여권명·국적·성별·생년월일은 빈칸, Email = alex.new@gmail.com (Verified), 전화번호는 인증 전 입력칸.","go('store')"],
+["C-03","예약 중 이메일 인증 회원 (자동 연결)","Book now → 날짜 28일 → 17:00 → 아래 날짜·시간 버튼 → Continue with Google → Mina Park (verified@example.com)","예약자 정보 화면 + 하단 연결 안내. 전화번호는 인증된 상태로 나옵니다.","go('store')"],
+["C-04","예약 중 이메일 미인증 회원","Book now → 날짜 28일 → 17:00 → 아래 날짜·시간 버튼 → Continue with Google → Old User → pass1234 → Link and Log In","비밀번호 확인 창을 거쳐 예약자 정보 화면으로 갑니다.","go('store')"],
+["C-05","예약 중 구글 화면에서 취소","Book now → 날짜 28일 → 17:00 → 아래 날짜·시간 버튼 → Continue with Google → 왼쪽 위 ✕","로그인 화면으로 돌아오고 검은 안내 상자와 날짜·시간이 그대로입니다.","go('store')"],
+["C-06","예약 중 이메일로 로그인","Book now → 날짜 28일 → 17:00 → 아래 날짜·시간 버튼 → Log in with email → verified@example.com / pass1234 → Login","안내 상자는 위에 남고 이메일 칸이 펼쳐지며, 로그인 후 예약자 정보 화면으로 갑니다.","go('store')"],
+["C-07","로그인 화면에서 뒤로","Book now → 날짜 28일 → 17:00 → 아래 날짜·시간 버튼 → 왼쪽 위 뒤로","날짜·시간 화면으로 돌아오고 28일·17:00이 그대로 선택돼 있습니다.","go('store')"],
+["C-08","이미 로그인한 상태로 예약","Book now → 날짜 28일 → 17:00 → 아래 날짜·시간 버튼","로그인 화면 없이 예약자 정보 화면으로 바로 갑니다.","DB.session=1;go('store')"],
+["C-09","예약 중 구글 오류","Book now → 날짜 28일 → 17:00 → 아래 날짜·시간 버튼 → Continue with Google → 아무 계정","로그인 화면 하단에 \"Google login failed. Please try again.\" 안내 상자와 날짜·시간은 그대로.","DB.nextGoogle='error';go('store')"],
+["C-10","LINE 앱에서 예약","Book now → 날짜 28일 → 17:00 → 아래 날짜·시간 버튼 → Continue with Google","\"Opening in your browser\" 후 기본 브라우저 주소창이 보이고 같은 로그인 화면이 열립니다. 안내 상자와 날짜·시간 유지. 구글 버튼을 한 번 더 누르면 계정 선택.","DB.env='line';go('store')"],
+["C-11","인스타그램 앱에서 예약","Book now → 날짜 28일 → 17:00 → 아래 날짜·시간 버튼 → Continue with Google → alex.new@gmail.com → Next → Next","브라우저로 넘기지 않고 앱 안에서 구글 로그인 후 예약자 정보 화면으로 갑니다.","DB.env='ig-ios';go('store')"],
+["C-12","홈에서부터 예약","홈 하단 STORE → DDYOU → Book now → 날짜 28일 → 17:00 → 아래 날짜·시간 버튼 → Continue with Google → Alex Kim","실화면 순서대로 이어져 예약자 정보 화면까지 갑니다.","go('home')"],
 ['D-01','구글로만 가입한 이메일로 이메일 가입','googleonly@gmail.com → Get Verification Code','칸 아래 "This email is registered with Google. Please log in with Google." 코드는 보내지 않습니다.',"go('signup')"],
 ['D-02','이메일 가입 회원의 이메일로 가입','verified@example.com → Get Verification Code','지금 라이브의 중복 이메일 안내가 그대로 나옵니다(구글 문구 아님).',"go('signup')"],
 ['D-03','구글 연결 + 비밀번호 있는 회원의 이메일로 가입','linked@example.com → Get Verification Code','라이브 중복 이메일 안내. 구글 문구가 아닙니다.',"go('signup')"],
@@ -169,17 +171,17 @@ const CASES=[
 ];
 const KEY='qa-gl-v1';let ST={};try{ST=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(ST))}catch(e){}};
-let GRP='A',FIL='all';
+let GRP='C',FIL='all';
 const W=()=>document.getElementById('fr').contentWindow;
 function toggleNew(){const b=W().document.body;b.classList.toggle('show-new');document.getElementById('nwbtn').classList.toggle('on',b.classList.contains('show-new'))}
-function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1792996800574?'+Date.now()}
+function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1792997394462?'+Date.now()}
 function open_(i){const c=CASES[i];const w=W();w.resetDB();try{w.eval(c[4])}catch(e){alert('세팅 실패: '+e.message)}cover(null);document.querySelectorAll('.case .open').forEach(b=>b.classList.remove('open'));const b=document.getElementById('o'+i);if(b)b.classList.add('open')}
 function mark(id,v){ST[id]=ST[id]||{};ST[id].s=ST[id].s===v?null:v;save();draw()}
 function memo(id,v){ST[id]=ST[id]||{};ST[id].m=v;save()}
 function setF(f){FIL=f;document.querySelectorAll('.fl button').forEach(b=>b.classList.toggle('on',b.dataset.f===f));draw()}
 function setG(g){GRP=g;draw()}
 function draw(){
- document.getElementById('tabs').innerHTML=GROUPS.map(([g,n])=>{const cs=CASES.filter(c=>c[0][0]===g),p=cs.filter(c=>ST[c[0]]?.s==='pass').length,f=cs.filter(c=>ST[c[0]]?.s==='fail').length;return`<button class="tab ${GRP===g?'on':''}" onclick="setG('${g}')">${g}. ${n} <span style="color:#999">${p+f}/${cs.length}</span><div class="bar"><i class="p" style="width:${p/cs.length*100}%"></i><i class="f" style="width:${f/cs.length*100}%"></i></div></button>`}).join('');
+ document.getElementById('tabs').innerHTML=GROUPS.map(([g,n])=>{const cs=CASES.filter(c=>c[0][0]===g),p=cs.filter(c=>ST[c[0]]?.s==='pass').length,f=cs.filter(c=>ST[c[0]]?.s==='fail').length;return`<button class="tab ${GRP===g?'on':''}" onclick="setG('${g}')">${GROUPS.findIndex(x=>x[0]===g)+1}. ${n} <span style="color:#999">${p+f}/${cs.length}</span><div class="bar"><i class="p" style="width:${p/cs.length*100}%"></i><i class="f" style="width:${f/cs.length*100}%"></i></div></button>`}).join('');
  const list=CASES.map((c,i)=>[c,i]).filter(([c])=>c[0][0]===GRP).filter(([c])=>FIL==='all'||(FIL==='todo'&&!ST[c[0]]?.s)||(FIL==='fail'&&ST[c[0]]?.s==='fail'));
  document.getElementById('list').innerHTML=list.map(([c,i])=>{const s=ST[c[0]]||{};return`<div class="case ${s.s||''}"><div class="h"><span class="id">${c[0]}</span><span class="t">${c[1]}${c[5]?'<span class="q">확인 필요</span>':''}</span><button id="o${i}" onclick="open_(${i})">이 화면 열기</button><button class="pb ${s.s==='pass'?'on':''}" onclick="mark('${c[0]}','pass')">통과</button><button class="fb ${s.s==='fail'?'on':''}" onclick="mark('${c[0]}','fail')">실패</button></div>
  <dl><dt>절차</dt><dd>${c[2]}</dd><dt>기대</dt><dd>${c[3]}</dd></dl>${s.s==='fail'?`<textarea placeholder="실패 메모" oninput="memo('${c[0]}',this.value)">${(s.m||'').replace(/</g,'&lt;')}</textarea>`:''}</div>`}).join('')||'<p style="color:#999">해당 케이스 없음</p>';
@@ -213,6 +215,7 @@ window.addEventListener('message',e=>{if(e.data&&e.data.type==='gl-render'){docu
   if(/^### /.test(l))h+='<h3>'+l.slice(4)+'</h3>';else if(/^## /.test(l))h+='<h2>'+l.slice(3)+'</h2>';else if(/^# /.test(l))h+='<h1>'+l.slice(2)+'</h1>';else if(l.trim())h+='<p style="margin:6px 0">'+l+'</p>'}
  if(inT)h+='</table>';if(inL)h+='</ul>';document.getElementById('doc').innerHTML=h.replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>')})();
 draw();
+document.getElementById('fr').addEventListener('load',()=>{if(!window.__first){window.__first=1;open_(CASES.findIndex(c=>c[0]==='C-01'))}});
 </script>
 </body>
 </html>
