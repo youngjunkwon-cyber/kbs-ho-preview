@@ -1552,10 +1552,10 @@ function go(p,o={}){VIEW.page=p;VIEW.modal=null;VIEW.err={};Object.assign(VIEW,o
  if(p==='signup'||p==='forgot')VIEW.form={};render();window.scrollTo(0,0)}
 function afterLogin(m,msg){DB.session=m.id;if(msg)toast(msg);VIEW.page=DB.booking?'bookinfo':(VIEW.returnTo&&VIEW.returnTo!=='login'?VIEW.returnTo:'home');VIEW.modal=null;VIEW.err={};render()}
 const INAPP=['ig-ios','ig-android','fb'];
-function startGoogle(forWhat){VIEW.gFor=forWhat;
- if(forWhat==='login'&&(DB.env==='line'||DB.env==='kakao')){DB.envFrom=DB.env;VIEW.page='external';render();setTimeout(()=>{DB.env='browser';VIEW.page='login';VIEW.expanded=!!DB.remembered;render()},1200);return}
+function startGoogle(forWhat){VIEW.gFor=forWhat;if(forWhat==='login'&&VIEW.page!=='external')VIEW.gBack=VIEW.page==='myout'?'myout':'login';
+ if(forWhat==='login'&&(DB.env==='line'||DB.env==='kakao')){DB.envFrom=DB.env;VIEW.page='external';render();setTimeout(()=>{DB.env='browser';VIEW.page=VIEW.gBack||'login';VIEW.expanded=!!DB.remembered;render()},1200);return}
  VIEW.page='google';VIEW.gStep=INAPP.includes(DB.env)?'email':'choose';VIEW.gEmail='';VIEW.gErr='';render()}
-const backOf=()=>({login:'login',connect:'account',delete:'account'}[VIEW.gFor]);
+const backOf=()=>({login:VIEW.gBack||'login',connect:'account',delete:'account'}[VIEW.gFor]);
 function googleBack(){VIEW.page=backOf();VIEW.modal=VIEW.gFor==='delete'?'delGoogle':null;render()}
 function googlePick(sub){
  if(DB.nextGoogle==='error'){DB.nextGoogle='ok';VIEW.page=backOf();toast('Google login failed. Please try again.');render();return}
@@ -1567,11 +1567,11 @@ function googleDone(sub){
   m.status='deleted';m.googleSub=null;DB.session=null;VIEW.page='home';toast('Your account has been deleted.');render();return}
  const j=judgeGoogle(DB,sub);
  if(j.result==='login'){afterLogin(j.member);return}
- if(j.result==='suspended'){VIEW.page='login';toast('This account has been suspended. Please contact customer support.');render();return}
- if(j.result==='signup-blocked'){VIEW.page='login';toast('This email is already linked to a different Google account. Please log in with your email.');render();return}
+ if(j.result==='suspended'){VIEW.page=backOf();toast('This account has been suspended. Please contact customer support.');render();return}
+ if(j.result==='signup-blocked'){VIEW.page=backOf();toast('This email is already linked to a different Google account. Please log in with your email.');render();return}
  if(j.result==='signup'){const m={id:++DB.seq,email:g.email.toLowerCase(),nickname:nickFor(g),verified:true,password:null,googleSub:sub,status:'active',via:'google',marketing:false,linkNoticeShown:true,termsAt:new Date().toLocaleString('ko-KR')};DB.members.push(m);afterLogin(m);return}
  if(j.result==='autolink'){const m=j.member;m.googleSub=sub;mail(m.email,'구글 연결 안내');let msg=null;if(!m.linkNoticeShown){msg='Your Google account is now linked. You can log in with Google or your email and password.';m.linkNoticeShown=true}afterLogin(m,msg);return}
- if(j.result==='pwconfirm'){VIEW.page='login';VIEW.pendingSub=sub;VIEW.modal='pwconfirm';VIEW.err={};VIEW.form.cpw='';render();return}
+ if(j.result==='pwconfirm'){VIEW.page=backOf();VIEW.pendingSub=sub;VIEW.modal='pwconfirm';VIEW.err={};VIEW.form.cpw='';render();return}
 }
 function confirmLink(){const g=gAcc(VIEW.pendingSub);const m=DB.members.find(x=>live(x)&&norm(x.email)===norm(g.email));const pw=val('cpw');
  if(pw!==m.password){VIEW.err.cpw='Incorrect password.';VIEW.form.cpw=pw;render();return}
@@ -1618,7 +1618,7 @@ function header(){on($('[aria-label="Go Back"]'),()=>{const back={login:VIEW.ret
 const P={};
 P.home=()=>{R().innerHTML=envBar()+tpl('t_home');
  const my=$$('a,button').find(x=>/MY PAGE/.test(x.textContent));on(my,toMy)};
-P.myout=()=>{R().innerHTML=envBar()+tpl('t_myout');header();on($('[class*="A3aY7G__primaryButton"]'),()=>go('login',{returnTo:'home'}));on($$('[class*="A3aY7G__guestCard__links"] button')[0],()=>go('signup'));const my=$$('a,button').find(x=>/MY PAGE/.test(x.textContent));on(my,toMy);$$('a').forEach(a=>on(a,()=>{}))};
+P.myout=()=>{R().innerHTML=envBar()+tpl('t_myout');header();const lb=$('[class*="A3aY7G__primaryButton"]'),lk=$('[class*="A3aY7G__guestCard__links"]');const g=el(`<div class="gl-gblock gl-new">${gbtn()}<p class="gl-notice">By continuing with Google, you agree to our <a>Terms of Service</a> and <a>Privacy Policy</a>.</p></div>`);lb.replaceWith(g);on(g.querySelector('[data-k=gstart]'),()=>{VIEW.returnTo='account';startGoogle('login')});const em=el('<div class="gl-new" style="text-align:center"><button type="button" class="gl-emlink" style="font-size:13px;color:#8e8e8e">Log in with email</button></div>');lk.replaceWith(em);on(em.querySelector('button'),()=>{go('login',{returnTo:'account'});VIEW.expanded=true;render()});const my=$$('a,button').find(x=>/MY PAGE/.test(x.textContent));on(my,toMy);$$('a').forEach(a=>on(a,()=>{}))};
 P.book=()=>{R().innerHTML=envBar()+tpl('t_book');header();const p=VIEW.pick;
  $$('[class*="LzH2OW__day"]').forEach(b=>{b.classList.remove([...b.classList].find(c=>/selectedDay/.test(c)));b.setAttribute('aria-pressed','false');const d=new Date(b.getAttribute('aria-label')||'');if(isNaN(d))return;const iso=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
   if(p.date===iso){b.classList.add(SELDAY);b.setAttribute('aria-pressed','true')}if(!b.disabled)on(b,()=>{p.date=iso;p.time=null;render()})});
@@ -1637,8 +1637,9 @@ P.login=()=>{const bk=DB.booking;R().innerHTML=envBar()+tpl(bk?'t_login_bk':'t_l
   const cb=$('[class*="checkbox2"]');const paint=()=>{const s=cb.querySelector('svg');if(s&&VIEW.form.rem){s.querySelectorAll('rect,path').forEach((n,i)=>{if(i===0){n.setAttribute('fill','#FB6F92');n.setAttribute('stroke','#FB6F92')}else n.setAttribute('stroke','#fff')})}};paint();
   on(cb,()=>{VIEW.form.rem=!VIEW.form.rem;VIEW.form.email=val('le');VIEW.form.pw=val('lp');render()});
   on(loginBtn,emailLogin);on(links[0],()=>go('signup'));on(links[1],()=>go('forgot'))}
- if(VIEW.modal==='pwconfirm'){const gg=gAcc(VIEW.pendingSub);R().insertAdjacentHTML('beforeend',modal('You already have an account with this email',`<div class="gl-mbody"><p class="gl-mdesc">Enter your K-Beauty Station password once to link your Google account.</p>${field('Email','ce','email',gg.email,'',true)}${field('Password','cpw','password',VIEW.form.cpw||'',VIEW.err.cpw)}<a class="gl-mlink" data-k="mforgot">Forgot Password</a><div class="gl-mbtns">${btn('Cancel','mclose','outline')}${btn('Link and Log In','mlink')}</div></div>`));
-  R().querySelectorAll('[data-k=mclose]').forEach(b=>on(b,()=>{VIEW.modal=null;VIEW.pendingSub=null;render()}));on($('[data-k=mlink]'),confirmLink);on($('[data-k=mforgot]'),()=>go('forgot'))}};
+};
+function drawPwConfirm(){ if(VIEW.modal==='pwconfirm'){const gg=gAcc(VIEW.pendingSub);R().insertAdjacentHTML('beforeend',modal('You already have an account with this email',`<div class="gl-mbody"><p class="gl-mdesc">Enter your K-Beauty Station password once to link your Google account.</p>${field('Email','ce','email',gg.email,'',true)}${field('Password','cpw','password',VIEW.form.cpw||'',VIEW.err.cpw)}<a class="gl-mlink" data-k="mforgot">Forgot Password</a><div class="gl-mbtns">${btn('Cancel','mclose','outline')}${btn('Link and Log In','mlink')}</div></div>`));
+  R().querySelectorAll('[data-k=mclose]').forEach(b=>on(b,()=>{VIEW.modal=null;VIEW.pendingSub=null;render()}));on($('[data-k=mlink]'),confirmLink);on($('[data-k=mforgot]'),()=>go('forgot'))}}
 P.signup=()=>{R().innerHTML=envBar()+tpl('t_signup');header();const ie=$('input[name=email]'),b=$('[class*="X-Toyq__sectionButton"]');ie.id='se';ie.value=VIEW.form.e||'';b.disabled=!ie.value;ie.addEventListener('input',()=>{b.disabled=!ie.value});on(b,()=>sendCode('signup'));
  if(VIEW.err.e){ie.setAttribute('aria-invalid','true');ie.style.borderColor='#EB003B';ie.closest('[class*="X-Toyq__field"]').appendChild(el(`<p class="index-module-scss-module__X-Toyq__formError gl-new" style="margin:4px 0 0">${esc(VIEW.err.e)}</p>`))}};
 P.forgot=()=>{R().innerHTML=envBar()+tpl('t_forgot');header();const ie=$('input[name=email]');ie.id='fe';ie.value=VIEW.form.e||'';const b=$('[class*="F9n-4q__page__footer"] button');on(b,()=>sendCode('forgot'));
@@ -1668,7 +1669,7 @@ P.google=()=>{const bar=`<div class="gbar"><button data-k="gx">✕</button>accou
 P.spin=()=>{R().innerHTML='<div class="gpage"><div class="spin"><i></i>accounts.google.com</div></div>'};
 P.external=()=>{R().innerHTML=`<div class="inapp"><b>${DB.envFrom==='line'?'LINE':'KakaoTalk'}</b>&nbsp;k-beautystation.com</div><div class="spin"><i></i>Opening in your browser</div>`};
 
-function render(){(P[VIEW.page]||P.home)();if(VIEW.toast)R().insertAdjacentHTML('beforeend',`<div class="BookingSurveySuccessToast-module-scss-module__xUKt_a__toast"><div class="BookingSurveySuccessToast-module-scss-module__xUKt_a__message"><strong>${esc(VIEW.toast)}</strong></div></div>`);
+function render(){(P[VIEW.page]||P.home)();if(VIEW.page==='login'||VIEW.page==='myout')drawPwConfirm();if(VIEW.toast)R().insertAdjacentHTML('beforeend',`<div class="BookingSurveySuccessToast-module-scss-module__xUKt_a__toast"><div class="BookingSurveySuccessToast-module-scss-module__xUKt_a__message"><strong>${esc(VIEW.toast)}</strong></div></div>`);
  try{parent.postMessage({type:'gl-render',page:VIEW.page},'*')}catch(e){}}
 window.addEventListener('DOMContentLoaded',()=>{R().addEventListener('click',e=>{const a=e.target.closest('a');if(a)e.preventDefault()});render()});
 </script></body></html>
