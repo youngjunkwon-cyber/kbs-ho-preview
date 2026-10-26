@@ -82,12 +82,17 @@ h2{font-size:19px;margin:56px 0 16px;padding-bottom:8px;border-bottom:2px solid 
 .flow span{border:1px solid #BDBDBD;border-radius:6px;padding:8px 12px;background:#FAFAFA}
 .flow span.d{transform:none;border-style:dashed}
 .flow em{font-style:normal;color:#999}
+.btn.gp{gap:10px}
+.gw{width:26px;height:26px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center}
+.emlink{text-align:center;font-size:14px;font-weight:500;color:var(--sub);text-decoration:underline;text-underline-offset:3px;margin:28px 0 0}
+.links.sm{font-size:13px;color:#8A8A8A;margin-top:24px}
+.links.sm b{height:14px}
 </style>
 </head>
 <body>
 <div class="wrap">
 <h1>구글 로그인 화면 시안</h1>
-<p class="lead">라이브 FO 로그인 화면(2026-10-26 실측, 모바일 375)에 구글 로그인을 붙인 모양입니다. 화면 안 문구는 영어 화면 기준이고, 설명은 오른쪽 표에 적었습니다.<br>
+<p class="lead">라이브 FO 로그인 화면(2026-10-26 실측, 모바일 375)을 바탕으로 구글 로그인을 앞에 세우고 이메일 로그인을 접어 둔 모양입니다. 화면 안 문구는 영어 화면 기준이고, 설명은 오른쪽 표에 적었습니다.<br>
 적용 범위는 웹 FO입니다. 알리페이 채널은 자체 로그인 경로가 숨겨져 있어 구글 버튼도 나오지 않습니다.</p>
 
 <h2>1. 로그인</h2>
@@ -97,29 +102,39 @@ h2{font-size:19px;margin:56px 0 16px;padding-bottom:8px;border-bottom:2px solid 
   <p class="cap">G-01 로그인 (기본)</p>
   <div class="phone">
    <div class="hd"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg><span class="t">Login</span><svg viewBox="0 0 24 24"><path d="M4 10l8-6 8 6v10h-5v-6H9v6H4z"/></svg></div>
-   <div class="bd">
-    <p class="lbl">Email <i>*</i></p><div class="in">Email</div>
-    <p class="lbl">Password <i>*</i></p><div class="in">Password</div>
-    <div class="chk"><span></span>Remember Email</div>
-    <div class="btn">Login</div>
-    <div class="or">or</div>
-    <div class="btn g"><svg class="gl" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>Continue with Google</div>
-    <p class="notice">By continuing with Google, you agree to our <u>Terms of Service</u> and <u>Privacy Policy</u>.</p>
-    <div class="links">Sign Up<b></b>Forgot Password</div>
-   </div>
+   <div class="bd"><div class="btn gp"><span class="gw"><svg class="gl" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg></span>Continue with Google</div><p class="notice">By continuing with Google, you agree to our <u>Terms of Service</u> and <u>Privacy Policy</u>.</p><p class="emlink">Log in with email</p></div>
   </div>
  </div>
  <div class="desc"><table>
-  <tr><th>위치</th><td>기존 Login 버튼 아래에 구분선(or)과 함께 <b>Continue with Google</b> 버튼 1개를 둡니다. 이메일·비밀번호 칸과 Sign Up·Forgot Password는 그대로입니다.</td></tr>
-  <tr><th>버튼 모양</th><td>흰 바탕, 회색 테두리, 구글 G 로고 + 문구. 크기는 Login 버튼과 같습니다(높이 44, 모서리 8). 구글 브랜드 가이드상 로고 색은 바꾸지 않습니다.</td></tr>
+  <tr><th>방향</th><td>구글 로그인을 앞에 세우고 이메일 로그인·가입은 뒤로 뺍니다. 처음 들어오면 <b>구글 버튼 하나</b>만 크게 보입니다.</td></tr>
+  <tr><th>구글 버튼</th><td>핑크 바탕 + 흰 글씨, 구글 G 로고는 흰 동그라미 안에 원래 색 그대로 둡니다(구글 가이드상 로고는 흰 바탕 위에만). 크기는 기존 Login 버튼과 같습니다(높이 44, 모서리 8).</td></tr>
   <tr><th>버튼 아래 문구</th><td>약관 체크 화면 없이 이 한 줄로 고지합니다. Terms of Service·Privacy Policy는 각각 현재 게시된 약관·처리방침으로 연결합니다.<br>마케팅 수신은 <b>미동의로 시작</b>합니다. 회원이 계정 설정의 Marketing emails에서 직접 켭니다.</td></tr>
-  <tr><th>누르면</th><td>구글 계정 선택 화면(G-03)으로 이동합니다. 끝나면 결과에 따라 아래 셋 중 하나로 갑니다.
+  <tr><th>Log in with email</th><td>밑줄 글씨 링크. 누르면 같은 화면에서 이메일 칸이 펼쳐집니다(G-01-1). 화면 이동은 없습니다.</td></tr>
+  <tr><th>안 보이는 것</th><td>이메일·비밀번호 칸, Remember Email, Login 버튼, Sign Up, Forgot Password는 펼치기 전에는 보이지 않습니다.</td></tr>
+  <tr><th>처음부터 펼쳐 두는 경우</th><td>Remember Email로 저장된 이메일이 있으면 펼친 상태(G-01-1)로 열고 이메일 칸을 채워 둡니다. 이메일로 로그인하던 회원이 한 번 더 누르지 않게 하려는 것입니다.</td></tr>
+  <tr><th>구글 버튼 누르면</th><td>구글 계정 선택 화면(G-03)으로 이동합니다. 끝나면 결과에 따라 아래 셋 중 하나로 갑니다.
    <ul><li>처음 보는 구글 계정 + 같은 이메일 회원 없음 → 바로 가입 후 로그인 (G-04)</li>
    <li>같은 이메일 회원 있음 + 이메일 인증 완료 → 자동 연결 후 로그인 (G-05)</li>
    <li>같은 이메일 회원 있음 + 이메일 미인증 → 비밀번호 확인 (G-06)</li></ul></td></tr>
   <tr><th>로그인 후 이동</th><td>들어오기 전 화면으로 돌아갑니다. 이메일 로그인과 같은 규칙입니다.</td></tr>
-  <tr><th>가입 화면</th><td>Sign Up(가입) 화면에는 구글 버튼을 두지 않습니다. 로그인 화면에만 둡니다.</td></tr>
-  <tr><th>Remember Email</th><td>구글 로그인에는 쓰지 않습니다. 체크돼 있어도 구글 로그인 결과와 무관합니다.</td></tr>
+  <tr><th>가입 화면</th><td>가입 화면(이메일 가입)에는 구글 버튼을 두지 않습니다. 화면 자체는 그대로입니다.</td></tr>
+ </table></div>
+</div>
+
+<div class="row">
+ <div>
+  <p class="cap">G-01-1 로그인 (이메일 펼침)</p>
+  <div class="phone">
+   <div class="hd"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg><span class="t">Login</span><svg viewBox="0 0 24 24"><path d="M4 10l8-6 8 6v10h-5v-6H9v6H4z"/></svg></div>
+   <div class="bd"><div class="btn gp"><span class="gw"><svg class="gl" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg></span>Continue with Google</div><p class="notice">By continuing with Google, you agree to our <u>Terms of Service</u> and <u>Privacy Policy</u>.</p><div class="or">or log in with email</div><p class="lbl">Email <i>*</i></p><div class="in">Email</div><p class="lbl">Password <i>*</i></p><div class="in">Password</div><div class="chk"><span></span>Remember Email</div><div class="btn line">Login</div><div class="links sm">Sign up with email<b></b>Forgot Password</div></div>
+  </div>
+ </div>
+ <div class="desc"><table>
+  <tr><th>펼친 모습</th><td>구글 버튼과 고지 문구는 위에 그대로 남고, 그 아래 구분선 "or log in with email" 다음에 기존 이메일 로그인 칸이 나옵니다.</td></tr>
+  <tr><th>Login 버튼</th><td>핑크 대신 <b>흰 바탕 + 회색 테두리</b>로 낮춥니다. 화면에서 핑크는 구글 버튼 하나만 남습니다.</td></tr>
+  <tr><th>Sign up with email</th><td>기존 Sign Up 링크를 이 문구로 바꿔 이메일 영역 안에만 둡니다. 누르면 기존 가입 화면으로 갑니다. Forgot Password와 함께 작은 회색 글씨입니다.</td></tr>
+  <tr><th>다시 접기</th><td>접는 버튼은 두지 않습니다. 다른 화면에 갔다 오면 G-01 규칙대로 다시 열립니다.</td></tr>
+  <tr><th>로그인 실패</th><td>비밀번호 오류 등 기존 안내는 펼친 상태 그대로에서 보여 줍니다.</td></tr>
  </table></div>
 </div>
 
@@ -128,22 +143,12 @@ h2{font-size:19px;margin:56px 0 16px;padding-bottom:8px;border-bottom:2px solid 
   <p class="cap">G-02 로그인 (예약 중 진입)</p>
   <div class="phone">
    <div class="hd"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg><span class="t">Login</span><svg viewBox="0 0 24 24"><path d="M4 10l8-6 8 6v10h-5v-6H9v6H4z"/></svg></div>
-   <div class="bd" style="padding-top:20px">
-    <div class="bk"><p>Your selected date and time will be saved.</p><small>Booking DDYOU for October 28, 2026 at 17:00 (KST)</small></div>
-    <p class="lbl">Email <i>*</i></p><div class="in">Email</div>
-    <p class="lbl">Password <i>*</i></p><div class="in">Password</div>
-    <div class="chk"><span></span>Remember Email</div>
-    <div class="btn">Login</div>
-    <div class="or">or</div>
-    <div class="btn g"><svg class="gl" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>Continue with Google</div>
-    <p class="notice">By continuing with Google, you agree to our <u>Terms of Service</u> and <u>Privacy Policy</u>.</p>
-    <div class="links">Sign Up<b></b>Forgot Password</div>
-   </div>
+   <div class="bd" style="padding-top:20px"><div class="bk"><p>Your selected date and time will be saved.</p><small>Booking DDYOU for October 28, 2026 at 17:00 (KST)</small></div><div class="btn gp"><span class="gw"><svg class="gl" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg></span>Continue with Google</div><p class="notice">By continuing with Google, you agree to our <u>Terms of Service</u> and <u>Privacy Policy</u>.</p><p class="emlink">Log in with email</p></div>
   </div>
  </div>
  <div class="desc"><table>
   <tr><th>진입</th><td>스토어·상품 예약에서 날짜·시간을 고르고 다음으로 넘어갈 때 비로그인이면 이 화면이 나옵니다(현재 라이브 그대로).</td></tr>
-  <tr><th>상단 안내</th><td>라이브의 검은 안내 상자를 그대로 씁니다. 구글로 로그인해도 고른 날짜·시간이 유지됩니다.</td></tr>
+  <tr><th>구성</th><td>상단 검은 안내 상자 아래로 G-01과 같습니다. Log in with email을 누르면 G-01-1과 같이 펼쳐지고 안내 상자는 그대로 남습니다.</td></tr>
   <tr><th>구글 로그인 후</th><td>가입·자동 연결·비밀번호 확인 중 어느 경우든, 끝나면 <b>예약자 정보 입력 화면</b>으로 바로 갑니다. 이메일 로그인 후와 같은 곳입니다.</td></tr>
   <tr><th>예약자 정보</th><td>Email 칸은 구글 이메일이 들어가고 Verified로 표시됩니다(구글이 확인한 이메일). 나머지 필수 칸(여권명·국적·성별·생년월일·휴대폰·메신저)은 지금처럼 예약자가 입력합니다.</td></tr>
   <tr><th>중간에 취소</th><td>구글 화면에서 뒤로 가거나 취소하면 이 화면으로 돌아오고, 상단 안내와 고른 날짜·시간은 그대로 남습니다.</td></tr>
@@ -221,7 +226,7 @@ h2{font-size:19px;margin:56px 0 16px;padding-bottom:8px;border-bottom:2px solid 
   <p class="cap">G-06 비밀번호 확인 (이메일 미인증 회원)</p>
   <div class="phone">
    <div class="hd"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg><span class="t">Login</span><svg viewBox="0 0 24 24"><path d="M4 10l8-6 8 6v10h-5v-6H9v6H4z"/></svg></div>
-   <div class="bd"><p class="lbl">Email <i>*</i></p><div class="in">Email</div><p class="lbl">Password <i>*</i></p><div class="in">Password</div></div>
+   <div class="bd"><div class="btn gp"><span class="gw"><svg class="gl" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg></span>Continue with Google</div><p class="notice">By continuing with Google, you agree to our <u>Terms of Service</u> and <u>Privacy Policy</u>.</p><p class="emlink">Log in with email</p></div>
    <div class="dim"><div class="md">
     <h4>You already have an account with this email</h4>
     <p>Enter your K-Beauty Station password once to link your Google account.</p>
@@ -249,7 +254,7 @@ h2{font-size:19px;margin:56px 0 16px;padding-bottom:8px;border-bottom:2px solid 
   <p class="cap">G-07 실패 안내</p>
   <div class="phone">
    <div class="hd"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg><span class="t">Login</span><svg viewBox="0 0 24 24"><path d="M4 10l8-6 8 6v10h-5v-6H9v6H4z"/></svg></div>
-   <div class="bd"><p class="lbl">Email <i>*</i></p><div class="in">Email</div><p class="lbl">Password <i>*</i></p><div class="in">Password</div></div>
+   <div class="bd"><div class="btn gp"><span class="gw"><svg class="gl" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg></span>Continue with Google</div><p class="notice">By continuing with Google, you agree to our <u>Terms of Service</u> and <u>Privacy Policy</u>.</p><p class="emlink">Log in with email</p></div>
    <div class="toast">Google login failed. Please try again.</div>
   </div>
  </div>
