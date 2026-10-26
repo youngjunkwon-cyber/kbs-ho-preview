@@ -69,13 +69,13 @@ svg text{font-family:"Pretendard Variable",Pretendard,sans-serif}
   <button data-cv="mail" onclick="cover('mail')">발송함</button>
   <button data-cv="doc" onclick="cover('doc')">전달 문서</button>
   <button id="nwbtn" onclick="toggleNew()">새 요소 표시</button>
-  <button onclick="window.open('gl-proto.html?v=1792996638874','_blank')">새 창</button>
+  <button onclick="window.open('gl-proto.html?v=1792996664589','_blank')">새 창</button>
   <button onclick="copyResult()">결과 복사</button>
  </div>
 </div>
 <div class="main">
  <div class="left">
-  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1792996638874"></iframe>
+  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1792996664589"></iframe>
    <div class="cover" id="cv-flow"><h3>구글 로그인 판정 순서 <button onclick="cover(null)">닫기</button></h3><div id="flow"></div></div>
    <div class="cover" id="cv-db"><h3>회원 DB (시안 안 데이터, 1초마다 갱신) <button onclick="cover(null)">닫기</button></h3><div id="db"></div></div>
    <div class="cover" id="cv-mail"><h3>발송함 <button onclick="cover(null)">닫기</button></h3><div id="mail"></div></div>
@@ -172,7 +172,7 @@ const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(ST))}catch(e){}};
 let GRP='A',FIL='all';
 const W=()=>document.getElementById('fr').contentWindow;
 function toggleNew(){const b=W().document.body;b.classList.toggle('show-new');document.getElementById('nwbtn').classList.toggle('on',b.classList.contains('show-new'))}
-function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1792996638874?'+Date.now()}
+function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1792996664589?'+Date.now()}
 function open_(i){const c=CASES[i];const w=W();w.resetDB();try{w.eval(c[4])}catch(e){alert('세팅 실패: '+e.message)}cover(null);document.querySelectorAll('.case .open').forEach(b=>b.classList.remove('open'));const b=document.getElementById('o'+i);if(b)b.classList.add('open')}
 function mark(id,v){ST[id]=ST[id]||{};ST[id].s=ST[id].s===v?null:v;save();draw()}
 function memo(id,v){ST[id]=ST[id]||{};ST[id].m=v;save()}
@@ -203,8 +203,7 @@ window.addEventListener('message',e=>{if(e.data&&e.data.type==='gl-render'){docu
  s+=ar(180,126,180,146,'아니오');s+=box(90,146,180,64,'같은 이메일 회원?\n(대소문자 무시, 탈퇴 제외)','d');s+=ar(270,178,300,178,'없음');s+=box(300,161,82,34,'가입');
  s+=ar(180,210,180,230,'있음');s+=box(90,230,180,64,'그 회원이 정지?','d');s+=ar(270,262,300,262,'예');s+=box(300,245,82,34,'정지 안내');
  s+=ar(180,294,180,314,'아니오');s+=box(90,314,180,64,'다른 구글에\n이미 연결?','d');s+=ar(270,346,300,346,'예');s+=box(300,329,82,34,'막음');
- s+=ar(180,378,180,398,'아니오');s+=box(90,398,180,64,'회원 인증 완료 +
-구글 이메일 확인?','d');s+=ar(270,430,300,430,'예');s+=box(300,413,82,34,'자동 연결');
+ s+=ar(180,378,180,398,'아니오');s+=box(90,398,180,64,'회원 인증 완료 +\n구글 이메일 확인?','d');s+=ar(270,430,300,430,'예');s+=box(300,413,82,34,'자동 연결');
  s+=ar(180,462,180,482,'아니오');s+=box(90,482,180,40,'비밀번호 확인 창');s+=ar(180,522,180,542);s+=box(110,542,140,34,'맞으면 연결 + 인증 완료','o');
  document.getElementById('flow').innerHTML=`<svg viewBox="0 0 390 590" width="100%">${s}</svg><p class="note">예약 중이면 모든 로그인 결과 뒤에 예약자 정보 입력 화면으로 갑니다. LINE·카카오톡은 이 판정 전에 기본 브라우저로 넘어갑니다.</p>`})();
 /* 문서 */
