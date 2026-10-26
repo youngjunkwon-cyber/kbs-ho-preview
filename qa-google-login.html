@@ -69,13 +69,13 @@ svg text{font-family:"Pretendard Variable",Pretendard,sans-serif}
   <button data-cv="mail" onclick="cover('mail')">발송함</button>
   <button data-cv="doc" onclick="cover('doc')">전달 문서</button>
   <button id="nwbtn" onclick="toggleNew()">새 요소 표시</button>
-  <button onclick="window.open('gl-proto.html?v=1792996168784','_blank')">새 창</button>
+  <button onclick="window.open('gl-proto.html?v=1792996638874','_blank')">새 창</button>
   <button onclick="copyResult()">결과 복사</button>
  </div>
 </div>
 <div class="main">
  <div class="left">
-  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1792996168784"></iframe>
+  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1792996638874"></iframe>
    <div class="cover" id="cv-flow"><h3>구글 로그인 판정 순서 <button onclick="cover(null)">닫기</button></h3><div id="flow"></div></div>
    <div class="cover" id="cv-db"><h3>회원 DB (시안 안 데이터, 1초마다 갱신) <button onclick="cover(null)">닫기</button></h3><div id="db"></div></div>
    <div class="cover" id="cv-mail"><h3>발송함 <button onclick="cover(null)">닫기</button></h3><div id="mail"></div></div>
@@ -104,14 +104,14 @@ const CASES=[
 ['A-03','저장된 이메일이 있으면 펼친 채로 열림','로그인 화면을 봅니다.','처음부터 펼친 상태이고 이메일 칸에 verified@example.com이 채워져 있습니다.',"DB.remembered='verified@example.com';go('login')"],
 ['A-04','이메일 로그인 + Remember Email','펼친 뒤 verified@example.com / pass1234, Remember Email 체크 후 Login → 하단 MY PAGE(계정 설정) → Logout → MY PAGE → Login','로그인됩니다. 다시 로그인 화면을 열면 펼친 상태로 이메일이 채워져 있습니다.',"go('login')"],
 ['A-05','Sign up with email','펼친 뒤 Sign up with email을 누릅니다.','기존 가입 화면으로 갑니다. 가입 화면에는 구글 버튼이 없습니다.',"go('login')"],
-['A-06','구글로만 가입한 회원이 이메일로 로그인 시도','googleonly@gmail.com + 아무 비밀번호 → Login','"This account uses Google login. Please log in with Google." 가 보이고 로그인되지 않습니다.',"go('login');VIEW.expanded=true;render()",1],
+['A-06','구글로만 가입한 회원이 이메일로 로그인 시도','googleonly@gmail.com + 아무 비밀번호 → Login','"This account uses Google login. Please log in with Google." 가 보이고 로그인되지 않습니다.',"go('login');VIEW.expanded=true;render()"],
 ['A-08','My Page(로그인 전)','홈 하단 MY PAGE를 누릅니다.','카드 안 핑크 Login 버튼 자리에 Continue with Google 버튼과 고지 문구가 있고, 그 아래 작은 회색 Log in with email 링크만 있습니다. Don\x27t have an account? Sign Up 줄은 없습니다.',"go('myout')"],
 ['A-09','My Page에서 구글로 신규 가입','Continue with Google → Alex Kim','가입·로그인 후 계정 설정 화면으로 갑니다(로그인한 My Page는 시안에 없어 계정 설정으로 대신).',"go('myout');startGoogle('login')"],
 ['A-10','My Page에서 구글 취소','Continue with Google → 구글 화면 ✕','My Page로 돌아옵니다.',"go('myout');startGoogle('login')"],
 ['A-11','My Page의 Log in with email','Log in with email','로그인 화면이 이메일 펼친 상태로 열립니다.',"go('myout')"],
 ['A-07','알리페이 채널','홈 하단 MY PAGE를 누릅니다.','로그인 화면으로 가지 않습니다(알리페이 채널은 자체 로그인 경로가 숨겨져 있어 구글 버튼도 없음).',"DB.env='alipay';go('home')"],
-['B-01','처음 보는 구글 계정이면 바로 가입','Alex Kim을 고릅니다.','안내 없이 홈으로 돌아오고 로그인돼 있습니다.\n회원 DB에 alex.new@gmail.com 추가: 닉네임 Alex Kim, 인증 완료, 비밀번호 없음, 가입 경로 구글, 마케팅 미동의, 약관 동의 시각 기록.',"go('login');startGoogle('login')"],
-['B-02','구글 이름이 비어 있을 때','noname@gmail.com을 고릅니다.','닉네임이 Member + 숫자 4자리로 만들어집니다(회원 DB 확인).',"go('login');startGoogle('login')"],
+['B-01','처음 보는 구글 계정이면 바로 가입','Alex Kim을 고릅니다.','안내 없이 홈으로 돌아오고 로그인돼 있습니다.\n회원 DB에 alex.new@gmail.com 추가: 닉네임 Member + 숫자 6자리(구글 이름은 쓰지 않음), 인증 완료, 비밀번호 없음, 가입 경로 구글, 마케팅 미동의, 약관 동의 시각 기록.',"go('login');startGoogle('login')"],
+['B-02','구글 이름이 비어 있어도 같은 규칙','noname@gmail.com을 고릅니다.','닉네임이 B-01과 같은 규칙(Member + 숫자 6자리)으로 만들어집니다. 형식은 개발 전달 전에 확정합니다.',"go('login');startGoogle('login')"],
 ['B-03','이메일 인증 회원은 자동 연결','Mina Park (verified@example.com)을 고릅니다.','로그인되고 하단에 "Your Google account is now linked..." 안내가 1번 뜹니다.\n발송함에 구글 연결 안내 1건. 회원 1의 닉네임은 Mina 그대로입니다.',"go('login');startGoogle('login')"],
 ['B-04','자동 연결 안내는 첫 로그인 때만','Mina Park으로 로그인 → MY PAGE(계정 설정) → Logout → MY PAGE → Login → Continue with Google → Mina Park','두 번째 로그인에서는 하단 안내가 뜨지 않습니다. 발송함도 1건 그대로입니다.',"go('login');startGoogle('login')"],
 ['B-05','이메일 대소문자가 달라도 같은 회원','Mina Park (Verified@Example.com)을 고릅니다.','새 회원이 생기지 않고 회원 1에 연결됩니다.',"go('login');startGoogle('login')"],
@@ -124,7 +124,14 @@ const CASES=[
 ['B-12','정지 회원','Blocked를 고릅니다.','이메일 로그인과 같은 정지 안내가 뜨고 로그인되지 않습니다. 구글도 연결되지 않습니다.',"go('login');startGoogle('login')"],
 ['B-13','구글 화면에서 취소','구글 화면 왼쪽 위 ✕','로그인 화면으로 돌아오고 아무 안내도 없습니다.',"go('login');startGoogle('login')"],
 ['B-14','구글 쪽 오류','아무 계정이나 고릅니다.','로그인 화면 하단에 "Google login failed. Please try again."',"DB.nextGoogle='error';go('login');startGoogle('login')"],
-['B-15','같은 이메일 회원이 다른 구글에 이미 연결','Mina Park (verified@example.com)을 고릅니다.','회원 1은 Other Person 구글이 연결돼 있는 상태입니다. 시안은 "This email is already linked to a different Google account. Please log in with your email." 로 막습니다.',"DB.members[0].googleSub='g-other';DB.members[0].linkNoticeShown=true;go('login');startGoogle('login')",1],
+['B-16','구글 쪽에서 이메일을 바꾼 회원','Jane Doe (jane.new@gmail.com)을 고릅니다.','구글 고유 번호로 회원 3에 그대로 로그인됩니다. 회원 이메일은 googleonly@gmail.com 그대로입니다(자동으로 바꾸지 않음).',"DB.google.find(g=>g.sub==='g-jane').email='jane.new@gmail.com';go('login');startGoogle('login')"],
+['B-17','구글이 이메일을 확인하지 않은 계정 + 같은 이메일 회원','Mina Park (verified@example.com)을 고릅니다.','회원 1은 인증 회원이지만 구글 쪽 이메일이 확인되지 않은 계정이라 자동 연결하지 않고 비밀번호 확인 창이 뜹니다.',"DB.google.find(g=>g.sub==='g-ver').emailVerified=false;go('login');startGoogle('login')"],
+['B-18','구글이 이메일을 확인하지 않은 계정 + 처음 가입','Alex Kim을 고릅니다.','가입은 되지만 회원 이메일은 미인증으로 저장됩니다(회원 DB 확인).',"DB.google.find(g=>g.sub==='g-new').emailVerified=false;go('login');startGoogle('login')"],
+['B-15','같은 이메일 회원이 다른 구글에 이미 연결','Mina Park (verified@example.com)을 고릅니다.','회원 1은 Other Person 구글이 연결돼 있는 상태입니다. 연결하지 않고 "This email is already linked to a different Google account. Please log in with your email or the Google account linked to your account." 안내를 띄웁니다.',"DB.members[0].googleSub='g-other';DB.members[0].linkNoticeShown=true;go('login');startGoogle('login')"],
+['C-00','처음부터 예약 흐름','홈 하단 STORE → DDYOU → 하단 Book now → 날짜 28일 → 17:00 → 아래 날짜·시간 버튼 → Continue with Google → Alex Kim','실화면 그대로 이어지고, 로그인 화면 맨 위에 검은 안내 상자(DDYOU, 고른 날짜·시간), 구글 가입 뒤 예약자 정보 화면으로 갑니다.',"go('home')"],
+['C-07','로그인 화면에서 뒤로','날짜·시간 고른 뒤 로그인 화면 → 왼쪽 위 뒤로','날짜·시간 화면으로 돌아오고 고른 날짜·시간이 그대로 선택돼 있습니다.',"go('book')"],
+['C-08','이미 로그인한 상태로 예약','Book now → 날짜·시간 → 아래 버튼','로그인 화면 없이 예약자 정보 화면으로 바로 갑니다.',"DB.session=1;go('store')"],
+['C-09','구글로 갓 가입한 회원의 예약자 정보','Alex Kim을 고릅니다.','예약자 정보에 여권명·국적·성별·생년월일이 비어 있고, 전화번호는 인증 전 입력칸(국가번호 + 번호 + 인증 버튼)으로 나옵니다. Email은 구글 이메일 (Verified).',BK+"go('login',{returnTo:'bookinfo'});startGoogle('login')"],
 ['C-01','날짜·시간 고른 뒤 로그인 화면','날짜(28일) → 시간 → 아래 날짜·시간 버튼','로그인 화면 맨 위 검은 안내 상자에 DDYOU, 고른 날짜·시간이 보입니다. 아래는 구글 버튼 + Log in with email.',"go('book')"],
 ['C-02','예약 중 구글로 신규 가입','Alex Kim을 고릅니다.','예약자 정보 화면으로 바로 갑니다. 매장·날짜·시간 그대로, Email 칸 = alex.new@gmail.com (Verified).',BK+"go('login',{returnTo:'bookinfo'});startGoogle('login')"],
 ['C-03','예약 중 자동 연결','Mina Park (verified@example.com)을 고릅니다.','예약자 정보 화면 + 연결 안내.',BK+"go('login',{returnTo:'bookinfo'});startGoogle('login')"],
@@ -146,7 +153,7 @@ const CASES=[
 ['E-06','연결한 다른 이메일 구글로 로그인','Other Person을 고릅니다.','회원 1(verified@example.com)로 로그인됩니다.',"DB.members[0].googleSub='g-other';DB.members[0].linkNoticeShown=true;go('login');startGoogle('login')"],
 ['E-07','구글 연결 해제','Disconnect → Disconnect','하단 "Google has been disconnected." Google = Connect. 발송함 해제 안내 1건.',"DB.session=5;go('account')"],
 ['E-08','연결 해제 취소','Disconnect → Cancel','창만 닫히고 연결은 그대로입니다.',"DB.session=5;go('account')"],
-['E-09','해제 후 같은 이메일 구글로 다시 로그인','Both Ways를 고릅니다.','회원 5에 다시 자동 연결되고, 해제 뒤 첫 연결이라 연결 안내와 메일이 다시 나갑니다.',"DB.members[4].googleSub=null;DB.members[4].linkNoticeShown=false;go('login');startGoogle('login')",1],
+['E-09','해제 후 같은 이메일 구글로 다시 로그인','Both Ways를 고릅니다.','회원 5에 다시 자동 연결되고, 해제 뒤 첫 연결이라 연결 안내와 메일이 다시 나갑니다.',"DB.members[4].googleSub=null;DB.members[4].linkNoticeShown=false;go('login');startGoogle('login')"],
 ['E-10','해제 후 다른 이메일 구글로 로그인','Other Person을 고릅니다.','회원 1과 이메일이 달라서 새 회원(other.person@gmail.com)이 만들어집니다.',"go('login');startGoogle('login')"],
 ['F-01','구글 전용 회원 탈퇴','맨 아래 Delete Account → Still Want to Withdraw? → Continue with Google → Jane Doe','탈퇴되고 로그아웃된 채 홈으로 갑니다. 회원 3 상태 = 탈퇴, 구글 연결 지워짐.',"DB.session=3;go('account')"],
 ['F-02','탈퇴 확인에서 다른 구글 선택','맨 아래 Delete Account → Still Want to Withdraw? → Continue with Google → Alex Kim','창 안에 "Please log in with the Google account linked to this account." 탈퇴되지 않습니다.',"DB.session=3;go('account')"],
@@ -165,7 +172,7 @@ const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(ST))}catch(e){}};
 let GRP='A',FIL='all';
 const W=()=>document.getElementById('fr').contentWindow;
 function toggleNew(){const b=W().document.body;b.classList.toggle('show-new');document.getElementById('nwbtn').classList.toggle('on',b.classList.contains('show-new'))}
-function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1792996168784?'+Date.now()}
+function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1792996638874?'+Date.now()}
 function open_(i){const c=CASES[i];const w=W();w.resetDB();try{w.eval(c[4])}catch(e){alert('세팅 실패: '+e.message)}cover(null);document.querySelectorAll('.case .open').forEach(b=>b.classList.remove('open'));const b=document.getElementById('o'+i);if(b)b.classList.add('open')}
 function mark(id,v){ST[id]=ST[id]||{};ST[id].s=ST[id].s===v?null:v;save();draw()}
 function memo(id,v){ST[id]=ST[id]||{};ST[id].m=v;save()}
@@ -195,8 +202,9 @@ window.addEventListener('message',e=>{if(e.data&&e.data.type==='gl-render'){docu
  s+=box(90,62,180,64,'이 구글이 이미\n회원에 연결?','d');s+=ar(270,94,300,94,'예');s+=box(300,77,82,34,'로그인');
  s+=ar(180,126,180,146,'아니오');s+=box(90,146,180,64,'같은 이메일 회원?\n(대소문자 무시, 탈퇴 제외)','d');s+=ar(270,178,300,178,'없음');s+=box(300,161,82,34,'가입');
  s+=ar(180,210,180,230,'있음');s+=box(90,230,180,64,'그 회원이 정지?','d');s+=ar(270,262,300,262,'예');s+=box(300,245,82,34,'정지 안내');
- s+=ar(180,294,180,314,'아니오');s+=box(90,314,180,64,'다른 구글에\n이미 연결?','d');s+=ar(270,346,300,346,'예');s+=box(300,329,82,34,'막음 (확인 필요)');
- s+=ar(180,378,180,398,'아니오');s+=box(90,398,180,64,'이메일 인증 완료?','d');s+=ar(270,430,300,430,'예');s+=box(300,413,82,34,'자동 연결');
+ s+=ar(180,294,180,314,'아니오');s+=box(90,314,180,64,'다른 구글에\n이미 연결?','d');s+=ar(270,346,300,346,'예');s+=box(300,329,82,34,'막음');
+ s+=ar(180,378,180,398,'아니오');s+=box(90,398,180,64,'회원 인증 완료 +
+구글 이메일 확인?','d');s+=ar(270,430,300,430,'예');s+=box(300,413,82,34,'자동 연결');
  s+=ar(180,462,180,482,'아니오');s+=box(90,482,180,40,'비밀번호 확인 창');s+=ar(180,522,180,542);s+=box(110,542,140,34,'맞으면 연결 + 인증 완료','o');
  document.getElementById('flow').innerHTML=`<svg viewBox="0 0 390 590" width="100%">${s}</svg><p class="note">예약 중이면 모든 로그인 결과 뒤에 예약자 정보 입력 화면으로 갑니다. LINE·카카오톡은 이 판정 전에 기본 브라우저로 넘어갑니다.</p>`})();
 /* 문서 */
