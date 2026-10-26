@@ -69,13 +69,13 @@ svg text{font-family:"Pretendard Variable",Pretendard,sans-serif}
   <button data-cv="mail" onclick="cover('mail')">발송함</button>
   <button data-cv="doc" onclick="cover('doc')">전달 문서</button>
   <button id="nwbtn" onclick="toggleNew()">새 요소 표시</button>
-  <button onclick="window.open('gl-proto.html?v=1792996752546','_blank')">새 창</button>
+  <button onclick="window.open('gl-proto.html?v=1792996800574','_blank')">새 창</button>
   <button onclick="copyResult()">결과 복사</button>
  </div>
 </div>
 <div class="main">
  <div class="left">
-  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1792996752546"></iframe>
+  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1792996800574"></iframe>
    <div class="cover" id="cv-flow"><h3>구글 로그인 판정 순서 <button onclick="cover(null)">닫기</button></h3><div id="flow"></div></div>
    <div class="cover" id="cv-db"><h3>회원 DB (시안 안 데이터, 1초마다 갱신) <button onclick="cover(null)">닫기</button></h3><div id="db"></div></div>
    <div class="cover" id="cv-mail"><h3>발송함 <button onclick="cover(null)">닫기</button></h3><div id="mail"></div></div>
@@ -89,7 +89,7 @@ svg text{font-family:"Pretendard Variable",Pretendard,sans-serif}
   <p class="note"><b>시드 데이터</b><br>
   회원 1 verified@example.com (이메일 인증 완료, 비밀번호 pass1234) / 회원 2 unverified@example.com (미인증, pass1234) / 회원 3 googleonly@gmail.com (구글로 가입, 비밀번호 없음) / 회원 4 suspended@example.com (정지) / 회원 5 linked@example.com (이메일 가입 + 구글 연결, pass1234)<br>
   기기의 구글 계정: Alex Kim(새 사람) / 이름 없음 / Mina Park(회원 1 이메일) / Mina Park(회원 1 이메일 대문자) / Old User(회원 2) / Jane Doe(회원 3) / Blocked(회원 4) / Both Ways(회원 5) / Other Person(어느 회원과도 다른 이메일)<br><br>
-  <b>확인하지 않는 것</b><br>화면은 라이브 FO(2026-10-26)를 그대로 떠 왔고, 분홍 점선(새 요소 표시)이 이번에 더하는 부분입니다. 로그인한 상태의 My Page는 개인정보 때문에 뜨지 않아, MY PAGE를 누르면 계정 설정으로 바로 갑니다. 비밀번호 있는 회원의 탈퇴 다음 단계(Still Want to Withdraw 이후)는 라이브에서 누르지 않아 비밀번호 확인 창으로 대신 넣었습니다.<br>
+  <b>확인하지 않는 것</b><br>화면은 라이브 FO(2026-10-26)를 그대로 떠 왔고, 분홍 점선(새 요소 표시)이 이번에 더하는 부분입니다. 로그인한 상태의 My Page는 개인정보 때문에 뜨지 않아, MY PAGE를 누르면 계정 설정으로 바로 갑니다. 예약자 정보 화면은 전화 인증이 끝난 회원 화면을 떠 왔고, 전화번호가 없는 회원(구글 신규 가입)은 가입 화면의 전화번호 칸을 가져다 끼웠습니다. 스토어 목록에서는 DDYOU만 눌립니다. 비밀번호 있는 회원의 탈퇴 다음 단계(Still Want to Withdraw 이후)는 라이브에서 누르지 않아 비밀번호 확인 창으로 대신 넣었습니다.<br>
   라이브에 이미 있는 문구(중복 이메일, 정지 회원, 비밀번호 규칙, 기존 탈퇴 화면)는 시안에서 비슷한 영어 문장으로 대신 넣었습니다. 실제 문구는 라이브 그대로 씁니다.<br>
   구글 화면(계정 선택·앱 안 로그인)은 구글이 그리는 화면을 흉내만 냈습니다. 인증 코드 메일 발송과 가입 나머지 단계는 동작하지 않습니다.</p>
  </div>
@@ -172,7 +172,7 @@ const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(ST))}catch(e){}};
 let GRP='A',FIL='all';
 const W=()=>document.getElementById('fr').contentWindow;
 function toggleNew(){const b=W().document.body;b.classList.toggle('show-new');document.getElementById('nwbtn').classList.toggle('on',b.classList.contains('show-new'))}
-function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1792996752546?'+Date.now()}
+function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1792996800574?'+Date.now()}
 function open_(i){const c=CASES[i];const w=W();w.resetDB();try{w.eval(c[4])}catch(e){alert('세팅 실패: '+e.message)}cover(null);document.querySelectorAll('.case .open').forEach(b=>b.classList.remove('open'));const b=document.getElementById('o'+i);if(b)b.classList.add('open')}
 function mark(id,v){ST[id]=ST[id]||{};ST[id].s=ST[id].s===v?null:v;save();draw()}
 function memo(id,v){ST[id]=ST[id]||{};ST[id].m=v;save()}
