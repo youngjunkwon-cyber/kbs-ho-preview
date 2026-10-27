@@ -74,14 +74,14 @@ svg text{font-family:"Pretendard Variable",Pretendard,sans-serif}
   <button data-cv="doc" onclick="cover('doc')">전달 문서</button>
   <button id="bobtn" onclick="showBO(!document.getElementById('bop').classList.contains('on'))">BO 회원 화면</button>
   <button id="nwbtn" onclick="toggleNew()">새 요소 표시</button>
-  <button onclick="window.open('gl-proto.html?v=1793069753754','_blank')">새 창</button>
+  <button onclick="window.open('gl-proto.html?v=1793070565057','_blank')">새 창</button>
   <button onclick="copyResult()">결과 복사</button>
  </div>
 </div>
 <div class="bo-panel" id="bop"><div class="bo-bar"><b>BO 회원 &gt; 정보조회</b><span style="color:#777">라이브 어드민 화면 구조 그대로이고, 회원 데이터는 FO 시안의 회원 DB를 그대로 읽습니다. 닫기를 누르면 FO 시안으로 돌아갑니다.</span><span style="flex:1"></span><button onclick="document.getElementById('bof').contentWindow.boDraw&&document.getElementById('bof').contentWindow.boDraw()">새로고침</button><button onclick="showBO(false)">닫기</button></div><iframe id="bof" src="about:blank"></iframe></div>
 <div class="main">
  <div class="left">
-  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1793069753754"></iframe>
+  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1793070565057"></iframe>
    <div class="cover" id="cv-flow"><h3>구글 로그인 판정 순서 <button onclick="cover(null)">닫기</button></h3><div id="flow"></div></div>
    <div class="cover" id="cv-db"><h3>회원 DB (시안 안 데이터, 1초마다 갱신) <button onclick="cover(null)">닫기</button></h3><div id="db"></div></div>
    <div class="cover" id="cv-doc"><h3>구글 로그인 개발 전달 문서 <button onclick="cover(null)">닫기</button></h3><div class="doc" id="doc"></div></div>
@@ -107,7 +107,7 @@ const CASES=[
 ['A-01','처음 들어온 로그인 화면','로그인 화면을 봅니다.','핑크 Continue with Google 버튼, 그 아래 약관 고지 한 줄, Log in with email 링크만 보입니다.\n이메일·비밀번호 칸, Sign up, Forgot Password는 보이지 않습니다.',"go('login')"],
 ['A-02','이메일 펼치기','Log in with email을 누릅니다.','화면 이동 없이 구분선 "or log in with email" 아래로 이메일·비밀번호 칸, Remember Email, 흰 Login 버튼, Sign up with email · Forgot Password가 나옵니다.\n핑크는 구글 버튼 하나뿐입니다.',"go('login')"],
 ['A-03','저장된 이메일이 있으면 펼친 채로 열림','로그인 화면을 봅니다.','처음부터 펼친 상태이고 이메일 칸에 verified@example.com이 채워져 있습니다.',"DB.remembered='verified@example.com';go('login')"],
-["A-04","이메일 로그인 + Remember Email","펼친 뒤 verified@example.com / pass1234, Remember Email 체크 후 Login → 하단 MY PAGE → Change account information → Logout → MY PAGE → Log in with email","로그인됩니다. 다시 로그인 화면을 열면 펼친 상태로 이메일이 채워져 있습니다.","go('login')"],
+["A-04","Remember Email 체크하고 로그인","(이메일 칸이 펼쳐진 로그인 화면으로 열림) verified@example.com / pass1234 입력 → Remember Email 체크 → Login","로그인됩니다. 위쪽 \"회원 DB\"를 열면 저장 이메일이 verified@example.com으로 바뀌어 있습니다. 저장된 뒤 로그인 화면 모습은 A-03에서 봅니다.","go('login');VIEW.expanded=true;render()"],
 ['A-05','Sign up with email','펼친 뒤 Sign up with email을 누릅니다.','기존 가입 화면으로 갑니다. 가입 화면에는 구글 버튼이 없습니다.',"go('login')"],
 ['A-06','구글로만 가입한 회원이 이메일로 로그인 시도','googleonly@gmail.com + 아무 비밀번호 → Login','"This account uses Google login. Please log in with Google." 가 보이고 로그인되지 않습니다.',"go('login');VIEW.expanded=true;render()"],
 ['A-08','My Page(로그인 전)','홈 하단 MY PAGE를 누릅니다.','카드 안 핑크 Login 버튼 자리에 Continue with Google 버튼과 고지 문구가 있고, 그 아래 작은 회색 Log in with email 링크만 있습니다. Don\x27t have an account? Sign Up 줄은 없습니다.',"go('myout')"],
@@ -123,7 +123,7 @@ const CASES=[
 ["B-02c","인도네시아어로 가입하면 인도네시아어 닉네임","Alex Kim을 고릅니다.","닉네임이 인도네시아어 어순(꽃 단어 + 형용사) + 숫자 4자리입니다(예: MawarBerseri4821).","DB.lang='id';go('login');startGoogle('login')"],
 ["B-02d","몽골어로 가입하면 몽골어 닉네임","Alex Kim을 고릅니다.","닉네임이 몽골어(키릴 문자) 단어 + 숫자 4자리입니다.","DB.lang='mn';go('login');startGoogle('login')"],
 ['B-03','이메일 인증 회원은 자동 연결','Mina Park (verified@example.com)을 고릅니다.','로그인되고 하단에 "Your Google account is now linked..." 안내가 1번 뜹니다.\n회원 1의 닉네임은 Mina 그대로입니다.',"go('login');startGoogle('login')"],
-['B-04','자동 연결 안내는 첫 로그인 때만','Mina Park으로 로그인 → MY PAGE(계정 설정) → Logout → MY PAGE → Login → Continue with Google → Mina Park','두 번째 로그인에서는 하단 안내가 뜨지 않습니다.',"go('login');startGoogle('login')"],
+["B-04","자동 연결 안내는 첫 로그인 때만","(이미 한 번 자동 연결된 회원 1로 구글 계정 선택이 열림) Mina Park (verified@example.com)","바로 로그인되고 하단 연결 안내가 뜨지 않습니다.","DB.members[0].googleSub='g-ver';DB.members[0].linkNoticeShown=true;go('login');startGoogle('login')"],
 ['B-05','이메일 대소문자가 달라도 같은 회원','Mina Park (Verified@Example.com)을 고릅니다.','새 회원이 생기지 않고 회원 1에 연결됩니다.',"go('login');startGoogle('login')"],
 ['B-11','이미 연결된 구글','Jane Doe를 고릅니다.','안내 없이 바로 로그인됩니다.',"go('login');startGoogle('login')"],
 ['B-13','구글 화면에서 취소','구글 화면 왼쪽 위 ✕','로그인 화면으로 돌아오고 아무 안내도 없습니다.',"go('login');startGoogle('login')"],
@@ -189,7 +189,7 @@ let GRP='C',FIL='all';
 const W=()=>document.getElementById('fr').contentWindow;
 function showBO(on){const p=document.getElementById('bop');p.classList.toggle('on',on);document.getElementById('bobtn').classList.toggle('on',on);if(on){p.style.top=document.querySelector('.top').offsetHeight+'px';const f=document.getElementById('bof');if(f.src.indexOf('gl-bo.html')<0){f.src='gl-bo.html?v='+Date.now();f.onload=()=>{if(document.body.classList.contains('nw'))f.contentWindow.document.body.classList.add('show-new')}}else if(f.contentWindow.boSet)f.contentWindow.boSet({via:'',q:''})}}
 function toggleNew(){const b=W().document.body;b.classList.toggle('show-new');document.body.classList.toggle('nw',b.classList.contains('show-new'));try{document.getElementById('bof').contentWindow.document.body.classList.toggle('show-new',b.classList.contains('show-new'))}catch(e){}document.getElementById('nwbtn').classList.toggle('on',b.classList.contains('show-new'))}
-function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1793069753754?'+Date.now()}
+function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1793070565057?'+Date.now()}
 function open_(i){const c=CASES[i];const w=W();w.resetDB();try{w.eval(c[4])}catch(e){alert('세팅 실패: '+e.message)}showBO(c[0][0]==='H');cover(null);document.querySelectorAll('.case .open').forEach(b=>b.classList.remove('open'));const b=document.getElementById('o'+i);if(b)b.classList.add('open')}
 function mark(id,v){ST[id]=ST[id]||{};ST[id].s=ST[id].s===v?null:v;save();draw()}
 function memo(id,v){ST[id]=ST[id]||{};ST[id].m=v;save()}
