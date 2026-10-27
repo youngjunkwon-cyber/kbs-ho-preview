@@ -1810,12 +1810,9 @@ function googlePick(sub){
  VIEW.page='spin';render();setTimeout(()=>googleDone(sub),500)}
 function googleDone(sub){
  const g=gAcc(sub);
- if(VIEW.gFor==='verify'){VIEW.page='signup';const j=judgeEmailCheck(DB,g.email,'signup');VIEW.err={};
-  if(g.emailVerified===false){toast('Login failed. Please try again.')}
-  else if(j.result==='google'){VIEW.form.e=g.email;VIEW.err.e='This email is registered with Google. Please log in with Google.';VIEW.err.g=true}
-  else if(j.result==='dup'){VIEW.form.e=g.email;VIEW.err.e='This email is already registered.'}
-  else{VIEW.form.gv={sub,email:g.email.toLowerCase()};VIEW.form.e=g.email.toLowerCase();if(!(VIEW.form.nick||'').trim())VIEW.form.nick=nickFor()}
-  render();return}
+ if(VIEW.gFor==='verify'){const j=judgeGoogle(DB,sub);VIEW.err={};
+  if(j.result==='signup'){VIEW.page='signup';VIEW.form.gv={sub,email:g.email.toLowerCase()};VIEW.form.e=g.email.toLowerCase();if(!(VIEW.form.nick||'').trim())VIEW.form.nick=nickFor();render();return}
+  VIEW.form={}}
  if(VIEW.gFor==='connect'){const m=me();VIEW.page='account';if(judgeConnect(DB,m.id,sub).result==='taken')toast('This Google account is already linked to another K-Beauty Station account.');else{m.googleSub=sub;m.linkNoticeShown=true;toast('Your Google account is now linked.')}render();return}
  if(VIEW.gFor==='delete'){const m=me();if(m.googleSub!==sub){VIEW.page='account';VIEW.modal='delGoogle';VIEW.err.del='Please log in with the Google account linked to this account.';render();return}
   m.status='deleted';m.googleSub=null;DB.session=null;VIEW.page='home';toast('Account withdrawal successful.');render();return}
