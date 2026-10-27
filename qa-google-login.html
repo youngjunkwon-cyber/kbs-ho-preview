@@ -69,13 +69,13 @@ svg text{font-family:"Pretendard Variable",Pretendard,sans-serif}
   <button data-cv="mail" onclick="cover('mail')">발송함</button>
   <button data-cv="doc" onclick="cover('doc')">전달 문서</button>
   <button id="nwbtn" onclick="toggleNew()">새 요소 표시</button>
-  <button onclick="window.open('gl-proto.html?v=1792997762777','_blank')">새 창</button>
+  <button onclick="window.open('gl-proto.html?v=1793063620359','_blank')">새 창</button>
   <button onclick="copyResult()">결과 복사</button>
  </div>
 </div>
 <div class="main">
  <div class="left">
-  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1792997762777"></iframe>
+  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1793063620359"></iframe>
    <div class="cover" id="cv-flow"><h3>구글 로그인 판정 순서 <button onclick="cover(null)">닫기</button></h3><div id="flow"></div></div>
    <div class="cover" id="cv-db"><h3>회원 DB (시안 안 데이터, 1초마다 갱신) <button onclick="cover(null)">닫기</button></h3><div id="db"></div></div>
    <div class="cover" id="cv-mail"><h3>발송함 <button onclick="cover(null)">닫기</button></h3><div id="mail"></div></div>
@@ -116,14 +116,14 @@ const CASES=[
 ['B-04','자동 연결 안내는 첫 로그인 때만','Mina Park으로 로그인 → MY PAGE(계정 설정) → Logout → MY PAGE → Login → Continue with Google → Mina Park','두 번째 로그인에서는 하단 안내가 뜨지 않습니다. 발송함도 1건 그대로입니다.',"go('login');startGoogle('login')"],
 ['B-05','이메일 대소문자가 달라도 같은 회원','Mina Park (Verified@Example.com)을 고릅니다.','새 회원이 생기지 않고 회원 1에 연결됩니다.',"go('login');startGoogle('login')"],
 ['B-06','이메일 미인증 회원은 비밀번호 확인','Old User를 고릅니다.','"You already have an account with this email" 창이 뜹니다. 이메일 칸은 unverified@example.com으로 고정입니다.',"go('login');startGoogle('login')"],
-['B-07','비밀번호 확인 창에서 틀린 비밀번호','아무 비밀번호 → Link and Log In','칸 아래 "Incorrect password." 연결·로그인 모두 안 됩니다.',"go('login');VIEW.pendingSub='g-unv';VIEW.modal='pwconfirm';VIEW.form.cpw='';render()"],
+['B-07','비밀번호 확인 창에서 틀린 비밀번호','아무 비밀번호 → Link and Log In','칸 아래 "Email or password is incorrect."(라이브 로그인 실패 문구) 연결·로그인 모두 안 됩니다.',"go('login');VIEW.pendingSub='g-unv';VIEW.modal='pwconfirm';VIEW.form.cpw='';render()"],
 ['B-08','비밀번호 확인 창에서 맞는 비밀번호','pass1234 → Link and Log In','로그인되고 연결 안내가 뜹니다. 회원 2가 인증 완료로 바뀌고 발송함에 연결 안내 1건.',"go('login');VIEW.pendingSub='g-unv';VIEW.modal='pwconfirm';VIEW.form.cpw='';render()"],
 ['B-09','비밀번호 확인 창 Cancel','Cancel을 누릅니다.','창이 닫히고 로그인 화면에 남습니다. 회원 2에 구글이 연결되지 않습니다.',"go('login');VIEW.pendingSub='g-unv';VIEW.modal='pwconfirm';VIEW.form.cpw='';render()"],
 ['B-10','비밀번호 확인 창 Forgot Password','Forgot Password를 누릅니다.','비밀번호 찾기 화면으로 갑니다.',"go('login');VIEW.pendingSub='g-unv';VIEW.modal='pwconfirm';VIEW.form.cpw='';render()"],
 ['B-11','이미 연결된 구글','Jane Doe를 고릅니다.','안내 없이 바로 로그인됩니다.',"go('login');startGoogle('login')"],
 ['B-12','정지 회원','Blocked를 고릅니다.','이메일 로그인과 같은 정지 안내가 뜨고 로그인되지 않습니다. 구글도 연결되지 않습니다.',"go('login');startGoogle('login')"],
 ['B-13','구글 화면에서 취소','구글 화면 왼쪽 위 ✕','로그인 화면으로 돌아오고 아무 안내도 없습니다.',"go('login');startGoogle('login')"],
-['B-14','구글 쪽 오류','아무 계정이나 고릅니다.','로그인 화면 하단에 "Google login failed. Please try again."',"DB.nextGoogle='error';go('login');startGoogle('login')"],
+['B-14','구글 쪽 오류','아무 계정이나 고릅니다.','로그인 화면 하단에 "Login failed. Please try again."',"DB.nextGoogle='error';go('login');startGoogle('login')"],
 ['B-16','구글 쪽에서 이메일을 바꾼 회원','Jane Doe (jane.new@gmail.com)을 고릅니다.','구글 고유 번호로 회원 3에 그대로 로그인됩니다. 회원 이메일은 googleonly@gmail.com 그대로입니다(자동으로 바꾸지 않음).',"DB.google.find(g=>g.sub==='g-jane').email='jane.new@gmail.com';go('login');startGoogle('login')"],
 ['B-17','구글이 이메일을 확인하지 않은 계정 + 같은 이메일 회원','Mina Park (verified@example.com)을 고릅니다.','회원 1은 인증 회원이지만 구글 쪽 이메일이 확인되지 않은 계정이라 자동 연결하지 않고 비밀번호 확인 창이 뜹니다.',"DB.google.find(g=>g.sub==='g-ver').emailVerified=false;go('login');startGoogle('login')"],
 ['B-18','구글이 이메일을 확인하지 않은 계정 + 처음 가입','Alex Kim을 고릅니다.','가입은 되지만 회원 이메일은 미인증으로 저장됩니다(회원 DB 확인).',"DB.google.find(g=>g.sub==='g-new').emailVerified=false;go('login');startGoogle('login')"],
@@ -136,7 +136,7 @@ const CASES=[
 ["C-06","예약 중 이메일로 로그인","Book now → 날짜 28일 → 17:00 → 아래 날짜·시간 버튼 → Log in with email → verified@example.com / pass1234 → Login","안내 상자는 위에 남고 이메일 칸이 펼쳐지며, 로그인 후 예약자 정보 화면으로 갑니다.","go('store')"],
 ["C-07","로그인 화면에서 뒤로","Book now → 날짜 28일 → 17:00 → 아래 날짜·시간 버튼 → 왼쪽 위 뒤로","날짜·시간 화면으로 돌아오고 28일·17:00이 그대로 선택돼 있습니다.","go('store')"],
 ["C-08","이미 로그인한 상태로 예약","Book now → 날짜 28일 → 17:00 → 아래 날짜·시간 버튼","로그인 화면 없이 예약자 정보 화면으로 바로 갑니다.","DB.session=1;go('store')"],
-["C-09","예약 중 구글 오류","Book now → 날짜 28일 → 17:00 → 아래 날짜·시간 버튼 → Continue with Google → 아무 계정","로그인 화면 하단에 \"Google login failed. Please try again.\" 안내 상자와 날짜·시간은 그대로.","DB.nextGoogle='error';go('store')"],
+["C-09","예약 중 구글 오류","Book now → 날짜 28일 → 17:00 → 아래 날짜·시간 버튼 → Continue with Google → 아무 계정","로그인 화면 하단에 \"Login failed. Please try again.\" 안내 상자와 날짜·시간은 그대로.","DB.nextGoogle='error';go('store')"],
 ["C-10","LINE 앱에서 예약","Book now → 날짜 28일 → 17:00 → 아래 날짜·시간 버튼 → Continue with Google","\"Opening in your browser\" 후 기본 브라우저 주소창이 보이고 같은 로그인 화면이 열립니다. 안내 상자와 날짜·시간 유지. 구글 버튼을 한 번 더 누르면 계정 선택.","DB.env='line';go('store')"],
 ["C-11","인스타그램 앱에서 예약","Book now → 날짜 28일 → 17:00 → 아래 날짜·시간 버튼 → Continue with Google → alex.new@gmail.com → Next → Next","브라우저로 넘기지 않고 앱 안에서 구글 로그인 후 예약자 정보 화면으로 갑니다.","DB.env='ig-ios';go('store')"],
 ["C-12","홈에서부터 예약","홈 하단 STORE → DDYOU → Book now → 날짜 28일 → 17:00 → 아래 날짜·시간 버튼 → Continue with Google → Alex Kim","실화면 순서대로 이어져 예약자 정보 화면까지 갑니다.","go('home')"],
@@ -145,11 +145,11 @@ const CASES=[
 ['D-03','구글 연결 + 비밀번호 있는 회원의 이메일로 가입','linked@example.com → Get Verification Code','라이브 중복 이메일 안내. 구글 문구가 아닙니다.',"go('signup')"],
 ['D-04','새 이메일로 가입','new.person@gmail.com → Get Verification Code','코드가 발송됩니다(지금과 동일).',"go('signup')"],
 ['D-05','비밀번호 없는 회원의 비밀번호 찾기','googleonly@gmail.com → Get Verification Code','"This account uses Google login. Please log in with Google." 코드는 보내지 않습니다.',"go('forgot')"],
-['D-06','구글 연결 + 비밀번호 있는 회원의 비밀번호 찾기','linked@example.com → Get Verification Code','지금처럼 코드가 발송됩니다.',"go('forgot')"],
+['D-06','구글 연결 + 비밀번호 있는 회원의 비밀번호 찾기','linked@example.com → Get Verification Code','지금처럼 코드가 발송되고 "Verification code has been sent."',"go('forgot')"],
 ['D-07','대문자로 입력한 비밀번호 찾기','GoogleOnly@Gmail.com → Get Verification Code','D-05와 같은 안내.',"go('forgot')"],
 ['E-01','구글로 가입한 회원의 계정 설정','화면을 봅니다.','Password = Set Password, Google = Connected + Disconnect(누를 수 없음), 아래 "Set a password before disconnecting Google." Marketing emails 꺼짐.',"DB.session=3;go('account')"],
 ['E-02','Set Password 두 칸 불일치','Set Password → 서로 다른 값 → Save','"Passwords do not match." 저장되지 않습니다.',"DB.session=3;go('account')"],
-['E-03','Set Password 저장','Set Password → 같은 값 두 번 → Save','하단 "Your password has been set." Password가 Change Password로, Disconnect가 눌리게, 안내 문장은 사라집니다.',"DB.session=3;go('account')"],
+['E-03','Set Password 저장','Set Password → Abcd123! 두 번 → Save','하단 "Your password has been set." Password가 Change Password로, Disconnect가 눌리게, 안내 문장은 사라집니다.',"DB.session=3;go('account')"],
 ['E-04','이메일 회원이 다른 이메일의 구글 연결','Connect → Other Person','하단 "Your Google account is now linked." Google = Connected. 회원 이메일은 verified@example.com 그대로. 발송함 연결 안내 1건.',"DB.session=1;go('account')"],
 ['E-05','이미 다른 회원에 붙은 구글 연결 시도','Connect → Jane Doe','"This Google account is already linked to another K-Beauty Station account." 연결되지 않습니다.',"DB.session=1;go('account')"],
 ['E-06','연결한 다른 이메일 구글로 로그인','Other Person을 고릅니다.','회원 1(verified@example.com)로 로그인됩니다.',"DB.members[0].googleSub='g-other';DB.members[0].linkNoticeShown=true;go('login');startGoogle('login')"],
@@ -174,7 +174,7 @@ const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(ST))}catch(e){}};
 let GRP='C',FIL='all';
 const W=()=>document.getElementById('fr').contentWindow;
 function toggleNew(){const b=W().document.body;b.classList.toggle('show-new');document.getElementById('nwbtn').classList.toggle('on',b.classList.contains('show-new'))}
-function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1792997762777?'+Date.now()}
+function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1793063620359?'+Date.now()}
 function open_(i){const c=CASES[i];const w=W();w.resetDB();try{w.eval(c[4])}catch(e){alert('세팅 실패: '+e.message)}cover(null);document.querySelectorAll('.case .open').forEach(b=>b.classList.remove('open'));const b=document.getElementById('o'+i);if(b)b.classList.add('open')}
 function mark(id,v){ST[id]=ST[id]||{};ST[id].s=ST[id].s===v?null:v;save();draw()}
 function memo(id,v){ST[id]=ST[id]||{};ST[id].m=v;save()}

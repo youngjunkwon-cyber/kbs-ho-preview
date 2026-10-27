@@ -1772,13 +1772,13 @@ function startGoogle(forWhat){VIEW.gFor=forWhat;if(forWhat==='login'&&VIEW.page!
 const backOf=()=>({login:VIEW.gBack||'login',connect:'account',delete:'account'}[VIEW.gFor]);
 function googleBack(){VIEW.page=backOf();VIEW.modal=VIEW.gFor==='delete'?'delGoogle':null;render()}
 function googlePick(sub){
- if(DB.nextGoogle==='error'){DB.nextGoogle='ok';VIEW.page=backOf();toast('Google login failed. Please try again.');render();return}
+ if(DB.nextGoogle==='error'){DB.nextGoogle='ok';VIEW.page=backOf();toast('Login failed. Please try again.');render();return}
  VIEW.page='spin';render();setTimeout(()=>googleDone(sub),500)}
 function googleDone(sub){
  const g=gAcc(sub);
  if(VIEW.gFor==='connect'){const m=me();VIEW.page='account';if(judgeConnect(DB,m.id,sub).result==='taken')toast('This Google account is already linked to another K-Beauty Station account.');else{m.googleSub=sub;m.linkNoticeShown=true;mail(m.email,'구글 연결 안내');toast('Your Google account is now linked.')}render();return}
  if(VIEW.gFor==='delete'){const m=me();if(m.googleSub!==sub){VIEW.page='account';VIEW.modal='delGoogle';VIEW.err.del='Please log in with the Google account linked to this account.';render();return}
-  m.status='deleted';m.googleSub=null;DB.session=null;VIEW.page='home';toast('Your account has been deleted.');render();return}
+  m.status='deleted';m.googleSub=null;DB.session=null;VIEW.page='home';toast('Account withdrawal successful.');render();return}
  const j=judgeGoogle(DB,sub);
  if(j.result==='login'){afterLogin(j.member);return}
  if(j.result==='suspended'){VIEW.page=backOf();toast('This account has been suspended. Please contact customer support.');render();return}
@@ -1788,26 +1788,26 @@ function googleDone(sub){
  if(j.result==='pwconfirm'){VIEW.page=backOf();VIEW.pendingSub=sub;VIEW.modal='pwconfirm';VIEW.err={};VIEW.form.cpw='';render();return}
 }
 function confirmLink(){const g=gAcc(VIEW.pendingSub);const m=DB.members.find(x=>live(x)&&norm(x.email)===norm(g.email));const pw=val('cpw');
- if(pw!==m.password){VIEW.err.cpw='Incorrect password.';VIEW.form.cpw=pw;render();return}
+ if(pw!==m.password){VIEW.err.cpw='Email or password is incorrect.';VIEW.form.cpw=pw;render();return}
  m.googleSub=g.sub;if(g.emailVerified!==false)m.verified=true;mail(m.email,'구글 연결 안내');m.linkNoticeShown=true;afterLogin(m,'Your Google account is now linked. You can log in with Google or your email and password.')}
 function emailLogin(){const e=val('le'),p=val('lp');VIEW.form.email=e;VIEW.form.pw=p;VIEW.err={};
  const m=DB.members.find(x=>live(x)&&norm(x.email)===norm(e));
  if(m&&m.status==='suspended'){toast('This account has been suspended. Please contact customer support.');render();return}
  if(m&&!m.password){VIEW.err.login='This account uses Google login. Please log in with Google.';render();return}
- if(!m||m.password!==p){VIEW.err.login='Incorrect email or password.';render();return}
+ if(!m||m.password!==p){VIEW.err.login='Email or password is incorrect.';render();return}
  DB.remembered=VIEW.form.rem?m.email:null;afterLogin(m)}
 function sendCode(purpose){const e=val(purpose==='signup'?'se':'fe');VIEW.form.e=e;if(!e.trim())return;
  const j=judgeEmailCheck(DB,e,purpose);VIEW.err={};
  if(j.result==='google')VIEW.err.e=purpose==='signup'?'This email is registered with Google. Please log in with Google.':'This account uses Google login. Please log in with Google.';
  else if(j.result==='dup')VIEW.err.e='This email is already registered.';
- else if(j.result==='none')VIEW.err.e='No account found with this email.';
- else toast('Verification code sent.');render()}
+ else if(j.result==='none')VIEW.err.e='Unregistered email';
+ else toast('Verification code has been sent.');render()}
 function setPw(){const a=val('np'),b=val('cp');VIEW.err={};
- if(!a){VIEW.err.np='Please enter a password.';render();return}if(a!==b){VIEW.err.cp='Passwords do not match.';render();return}
+ const pe=!a?'Please enter your password.':a.length<8?'Password must be at least 8 characters.':a.length>20?'Password must be at most 20 characters.':!/[A-Z]/.test(a)?'Please include an uppercase letter.':!/[a-z]/.test(a)?'Please include a lowercase letter.':!/[0-9]/.test(a)?'Please include a number.':!/[^A-Za-z0-9]/.test(a)?'Please include a special character.':null;if(pe){VIEW.err.np=pe;render();return}if(a!==b){VIEW.err.cp='Passwords do not match.';render();return}
  me().password=a;VIEW.modal=null;toast('Your password has been set.');render()}
 function disconnect(){const m=me();m.googleSub=null;m.linkNoticeShown=false;mail(m.email,'구글 연결 해제 안내');VIEW.modal=null;toast('Google has been disconnected.');render()}
-function delPw(){const m=me();if(val('dp')!==m.password){VIEW.err.dp='Incorrect password.';render();return}m.status='deleted';m.googleSub=null;DB.session=null;VIEW.modal=null;VIEW.page='home';toast('Your account has been deleted.');render()}
-function logout(){DB.session=null;VIEW.page='home';render()}
+function delPw(){const m=me();if(val('dp')!==m.password){VIEW.err.dp='Incorrect password.';render();return}m.status='deleted';m.googleSub=null;DB.session=null;VIEW.modal=null;VIEW.page='home';toast('Account withdrawal successful.');render()}
+function logout(){DB.session=null;VIEW.page='home';toast('logged out.');render()}
 function toMy(){if(DB.session)go('account');else if(DB.env==='alipay')return;else go('myout')}
 function nextBook(){const p=VIEW.pick;if(!p.date||!p.time)return;DB.booking={store:'DDYOU',date:p.date,time:p.time};if(DB.session)go('bookinfo');else go('login',{returnTo:'bookinfo'})}
 function gLoginNext(){const v=val('gi').trim();const g=DB.google.find(x=>norm(x.email)===norm(v));VIEW.gEmail=v;if(!g){VIEW.gErr="Couldn't find your Google Account";render();return}VIEW.gSub=g.sub;VIEW.gStep='pw';VIEW.gErr='';render()}
@@ -1875,7 +1875,7 @@ P.account=()=>{const m=me();if(!m){VIEW.page='home';return P.home()}const g=!!m.
  if(md==='withdraw')html=modal('Delete Membership',`<div class="index-module-scss-module__HwTRHW__withdrawalModal"><div class="index-module-scss-module__HwTRHW__withdrawalModal__content"><div class="index-module-scss-module__HwTRHW__withdrawalModal__content__intro"><div class="index-module-scss-module__HwTRHW__withdrawalModal__content__intro__title"><div class="index-module-scss-module__HwTRHW__withdrawalModal__content__intro__title__text">Membership Withdrawal Notice</div></div><div class="index-module-scss-module__HwTRHW__withdrawalModal__content__intro__description"><div class="index-module-scss-module__HwTRHW__withdrawalModal__content__intro__description__text">All your data will be deleted and cannot be recovered after withdrawal.</div></div></div>${btn('Still Want to Withdraw?','wnext')}</div></div>`,false);
  if(md==='delPw')html=modal('Delete Membership',`<div class="gl-mbody"><p class="gl-mdesc">Enter your password to delete your account.</p>${field('Password','dp','password','',VIEW.err.dp)}<div class="gl-mbtns">${btn('Cancel','mclose','outline')}${btn('Delete','mdel')}</div></div>`,false);
  if(md==='delGoogle')html=modal('Confirm with Google',`<div class="gl-mbody"><p class="gl-mdesc">To delete your account, log in with Google once more.</p>${VIEW.err.del?`<div class="${IF}__input__error">${esc(VIEW.err.del)}</div>`:''}${gbtn(false,'mgoogle')}${btn('Cancel','mclose','outline')}</div>`);
- if(md==='setpw')html=modal('Set Password',`<div class="gl-mbody"><p class="gl-mdesc">Create a password to also log in with your email.</p>${field('New Password','np','password','',VIEW.err.np)}${field('Confirm Password','cp','password','',VIEW.err.cp)}<div class="gl-mbtns">${btn('Cancel','mclose','outline')}${btn('Save','msave')}</div></div>`);
+ if(md==='setpw')html=modal('Set Password',`<div class="gl-mbody"><p class="gl-mdesc">Create a password to also log in with your email.</p>${field('New Password','np','password','',VIEW.err.np)}${field('Confirm New Password','cp','password','',VIEW.err.cp)}<div class="gl-mbtns">${btn('Cancel','mclose','outline')}${btn('Save','msave')}</div></div>`);
  if(md==='disc')html=modal('Disconnect Google?',`<div class="gl-mbody"><p class="gl-mdesc">You won't be able to log in with Google. Use your email and password to log in.</p><div class="gl-mbtns">${btn('Cancel','mclose','outline')}${btn('Disconnect','mdisc')}</div></div>`);
  if(html){R().insertAdjacentHTML('beforeend',html);R().querySelectorAll('[data-k=mclose]').forEach(b=>on(b,()=>{VIEW.modal=null;VIEW.err={};render()}));
   on($('[data-k=wnext]'),()=>{VIEW.modal=m.password?'delPw':'delGoogle';VIEW.err={};render()});on($('[data-k=mdel]'),delPw);on($('[data-k=mgoogle]'),()=>startGoogle('delete'));on($('[data-k=msave]'),setPw);on($('[data-k=mdisc]'),disconnect)}};
