@@ -1735,8 +1735,8 @@ const M='index-module-scss-module__185j0W__modal__wrapper', IF='index-module-scs
 function seed(){return{
  members:[
   {id:1,email:'verified@example.com',nickname:'Mina',verified:true,password:'pass1234',googleSub:null,status:'active',via:'email',marketing:false,linkNoticeShown:false,phone:true},
-  {id:3,email:'googleonly@gmail.com',nickname:'SilkyLotus2048',verified:true,password:null,googleSub:'g-jane',status:'active',via:'google',marketing:false,linkNoticeShown:true},
-  {id:5,email:'linked@example.com',nickname:'Both Ways',verified:true,password:'pass1234',googleSub:'g-both',status:'active',via:'email',marketing:true,linkNoticeShown:true,phone:true}
+  {id:3,email:'googleonly@gmail.com',nickname:'SilkyLotus2048',verified:true,password:null,googleSub:'g-jane',googleAt:'2025-10-30 10:00',status:'active',via:'google',marketing:false,linkNoticeShown:true},
+  {id:5,email:'linked@example.com',nickname:'Both Ways',verified:true,password:'pass1234',googleSub:'g-both',googleAt:'2026-09-12 14:20',status:'active',via:'email',marketing:true,linkNoticeShown:true,phone:true}
  ],
  google:[
   {sub:'g-new',name:'Alex Kim',email:'alex.new@gmail.com'},
@@ -1813,14 +1813,14 @@ function googleDone(sub){
  if(VIEW.gFor==='verify'){const j=judgeGoogle(DB,sub);VIEW.err={};
   if(j.result==='signup'){VIEW.page='signup';VIEW.form.gv={sub,email:g.email.toLowerCase()};VIEW.form.e=g.email.toLowerCase();if(!(VIEW.form.nick||'').trim())VIEW.form.nick=nickFor();render();return}
   VIEW.form={}}
- if(VIEW.gFor==='connect'){const m=me();VIEW.page='account';if(judgeConnect(DB,m.id,sub).result==='taken')toast('This Google account is already linked to another K-Beauty Station account.');else{m.googleSub=sub;m.linkNoticeShown=true;toast('Your Google account is now linked.')}render();return}
+ if(VIEW.gFor==='connect'){const m=me();VIEW.page='account';if(judgeConnect(DB,m.id,sub).result==='taken')toast('This Google account is already linked to another K-Beauty Station account.');else{m.googleSub=sub;m.googleAt=stamp();m.linkNoticeShown=true;toast('Your Google account is now linked.')}render();return}
  if(VIEW.gFor==='delete'){const m=me();if(m.googleSub!==sub){VIEW.page='account';VIEW.modal='delGoogle';VIEW.err.del='Please log in with the Google account linked to this account.';render();return}
-  m.status='deleted';m.googleSub=null;DB.session=null;VIEW.page='home';toast('Account withdrawal successful.');render();return}
+  m.status='deleted';m.googleSub=null;m.googleAt=null;DB.session=null;VIEW.page='home';toast('Account withdrawal successful.');render();return}
  const j=judgeGoogle(DB,sub);
  if(j.result==='login'){afterLogin(j.member);return}
  if(j.result==='signup-blocked'){VIEW.page=backOf();toast('This email is already linked to a different Google account. Please log in with your email or the Google account linked to your account.');render();return}
- if(j.result==='signup'){const m={id:++DB.seq,email:g.email.toLowerCase(),nickname:nickFor(),joined:'2026. 10. 27',lang:DB.lang,verified:true,password:null,googleSub:sub,status:'active',via:'google',marketing:false,linkNoticeShown:true,termsAt:new Date().toLocaleString('ko-KR')};DB.members.push(m);afterLogin(m);return}
- if(j.result==='autolink'){const m=j.member;m.googleSub=sub;let msg=null;if(!m.linkNoticeShown){msg='Your Google account is now linked. You can log in with Google or your email and password.';m.linkNoticeShown=true}afterLogin(m,msg);return}
+ if(j.result==='signup'){const m={id:++DB.seq,email:g.email.toLowerCase(),nickname:nickFor(),joined:'2026. 10. 27',lang:DB.lang,verified:true,password:null,googleSub:sub,googleAt:stamp(),status:'active',via:'google',marketing:false,linkNoticeShown:true,termsAt:new Date().toLocaleString('ko-KR')};DB.members.push(m);afterLogin(m);return}
+ if(j.result==='autolink'){const m=j.member;m.googleSub=sub;m.googleAt=stamp();let msg=null;if(!m.linkNoticeShown){msg='Your Google account is now linked. You can log in with Google or your email and password.';m.linkNoticeShown=true}afterLogin(m,msg);return}
  if(j.result==='error'){VIEW.page=backOf();toast('Login failed. Please try again.');render();return}
 }
 function emailLogin(){const e=val('le'),p=val('lp');VIEW.form.email=e;VIEW.form.pw=p;VIEW.err={};
@@ -1840,8 +1840,9 @@ function setPw(){const a=val('np'),b=val('cp');VIEW.err={};
  me().password=a;VIEW.modal=null;toast('Your password has been set.');render()}
 function nickModal(m){if(VIEW.modal!=='nick')return;R().insertAdjacentHTML('beforeend',modal('Change Nickname',`<div class="gl-mbody">${field('Current Nickname','cn','text',m.nickname,'',true)}${field('New Nickname','nn','text','',VIEW.err.nn)}<div class="gl-mbtns">${btn('Cancel','mclose','outline')}${btn('Save','mnick')}</div></div>`));R().querySelectorAll('[data-k=mclose]').forEach(b=>on(b,()=>{VIEW.modal=null;VIEW.err={};render()}));on($('[data-k=mnick]'),saveNick)}
 function saveNick(){const m=me(),v=val('nn');VIEW.err={};const e=!v.trim()?'Please enter your name.':/\s/.test(v)?'Spaces are not allowed.':v===m.nickname?'Same as current name.':DB.members.some(x=>x.id!==m.id&&x.status!=='deleted'&&x.nickname.toLowerCase()===v.toLowerCase())?'This nickname is already in use.':null;if(e){VIEW.err.nn=e;render();return}m.nickname=v;VIEW.modal=null;toast('Nickname changed.');render()}
-function disconnect(){const m=me();m.googleSub=null;m.linkNoticeShown=false;VIEW.modal=null;toast('Google has been disconnected.');render()}
-function delPw(){const m=me();if(val('dp')!==m.password){VIEW.err.dp='Incorrect password.';render();return}m.status='deleted';m.googleSub=null;DB.session=null;VIEW.modal=null;VIEW.page='home';toast('Account withdrawal successful.');render()}
+function stamp(){const d=new Date(),z=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate())+' '+z(d.getHours())+':'+z(d.getMinutes())}
+function disconnect(){const m=me();m.googleSub=null;m.googleAt=null;m.linkNoticeShown=false;VIEW.modal=null;toast('Google has been disconnected.');render()}
+function delPw(){const m=me();if(val('dp')!==m.password){VIEW.err.dp='Incorrect password.';render();return}m.status='deleted';m.googleSub=null;m.googleAt=null;DB.session=null;VIEW.modal=null;VIEW.page='home';toast('Account withdrawal successful.');render()}
 function logout(){DB.session=null;VIEW.page='home';toast('logged out.');render()}
 function toMy(){if(DB.session)go('myin');else go('myout')}
 function nextBook(){const p=VIEW.pick;if(!p.date||!p.time)return;DB.booking={store:'DDYOU',date:p.date,time:p.time};if(DB.session)go('bookinfo');else go('login',{returnTo:'bookinfo'})}
@@ -1911,7 +1912,7 @@ P.signup=()=>{R().innerHTML=envBar()+tpl('t_signup');header();const F=VIEW.form;
  const sb=$$('[class*="X-Toyq__footer"] button').find(x=>/Sign Up/.test(x.textContent));
  const upd=()=>{sb.disabled=!(F.gv&&(F.nick||'').trim()&&F.ag.svc&&F.ag.pp)};upd();
  on(sb,()=>{if(sb.disabled)return;const v=val('snk');const e=/\s/.test(v)?'Spaces are not allowed.':DB.members.some(x=>x.status!=='deleted'&&x.nickname.toLowerCase()===v.toLowerCase())?'This nickname is already in use.':null;if(e){VIEW.err.nick=e;F.nick=v;render();return}
-  const m={id:++DB.seq,email:F.gv.email,nickname:v,joined:'2026. 10. 27',lang:DB.lang,verified:true,password:null,googleSub:F.gv.sub,status:'active',via:'google',marketing:!!F.ag.mk,linkNoticeShown:true,termsAt:new Date().toLocaleString('ko-KR')};DB.members.push(m);VIEW.form={};afterLogin(m,'Sign up successful.')});
+  const m={id:++DB.seq,email:F.gv.email,nickname:v,joined:'2026. 10. 27',lang:DB.lang,verified:true,password:null,googleSub:F.gv.sub,googleAt:stamp(),status:'active',via:'google',marketing:!!F.ag.mk,linkNoticeShown:true,termsAt:new Date().toLocaleString('ko-KR')};DB.members.push(m);VIEW.form={};afterLogin(m,'Sign up successful.')});
  if(VIEW.err.nick)nk.closest('label').appendChild(el(`<p class="index-module-scss-module__X-Toyq__formError gl-new" style="margin:4px 0 0">${esc(VIEW.err.nick)}</p>`));
  if(VIEW.err.e){ie.setAttribute('aria-invalid','true');ie.style.borderColor='#EB003B';const em=el(`<p class="index-module-scss-module__X-Toyq__formError gl-new" style="margin:4px 0 0">${esc(VIEW.err.e)}</p>`);const gvb=flow.querySelector('.gl-new');if(gvb)flow.insertBefore(em,gvb);else flow.appendChild(em);if(VIEW.err.g){const gb=el(`<div class="gl-new" style="margin-top:8px">${gbtn()}</div>`);flow.appendChild(gb);on(gb.querySelector('[data-k=gstart]'),()=>startGoogle('login'))}}};
 P.forgot=()=>{R().innerHTML=envBar()+tpl('t_forgot');header();const ie=$('input[name=email]');ie.id='fe';ie.value=VIEW.form.e||'';const b=$('[class*="F9n-4q__page__footer"] button');on(b,()=>sendCode('forgot'));
@@ -1937,7 +1938,7 @@ P.account=()=>{const m=me();if(!m){VIEW.page='home';return P.home()}const g=!!m.
  if(md==='setpw')html=modal('Set Password',`<div class="gl-mbody"><p class="gl-mdesc">Create a password to also log in with your email.</p>${field('New Password','np','password','',VIEW.err.np)}${field('Confirm New Password','cp','password','',VIEW.err.cp)}<div class="gl-mbtns">${btn('Cancel','mclose','outline')}${btn('Save','msave')}</div></div>`);
  if(md==='disc')html=modal('Disconnect Google?',`<div class="gl-mbody"><p class="gl-mdesc">You won't be able to log in with Google. Use your email and password to log in.</p><div class="gl-mbtns">${btn('Cancel','mclose','outline')}${btn('Disconnect','mdisc')}</div></div>`);
  nickModal(m);if(html){R().insertAdjacentHTML('beforeend',html);R().querySelectorAll('[data-k=mclose]').forEach(b=>on(b,()=>{VIEW.modal=null;VIEW.err={};render()}));
-  on($('[data-k=wnext]'),()=>{VIEW.modal=m.password?'delPw':'delGoogle';VIEW.err={};render()});on($('[data-k=mdel]'),delPw);on($('[data-k=mgoogle]'),()=>startGoogle('delete'));on($('[data-k=msave]'),setPw);on($('[data-k=mdisc]'),disconnect);const ck=$('[data-k=delok]');if(ck)ck.addEventListener('change',()=>{VIEW.form.delok=ck.checked;render()});on($('[data-k=mdelgo]'),()=>{if(!VIEW.form.delok)return;m.status='deleted';m.googleSub=null;DB.session=null;VIEW.modal=null;VIEW.page='home';toast('Account withdrawal successful.');render()})}};
+  on($('[data-k=wnext]'),()=>{VIEW.modal=m.password?'delPw':'delGoogle';VIEW.err={};render()});on($('[data-k=mdel]'),delPw);on($('[data-k=mgoogle]'),()=>startGoogle('delete'));on($('[data-k=msave]'),setPw);on($('[data-k=mdisc]'),disconnect);const ck=$('[data-k=delok]');if(ck)ck.addEventListener('change',()=>{VIEW.form.delok=ck.checked;render()});on($('[data-k=mdelgo]'),()=>{if(!VIEW.form.delok)return;m.status='deleted';m.googleSub=null;m.googleAt=null;DB.session=null;VIEW.modal=null;VIEW.page='home';toast('Account withdrawal successful.');render()})}};
 P.google=()=>{const bar=`<div class="gbar"><button data-k="gx">✕</button>accounts.google.com</div>`;let h;
  if(VIEW.gStep==='choose')h=`<div class="gpage">${bar}<div class="gtop">${G_SVG}<h1>Choose an account</h1><p>to continue to K-Beauty Station</p></div><div class="gacc">${DB.google.map(g=>`<button data-sub="${g.sub}"><span class="gav">${esc((g.name||g.email)[0].toUpperCase())}</span><span>${esc(g.name||g.email)}<small>${esc(g.email)}</small></span></button>`).join('')}</div></div>`;
  else if(VIEW.gStep==='email')h=`<div class="gpage">${envBar()}${bar}<div class="gtop">${G_SVG}<h1>Sign in</h1><p>to continue to K-Beauty Station</p></div><div class="gform"><input id="gi" placeholder="Email or phone" value="${esc(VIEW.gEmail)}">${VIEW.gErr?`<p class="gerr">${VIEW.gErr}</p>`:''}</div><div class="gnext"><a data-k="gx">Cancel</a><button data-k="gnext">Next</button></div></div>`;
