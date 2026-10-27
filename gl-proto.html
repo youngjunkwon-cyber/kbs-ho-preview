@@ -1818,7 +1818,7 @@ function googleDone(sub){
  const j=judgeGoogle(DB,sub);
  if(j.result==='login'){afterLogin(j.member);return}
  if(j.result==='signup-blocked'){VIEW.page=backOf();toast('This email is already linked to a different Google account. Please log in with your email or the Google account linked to your account.');render();return}
- if(j.result==='signup'){const m={id:++DB.seq,email:g.email.toLowerCase(),nickname:nickFor(),joined:'2026. 10. 27',verified:g.emailVerified!==false,password:null,googleSub:sub,status:'active',via:'google',marketing:false,linkNoticeShown:true,termsAt:new Date().toLocaleString('ko-KR')};DB.members.push(m);afterLogin(m);return}
+ if(j.result==='signup'){const m={id:++DB.seq,email:g.email.toLowerCase(),nickname:nickFor(),joined:'2026. 10. 27',lang:DB.lang,verified:g.emailVerified!==false,password:null,googleSub:sub,status:'active',via:'google',marketing:false,linkNoticeShown:true,termsAt:new Date().toLocaleString('ko-KR')};DB.members.push(m);afterLogin(m);return}
  if(j.result==='autolink'){const m=j.member;m.googleSub=sub;mail(m.email,'구글 연결 안내');let msg=null;if(!m.linkNoticeShown){msg='Your Google account is now linked. You can log in with Google or your email and password.';m.linkNoticeShown=true}afterLogin(m,msg);return}
  if(j.result==='pwconfirm'){VIEW.page=backOf();VIEW.pendingSub=sub;VIEW.modal='pwconfirm';VIEW.err={};VIEW.form.cpw='';render();return}
 }

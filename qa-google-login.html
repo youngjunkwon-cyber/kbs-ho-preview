@@ -75,14 +75,14 @@ svg text{font-family:"Pretendard Variable",Pretendard,sans-serif}
   <button data-cv="doc" onclick="cover('doc')">전달 문서</button>
   <button id="bobtn" onclick="showBO(!document.getElementById('bop').classList.contains('on'))">BO 회원 화면</button>
   <button id="nwbtn" onclick="toggleNew()">새 요소 표시</button>
-  <button onclick="window.open('gl-proto.html?v=1793068874220','_blank')">새 창</button>
+  <button onclick="window.open('gl-proto.html?v=1793068950486','_blank')">새 창</button>
   <button onclick="copyResult()">결과 복사</button>
  </div>
 </div>
 <div class="bo-panel" id="bop"><div class="bo-bar"><b>BO 회원 &gt; 정보조회</b><span style="color:#777">라이브 어드민 구조 그대로, 데이터는 왼쪽 FO 시안의 회원 DB를 그대로 읽습니다. 지금 보고 있는 케이스는 오른쪽 아래 버튼으로 돌아갑니다.</span><span style="flex:1"></span><button onclick="document.getElementById('bof').contentWindow.boDraw&&document.getElementById('bof').contentWindow.boDraw()">새로고침</button><button onclick="showBO(false)">닫기</button></div><iframe id="bof" src="about:blank"></iframe></div>
 <div class="main">
  <div class="left">
-  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1793068874220"></iframe>
+  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1793068950486"></iframe>
    <div class="cover" id="cv-flow"><h3>구글 로그인 판정 순서 <button onclick="cover(null)">닫기</button></h3><div id="flow"></div></div>
    <div class="cover" id="cv-db"><h3>회원 DB (시안 안 데이터, 1초마다 갱신) <button onclick="cover(null)">닫기</button></h3><div id="db"></div></div>
    <div class="cover" id="cv-mail"><h3>발송함 <button onclick="cover(null)">닫기</button></h3><div id="mail"></div></div>
@@ -197,7 +197,7 @@ let GRP='C',FIL='all';
 const W=()=>document.getElementById('fr').contentWindow;
 function showBO(on){const p=document.getElementById('bop');p.classList.toggle('on',on);document.getElementById('bobtn').classList.toggle('on',on);if(on){p.style.top=document.querySelector('.top').offsetHeight+'px';const f=document.getElementById('bof');if(f.src.indexOf('gl-bo.html')<0){f.src='gl-bo.html?v='+Date.now();f.onload=()=>{if(document.body.classList.contains('nw'))f.contentWindow.document.body.classList.add('show-new')}}else if(f.contentWindow.boSet)f.contentWindow.boSet({via:'',q:''})}}
 function toggleNew(){const b=W().document.body;b.classList.toggle('show-new');document.body.classList.toggle('nw',b.classList.contains('show-new'));try{document.getElementById('bof').contentWindow.document.body.classList.toggle('show-new',b.classList.contains('show-new'))}catch(e){}document.getElementById('nwbtn').classList.toggle('on',b.classList.contains('show-new'))}
-function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1793068874220?'+Date.now()}
+function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1793068950486?'+Date.now()}
 function open_(i){const c=CASES[i];const w=W();w.resetDB();try{w.eval(c[4])}catch(e){alert('세팅 실패: '+e.message)}showBO(c[0][0]==='H');cover(null);document.querySelectorAll('.case .open').forEach(b=>b.classList.remove('open'));const b=document.getElementById('o'+i);if(b)b.classList.add('open')}
 function mark(id,v){ST[id]=ST[id]||{};ST[id].s=ST[id].s===v?null:v;save();draw()}
 function memo(id,v){ST[id]=ST[id]||{};ST[id].m=v;save()}
