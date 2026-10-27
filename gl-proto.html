@@ -1750,7 +1750,7 @@ function seed(){return{
   {sub:'g-other',name:'Other Person',email:'other.person@gmail.com'}
  ],
  session:null, lang:'en', env:'web', envFrom:null, remembered:null, booking:null,
- nextGoogle:'ok', outbox:[], seq:100
+ nextGoogle:'ok', seq:100
 }}
 const freshView=()=>({page:'home',expanded:false,modal:null,toast:null,gFor:'login',err:{},form:{},returnTo:'home',pendingSub:null,pick:{date:null,time:null}});
 let DB=seed(), VIEW=freshView();
@@ -1796,7 +1796,6 @@ function nickFor(){const L=NICK[DB.lang]||NICK.en;const p=a=>a[Math.floor(Math.r
 /* ---------- 동작 ---------- */
 let tt;
 function toast(s){VIEW.toast=s;clearTimeout(tt);tt=setTimeout(()=>{VIEW.toast=null;render()},4000)}
-function mail(to,type){DB.outbox.unshift({to,type,at:new Date().toLocaleTimeString('ko-KR')})}
 function go(p,o={}){VIEW.page=p;VIEW.modal=null;VIEW.err={};Object.assign(VIEW,o);
  if(p==='login'){if(DB.env==='alipay'){VIEW.page='home'}else{VIEW.expanded=!!DB.remembered;VIEW.form={email:DB.remembered||'',pw:'',rem:!!DB.remembered}}}
  if(p==='signup'||p==='forgot')VIEW.form={};render();window.scrollTo(0,0)}
@@ -1812,19 +1811,19 @@ function googlePick(sub){
  VIEW.page='spin';render();setTimeout(()=>googleDone(sub),500)}
 function googleDone(sub){
  const g=gAcc(sub);
- if(VIEW.gFor==='connect'){const m=me();VIEW.page='account';if(judgeConnect(DB,m.id,sub).result==='taken')toast('This Google account is already linked to another K-Beauty Station account.');else{m.googleSub=sub;m.linkNoticeShown=true;mail(m.email,'구글 연결 안내');toast('Your Google account is now linked.')}render();return}
+ if(VIEW.gFor==='connect'){const m=me();VIEW.page='account';if(judgeConnect(DB,m.id,sub).result==='taken')toast('This Google account is already linked to another K-Beauty Station account.');else{m.googleSub=sub;m.linkNoticeShown=true;toast('Your Google account is now linked.')}render();return}
  if(VIEW.gFor==='delete'){const m=me();if(m.googleSub!==sub){VIEW.page='account';VIEW.modal='delGoogle';VIEW.err.del='Please log in with the Google account linked to this account.';render();return}
   m.status='deleted';m.googleSub=null;DB.session=null;VIEW.page='home';toast('Account withdrawal successful.');render();return}
  const j=judgeGoogle(DB,sub);
  if(j.result==='login'){afterLogin(j.member);return}
  if(j.result==='signup-blocked'){VIEW.page=backOf();toast('This email is already linked to a different Google account. Please log in with your email or the Google account linked to your account.');render();return}
  if(j.result==='signup'){const m={id:++DB.seq,email:g.email.toLowerCase(),nickname:nickFor(),joined:'2026. 10. 27',lang:DB.lang,verified:g.emailVerified!==false,password:null,googleSub:sub,status:'active',via:'google',marketing:false,linkNoticeShown:true,termsAt:new Date().toLocaleString('ko-KR')};DB.members.push(m);afterLogin(m);return}
- if(j.result==='autolink'){const m=j.member;m.googleSub=sub;mail(m.email,'구글 연결 안내');let msg=null;if(!m.linkNoticeShown){msg='Your Google account is now linked. You can log in with Google or your email and password.';m.linkNoticeShown=true}afterLogin(m,msg);return}
+ if(j.result==='autolink'){const m=j.member;m.googleSub=sub;let msg=null;if(!m.linkNoticeShown){msg='Your Google account is now linked. You can log in with Google or your email and password.';m.linkNoticeShown=true}afterLogin(m,msg);return}
  if(j.result==='pwconfirm'){VIEW.page=backOf();VIEW.pendingSub=sub;VIEW.modal='pwconfirm';VIEW.err={};VIEW.form.cpw='';render();return}
 }
 function confirmLink(){const g=gAcc(VIEW.pendingSub);const m=DB.members.find(x=>live(x)&&norm(x.email)===norm(g.email));const pw=val('cpw');
  if(pw!==m.password){VIEW.err.cpw='Email or password is incorrect.';VIEW.form.cpw=pw;render();return}
- m.googleSub=g.sub;if(g.emailVerified!==false)m.verified=true;mail(m.email,'구글 연결 안내');m.linkNoticeShown=true;afterLogin(m,'Your Google account is now linked. You can log in with Google or your email and password.')}
+ m.googleSub=g.sub;if(g.emailVerified!==false)m.verified=true;m.linkNoticeShown=true;afterLogin(m,'Your Google account is now linked. You can log in with Google or your email and password.')}
 function emailLogin(){const e=val('le'),p=val('lp');VIEW.form.email=e;VIEW.form.pw=p;VIEW.err={};
  const m=DB.members.find(x=>live(x)&&norm(x.email)===norm(e));
  if(m&&!m.password){VIEW.err.login='This account uses Google login. Please log in with Google.';render();return}
@@ -1840,7 +1839,7 @@ function setPw(){const a=val('np'),b=val('cp');VIEW.err={};
  const pe=!a?'Please enter your password.':a.length<8?'Password must be at least 8 characters.':a.length>20?'Password must be at most 20 characters.':!/[A-Z]/.test(a)?'Please include an uppercase letter.':!/[a-z]/.test(a)?'Please include a lowercase letter.':!/[0-9]/.test(a)?'Please include a number.':!/[^A-Za-z0-9]/.test(a)?'Please include a special character.':null;if(pe){VIEW.err.np=pe;render();return}if(a!==b){VIEW.err.cp='Passwords do not match.';render();return}
  me().password=a;VIEW.modal=null;toast('Your password has been set.');render()}
 function saveNick(){const m=me(),v=val('nn');VIEW.err={};const e=!v.trim()?'Please enter your name.':/\s/.test(v)?'Spaces are not allowed.':v===m.nickname?'Same as current name.':DB.members.some(x=>x.id!==m.id&&x.status!=='deleted'&&x.nickname.toLowerCase()===v.toLowerCase())?'This nickname is already in use.':null;if(e){VIEW.err.nn=e;render();return}m.nickname=v;VIEW.modal=null;toast('Nickname changed.');render()}
-function disconnect(){const m=me();m.googleSub=null;m.linkNoticeShown=false;mail(m.email,'구글 연결 해제 안내');VIEW.modal=null;toast('Google has been disconnected.');render()}
+function disconnect(){const m=me();m.googleSub=null;m.linkNoticeShown=false;VIEW.modal=null;toast('Google has been disconnected.');render()}
 function delPw(){const m=me();if(val('dp')!==m.password){VIEW.err.dp='Incorrect password.';render();return}m.status='deleted';m.googleSub=null;DB.session=null;VIEW.modal=null;VIEW.page='home';toast('Account withdrawal successful.');render()}
 function logout(){DB.session=null;VIEW.page='home';toast('logged out.');render()}
 function toMy(){if(DB.session)go('myin');else if(DB.env==='alipay')return;else go('myout')}
