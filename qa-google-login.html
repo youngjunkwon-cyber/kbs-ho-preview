@@ -69,13 +69,13 @@ svg text{font-family:"Pretendard Variable",Pretendard,sans-serif}
   <button data-cv="mail" onclick="cover('mail')">발송함</button>
   <button data-cv="doc" onclick="cover('doc')">전달 문서</button>
   <button id="nwbtn" onclick="toggleNew()">새 요소 표시</button>
-  <button onclick="window.open('gl-proto.html?v=1793065270096','_blank')">새 창</button>
+  <button onclick="window.open('gl-proto.html?v=1793065575735','_blank')">새 창</button>
   <button onclick="copyResult()">결과 복사</button>
  </div>
 </div>
 <div class="main">
  <div class="left">
-  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1793065270096"></iframe>
+  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1793065575735"></iframe>
    <div class="cover" id="cv-flow"><h3>구글 로그인 판정 순서 <button onclick="cover(null)">닫기</button></h3><div id="flow"></div></div>
    <div class="cover" id="cv-db"><h3>회원 DB (시안 안 데이터, 1초마다 갱신) <button onclick="cover(null)">닫기</button></h3><div id="db"></div></div>
    <div class="cover" id="cv-mail"><h3>발송함 <button onclick="cover(null)">닫기</button></h3><div id="mail"></div></div>
@@ -90,7 +90,7 @@ svg text{font-family:"Pretendard Variable",Pretendard,sans-serif}
   회원 1 verified@example.com (이메일 인증 완료, 비밀번호 pass1234) / 회원 2 unverified@example.com (미인증, pass1234) / 회원 3 googleonly@gmail.com (구글로 가입, 비밀번호 없음) / 회원 5 linked@example.com (이메일 가입 + 구글 연결, pass1234)<br>
   기기의 구글 계정: Alex Kim(새 사람) / 이름 없음 / Mina Park(회원 1 이메일) / Mina Park(회원 1 이메일 대문자) / Old User(회원 2) / Jane Doe(회원 3) / Both Ways(회원 5) / Other Person(어느 회원과도 다른 이메일)<br><br>
   <b>확인하지 않는 것</b><br>화면은 라이브 FO(2026-10-26)를 그대로 떠 왔고, 분홍 점선(새 요소 표시)이 이번에 더하는 부분입니다. 로그인한 My Page와 예약자 정보의 전화번호 입력칸(Use a different number 상태)도 라이브에서 떠 왔고 이름·연락처는 예시값입니다. 스토어 목록에서는 DDYOU만 눌립니다.<br>
-  화면 문구는 라이브 FO 번역 문구를 그대로 썼습니다. 라이브 탈퇴는 실제로 누를 수 없어, 번역 문구에 비밀번호 단계가 없는 것을 근거로 Still Want to Withdraw? 다음 바로 탈퇴로 넣었습니다. 닉네임 중복 검사 문구는 라이브에 없어 시안에서는 겹쳐도 저장됩니다.<br>
+  화면 문구는 라이브 FO 번역 문구를 그대로 썼습니다. 라이브 탈퇴는 실제로 누를 수 없어, 번역 문구에 비밀번호 단계가 없는 것을 근거로 Still Want to Withdraw? 다음 바로 탈퇴로 넣었습니다. 닉네임 중복 안내는 라이브에 문구가 없어 "This nickname is already in use."를 새로 넣었습니다.<br>
   구글 화면(계정 선택·앱 안 로그인)은 구글이 그리는 화면을 흉내만 냈습니다. 인증 코드 메일 발송과 가입 나머지 단계는 동작하지 않습니다.</p>
  </div>
 </div>
@@ -160,8 +160,9 @@ const CASES=[
 ["E-11","닉네임 수정 창","계정 설정 Account 구역 Nickname 줄 → Change","Change Nickname 창에 Current Nickname(지금 닉네임, 고칠 수 없음)과 New Nickname 칸이 있습니다.","DB.session=3;go('account')"],
 ["E-12","닉네임 수정 오류","Change → 빈칸으로 Save / 띄어쓰기 넣고 Save / 지금 닉네임 그대로 Save","차례로 \"Please enter your name.\" / \"Spaces are not allowed.\" / \"Same as current name.\" (라이브 문구)","DB.session=3;go('account')"],
 ["E-13","닉네임 수정 저장","Change → New Nickname에 JaneBeauty → Save → 뒤로 가서 My Page","하단 \"Nickname changed.\" 계정 설정과 My Page Name이 JaneBeauty로 바뀝니다.","DB.session=3;go('account')"],
-['F-01','구글 전용 회원 탈퇴','맨 아래 Delete Account → Still Want to Withdraw? → Continue with Google → Jane Doe','탈퇴되고 로그아웃된 채 홈으로 갑니다. 회원 3 상태 = 탈퇴, 구글 연결 지워짐.',"DB.session=3;go('account')"],
-['F-02','탈퇴 확인에서 다른 구글 선택','맨 아래 Delete Account → Still Want to Withdraw? → Continue with Google → Alex Kim','창 안에 "Please log in with the Google account linked to this account." 탈퇴되지 않습니다.',"DB.session=3;go('account')"],
+["E-14","닉네임 중복","Change → New Nickname에 Mina(다른 회원 닉네임, 대소문자 달라도 같음) → Save","\"This nickname is already in use.\" (라이브에 없는 새 문구) 저장되지 않습니다.","DB.session=3;go('account')"],
+["F-01","구글 전용 회원 탈퇴","맨 아래 Delete Account → Still Want to Withdraw? → 확인 체크 → Delete Account","구글 재인증 없이 우리 확인 창이 뜹니다. 체크하면 Delete Account가 눌리고, 누르면 바로 탈퇴돼 \"Account withdrawal successful.\" 후 홈으로 갑니다. 회원 3 상태 = 탈퇴, 구글 연결 지워짐.","DB.session=3;go('account')"],
+["F-02","확인 체크 전에는 탈퇴 안 됨","맨 아래 Delete Account → Still Want to Withdraw? → 체크하지 않고 Delete Account","Delete Account가 흐리게 눌리지 않고 탈퇴되지 않습니다. Cancel을 누르면 창이 닫히고 그대로 로그인 상태입니다.","DB.session=3;go('account')"],
 ['F-03','탈퇴한 구글로 다시 로그인','Jane Doe를 고릅니다.','새 회원으로 가입됩니다(이전 회원 3과 별개).',"DB.members[2].status='deleted';DB.members[2].googleSub=null;go('login');startGoogle('login')"],
 ["F-04","비밀번호 있는 회원 탈퇴 (라이브 그대로)","맨 아래 Delete Account → Still Want to Withdraw?","구글 재인증 없이 지금 라이브처럼 바로 탈퇴되고 \"Account withdrawal successful.\" 안내 후 홈으로 갑니다.","DB.session=5;go('account')"],
 ['G-01','LINE 앱 + 예약 중','Continue with Google','"Opening in your browser" 후 기본 브라우저 주소창이 보이고 같은 로그인 화면이 열립니다. 검은 안내 상자와 날짜·시간 유지. 구글 버튼을 한 번 더 누르면 계정 선택.',"DB.env='line';"+BK+"go('login',{returnTo:'bookinfo'})"],
@@ -177,7 +178,7 @@ const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(ST))}catch(e){}};
 let GRP='C',FIL='all';
 const W=()=>document.getElementById('fr').contentWindow;
 function toggleNew(){const b=W().document.body;b.classList.toggle('show-new');document.getElementById('nwbtn').classList.toggle('on',b.classList.contains('show-new'))}
-function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1793065270096?'+Date.now()}
+function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1793065575735?'+Date.now()}
 function open_(i){const c=CASES[i];const w=W();w.resetDB();try{w.eval(c[4])}catch(e){alert('세팅 실패: '+e.message)}cover(null);document.querySelectorAll('.case .open').forEach(b=>b.classList.remove('open'));const b=document.getElementById('o'+i);if(b)b.classList.add('open')}
 function mark(id,v){ST[id]=ST[id]||{};ST[id].s=ST[id].s===v?null:v;save();draw()}
 function memo(id,v){ST[id]=ST[id]||{};ST[id].m=v;save()}
