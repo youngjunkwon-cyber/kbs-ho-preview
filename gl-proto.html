@@ -1907,7 +1907,7 @@ P.signup=()=>{R().innerHTML=envBar()+tpl('t_signup');header();const F=VIEW.form;
  else{const gv=el('<div class="gl-new" style="display:flex;flex-direction:column;gap:8px;margin-top:8px"><div class="gl-or" style="margin:0">or</div><button type="button" class="gl-gbtn white" data-k="gverify">'+G_SVG+'Verify with Google</button></div>');flow.appendChild(gv);on(gv.querySelector('[data-k=gverify]'),()=>{F.nick=val('snk');startGoogle('verify')})}
  // 약관 (라이브 체크 칸, 시안에서 켜고 끌 수 있게)
  const all=$('[class*="X-Toyq__agreementAll"]'),rows=$$('[class*="X-Toyq__agreementCheck"]'),keys=['svc','pp','mk'];
- const tick=(btn,on_)=>{const s=btn.querySelector('svg');if(s){s.style.color=on_?'#FB6F92':'';s.querySelectorAll('path,rect,circle').forEach(n=>{if(on_){n.setAttribute('stroke','#FB6F92')}})}};
+ const tick=(btn,on_)=>{const s=btn.querySelector('svg');if(s&&on_)s.outerHTML='<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="2" fill="#FB6F92"/><path d="M7.5 12.2l3 3 6-6.4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'};
  rows.forEach((x,i)=>{tick(x,F.ag[keys[i]]);on(x,()=>{F.ag[keys[i]]=!F.ag[keys[i]];F.nick=val('snk');render()})});tick(all,keys.every(k=>F.ag[k]));on(all,()=>{const v=!keys.every(k=>F.ag[k]);keys.forEach(k=>F.ag[k]=v);F.nick=val('snk');render()});
  const sb=$$('[class*="X-Toyq__footer"] button').find(x=>/Sign Up/.test(x.textContent));
  const upd=()=>{sb.disabled=!(F.gv&&(F.nick||'').trim()&&F.ag.svc&&F.ag.pp)};upd();
