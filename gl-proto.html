@@ -1875,7 +1875,7 @@ P.book=()=>{R().innerHTML=envBar()+tpl('t_book');header();const p=VIEW.pick;
 P.login=()=>{const bk=DB.booking;R().innerHTML=envBar()+tpl(bk?'t_login_bk':'t_login');header();
  if(bk){$('[class*="983qcG__subtitle"]').textContent=`Booking ${bk.store} for ${longDate(bk.date)} at ${bk.time} (KST)`}
  const main=$('main'),form=$('[class*="cCWY7G__page__form"]'),foot=$('[class*="cCWY7G__page__footer"]');
- const g=el(`<div class="gl-gblock gl-new">${gbtn()}<p class="gl-notice">By continuing with Google, you agree to our <a>Terms of Service</a> and <a>Privacy Policy</a>.</p></div>`);main.insertBefore(g,form);on(g.querySelector('[data-k=gstart]'),()=>startGoogle('login'));
+ const g=el(`<div class="gl-gblock gl-new">${gbtn()}</div>`);main.insertBefore(g,form);on(g.querySelector('[data-k=gstart]'),()=>startGoogle('login'));
  const loginBtn=$('[class*="cCWY7G__loginButton"]'),links=$$('[class*="footer__links__link"]');
  if(!VIEW.expanded){form.style.display='none';foot.style.display='none';const l=el('<button type="button" class="gl-emlink gl-new">Log in with email</button>');main.insertBefore(l,form);on(l,()=>{VIEW.expanded=true;render()})}
  else{main.insertBefore(el('<div class="gl-or gl-new">or log in with email</div>'),form);loginBtn.classList.add('gl-outline','gl-new');links[0].textContent='Sign up with email';links[0].classList.add('gl-new');
