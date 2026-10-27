@@ -74,14 +74,14 @@ svg text{font-family:"Pretendard Variable",Pretendard,sans-serif}
   <button data-cv="doc" onclick="cover('doc')">전달 문서</button>
   <button id="bobtn" onclick="showBO(!document.getElementById('bop').classList.contains('on'))">BO 회원 화면</button>
   <button id="nwbtn" onclick="toggleNew()">새 요소 표시</button>
-  <button onclick="window.open('gl-proto.html?v=1793071972513','_blank')">새 창</button>
+  <button onclick="window.open('gl-proto.html?v=1793075930416','_blank')">새 창</button>
   <button onclick="copyResult()">결과 복사</button>
  </div>
 </div>
 <div class="bo-panel" id="bop"><div class="bo-bar"><b>BO 회원 &gt; 정보조회</b><span style="color:#777">라이브 어드민 화면 구조 그대로이고, 회원 데이터는 FO 시안의 회원 DB를 그대로 읽습니다. 닫기를 누르면 FO 시안으로 돌아갑니다.</span><span style="flex:1"></span><button onclick="document.getElementById('bof').contentWindow.boDraw&&document.getElementById('bof').contentWindow.boDraw()">새로고침</button><button onclick="showBO(false)">닫기</button></div><iframe id="bof" src="about:blank"></iframe></div>
 <div class="main">
  <div class="left">
-  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1793071972513"></iframe>
+  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1793075930416"></iframe>
    <div class="cover" id="cv-flow"><h3>구글 로그인 판정 순서 <button onclick="cover(null)">닫기</button></h3><div id="flow"></div></div>
    <div class="cover" id="cv-db"><h3>회원 DB (시안 안 데이터, 1초마다 갱신) <button onclick="cover(null)">닫기</button></h3><div id="db"></div></div>
    <div class="cover" id="cv-doc"><h3>구글 로그인 개발 전달 문서 <button onclick="cover(null)">닫기</button></h3><div class="doc" id="doc"></div></div>
@@ -116,19 +116,19 @@ const CASES=[
 ["A-11","My Page의 Log in with email","Log in with email → verified@example.com / pass1234 → Login","화면 이동 없이 카드 안에서 이메일·비밀번호 칸, Remember Email, 흰 Login 버튼, Sign up with email · Forgot Password가 펼쳐지고 아래 메뉴(Chat History 등)는 그대로입니다. 로그인하면 로그인한 My Page가 됩니다.","go('myout')"],
 ["A-12","로그인한 My Page","홈 하단 MY PAGE","Name에 회원 닉네임(Mina)과 가입일, 예약 내역, My Activity가 라이브와 같게 보입니다. 아래 Change account information을 누르면 계정 설정으로 갑니다.","DB.session=1;go('home')"],
 ["A-07","알리페이 채널로 들어온 회원","(알리페이 앱으로 들어와 이미 로그인된 상태로 홈이 열림) 하단 MY PAGE → Change account information","로그인한 My Page가 바로 보이고 구글 버튼·로그인 화면은 나오지 않습니다. 계정 설정에는 Google 줄이 없습니다(알리페이 채널은 자체 로그인 경로가 숨겨져 있음).","DB.env='alipay';DB.members.push({id:9,email:'alipay.user@example.com',nickname:'AlipayGuest',verified:true,password:null,googleSub:null,status:'active',via:'alipay',marketing:false,linkNoticeShown:true});DB.session=9;go('home')"],
-["B-01","처음 보는 구글 계정이면 바로 가입","Alex Kim을 고릅니다.","안내 없이 홈으로 돌아오고 로그인돼 있습니다.\n회원 DB에 alex.new@gmail.com 추가: 닉네임은 구글 이름을 쓰지 않고, 가입할 때의 서비스 언어로 자동 생성(형용사 + 꽃·뷰티 단어 + 숫자 4자리, 띄어쓰기 없음. 영어 예: GlowingPeony4821), 인증 완료, 비밀번호 없음, 가입 경로 구글, 마케팅 미동의, 약관 동의 시각 기록.","go('login');startGoogle('login')"],
-["B-02","구글 이름이 비어 있어도 같은 규칙","noname@gmail.com을 고릅니다.","닉네임이 B-01과 같은 규칙으로 만들어집니다.","go('login');startGoogle('login')"],
-["B-02a","중국어(간체)로 가입하면 중국어 닉네임","Alex Kim을 고릅니다.","회원 DB의 닉네임이 중국어(간체) 단어 + 숫자 4자리입니다(예: 闪耀牡丹4821). 시안 화면 문구는 영어로만 떠 와서 영어로 보입니다.","DB.lang='zh-CN';go('login');startGoogle('login')"],
-["B-02b","일본어로 가입하면 일본어 닉네임","Alex Kim을 고릅니다.","닉네임이 일본어 단어 + 숫자 4자리입니다(예: きらめくさくら4821).","DB.lang='ja';go('login');startGoogle('login')"],
-["B-02c","인도네시아어로 가입하면 인도네시아어 닉네임","Alex Kim을 고릅니다.","닉네임이 인도네시아어 어순(꽃 단어 + 형용사) + 숫자 4자리입니다(예: MawarBerseri4821).","DB.lang='id';go('login');startGoogle('login')"],
-["B-02d","몽골어로 가입하면 몽골어 닉네임","Alex Kim을 고릅니다.","닉네임이 몽골어(키릴 문자) 단어 + 숫자 4자리입니다.","DB.lang='mn';go('login');startGoogle('login')"],
-['B-03','이메일 인증 회원은 자동 연결','Mina Park (verified@example.com)을 고릅니다.','로그인되고 하단에 "Your Google account is now linked..." 안내가 1번 뜹니다.\n회원 1의 닉네임은 Mina 그대로입니다.',"go('login');startGoogle('login')"],
-["B-04","자동 연결 안내는 첫 로그인 때만","(이미 한 번 자동 연결된 회원 1로 구글 계정 선택이 열림) Mina Park (verified@example.com)","바로 로그인되고 하단 연결 안내가 뜨지 않습니다.","DB.members[0].googleSub='g-ver';DB.members[0].linkNoticeShown=true;go('login');startGoogle('login')"],
-['B-05','이메일 대소문자가 달라도 같은 회원','Mina Park (Verified@Example.com)을 고릅니다.','새 회원이 생기지 않고 회원 1에 연결됩니다.',"go('login');startGoogle('login')"],
-["B-16","이미 연결된 구글로 로그인 (구글 쪽 이메일이 바뀐 경우 포함)","Jane Doe (jane.new@gmail.com)을 고릅니다.","안내 없이 회원 3으로 바로 로그인됩니다. 구글 쪽 이메일이 바뀌었어도 같은 회원으로 들어오고, 회원 이메일은 googleonly@gmail.com 그대로입니다.","DB.google.find(g=>g.sub==='g-jane').email='jane.new@gmail.com';go('login');startGoogle('login')"],
-["B-17","구글이 이메일을 확인하지 않은 계정 + 같은 이메일 회원","Mina Park (verified@example.com)을 고릅니다.","연결하지 않고 \"Login failed. Please try again.\" 회원 1에 구글이 붙지 않습니다.","DB.google.find(g=>g.sub==='g-ver').emailVerified=false;go('login');startGoogle('login')"],
-["B-18","구글이 이메일을 확인하지 않은 계정 + 처음 가입","Alex Kim을 고릅니다.","가입하지 않고 \"Login failed. Please try again.\" 회원이 새로 생기지 않습니다.","DB.google.find(g=>g.sub==='g-new').emailVerified=false;go('login');startGoogle('login')"],
-['B-15','같은 이메일 회원이 다른 구글에 이미 연결','Mina Park (verified@example.com)을 고릅니다.','회원 1은 Other Person 구글이 연결돼 있는 상태입니다. 연결하지 않고 "This email is already linked to a different Google account. Please log in with your email or the Google account linked to your account." 안내를 띄웁니다.',"DB.members[0].googleSub='g-other';DB.members[0].linkNoticeShown=true;go('login');startGoogle('login')"],
+["B-01","처음 보는 구글 계정이면 바로 가입","(My Page에서 Continue with Google을 누른 상태로 열림) Alex Kim을 고릅니다.","안내 없이 로그인한 My Page로 돌아옵니다.\n회원 DB에 alex.new@gmail.com 추가: 닉네임은 구글 이름을 쓰지 않고, 가입할 때의 서비스 언어로 자동 생성(형용사 + 꽃·뷰티 단어 + 숫자 4자리, 띄어쓰기 없음. 영어 예: GlowingPeony4821), 인증 완료, 비밀번호 없음, 가입 경로 구글, 마케팅 미동의, 약관 동의 시각 기록.","go('myout');startGoogle('login')"],
+["B-02","구글 이름이 비어 있어도 같은 규칙","(My Page에서 Continue with Google을 누른 상태로 열림) noname@gmail.com을 고릅니다.","닉네임이 B-01과 같은 규칙으로 만들어집니다.","go('myout');startGoogle('login')"],
+["B-02a","중국어(간체)로 가입하면 중국어 닉네임","(My Page에서 Continue with Google을 누른 상태로 열림) Alex Kim을 고릅니다.","회원 DB의 닉네임이 중국어(간체) 단어 + 숫자 4자리입니다(예: 闪耀牡丹4821). 시안 화면 문구는 영어로만 떠 와서 영어로 보입니다.","DB.lang='zh-CN';go('myout');startGoogle('login')"],
+["B-02b","일본어로 가입하면 일본어 닉네임","(My Page에서 Continue with Google을 누른 상태로 열림) Alex Kim을 고릅니다.","닉네임이 일본어 단어 + 숫자 4자리입니다(예: きらめくさくら4821).","DB.lang='ja';go('myout');startGoogle('login')"],
+["B-02c","인도네시아어로 가입하면 인도네시아어 닉네임","(My Page에서 Continue with Google을 누른 상태로 열림) Alex Kim을 고릅니다.","닉네임이 인도네시아어 어순(꽃 단어 + 형용사) + 숫자 4자리입니다(예: MawarBerseri4821).","DB.lang='id';go('myout');startGoogle('login')"],
+["B-02d","몽골어로 가입하면 몽골어 닉네임","(My Page에서 Continue with Google을 누른 상태로 열림) Alex Kim을 고릅니다.","닉네임이 몽골어(키릴 문자) 단어 + 숫자 4자리입니다.","DB.lang='mn';go('myout');startGoogle('login')"],
+["B-03","이메일 인증 회원은 자동 연결","(My Page에서 Continue with Google을 누른 상태로 열림) Mina Park (verified@example.com)을 고릅니다.","로그인되고 하단에 \"Your Google account is now linked...\" 안내가 1번 뜹니다.\n회원 1의 닉네임은 Mina 그대로입니다.","go('myout');startGoogle('login')"],
+["B-04","자동 연결 안내는 첫 로그인 때만","(이미 한 번 자동 연결된 회원 1로 My Page에서 구글 계정 선택이 열림) Mina Park (verified@example.com)","바로 로그인되고 하단 연결 안내가 뜨지 않습니다.","DB.members[0].googleSub='g-ver';DB.members[0].linkNoticeShown=true;go('myout');startGoogle('login')"],
+["B-05","이메일 대소문자가 달라도 같은 회원","(My Page에서 Continue with Google을 누른 상태로 열림) Mina Park (Verified@Example.com)을 고릅니다.","새 회원이 생기지 않고 회원 1에 연결됩니다.","go('myout');startGoogle('login')"],
+["B-16","이미 연결된 구글로 로그인 (구글 쪽 이메일이 바뀐 경우 포함)","(My Page에서 Continue with Google을 누른 상태로 열림) Jane Doe (jane.new@gmail.com)을 고릅니다.","안내 없이 회원 3으로 바로 로그인됩니다. 구글 쪽 이메일이 바뀌었어도 같은 회원으로 들어오고, 회원 이메일은 googleonly@gmail.com 그대로입니다.","DB.google.find(g=>g.sub==='g-jane').email='jane.new@gmail.com';go('myout');startGoogle('login')"],
+["B-17","구글이 이메일을 확인하지 않은 계정 + 같은 이메일 회원","(My Page에서 Continue with Google을 누른 상태로 열림) Mina Park (verified@example.com)을 고릅니다.","연결하지 않고 \"Login failed. Please try again.\" 회원 1에 구글이 붙지 않습니다.","DB.google.find(g=>g.sub==='g-ver').emailVerified=false;go('myout');startGoogle('login')"],
+["B-18","구글이 이메일을 확인하지 않은 계정 + 처음 가입","(My Page에서 Continue with Google을 누른 상태로 열림) Alex Kim을 고릅니다.","가입하지 않고 \"Login failed. Please try again.\" 회원이 새로 생기지 않습니다.","DB.google.find(g=>g.sub==='g-new').emailVerified=false;go('myout');startGoogle('login')"],
+["B-15","같은 이메일 회원이 다른 구글에 이미 연결","(My Page에서 Continue with Google을 누른 상태로 열림) Mina Park (verified@example.com)을 고릅니다.","회원 1은 Other Person 구글이 연결돼 있는 상태입니다. 연결하지 않고 \"This email is already linked to a different Google account. Please log in with your email or the Google account linked to your account.\" 안내를 띄웁니다.","DB.members[0].googleSub='g-other';DB.members[0].linkNoticeShown=true;go('myout');startGoogle('login')"],
 ["C-01","스토어 상세에서 예약 시작","Book now → 날짜 28일 → 17:00 → 아래 날짜·시간 버튼","로그인 화면이 열리고 맨 위 검은 안내 상자에 DDYOU, October 28, 2026, 17:00이 보입니다. 그 아래 핑크 Continue with Google, Log in with email. 홈 하단 STORE → DDYOU로 들어와도 같습니다.","go('store')"],
 ["C-02","예약 중 구글로 처음 가입","(DDYOU 28일 17:00을 고른 뒤 상태로 열림) 구글 계정 선택에서 Alex Kim","예약자 정보 화면으로 바로 갑니다. 상단에 DDYOU와 고른 시간, 여권명·국적·성별·생년월일은 빈칸, Email = alex.new@gmail.com (Verified), 전화번호는 인증 전 입력칸.","VIEW.pick={date:'2026-10-28',time:'17:00'};DB.booking={store:'DDYOU',date:'2026-10-28',time:'17:00'};go('login',{returnTo:'bookinfo'});startGoogle('login')"],
 ["C-05","구글 화면에서 취소 (예약 중)","(DDYOU 28일 17:00을 고른 뒤 상태로 열림) 구글 화면 왼쪽 위 ✕","로그인 화면으로 돌아오고 아무 안내도 뜨지 않습니다. 검은 안내 상자와 날짜·시간은 그대로입니다.","VIEW.pick={date:'2026-10-28',time:'17:00'};DB.booking={store:'DDYOU',date:'2026-10-28',time:'17:00'};go('login',{returnTo:'bookinfo'});startGoogle('login')"],
@@ -150,16 +150,16 @@ const CASES=[
 ['E-03','Set Password 저장','Set Password → Abcd123! 두 번 → Save','하단 "Your password has been set." Password가 Change Password로, Disconnect가 눌리게, 안내 문장은 사라집니다.',"DB.session=3;go('account')"],
 ['E-04','이메일 회원이 다른 이메일의 구글 연결','Connect → Other Person','하단 "Your Google account is now linked." Google = Connected. 회원 이메일은 verified@example.com 그대로.',"DB.session=1;go('account')"],
 ['E-05','이미 다른 회원에 붙은 구글 연결 시도','Connect → Jane Doe','"This Google account is already linked to another K-Beauty Station account." 연결되지 않습니다.',"DB.session=1;go('account')"],
-['E-06','연결한 다른 이메일 구글로 로그인','Other Person을 고릅니다.','회원 1(verified@example.com)로 로그인됩니다.',"DB.members[0].googleSub='g-other';DB.members[0].linkNoticeShown=true;go('login');startGoogle('login')"],
+["E-06","연결한 다른 이메일 구글로 로그인","(My Page에서 Continue with Google을 누른 상태로 열림) Other Person을 고릅니다.","회원 1(verified@example.com)로 로그인됩니다.","DB.members[0].googleSub='g-other';DB.members[0].linkNoticeShown=true;go('myout');startGoogle('login')"],
 ['E-07','구글 연결 해제','Disconnect → Disconnect','하단 "Google has been disconnected." Google = Connect.',"DB.session=5;go('account')"],
 ['E-08','연결 해제 취소','Disconnect → Cancel','창만 닫히고 연결은 그대로입니다.',"DB.session=5;go('account')"],
-['E-09','해제 후 같은 이메일 구글로 다시 로그인','Both Ways를 고릅니다.','회원 5에 다시 자동 연결되고, 해제 뒤 첫 연결이라 하단 연결 안내가 다시 뜹니다.',"DB.members.find(m=>m.id===5).googleSub=null;DB.members.find(m=>m.id===5).linkNoticeShown=false;go('login');startGoogle('login')"],
+["E-09","해제 후 같은 이메일 구글로 다시 로그인","(My Page에서 Continue with Google을 누른 상태로 열림) Both Ways를 고릅니다.","회원 5에 다시 자동 연결되고, 해제 뒤 첫 연결이라 하단 연결 안내가 다시 뜹니다.","DB.members.find(m=>m.id===5).googleSub=null;DB.members.find(m=>m.id===5).linkNoticeShown=false;go('myout');startGoogle('login')"],
 ["E-12","닉네임 수정 오류","Change → 빈칸으로 Save / 띄어쓰기 넣고 Save / 지금 닉네임 그대로 Save","차례로 \"Please enter your name.\" / \"Spaces are not allowed.\" / \"Same as current name.\" (라이브 문구)","DB.session=3;go('account')"],
 ["E-13","닉네임 수정","Nickname 줄 Change → New Nickname에 JaneBeauty → Save → 뒤로 가서 My Page","Change Nickname 창에 Current Nickname(고칠 수 없음)과 New Nickname 칸이 있습니다. 저장하면 하단 \"Nickname changed.\" 계정 설정과 My Page Name이 JaneBeauty로 바뀝니다.","DB.session=3;go('account')"],
 ["E-14","닉네임 중복","Change → New Nickname에 Mina(다른 회원 닉네임, 대소문자 달라도 같음) → Save","\"This nickname is already in use.\" (라이브에 없는 새 문구) 저장되지 않습니다.","DB.session=3;go('account')"],
 ["F-01","구글 전용 회원 탈퇴","맨 아래 Delete Account → Still Want to Withdraw? → 확인 체크 → Delete Account","구글 재인증 없이 우리 확인 창이 뜹니다. 체크하면 Delete Account가 눌리고, 누르면 바로 탈퇴돼 \"Account withdrawal successful.\" 후 홈으로 갑니다. 회원 3 상태 = 탈퇴, 구글 연결 지워짐.","DB.session=3;go('account')"],
 ["F-02","확인 체크 전에는 탈퇴 안 됨","맨 아래 Delete Account → Still Want to Withdraw? → 체크하지 않고 Delete Account","Delete Account가 흐리게 눌리지 않고 탈퇴되지 않습니다. Cancel을 누르면 창이 닫히고 그대로 로그인 상태입니다.","DB.session=3;go('account')"],
-['F-03','탈퇴한 구글로 다시 로그인','Jane Doe를 고릅니다.','새 회원으로 가입됩니다(이전 회원 3과 별개).',"DB.members.find(m=>m.id===3).status='deleted';DB.members.find(m=>m.id===3).googleSub=null;go('login');startGoogle('login')"],
+["F-03","탈퇴한 구글로 다시 로그인","(My Page에서 Continue with Google을 누른 상태로 열림) Jane Doe를 고릅니다.","새 회원으로 가입됩니다(이전 회원 3과 별개).","DB.members.find(m=>m.id===3).status='deleted';DB.members.find(m=>m.id===3).googleSub=null;go('myout');startGoogle('login')"],
 ["F-04","비밀번호 있는 회원 탈퇴 (라이브 그대로)","맨 아래 Delete Account → Still Want to Withdraw?","구글 재인증 없이 지금 라이브처럼 바로 탈퇴되고 \"Account withdrawal successful.\" 안내 후 홈으로 갑니다.","DB.session=5;go('account')"],
 ['G-02','카카오톡 앱 + 예약 중','Continue with Google','G-01과 같습니다.',"DB.env='kakao';"+BK+"go('login',{returnTo:'bookinfo'})"],
 ['G-03','LINE 앱 (예약 아님)','Continue with Google','기본 브라우저로 로그인 화면이 열리고 안내 상자는 없습니다.',"DB.env='line';go('login')"],
@@ -180,7 +180,7 @@ let GRP='C',FIL='all';
 const W=()=>document.getElementById('fr').contentWindow;
 function showBO(on){const p=document.getElementById('bop');p.classList.toggle('on',on);document.getElementById('bobtn').classList.toggle('on',on);if(on){p.style.top=document.querySelector('.top').offsetHeight+'px';const f=document.getElementById('bof');if(f.src.indexOf('gl-bo.html')<0){f.src='gl-bo.html?v='+Date.now();f.onload=()=>{if(document.body.classList.contains('nw'))f.contentWindow.document.body.classList.add('show-new')}}else if(f.contentWindow.boSet)f.contentWindow.boSet({via:'',q:''})}}
 function toggleNew(){const b=W().document.body;b.classList.toggle('show-new');document.body.classList.toggle('nw',b.classList.contains('show-new'));try{document.getElementById('bof').contentWindow.document.body.classList.toggle('show-new',b.classList.contains('show-new'))}catch(e){}document.getElementById('nwbtn').classList.toggle('on',b.classList.contains('show-new'))}
-function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1793071972513?'+Date.now()}
+function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1793075930416?'+Date.now()}
 function open_(i){const c=CASES[i];const w=W();w.resetDB();try{w.eval(c[4])}catch(e){alert('세팅 실패: '+e.message)}showBO(c[0][0]==='H');cover(null);document.querySelectorAll('.case .open').forEach(b=>b.classList.remove('open'));const b=document.getElementById('o'+i);if(b)b.classList.add('open')}
 function mark(id,v){ST[id]=ST[id]||{};ST[id].s=ST[id].s===v?null:v;save();draw()}
 function memo(id,v){ST[id]=ST[id]||{};ST[id].m=v;save()}
