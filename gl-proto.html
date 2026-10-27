@@ -1924,7 +1924,7 @@ P.account=()=>{const m=me();if(!m){VIEW.page='home';return P.home()}const g=!!m.
  const gEmail=g?(DB.google.find(x=>x.sub===m.googleSub)||{}).email||'':'';
  const nickBlock='';
  const gBlock=`<div class="${F}field gl-new" data-k="gblock"><label>Google</label><div class="${F}verifiedPhoneForm"><div class="${F}verifiedPhoneRow"><span class="${F}verifiedPhoneNumber">${g?'Connected ('+esc(gEmail)+')':'Not connected'}</span></div>${g?(pw?`<button type="button" class="${F}changePhoneButton" data-k="gdisc">Disconnect</button>`:''):`<button type="button" class="${F}changePhoneButton" data-k="gconn">Connect</button>`}</div></div>`;
- let h=tpl('t_account').replace('jane.doe@gmail.com',esc(m.email)).replace('<!--GOOGLE-->','').replace(`<div class="${F}profileSection">`,`<div class="${F}profileSection">`+nickBlock).replace(`<button type="submit" class="${F}saveButton">`,gBlock+`<button type="submit" class="${F}saveButton">`);
+ let h=tpl('t_account').replace('jane.doe@gmail.com',esc(m.email)).replace('<!--GOOGLE-->','').replace(`<div class="${F}profileSection">`,`<div class="${F}profileSection">`+gBlock);
  if(DB.env==='alipay'){const dd=document.createElement('div');dd.innerHTML=h;const gb=dd.querySelector('[data-k=gblock]');if(gb)gb.remove();h=dd.innerHTML}
  R().innerHTML=envBar()+h;header();const pb=$('[data-k=pwbtn]');if(g){const row=pb.closest('[class$=passwordFormItem]');const dv=row.nextElementSibling;row.remove();if(dv&&/divider/.test(dv.className))dv.remove()}else on(pb,()=>{});
  const sw=$('[data-k=mk]');if(m.marketing)sw.classList.add(F+'switchOn');$('[data-k=mkdate]').style.display=m.marketing?'':'none';on(sw,()=>{m.marketing=!m.marketing;render()});
