@@ -74,14 +74,14 @@ svg text{font-family:"Pretendard Variable",Pretendard,sans-serif}
   <button data-cv="doc" onclick="cover('doc')">전달 문서</button>
   <button id="bobtn" onclick="showBO(!document.getElementById('bop').classList.contains('on'))">BO 회원 화면</button>
   <button id="nwbtn" onclick="toggleNew()">새 요소 표시</button>
-  <button onclick="window.open('gl-proto.html?v=1793071789955','_blank')">새 창</button>
+  <button onclick="window.open('gl-proto.html?v=1793071972513','_blank')">새 창</button>
   <button onclick="copyResult()">결과 복사</button>
  </div>
 </div>
 <div class="bo-panel" id="bop"><div class="bo-bar"><b>BO 회원 &gt; 정보조회</b><span style="color:#777">라이브 어드민 화면 구조 그대로이고, 회원 데이터는 FO 시안의 회원 DB를 그대로 읽습니다. 닫기를 누르면 FO 시안으로 돌아갑니다.</span><span style="flex:1"></span><button onclick="document.getElementById('bof').contentWindow.boDraw&&document.getElementById('bof').contentWindow.boDraw()">새로고침</button><button onclick="showBO(false)">닫기</button></div><iframe id="bof" src="about:blank"></iframe></div>
 <div class="main">
  <div class="left">
-  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1793071789955"></iframe>
+  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1793071972513"></iframe>
    <div class="cover" id="cv-flow"><h3>구글 로그인 판정 순서 <button onclick="cover(null)">닫기</button></h3><div id="flow"></div></div>
    <div class="cover" id="cv-db"><h3>회원 DB (시안 안 데이터, 1초마다 갱신) <button onclick="cover(null)">닫기</button></h3><div id="db"></div></div>
    <div class="cover" id="cv-doc"><h3>구글 로그인 개발 전달 문서 <button onclick="cover(null)">닫기</button></h3><div class="doc" id="doc"></div></div>
@@ -127,7 +127,7 @@ const CASES=[
 ['B-05','이메일 대소문자가 달라도 같은 회원','Mina Park (Verified@Example.com)을 고릅니다.','새 회원이 생기지 않고 회원 1에 연결됩니다.',"go('login');startGoogle('login')"],
 ["B-16","이미 연결된 구글로 로그인 (구글 쪽 이메일이 바뀐 경우 포함)","Jane Doe (jane.new@gmail.com)을 고릅니다.","안내 없이 회원 3으로 바로 로그인됩니다. 구글 쪽 이메일이 바뀌었어도 같은 회원으로 들어오고, 회원 이메일은 googleonly@gmail.com 그대로입니다.","DB.google.find(g=>g.sub==='g-jane').email='jane.new@gmail.com';go('login');startGoogle('login')"],
 ["B-17","구글이 이메일을 확인하지 않은 계정 + 같은 이메일 회원","Mina Park (verified@example.com)을 고릅니다.","연결하지 않고 \"Login failed. Please try again.\" 회원 1에 구글이 붙지 않습니다.","DB.google.find(g=>g.sub==='g-ver').emailVerified=false;go('login');startGoogle('login')"],
-["B-18","구글이 이메일을 확인하지 않은 계정 + 처음 가입","Alex Kim을 고릅니다.","가입하지 않고 \"Login failed. Please try again.\" 회원이 새로 생기지 않습니다(미인증 회원을 만들지 않음).","DB.google.find(g=>g.sub==='g-new').emailVerified=false;go('login');startGoogle('login')"],
+["B-18","구글이 이메일을 확인하지 않은 계정 + 처음 가입","Alex Kim을 고릅니다.","가입하지 않고 \"Login failed. Please try again.\" 회원이 새로 생기지 않습니다.","DB.google.find(g=>g.sub==='g-new').emailVerified=false;go('login');startGoogle('login')"],
 ['B-15','같은 이메일 회원이 다른 구글에 이미 연결','Mina Park (verified@example.com)을 고릅니다.','회원 1은 Other Person 구글이 연결돼 있는 상태입니다. 연결하지 않고 "This email is already linked to a different Google account. Please log in with your email or the Google account linked to your account." 안내를 띄웁니다.',"DB.members[0].googleSub='g-other';DB.members[0].linkNoticeShown=true;go('login');startGoogle('login')"],
 ["C-01","스토어 상세에서 예약 시작","Book now → 날짜 28일 → 17:00 → 아래 날짜·시간 버튼","로그인 화면이 열리고 맨 위 검은 안내 상자에 DDYOU, October 28, 2026, 17:00이 보입니다. 그 아래 핑크 Continue with Google, Log in with email. 홈 하단 STORE → DDYOU로 들어와도 같습니다.","go('store')"],
 ["C-02","예약 중 구글로 처음 가입","(DDYOU 28일 17:00을 고른 뒤 상태로 열림) 구글 계정 선택에서 Alex Kim","예약자 정보 화면으로 바로 갑니다. 상단에 DDYOU와 고른 시간, 여권명·국적·성별·생년월일은 빈칸, Email = alex.new@gmail.com (Verified), 전화번호는 인증 전 입력칸.","VIEW.pick={date:'2026-10-28',time:'17:00'};DB.booking={store:'DDYOU',date:'2026-10-28',time:'17:00'};go('login',{returnTo:'bookinfo'});startGoogle('login')"],
@@ -180,7 +180,7 @@ let GRP='C',FIL='all';
 const W=()=>document.getElementById('fr').contentWindow;
 function showBO(on){const p=document.getElementById('bop');p.classList.toggle('on',on);document.getElementById('bobtn').classList.toggle('on',on);if(on){p.style.top=document.querySelector('.top').offsetHeight+'px';const f=document.getElementById('bof');if(f.src.indexOf('gl-bo.html')<0){f.src='gl-bo.html?v='+Date.now();f.onload=()=>{if(document.body.classList.contains('nw'))f.contentWindow.document.body.classList.add('show-new')}}else if(f.contentWindow.boSet)f.contentWindow.boSet({via:'',q:''})}}
 function toggleNew(){const b=W().document.body;b.classList.toggle('show-new');document.body.classList.toggle('nw',b.classList.contains('show-new'));try{document.getElementById('bof').contentWindow.document.body.classList.toggle('show-new',b.classList.contains('show-new'))}catch(e){}document.getElementById('nwbtn').classList.toggle('on',b.classList.contains('show-new'))}
-function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1793071789955?'+Date.now()}
+function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1793071972513?'+Date.now()}
 function open_(i){const c=CASES[i];const w=W();w.resetDB();try{w.eval(c[4])}catch(e){alert('세팅 실패: '+e.message)}showBO(c[0][0]==='H');cover(null);document.querySelectorAll('.case .open').forEach(b=>b.classList.remove('open'));const b=document.getElementById('o'+i);if(b)b.classList.add('open')}
 function mark(id,v){ST[id]=ST[id]||{};ST[id].s=ST[id].s===v?null:v;save();draw()}
 function memo(id,v){ST[id]=ST[id]||{};ST[id].m=v;save()}
@@ -199,7 +199,7 @@ let CV=null,dbT;
 function cover(k){CV=CV===k?null:k;document.querySelectorAll('.cover').forEach(e=>e.classList.toggle('on',e.id==='cv-'+CV));document.querySelectorAll('.tools [data-cv]').forEach(b=>b.classList.toggle('on',b.dataset.cv===CV));clearInterval(dbT);if(CV==='db'){drawDB();dbT=setInterval(drawDB,1000)}}
 function drawDB(){let D;try{D=W().eval('DB')}catch(e){return}const ses=D.session;const yn=v=>v?'예':'아니오';
  document.getElementById('db').innerHTML=`<p style="margin:0 0 8px">언어: <b>${D.lang}</b> · 환경: <b>${D.env}</b>${D.envFrom?' (원래 '+D.envFrom+')':''} · 로그인: <b>${ses?'회원 '+ses:'안 함'}</b> · 예약 중: <b>${D.booking?D.booking.date+' '+D.booking.time:'아님'}</b> · 저장 이메일: <b>${D.remembered||'없음'}</b></p>
- <table><tr><th>#</th><th>회원</th><th>상태</th></tr>${D.members.map(m=>`<tr style="${m.id===ses?'background:#FFF6F8':''}"><td>${m.id}</td><td><b>${m.email}</b><br>${m.nickname}<br>구글: ${m.googleSub?(D.google.find(g=>g.sub===m.googleSub)||{}).email||m.googleSub:'없음'}</td><td>인증 ${yn(m.verified)}<br>비밀번호 ${m.password?'있음':'없음'}<br>경로 ${m.via==='google'?'구글':'이메일'} / ${{active:'정상',suspended:'정지',deleted:'탈퇴'}[m.status]}<br>마케팅 ${m.marketing?'동의':'미동의'}</td></tr>`).join('')}</table>
+ <table><tr><th>#</th><th>회원</th><th>상태</th></tr>${D.members.map(m=>`<tr style="${m.id===ses?'background:#FFF6F8':''}"><td>${m.id}</td><td><b>${m.email}</b><br>${m.nickname}<br>구글: ${m.googleSub?(D.google.find(g=>g.sub===m.googleSub)||{}).email||m.googleSub:'없음'}</td><td>인증 ${yn(m.verified)}<br>비밀번호 ${m.password?'있음':'없음'}<br>경로 ${m.via==='google'?'구글':'이메일'} / ${{active:'정상',deleted:'탈퇴'}[m.status]}<br>마케팅 ${m.marketing?'동의':'미동의'}</td></tr>`).join('')}</table>
  ${D.members.some(m=>m.termsAt)?`<p style="margin:8px 0 0">구글 가입 회원 약관 동의 시각: ${D.members.filter(m=>m.termsAt).map(m=>m.id+' = '+m.termsAt).join(', ')}</p>`:''}`}
 window.addEventListener('message',e=>{if(e.data&&e.data.type==='gl-render'){document.getElementById('where').textContent='시안 현재 화면: '+e.data.page}});
 /* 흐름도 */
