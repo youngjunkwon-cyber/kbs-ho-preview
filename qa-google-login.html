@@ -74,14 +74,14 @@ svg text{font-family:"Pretendard Variable",Pretendard,sans-serif}
   <button data-cv="doc" onclick="cover('doc')">전달 문서</button>
   <button id="bobtn" onclick="showBO(!document.getElementById('bop').classList.contains('on'))">BO 회원 화면</button>
   <button id="nwbtn" onclick="toggleNew()">새 요소 표시</button>
-  <button onclick="window.open('gl-proto.html?v=1793071681742','_blank')">새 창</button>
+  <button onclick="window.open('gl-proto.html?v=1793071789955','_blank')">새 창</button>
   <button onclick="copyResult()">결과 복사</button>
  </div>
 </div>
 <div class="bo-panel" id="bop"><div class="bo-bar"><b>BO 회원 &gt; 정보조회</b><span style="color:#777">라이브 어드민 화면 구조 그대로이고, 회원 데이터는 FO 시안의 회원 DB를 그대로 읽습니다. 닫기를 누르면 FO 시안으로 돌아갑니다.</span><span style="flex:1"></span><button onclick="document.getElementById('bof').contentWindow.boDraw&&document.getElementById('bof').contentWindow.boDraw()">새로고침</button><button onclick="showBO(false)">닫기</button></div><iframe id="bof" src="about:blank"></iframe></div>
 <div class="main">
  <div class="left">
-  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1793071681742"></iframe>
+  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1793071789955"></iframe>
    <div class="cover" id="cv-flow"><h3>구글 로그인 판정 순서 <button onclick="cover(null)">닫기</button></h3><div id="flow"></div></div>
    <div class="cover" id="cv-db"><h3>회원 DB (시안 안 데이터, 1초마다 갱신) <button onclick="cover(null)">닫기</button></h3><div id="db"></div></div>
    <div class="cover" id="cv-doc"><h3>구글 로그인 개발 전달 문서 <button onclick="cover(null)">닫기</button></h3><div class="doc" id="doc"></div></div>
@@ -125,24 +125,19 @@ const CASES=[
 ['B-03','이메일 인증 회원은 자동 연결','Mina Park (verified@example.com)을 고릅니다.','로그인되고 하단에 "Your Google account is now linked..." 안내가 1번 뜹니다.\n회원 1의 닉네임은 Mina 그대로입니다.',"go('login');startGoogle('login')"],
 ["B-04","자동 연결 안내는 첫 로그인 때만","(이미 한 번 자동 연결된 회원 1로 구글 계정 선택이 열림) Mina Park (verified@example.com)","바로 로그인되고 하단 연결 안내가 뜨지 않습니다.","DB.members[0].googleSub='g-ver';DB.members[0].linkNoticeShown=true;go('login');startGoogle('login')"],
 ['B-05','이메일 대소문자가 달라도 같은 회원','Mina Park (Verified@Example.com)을 고릅니다.','새 회원이 생기지 않고 회원 1에 연결됩니다.',"go('login');startGoogle('login')"],
-['B-11','이미 연결된 구글','Jane Doe를 고릅니다.','안내 없이 바로 로그인됩니다.',"go('login');startGoogle('login')"],
-['B-13','구글 화면에서 취소','구글 화면 왼쪽 위 ✕','로그인 화면으로 돌아오고 아무 안내도 없습니다.',"go('login');startGoogle('login')"],
-['B-14','구글 쪽 오류','아무 계정이나 고릅니다.','로그인 화면 하단에 "Login failed. Please try again."',"DB.nextGoogle='error';go('login');startGoogle('login')"],
-['B-16','구글 쪽에서 이메일을 바꾼 회원','Jane Doe (jane.new@gmail.com)을 고릅니다.','구글 고유 번호로 회원 3에 그대로 로그인됩니다. 회원 이메일은 googleonly@gmail.com 그대로입니다(자동으로 바꾸지 않음).',"DB.google.find(g=>g.sub==='g-jane').email='jane.new@gmail.com';go('login');startGoogle('login')"],
+["B-16","이미 연결된 구글로 로그인 (구글 쪽 이메일이 바뀐 경우 포함)","Jane Doe (jane.new@gmail.com)을 고릅니다.","안내 없이 회원 3으로 바로 로그인됩니다. 구글 쪽 이메일이 바뀌었어도 같은 회원으로 들어오고, 회원 이메일은 googleonly@gmail.com 그대로입니다.","DB.google.find(g=>g.sub==='g-jane').email='jane.new@gmail.com';go('login');startGoogle('login')"],
 ["B-17","구글이 이메일을 확인하지 않은 계정 + 같은 이메일 회원","Mina Park (verified@example.com)을 고릅니다.","연결하지 않고 \"Login failed. Please try again.\" 회원 1에 구글이 붙지 않습니다.","DB.google.find(g=>g.sub==='g-ver').emailVerified=false;go('login');startGoogle('login')"],
 ["B-18","구글이 이메일을 확인하지 않은 계정 + 처음 가입","Alex Kim을 고릅니다.","가입하지 않고 \"Login failed. Please try again.\" 회원이 새로 생기지 않습니다(미인증 회원을 만들지 않음).","DB.google.find(g=>g.sub==='g-new').emailVerified=false;go('login');startGoogle('login')"],
 ['B-15','같은 이메일 회원이 다른 구글에 이미 연결','Mina Park (verified@example.com)을 고릅니다.','회원 1은 Other Person 구글이 연결돼 있는 상태입니다. 연결하지 않고 "This email is already linked to a different Google account. Please log in with your email or the Google account linked to your account." 안내를 띄웁니다.',"DB.members[0].googleSub='g-other';DB.members[0].linkNoticeShown=true;go('login');startGoogle('login')"],
-["C-01","스토어 상세에서 예약 시작","Book now → 날짜 28일 → 17:00 → 아래 날짜·시간 버튼","로그인 화면이 열리고 맨 위 검은 안내 상자에 DDYOU, October 28, 2026, 17:00이 보입니다. 그 아래 핑크 Continue with Google, Log in with email.","go('store')"],
+["C-01","스토어 상세에서 예약 시작","Book now → 날짜 28일 → 17:00 → 아래 날짜·시간 버튼","로그인 화면이 열리고 맨 위 검은 안내 상자에 DDYOU, October 28, 2026, 17:00이 보입니다. 그 아래 핑크 Continue with Google, Log in with email. 홈 하단 STORE → DDYOU로 들어와도 같습니다.","go('store')"],
 ["C-02","예약 중 구글로 처음 가입","(DDYOU 28일 17:00을 고른 뒤 상태로 열림) 구글 계정 선택에서 Alex Kim","예약자 정보 화면으로 바로 갑니다. 상단에 DDYOU와 고른 시간, 여권명·국적·성별·생년월일은 빈칸, Email = alex.new@gmail.com (Verified), 전화번호는 인증 전 입력칸.","VIEW.pick={date:'2026-10-28',time:'17:00'};DB.booking={store:'DDYOU',date:'2026-10-28',time:'17:00'};go('login',{returnTo:'bookinfo'});startGoogle('login')"],
-["C-03","예약 중 이메일 인증 회원 (자동 연결)","(DDYOU 28일 17:00을 고른 뒤 상태로 열림) 구글 계정 선택에서 Mina Park (verified@example.com)","예약자 정보 화면 + 하단 연결 안내. 전화번호는 인증된 상태로 나옵니다.","VIEW.pick={date:'2026-10-28',time:'17:00'};DB.booking={store:'DDYOU',date:'2026-10-28',time:'17:00'};go('login',{returnTo:'bookinfo'});startGoogle('login')"],
-["C-05","예약 중 구글 화면에서 취소","(DDYOU 28일 17:00을 고른 뒤 상태로 열림) 구글 화면 왼쪽 위 ✕","로그인 화면으로 돌아오고 검은 안내 상자와 날짜·시간이 그대로입니다.","VIEW.pick={date:'2026-10-28',time:'17:00'};DB.booking={store:'DDYOU',date:'2026-10-28',time:'17:00'};go('login',{returnTo:'bookinfo'});startGoogle('login')"],
+["C-05","구글 화면에서 취소 (예약 중)","(DDYOU 28일 17:00을 고른 뒤 상태로 열림) 구글 화면 왼쪽 위 ✕","로그인 화면으로 돌아오고 아무 안내도 뜨지 않습니다. 검은 안내 상자와 날짜·시간은 그대로입니다.","VIEW.pick={date:'2026-10-28',time:'17:00'};DB.booking={store:'DDYOU',date:'2026-10-28',time:'17:00'};go('login',{returnTo:'bookinfo'});startGoogle('login')"],
 ["C-06","예약 중 이메일로 로그인","(DDYOU 28일 17:00을 고른 뒤 상태로 열림) Log in with email → verified@example.com / pass1234 → Login","안내 상자는 위에 남고 이메일 칸이 펼쳐지며, 로그인 후 예약자 정보 화면으로 갑니다.","VIEW.pick={date:'2026-10-28',time:'17:00'};DB.booking={store:'DDYOU',date:'2026-10-28',time:'17:00'};go('login',{returnTo:'bookinfo'});"],
 ["C-07","로그인 화면에서 뒤로","(DDYOU 28일 17:00을 고른 뒤 상태로 열림) 왼쪽 위 뒤로","날짜·시간 화면으로 돌아오고 28일·17:00이 그대로 선택돼 있습니다.","VIEW.pick={date:'2026-10-28',time:'17:00'};DB.booking={store:'DDYOU',date:'2026-10-28',time:'17:00'};go('login',{returnTo:'bookinfo'});"],
 ["C-08","이미 로그인한 상태로 예약","(로그인한 상태로 날짜·시간 화면에서 28일 17:00을 고른 채 열림) 아래 날짜·시간 버튼","로그인 화면 없이 예약자 정보 화면으로 바로 갑니다.","DB.session=1;VIEW.pick={date:'2026-10-28',time:'17:00'};go('book')"],
-["C-09","예약 중 구글 오류","(DDYOU 28일 17:00을 고른 뒤 상태로 열림) 구글 계정 선택에서 아무 계정","로그인 화면 하단에 \"Login failed. Please try again.\" 안내 상자와 날짜·시간은 그대로.","DB.nextGoogle='error';VIEW.pick={date:'2026-10-28',time:'17:00'};DB.booking={store:'DDYOU',date:'2026-10-28',time:'17:00'};go('login',{returnTo:'bookinfo'});startGoogle('login')"],
+["C-09","구글 쪽 오류 (예약 중)","(DDYOU 28일 17:00을 고른 뒤 상태로 열림) 구글 계정 선택에서 아무 계정","로그인 화면 하단에 \"Login failed. Please try again.\" 안내 상자와 날짜·시간은 그대로.","DB.nextGoogle='error';VIEW.pick={date:'2026-10-28',time:'17:00'};DB.booking={store:'DDYOU',date:'2026-10-28',time:'17:00'};go('login',{returnTo:'bookinfo'});startGoogle('login')"],
 ["C-10","LINE 앱에서 예약","(LINE 앱 안, 날짜·시간을 고른 뒤 로그인 화면으로 열림) Continue with Google","\"Opening in your browser\" 후 기본 브라우저 주소창이 보이고 같은 로그인 화면이 열립니다. 안내 상자와 날짜·시간 유지. 구글 버튼을 한 번 더 누르면 계정 선택.","DB.env='line';VIEW.pick={date:'2026-10-28',time:'17:00'};DB.booking={store:'DDYOU',date:'2026-10-28',time:'17:00'};go('login',{returnTo:'bookinfo'});"],
-["C-11","인스타그램 앱에서 예약","(인스타그램 앱 안, 날짜·시간을 고른 뒤 로그인 화면으로 열림) Continue with Google → alex.new@gmail.com → Next → Next","브라우저로 넘기지 않고 앱 안에서 구글 로그인 후 예약자 정보 화면으로 갑니다.","DB.env='ig-ios';VIEW.pick={date:'2026-10-28',time:'17:00'};DB.booking={store:'DDYOU',date:'2026-10-28',time:'17:00'};go('login',{returnTo:'bookinfo'});"],
-["C-12","홈에서부터 예약","홈 하단 STORE → DDYOU → Book now → 날짜 28일 → 17:00 → 아래 날짜·시간 버튼 → Continue with Google → Alex Kim","실화면 순서대로 이어져 예약자 정보 화면까지 갑니다.","go('home')"],
+["C-11","인스타그램 앱(아이폰)에서 예약","(인스타그램 앱 안, 날짜·시간을 고른 뒤 로그인 화면으로 열림) Continue with Google → alex.new@gmail.com → Next → Next","브라우저로 넘기지 않고 앱 안에서 구글 로그인 후 예약자 정보 화면으로 갑니다.","DB.env='ig-ios';VIEW.pick={date:'2026-10-28',time:'17:00'};DB.booking={store:'DDYOU',date:'2026-10-28',time:'17:00'};go('login',{returnTo:'bookinfo'});"],
 ['D-01','구글로만 가입한 이메일로 이메일 가입','googleonly@gmail.com → Get Verification Code','칸 아래 "This email is registered with Google. Please log in with Google." 코드는 보내지 않습니다.',"go('signup')"],
 ['D-02','이메일 가입 회원의 이메일로 가입','verified@example.com → Get Verification Code','지금 라이브의 중복 이메일 안내가 그대로 나옵니다(구글 문구 아님).',"go('signup')"],
 ['D-03','구글 연결 + 비밀번호 있는 회원의 이메일로 가입','linked@example.com → Get Verification Code','라이브 중복 이메일 안내. 구글 문구가 아닙니다.',"go('signup')"],
@@ -159,22 +154,17 @@ const CASES=[
 ['E-07','구글 연결 해제','Disconnect → Disconnect','하단 "Google has been disconnected." Google = Connect.',"DB.session=5;go('account')"],
 ['E-08','연결 해제 취소','Disconnect → Cancel','창만 닫히고 연결은 그대로입니다.',"DB.session=5;go('account')"],
 ['E-09','해제 후 같은 이메일 구글로 다시 로그인','Both Ways를 고릅니다.','회원 5에 다시 자동 연결되고, 해제 뒤 첫 연결이라 하단 연결 안내가 다시 뜹니다.',"DB.members.find(m=>m.id===5).googleSub=null;DB.members.find(m=>m.id===5).linkNoticeShown=false;go('login');startGoogle('login')"],
-['E-10','해제 후 다른 이메일 구글로 로그인','Other Person을 고릅니다.','회원 1과 이메일이 달라서 새 회원(other.person@gmail.com)이 만들어집니다.',"go('login');startGoogle('login')"],
-["E-11","닉네임 수정 창","계정 설정 Account 구역 Nickname 줄 → Change","Change Nickname 창에 Current Nickname(지금 닉네임, 고칠 수 없음)과 New Nickname 칸이 있습니다.","DB.session=3;go('account')"],
 ["E-12","닉네임 수정 오류","Change → 빈칸으로 Save / 띄어쓰기 넣고 Save / 지금 닉네임 그대로 Save","차례로 \"Please enter your name.\" / \"Spaces are not allowed.\" / \"Same as current name.\" (라이브 문구)","DB.session=3;go('account')"],
-["E-13","닉네임 수정 저장","Change → New Nickname에 JaneBeauty → Save → 뒤로 가서 My Page","하단 \"Nickname changed.\" 계정 설정과 My Page Name이 JaneBeauty로 바뀝니다.","DB.session=3;go('account')"],
+["E-13","닉네임 수정","Nickname 줄 Change → New Nickname에 JaneBeauty → Save → 뒤로 가서 My Page","Change Nickname 창에 Current Nickname(고칠 수 없음)과 New Nickname 칸이 있습니다. 저장하면 하단 \"Nickname changed.\" 계정 설정과 My Page Name이 JaneBeauty로 바뀝니다.","DB.session=3;go('account')"],
 ["E-14","닉네임 중복","Change → New Nickname에 Mina(다른 회원 닉네임, 대소문자 달라도 같음) → Save","\"This nickname is already in use.\" (라이브에 없는 새 문구) 저장되지 않습니다.","DB.session=3;go('account')"],
 ["F-01","구글 전용 회원 탈퇴","맨 아래 Delete Account → Still Want to Withdraw? → 확인 체크 → Delete Account","구글 재인증 없이 우리 확인 창이 뜹니다. 체크하면 Delete Account가 눌리고, 누르면 바로 탈퇴돼 \"Account withdrawal successful.\" 후 홈으로 갑니다. 회원 3 상태 = 탈퇴, 구글 연결 지워짐.","DB.session=3;go('account')"],
 ["F-02","확인 체크 전에는 탈퇴 안 됨","맨 아래 Delete Account → Still Want to Withdraw? → 체크하지 않고 Delete Account","Delete Account가 흐리게 눌리지 않고 탈퇴되지 않습니다. Cancel을 누르면 창이 닫히고 그대로 로그인 상태입니다.","DB.session=3;go('account')"],
 ['F-03','탈퇴한 구글로 다시 로그인','Jane Doe를 고릅니다.','새 회원으로 가입됩니다(이전 회원 3과 별개).',"DB.members.find(m=>m.id===3).status='deleted';DB.members.find(m=>m.id===3).googleSub=null;go('login');startGoogle('login')"],
 ["F-04","비밀번호 있는 회원 탈퇴 (라이브 그대로)","맨 아래 Delete Account → Still Want to Withdraw?","구글 재인증 없이 지금 라이브처럼 바로 탈퇴되고 \"Account withdrawal successful.\" 안내 후 홈으로 갑니다.","DB.session=5;go('account')"],
-['G-01','LINE 앱 + 예약 중','Continue with Google','"Opening in your browser" 후 기본 브라우저 주소창이 보이고 같은 로그인 화면이 열립니다. 검은 안내 상자와 날짜·시간 유지. 구글 버튼을 한 번 더 누르면 계정 선택.',"DB.env='line';"+BK+"go('login',{returnTo:'bookinfo'})"],
 ['G-02','카카오톡 앱 + 예약 중','Continue with Google','G-01과 같습니다.',"DB.env='kakao';"+BK+"go('login',{returnTo:'bookinfo'})"],
 ['G-03','LINE 앱 (예약 아님)','Continue with Google','기본 브라우저로 로그인 화면이 열리고 안내 상자는 없습니다.',"DB.env='line';go('login')"],
-['G-04','인스타그램 앱 (아이폰)','Continue with Google → alex.new@gmail.com → Next → 비밀번호 → Next','앱 안에서 구글 로그인 화면이 열리고 직접 입력으로 진행해 가입·로그인됩니다. 브라우저로 넘기지 않습니다.',"DB.env='ig-ios';go('login')"],
-['G-05','인스타그램 앱 (안드로이드)','G-04와 같게','G-04와 같습니다.',"DB.env='ig-android';go('login')"],
-['G-06','페이스북 앱','G-04와 같게','G-04와 같습니다.',"DB.env='fb';go('login')"],
-['G-07','인스타그램 앱 + 예약 중','Continue with Google → alex.new@gmail.com → Next → Next','예약자 정보 화면으로 갑니다.',"DB.env='ig-ios';"+BK+"go('login',{returnTo:'bookinfo'})"],
+["G-05","인스타그램 앱 (안드로이드)","Continue with Google → alex.new@gmail.com → Next → Next","브라우저로 넘기지 않고 앱 안 구글 로그인 화면에서 직접 입력해 가입·로그인됩니다.","DB.env='ig-android';go('login')"],
+["G-06","페이스북 앱","Continue with Google → alex.new@gmail.com → Next → Next","브라우저로 넘기지 않고 앱 안 구글 로그인 화면에서 직접 입력해 가입·로그인됩니다.","DB.env='fb';go('login')"],
 ["H-01","구글로 가입한 회원이 BO 목록에 보임","아래 BO 화면 회원 목록 맨 위 줄을 봅니다.","이름 = 자동 생성 닉네임, 이메일 = alex.new@gmail.com, 가입 경로 = 구글, 구글 연결 = alex.new@gmail.com, 마케팅 미동의. 새 칼럼 두 개(가입 경로·구글 연결)만 새로 더한 것이고 나머지는 라이브 칼럼 그대로입니다.","googleDone('g-new')"],
 ["H-02","자동 연결된 이메일 회원","회원 목록에서 verified@example.com 줄을 봅니다.","가입 경로 = 이메일 그대로, 구글 연결 = verified@example.com. 이름(Mina)은 바뀌지 않습니다.","googleDone('g-ver')"],
 ["H-03","다른 이메일 구글을 연결한 회원","verified@example.com 줄을 봅니다.","구글 연결 칸에 회원 이메일과 다른 other.person@gmail.com이 보입니다.","DB.members[0].googleSub='g-other'"],
@@ -185,11 +175,12 @@ const CASES=[
 ];
 const KEY='qa-gl-v1';let ST={};try{ST=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(ST))}catch(e){}};
+const ALIAS={"C-12":"C-01","C-03":"B-03","B-13":"C-05","B-14":"C-09","G-01":"C-10","G-07":"C-11","G-04":"C-11","B-11":"B-16","E-10":"B-01","E-11":"E-13"};for(const [o,n] of Object.entries(ALIAS)){if(ST[o]){if(!ST[n]||!ST[n].s)ST[n]=ST[o];delete ST[o]}}for(const k of Object.keys(ST))if(!CASES.some(c=>c[0]===k))delete ST[k];save();
 let GRP='C',FIL='all';
 const W=()=>document.getElementById('fr').contentWindow;
 function showBO(on){const p=document.getElementById('bop');p.classList.toggle('on',on);document.getElementById('bobtn').classList.toggle('on',on);if(on){p.style.top=document.querySelector('.top').offsetHeight+'px';const f=document.getElementById('bof');if(f.src.indexOf('gl-bo.html')<0){f.src='gl-bo.html?v='+Date.now();f.onload=()=>{if(document.body.classList.contains('nw'))f.contentWindow.document.body.classList.add('show-new')}}else if(f.contentWindow.boSet)f.contentWindow.boSet({via:'',q:''})}}
 function toggleNew(){const b=W().document.body;b.classList.toggle('show-new');document.body.classList.toggle('nw',b.classList.contains('show-new'));try{document.getElementById('bof').contentWindow.document.body.classList.toggle('show-new',b.classList.contains('show-new'))}catch(e){}document.getElementById('nwbtn').classList.toggle('on',b.classList.contains('show-new'))}
-function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1793071681742?'+Date.now()}
+function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1793071789955?'+Date.now()}
 function open_(i){const c=CASES[i];const w=W();w.resetDB();try{w.eval(c[4])}catch(e){alert('세팅 실패: '+e.message)}showBO(c[0][0]==='H');cover(null);document.querySelectorAll('.case .open').forEach(b=>b.classList.remove('open'));const b=document.getElementById('o'+i);if(b)b.classList.add('open')}
 function mark(id,v){ST[id]=ST[id]||{};ST[id].s=ST[id].s===v?null:v;save();draw()}
 function memo(id,v){ST[id]=ST[id]||{};ST[id].m=v;save()}
