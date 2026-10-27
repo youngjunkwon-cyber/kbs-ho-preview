@@ -2636,7 +2636,7 @@ const SEED=[ // 화면을 채우는 기존 회원 예시 (FO 시안 DB 회원은
 function fo(){try{return parent.document.getElementById('fr').contentWindow.eval('DB')}catch(e){return null}}
 const LANG={en:'영어','zh-CN':'중국어(간체)','zh-TW':'중국어(번체)',ja:'일본어',id:'인도네시아어',mn:'몽골어'};
 function rows(){const D=fo();let r=[];if(D){r=D.members.slice().sort((a,b)=>b.id-a.id).map(m=>{const g=m.googleSub?(D.google.find(x=>x.sub===m.googleSub)||{}).email||'-':'-';return{id:m.id,joined:m.joined?m.joined.replace(/\. /g,'-').replace(/\.$/,'')+' 10:00':'2025-10-30 10:00',last:m.id===D.session?'방금':'-',name:m.nickname,email:m.email,via:m.via==='google'?'구글':'이메일',viaKey:m.via,g,pp:'-',nat:'-',lang:LANG[m.lang||'en']||'영어',tel:m.phone?'+1 2025550147':'-',bk:0,ns:0,mk:m.marketing?'동의':'미동의',mkd:m.marketing?'2026-08-06 17:25':'-',out:m.status==='deleted'}})}
- return r.concat(SEED.map(s=>Object.assign({viaKey:'email',via:'이메일'},s)))}
+ return r.concat(SEED.map(s=>Object.assign({},s,{viaKey:'email',via:'이메일'})))}
 let F={via:'',q:''};
 function draw(){const tb=document.querySelector('[data-k=tbody]');const q=F.q.trim().toLowerCase();
  const list=rows().filter(r=>!r.out).filter(r=>!F.via||r.viaKey===F.via).filter(r=>!q||[r.name,r.email,r.g].some(v=>(v||'').toLowerCase().includes(q)));
