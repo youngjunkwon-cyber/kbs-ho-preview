@@ -1749,7 +1749,7 @@ function seed(){return{
   {sub:'g-both',name:'Both Ways',email:'linked@example.com'},
   {sub:'g-other',name:'Other Person',email:'other.person@gmail.com'}
  ],
- session:null, env:'web', envFrom:null, remembered:null, booking:null,
+ session:null, lang:'en', env:'web', envFrom:null, remembered:null, booking:null,
  nextGoogle:'ok', outbox:[], seq:100
 }}
 const freshView=()=>({page:'home',expanded:false,modal:null,toast:null,gFor:'login',err:{},form:{},returnTo:'home',pendingSub:null,pick:{date:null,time:null}});
@@ -1782,9 +1782,16 @@ function judgeEmailCheck(db,email,purpose){
  if(purpose==='signup'){if(!m)return{result:'send'};if(!m.password&&m.googleSub)return{result:'google'};return{result:'dup'}}
  if(!m)return{result:'none'};if(!m.password)return{result:'google'};return{result:'send'};
 }
-const NICK_A=['Glowing','Dewy','Rosy','Silky','Velvet','Radiant','Fresh','Bright','Soft','Lucky','Sunny','Misty','Pearly','Blooming','Gentle','Sweet','Clear','Peachy','Golden','Lovely'];
-const NICK_N=['Peony','Camellia','Lotus','Petal','Pearl','Blossom','Mist','Cushion','Serum','Lily','Tulip','Cherry','Bloom','Dew','Iris','Jasmine','Orchid','Daisy','Rose','Magnolia'];
-function nickFor(){let n;do{n=NICK_A[Math.floor(Math.random()*NICK_A.length)]+NICK_N[Math.floor(Math.random()*NICK_N.length)]+String(1000+Math.floor(Math.random()*9000))}while(DB.members.some(m=>m.nickname===n));return n}
+/* 서비스 언어별 단어 (시안용 임시. 형용사 + 꽃·뷰티 단어 + 숫자 4자리, 띄어쓰기 없음. 인도네시아어는 명사 + 형용사 어순) */
+const NICK={
+ en:{a:['Glowing','Dewy','Rosy','Silky','Velvet','Radiant','Fresh','Bright','Soft','Lucky'],n:['Peony','Camellia','Lotus','Petal','Pearl','Blossom','Lily','Tulip','Orchid','Rose']},
+ 'zh-CN':{a:['闪耀','水润','粉嫩','丝滑','明亮','清新','柔软','幸运','温柔','甜美'],n:['牡丹','山茶','莲花','花瓣','珍珠','樱花','百合','郁金香','兰花','玫瑰']},
+ 'zh-TW':{a:['閃耀','水潤','粉嫩','絲滑','明亮','清新','柔軟','幸運','溫柔','甜美'],n:['牡丹','山茶','蓮花','花瓣','珍珠','櫻花','百合','鬱金香','蘭花','玫瑰']},
+ ja:{a:['きらめく','うるおう','ほんのり','なめらか','あかるい','さわやか','やわらか','しあわせ','やさしい','あまい'],n:['ぼたん','つばき','はす','はなびら','しんじゅ','さくら','ゆり','チューリップ','らん','ばら']},
+ id:{a:['Berseri','Segar','Lembut','Cerah','Manis','Ceria','Anggun','Mungil','Harum','Elok'],n:['Mawar','Melati','Anggrek','Teratai','Mutiara','Kelopak','Lili','Tulip','Kamelia','Sakura']},
+ mn:{a:['Гэрэлт','Чийглэг','Ягаан','Зөөлөн','Тод','Шинэлэг','Эелдэг','Азтай','Сайхан','Цэвэр'],n:['Цэцэг','Сарнай','Лянхуа','Сувд','Навч','Сакура','Сараана','Алтанзул','Цагаанцэцэг','Наранцэцэг']}
+};
+function nickFor(){const L=NICK[DB.lang]||NICK.en;const p=a=>a[Math.floor(Math.random()*a.length)];let n;do{const num=String(1000+Math.floor(Math.random()*9000));n=DB.lang==='id'?p(L.n)+p(L.a)+num:p(L.a)+p(L.n)+num}while(DB.members.some(m=>m.nickname.toLowerCase()===n.toLowerCase()));return n}
 
 /* ---------- 동작 ---------- */
 let tt;

@@ -69,13 +69,13 @@ svg text{font-family:"Pretendard Variable",Pretendard,sans-serif}
   <button data-cv="mail" onclick="cover('mail')">발송함</button>
   <button data-cv="doc" onclick="cover('doc')">전달 문서</button>
   <button id="nwbtn" onclick="toggleNew()">새 요소 표시</button>
-  <button onclick="window.open('gl-proto.html?v=1793065575735','_blank')">새 창</button>
+  <button onclick="window.open('gl-proto.html?v=1793066155540','_blank')">새 창</button>
   <button onclick="copyResult()">결과 복사</button>
  </div>
 </div>
 <div class="main">
  <div class="left">
-  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1793065575735"></iframe>
+  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1793066155540"></iframe>
    <div class="cover" id="cv-flow"><h3>구글 로그인 판정 순서 <button onclick="cover(null)">닫기</button></h3><div id="flow"></div></div>
    <div class="cover" id="cv-db"><h3>회원 DB (시안 안 데이터, 1초마다 갱신) <button onclick="cover(null)">닫기</button></h3><div id="db"></div></div>
    <div class="cover" id="cv-mail"><h3>발송함 <button onclick="cover(null)">닫기</button></h3><div id="mail"></div></div>
@@ -90,7 +90,7 @@ svg text{font-family:"Pretendard Variable",Pretendard,sans-serif}
   회원 1 verified@example.com (이메일 인증 완료, 비밀번호 pass1234) / 회원 2 unverified@example.com (미인증, pass1234) / 회원 3 googleonly@gmail.com (구글로 가입, 비밀번호 없음) / 회원 5 linked@example.com (이메일 가입 + 구글 연결, pass1234)<br>
   기기의 구글 계정: Alex Kim(새 사람) / 이름 없음 / Mina Park(회원 1 이메일) / Mina Park(회원 1 이메일 대문자) / Old User(회원 2) / Jane Doe(회원 3) / Both Ways(회원 5) / Other Person(어느 회원과도 다른 이메일)<br><br>
   <b>확인하지 않는 것</b><br>화면은 라이브 FO(2026-10-26)를 그대로 떠 왔고, 분홍 점선(새 요소 표시)이 이번에 더하는 부분입니다. 로그인한 My Page와 예약자 정보의 전화번호 입력칸(Use a different number 상태)도 라이브에서 떠 왔고 이름·연락처는 예시값입니다. 스토어 목록에서는 DDYOU만 눌립니다.<br>
-  화면 문구는 라이브 FO 번역 문구를 그대로 썼습니다. 라이브 탈퇴는 실제로 누를 수 없어, 번역 문구에 비밀번호 단계가 없는 것을 근거로 Still Want to Withdraw? 다음 바로 탈퇴로 넣었습니다. 닉네임 중복 안내는 라이브에 문구가 없어 "This nickname is already in use."를 새로 넣었습니다.<br>
+  화면 문구는 라이브 FO 번역 문구를 그대로 썼습니다. 라이브 탈퇴는 실제로 누를 수 없어, 번역 문구에 비밀번호 단계가 없는 것을 근거로 Still Want to Withdraw? 다음 바로 탈퇴로 넣었습니다. 닉네임 단어 목록(6개 언어)은 시안용 임시입니다. 닉네임 중복 안내는 라이브에 문구가 없어 "This nickname is already in use."를 새로 넣었습니다.<br>
   구글 화면(계정 선택·앱 안 로그인)은 구글이 그리는 화면을 흉내만 냈습니다. 인증 코드 메일 발송과 가입 나머지 단계는 동작하지 않습니다.</p>
  </div>
 </div>
@@ -111,8 +111,12 @@ const CASES=[
 ['A-11','My Page의 Log in with email','Log in with email','로그인 화면이 이메일 펼친 상태로 열립니다.',"go('myout')"],
 ["A-12","로그인한 My Page","홈 하단 MY PAGE","Name에 회원 닉네임(Mina)과 가입일, 예약 내역, My Activity가 라이브와 같게 보입니다. 아래 Change account information을 누르면 계정 설정으로 갑니다.","DB.session=1;go('home')"],
 ['A-07','알리페이 채널','홈 하단 MY PAGE를 누릅니다.','로그인 화면으로 가지 않습니다(알리페이 채널은 자체 로그인 경로가 숨겨져 있어 구글 버튼도 없음).',"DB.env='alipay';go('home')"],
-["B-01","처음 보는 구글 계정이면 바로 가입","Alex Kim을 고릅니다.","안내 없이 홈으로 돌아오고 로그인돼 있습니다.\n회원 DB에 alex.new@gmail.com 추가: 닉네임은 구글 이름을 쓰지 않고 자동 생성(형용사 + 꽃·뷰티 단어 + 숫자 4자리, 띄어쓰기 없음, 예: GlowingPeony4821), 인증 완료, 비밀번호 없음, 가입 경로 구글, 마케팅 미동의, 약관 동의 시각 기록.","go('login');startGoogle('login')"],
+["B-01","처음 보는 구글 계정이면 바로 가입","Alex Kim을 고릅니다.","안내 없이 홈으로 돌아오고 로그인돼 있습니다.\n회원 DB에 alex.new@gmail.com 추가: 닉네임은 구글 이름을 쓰지 않고, 가입할 때의 서비스 언어로 자동 생성(형용사 + 꽃·뷰티 단어 + 숫자 4자리, 띄어쓰기 없음. 영어 예: GlowingPeony4821), 인증 완료, 비밀번호 없음, 가입 경로 구글, 마케팅 미동의, 약관 동의 시각 기록.","go('login');startGoogle('login')"],
 ["B-02","구글 이름이 비어 있어도 같은 규칙","noname@gmail.com을 고릅니다.","닉네임이 B-01과 같은 규칙으로 만들어집니다.","go('login');startGoogle('login')"],
+["B-02a","중국어(간체)로 가입하면 중국어 닉네임","Alex Kim을 고릅니다.","회원 DB의 닉네임이 중국어(간체) 단어 + 숫자 4자리입니다(예: 闪耀牡丹4821). 시안 화면 문구는 영어로만 떠 와서 영어로 보입니다.","DB.lang='zh-CN';go('login');startGoogle('login')"],
+["B-02b","일본어로 가입하면 일본어 닉네임","Alex Kim을 고릅니다.","닉네임이 일본어 단어 + 숫자 4자리입니다(예: きらめくさくら4821).","DB.lang='ja';go('login');startGoogle('login')"],
+["B-02c","인도네시아어로 가입하면 인도네시아어 닉네임","Alex Kim을 고릅니다.","닉네임이 인도네시아어 어순(꽃 단어 + 형용사) + 숫자 4자리입니다(예: MawarBerseri4821).","DB.lang='id';go('login');startGoogle('login')"],
+["B-02d","몽골어로 가입하면 몽골어 닉네임","Alex Kim을 고릅니다.","닉네임이 몽골어(키릴 문자) 단어 + 숫자 4자리입니다.","DB.lang='mn';go('login');startGoogle('login')"],
 ['B-03','이메일 인증 회원은 자동 연결','Mina Park (verified@example.com)을 고릅니다.','로그인되고 하단에 "Your Google account is now linked..." 안내가 1번 뜹니다.\n발송함에 구글 연결 안내 1건. 회원 1의 닉네임은 Mina 그대로입니다.',"go('login');startGoogle('login')"],
 ['B-04','자동 연결 안내는 첫 로그인 때만','Mina Park으로 로그인 → MY PAGE(계정 설정) → Logout → MY PAGE → Login → Continue with Google → Mina Park','두 번째 로그인에서는 하단 안내가 뜨지 않습니다. 발송함도 1건 그대로입니다.',"go('login');startGoogle('login')"],
 ['B-05','이메일 대소문자가 달라도 같은 회원','Mina Park (Verified@Example.com)을 고릅니다.','새 회원이 생기지 않고 회원 1에 연결됩니다.',"go('login');startGoogle('login')"],
@@ -178,7 +182,7 @@ const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(ST))}catch(e){}};
 let GRP='C',FIL='all';
 const W=()=>document.getElementById('fr').contentWindow;
 function toggleNew(){const b=W().document.body;b.classList.toggle('show-new');document.getElementById('nwbtn').classList.toggle('on',b.classList.contains('show-new'))}
-function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1793065575735?'+Date.now()}
+function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1793066155540?'+Date.now()}
 function open_(i){const c=CASES[i];const w=W();w.resetDB();try{w.eval(c[4])}catch(e){alert('세팅 실패: '+e.message)}cover(null);document.querySelectorAll('.case .open').forEach(b=>b.classList.remove('open'));const b=document.getElementById('o'+i);if(b)b.classList.add('open')}
 function mark(id,v){ST[id]=ST[id]||{};ST[id].s=ST[id].s===v?null:v;save();draw()}
 function memo(id,v){ST[id]=ST[id]||{};ST[id].m=v;save()}
@@ -196,7 +200,7 @@ function copyResult(){const fails=CASES.filter(c=>ST[c[0]]?.s==='fail').map(c=>`
 let CV=null,dbT;
 function cover(k){CV=CV===k?null:k;document.querySelectorAll('.cover').forEach(e=>e.classList.toggle('on',e.id==='cv-'+CV));document.querySelectorAll('.tools [data-cv]').forEach(b=>b.classList.toggle('on',b.dataset.cv===CV));clearInterval(dbT);if(CV==='db'){drawDB();dbT=setInterval(drawDB,1000)}if(CV==='mail')drawMail()}
 function drawDB(){let D;try{D=W().eval('DB')}catch(e){return}const ses=D.session;const yn=v=>v?'예':'아니오';
- document.getElementById('db').innerHTML=`<p style="margin:0 0 8px">환경: <b>${D.env}</b>${D.envFrom?' (원래 '+D.envFrom+')':''} · 로그인: <b>${ses?'회원 '+ses:'안 함'}</b> · 예약 중: <b>${D.booking?D.booking.date+' '+D.booking.time:'아님'}</b> · 저장 이메일: <b>${D.remembered||'없음'}</b></p>
+ document.getElementById('db').innerHTML=`<p style="margin:0 0 8px">언어: <b>${D.lang}</b> · 환경: <b>${D.env}</b>${D.envFrom?' (원래 '+D.envFrom+')':''} · 로그인: <b>${ses?'회원 '+ses:'안 함'}</b> · 예약 중: <b>${D.booking?D.booking.date+' '+D.booking.time:'아님'}</b> · 저장 이메일: <b>${D.remembered||'없음'}</b></p>
  <table><tr><th>#</th><th>회원</th><th>상태</th></tr>${D.members.map(m=>`<tr style="${m.id===ses?'background:#FFF6F8':''}"><td>${m.id}</td><td><b>${m.email}</b><br>${m.nickname}<br>구글: ${m.googleSub?(D.google.find(g=>g.sub===m.googleSub)||{}).email||m.googleSub:'없음'}</td><td>인증 ${yn(m.verified)}<br>비밀번호 ${m.password?'있음':'없음'}<br>경로 ${m.via==='google'?'구글':'이메일'} / ${{active:'정상',suspended:'정지',deleted:'탈퇴'}[m.status]}<br>마케팅 ${m.marketing?'동의':'미동의'}</td></tr>`).join('')}</table>
  ${D.members.some(m=>m.termsAt)?`<p style="margin:8px 0 0">구글 가입 회원 약관 동의 시각: ${D.members.filter(m=>m.termsAt).map(m=>m.id+' = '+m.termsAt).join(', ')}</p>`:''}`}
 function drawMail(){let D;try{D=W().eval('DB')}catch(e){return}document.getElementById('mail').innerHTML=D.outbox.length?`<table><tr><th>시각</th><th>받는 사람</th><th>종류</th></tr>${D.outbox.map(o=>`<tr><td>${o.at}</td><td>${o.to}</td><td>${o.type}</td></tr>`).join('')}</table><p class="note">메일 본문 원문은 아직 없습니다. 구글 연결 안내에는 "본인이 아니면 고객센터로 연락" 문장이 들어가야 합니다.</p>`:'<p style="color:#999">보낸 메일이 없습니다.</p>'}
