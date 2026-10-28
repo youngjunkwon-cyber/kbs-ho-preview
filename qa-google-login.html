@@ -76,14 +76,14 @@ body.boon .right{position:fixed;right:0;top:var(--toph,96px);bottom:0;width:440p
   <button data-cv="doc" onclick="cover('doc')">전달 문서</button>
   <button id="bobtn" onclick="showBO(!document.getElementById('bop').classList.contains('on'))">BO 회원 화면</button>
   <button id="nwbtn" onclick="toggleNew()">새 요소 표시</button>
-  <button onclick="window.open('gl-proto.html?v=1793099452710','_blank')">새 창</button>
+  <button onclick="window.open('gl-proto.html?v=1793152160726','_blank')">새 창</button>
   <button onclick="copyResult()">결과 복사</button>
  </div>
 </div>
 <div class="bo-panel" id="bop"><div class="bo-bar"><b>BO 회원 &gt; 정보조회</b><span style="color:#777">라이브 어드민 화면 구조 그대로이고, 회원 데이터는 FO 시안의 회원 DB를 그대로 읽습니다. 닫기를 누르면 FO 시안으로 돌아갑니다.</span><span style="flex:1"></span><button onclick="document.getElementById('bof').contentWindow.boDraw&&document.getElementById('bof').contentWindow.boDraw()">새로고침</button><button onclick="showBO(false)">닫기</button></div><iframe id="bof" src="about:blank"></iframe></div>
 <div class="main">
  <div class="left">
-  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1793099452710"></iframe>
+  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1793152160726"></iframe>
    <div class="cover" id="cv-flow"><h3>구글 로그인 판정 순서 <button onclick="cover(null)">닫기</button></h3><div id="flow"></div></div>
    <div class="cover" id="cv-db"><h3>회원 DB (시안 안 데이터, 1초마다 갱신) <button onclick="cover(null)">닫기</button></h3><div id="db"></div></div>
    <div class="cover" id="cv-doc"><h3>구글 로그인 개발 전달 문서 <button onclick="cover(null)">닫기</button></h3><div class="doc" id="doc"></div></div>
@@ -139,11 +139,11 @@ const CASES=[
 ["C-09","구글 쪽 오류 (예약 중)","(DDYOU 28일 17:00을 고른 뒤 상태로 열림) 구글 계정 선택에서 아무 계정","로그인 화면 하단에 \"Login failed. Please try again.\" 안내 상자와 날짜·시간은 그대로.","DB.nextGoogle='error';VIEW.pick={date:'2026-10-28',time:'17:00'};DB.booking={store:'DDYOU',date:'2026-10-28',time:'17:00'};go('login',{returnTo:'bookinfo'});startGoogle('login')"],
 ["C-10","LINE 앱에서 예약","(LINE 앱 안, 날짜·시간을 고른 뒤 로그인 화면으로 열림) Continue with Google","\"Opening in your browser\" 후 기본 브라우저 주소창이 보이고 같은 로그인 화면이 열립니다. 안내 상자와 날짜·시간 유지. 구글 버튼을 한 번 더 누르면 계정 선택.","DB.env='line';VIEW.pick={date:'2026-10-28',time:'17:00'};DB.booking={store:'DDYOU',date:'2026-10-28',time:'17:00'};go('login',{returnTo:'bookinfo'});"],
 ["C-11","인스타그램 앱(아이폰)에서 예약","(인스타그램 앱 안, 날짜·시간을 고른 뒤 로그인 화면으로 열림) Continue with Google → alex.new@gmail.com → Next → Next","브라우저로 넘기지 않고 앱 안에서 구글 로그인 후 예약자 정보 화면으로 갑니다.","DB.env='ig-ios';VIEW.pick={date:'2026-10-28',time:'17:00'};DB.booking={store:'DDYOU',date:'2026-10-28',time:'17:00'};go('login',{returnTo:'bookinfo'});"],
-["I-01","스토어 리뷰 작성 (구글로 로그인)","(DDYOU 스토어 상세로 열림) 상단 4.9 (700+) → 리뷰 목록의 별 5개 중 하나 → Continue with Google → Jane Doe","별을 누르면 로그인 화면(구글 버튼 + 이메일 칸)이 뜹니다. 구글로 로그인하면 바로 리뷰 작성 화면(Write Store Review)으로 갑니다. 라이브는 이 주소를 서버에서 /auth/login?redirectUrl=/stores/{id}/reviews/new 으로 돌리고, 로그인 뒤 redirectUrl로 돌아옵니다. 구글 로그인도 같은 redirectUrl로 돌아와야 합니다.","go('store')"],
+["I-01","스토어 리뷰 작성 (구글로 로그인)","(DDYOU 리뷰 목록으로 열림. 스토어 상세에서는 아래 Verified Google Reviews 구역의 4.9 (700+)를 누르면 이 목록으로 옴) 리뷰 목록의 별 5개 중 하나 → Continue with Google → Jane Doe","별을 누르면 로그인 화면(구글 버튼 + 이메일 칸)이 뜹니다. 구글로 로그인하면 바로 리뷰 작성 화면(Write Store Review)으로 갑니다. 라이브는 이 주소를 서버에서 /auth/login?redirectUrl=/stores/{id}/reviews/new 으로 돌리고, 로그인 뒤 redirectUrl로 돌아옵니다. 구글 로그인도 같은 redirectUrl로 돌아와야 합니다.","go('reviews')"],
 ["I-02","리뷰 작성 로그인 화면에서 이메일 로그인·뒤로","별 → verified@example.com / pass1234 → Login / 다시 열어 별 → 로그인 화면 왼쪽 위 뒤로","이메일로 로그인해도 같은 리뷰 작성 화면으로 갑니다. 뒤로를 누르면 리뷰 목록으로 돌아옵니다(로그인 안 됨).","go('reviews')"],
 ["I-03","상품 북마크 (비로그인)","(DDYOU 상품 상세로 열림) 오른쪽 위 북마크 → 안내 창 Login → Continue with Google → Jane Doe → 다시 북마크","북마크를 누르면 라이브 안내 창 \"Please log in to use this feature.\" + Cancel / Login. Login을 누르면 로그인 화면으로 가고, 로그인하면 상품 상세로 돌아옵니다. 돌아온 뒤 북마크는 아직 안 된 상태라 다시 눌러야 저장됩니다(라이브 동작 그대로). 저장되면 아이콘이 채워집니다.","go('product')"],
 ["I-04","상품 북마크 안내 창 취소","북마크 → Cancel","창만 닫히고 상품 상세 그대로입니다. 북마크되지 않습니다.","go('product')"],
-["I-05","상품 리뷰 작성","(상품 상세로 열림) 아래 Review 탭의 별 → Continue with Google → Jane Doe","I-01과 같습니다. 로그인 화면 → 로그인 → 리뷰 작성 화면. 라이브 주소는 /products/{id}/reviews/new.","go('product')"],
+["I-05","상품 리뷰 작성","(DDYOU 상품 상세로 열림) 화면을 내려 Review 탭 아래 별 5개 중 하나 → Continue with Google → Jane Doe","I-01과 같습니다. 로그인 화면 → 로그인 → 리뷰 작성 화면. 라이브 주소는 /products/{id}/reviews/new.","go('product')"],
 ["I-06","My Page 하위 페이지에 로그인 없이 바로 들어온 경우","(쿠폰 목록 주소로 직접 들어와 로그인 화면이 뜬 상태로 열림) Continue with Google → Jane Doe","링크·뒤로가기·북마크한 주소로 /mypage/coupons, /mypage/reviews, /mypage/bookings 에 들어오면 라이브가 서버에서 로그인 화면으로 돌립니다(redirectUrl=그 주소). 로그인하면 그 페이지(Coupon List)로 갑니다. 뒤로는 My Page(로그인 전).","VIEW.loginFrom='myout';go('login',{returnTo:'mycoupons'})"],
 ["I-07","쿠폰 받기 (비로그인, 시안에서 못 눌러 봄)","라이브에서 쿠폰이 있는 스토어·상품 상세의 쿠폰 받기, 쿠폰 전체 받기","라이브는 받기 요청이 401이면 \"Please log in to use this feature.\" 안내 뒤 로그인 화면으로 보냅니다. 구글 로그인도 같은 흐름이고 끝나면 원래 페이지로 돌아옵니다. 시안의 DDYOU에는 쿠폰이 없어 눌러 볼 수 없습니다. 확인 필요: 쿠폰 받기의 로그인 이동이 redirectUrl이 아니라 redirect 파라미터를 써서 로그인 뒤 원래 페이지로 안 돌아올 수 있습니다(개발 확인).","go('product')"],
 ["I-08","채팅·상담은 로그인 없이","(상품 상세로 열림) 아래 Chat on","로그인을 요구하지 않습니다(게스트 채팅). 시안은 채팅방을 만들지 않아 눌러도 반응이 없고, 라이브는 채팅방으로 갑니다. 상담접수도 같습니다.","go('product')"],
@@ -197,7 +197,7 @@ let GRP='C',FIL='all';
 const W=()=>document.getElementById('fr').contentWindow;
 function showBO(on){const p=document.getElementById('bop');p.classList.toggle('on',on);document.body.classList.toggle('boon',on);document.getElementById('bobtn').classList.toggle('on',on);if(on){const th=document.querySelector('.top').offsetHeight;p.style.top=th+'px';document.body.style.setProperty('--toph',th+'px');const f=document.getElementById('bof');if(f.src.indexOf('gl-bo.html')<0){f.src='gl-bo.html?v='+Date.now();f.onload=()=>{if(document.body.classList.contains('nw'))f.contentWindow.document.body.classList.add('show-new')}}else if(f.contentWindow.boSet)f.contentWindow.boSet({via:'',q:''})}}
 function toggleNew(){const b=W().document.body;b.classList.toggle('show-new');document.body.classList.toggle('nw',b.classList.contains('show-new'));try{document.getElementById('bof').contentWindow.document.body.classList.toggle('show-new',b.classList.contains('show-new'))}catch(e){}document.getElementById('nwbtn').classList.toggle('on',b.classList.contains('show-new'))}
-function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1793099452710?'+Date.now()}
+function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1793152160726?'+Date.now()}
 function open_(i){const c=CASES[i];const w=W();w.resetDB();try{w.eval(c[4])}catch(e){alert('세팅 실패: '+e.message)}showBO(c[0][0]==='H');cover(null);document.querySelectorAll('.case .open').forEach(b=>b.classList.remove('open'));const b=document.getElementById('o'+i);if(b)b.classList.add('open')}
 function mark(id,v){ST[id]=ST[id]||{};ST[id].s=ST[id].s===v?null:v;save();draw()}
 function memo(id,v){ST[id]=ST[id]||{};ST[id].m=v;save()}
