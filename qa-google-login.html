@@ -76,14 +76,14 @@ body.boon .right{position:fixed;right:0;top:var(--toph,96px);bottom:0;width:440p
   <button data-cv="doc" onclick="cover('doc')">전달 문서</button>
   <button id="bobtn" onclick="showBO(!document.getElementById('bop').classList.contains('on'))">BO 회원 화면</button>
   <button id="nwbtn" onclick="toggleNew()">새 요소 표시</button>
-  <button onclick="window.open('gl-proto.html?v=1793171634941','_blank')">새 창</button>
+  <button onclick="window.open('gl-proto.html?v=1793171661187','_blank')">새 창</button>
   <button onclick="copyResult()">결과 복사</button>
  </div>
 </div>
 <div class="bo-panel" id="bop"><div class="bo-bar"><b>BO 회원 &gt; 정보조회</b><span style="color:#777">라이브 어드민 화면 구조 그대로이고, 회원 데이터는 FO 시안의 회원 DB를 그대로 읽습니다. 닫기를 누르면 FO 시안으로 돌아갑니다.</span><span style="flex:1"></span><button onclick="document.getElementById('bof').contentWindow.boDraw&&document.getElementById('bof').contentWindow.boDraw()">새로고침</button><button onclick="showBO(false)">닫기</button></div><iframe id="bof" src="about:blank"></iframe></div>
 <div class="main">
  <div class="left">
-  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1793171634941"></iframe>
+  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1793171661187"></iframe>
    <div class="cover" id="cv-flow"><h3>구글 로그인 판정 순서 <button onclick="cover(null)">닫기</button></h3><div id="flow"></div></div>
    <div class="cover" id="cv-db"><h3>회원 DB (시안 안 데이터, 1초마다 갱신) <button onclick="cover(null)">닫기</button></h3><div id="db"></div></div>
    <div class="cover" id="cv-doc"><h3>구글 로그인 개발 전달 문서 <button onclick="cover(null)">닫기</button></h3><div class="doc" id="doc"></div></div>
@@ -161,6 +161,7 @@ const CASES=[
 ["I-08","채팅·상담은 로그인 없이","(상품 상세로 열림) 아래 Chat on","로그인을 요구하지 않습니다(게스트 채팅). 시안은 채팅방을 만들지 않아 눌러도 반응이 없고, 라이브는 채팅방으로 갑니다. 상담접수도 같습니다.","go('product')"],
 ["I-09","redirectUrl이 우리 도메인 밖 주소","(redirectUrl에 다른 사이트 주소가 들어온 로그인 화면으로 열림) verified@example.com / pass1234 → Login","그 주소로 가지 않고 홈으로 갑니다.","go('login',{returnTo:'https://other-site.example/'})"],
 ["I-10","redirectUrl이 우리 도메인 밖 주소 (구글 로그인)","(redirectUrl에 다른 사이트 주소가 들어온 로그인 화면으로 열림) Continue with Google → Jane Doe","그 주소로 가지 않고 홈으로 갑니다.","go('login',{returnTo:'https://other-site.example/'})"],
+["I-11","계정 설정 주소로 직접 진입","(로그인 없이 /mypage/account-settings 주소로 들어와 로그인 화면이 뜬 상태로 열림) Continue with Google → Jane Doe","라이브는 서버가 /auth/login?redirectUrl=/mypage/account-settings 로 돌립니다(STG 실측). 로그인하면 계정 설정으로 갑니다. 뒤로 가면 My Page(로그인 전)입니다.","VIEW.loginFrom='myout';go('login',{returnTo:'account'})"],
 ["D-01","구글로만 가입한 이메일로 이메일 가입","(My Page → Sign up with email로 들어온 상태로 열림) googleonly@gmail.com → Get Verification Code → 안내 아래 Continue with Google → Jane Doe","이메일 칸 바로 아래 \"This email is registered with Google. Please log in with Google.\"이 뜹니다. 코드는 보내지 않고, 그 아래 Continue with Google 버튼 하나만 있습니다(or·Verify with Google은 없음). 누르면 그 구글로 바로 로그인되고 로그인한 My Page로 갑니다.","go('signup',{returnTo:'myin'})"],
 ['D-02','이메일 가입 회원의 이메일로 가입','verified@example.com → Get Verification Code','지금 라이브의 중복 이메일 안내가 그대로 나옵니다(구글 문구 아님).',"go('signup')"],
 ["D-03","구글이 연결된 회원(비밀번호도 있음)의 이메일로 가입","linked@example.com → Get Verification Code","구글이 연결된 회원이라 중복 이메일 문구 대신 이메일 칸 바로 아래 \"This email is registered with Google. Please log in with Google.\"와 Continue with Google 버튼 하나만 나옵니다(or·Verify with Google은 없음).","go('signup')"],
@@ -241,8 +242,8 @@ let GRP='C',FIL='all';
 const W=()=>document.getElementById('fr').contentWindow;
 function showBO(on){const p=document.getElementById('bop');p.classList.toggle('on',on);document.body.classList.toggle('boon',on);document.getElementById('bobtn').classList.toggle('on',on);if(on){const th=document.querySelector('.top').offsetHeight;p.style.top=th+'px';document.body.style.setProperty('--toph',th+'px');const f=document.getElementById('bof');if(f.src.indexOf('gl-bo.html')<0){f.src='gl-bo.html?v='+Date.now();f.onload=()=>{if(document.body.classList.contains('nw'))f.contentWindow.document.body.classList.add('show-new')}}else if(f.contentWindow.boSet)f.contentWindow.boSet({via:'',q:''})}}
 function toggleNew(){const b=W().document.body;b.classList.toggle('show-new');document.body.classList.toggle('nw',b.classList.contains('show-new'));try{document.getElementById('bof').contentWindow.document.body.classList.toggle('show-new',b.classList.contains('show-new'))}catch(e){}document.getElementById('nwbtn').classList.toggle('on',b.classList.contains('show-new'))}
-function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1793171634941?'+Date.now()}
-function open_(i,retry){const c=CASES[i];const w=W();let ok=true;try{w.resetDB();w.eval(c[4])}catch(e){ok=false;if(!retry){const f=document.getElementById('fr');f.onload=()=>{f.onload=null;open_(i,true)};f.src='gl-proto.html?v=1793171634941?'+Date.now();return}alert('세팅 실패: '+e.message)}try{w.scrollTo(0,0)}catch(e){}showBO(c[0][0]==='H');cover(null);document.querySelectorAll('.case .open').forEach(b=>b.classList.remove('open'));const b=document.getElementById('o'+i);if(b)b.classList.add('open')}
+function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1793171661187?'+Date.now()}
+function open_(i,retry){const c=CASES[i];const w=W();let ok=true;try{w.resetDB();w.eval(c[4])}catch(e){ok=false;if(!retry){const f=document.getElementById('fr');f.onload=()=>{f.onload=null;open_(i,true)};f.src='gl-proto.html?v=1793171661187?'+Date.now();return}alert('세팅 실패: '+e.message)}try{w.scrollTo(0,0)}catch(e){}showBO(c[0][0]==='H');cover(null);document.querySelectorAll('.case .open').forEach(b=>b.classList.remove('open'));const b=document.getElementById('o'+i);if(b)b.classList.add('open')}
 function mark(id,v){ST[id]=ST[id]||{};ST[id].s=ST[id].s===v?null:v;save();draw()}
 function memo(id,v){ST[id]=ST[id]||{};ST[id].m=v;save()}
 function setF(f){FIL=f;document.querySelectorAll('.fl button').forEach(b=>b.classList.toggle('on',b.dataset.f===f));draw()}
