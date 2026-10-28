@@ -76,14 +76,14 @@ body.boon .right{position:fixed;right:0;top:var(--toph,96px);bottom:0;width:440p
   <button data-cv="doc" onclick="cover('doc')">전달 문서</button>
   <button id="bobtn" onclick="showBO(!document.getElementById('bop').classList.contains('on'))">BO 회원 화면</button>
   <button id="nwbtn" onclick="toggleNew()">새 요소 표시</button>
-  <button onclick="window.open('gl-proto.html?v=1793162758203','_blank')">새 창</button>
+  <button onclick="window.open('gl-proto.html?v=1793162807865','_blank')">새 창</button>
   <button onclick="copyResult()">결과 복사</button>
  </div>
 </div>
 <div class="bo-panel" id="bop"><div class="bo-bar"><b>BO 회원 &gt; 정보조회</b><span style="color:#777">라이브 어드민 화면 구조 그대로이고, 회원 데이터는 FO 시안의 회원 DB를 그대로 읽습니다. 닫기를 누르면 FO 시안으로 돌아갑니다.</span><span style="flex:1"></span><button onclick="document.getElementById('bof').contentWindow.boDraw&&document.getElementById('bof').contentWindow.boDraw()">새로고침</button><button onclick="showBO(false)">닫기</button></div><iframe id="bof" src="about:blank"></iframe></div>
 <div class="main">
  <div class="left">
-  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1793162758203"></iframe>
+  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1793162807865"></iframe>
    <div class="cover" id="cv-flow"><h3>구글 로그인 판정 순서 <button onclick="cover(null)">닫기</button></h3><div id="flow"></div></div>
    <div class="cover" id="cv-db"><h3>회원 DB (시안 안 데이터, 1초마다 갱신) <button onclick="cover(null)">닫기</button></h3><div id="db"></div></div>
    <div class="cover" id="cv-doc"><h3>구글 로그인 개발 전달 문서 <button onclick="cover(null)">닫기</button></h3><div class="doc" id="doc"></div></div>
@@ -163,7 +163,7 @@ const CASES=[
 ["D-10a","가입 화면에서 다른 구글이 연결된 회원 이메일의 구글로 인증","(회원 1에 Other Person 구글이 연결된 상태) Verify with Google → Mina Park (verified@example.com)","가입 화면으로 돌아오고 하단에 \"This email is already linked to a different Google account. Please log in with your email or the Google account linked to your account.\" 안내. 인증·로그인·가입 모두 되지 않습니다.","DB.members[0].googleSub='g-other';DB.members[0].linkNoticeShown=true;go('signup',{returnTo:'myin'})"],
 ["D-11","닉네임을 먼저 입력하고 구글로 인증","Nickname에 GlowAlex 입력 → Verify with Google → Alex Kim","입력해 둔 GlowAlex가 그대로 남습니다. 자동 생성 닉네임으로 바뀌지 않습니다.","go('signup',{returnTo:'myin'})"],
 ["D-12","LINE 앱 가입 화면에서 구글로 인증","Nickname 등 몇 칸 입력 → Verify with Google","기본 브라우저로 가입 화면이 열립니다. 앱에서 입력한 값은 넘어가지 않아 칸이 비어 있고, 브라우저에서 다시 입력하고 Verify with Google을 누릅니다.","DB.env='line';go('signup')"],
-["D-13","가입 화면 구글 인증에서 막히는 계정","① Verify with Google → Mina Park (이메일 미인증 회원) / 다시 열어 ② Verify with Google → Alex Kim (구글이 이메일을 확인하지 않은 계정)","① \"This email is already registered. Please log in with your email and password.\" (새 문구) 안내가 뜨고 가입 화면 그대로입니다. ② \"Login failed. Please try again.\" (라이브 문구). 둘 다 인증·가입되지 않습니다.","DB.members[0].verified=false;DB.google.find(g=>g.sub==='g-new').emailVerified=false;go('signup',{returnTo:'myin'})"],
+["D-13","가입 화면 구글 인증에서 막히는 계정","① Verify with Google → Mina Park (이메일 미인증 회원) / 다시 열어 ② Verify with Google → Alex Kim (구글이 이메일을 확인하지 않은 계정)","① \"This email is already registered. Please log in with your email and password.\" (새 문구) 안내가 뜨고 가입 화면 그대로입니다. ② \"Login failed. Please try again.\" (라이브 문구)가 뜹니다. 둘 다 인증·가입되지 않습니다.","DB.members[0].verified=false;DB.google.find(g=>g.sub==='g-new').emailVerified=false;go('signup',{returnTo:'myin'})"],
 ["E-01","구글로 가입한 회원의 계정 설정","화면을 봅니다.","Profile에 Nickname 칸은 없고(닉네임은 My Page에서 바꿈), Profile 맨 위에 Google 칸 \"Connected (googleonly@gmail.com)\"이 Phone Number 칸과 같은 모양으로 있습니다. 비밀번호가 없어서 Disconnect 버튼은 없습니다. 아래 Account 구역의 Password 줄 버튼은 Change Password 대신 Set Password, Marketing emails는 꺼져 있습니다.","DB.session=3;go('account')"],
 ["E-02","구글 회원이 비밀번호 만들기","Set Password → New Password에 Abcd1234 → Confirm New Password에 Abcd1234 → Save","Set Password 창(안내 \"Create a password to also log in with your email.\", New Password·Confirm New Password)이 뜹니다. 저장하면 하단 \"Your password has been set.\" Password 줄이 Change Password로 바뀌고 Google 칸에 Disconnect 버튼이 생깁니다. 이제 googleonly@gmail.com + Abcd1234로 이메일 로그인도 됩니다.","DB.session=3;go('account')"],
 ["E-03","Set Password 막히는 값","Set Password → New Password에 Abc1234(7자) → Save / Abcd1234Abcd1234Abcd1(21자) → Save / Abcd1234 + Confirm에 Abcd1235 → Save","차례로 \"Password must be at least 8 characters.\" / \"Password must be at most 20 characters.\" / \"Passwords do not match.\" (라이브 문구). 저장되지 않습니다.","DB.session=3;go('account')"],
@@ -203,8 +203,8 @@ let GRP='C',FIL='all';
 const W=()=>document.getElementById('fr').contentWindow;
 function showBO(on){const p=document.getElementById('bop');p.classList.toggle('on',on);document.body.classList.toggle('boon',on);document.getElementById('bobtn').classList.toggle('on',on);if(on){const th=document.querySelector('.top').offsetHeight;p.style.top=th+'px';document.body.style.setProperty('--toph',th+'px');const f=document.getElementById('bof');if(f.src.indexOf('gl-bo.html')<0){f.src='gl-bo.html?v='+Date.now();f.onload=()=>{if(document.body.classList.contains('nw'))f.contentWindow.document.body.classList.add('show-new')}}else if(f.contentWindow.boSet)f.contentWindow.boSet({via:'',q:''})}}
 function toggleNew(){const b=W().document.body;b.classList.toggle('show-new');document.body.classList.toggle('nw',b.classList.contains('show-new'));try{document.getElementById('bof').contentWindow.document.body.classList.toggle('show-new',b.classList.contains('show-new'))}catch(e){}document.getElementById('nwbtn').classList.toggle('on',b.classList.contains('show-new'))}
-function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1793162758203?'+Date.now()}
-function open_(i,retry){const c=CASES[i];const w=W();let ok=true;try{w.resetDB();w.eval(c[4])}catch(e){ok=false;if(!retry){const f=document.getElementById('fr');f.onload=()=>{f.onload=null;open_(i,true)};f.src='gl-proto.html?v=1793162758203?'+Date.now();return}alert('세팅 실패: '+e.message)}try{w.scrollTo(0,0)}catch(e){}showBO(c[0][0]==='H');cover(null);document.querySelectorAll('.case .open').forEach(b=>b.classList.remove('open'));const b=document.getElementById('o'+i);if(b)b.classList.add('open')}
+function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1793162807865?'+Date.now()}
+function open_(i,retry){const c=CASES[i];const w=W();let ok=true;try{w.resetDB();w.eval(c[4])}catch(e){ok=false;if(!retry){const f=document.getElementById('fr');f.onload=()=>{f.onload=null;open_(i,true)};f.src='gl-proto.html?v=1793162807865?'+Date.now();return}alert('세팅 실패: '+e.message)}try{w.scrollTo(0,0)}catch(e){}showBO(c[0][0]==='H');cover(null);document.querySelectorAll('.case .open').forEach(b=>b.classList.remove('open'));const b=document.getElementById('o'+i);if(b)b.classList.add('open')}
 function mark(id,v){ST[id]=ST[id]||{};ST[id].s=ST[id].s===v?null:v;save();draw()}
 function memo(id,v){ST[id]=ST[id]||{};ST[id].m=v;save()}
 function setF(f){FIL=f;document.querySelectorAll('.fl button').forEach(b=>b.classList.toggle('on',b.dataset.f===f));draw()}
