@@ -1906,32 +1906,32 @@ const NICK={
  id:{a:['Berseri','Segar','Lembut','Cerah','Manis','Ceria','Anggun','Mungil','Harum','Elok'],n:['Mawar','Melati','Anggrek','Teratai','Mutiara','Kelopak','Lili','Tulip','Kamelia','Sakura']},
  mn:{a:['Гэрэлт','Чийглэг','Ягаан','Зөөлөн','Тод','Шинэлэг','Эелдэг','Азтай','Сайхан','Цэвэр'],n:['Цэцэг','Сарнай','Лянхуа','Сувд','Навч','Сакура','Сараана','Алтанзул','Цагаанцэцэг','Наранцэцэг']}
 };
-function nickFor(){const L=NICK[DB.lang]||NICK.en;const p=a=>a[Math.floor(Math.random()*a.length)];let n;do{const num=String(1000+Math.floor(Math.random()*9000));n=DB.lang==='id'?p(L.n)+p(L.a)+num:p(L.a)+p(L.n)+num}while(n.length>20||DB.members.some(m=>m.nickname.toLowerCase()===n.toLowerCase()));return n}
+function nickFor(){const L=NICK[DB.lang]||NICK.en;const p=a=>a[Math.floor(Math.random()*a.length)];let n;do{const num=String(1000+Math.floor(Math.random()*9000));n=DB.lang==='id'?p(L.n)+p(L.a)+num:p(L.a)+p(L.n)+num}while(n.length>20||DB.members.some(m=>m.status!=='deleted'&&m.nickname.toLowerCase()===n.toLowerCase()));return n}
 
 /* ---------- 동작 ---------- */
 let tt;
 function toast(s){VIEW.toast=s;clearTimeout(tt);tt=setTimeout(()=>{VIEW.toast=null;render()},4000)}
-function go(p,o={}){if(p!==VIEW.page)VIEW.myExpanded=false;if(VIEW.page==='signup'&&p!=='signup')VIEW.form={};VIEW.page=p;VIEW.modal=null;VIEW.err={};Object.assign(VIEW,o);
+function go(p,o={}){if(p!==VIEW.page)VIEW.myExpanded=false;if(VIEW.page==='signup'&&p!=='signup')VIEW.form={};if(!['login','signup','forgot','book','bookinfo','google','spin','external'].includes(p))DB.booking=null;VIEW.page=p;VIEW.modal=null;VIEW.err={};Object.assign(VIEW,o);
  if(p==='login'){if(DB.env==='alipay'){VIEW.page='home'}else{VIEW.expanded=!!DB.remembered;VIEW.form={email:DB.remembered||'',pw:'',rem:!!DB.remembered}}}
  if(p==='signup'||p==='forgot')VIEW.form={};render();window.scrollTo(0,0)}
-function afterLogin(m,msg){DB.session=m.id;if(msg)toast(msg);VIEW.page=DB.booking?'bookinfo':(VIEW.returnTo&&VIEW.returnTo!=='login'?VIEW.returnTo:'home');VIEW.modal=null;VIEW.err={};render()}
+function afterLogin(m,msg){DB.session=m.id;if(msg)toast(msg);const rt=VIEW.returnTo;VIEW.page=DB.booking?'bookinfo':(rt&&rt!=='login'&&P[rt]?rt:'home');VIEW.returnTo=null;VIEW.modal=null;VIEW.err={};render()}
 const INAPP=['ig-ios','ig-android','fb'];
 function startGoogle(forWhat){VIEW.gFor=forWhat;if(forWhat==='login'&&VIEW.page!=='external'){VIEW.gBack=['myout','signup','forgot'].includes(VIEW.page)?VIEW.page:'login';if(VIEW.gBack==='myout')VIEW.returnTo='myin'}
- if(forWhat==='verify'&&(DB.env==='line'||DB.env==='kakao')){DB.envFrom=DB.env;VIEW.page='external';render();setTimeout(()=>{DB.env='browser';VIEW.page='signup';VIEW.form={};VIEW.err={};render()},1200);return}
- if(forWhat==='login'&&(DB.env==='line'||DB.env==='kakao')){DB.envFrom=DB.env;VIEW.page='external';render();setTimeout(()=>{DB.env='browser';VIEW.page=VIEW.gBack||'login';VIEW.expanded=!!DB.remembered;render()},1200);return}
- if(INAPP.includes(DB.env)&&DB.nextGoogle==='blocked'){DB.nextGoogle='ok';DB.envFrom=DB.env;const back=forWhat==='verify'?'signup':(VIEW.gBack||'login');VIEW.page='external';render();setTimeout(()=>{DB.env='browser';VIEW.page=back;VIEW.form={};VIEW.err={};if(back==='login')VIEW.expanded=!!DB.remembered;render()},1200);return}
+ const toBrowser=()=>{DB.envFrom=DB.env;VIEW.page='external';VIEW.modal=null;render();setTimeout(()=>{DB.env='browser';VIEW.form={};VIEW.err={};if(forWhat==='verify')VIEW.page='signup';else if(forWhat==='connect'||forWhat==='delete'){DB.session=null;VIEW.returnTo='account';VIEW.page='login';VIEW.expanded=!!DB.remembered}else{VIEW.page=VIEW.gBack||'login';if(VIEW.page==='login')VIEW.expanded=!!DB.remembered}render()},1200)};
+ if(DB.env==='line'||DB.env==='kakao'){toBrowser();return}
+ if(INAPP.includes(DB.env)&&DB.nextGoogle==='blocked'){DB.nextGoogle='ok';if(DB.extFail){toast('Please open this page in your browser to continue with Google.');render();return}toBrowser();return}
  VIEW.page='google';VIEW.gStep=INAPP.includes(DB.env)?'email':'choose';VIEW.gEmail='';VIEW.gErr='';render()}
 const backOf=()=>({verify:'signup',login:VIEW.gBack||'login',connect:'account',delete:'account'}[VIEW.gFor]);
 function googleBack(){VIEW.page=backOf();VIEW.modal=VIEW.gFor==='delete'?'delGoogle':null;render()}
 function googlePick(sub){
- if(DB.nextGoogle==='error'){DB.nextGoogle='ok';VIEW.page=backOf();toast('Login failed. Please try again.');render();return}
+ if(DB.nextGoogle==='error'){DB.nextGoogle='ok';VIEW.page=backOf();VIEW.modal=VIEW.gFor==='delete'?'delGoogle':null;toast('Login failed. Please try again.');render();return}
  VIEW.page='spin';render();setTimeout(()=>googleDone(sub),500)}
 function googleDone(sub){
  const g=gAcc(sub);
  if(VIEW.gFor==='verify'){const j=judgeGoogle(DB,sub);VIEW.err={};
   if(j.result==='signup'){VIEW.page='signup';VIEW.form.gv={sub,email:g.email.toLowerCase()};VIEW.form.e=g.email.toLowerCase();if(!(VIEW.form.nick||'').trim())VIEW.form.nick=nickFor();render();return}
-  VIEW.form={}}
- if(VIEW.gFor==='connect'){const m=me();VIEW.page='account';if(judgeConnect(DB,m.id,sub).result==='taken')toast('This Google account is already linked to another K-Beauty Station account.');else{m.googleSub=sub;m.googleAt=stamp();m.linkNoticeShown=true;toast('Your Google account is now linked.')}render();return}
+  VIEW.form.gv=null;if(j.result==='login'||j.result==='autolink')VIEW.form={}}
+ if(VIEW.gFor==='connect'){const m=me();VIEW.page='account';if(g.emailVerified===false)toast('Login failed. Please try again.');else if(judgeConnect(DB,m.id,sub).result==='taken')toast('This Google account is already linked to another K-Beauty Station account.');else{m.googleSub=sub;m.googleAt=stamp();m.linkNoticeShown=true;toast('Your Google account is now linked.')}render();return}
  if(VIEW.gFor==='delete'){const m=me();if(m.googleSub!==sub){VIEW.page='account';VIEW.modal='delGoogle';VIEW.err.del='Please log in with the Google account linked to this account.';render();return}
   m.status='deleted';m.googleSub=null;m.googleAt=null;DB.session=null;VIEW.page='home';toast('Account withdrawal successful.');render();return}
  const j=judgeGoogle(DB,sub);
@@ -2039,6 +2039,7 @@ P.signup=()=>{R().innerHTML=envBar()+tpl('t_signup');header();const F=VIEW.form;
  const sb=$$('[class*="X-Toyq__footer"] button').find(x=>/Sign Up/.test(x.textContent));
  const upd=()=>{sb.disabled=!(F.gv&&(F.nick||'').trim()&&F.ag.svc&&F.ag.pp)};upd();
  on(sb,()=>{if(sb.disabled)return;const v=val('snk');const e=/\s/.test(v)?'Spaces are not allowed.':DB.members.some(x=>x.status!=='deleted'&&x.nickname.toLowerCase()===v.toLowerCase())?'This nickname is already in use.':null;if(e){VIEW.err.nick=e;F.nick=v;render();return}
+  if(DB.members.some(x=>x.status!=='deleted'&&(norm(x.email)===norm(F.gv.email)||x.googleSub===F.gv.sub))){F.nick=v;F.gv=null;VIEW.err.e='This email is already registered.';render();return}
   const m={id:++DB.seq,email:F.gv.email,nickname:v,joined:'2026. 10. 27',lang:DB.lang,verified:true,password:null,googleSub:F.gv.sub,googleAt:stamp(),status:'active',via:'google',marketing:!!F.ag.mk,linkNoticeShown:true,termsAt:new Date().toLocaleString('ko-KR')};DB.members.push(m);VIEW.form={};afterLogin(m,'Sign up successful.')});
  if(VIEW.err.nick)nk.closest('label').appendChild(el(`<p class="index-module-scss-module__X-Toyq__formError gl-new" style="margin:4px 0 0">${esc(VIEW.err.nick)}</p>`));
  if(VIEW.err.e){ie.setAttribute('aria-invalid','true');ie.style.borderColor='#EB003B';const em=el(`<p class="index-module-scss-module__X-Toyq__formError gl-new" style="margin:4px 0 0">${esc(VIEW.err.e)}</p>`);const gvb=flow.querySelector('.gl-new');if(gvb)flow.insertBefore(em,gvb);else flow.appendChild(em);if(VIEW.err.g){const gb=el(`<div class="gl-new" style="margin-top:8px">${gbtn()}</div>`);flow.appendChild(gb);on(gb.querySelector('[data-k=gstart]'),()=>startGoogle('login'))}}};
