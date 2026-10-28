@@ -1911,7 +1911,7 @@ function nickFor(){const L=NICK[DB.lang]||NICK.en;const p=a=>a[Math.floor(Math.r
 /* ---------- 동작 ---------- */
 let tt;
 function toast(s){VIEW.toast=s;clearTimeout(tt);tt=setTimeout(()=>{VIEW.toast=null;render()},4000)}
-function go(p,o={}){if(p!==VIEW.page)VIEW.myExpanded=false;VIEW.page=p;VIEW.modal=null;VIEW.err={};Object.assign(VIEW,o);
+function go(p,o={}){if(p!==VIEW.page)VIEW.myExpanded=false;if(VIEW.page==='signup'&&p!=='signup')VIEW.form={};VIEW.page=p;VIEW.modal=null;VIEW.err={};Object.assign(VIEW,o);
  if(p==='login'){if(DB.env==='alipay'){VIEW.page='home'}else{VIEW.expanded=!!DB.remembered;VIEW.form={email:DB.remembered||'',pw:'',rem:!!DB.remembered}}}
  if(p==='signup'||p==='forgot')VIEW.form={};render();window.scrollTo(0,0)}
 function afterLogin(m,msg){DB.session=m.id;if(msg)toast(msg);VIEW.page=DB.booking?'bookinfo':(VIEW.returnTo&&VIEW.returnTo!=='login'?VIEW.returnTo:'home');VIEW.modal=null;VIEW.err={};render()}
@@ -1919,6 +1919,7 @@ const INAPP=['ig-ios','ig-android','fb'];
 function startGoogle(forWhat){VIEW.gFor=forWhat;if(forWhat==='login'&&VIEW.page!=='external'){VIEW.gBack=['myout','signup','forgot'].includes(VIEW.page)?VIEW.page:'login';if(VIEW.gBack==='myout')VIEW.returnTo='myin'}
  if(forWhat==='verify'&&(DB.env==='line'||DB.env==='kakao')){DB.envFrom=DB.env;VIEW.page='external';render();setTimeout(()=>{DB.env='browser';VIEW.page='signup';VIEW.form={};VIEW.err={};render()},1200);return}
  if(forWhat==='login'&&(DB.env==='line'||DB.env==='kakao')){DB.envFrom=DB.env;VIEW.page='external';render();setTimeout(()=>{DB.env='browser';VIEW.page=VIEW.gBack||'login';VIEW.expanded=!!DB.remembered;render()},1200);return}
+ if(INAPP.includes(DB.env)&&DB.nextGoogle==='blocked'){DB.nextGoogle='ok';DB.envFrom=DB.env;const back=forWhat==='verify'?'signup':(VIEW.gBack||'login');VIEW.page='external';render();setTimeout(()=>{DB.env='browser';VIEW.page=back;VIEW.form={};VIEW.err={};if(back==='login')VIEW.expanded=!!DB.remembered;render()},1200);return}
  VIEW.page='google';VIEW.gStep=INAPP.includes(DB.env)?'email':'choose';VIEW.gEmail='';VIEW.gErr='';render()}
 const backOf=()=>({verify:'signup',login:VIEW.gBack||'login',connect:'account',delete:'account'}[VIEW.gFor]);
 function googleBack(){VIEW.page=backOf();VIEW.modal=VIEW.gFor==='delete'?'delGoogle':null;render()}
@@ -2071,7 +2072,7 @@ P.google=()=>{const bar=`<div class="gbar"><button data-k="gx">✕</button>accou
  else h=`<div class="gpage">${envBar()}${bar}<div class="gtop">${G_SVG}<h1>Welcome</h1><p>${esc(VIEW.gEmail)}</p></div><div class="gform"><input type="password" placeholder="Enter your password"></div><div class="gnext"><a data-k="gback">Back</a><button data-k="gpw">Next</button></div></div>`;
  R().innerHTML=h;R().querySelectorAll('[data-k=gx]').forEach(b=>on(b,googleBack));R().querySelectorAll('[data-sub]').forEach(b=>on(b,()=>googlePick(b.dataset.sub)));on($('[data-k=gnext]'),gLoginNext);on($('[data-k=gback]'),()=>{VIEW.gStep='email';render()});on($('[data-k=gpw]'),()=>googlePick(VIEW.gSub))};
 P.spin=()=>{R().innerHTML='<div class="gpage"><div class="spin"><i></i>accounts.google.com</div></div>'};
-P.external=()=>{R().innerHTML=`<div class="inapp"><b>${DB.envFrom==='line'?'LINE':'KakaoTalk'}</b>&nbsp;k-beautystation.com</div><div class="spin"><i></i>Opening in your browser</div>`};
+P.external=()=>{R().innerHTML=`<div class="inapp"><b>${({line:'LINE',kakao:'KakaoTalk','ig-ios':'Instagram','ig-android':'Instagram',fb:'Facebook'})[DB.envFrom]||'KakaoTalk'}</b>&nbsp;k-beautystation.com</div><div class="spin"><i></i>Opening in your browser</div>`};
 
 function render(){(P[VIEW.page]||P.home)();if(VIEW.toast)R().insertAdjacentHTML('beforeend',`<div class="BookingSurveySuccessToast-module-scss-module__xUKt_a__toast"><div class="BookingSurveySuccessToast-module-scss-module__xUKt_a__message"><strong>${esc(VIEW.toast)}</strong></div></div>`);
  try{parent.postMessage({type:'gl-render',page:VIEW.page},'*')}catch(e){}}
