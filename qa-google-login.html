@@ -76,14 +76,14 @@ body.boon .right{position:fixed;right:0;top:var(--toph,96px);bottom:0;width:440p
   <button data-cv="doc" onclick="cover('doc')">전달 문서</button>
   <button id="bobtn" onclick="showBO(!document.getElementById('bop').classList.contains('on'))">BO 회원 화면</button>
   <button id="nwbtn" onclick="toggleNew()">새 요소 표시</button>
-  <button onclick="window.open('gl-proto.html?v=1793153113333','_blank')">새 창</button>
+  <button onclick="window.open('gl-proto.html?v=1793153135438','_blank')">새 창</button>
   <button onclick="copyResult()">결과 복사</button>
  </div>
 </div>
 <div class="bo-panel" id="bop"><div class="bo-bar"><b>BO 회원 &gt; 정보조회</b><span style="color:#777">라이브 어드민 화면 구조 그대로이고, 회원 데이터는 FO 시안의 회원 DB를 그대로 읽습니다. 닫기를 누르면 FO 시안으로 돌아갑니다.</span><span style="flex:1"></span><button onclick="document.getElementById('bof').contentWindow.boDraw&&document.getElementById('bof').contentWindow.boDraw()">새로고침</button><button onclick="showBO(false)">닫기</button></div><iframe id="bof" src="about:blank"></iframe></div>
 <div class="main">
  <div class="left">
-  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1793153113333"></iframe>
+  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1793153135438"></iframe>
    <div class="cover" id="cv-flow"><h3>구글 로그인 판정 순서 <button onclick="cover(null)">닫기</button></h3><div id="flow"></div></div>
    <div class="cover" id="cv-db"><h3>회원 DB (시안 안 데이터, 1초마다 갱신) <button onclick="cover(null)">닫기</button></h3><div id="db"></div></div>
    <div class="cover" id="cv-doc"><h3>구글 로그인 개발 전달 문서 <button onclick="cover(null)">닫기</button></h3><div class="doc" id="doc"></div></div>
@@ -131,7 +131,7 @@ const CASES=[
 ["B-18","구글이 이메일을 확인하지 않은 계정 + 처음 가입","(My Page에서 Continue with Google을 누른 상태로 열림) Alex Kim을 고릅니다.","가입하지 않고 \"Login failed. Please try again.\" 회원이 새로 생기지 않습니다.","DB.google.find(g=>g.sub==='g-new').emailVerified=false;go('myout');startGoogle('login')"],
 ["B-15","같은 이메일 회원이 다른 구글에 이미 연결","(My Page에서 Continue with Google을 누른 상태로 열림) Mina Park (verified@example.com)을 고릅니다.","회원 1은 Other Person 구글이 연결돼 있는 상태입니다. 연결하지 않고 \"This email is already linked to a different Google account. Please log in with your email or the Google account linked to your account.\" 안내를 띄웁니다.","DB.members[0].googleSub='g-other';DB.members[0].linkNoticeShown=true;go('myout');startGoogle('login')"],
 ["C-01","스토어 상세에서 예약 시작","Book now → 날짜 28일 → 17:00 → 아래 날짜·시간 버튼","로그인 화면이 열리고 맨 위 검은 안내 상자에 DDYOU, October 28, 2026, 17:00이 보입니다. 그 아래는 A-01과 같이 핑크 Continue with Google과 이메일 로그인 칸 전부입니다.","go('store')"],
-["C-02","예약 중 구글로 처음 가입","(DDYOU 28일 17:00을 고른 뒤 상태로 열림) 구글 계정 선택에서 Alex Kim","예약자 정보 화면으로 바로 갑니다. 상단에 DDYOU와 고른 시간, 여권명·국적·성별·생년월일은 빈칸, Email = alex.new@gmail.com (Verified), 전화번호는 인증 전 입력칸.","VIEW.pick={date:'2026-10-28',time:'17:00'};DB.booking={store:'DDYOU',date:'2026-10-28',time:'17:00'};go('login',{returnTo:'bookinfo'});startGoogle('login')"],
+["C-02","예약 중 구글로 처음 가입","(DDYOU 28일 17:00을 고른 뒤 상태로 열림) 구글 계정 선택에서 Alex Kim","예약자 정보 화면으로 바로 갑니다. 상단에 DDYOU와 고른 시간, 여권명·국적·성별·생년월일은 빈칸, Email = alex.new@gmail.com (Verified), 전화번호는 인증 전 입력칸이 나옵니다.","VIEW.pick={date:'2026-10-28',time:'17:00'};DB.booking={store:'DDYOU',date:'2026-10-28',time:'17:00'};go('login',{returnTo:'bookinfo'});startGoogle('login')"],
 ["C-05","구글 화면에서 취소 (예약 중)","(DDYOU 28일 17:00을 고른 뒤 상태로 열림) 구글 화면 왼쪽 위 ✕","로그인 화면으로 돌아오고 아무 안내도 뜨지 않습니다. 검은 안내 상자와 날짜·시간은 그대로입니다.","VIEW.pick={date:'2026-10-28',time:'17:00'};DB.booking={store:'DDYOU',date:'2026-10-28',time:'17:00'};go('login',{returnTo:'bookinfo'});startGoogle('login')"],
 ["C-06","예약 중 이메일로 로그인","(DDYOU 28일 17:00을 고른 뒤 상태로 열림) verified@example.com / pass1234 → Login","안내 상자는 위에 남고, 로그인 후 예약자 정보 화면으로 갑니다.","VIEW.pick={date:'2026-10-28',time:'17:00'};DB.booking={store:'DDYOU',date:'2026-10-28',time:'17:00'};go('login',{returnTo:'bookinfo'});"],
 ["C-07","로그인 화면에서 뒤로","(DDYOU 28일 17:00을 고른 뒤 상태로 열림) 왼쪽 위 뒤로","날짜·시간 화면으로 돌아오고 28일·17:00이 그대로 선택돼 있습니다.","VIEW.pick={date:'2026-10-28',time:'17:00'};DB.booking={store:'DDYOU',date:'2026-10-28',time:'17:00'};go('login',{returnTo:'bookinfo'});"],
@@ -197,8 +197,8 @@ let GRP='C',FIL='all';
 const W=()=>document.getElementById('fr').contentWindow;
 function showBO(on){const p=document.getElementById('bop');p.classList.toggle('on',on);document.body.classList.toggle('boon',on);document.getElementById('bobtn').classList.toggle('on',on);if(on){const th=document.querySelector('.top').offsetHeight;p.style.top=th+'px';document.body.style.setProperty('--toph',th+'px');const f=document.getElementById('bof');if(f.src.indexOf('gl-bo.html')<0){f.src='gl-bo.html?v='+Date.now();f.onload=()=>{if(document.body.classList.contains('nw'))f.contentWindow.document.body.classList.add('show-new')}}else if(f.contentWindow.boSet)f.contentWindow.boSet({via:'',q:''})}}
 function toggleNew(){const b=W().document.body;b.classList.toggle('show-new');document.body.classList.toggle('nw',b.classList.contains('show-new'));try{document.getElementById('bof').contentWindow.document.body.classList.toggle('show-new',b.classList.contains('show-new'))}catch(e){}document.getElementById('nwbtn').classList.toggle('on',b.classList.contains('show-new'))}
-function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1793153113333?'+Date.now()}
-function open_(i,retry){const c=CASES[i];const w=W();let ok=true;try{w.resetDB();w.eval(c[4])}catch(e){ok=false;if(!retry){const f=document.getElementById('fr');f.onload=()=>{f.onload=null;open_(i,true)};f.src='gl-proto.html?v=1793153113333?'+Date.now();return}alert('세팅 실패: '+e.message)}try{w.scrollTo(0,0)}catch(e){}showBO(c[0][0]==='H');cover(null);document.querySelectorAll('.case .open').forEach(b=>b.classList.remove('open'));const b=document.getElementById('o'+i);if(b)b.classList.add('open')}
+function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1793153135438?'+Date.now()}
+function open_(i,retry){const c=CASES[i];const w=W();let ok=true;try{w.resetDB();w.eval(c[4])}catch(e){ok=false;if(!retry){const f=document.getElementById('fr');f.onload=()=>{f.onload=null;open_(i,true)};f.src='gl-proto.html?v=1793153135438?'+Date.now();return}alert('세팅 실패: '+e.message)}try{w.scrollTo(0,0)}catch(e){}showBO(c[0][0]==='H');cover(null);document.querySelectorAll('.case .open').forEach(b=>b.classList.remove('open'));const b=document.getElementById('o'+i);if(b)b.classList.add('open')}
 function mark(id,v){ST[id]=ST[id]||{};ST[id].s=ST[id].s===v?null:v;save();draw()}
 function memo(id,v){ST[id]=ST[id]||{};ST[id].m=v;save()}
 function setF(f){FIL=f;document.querySelectorAll('.fl button').forEach(b=>b.classList.toggle('on',b.dataset.f===f));draw()}
