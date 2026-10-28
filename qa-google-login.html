@@ -76,14 +76,14 @@ body.boon .right{position:fixed;right:0;top:var(--toph,96px);bottom:0;width:440p
   <button data-cv="doc" onclick="cover('doc')">전달 문서</button>
   <button id="bobtn" onclick="showBO(!document.getElementById('bop').classList.contains('on'))">BO 회원 화면</button>
   <button id="nwbtn" onclick="toggleNew()">새 요소 표시</button>
-  <button onclick="window.open('gl-proto.html?v=1793158223145','_blank')">새 창</button>
+  <button onclick="window.open('gl-proto.html?v=1793158396310','_blank')">새 창</button>
   <button onclick="copyResult()">결과 복사</button>
  </div>
 </div>
 <div class="bo-panel" id="bop"><div class="bo-bar"><b>BO 회원 &gt; 정보조회</b><span style="color:#777">라이브 어드민 화면 구조 그대로이고, 회원 데이터는 FO 시안의 회원 DB를 그대로 읽습니다. 닫기를 누르면 FO 시안으로 돌아갑니다.</span><span style="flex:1"></span><button onclick="document.getElementById('bof').contentWindow.boDraw&&document.getElementById('bof').contentWindow.boDraw()">새로고침</button><button onclick="showBO(false)">닫기</button></div><iframe id="bof" src="about:blank"></iframe></div>
 <div class="main">
  <div class="left">
-  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1793158223145"></iframe>
+  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1793158396310"></iframe>
    <div class="cover" id="cv-flow"><h3>구글 로그인 판정 순서 <button onclick="cover(null)">닫기</button></h3><div id="flow"></div></div>
    <div class="cover" id="cv-db"><h3>회원 DB (시안 안 데이터, 1초마다 갱신) <button onclick="cover(null)">닫기</button></h3><div id="db"></div></div>
    <div class="cover" id="cv-doc"><h3>구글 로그인 개발 전달 문서 <button onclick="cover(null)">닫기</button></h3><div class="doc" id="doc"></div></div>
@@ -199,8 +199,8 @@ let GRP='C',FIL='all';
 const W=()=>document.getElementById('fr').contentWindow;
 function showBO(on){const p=document.getElementById('bop');p.classList.toggle('on',on);document.body.classList.toggle('boon',on);document.getElementById('bobtn').classList.toggle('on',on);if(on){const th=document.querySelector('.top').offsetHeight;p.style.top=th+'px';document.body.style.setProperty('--toph',th+'px');const f=document.getElementById('bof');if(f.src.indexOf('gl-bo.html')<0){f.src='gl-bo.html?v='+Date.now();f.onload=()=>{if(document.body.classList.contains('nw'))f.contentWindow.document.body.classList.add('show-new')}}else if(f.contentWindow.boSet)f.contentWindow.boSet({via:'',q:''})}}
 function toggleNew(){const b=W().document.body;b.classList.toggle('show-new');document.body.classList.toggle('nw',b.classList.contains('show-new'));try{document.getElementById('bof').contentWindow.document.body.classList.toggle('show-new',b.classList.contains('show-new'))}catch(e){}document.getElementById('nwbtn').classList.toggle('on',b.classList.contains('show-new'))}
-function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1793158223145?'+Date.now()}
-function open_(i,retry){const c=CASES[i];const w=W();let ok=true;try{w.resetDB();w.eval(c[4])}catch(e){ok=false;if(!retry){const f=document.getElementById('fr');f.onload=()=>{f.onload=null;open_(i,true)};f.src='gl-proto.html?v=1793158223145?'+Date.now();return}alert('세팅 실패: '+e.message)}try{w.scrollTo(0,0)}catch(e){}showBO(c[0][0]==='H');cover(null);document.querySelectorAll('.case .open').forEach(b=>b.classList.remove('open'));const b=document.getElementById('o'+i);if(b)b.classList.add('open')}
+function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1793158396310?'+Date.now()}
+function open_(i,retry){const c=CASES[i];const w=W();let ok=true;try{w.resetDB();w.eval(c[4])}catch(e){ok=false;if(!retry){const f=document.getElementById('fr');f.onload=()=>{f.onload=null;open_(i,true)};f.src='gl-proto.html?v=1793158396310?'+Date.now();return}alert('세팅 실패: '+e.message)}try{w.scrollTo(0,0)}catch(e){}showBO(c[0][0]==='H');cover(null);document.querySelectorAll('.case .open').forEach(b=>b.classList.remove('open'));const b=document.getElementById('o'+i);if(b)b.classList.add('open')}
 function mark(id,v){ST[id]=ST[id]||{};ST[id].s=ST[id].s===v?null:v;save();draw()}
 function memo(id,v){ST[id]=ST[id]||{};ST[id].m=v;save()}
 function setF(f){FIL=f;document.querySelectorAll('.fl button').forEach(b=>b.classList.toggle('on',b.dataset.f===f));draw()}
@@ -228,10 +228,8 @@ window.addEventListener('message',e=>{if(e.data&&e.data.type==='gl-render'){docu
  s+=box(90,62,180,64,'이 구글이 이미\n회원에 연결?','d');s+=ar(270,94,300,94,'예');s+=box(300,77,82,34,'로그인');
  s+=ar(180,126,180,146,'아니오');s+=box(90,146,180,64,'구글이 이메일을\n확인 안 한 계정?','d');s+=ar(270,178,300,178,'예');s+=box(300,161,82,34,'막음');
  s+=ar(180,210,180,230,'아니오');s+=box(90,230,180,64,'같은 이메일 회원?\n(대소문자 무시, 탈퇴 제외)','d');s+=ar(270,262,300,262,'없음');s+=box(300,245,82,34,'가입');
- s+=ar(180,294,180,314,'있음');s+=box(90,314,180,64,'그 회원 이메일이
-인증된 상태?','d');s+=ar(270,346,300,346,'아니오');s+=box(300,329,82,34,'막음');
- s+=ar(180,378,180,398,'예');s+=box(90,398,180,64,'다른 구글에
-이미 연결?','d');s+=ar(270,430,300,430,'예');s+=box(300,413,82,34,'막음');
+ s+=ar(180,294,180,314,'있음');s+=box(90,314,180,64,'그 회원 이메일이\n인증된 상태?','d');s+=ar(270,346,300,346,'아니오');s+=box(300,329,82,34,'막음');
+ s+=ar(180,378,180,398,'예');s+=box(90,398,180,64,'다른 구글에\n이미 연결?','d');s+=ar(270,430,300,430,'예');s+=box(300,413,82,34,'막음');
  s+=ar(180,462,180,482,'아니오');s+=box(110,482,140,34,'자동 연결 후 로그인','o');
  document.getElementById('flow').innerHTML=`<svg viewBox="0 0 390 540" width="100%">${s}</svg><p class="note">예약 중이면 모든 로그인 결과 뒤에 예약자 정보 입력 화면으로 갑니다. LINE·카카오톡은 이 판정 전에 기본 브라우저로 넘어갑니다. 가입 화면의 Verify with Google은 이 판정이 아니라 가입 화면 이메일 중복 확인과 같은 판정을 따릅니다(전달 문서 다-4).</p>`})();
 /* 문서 */
