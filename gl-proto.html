@@ -1887,6 +1887,7 @@ function judgeGoogle(db,sub){
  if(g.emailVerified===false)return{result:'error'};
  const same=db.members.find(m=>m.status!=='deleted'&&norm(m.email)===norm(g.email));
  if(!same)return{result:'signup'};
+ if(same.verified===false)return{result:'unverified-member',member:same};
  if(same.googleSub)return{result:'signup-blocked',member:same};
  return{result:'autolink',member:same};
 }
@@ -1905,7 +1906,7 @@ const NICK={
  id:{a:['Berseri','Segar','Lembut','Cerah','Manis','Ceria','Anggun','Mungil','Harum','Elok'],n:['Mawar','Melati','Anggrek','Teratai','Mutiara','Kelopak','Lili','Tulip','Kamelia','Sakura']},
  mn:{a:['Гэрэлт','Чийглэг','Ягаан','Зөөлөн','Тод','Шинэлэг','Эелдэг','Азтай','Сайхан','Цэвэр'],n:['Цэцэг','Сарнай','Лянхуа','Сувд','Навч','Сакура','Сараана','Алтанзул','Цагаанцэцэг','Наранцэцэг']}
 };
-function nickFor(){const L=NICK[DB.lang]||NICK.en;const p=a=>a[Math.floor(Math.random()*a.length)];let n;do{const num=String(1000+Math.floor(Math.random()*9000));n=DB.lang==='id'?p(L.n)+p(L.a)+num:p(L.a)+p(L.n)+num}while(DB.members.some(m=>m.nickname.toLowerCase()===n.toLowerCase()));return n}
+function nickFor(){const L=NICK[DB.lang]||NICK.en;const p=a=>a[Math.floor(Math.random()*a.length)];let n;do{const num=String(1000+Math.floor(Math.random()*9000));n=DB.lang==='id'?p(L.n)+p(L.a)+num:p(L.a)+p(L.n)+num}while(n.length>20||DB.members.some(m=>m.nickname.toLowerCase()===n.toLowerCase()));return n}
 
 /* ---------- 동작 ---------- */
 let tt;
@@ -1934,6 +1935,7 @@ function googleDone(sub){
   m.status='deleted';m.googleSub=null;m.googleAt=null;DB.session=null;VIEW.page='home';toast('Account withdrawal successful.');render();return}
  const j=judgeGoogle(DB,sub);
  if(j.result==='login'){afterLogin(j.member);return}
+ if(j.result==='unverified-member'){VIEW.page=backOf();toast('This email is already registered. Please log in with your email and password.');render();return}
  if(j.result==='signup-blocked'){VIEW.page=backOf();toast('This email is already linked to a different Google account. Please log in with your email or the Google account linked to your account.');render();return}
  if(j.result==='signup'){const m={id:++DB.seq,email:g.email.toLowerCase(),nickname:nickFor(),joined:'2026. 10. 27',lang:DB.lang,verified:true,password:null,googleSub:sub,googleAt:stamp(),status:'active',via:'google',marketing:false,linkNoticeShown:true,termsAt:new Date().toLocaleString('ko-KR')};DB.members.push(m);afterLogin(m);return}
  if(j.result==='autolink'){const m=j.member;m.googleSub=sub;m.googleAt=stamp();let msg=null;if(!m.linkNoticeShown){msg='Your Google account is now linked. You can log in with Google or your email and password.';m.linkNoticeShown=true}afterLogin(m,msg);return}
