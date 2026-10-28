@@ -1916,7 +1916,7 @@ function go(p,o={}){if(p!==VIEW.page)VIEW.myExpanded=false;if(VIEW.page==='signu
  if(p==='signup'||p==='forgot')VIEW.form={};render();window.scrollTo(0,0)}
 function afterLogin(m,msg){DB.session=m.id;if(msg)toast(msg);const rt=VIEW.returnTo;VIEW.page=DB.booking?'bookinfo':(rt&&rt!=='login'&&P[rt]?rt:'home');VIEW.returnTo=null;VIEW.modal=null;VIEW.err={};render()}
 const INAPP=['ig-ios','fb'];const TOBROWSER=['line','kakao','ig-android','fb-android'];
-function startGoogle(forWhat){VIEW.gFor=forWhat;if(forWhat==='login'&&VIEW.page!=='external'){VIEW.gBack=['myout','signup','forgot'].includes(VIEW.page)?VIEW.page:'login';if(VIEW.gBack==='myout')VIEW.returnTo='myin'}
+function startGoogle(forWhat){if(['google','external','spin'].includes(VIEW.page))return;DB.gStarts=(DB.gStarts||0)+1;VIEW.gFor=forWhat;if(forWhat==='login'&&VIEW.page!=='external'){VIEW.gBack=['myout','signup','forgot'].includes(VIEW.page)?VIEW.page:'login';if(VIEW.gBack==='myout')VIEW.returnTo='myin'}
  const toBrowser=()=>{DB.envFrom=DB.env;VIEW.page='external';VIEW.modal=null;render();setTimeout(()=>{DB.env='browser';VIEW.form={};VIEW.err={};if(forWhat==='verify')VIEW.page='signup';else if(forWhat==='connect'||forWhat==='delete'){DB.session=null;VIEW.returnTo='account';VIEW.page='login';VIEW.expanded=!!DB.remembered}else{VIEW.page=VIEW.gBack==='myout'?'myout':'login';if(VIEW.page==='login')VIEW.expanded=!!DB.remembered}render()},1200)};
  if(TOBROWSER.includes(DB.env)){if(DB.extFail){toast('Please open this page in your browser to continue with Google.');render();return}toBrowser();return}
  VIEW.page='google';VIEW.gStep=INAPP.includes(DB.env)?'email':'choose';VIEW.gEmail='';VIEW.gErr='';render()}
@@ -1961,7 +1961,7 @@ function nickModal(m){if(VIEW.modal!=='nick')return;R().insertAdjacentHTML('befo
 function saveNick(){const m=me(),v=val('nn');VIEW.err={};const e=!v.trim()?'Please enter your name.':/\s/.test(v)?'Spaces are not allowed.':v===m.nickname?'Same as current name.':DB.members.some(x=>x.id!==m.id&&x.status!=='deleted'&&x.nickname.toLowerCase()===v.toLowerCase())?'This nickname is already in use.':null;if(e){VIEW.err.nn=e;render();return}m.nickname=v;VIEW.modal=null;toast('Nickname changed.');render()}
 function stamp(){const d=new Date(),z=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate())+' '+z(d.getHours())+':'+z(d.getMinutes())}
 function disconnect(){const m=me();m.googleSub=null;m.gEmail=null;m.googleAt=null;m.linkNoticeShown=false;VIEW.modal=null;toast('Google has been disconnected.');render()}
-function delPw(){const m=me();if(val('dp')!==m.password){VIEW.err.dp='Incorrect password.';render();return}m.status='deleted';m.googleSub=null;m.gEmail=null;m.googleAt=null;DB.session=null;VIEW.modal=null;VIEW.page='home';toast('Account withdrawal successful.');render()}
+function delPw(){const m=me();if(!val('dp')){VIEW.err.dp='Please enter your password.';render();return}if(val('dp')!==m.password){VIEW.err.dp='Incorrect password.';render();return}m.status='deleted';m.googleSub=null;m.gEmail=null;m.googleAt=null;DB.session=null;VIEW.modal=null;VIEW.page='home';toast('Account withdrawal successful.');render()}
 function logout(){DB.session=null;VIEW.page='home';toast('logged out.');render()}
 function toMy(){if(DB.session)go('myin');else go('myout')}
 function nextBook(){const p=VIEW.pick;if(!p.date||!p.time)return;DB.booking={store:'DDYOU',date:p.date,time:p.time};if(DB.session)go('bookinfo');else go('login',{returnTo:'bookinfo'})}
@@ -2025,7 +2025,7 @@ P.login=()=>{VIEW.expanded=true;const bk=DB.booking;R().innerHTML=envBar()+tpl(b
   on(cb,()=>{VIEW.form.rem=!VIEW.form.rem;VIEW.form.email=val('le');VIEW.form.pw=val('lp');render()});
   on(loginBtn,emailLogin);on(links[0],()=>go('signup'));on(links[1],()=>go('forgot'))}
 };
-P.signup=()=>{R().innerHTML=envBar()+tpl('t_signup');header();const F=VIEW.form;F.ag=F.ag||{};const ie=$('input[name=email]'),b=$('[class*="X-Toyq__sectionButton"]');ie.id='se';ie.value=F.e||'';b.disabled=!ie.value;ie.addEventListener('input',()=>{b.disabled=!ie.value});on(b,()=>sendCode('signup'));
+P.signup=()=>{R().innerHTML=envBar()+tpl('t_signup');header();const F=VIEW.form;F.ag=F.ag||{};const ie=$('input[name=email]'),b=$('[class*="X-Toyq__sectionButton"]');ie.id='se';ie.value=F.e||'';b.disabled=!ie.value;ie.addEventListener('input',()=>{b.disabled=!ie.value;if(VIEW.err.g){F.e=ie.value;F.nick=val('snk');VIEW.err={};render();const e2=$('input[name=email]');e2.focus();e2.setSelectionRange(e2.value.length,e2.value.length)}});on(b,()=>sendCode('signup'));
  const nk=$('input[name=name]');nk.id='snk';nk.value=F.nick||'';nk.addEventListener('input',()=>{F.nick=nk.value;upd()});
  const flow=ie.closest('[class*="X-Toyq__verificationFlow"]');
  const pwF=[$('input[name=passwd]'),$('input[name=passwdConfirm]')].map(x=>x.closest('label'));
