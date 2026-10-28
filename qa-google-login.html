@@ -76,14 +76,14 @@ body.boon .right{position:fixed;right:0;top:var(--toph,96px);bottom:0;width:440p
   <button data-cv="doc" onclick="cover('doc')">전달 문서</button>
   <button id="bobtn" onclick="showBO(!document.getElementById('bop').classList.contains('on'))">BO 회원 화면</button>
   <button id="nwbtn" onclick="toggleNew()">새 요소 표시</button>
-  <button onclick="window.open('gl-proto.html?v=1793162709218','_blank')">새 창</button>
+  <button onclick="window.open('gl-proto.html?v=1793162758203','_blank')">새 창</button>
   <button onclick="copyResult()">결과 복사</button>
  </div>
 </div>
 <div class="bo-panel" id="bop"><div class="bo-bar"><b>BO 회원 &gt; 정보조회</b><span style="color:#777">라이브 어드민 화면 구조 그대로이고, 회원 데이터는 FO 시안의 회원 DB를 그대로 읽습니다. 닫기를 누르면 FO 시안으로 돌아갑니다.</span><span style="flex:1"></span><button onclick="document.getElementById('bof').contentWindow.boDraw&&document.getElementById('bof').contentWindow.boDraw()">새로고침</button><button onclick="showBO(false)">닫기</button></div><iframe id="bof" src="about:blank"></iframe></div>
 <div class="main">
  <div class="left">
-  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1793162709218"></iframe>
+  <div class="frame"><iframe id="fr" src="gl-proto.html?v=1793162758203"></iframe>
    <div class="cover" id="cv-flow"><h3>구글 로그인 판정 순서 <button onclick="cover(null)">닫기</button></h3><div id="flow"></div></div>
    <div class="cover" id="cv-db"><h3>회원 DB (시안 안 데이터, 1초마다 갱신) <button onclick="cover(null)">닫기</button></h3><div id="db"></div></div>
    <div class="cover" id="cv-doc"><h3>구글 로그인 개발 전달 문서 <button onclick="cover(null)">닫기</button></h3><div class="doc" id="doc"></div></div>
@@ -118,7 +118,7 @@ const CASES=[
 ["A-11","My Page 카드에서 이메일로 로그인","verified@example.com / pass1234 → Login","화면 이동 없이 카드 안에서 로그인되고 로그인한 My Page로 바뀝니다.","go('myout')"],
 ["A-12","로그인한 My Page","홈 하단 MY PAGE","Name에 회원 닉네임(Mina)과 가입일, 오른쪽에 Change 버튼이 보이고, 예약 내역, My Activity가 라이브와 같게 보입니다. 아래 Change account information을 누르면 계정 설정으로 갑니다.","DB.session=1;go('home')"],
 ["A-07","알리페이 채널로 들어온 회원","(알리페이 앱으로 들어와 이미 로그인된 상태로 홈이 열림) 하단 MY PAGE → Change account information","로그인한 My Page가 바로 보이고 구글 버튼·로그인 화면은 나오지 않습니다. 계정 설정에는 Google 줄이 없습니다(알리페이 채널은 자체 로그인 경로가 숨겨져 있음).","DB.env='alipay';DB.members.push({id:9,email:'alipay.user@example.com',nickname:'AlipayGuest',verified:true,password:null,googleSub:null,status:'active',via:'alipay',marketing:false,linkNoticeShown:true});DB.session=9;go('home')"],
-["B-01","처음 보는 구글 계정이면 바로 가입","(My Page에서 Continue with Google을 누른 상태로 열림) Alex Kim을 고릅니다.","안내 없이 로그인한 My Page로 돌아옵니다.\n회원 DB에 alex.new@gmail.com 추가: 닉네임은 구글 이름을 쓰지 않고, 가입할 때의 서비스 언어로 자동 생성(형용사 + 꽃·뷰티 단어 + 숫자 4자리, 띄어쓰기 없음. 영어 예: GlowingLotus5382), 인증 완료, 비밀번호 없음, 가입 경로 구글, 마케팅 미동의, 약관 동의 시각 기록.","go('myout');startGoogle('login')"],
+["B-01","처음 보는 구글 계정이면 바로 가입","(My Page에서 Continue with Google을 누른 상태로 열림) Alex Kim을 고릅니다.","안내 없이 로그인한 My Page로 돌아옵니다.\n회원 DB에 alex.new@gmail.com 추가: 닉네임은 구글 이름을 쓰지 않고, 가입할 때의 서비스 언어로 자동 생성(형용사 + 꽃·뷰티 단어 + 숫자 4자리, 띄어쓰기 없음, 영어 예 GlowingLotus5382)됩니다. 이메일 인증 완료, 비밀번호 없음, 가입 경로 구글, 마케팅 미동의로 저장되고 약관 동의 시각(칸이 있으면)이 기록됩니다.","go('myout');startGoogle('login')"],
 ["B-02","구글 이름이 비어 있어도 같은 규칙","(My Page에서 Continue with Google을 누른 상태로 열림) noname@gmail.com을 고릅니다.","닉네임이 B-01과 같은 규칙으로 만들어집니다.","go('myout');startGoogle('login')"],
 ["B-02a","중국어(간체)로 가입하면 중국어 닉네임","(My Page에서 Continue with Google을 누른 상태로 열림) Alex Kim을 고릅니다.","회원 DB의 닉네임이 중국어(간체) 단어 + 숫자 4자리입니다(예: 甜美玫瑰3181). 시안 화면 문구는 영어로만 떠 와서 영어로 보입니다.","DB.lang='zh-CN';go('myout');startGoogle('login')"],
 ["B-02b","일본어로 가입하면 일본어 닉네임","(My Page에서 Continue with Google을 누른 상태로 열림) Alex Kim을 고릅니다.","닉네임이 일본어 단어 + 숫자 4자리입니다(예: うるおうばら1884).","DB.lang='ja';go('myout');startGoogle('login')"],
@@ -186,7 +186,7 @@ const CASES=[
 ["J-05","인스타그램 앱 (안드로이드)","Continue with Google → alex.new@gmail.com → Next → Next","브라우저로 넘기지 않고 앱 안 구글 로그인 화면에서 직접 입력해 가입·로그인됩니다.","DB.env='ig-android';go('login')"],
 ["J-06","페이스북 앱","Continue with Google → alex.new@gmail.com → Next → Next","브라우저로 넘기지 않고 앱 안 구글 로그인 화면에서 직접 입력해 가입·로그인됩니다.","DB.env='fb';go('login')"],
 ["H-01","구글로 가입한 회원이 BO 목록에 보임","아래 BO 화면 회원 목록 맨 위 줄을 봅니다.","이름 = 자동 생성 닉네임, 이메일 = alex.new@gmail.com, 가입 경로 = 구글, 구글 연결 = alex.new@gmail.com, 구글 연결일 = 지금 시각(가입 시각), 마케팅 미동의, 비밀번호 없음으로 보입니다. 새 칼럼 네 개(가입 경로·구글 연결·구글 연결일·비밀번호)만 새로 더한 것이고 나머지는 라이브 칼럼 그대로입니다.","googleDone('g-new')"],
-["H-02","자동 연결된 이메일 회원","회원 목록에서 verified@example.com 줄을 봅니다.","가입 경로 = 이메일 그대로, 구글 연결 = verified@example.com, 구글 연결일 = 지금 시각(연결된 시각, 가입일과 다름). 이름(Mina)은 바뀌지 않습니다. 구글을 연결하지 않은 회원은 구글 연결·연결일 모두 하이픈입니다.","googleDone('g-ver')"],
+["H-02","자동 연결된 이메일 회원","회원 목록에서 verified@example.com 줄을 봅니다.","가입 경로 = 이메일 그대로, 구글 연결 = verified@example.com, 구글 연결일 = 지금 시각(연결된 시각이라 가입일과 다릅니다). 이름(Mina)은 바뀌지 않습니다. 구글을 연결하지 않은 회원은 구글 연결·연결일 모두 하이픈입니다.","googleDone('g-ver')"],
 ["H-03","다른 이메일 구글을 연결한 회원","verified@example.com 줄을 봅니다.","구글 연결 칸에 회원 이메일과 다른 other.person@gmail.com이 보이고, 구글 연결일은 연결한 시각입니다. 연결을 해제하면 두 칸 모두 하이픈으로 돌아갑니다.","DB.members[0].googleSub='g-other';DB.members[0].googleAt='2026-10-27 09:30'"],
 ["H-04","가입 경로 필터","가입 경로 → 구글 → 검색","구글로 가입한 회원(googleonly@gmail.com 등)만 남습니다. 이메일로 가입한 뒤 구글을 연결한 회원은 이메일 가입이라 빠집니다.","googleDone('g-new')"],
 ["H-05","검색어로 연결된 구글 이메일 찾기","검색어에 other.person → 검색","회원 이메일이 verified@example.com인 회원이 구글 연결 이메일로 찾아집니다.","DB.members[0].googleSub='g-other'"],
@@ -203,8 +203,8 @@ let GRP='C',FIL='all';
 const W=()=>document.getElementById('fr').contentWindow;
 function showBO(on){const p=document.getElementById('bop');p.classList.toggle('on',on);document.body.classList.toggle('boon',on);document.getElementById('bobtn').classList.toggle('on',on);if(on){const th=document.querySelector('.top').offsetHeight;p.style.top=th+'px';document.body.style.setProperty('--toph',th+'px');const f=document.getElementById('bof');if(f.src.indexOf('gl-bo.html')<0){f.src='gl-bo.html?v='+Date.now();f.onload=()=>{if(document.body.classList.contains('nw'))f.contentWindow.document.body.classList.add('show-new')}}else if(f.contentWindow.boSet)f.contentWindow.boSet({via:'',q:''})}}
 function toggleNew(){const b=W().document.body;b.classList.toggle('show-new');document.body.classList.toggle('nw',b.classList.contains('show-new'));try{document.getElementById('bof').contentWindow.document.body.classList.toggle('show-new',b.classList.contains('show-new'))}catch(e){}document.getElementById('nwbtn').classList.toggle('on',b.classList.contains('show-new'))}
-function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1793162709218?'+Date.now()}
-function open_(i,retry){const c=CASES[i];const w=W();let ok=true;try{w.resetDB();w.eval(c[4])}catch(e){ok=false;if(!retry){const f=document.getElementById('fr');f.onload=()=>{f.onload=null;open_(i,true)};f.src='gl-proto.html?v=1793162709218?'+Date.now();return}alert('세팅 실패: '+e.message)}try{w.scrollTo(0,0)}catch(e){}showBO(c[0][0]==='H');cover(null);document.querySelectorAll('.case .open').forEach(b=>b.classList.remove('open'));const b=document.getElementById('o'+i);if(b)b.classList.add('open')}
+function reloadFrame(){document.getElementById('fr').src='gl-proto.html?v=1793162758203?'+Date.now()}
+function open_(i,retry){const c=CASES[i];const w=W();let ok=true;try{w.resetDB();w.eval(c[4])}catch(e){ok=false;if(!retry){const f=document.getElementById('fr');f.onload=()=>{f.onload=null;open_(i,true)};f.src='gl-proto.html?v=1793162758203?'+Date.now();return}alert('세팅 실패: '+e.message)}try{w.scrollTo(0,0)}catch(e){}showBO(c[0][0]==='H');cover(null);document.querySelectorAll('.case .open').forEach(b=>b.classList.remove('open'));const b=document.getElementById('o'+i);if(b)b.classList.add('open')}
 function mark(id,v){ST[id]=ST[id]||{};ST[id].s=ST[id].s===v?null:v;save();draw()}
 function memo(id,v){ST[id]=ST[id]||{};ST[id].m=v;save()}
 function setF(f){FIL=f;document.querySelectorAll('.fl button').forEach(b=>b.classList.toggle('on',b.dataset.f===f));draw()}
