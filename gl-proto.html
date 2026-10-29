@@ -2055,7 +2055,7 @@ P.signup=()=>{R().innerHTML=envBar()+tpl('t_signup');header();const F=VIEW.form;
  rows.forEach((x,i)=>{tick(x,F.ag[keys[i]]);on(x,()=>{F.ag[keys[i]]=!F.ag[keys[i]];F.nick=val('snk');render()})});tick(all,keys.every(k=>F.ag[k]));on(all,()=>{const v=!keys.every(k=>F.ag[k]);keys.forEach(k=>F.ag[k]=v);F.nick=val('snk');render()});
  const sb=$$('[class*="X-Toyq__footer"] button').find(x=>/Sign Up/.test(x.textContent));
  const upd=()=>{const okE=F.gv||(F.codeVerified&&!pwError(F.pw||'')&&F.pw===F.pw2);sb.disabled=!(okE&&(F.nick||'').trim()&&F.ag.svc&&F.ag.pp)};upd();
- on(sb,()=>{if(sb.disabled)return;const v=val('snk');const e=/\s/.test(v)?'Spaces are not allowed.':DB.members.some(x=>x.status!=='deleted'&&x.nickname.toLowerCase()===v.toLowerCase())?(F.gv?'This nickname is already in use.':null):null;if(e){VIEW.err.nick=e;F.nick=v;render();return}
+ on(sb,()=>{if(sb.disabled)return;const v=val('snk');const e=/\s/.test(v)?'Spaces are not allowed.':DB.members.some(x=>x.status!=='deleted'&&x.nickname.toLowerCase()===v.toLowerCase())?'This nickname is already in use.':null;if(e){VIEW.err.nick=e;F.nick=v;render();return}
   const gv=F.gv,emailV=gv?gv.email:norm(F.e);
   if(gv){const dupG=DB.members.some(x=>x.status!=='deleted'&&x.googleSub===gv.sub),dupE=DB.members.some(x=>x.status!=='deleted'&&norm(x.email)===emailV);if(dupG||dupE){F.nick=v;F.gv=null;VIEW.err.e=dupE?'This email is already registered.':'This Google account is already linked to another K-Beauty Station account.';render();return}}
   else if(DB.members.some(x=>x.status!=='deleted'&&norm(x.email)===emailV)){F.nick=v;VIEW.err.e='This email is already registered.';render();return}
