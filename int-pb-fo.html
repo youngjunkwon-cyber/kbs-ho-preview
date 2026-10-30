@@ -1347,7 +1347,7 @@ function pInfo() {
   var cc = $('[class*=verifiedCountryCode]'); if (cc) cc.textContent = '+1'; var pn = $('[class*=verifiedPhoneNumber]'); if (pn) pn.textContent = '4165550199 (Verified)';
   if (f.ch === 'ali') {
     var tag = function (lbl, txt) { var sp = $$('[class*=informationLabel]').filter(function (x) { return x.textContent.replace('*', '').trim() === lbl; })[0]; if (!sp) return; var t = document.createElement('span'); t.className = 'pb-autotag'; t.textContent = txt; t.setAttribute('data-test', 'fo-autotag'); sp.appendChild(mark(t)); };
-    ['Nationality', 'Gender', 'Date of birth'].forEach(function (l) { tag(l, '회원 정보에서 채웠습니다'); }); tag('Mobile phone number', '알리페이 계정에서 채웠습니다');
+    ['Nationality', 'Gender', 'Date of birth'].forEach(function (l) { tag(l, '회원 정보에서 채웠습니다'); }); tag('Mobile phone number', '회원 정보에서 채웠습니다');
     var vf = $('[class*=verifiedPhoneForm]'); if (vf) { var hs = document.createElement('div'); hs.className = 'pb-fohint'; hs.setAttribute('data-test', 'fo-phone-hint'); hs.textContent = '고치면 문자 인증을 다시 합니다.'; vf.after(mark(hs)); }
     if (tl[0]) tl[0].textContent = 'China'; var cc2 = $('[class*=verifiedCountryCode]'); if (cc2) cc2.textContent = '+86'; var pn2 = $('[class*=verifiedPhoneNumber]'); if (pn2) pn2.textContent = '13800000099 (Verified)';
     var pi = $('input[name=passportName]'); if (pi) { pi.value = ''; pi.setAttribute('value', ''); } var mi = $('input[name=messengerId]'); if (mi) { mi.value = f.mid || ''; mi.setAttribute('value', f.mid || ''); mi.oninput = function () { f.mid = mi.value; }; mi.placeholder = '메신저 아이디를 직접 입력해 주세요'; mi.setAttribute('data-test', 'fo-msgid'); mark(mi); }

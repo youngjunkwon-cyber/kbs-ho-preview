@@ -790,16 +790,14 @@ function resetDB(keepRows) {
     open: {},
     step: 'consent',      // consent(우리 창) → perm(알리페이 권한 창) → done | blocked
     blocked: '',          // '' | consent | prof | fail
-    plaintext: true,      // 알리페이가 원본 휴대폰 권한을 승인해 준 상태인가 (담당 확인 결과에 따라 갈린다)
-    phoneGranted: true,   // 알리페이 권한 창의 휴대폰 번호 원본 (승인된 동안 필수, 거부하면 차단)
+    nameGranted: true,    // 알리페이 권한 창의 이름 토글 (필수 다섯 중 하나. 끄고 허용하면 차단)
     wallet: 'CN',
-    tel: '', telVerified: false, telEdited: false, telSrc: '',
-    mtel: '', mtelSrc: '', mtelSaved: false, mtelDraft: '',   // 회원 정보에 저장된 인증 번호와 마이페이지 수정 중 번호
+    tel: '', telVerified: false, telEdited: false,
+    mtel: '', mtelSaved: false, mtelDraft: '',   // 회원 정보에 저장된 인증 번호와 마이페이지 수정 중 번호
     passport: '', passportSaved: '', msg: '',
     userSet: {},          // 예약 입력 화면에서 이용자가 직접 넣은 칸
     birthMode: 'adult',   // adult(생년월일 있음) | none(생년월일 없음)
     agAge: false,         // 쓰지 않음(나이 확인 단계 삭제, 2026-10-17)
-    contactGranted: true, // 알리페이 권한 창의 연락처 (필수 권한)
     toast: '',
     booked: 0,            // 이 시안에서 보낸 예약 요청 수 (알리페이 회원 목록의 예약 칸)
     prof: null,           // 회원 정보에 저장된 프로필 (수정 가능)
@@ -834,7 +832,7 @@ var TERMS_FULL = [
 ].join('\n\n');
 var PRIV_FULL = [
   '제1조(처리 목적) 회사는 회원 식별과 로그인, 예약 중개, 예약 알림, 고객 문의 응대, 서비스 개선을 위하여 개인정보를 처리합니다.',
-  '제2조(처리하는 항목) ① 알리페이 계정으로 이용하는 경우 알리페이가 제공하는 이용자 식별자, 이름, 닉네임, 프로필 사진, 성별, 생년월일, 국적, 주소, 휴대폰 번호를 수집합니다. ② 예약 시 여권 영문명, 메신저 연락처를 수집합니다. ③ 서비스 이용 과정에서 접속 기록, 기기 정보, 쿠키가 자동으로 생성될 수 있습니다.',
+  '제2조(처리하는 항목) ① 알리페이 계정으로 이용하는 경우 알리페이가 제공하는 이용자 식별자, 이름, 닉네임, 성별, 생년월일, 국적을 수집합니다. ② 예약 시 여권 영문명, 휴대폰 번호, 메신저 연락처를 수집합니다. ③ 서비스 이용 과정에서 접속 기록, 기기 정보, 쿠키가 자동으로 생성될 수 있습니다.',
   '제3조(처리 및 보유 기간) ① 회원 식별 정보는 이용계약이 해지되면 지체 없이 파기합니다. ② 전자상거래법 등 관계 법령이 정한 거래 기록은 해당 법령이 정한 기간 동안 보관합니다.',
   '제4조(제3자 제공) 회사는 예약의 이행을 위하여 필요한 범위에서 예약 정보를 해당 입점사에 제공합니다.',
   '제5조(처리 위탁) 회사는 메시지 발송, 서버 운영을 외부에 위탁할 수 있으며, 위탁받는 자와 위탁 업무의 내용을 이 방침에 공개합니다.',
@@ -844,10 +842,10 @@ var PRIV_FULL = [
 ].join('\n\n');
 
 /* 알리페이가 주는 값. 권한 창에서 허용하면 온다. 계정에 값이 없는 항목은 빈다 */
-var ALI = { name: '왕샤오메이', nick: 'xiaomei_w', sex: '여성', birth: '1996-03-12', nation: '중국', addr: '상하이시 징안구', phone: '+86 13900001111', id: '2088_9f31c07a' };
+var ALI = { name: '왕샤오메이', nick: 'xiaomei_w', sex: '여성', birth: '1996-03-12', nation: '중국', id: '2088_9f31c07a' };
 var LANG = { CN: '중국어(간체)', HK: '중국어(번체)' };
 /* 프로필 칸을 누르면 들어가는 예시 값. 값이 있으면 다른 예시 값으로 바꾼다 */
-var EX = { passport: ['WANG XIAOMEI', 'WANG MEI'], name: ['왕샤오메이', '왕메이'], nick: ['xiaomei_w', 'xiaomei_02'], sex: ['여성', '남성'], birth: ['1996-03-12', '1996-03-21'], nation: ['중국', '홍콩(중국 특별행정구)'], addr: ['상하이시 징안구', '상하이시 푸둥신구'], msg: ['위챗 wxid_alipay01', '위챗 wxid_alipay02'] };
+var EX = { passport: ['WANG XIAOMEI', 'WANG MEI'], name: ['왕샤오메이', '왕메이'], nick: ['xiaomei_w', 'xiaomei_02'], sex: ['여성', '남성'], birth: ['1996-03-12', '1996-03-21'], nation: ['중국', '홍콩(중국 특별행정구)'], msg: ['위챗 wxid_alipay01', '위챗 wxid_alipay02'] };
 /* 시안 조작 힌트. 휴대폰 화면 밖 점선 상자로 둔다 (화면 문구가 아님) */
 var ANNO = {
   fo11: 'Change account information 버튼만 눌러 볼 수 있습니다. 나머지 메뉴는 현행 화면 그대로라 눌러도 "Not available in this mockup" 토스트만 뜹니다.',
@@ -868,41 +866,40 @@ var VIEWS = [
   ['bo11', 'BO-CH-11 알리페이 회원']
 ];
 var CAPS = {
-  fo09: '권한 창은 알리페이 앱이 그립니다. 우리 화면에 합칠 수 없습니다. 알리페이에서 식별자를 받은 직후 한 번 뜹니다. 회원을 만들기 전이라 뒤 화면은 비어 있고 어둡게만 깔립니다. 이용 약관, 개인정보 처리방침, 알리페이 프로필 제공 셋이 필수라 셋을 다 체크해야 동의 버튼이 켜집니다. 권한 창의 연락처는 필수 권한이라 끄고 허용하면 진입 차단 화면으로 갑니다. 휴대폰 번호 원본은 알리페이가 승인한 경우에만 요청하고 필수라 끄고 허용하면 진입 차단 화면으로 갑니다. 마케팅 정보 수신은 선택입니다. 동의를 누르면 알리페이가 권한 창을 한 번 더 띄웁니다. 권한 창에서 허용하면 회원이 만들어집니다.',
+  fo09: '권한 창은 알리페이 앱이 그립니다. 우리 화면에 합칠 수 없습니다. 알리페이에서 식별자를 받은 직후 한 번 뜹니다. 회원을 만들기 전이라 뒤 화면은 비어 있고 어둡게만 깔립니다. 이용 약관, 개인정보 처리방침, 알리페이 프로필 제공 셋이 필수라 셋을 다 체크해야 동의 버튼이 켜집니다. 권한 창의 다섯 항목(이름, 닉네임, 성별, 생년월일, 국적)은 모두 필수라 이름을 끄고 허용하면 진입 차단 화면으로 갑니다. 휴대폰 번호는 알리페이에서 받지 않습니다. 마케팅 정보 수신은 선택입니다. 동의를 누르면 알리페이가 권한 창을 한 번 더 띄웁니다. 권한 창에서 허용하면 회원이 만들어집니다.',
   fo08: '상단 상태의 차단 이유 버튼으로 세 가지(동의 창 닫기 / 프로필 거부 / 식별 실패)를 바꿔 볼 수 있습니다. 헤더, 메뉴, 검색이 없습니다. 동의 창을 닫았을 때, 알리페이 권한 창에서 필수 권한(프로필)을 거부했을 때, 식별에 실패했을 때 머무는 화면입니다. 둘러보기는 없습니다. 버튼은 하나입니다. 식별 실패의 다시 시도는 계정 식별부터 다시 진행하고, 동의 창에서 동의하고 시작하기를 이미 눌렀으면 알리페이 권한 창부터, 아니면 동의 창부터 다시 띄웁니다.',
   fo10: '알리페이 식별이 로그인을 대신합니다. 로그인 주소로 직접 들어오면 My Page로 보냅니다. 알리페이 채널에서는 자체 로그인 경로를 숨깁니다. 점선 박스가 웹 채널에는 있고 알리페이 채널에는 없는 자리입니다. 진입 관문을 통과해야 들어오므로 비로그인 상태 자체가 없습니다.',
-  fo11: 'My Page는 현행 화면과 같은 구성입니다. Nickname과 Joined, 알리페이 계정 안내, Booking History, My Activity, Explore, Customer Center가 있고 Change account information 버튼으로 Account Settings에 들어갑니다. Account Settings에서는 칸을 눌러 예시 값으로 바꾸고 Save를 눌러야 회원 정보에 저장됩니다(알리페이 회원 탭에서 확인). Phone Number는 원본 권한이 승인되면 채워지고, Use a different number로 바꾼 뒤 Get verification code로 문자 인증을 마치면 바로 저장됩니다. 이메일, 비밀번호 변경, 로그아웃 자리가 없습니다. Marketing messages는 여기서 켜고 끕니다. 알리페이 계정에 닉네임이 없으면 Nickname 자리에 알리페이 회원이 보입니다(회원이 되기 전에 상단 닉네임 비우기로 확인).',
+  fo11: 'My Page는 현행 화면과 같은 구성입니다. Nickname과 Joined, 알리페이 계정 안내, Booking History, My Activity, Explore, Customer Center가 있고 Change account information 버튼으로 Account Settings에 들어갑니다. Account Settings에서는 칸을 눌러 예시 값으로 바꾸고 Save를 눌러야 회원 정보에 저장됩니다(알리페이 회원 탭에서 확인). Phone Number는 예약이나 계정 설정에서 인증한 번호가 있으면 채워지고, 없으면 빈 칸을 눌러 입력해 Get verification code로 문자 인증을 마치면 바로 저장됩니다. Use a different number로 바꾼 뒤 문자 인증을 마쳐도 바로 저장됩니다. 이메일, 비밀번호 변경, 로그아웃 자리가 없습니다. Marketing messages는 여기서 켜고 끕니다. 알리페이 계정에 닉네임이 없으면 Nickname 자리에 알리페이 회원이 보입니다(회원이 되기 전에 상단 닉네임 비우기로 확인).',
   fo12: 'My Page > Account Settings의 기존 탈퇴 경로를 그대로 씁니다. 알리페이 연결과 권한이 끊기고 다시 들어오면 새 회원이 되어 진입 관문을 다시 거칩니다.',
-  fo13: '회원 정보에서 채운 값은 고칠 수 있고 고친 값은 회원 정보에 저장됩니다. 이메일 칸이 없습니다. 원본 휴대폰 번호가 온 회원은 번호가 채워진 채 문자 인증을 건너뛰고, 고치면 그때 인증합니다. 원본이 없으면 직접 입력하고 인증합니다. Passport name은 직접 입력합니다. Book은 웹 예약과 같은 필수값(이메일 제외)이 모두 차야 켜집니다. 클리닉 스토어(피부과·성형외과·치과·메디컬체크)는 방문 예정일 기준 만 18세 이상만 예약할 수 있어, 만 18세 미만이면 Book을 눌렀을 때 요청을 보내지 않고 알림 창이 뜹니다(상단 클리닉 스토어로 바꿔 확인). 입력한 값은 그대로 남습니다. Nationality·Gender·Date of birth는 칸을 벗어나는 순간 회원 정보에 들어가고, Mobile phone number·Messenger contact·Passport name은 요청 전에 나가면 남지 않습니다. 상단 상담접수 폼 보기로 알리페이 채널 상담접수 폼을 볼 수 있습니다.',
-  bo11: '검색어는 알리페이 식별자, 닉네임, 이름, 연락처를 봅니다. 식별자는 완전 일치로 찾습니다. 빈 값은 알리페이 계정에 값이 없던 항목입니다. 회원 메뉴 아래에 새로 두는 화면입니다. 칼럼은 알리페이가 주는 항목에 맞춘 19개입니다. 이메일과 프로필 동의 여부 칼럼이 없습니다. 회원이면 프로필 제공에 항상 동의한 상태입니다.'
+  fo13: '회원 정보에서 채운 값은 고칠 수 있고 고친 값은 회원 정보에 저장됩니다. 이메일 칸이 없습니다. 휴대폰 번호는 알리페이에서 받지 않습니다. 첫 예약 때 직접 입력하고 문자 인증을 하며, 두 번째 예약부터는 회원 정보에 저장된 인증 번호가 채워지고 인증을 건너뜁니다. 고치면 그때 인증합니다. Passport name은 직접 입력합니다. Book은 웹 예약과 같은 필수값(이메일 제외)이 모두 차야 켜집니다. 클리닉 스토어(피부과·성형외과·치과·메디컬체크)는 방문 예정일 기준 만 18세 이상만 예약할 수 있어, 만 18세 미만이면 Book을 눌렀을 때 요청을 보내지 않고 알림 창이 뜹니다(상단 클리닉 스토어로 바꿔 확인). 입력한 값은 그대로 남습니다. Nationality·Gender·Date of birth는 칸을 벗어나는 순간 회원 정보에 들어가고, Mobile phone number·Messenger contact·Passport name은 요청 전에 나가면 남지 않습니다. 상단 상담접수 폼 보기로 알리페이 채널 상담접수 폼을 볼 수 있습니다.',
+  bo11: '검색어는 알리페이 식별자, 닉네임, 이름, 연락처를 봅니다. 식별자는 완전 일치로 찾습니다. 빈 값은 알리페이 계정에 값이 없던 항목입니다. 회원 메뉴 아래에 새로 두는 화면입니다. 칼럼은 알리페이가 주는 항목에 맞춘 18개입니다. 이메일과 프로필 동의 여부 칼럼이 없습니다. 연락처는 예약이나 계정 설정에서 인증한 번호입니다. 회원이면 프로필 제공에 항상 동의한 상태입니다.'
 };
 
 function h(s) { return s == null ? '' : String(s); }
 function dash(v) { return v ? h(v) : '<span class="dash">-</span>'; }
 /* FO-CH-13을 떠나거나 새로 열 때: 예약 요청·상담접수 전에 넣은 값은 남기지 않는다 */
-function reset13() { S.userSet = {}; S.done13 = false; S.age18 = false; S.passport = ''; S.minor13 = ''; S.rmsg = ''; S.rchip = ''; S.cd = null; S.doneC = false; S.tel = S.mtel; S.telVerified = !!S.mtel; S.telSrc = S.mtelSrc; S.telEdited = false; S.telSaved = S.mtelSaved; }
+function reset13() { S.userSet = {}; S.done13 = false; S.age18 = false; S.passport = ''; S.minor13 = ''; S.rmsg = ''; S.rchip = ''; S.cd = null; S.doneC = false; S.tel = S.mtel; S.telVerified = !!S.mtel; S.telEdited = false; S.telSaved = S.mtelSaved; }
 function go(v) { if (v === 'fo11') S.sub = 'home'; if ((S.view === 'fo13' && v !== 'fo13') || (v === 'fo13' && (S.view !== 'fo13' || S.done13 || S.doneC))) reset13(); S.view = v; render(); }
 function setF13(m) { S.f13 = m; if (S.view === 'fo13') reset13(); render(); }
 
 /* 클리닉 스토어 예약 나이: 방문 예정일 기준 만 18세 이상 */
 var VISIT13 = '2026-10-20';
 function adult18(b) { if (!b) return false; var q = b.split('-'), v = VISIT13.split('-'), age = (+v[0]) - (+q[0]); if (+q[1] > +v[1] || (+q[1] === +v[1] && +q[2] > +v[2])) age--; return age >= 18; }
-function submit13() { if (S.clinic13 && !adult18(S.prof.birth)) { S.age18 = true; render(); return; } S.passportSaved = S.passport; S.passport = ''; S.booked = (S.booked || 0) + 1; S.telSaved = true; S.telEdited = false; S.mtel = S.tel; S.mtelSrc = S.telSrc; S.mtelSaved = true; S.mtelDraft = ''; S.userSet = {}; S.done13 = true; render(); }
+function submit13() { if (S.clinic13 && !adult18(S.prof.birth)) { S.age18 = true; render(); return; } S.passportSaved = S.passport; S.passport = ''; S.booked = (S.booked || 0) + 1; S.telSaved = true; S.telEdited = false; S.mtel = S.tel; S.mtelSaved = true; S.mtelDraft = ''; S.userSet = {}; S.done13 = true; render(); }
 
 /* 예시 값 순환: 지금 값의 다음 값. 목록에 없으면 첫 값 */
 function nextEx(e, cur) { return e[(e.indexOf(cur) + 1) % e.length]; }
-/* 권한 창에서 허용. 연락처를 끄거나 승인된 휴대폰 번호 원본을 끄면 차단, 아니면 바로 회원을 만든다 */
+/* 권한 창에서 허용. 필수 다섯 중 하나(이름)를 끄면 차단, 아니면 바로 회원을 만든다 */
 function allowPerm() {
-  if (!S.contactGranted || (S.plaintext && !S.phoneGranted)) { S.step = 'blocked'; S.blocked = 'prof'; S.view = 'fo08'; return; }
+  if (!S.nameGranted) { S.step = 'blocked'; S.blocked = 'prof'; S.view = 'fo08'; return; }
   
   
   joinNow();
 }
 function joinNow() {
   S.joined = true; S.step = 'done'; S.blocked = '';
-  S.prof = { name: ALI.name, nick: S.noNick ? '' : ALI.nick, sex: ALI.sex, birth: S.birthMode === 'none' ? '' : ALI.birth, nation: ALI.nation, addr: ALI.addr };
+  S.prof = { name: ALI.name, nick: S.noNick ? '' : ALI.nick, sex: ALI.sex, birth: S.birthMode === 'none' ? '' : ALI.birth, nation: ALI.nation };
   S.mktDate = clk(0).replace('2026-10-12', '2026-10-12 (월)');
-  if (S.plaintext && S.phoneGranted) { S.tel = ALI.phone; S.telVerified = true; S.telEdited = false; S.telSrc = 'ali'; S.mtel = ALI.phone; S.mtelSrc = 'ali'; }
   S.view = 'fo11';
 }
 
@@ -912,7 +909,7 @@ function fo09() {
   var rows = [
     ['agTerms', '이용 약관', true, TERMS_FULL, ''],
     ['agPriv', '개인정보 처리방침', true, PRIV_FULL, ''],
-    ['agProf', '알리페이 프로필 제공', true, '', ['이름', '닉네임', '프로필 사진', '성별', '생년월일', '국적', '주소', '휴대폰 번호'].join(', ') + '를 가져옵니다.' + ' 닉네임은 리뷰와 채팅에 작성자 이름으로 표시됩니다.'],
+    ['agProf', '알리페이 프로필 제공', true, '', '이름, 닉네임, 성별, 생년월일, 국적을 가져옵니다.' + ' 닉네임은 리뷰와 채팅에 작성자 이름으로 표시됩니다.'],
     ['agMkt', '마케팅 정보 수신', false, '', 'K-Beauty Station의 혜택·이벤트 정보를 휴대폰 번호로 받습니다.']
   ];
   var body = rows.map(function (r) {
@@ -929,9 +926,8 @@ function fo09() {
     overlay = '<div class="dim" style="align-items:flex-end;padding:0"><div class="alisheet">' +
       '<div class="brand"><i></i>Alipay</div>' +
       '<h4>K-Beauty Station이 다음 정보를 요청합니다</h4>' +
-      '<ul class="lst"><li>이름, 닉네임, 프로필 사진</li><li>성별, 생년월일, 국적, 주소</li><li>연락처</li>' + (S.plaintext ? '<li>휴대폰 번호 원본</li>' : '') + '</ul>' +
-      '<div class="tg"><span>연락처 (필수)</span><span class="sw ' + (S.contactGranted ? 'on' : '') + '" onclick="S.contactGranted=!S.contactGranted;render()"><i></i></span></div>' +
-      (S.plaintext ? '<div class="tg"><span>휴대폰 번호 원본 (필수)</span><span class="sw ' + (S.phoneGranted ? 'on' : '') + '" onclick="S.phoneGranted=!S.phoneGranted;render()"><i></i></span></div>' : '') +
+      '<ul class="lst"><li>이름, 닉네임</li><li>성별, 생년월일, 국적</li></ul>' +
+      '<div class="tg"><span>이름 (필수)</span><span class="sw ' + (S.nameGranted ? 'on' : '') + '" onclick="S.nameGranted=!S.nameGranted;render()"><i></i></span></div>' +
       '<div class="row2" style="margin-top:14px"><div class="ab" onclick="S.step=\'blocked\';S.blocked=\'prof\';S.view=\'fo08\';render()">거부</div><div class="ab pri" onclick="allowPerm();render()">허용</div></div>' +
       '</div></div>';
   } else if (S.joined) {
@@ -956,10 +952,10 @@ function fo08() {
 }
 function blockPage(b) {
   var t, d, btn, act;
-  if (b === 'prof') { t = '이용 동의가 필요합니다'; d = '알리페이 프로필 제공에 동의해야 K-Beauty Station을 이용할 수 있습니다.'; btn = '다시 동의하기'; act = "S.contactGranted=true;S.phoneGranted=true;S.step='perm';S.blocked='';S.view='fo09';render()"; }
+  if (b === 'prof') { t = '이용 동의가 필요합니다'; d = '알리페이 프로필 제공에 동의해야 K-Beauty Station을 이용할 수 있습니다.'; btn = '다시 동의하기'; act = "S.nameGranted=true;S.step='perm';S.blocked='';S.view='fo09';render()"; }
   
   
-  else if (b === 'fail') { t = '알리페이 계정을 확인할 수 없습니다'; d = '잠시 후 다시 시도해 주세요.'; btn = '다시 시도'; act = "if(S.agreed){S.contactGranted=true;S.phoneGranted=true;S.step='perm';}else{S.step='consent';}S.blocked='';S.view='fo09';render()"; }
+  else if (b === 'fail') { t = '알리페이 계정을 확인할 수 없습니다'; d = '잠시 후 다시 시도해 주세요.'; btn = '다시 시도'; act = "if(S.agreed){S.nameGranted=true;S.step='perm';}else{S.step='consent';}S.blocked='';S.view='fo09';render()"; }
   else { t = '이용 동의가 필요합니다'; d = '필수 항목에 동의해야 K-Beauty Station을 이용할 수 있습니다.'; btn = '다시 동의하기'; act = "S.step='consent';S.blocked='';S.view='fo09';render()"; }
   return '<div class="blockpage"><div class="logo">K-Beauty Station</div><h3>' + t + '</h3><p>' + d + '</p>' + (btn ? '<div class="cta" onclick="' + act + '">' + btn + '</div>' : '') + '</div>';
 }
@@ -979,12 +975,12 @@ function fo10() {
 
 /* ─────────── FO-CH-11 마이페이지 ─────────── */
 /* 칸을 누르면 예시 값으로 고친다. 값이 있으면 다른 예시 값으로 바꾼다. 고친 값은 바로 회원 정보(S.prof)에 저장된다 */
-/* 예시 번호 순환: 알리페이 원본(있으면) → 2222 → 4444 → 처음으로 */
-function nextTel(cur, hasAli) { var list = (hasAli ? [ALI.phone] : []).concat(['+86 13922223333', '+86 13944445555']); var i = list.indexOf(cur); return list[(i + 1) % list.length]; }
+/* 예시 번호 순환: 2222 → 4444 → 처음으로. 휴대폰 번호는 알리페이에서 받지 않으므로 직접 입력한 값만 있다 */
+function nextTel(cur) { var list = ['+86 13922223333', '+86 13944445555']; var i = list.indexOf(cur); return list[(i + 1) % list.length]; }
 function setTelNext() {
-  var next = nextTel(S.tel || '', S.mtelSrc === 'ali' || S.telSrc === 'ali' || S.plaintext);
-  if (next === S.mtel && S.mtel) { S.tel = next; S.telEdited = false; S.telVerified = true; S.telSrc = S.mtelSrc; } /* 저장된 번호와 같으면 인증 유지 */
-  else { S.tel = next; S.telEdited = true; S.telVerified = false; S.telSrc = 'user'; }
+  var next = nextTel(S.tel || '');
+  if (next === S.mtel && S.mtel) { S.tel = next; S.telEdited = false; S.telVerified = true; } /* 저장된 번호와 같으면 인증 유지 */
+  else { S.tel = next; S.telEdited = true; S.telVerified = false; }
   render();
 }
 function edit(key) {
@@ -998,7 +994,7 @@ function openAcct() { S.view = 'fo11'; S.sub = 'acct'; S.draft = { passport: S.p
 function dedit(key) { var e = EX[key]; if (!e) return; S.draft[key] = nextEx(e, S.draft[key]); render(); }
 function saveAcct() { var d = S.draft; S.prof.nation = d.nation; S.prof.sex = d.sex; S.prof.birth = d.birth; S.passportSaved = d.passport; S.msg = d.msg; render(); }
 function toggleMkt() { S.agMkt = !S.agMkt; S.mktDate = clk(28).replace('2026-10-12', '2026-10-12 (월)'); render(); }
-function nextMtel() { S.mtelDraft = nextTel(S.mtelDraft || S.mtel, S.mtelSrc === 'ali'); if (S.mtelDraft === S.mtel) S.mtelDraft = ''; render(); }
+function nextMtel() { S.mtelDraft = nextTel(S.mtelDraft || S.mtel); if (S.mtelDraft === S.mtel) S.mtelDraft = ''; render(); }
 function fo11() {
   if (!S.joined || !S.prof) return phoneNote('마이페이지', '회원이 만들어진 뒤에 보이는 화면입니다. 위쪽 처음으로를 누른 뒤 진입 동의 창에서 동의를 마쳐 주세요.');
   return S.sub === 'acct' ? fo11acct() : fo11home();
@@ -1026,9 +1022,9 @@ function fo11acct() {
   var tel;
   if (S.mtelDraft) {
     tel = '<div class="fld"><div class="l">휴대폰 번호</div><div class="vrow"><div class="in" onclick="nextMtel()">' + S.mtelDraft + '</div>' +
-      '<div class="vbtn" onclick="S.mtel=S.mtelDraft;S.mtelDraft=\'\';S.mtelSrc=\'user\';S.mtelSaved=true;render()">문자 인증</div></div><div class="sub">입력한 번호로 문자 인증을 합니다.</div></div>';
+      '<div class="vbtn" onclick="S.mtel=S.mtelDraft;S.mtelDraft=\'\';S.mtelSaved=true;render()">문자 인증</div></div><div class="sub">입력한 번호로 문자 인증을 합니다.</div></div>';
   } else if (S.mtel) {
-    tel = '<div class="fld"><div class="l">휴대폰 번호' + (S.mtelSrc === 'ali' ? '<span class="autotag">알리페이 계정에서 채웠습니다</span>' : '') + '</div><div class="in auto" style="cursor:default">' + S.mtel + '</div>' +
+    tel = '<div class="fld"><div class="l">휴대폰 번호<span class="autotag">회원 정보에서 채웠습니다</span></div><div class="in auto" style="cursor:default">' + S.mtel + '</div>' +
       '<div class="sub">고치면 문자 인증을 다시 합니다.</div><div class="cta ghost sm" onclick="nextMtel()">다른 번호 사용</div></div>';
   } else {
     tel = '<div class="fld"><div class="l">휴대폰 번호</div><div class="in" onclick="nextMtel()">&nbsp;</div><div class="sub">입력한 번호로 문자 인증을 합니다.</div></div>';
@@ -1071,18 +1067,12 @@ function fo13() {
   function auto(label, key, ph) { var mn = key === 'birth' && S.minor13, v = mn ? S.minor13 : p[key]; return '<div class="fld"><div class="l">' + label + (v && !S.userSet[key] ? '<span class="autotag">회원 정보에서 채웠습니다</span>' : '') + '</div>' +
     '<div class="in ' + (v ? 'auto' : 'plc') + '" onclick="edit(\'' + key + '\')">' + (v || ph) + '</div>' + '' + '</div>'; }
   function tap(label, key, ph, ex) { var v = S[key]; return '<div class="fld"><div class="l">' + label + '</div><div class="in ' + (v ? '' : 'plc') + '" onclick="S.' + key + '=S.' + key + '||\'' + ex + '\';render()">' + (v || ph) + '</div></div>'; }
-  var tel;
-  if (S.telSrc === 'ali' && S.tel && S.telVerified && !S.telEdited) {
-    tel = '<div class="fld"><div class="l">휴대폰 번호<span class="autotag">알리페이 계정에서 채웠습니다</span></div>' +
-      '<div class="vrow"><div class="in auto" onclick="setTelNext()">' + S.tel + '</div></div>' +
-      '<div class="sub">고치면 문자 인증을 다시 합니다.</div></div>';
-  } else {
-    var fromMember = S.telSrc === 'user' && S.telSaved && S.telVerified && !S.telEdited && S.tel && S.tel === S.mtel;
-    tel = '<div class="fld"><div class="l">휴대폰 번호' + (fromMember ? '<span class="autotag">회원 정보에서 채웠습니다</span>' : '') + '</div>' +
-      '<div class="vrow"><div class="in ' + (S.tel ? '' : 'plc') + '" onclick="setTelNext()">' + (S.tel || '&nbsp;') + '</div>' +
-      (S.tel && !S.telVerified ? '<div class="vbtn" onclick="S.telVerified=true;render()">문자 인증</div>' : '') + '</div>' +
-      (S.telVerified ? '<div class="sub">고치면 문자 인증을 다시 합니다.</div>' : '<div class="sub">입력한 번호로 문자 인증을 합니다.</div>') + '</div>';
-  }
+  /* 휴대폰 번호: 알리페이에서 받지 않는다. 첫 예약은 직접 입력·문자 인증, 회원 정보에 인증 번호가 있으면 채우고 인증을 건너뛴다 */
+  var fromMember = S.telSaved && S.telVerified && !S.telEdited && S.tel && S.tel === S.mtel;
+  var tel = '<div class="fld"><div class="l">휴대폰 번호' + (fromMember ? '<span class="autotag">회원 정보에서 채웠습니다</span>' : '') + '</div>' +
+    '<div class="vrow"><div class="in ' + (S.tel ? (fromMember ? 'auto' : '') : 'plc') + '" onclick="setTelNext()">' + (S.tel || '&nbsp;') + '</div>' +
+    (S.tel && !S.telVerified ? '<div class="vbtn" onclick="S.telVerified=true;render()">문자 인증</div>' : '') + '</div>' +
+    (S.telVerified ? '<div class="sub">고치면 문자 인증을 다시 합니다.</div>' : '<div class="sub">입력한 번호로 문자 인증을 합니다.</div>') + '</div>';
   /* 웹 예약과 같은 필수값. 이메일만 뺀다 */
   var ready = S.passport && p.nation && p.sex && p.birth && !S.minor13 && S.tel && S.telVerified && S.rmsg;
   return phone('예약하기', '<div class="sec" data-test="bk-sum"><div style="border-radius:10px;padding:14px 16px;background:#111;color:#fff"><div style="font-size:15px;font-weight:700">Abijou 肉毒杆菌</div><div style="font-size:12px;color:#ddd;margin-top:4px">at Abijou Clinic Myeongdong · 99,000 KRW</div><div style="font-size:12px;color:#ddd;margin-top:2px">Selected time: Tue, Oct 20, 2026 14:00 (KST)</div></div></div>' + '<div class="sec"><div class="h">예약자 정보</div><div class="box">' +
@@ -1101,7 +1091,7 @@ function fo13() {
 function cedit(key) {
   var c = S.cd; c.set[key] = true;
   if (key === 'name') c.name = nextEx(EX.name, c.name);
-  else if (key === 'tel') c.tel = nextTel(c.tel || '', S.mtelSrc === 'ali' || S.plaintext);
+  else if (key === 'tel') c.tel = nextTel(c.tel || '');
   else if (key === 'msg') c.msg = c.msg ? nextEx(EX.msg, c.msg) : EX.msg[0];
   render();
 }
@@ -1115,7 +1105,7 @@ function fo13c() {
   return phone('상담접수',
     '<div class="sec"><div class="h">신청자 정보</div><div class="box">' +
     fl('이름', 'name', '이름', '회원 정보에서 채웠습니다') +
-    fl('휴대폰 번호', 'tel', '휴대폰 번호', S.mtelSrc === 'ali' && c.tel === ALI.phone ? '알리페이 계정에서 채웠습니다' : '회원 정보에서 채웠습니다') +
+    fl('휴대폰 번호', 'tel', '휴대폰 번호', '회원 정보에서 채웠습니다') +
     fl('연락 메신저', 'msg', '메신저 아이디를 직접 입력해 주세요', '') +
     '<div class="gone" style="margin:8px 0 0">(시안 주석) 알리페이 채널에서는<br>앱 열기 버튼이 없습니다</div>' +
     '<div class="fld"><div class="l">문의 내용 (선택)</div><div class="in" style="min-height:64px;cursor:text"></div></div>' +
@@ -1129,16 +1119,16 @@ function fo13c() {
 var BOW = 'all', BOQ = false, BOQF = 'in', BOM = true, BOMF = 'all';
 var MEM = [
   { no: 'A-1041', join: '2026-10-12 09:02', quit: '', last: '2026-10-12 09:02', self: true },
-  { no: 'A-1040', join: '2026-10-12 08:41', quit: '', last: '2026-10-12 08:41', aid: '2088041663827450', wallet: 'HK', nick: 'meiling_c', name: '천메이링', sex: '여성', birth: '1993-11-02', nat: '홍콩(중국 특별행정구)', addr: '홍콩 완차이', lang: '중국어(번체)', tel: '+852 91234567', pp: '', bk: 0, ns: 0, profd: '2026-10-12 08:41', mkt: '동의', mktd: '2026-10-12 08:41' },
-  { no: 'A-1039', join: '2026-10-12 07:55', quit: '', last: '2026-10-12 08:10', aid: '2088926610334872', wallet: 'CN', nick: 'liuting88', name: '리우팅', sex: '여성', birth: '1990-05-21', nat: '중국', addr: '베이징시 차오양구', lang: '중국어(간체)', tel: '+86 13755556666', pp: 'LIU TING', bk: 1, ns: 0, profd: '2026-10-12 07:55', mkt: '미동의', mktd: '2026-10-12 07:55' },
-  { no: 'A-1036', join: '2026-10-11 21:12', quit: '2026-10-12 10:40', last: '2026-10-11 21:20', aid: '2088350417726693', wallet: 'CN', nick: 'zz_lee', name: '리쯔치', sex: '', birth: '', nat: '중국', addr: '', lang: '중국어(간체)', tel: '', pp: '', bk: 0, ns: 0, profd: '2026-10-11 21:12', mkt: '미동의', mktd: '2026-10-11 21:12' },
-  { no: 'A-1033', join: '2026-10-10 18:27', quit: '', last: '2026-10-11 09:05', aid: '2088174902265318', wallet: 'HK', nick: 'zw.huang', name: '황즈웨이', sex: '남성', birth: '1988-02-14', nat: '홍콩(중국 특별행정구)', addr: '홍콩 몽콕', lang: '영어', tel: '+852 61234788', pp: 'HUANG ZHIWEI', bk: 2, ns: 1, profd: '2026-10-10 18:27', mkt: '동의', mktd: '2026-10-10 18:27' }
+  { no: 'A-1040', join: '2026-10-12 08:41', quit: '', last: '2026-10-12 08:41', aid: '2088041663827450', wallet: 'HK', nick: 'meiling_c', name: '천메이링', sex: '여성', birth: '1993-11-02', nat: '홍콩(중국 특별행정구)', lang: '중국어(번체)', tel: '', pp: '', bk: 0, ns: 0, profd: '2026-10-12 08:41', mkt: '동의', mktd: '2026-10-12 08:41' },
+  { no: 'A-1039', join: '2026-10-12 07:55', quit: '', last: '2026-10-12 08:10', aid: '2088926610334872', wallet: 'CN', nick: 'liuting88', name: '리우팅', sex: '여성', birth: '1990-05-21', nat: '중국', lang: '중국어(간체)', tel: '+86 13755556666', pp: 'LIU TING', bk: 1, ns: 0, profd: '2026-10-12 07:55', mkt: '미동의', mktd: '2026-10-12 07:55' },
+  { no: 'A-1036', join: '2026-10-11 21:12', quit: '2026-10-12 10:40', last: '2026-10-11 21:20', aid: '2088350417726693', wallet: 'CN', nick: 'zz_lee', name: '리쯔치', sex: '', birth: '', nat: '중국', lang: '중국어(간체)', tel: '', pp: '', bk: 0, ns: 0, profd: '2026-10-11 21:12', mkt: '미동의', mktd: '2026-10-11 21:12' },
+  { no: 'A-1033', join: '2026-10-10 18:27', quit: '', last: '2026-10-11 09:05', aid: '2088174902265318', wallet: 'HK', nick: 'zw.huang', name: '황즈웨이', sex: '남성', birth: '1988-02-14', nat: '홍콩(중국 특별행정구)', lang: '영어', tel: '+852 61234788', pp: 'HUANG ZHIWEI', bk: 2, ns: 1, profd: '2026-10-10 18:27', mkt: '동의', mktd: '2026-10-10 18:27' }
 ];
 function syncMe() {
   var me = MEM[0]; var p = S.prof || {};
   me.no = 'A-' + (1041 + GEN); me.join = clk(0); me.last = S.booked ? clk(30) : clk(0);
   me.aid = S.wallet === 'CN' ? '2088712034559781' : '2088558801247390'; me.wallet = S.wallet; me.lang = LANG[S.wallet];
-  me.nick = S.joined ? p.nick : ''; me.name = S.joined ? p.name : ''; me.sex = S.joined ? p.sex : ''; me.birth = S.joined ? p.birth : ''; me.nat = S.joined ? p.nation : ''; me.addr = S.joined ? p.addr : '';
+  me.nick = S.joined ? p.nick : ''; me.name = S.joined ? p.name : ''; me.sex = S.joined ? p.sex : ''; me.birth = S.joined ? p.birth : ''; me.nat = S.joined ? p.nation : '';
   me.tel = S.mtel; me.pp = S.passportSaved || ''; me.bk = S.booked || 0; me.ns = 0; me.profd = S.joined ? clk(0) : ''; me.mkt = S.agMkt ? '동의' : '미동의'; me.mktd = (S.joined && S.agMkt && S.mktDate) ? S.mktDate.replace(' (월)', '') : '';
 }
 /* 탈퇴: 지금 회원 행을 탈퇴로 남긴다. 다시 들어오면 같은 알리페이 식별자로 새 회원번호·가입일의 새 행이 생긴다 */
@@ -1146,7 +1136,7 @@ function withdraw() {
   syncMe(); var old = {}; for (var k in MEM[0]) old[k] = MEM[0][k];
   old.self = false; old.snap = true; old.quit = clk(40);
   MEM.splice(1, 0, old); GEN++;
-  var pt = S.plaintext, w = S.wallet, bm = S.birthMode, nn = S.noNick; resetDB(true); S.plaintext = pt; S.wallet = w; S.birthMode = bm; S.noNick = nn; S.view = 'fo09'; render();
+  var w = S.wallet, bm = S.birthMode, nn = S.noNick; resetDB(true); S.wallet = w; S.birthMode = bm; S.noNick = nn; S.view = 'fo09'; render();
 }
 /* BO 사이드바 (alipay-ops-admin.html 메뉴 목록). 회원 그룹만 펼친다. 메뉴는 시안에서 동작하지 않는다 */
 var BO_TOAST_T = null;
@@ -1166,11 +1156,11 @@ function bo11() {
   syncMe();
   var list = MEM.filter(function (m) { if (!S.joined && m.self) return false; if (BOW !== 'all' && m.wallet !== BOW) return false; if (BOQF === 'out' ? !m.quit : BOQF === 'in' ? !!m.quit : false) return false; if (BOMF !== 'all' && m.mkt !== BOMF) return false; return true; });
   var head = '<tr><th rowspan="2">회원번호</th><th rowspan="2">가입일</th>' + (BOQ ? '<th rowspan="2">탈퇴일</th>' : '') + '<th rowspan="2">마지막 로그인</th><th rowspan="2">알리페이 식별자</th><th class="c" rowspan="2">유입 채널</th>' +
-    '<th rowspan="2">닉네임</th><th rowspan="2">이름</th><th rowspan="2">성별</th><th rowspan="2">생년월일</th><th rowspan="2">국적</th><th rowspan="2">주소</th><th rowspan="2">언어</th><th rowspan="2">연락처</th><th rowspan="2">여권명</th><th class="c" rowspan="2">예약</th><th class="c" rowspan="2">노쇼</th><th rowspan="2">프로필 동의 일자</th>' + (BOM ? '<th class="c" colspan="2">마케팅 활용 정보</th>' : '') + '</tr><tr>' + (BOM ? '<th class="c">동의 여부</th><th>동의 일자</th>' : '') + '</tr>';
+    '<th rowspan="2">닉네임</th><th rowspan="2">이름</th><th rowspan="2">성별</th><th rowspan="2">생년월일</th><th rowspan="2">국적</th><th rowspan="2">언어</th><th rowspan="2">연락처</th><th rowspan="2">여권명</th><th class="c" rowspan="2">예약</th><th class="c" rowspan="2">노쇼</th><th rowspan="2">프로필 동의 일자</th>' + (BOM ? '<th class="c" colspan="2">마케팅 활용 정보</th>' : '') + '</tr><tr>' + (BOM ? '<th class="c">동의 여부</th><th>동의 일자</th>' : '') + '</tr>';
   var rows = list.map(function (m) {
     return '<tr><td class="mono">' + m.no + '</td><td>' + m.join + '</td>' + (BOQ ? '<td>' + dash(m.quit) + '</td>' : '') +
       '<td>' + dash(m.last) + '</td><td class="mono">' + m.aid + '</td><td class="c">' + (m.wallet === 'CN' ? '알리페이 중국' : '알리페이 홍콩') + '</td>' +
-      '<td>' + dash(m.nick) + '</td><td>' + dash(m.name) + '</td><td>' + dash(m.sex) + '</td><td>' + dash(m.birth) + '</td><td>' + dash(m.nat) + '</td><td>' + dash(m.addr) + '</td><td>' + dash(m.lang) + '</td><td>' + dash(m.tel) + '</td><td>' + dash(m.pp) + '</td>' +
+      '<td>' + dash(m.nick) + '</td><td>' + dash(m.name) + '</td><td>' + dash(m.sex) + '</td><td>' + dash(m.birth) + '</td><td>' + dash(m.nat) + '</td><td>' + dash(m.lang) + '</td><td>' + dash(m.tel) + '</td><td>' + dash(m.pp) + '</td>' +
       '<td class="c">' + m.bk + '</td><td class="c">' + m.ns + '</td><td>' + dash(m.profd) + '</td>' + (BOM ? '<td class="c"><span class="pill ' + (m.mkt === '동의' ? 'yes' : 'no') + '">' + m.mkt + '</span></td><td>' + dash(m.mkt === '동의' ? m.mktd : '') + '</td>' : '') + '</tr>';
   }).join('');
   var sel = function (cur, opts, fn, isNew) { return '<select class="sel' + (isNew ? ' new' : '') + '" onchange="' + fn + '=this.value;render()">' + opts.map(function (o) { return '<option value="' + o[0] + '"' + (cur === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>'; };
@@ -1178,7 +1168,7 @@ function bo11() {
     '<div class="filt"><select class="sel" disabled><option>가입 기간</option></select><input class="inp" placeholder="가입 시작일" style="width:110px" disabled><input class="inp" placeholder="가입 종료일" style="width:110px" disabled>' + sel(BOQF, [['all', '탈퇴 여부 (전체)'], ['in', '미탈퇴'], ['out', '탈퇴']], 'BOQF') +
     sel(BOW, [['all', '유입 채널 (전체)'], ['CN', '알리페이 중국'], ['HK', '알리페이 홍콩']], 'BOW', true) + sel(BOMF, [['all', '마케팅 수신 여부 (전체)'], ['동의', '동의'], ['미동의', '미동의']], 'BOMF') + '<input class="inp" placeholder="검색어" style="width:150px" disabled><button class="btn blue" disabled>검색</button></div>' +
     '<div class="card"><div class="hd"><span>회원 목록</span><span class="grpbtn"><span class="g' + (BOQ ? ' on' : '') + '" onclick="BOQ=!BOQ;render()">탈퇴정보</span><span class="g' + (BOM ? ' on' : '') + '" onclick="BOM=!BOM;render()">마케팅 활용 정보</span></span></div>' +
-    '<div class="tblwrap"><table><thead>' + head + '</thead><tbody>' + (rows || '<tr class="empty-row"><td colspan="' + (17 + (BOQ ? 1 : 0) + (BOM ? 2 : 0)) + '">데이터가 없습니다</td></tr>') + '</tbody></table></div>' +
+    '<div class="tblwrap"><table><thead>' + head + '</thead><tbody>' + (rows || '<tr class="empty-row"><td colspan="' + (16 + (BOQ ? 1 : 0) + (BOM ? 2 : 0)) + '">데이터가 없습니다</td></tr>') + '</tbody></table></div>' +
     '<div class="foot"><span class="pg">‹</span><span class="pg on">1</span><span class="pg">›</span></div></div></div></div></div></div>';
 }
 
@@ -1206,11 +1196,9 @@ function render() {
     '<span class="kv">회원 <em>' + (S.joined ? '생성됨' : '아직 아님') + '</em></span>' +
     '<span class="kv">필수 셋 <em>' + (S.agTerms && S.agPriv && S.agProf ? '동의' : '미동의') + '</em></span>' +
     '<span class="kv">마케팅 <em>' + (S.agMkt ? '동의' : '미동의') + '</em></span>' +
-    '<span class="kv">원본 휴대폰 권한 <em>' + (S.plaintext ? '승인' : '미승인') + '</em></span>' +
     '<span class="kv">들어온 앱 <em>' + (S.wallet === 'CN' ? '알리페이 중국' : '알리페이 홍콩') + '</em></span>' +
     '<span class="kv">생년월일 <em>' + ({ adult: '있음', none: '없음' })[S.birthMode] + '</em></span>' +
     '<span class="kv">닉네임 <em>' + (S.noNick ? '없음' : '있음') + '</em></span>' +
-    '<button' + (S.joined ? ' disabled' : '') + ' onclick="S.plaintext=!S.plaintext;if(S.joined){S.tel=S.plaintext?ALI.phone:\'\';S.telVerified=S.plaintext;S.telEdited=false;S.telSrc=S.plaintext?\'ali\':\'\';S.mtel=S.tel;S.mtelSrc=S.telSrc;S.mtelDraft=\'\';S.mtelSaved=false;S.telSaved=false;}render()">원본 휴대폰 ' + (S.plaintext ? '미승인으로' : '승인으로') + '</button>' +
     '<button' + (S.joined ? ' disabled' : '') + ' onclick="S.wallet=(S.wallet===\'CN\'?\'HK\':\'CN\');render()">' + (S.wallet === 'CN' ? '홍콩 앱으로 들어온 경우 보기' : '중국 앱으로 들어온 경우 보기') + '</button>' +
     '<button onclick="if(!S.joined){S.birthMode=(S.birthMode===\'none\'?\'adult\':\'none\');}render()"' + (S.joined ? ' disabled' : '') + '>생년월일 바꾸기</button>' +
     '<button onclick="if(!S.joined){S.noNick=!S.noNick;}render()"' + (S.joined ? ' disabled' : '') + '>' + (S.noNick ? '닉네임 채우기' : '닉네임 비우기') + '</button>' +
@@ -1222,7 +1210,7 @@ function render() {
       '<button onclick="setF13(S.f13===\'consult\'?\'book\':\'consult\')">' + (S.f13 === 'consult' ? '예약 입력 보기' : '상담접수 폼 보기') + '</button>' +
       (S.f13 === 'consult' ? '' : '<span class="kv">스토어 <em>' + (S.clinic13 ? '클리닉' : '클리닉 아님') + '</em></span><span class="kv">방문 예정일 <em>' + VISIT13 + '</em></span>' +
       '<button onclick="S.clinic13=!S.clinic13;S.age18=false;render()">' + (S.clinic13 ? '클리닉 아닌 스토어로' : '클리닉 스토어로') + '</button>') : '') +
-    '<button onclick="var pt=S.plaintext;var bm=S.birthMode;var w=S.wallet;var nn=S.noNick;resetDB();S.plaintext=pt;S.birthMode=bm;S.wallet=w;S.noNick=nn;render()">처음으로</button>';
+    '<button onclick="var bm=S.birthMode;var w=S.wallet;var nn=S.noNick;resetDB();S.birthMode=bm;S.wallet=w;S.noNick=nn;render()">처음으로</button>';
   document.getElementById('cap').textContent = CAPS[S.view] || '';
   var m = { fo09: fo09, fo08: fo08, fo10: fo10, fo11: fo11, fo12: fo12, fo13: fo13, bo11: bo11 };
   var st = document.getElementById('stage'), key = [S.view, S.sub, S.done13, S.step, S.blocked, S.f13, S.doneC].join('/'), keep = {}, sels = ['.ph .bd', '.mdl', '.tblwrap'], FQ = 'input,select,textarea';
@@ -1328,9 +1316,8 @@ function fo09() {
     /* 알리페이 앱이 그리는 권한 창. 우리 화면이 아니라 파란 톤 */
     ov = '<div class="rf-dim rf-dim--sheet"><div class="rf-sheet" data-test="al-perm"><div class="rf-sheet__brand"><i></i>Alipay</div>' +
       '<h4>K-Beauty Station이 다음 정보를 요청합니다</h4>' +
-      '<ul><li>이름, 닉네임, 프로필 사진</li><li>성별, 생년월일, 국적, 주소</li><li>연락처</li>' + (S.plaintext ? '<li>휴대폰 번호 원본</li>' : '') + '</ul>' +
-      '<div class="rf-sheet__tg"><span>연락처 (필수)</span><button type="button" class="rf-sheet__sw' + (S.contactGranted ? ' on' : '') + '" data-test="al-perm-contact" onclick="S.contactGranted=!S.contactGranted;render()"><span></span></button></div>' +
-      (S.plaintext ? '<div class="rf-sheet__tg"><span>휴대폰 번호 원본 (필수)</span><button type="button" class="rf-sheet__sw' + (S.phoneGranted ? ' on' : '') + '" data-test="al-perm-phone" onclick="S.phoneGranted=!S.phoneGranted;render()"><span></span></button></div>' : '') +
+      '<ul><li>이름, 닉네임</li><li>성별, 생년월일, 국적</li></ul>' +
+      '<div class="rf-sheet__tg"><span>이름 (필수)</span><button type="button" class="rf-sheet__sw' + (S.nameGranted ? ' on' : '') + '" data-test="al-perm-name" onclick="S.nameGranted=!S.nameGranted;render()"><span></span></button></div>' +
       '<div class="rf-sheet__row"><button type="button" data-test="al-perm-deny" onclick="S.step=\'blocked\';S.blocked=\'prof\';S.view=\'fo08\';render()">거부</button><button type="button" class="pri" data-test="al-perm-allow" onclick="allowPerm();render()">허용</button></div></div></div>';
   } else {
     var ready = S.agTerms && S.agPriv && S.agProf;
@@ -1338,7 +1325,7 @@ function fo09() {
       '<div class="' + RBI + 'agreements rf-agree">' +
       rAgreeRow('agTerms', '이용 약관', true, TERMS_FULL, '') + '<div class="' + RBI + 'agreementDivider"></div>' +
       rAgreeRow('agPriv', '개인정보 처리방침', true, PRIV_FULL, '') + '<div class="' + RBI + 'agreementDivider"></div>' +
-      rAgreeRow('agProf', '알리페이 프로필 제공', true, '', ['이름', '닉네임', '프로필 사진', '성별', '생년월일', '국적', '주소', '휴대폰 번호'].join(', ') + '를 가져옵니다. 닉네임은 리뷰와 채팅에 작성자 이름으로 표시됩니다.') + '<div class="' + RBI + 'agreementDivider"></div>' +
+      rAgreeRow('agProf', '알리페이 프로필 제공', true, '', '이름, 닉네임, 성별, 생년월일, 국적을 가져옵니다. 닉네임은 리뷰와 채팅에 작성자 이름으로 표시됩니다.') + '<div class="' + RBI + 'agreementDivider"></div>' +
       rAgreeRow('agMkt', '마케팅 정보 수신', false, '', 'K-Beauty Station의 혜택·이벤트 정보를 휴대폰 번호로 받습니다.') + '</div>' +
       '<div class="rf-modal__actions"><button type="button" class="rf-modal__close" data-test="al-consent-close" onclick="S.step=\'blocked\';S.blocked=\'consent\';S.view=\'fo08\';render()">닫기</button><button type="button" class="rf-modal__primary" data-test="al-consent-ok"' + (ready ? ' onclick="S.agreed=true;S.step=\'perm\';render()"' : ' disabled') + '>동의하고 시작하기</button></div></div></div></div>';
   }
@@ -1352,8 +1339,8 @@ function fo08() {
 }
 function blockPage(b) {
   var t, d, btn, act;
-  if (b === 'prof') { t = '이용 동의가 필요합니다'; d = '알리페이 프로필 제공에 동의해야 K-Beauty Station을 이용할 수 있습니다.'; btn = '다시 동의하기'; act = "S.contactGranted=true;S.phoneGranted=true;S.step='perm';S.blocked='';S.view='fo09';render()"; }
-  else if (b === 'fail') { t = '알리페이 계정을 확인할 수 없습니다'; d = '잠시 후 다시 시도해 주세요.'; btn = '다시 시도'; act = "if(S.agreed){S.contactGranted=true;S.phoneGranted=true;S.step='perm';}else{S.step='consent';}S.blocked='';S.view='fo09';render()"; }
+  if (b === 'prof') { t = '이용 동의가 필요합니다'; d = '알리페이 프로필 제공에 동의해야 K-Beauty Station을 이용할 수 있습니다.'; btn = '다시 동의하기'; act = "S.nameGranted=true;S.step='perm';S.blocked='';S.view='fo09';render()"; }
+  else if (b === 'fail') { t = '알리페이 계정을 확인할 수 없습니다'; d = '잠시 후 다시 시도해 주세요.'; btn = '다시 시도'; act = "if(S.agreed){S.nameGranted=true;S.step='perm';}else{S.step='consent';}S.blocked='';S.view='fo09';render()"; }
   else { t = '이용 동의가 필요합니다'; d = '필수 항목에 동의해야 K-Beauty Station을 이용할 수 있습니다.'; btn = '다시 동의하기'; act = "S.step='consent';S.blocked='';S.view='fo09';render()"; }
   return '<main class="' + RUP + 'page" data-test="al-block" data-kind="' + b + '"><div class="' + RUP + 'notice"><span class="rf-logo" role="img" aria-label="K-Beauty Station">' + RF_LOGO + '</span><div class="' + RUP + 'message"><h1>' + t + '</h1><p>' + d + '</p></div>' +
     (btn ? '<button type="button" class="rf-bigbtn" data-test="al-block-btn" onclick="' + act + '">' + btn + '</button>' : '') + '</div></main>';
@@ -1398,10 +1385,10 @@ function fo11acct() {
   if (S.mtelDraft) {
     cc = rTel(S.mtelDraft);
     tel = fld('Phone Number', '<div class="' + RAC + 'phoneVerificationForm"><div class="' + RAC + 'phoneInputRow"><div class="' + RAC + 'countryCallingCode">' + rSel('Calling code', cc[0], 'Select', 'rNA()') + '</div><input readonly value="' + rEsc(cc[1]) + '" placeholder="Phone number" onclick="nextMtel()"></div>' +
-      '<button type="button" class="' + RAC + 'verificationButton" data-test="al-acct-verify" onclick="S.mtel=S.mtelDraft;S.mtelDraft=\'\';S.mtelSrc=\'user\';S.mtelSaved=true;render()">Get verification code</button></div>' + rHint('입력한 번호로 문자 인증을 합니다.'), 'al-acct-tel');
+      '<button type="button" class="' + RAC + 'verificationButton" data-test="al-acct-verify" onclick="S.mtel=S.mtelDraft;S.mtelDraft=\'\';S.mtelSaved=true;render()">Get verification code</button></div>' + rHint('입력한 번호로 문자 인증을 합니다.'), 'al-acct-tel');
   } else if (S.mtel) {
     cc = rTel(S.mtel);
-    tel = fld('Phone Number' + (S.mtelSrc === 'ali' ? rTag('알리페이 계정에서 채웠습니다') : ''), '<div class="' + RAC + 'verifiedPhoneForm"><div class="' + RAC + 'verifiedPhoneRow"><span class="' + RAC + 'verifiedCountryCode">' + cc[0] + '</span><span class="' + RAC + 'verifiedPhoneNumber" data-test="al-acct-telno">' + rEsc(cc[1]) + ' (Verified)</span></div>' +
+    tel = fld('Phone Number' + rTag('회원 정보에서 채웠습니다'), '<div class="' + RAC + 'verifiedPhoneForm"><div class="' + RAC + 'verifiedPhoneRow"><span class="' + RAC + 'verifiedCountryCode">' + cc[0] + '</span><span class="' + RAC + 'verifiedPhoneNumber" data-test="al-acct-telno">' + rEsc(cc[1]) + ' (Verified)</span></div>' +
       '<button type="button" class="' + RAC + 'changePhoneButton" data-test="al-acct-change" onclick="nextMtel()">Use a different number</button></div>' + rHint('고치면 문자 인증을 다시 합니다.'), 'al-acct-tel');
   } else {
     tel = fld('Phone Number', '<div class="' + RAC + 'phoneVerificationForm"><div class="' + RAC + 'phoneInputRow"><div class="' + RAC + 'countryCallingCode">' + rSel('Calling code', '', 'Select', 'rNA()') + '</div><input readonly value="" placeholder="Phone number" onclick="nextMtel()"></div></div>' + rHint('입력한 번호로 문자 인증을 합니다.'), 'al-acct-tel');
@@ -1456,11 +1443,9 @@ function fo13() {
   var verified = function (t) { var c = rTel(t); return '<div class="' + RBI + 'verifiedPhoneForm"><div class="' + RBI + 'verifiedPhoneRow"><span class="' + RBI + 'verifiedCountryCode">' + c[0] + '</span><span class="' + RBI + 'verifiedPhoneNumber" data-test="al-bk-telno">' + rEsc(c[1]) + ' (Verified)</span></div><button type="button" class="' + RBI + 'changePhoneButton" data-test="al-bk-change" onclick="setTelNext()">Use a different number</button></div>'; };
   var unver = function (t) { var c = rTel(t); return '<div class="' + RBI + 'verifiedPhoneForm"><div class="' + RBI + 'phoneInputRow"><div class="' + RBI + 'countryCallingCode">' + rSel('Calling code', c[0], 'Select', 'rNA()') + '</div><input readonly placeholder="Phone number" value="' + rEsc(c[1]) + '" onclick="setTelNext()"></div>' + (t && !S.telVerified ? '<button type="button" class="' + RBI + 'verificationButton" data-test="al-bk-verify" onclick="S.telVerified=true;render()">Get verification code</button>' : '') + '</div>'; };
   var tel;
-  if (S.telSrc === 'ali' && S.tel && S.telVerified && !S.telEdited) tel = head('알리페이 계정에서 채웠습니다') + verified(S.tel) + rHint('고치면 문자 인증을 다시 합니다.');
-  else {
-    var fromMember = S.telSrc === 'user' && S.telSaved && S.telVerified && !S.telEdited && S.tel && S.tel === S.mtel;
-    tel = (S.tel && S.telVerified ? head(fromMember ? '회원 정보에서 채웠습니다' : '') + verified(S.tel) : head('') + unver(S.tel)) + rHint(S.telVerified ? '고치면 문자 인증을 다시 합니다.' : '입력한 번호로 문자 인증을 합니다.');
-  }
+  /* 휴대폰 번호: 알리페이에서 받지 않는다. 첫 예약은 직접 입력·문자 인증, 회원 정보에 인증 번호가 있으면 채우고 인증을 건너뛴다 */
+  var fromMember = S.telSaved && S.telVerified && !S.telEdited && S.tel && S.tel === S.mtel;
+  tel = (S.tel && S.telVerified ? head(fromMember ? '회원 정보에서 채웠습니다' : '') + verified(S.tel) : head('') + unver(S.tel)) + rHint(S.telVerified ? '고치면 문자 인증을 다시 합니다.' : '입력한 번호로 문자 인증을 합니다.');
   var mm = rMsg(S.rmsg);
   var msg = '<div class="' + RBI + 'informationField" data-test="al-bk-msg"><div class="' + RBI + 'informationFieldHeading">' + rLabel('Messenger contact', 1) + '<p>The store will contact you here if they need to discuss your booking.</p></div>' + rChips(S.rchip || mm[0] || 'WhatsApp', 'S.rchip') +
     '<input readonly name="messengerId" data-test="fo-msgid" placeholder="메신저 아이디를 직접 입력해 주세요" value="' + rEsc(mm[1]) + '" onclick="S.rmsg=S.rmsg||\'위챗 wxid_alipay01\';S.rchip=\'\';render()">' +
@@ -1483,7 +1468,7 @@ function fo13c() {
   if (S.doneC) { ANNO_OFF = true; var dn = rPhone('<div style="padding:16px">' + rGone('현행 상담접수 완료 화면을 그대로 씁니다.') + '</div>', ''); ANNO_OFF = false; return dn; }
   var p = S.prof; if (!S.cd) S.cd = { name: p.name, tel: S.mtel, msg: '', set: {} };
   var c = S.cd, tn = rTel(c.tel), mm = rMsg(c.msg);
-  var telTag = S.mtelSrc === 'ali' && c.tel === ALI.phone ? '알리페이 계정에서 채웠습니다' : '회원 정보에서 채웠습니다';
+  var telTag = '회원 정보에서 채웠습니다';
   var grp = function (title, req, desc, tag, inner, dt) { return '<div class="' + RZ + '__form__group" data-test="' + dt + '"><div class="' + RZ + '__form__group__header"><div class="' + RZ + '__form__group__header__title">' + title + (req ? ' <span>*</span>' : '') + '</div>' + (tag ? rTag(tag) : '') + '<div class="' + RZ + '__form__group__header__description">' + desc + '</div></div>' + inner + '</div>'; };
   var ready = c.name && c.tel && c.msg;
   var store = '<div style="margin-top:24px"><article class="' + RSC + 'root"><a class="' + RSC + 'link"' + RNA + '><figure class="' + RSC + 'figure"><div class="' + RSC + 'thumbnail"><img alt="Abijou Clinic Myeongdong" width="76" height="76" class="' + RSC + 'image" src="' + RF_ORIGIN + '/_next/image?url=https%3A%2F%2Fimage.kbstations.com%2F2025%2F06%2F25%2Fe3de94ab-8ed5-4ac8-8f32-af57daafc04b&amp;w=256&amp;q=75"><span class="' + RSC + 'statusDot" aria-hidden="true"></span></div>' +
