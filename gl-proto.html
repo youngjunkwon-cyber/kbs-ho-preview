@@ -1999,7 +1999,7 @@ const modal=(title,body,newEl=true)=>`<div class="${M} ${newEl?'':''}"><div clas
 const btn=(t,k,variant='primary')=>`<button type="button" class="${BT} ${BT}__variant__${variant}" data-k="${k}">${t}</button>`;
 function envBar(){const L={line:'LINE',kakao:'KakaoTalk','ig-ios':'Instagram','ig-android':'Instagram',fb:'Facebook','fb-android':'Facebook'}[DB.env];
  if(L)return`<div class="inapp"><b>${L}</b>&nbsp;k-beautystation.com</div>`;
- if(DB.env==='browser'&&DB.envFrom)return`<div class="bchrome"><span>k-beautystation.com/en/auth/login${DB.booking?'?source=booking-schedule&amp;redirectUrl=…':''}</span></div>`;return''}
+ if(DB.env==='browser'&&DB.envFrom){const path={myout:'/en/mypage',myin:'/en/mypage',signup:'/en/auth/signup',account:'/en/mypage/account-settings'}[VIEW.page]||('/en/auth/login'+(DB.booking?'?source=booking-schedule&amp;redirectUrl=…':''));return`<div class="bchrome"><span>k-beautystation.com${path}</span></div>`};return''}
 function header(){on($('[aria-label="Go Back"]'),()=>{const back={login:({bookinfo:'book',reviewnew:VIEW.loginFrom||'reviews',product:'product',mycoupons:'myout',myreviews:'myout',mybookings:'myout'})[VIEW.returnTo]||'myout',reviews:'store',product:'store',reviewnew:'reviews',mycoupons:'myin',myreviews:'myin',mybookings:'myin',signup:'login',forgot:'login',bookinfo:'book',account:'myin',myin:'home',book:'store',store:'storelist',storelist:'home',myout:'home'}[VIEW.page]||'home';go(back)});on($('[aria-label="Go Home"]'),()=>go('home'));nav()}
 function nav(){on($('a[aria-label="HOME"]'),()=>go('home'));on($('a[aria-label="STORE"]'),()=>go('storelist'));const my=$$('a,button').find(x=>/^MY PAGE$/.test(x.textContent.trim()));on(my,toMy)}
 
