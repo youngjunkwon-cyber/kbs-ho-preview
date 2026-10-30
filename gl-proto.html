@@ -1931,7 +1931,7 @@ function judgeGoogle(db,sub){
 function judgeConnect(db,memberId,sub){return db.members.find(m=>m.googleSub===sub&&m.status!=='deleted'&&m.id!==memberId)?{result:'taken'}:{result:'link'}}
 function judgeEmailCheck(db,email,purpose){
  const m=db.members.find(x=>x.status!=='deleted'&&x.via!=='alipay'&&norm(x.email)===norm(email));
- if(purpose==='signup'){if(!m)return{result:'send'};if(m.googleSub&&!m.password)return{result:'google'};return{result:'dup'}}
+ if(purpose==='signup'){if(!m)return{result:'send'};if(m.googleSub)return{result:'google'};return{result:'dup'}}
  if(!m)return{result:'none'};return{result:'send'};
 }
 /* 서비스 언어별 단어 (시안용 임시. 형용사 + 꽃·뷰티 단어 + 숫자 4자리, 띄어쓰기 없음. 인도네시아어는 명사 + 형용사 어순) */
