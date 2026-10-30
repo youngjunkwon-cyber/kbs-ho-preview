@@ -92,7 +92,7 @@ function seedCollections(){return [
  {id:3,name:'秋のおすすめ',lang:'ja',type:'추천상품',period:'2026-10-01 ~ 2026-11-30',items:[102,104]}
 ];}
 var DB,S;
-function freshDB(){var P=seedProducts();DB={store:seedStore(),prods:P,books:seedBookings(P),cols:seedCollections()};}
+function freshDB(){var P=seedProducts();DB={store:seedStore(),prods:P,books:seedBookings(P),cols:seedCollections()};bookLockOff();}
 function freshState(){return {surf:'HOST',mark:true,
  fo:{lang:'en',ch:'web',screen:'store',entry:'store',pid:null,sel:'',date:TODAY,time:'',err:null,lastNo:null,myNo:null,tab:'upcoming'},
  host:{ich:'',view:'dash',dtab:'전체',st:'',kind:'',owner:'',q:'',qd:'',ptab:'전체',open:null,editPid:null,man:{date:'',time:'',name:'',lang:'',pid:''},statPer:'전체'},
@@ -150,7 +150,11 @@ function manSave(){
  S.host.man={date:'',time:'',name:'',lang:'',pid:''};S.host.view='res';S.host.open=no;
  return '';
 }
-function bookOff(){DB.store.bookingSetting=false;} /* 통합 결정(2026-10-14): 값은 지우지 않고 잠금, 다시 켜면 그 값이 살아남(알리페이 PRD 8장) */
+function bookOff(){DB.store.bookingSetting=false;bookReset();}
+/* 통합 PRD v1.31 결정 1(2026-10-30): 예약 설정이 꺼지면 스토어 예약 버튼·상품 예약 버튼은 꺼짐으로 잠기고, 다시 켜면 둘 다 꺼진 상태로 시작(꺼지기 전 값으로 돌아오지 않음) */
+function bookReset(){DB.store.btn.web=false;DB.store.btn.ali=false;DB.prods.forEach(function(p){p.book.web=false;p.book.ali=false;});}
+/* 노출 채널·대상 외 언어로 잠긴 예약 칸도 꺼짐(1부 7장, 기본값 15) */
+function bookLockOff(){DB.prods.forEach(function(p){if(p.exposeCh==='web'||['zh','en'].indexOf(p.lang)<0)p.book.ali=false;if(p.exposeCh==='ali')p.book.web=false;});}
 
 /* ===== 렌더 ===== */
 function swHTML(){
@@ -188,10 +192,10 @@ window.foOpenStore=function(lang,ch){S.surf='FO';if(lang)S.fo.lang=lang;if(ch)S.
 window.foOpenProduct=function(id,lang,ch){S.surf='FO';if(lang)S.fo.lang=lang;if(ch)S.fo.ch=ch;S.fo.pid=id;S.fo.screen='product';S.fo.err=null;render();};
 /* 예약하기 URL 진입(PRD 5.2): 스토어 예약 URL = 스토어 진입(유입경로 스토어), 상품 예약 URL = 상품 고정(유입경로 상품). 스토어 페이지 · 상품 상세를 거치지 않고 예약 화면이 바로 열림 */
 window.foOpenUrl=function(kind,pid,lang,ch){S.surf='FO';if(lang)S.fo.lang=lang;if(ch)S.fo.ch=ch;var f=S.fo;f.err=null;f.accTop={};f.sel='';f.time='';f.date=TODAY;f.cat='All';f.showN=5;f.acc={};f.back=null;f.entry=kind==='product'?'product':'store';if(kind==='product')f.pid=+pid;f.viaUrl=true;f.screen='book';render();};
-window.setProd=function(id,patch){var p=prodById(id);Object.keys(patch).forEach(function(k){if(k==='book')Object.assign(p.book,patch.book);else p[k]=patch[k];});render();};
+window.setProd=function(id,patch){var p=prodById(id);Object.keys(patch).forEach(function(k){if(k==='book')Object.assign(p.book,patch.book);else p[k]=patch[k];});bookLockOff();render();};
 /* 상품이 많은 매장 보기용: 예약 가능한 영어 상품 n개 추가 (id 201~) */
 window.addDemoProducts=function(n){var subs=['보톡스','스킨부스터','리프팅','여드름/흉터','색소/점/문신'],names=['Glow Facial','Aqua Peel','Jawline Botox','Rejuran Healer','Ultherapy 300','Thermage FLX','Pico Toning','Acne Scar Laser','Chin Filler','Neck Lift','Exosome Care','LDM Hydration'];for(var i=0;i<n;i++){var id=201+i;DB.prods.push({id:id,lang:'en',name:'Abijou '+names[i%names.length],price:50000+i*10000,status:'approved',active:true,hidden:false,deleted:false,mode:'기본',book:{web:true,ali:false},exposeCh:null,cat:'피부과',sub:subs[i%subs.length],reg:'2026-09-0'+(1+i%9)+' 10:00',chat:1,cons:0,rev:0,views:100,inner:20,direct:5,bclk:0});}render();};
-window.setStore=function(patch){Object.keys(patch).forEach(function(k){if(k==='btn')Object.assign(DB.store.btn,patch.btn);else DB.store[k]=patch[k];});render();};
+window.setStore=function(patch){var was=DB.store.bookingSetting;Object.keys(patch).forEach(function(k){if(k==='btn')Object.assign(DB.store.btn,patch.btn);else DB.store[k]=patch[k];});if('bookingSetting' in patch&&!!patch.bookingSetting!==!!was&&!patch.btn)bookReset();render();};
 window.openHostBooking=function(no){S.surf='HOST';S.host.view='res';S.host.open=no;render();};
 window.openBoBooking=function(no){S.surf='BO';S.bo.view='res';S.bo.open=no;render();};
 Object.defineProperty(window,'VIEW',{get:function(){return S.surf+':'+(S.surf==='HOST'?S.host.view:S.surf==='BO'?S.bo.view:S.fo.screen);}});

@@ -3094,9 +3094,9 @@ function pEdit() {
   var msgCol = byText(document, 'label', '메신저 설정').closest('.ant-col.ant-col-12'), nc = msgCol.cloneNode(true);
   var nl = $('label', nc); nl.textContent = '예약'; nl.title = '예약'; nl.setAttribute('for', 'productForm_isActiveBooking');
   var g = $('[role=radiogroup]', nc); g.id = 'productForm_isActiveBooking'; $$('input', g).forEach(function (i) { i.name = 'isActiveBooking'; });
-  var lock = !s.bookingSetting, aliOnly = p.exposeCh === 'ali'; radioSet(g, p.book.web ? 'y' : 'n', lock || aliOnly || base) /* 기본 설정이면 예약 줄도 잠김(PRD v1.13) */ /* 통합: 잠겨도 저장된 값을 그대로 보여 줌(알리페이 PRD 설정값 유지) */; g.setAttribute('data-test', 'prod-book-web');
+  var lock = !s.bookingSetting, aliOnly = p.exposeCh === 'ali'; radioSet(g, !lock && !aliOnly && p.book.web ? 'y' : 'n', lock || aliOnly || base) /* 기본 설정이면 예약 줄도 잠김(PRD v1.13), 이때는 상품 값을 흐리게 */ /* 예약 설정·노출 채널 잠금은 꺼짐으로 흐리게(통합 PRD v1.31 기본값 15) */; g.setAttribute('data-test', 'prod-book-web');
   $$('label.ant-radio-wrapper', g).forEach(function (l) { l.onclick = function (e) { e.preventDefault(); if (base) return; if (!s.bookingSetting) { toast('예약설정에서 예약을 사용하면 켤 수 있습니다.'); return; } if (aliOnly) return; var on = $('input', l).value === 'y'; if (on && !p.book.web && seats(p).web.length >= 2) { seatToast('웹', seats(p).web); return; } p.book.web = on; PB.render(); }; });
-  if (aliOnly && !lock) { var ax = document.createElement('div'); ax.className = 'pb-lockhint'; ax.setAttribute('data-test', 'lockmsg-web'); ax.textContent = '알리페이 앱에만 노출되는 상태에서는 웹 버튼을 수정할 수 없습니다. 설정값은 유지됩니다.'; $('.ant-form-item-control', nc).appendChild(ax); }
+  if (aliOnly && !lock) { var ax = document.createElement('div'); ax.className = 'pb-lockhint'; ax.setAttribute('data-test', 'lockmsg-web'); ax.textContent = '알리페이 앱에만 노출되는 상태에서는 웹 버튼을 수정할 수 없습니다. 다시 열리면 꺼진 상태로 시작합니다.'; $('.ant-form-item-control', nc).appendChild(ax); }
   if (!s.bookingSetting) { var ex = document.createElement('div'); ex.className = 'ant-form-item-explain ant-form-item-explain-connected'; ex.innerHTML = '<div class="pb-lockhint" data-test="lockmsg">예약설정에서 예약을 사용하면 켤 수 있습니다.</div>'; $('.ant-form-item-control', nc).appendChild(ex); }
   var row = msgCol.parentElement, holder = msgCol.cloneNode(false); holder.style.cssText = msgCol.style.cssText; holder.appendChild($('.ant-form-item', nc)); msgCol.after(mark(holder));
   nl.textContent = '예약 (웹)'; nl.title = '예약 (웹)';
@@ -3104,9 +3104,9 @@ function pEdit() {
   var hA = holder.cloneNode(true), lbA = $('label', hA); $$('[data-test=lockmsg-web]', hA).forEach(function (x) { x.remove(); }); lbA.textContent = '예약 (알리페이 앱)'; lbA.title = lbA.textContent; lbA.setAttribute('for', 'productForm_isActiveBookingAli');
   var gA = $('[role=radiogroup]', hA); gA.id = 'productForm_isActiveBookingAli'; $$('input', gA).forEach(function (i) { i.name = 'isActiveBookingAli'; }); /* 잠금 안내는 줄마다(스토어 화면과 같음): 복제된 안내를 그대로 둔다 */
   var webOnly = p.exposeCh === 'web', outLang = ['zh', 'en'].indexOf(p.lang) < 0, lockA = lock || webOnly || outLang || base;
-  radioSet(gA, p.book.ali ? 'y' : 'n', lockA); gA.setAttribute('data-test', 'prod-book-ali');
+  radioSet(gA, !lock && !webOnly && !outLang && p.book.ali ? 'y' : 'n', lockA); /* 예약 설정·노출 채널·대상 외 언어 잠금은 꺼짐으로 흐리게 */ gA.setAttribute('data-test', 'prod-book-ali');
   $$('label.ant-radio-wrapper', gA).forEach(function (l) { l.onclick = function (e) { e.preventDefault(); if (base) return; if (!s.bookingSetting) { toast('예약설정에서 예약을 사용하면 켤 수 있습니다.'); return; } if (webOnly || outLang) return; var on = $('input', l).value === 'y'; if (on && !p.book.ali && seats(p).ali.length >= 2) { seatToast('알리페이 앱', seats(p).ali); return; } p.book.ali = on; PB.render(); }; });
-  if (webOnly && !lock) { var wx = document.createElement('div'); wx.className = 'pb-lockhint'; wx.setAttribute('data-test', 'lockmsg-ali'); wx.textContent = '웹에만 노출되는 상태에서는 알리페이 앱 버튼을 수정할 수 없습니다. 설정값은 유지됩니다.'; gA.closest('.ant-form-item-control').appendChild(wx); }
+  if (webOnly && !lock) { var wx = document.createElement('div'); wx.className = 'pb-lockhint'; wx.setAttribute('data-test', 'lockmsg-ali'); wx.textContent = '웹에만 노출되는 상태에서는 알리페이 앱 버튼을 수정할 수 없습니다. 다시 열리면 꺼진 상태로 시작합니다.'; gA.closest('.ant-form-item-control').appendChild(wx); }
   holder.after(mark(hA));
   {
     var st = seats(p), nm = function (a) { return a.length ? ' (' + a.join(' / ') + ')' : ''; }, sl = document.createElement('div'); sl.className = 'pb-seatline'; sl.setAttribute('data-test', 'seat-line');
