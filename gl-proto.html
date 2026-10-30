@@ -1884,17 +1884,17 @@ const M='index-module-scss-module__185j0W__modal__wrapper', IF='index-module-scs
 /* ---------- 데이터 ---------- */
 function seed(){return{
  members:[
-  {id:1,email:'verified@example.com',nickname:'Mina',verified:true,password:'pass1234',googleSub:null,status:'active',via:'email',marketing:false,linkNoticeShown:false,phone:true},
+  {id:1,email:'verified@gmail.com',nickname:'Mina',verified:true,password:'pass1234',googleSub:null,status:'active',via:'email',marketing:false,linkNoticeShown:false,phone:true},
   {id:3,email:'googleonly@gmail.com',nickname:'SilkyLotus2048',verified:true,password:null,googleSub:'g-jane',googleAt:'2025-10-30 10:00',status:'active',via:'google',marketing:false,linkNoticeShown:true},
-  {id:5,email:'linked@example.com',nickname:'BothWays',verified:true,password:'pass1234',googleSub:'g-both',googleAt:'2026-09-12 14:20',status:'active',via:'email',marketing:true,linkNoticeShown:true,phone:true}
+  {id:5,email:'linked@gmail.com',nickname:'BothWays',verified:true,password:'pass1234',googleSub:'g-both',googleAt:'2026-09-12 14:20',status:'active',via:'email',marketing:true,linkNoticeShown:true,phone:true}
  ],
  google:[
   {sub:'g-new',name:'Alex Kim',email:'alex.new@gmail.com'},
   {sub:'g-noname',name:'',email:'noname@gmail.com'},
-  {sub:'g-ver',name:'Mina Park',email:'verified@example.com',hd:'example.com'},
-  {sub:'g-vercase',name:'Mina Park',email:'Verified@Example.com',hd:'example.com'},
+  {sub:'g-ver',name:'Mina Park',email:'verified@gmail.com'},
+  {sub:'g-vercase',name:'Mina Park',email:'Verified@Gmail.com'},
   {sub:'g-jane',name:'Jane Doe',email:'googleonly@gmail.com'},
-  {sub:'g-both',name:'Both Ways',email:'linked@example.com',hd:'example.com'},
+  {sub:'g-both',name:'Both Ways',email:'linked@gmail.com'},
   {sub:'g-other',name:'Other Person',email:'other.person@gmail.com'},
   {sub:'g-yahoo',name:'Yuna Choi',email:'yuna.choi@yahoo.com'},
   {sub:'g-outlook',name:'Sam Lee',email:'sam.lee@outlook.com'}
@@ -1909,7 +1909,7 @@ const norm=e=>(e||'').trim().toLowerCase();
 const me=()=>DB.members.find(m=>m.id===DB.session);
 const live=m=>m&&m.status!=='deleted';
 const gAcc=sub=>DB.google.find(g=>g.sub===sub);
-const trusted=g=>/@gmail\.com$/i.test(g.email)||!!g.hd;
+const trusted=g=>/@gmail\.com$/i.test(g.email);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const MON=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const WD=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
