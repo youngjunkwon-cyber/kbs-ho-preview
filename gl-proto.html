@@ -1877,11 +1877,13 @@ function seed(){return{
  google:[
   {sub:'g-new',name:'Alex Kim',email:'alex.new@gmail.com'},
   {sub:'g-noname',name:'',email:'noname@gmail.com'},
-  {sub:'g-ver',name:'Mina Park',email:'verified@example.com'},
-  {sub:'g-vercase',name:'Mina Park',email:'Verified@Example.com'},
+  {sub:'g-ver',name:'Mina Park',email:'verified@example.com',hd:'example.com'},
+  {sub:'g-vercase',name:'Mina Park',email:'Verified@Example.com',hd:'example.com'},
   {sub:'g-jane',name:'Jane Doe',email:'googleonly@gmail.com'},
-  {sub:'g-both',name:'Both Ways',email:'linked@example.com'},
-  {sub:'g-other',name:'Other Person',email:'other.person@gmail.com'}
+  {sub:'g-both',name:'Both Ways',email:'linked@example.com',hd:'example.com'},
+  {sub:'g-other',name:'Other Person',email:'other.person@gmail.com'},
+  {sub:'g-yahoo',name:'Yuna Choi',email:'yuna.choi@yahoo.com'},
+  {sub:'g-outlook',name:'Sam Lee',email:'sam.lee@outlook.com'}
  ],
  session:null, lang:'en', env:'web', envFrom:null, remembered:null, booking:null,
  nextGoogle:'ok', seq:100
@@ -1893,6 +1895,7 @@ const norm=e=>(e||'').trim().toLowerCase();
 const me=()=>DB.members.find(m=>m.id===DB.session);
 const live=m=>m&&m.status!=='deleted';
 const gAcc=sub=>DB.google.find(g=>g.sub===sub);
+const trusted=g=>/@gmail\.com$/i.test(g.email)||!!g.hd;
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const MON=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const WD=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
@@ -1909,12 +1912,12 @@ function judgeGoogle(db,sub){
  if(!same)return{result:'signup'};
  if(same.verified===false)return{result:'unverified-member',member:same};
  if(same.googleSub)return{result:'signup-blocked',member:same};
- return{result:'autolink',member:same};
+ return trusted(g)?{result:'autolink',member:same}:{result:'pwlink',member:same};
 }
 function judgeConnect(db,memberId,sub){return db.members.find(m=>m.googleSub===sub&&m.status!=='deleted'&&m.id!==memberId)?{result:'taken'}:{result:'link'}}
 function judgeEmailCheck(db,email,purpose){
  const m=db.members.find(x=>x.status!=='deleted'&&x.via!=='alipay'&&norm(x.email)===norm(email));
- if(purpose==='signup'){if(!m)return{result:'send'};if(m.googleSub)return{result:'google'};return{result:'dup'}}
+ if(purpose==='signup'){if(!m)return{result:'send'};if(m.googleSub&&!m.password)return{result:'google'};return{result:'dup'}}
  if(!m)return{result:'none'};return{result:'send'};
 }
 /* 서비스 언어별 단어 (시안용 임시. 형용사 + 꽃·뷰티 단어 + 숫자 4자리, 띄어쓰기 없음. 인도네시아어는 명사 + 형용사 어순) */
@@ -1950,6 +1953,7 @@ function googlePick(sub){
 function googleDone(sub){
  const g=gAcc(sub);
  if(VIEW.gFor==='verify'){const j=judgeGoogle(DB,sub);VIEW.err={};
+  if(j.result==='signup'&&!trusted(g)){VIEW.page='signup';toast("This email can\'t be verified with Google. Please use Get Verification Code.");render();return}
   if(j.result==='signup'){VIEW.page='signup';VIEW.form.gv={sub,email:g.email.toLowerCase()};VIEW.form.e=g.email.toLowerCase();VIEW.form.codeSent=false;VIEW.form.codeVerified=false;VIEW.form.codeErr=null;if(!(VIEW.form.nick||'').trim())VIEW.form.nick=nickFor();render();return}
   VIEW.form.gv=null;if(j.result==='login'||j.result==='autolink')VIEW.form={}}
  if(VIEW.gFor==='connect'){const m=me();VIEW.page='account';if(g.emailVerified===false)toast('Login failed. Please try again.');else if(judgeConnect(DB,m.id,sub).result==='taken')toast('This Google account is already linked to another K-Beauty Station account.');else if(m.googleSub===sub){}else{m.googleSub=sub;m.gEmail=g.email.toLowerCase();m.googleAt=stamp();m.linkNoticeShown=true;toast('Your Google account is now linked.')}render();return}
@@ -1959,10 +1963,13 @@ function googleDone(sub){
  if(j.result==='login'){j.member.gEmail=g.email.toLowerCase();afterLogin(j.member);return}
  if(j.result==='unverified-member'){VIEW.page=backOf();toast('This email is already registered. Please log in with your email and password.');render();return}
  if(j.result==='signup-blocked'){VIEW.page=backOf();toast('This email is already linked to a different Google account. Please log in with your email or the Google account linked to your account.');render();return}
- if(j.result==='signup'){const m={id:++DB.seq,email:g.email.toLowerCase(),nickname:nickFor(),joined:'2026. 10. 27',lang:DB.lang,verified:true,password:null,googleSub:sub,gEmail:g.email.toLowerCase(),googleAt:stamp(),status:'active',via:'google',marketing:false,linkNoticeShown:true,termsAt:new Date().toLocaleString('ko-KR')};DB.members.push(m);afterLogin(m);return}
+ if(j.result==='signup'){const m={id:++DB.seq,email:g.email.toLowerCase(),nickname:nickFor(),joined:'2026. 10. 27',lang:DB.lang,verified:true,password:null,googleSub:sub,gEmail:g.email.toLowerCase(),googleAt:stamp(),status:'active',via:'google',marketing:false,linkNoticeShown:true};DB.members.push(m);afterLogin(m);return}
  if(j.result==='autolink'){const m=j.member;m.googleSub=sub;m.gEmail=g.email.toLowerCase();m.googleAt=stamp();let msg=null;if(!m.linkNoticeShown){msg='Your Google account is now linked. You can log in with Google or your email and password.';m.linkNoticeShown=true}afterLogin(m,msg);return}
+ if(j.result==='pwlink'){VIEW.page=backOf();VIEW.modal='pwlink';VIEW.pw={sub,id:j.member.id,at:Date.now()};VIEW.err={};render();return}
  if(j.result==='error'){VIEW.page=backOf();toast('Login failed. Please try again.');render();return}
 }
+function pwLink(){const P2=VIEW.pw;if(!P2||DB.pwExpired){DB.pwExpired=false;VIEW.modal=null;VIEW.pw=null;toast('Login failed. Please try again.');render();return}const v=val('plp');const m=DB.members.find(x=>x.id===P2.id);if(!v){VIEW.err.plp='Please enter your password.';render();return}if(v!==m.password){VIEW.err.plp='Incorrect password.';render();return}const g=gAcc(P2.sub);m.googleSub=P2.sub;m.gEmail=g.email.toLowerCase();m.googleAt=stamp();let msg=null;if(!m.linkNoticeShown){msg='Your Google account is now linked. You can log in with Google or your email and password.';m.linkNoticeShown=true}VIEW.pw=null;if(VIEW.page==='signup')VIEW.form={};afterLogin(m,msg)}
+function pwModal(){if(VIEW.modal!=='pwlink')return;R().insertAdjacentHTML('beforeend',modal('Connect Google?',`<div class="gl-mbody"><p class="gl-mdesc">This email is already registered. Enter your password to connect this Google account.</p>${field('Password','plp','password','',VIEW.err.plp)}<p class="gl-mdesc" style="margin-top:4px"><a href="#" data-k="plforgot" style="text-decoration:underline">Forgot Password</a></p><div class="gl-mbtns">${btn('Cancel','plclose','outline')}${btn('Connect','plgo')}</div></div>`));R().querySelectorAll('[data-k=mclose],[data-k=plclose]').forEach(b=>on(b,()=>{VIEW.modal=null;VIEW.pw=null;VIEW.err={};render()}));on($('[data-k=plgo]'),pwLink);on($('[data-k=plforgot]'),()=>{VIEW.pw=null;go('forgot')})}
 function emailLogin(){const e=val('le'),p=val('lp');VIEW.form.email=e;VIEW.form.pw=p;VIEW.err={};
  const m=DB.members.find(x=>live(x)&&x.via!=='alipay'&&norm(x.email)===norm(e));
  if(m&&m.googleSub&&!m.password){VIEW.err.login='This account uses Google login. Please log in with Google.';render();return}
@@ -2071,7 +2078,7 @@ P.signup=()=>{R().innerHTML=envBar()+tpl('t_signup');header();const F=VIEW.form;
   const gv=F.gv,emailV=gv?gv.email:norm(F.e);
   if(gv){const dupG=DB.members.some(x=>x.status!=='deleted'&&x.googleSub===gv.sub),dupE=DB.members.some(x=>x.status!=='deleted'&&x.via!=='alipay'&&norm(x.email)===emailV);if(dupG||dupE){F.nick=v;F.gv=null;VIEW.err.e=dupE?'This email is already registered.':'This Google account is already linked to another K-Beauty Station account.';render();return}}
   else if(DB.members.some(x=>x.status!=='deleted'&&x.via!=='alipay'&&norm(x.email)===emailV)){F.nick=v;VIEW.err.e='This email is already registered.';render();return}
-  const m={id:++DB.seq,email:emailV,nickname:v,joined:'2026. 10. 27',lang:DB.lang,verified:true,password:gv?null:F.pw,googleSub:gv?gv.sub:null,gEmail:gv?gv.email:null,googleAt:gv?stamp():null,status:'active',via:gv?'google':'email',marketing:!!F.ag.mk,linkNoticeShown:true,termsAt:new Date().toLocaleString('ko-KR')};DB.members.push(m);VIEW.form={};afterLogin(m,'Sign up successful.')});
+  const m={id:++DB.seq,email:emailV,nickname:v,joined:'2026. 10. 27',lang:DB.lang,verified:true,password:gv?null:F.pw,googleSub:gv?gv.sub:null,gEmail:gv?gv.email:null,googleAt:gv?stamp():null,status:'active',via:gv?'google':'email',marketing:!!F.ag.mk,linkNoticeShown:true};DB.members.push(m);VIEW.form={};afterLogin(m,'Sign up successful.')});
  if(VIEW.err.nick)nk.closest('label').appendChild(el(`<p class="index-module-scss-module__X-Toyq__formError gl-new" style="margin:4px 0 0">${esc(VIEW.err.nick)}</p>`));
  if(VIEW.err.e){ie.setAttribute('aria-invalid','true');ie.style.borderColor='#EB003B';const em=el(`<p class="index-module-scss-module__X-Toyq__formError gl-new" style="margin:4px 0 0">${esc(VIEW.err.e)}</p>`);const gvb=flow.querySelector('.gl-new');if(gvb)flow.insertBefore(em,gvb);else flow.appendChild(em);if(VIEW.err.g){const gb=el(`<div class="gl-new" style="margin-top:8px">${gbtn()}${AGREE}</div>`);flow.appendChild(gb);on(gb.querySelector('[data-k=gstart]'),()=>startGoogle('login'));hookAgree(gb)}}};
 P.forgot=()=>{R().innerHTML=envBar()+tpl('t_forgot');header();const ie=$('input[name=email]');ie.id='fe';ie.value=VIEW.form.e||'';const b=$('[class*="F9n-4q__page__footer"] button');on(b,()=>sendCode('forgot'));
@@ -2106,7 +2113,7 @@ P.google=()=>{const bar=`<div class="gbar"><button data-k="gx">✕</button>accou
 P.spin=()=>{R().innerHTML='<div class="gpage"><div class="spin"><i></i>accounts.google.com</div></div>'};
 P.external=()=>{R().innerHTML=`<div class="inapp"><b>${({line:'LINE',kakao:'KakaoTalk','ig-ios':'Instagram','ig-android':'Instagram',fb:'Facebook','fb-android':'Facebook'})[DB.envFrom]||'KakaoTalk'}</b>&nbsp;k-beautystation.com</div><div class="spin"><i></i>Opening in your browser</div>`};
 
-function render(){(P[VIEW.page]||P.home)();if(VIEW.toast)R().insertAdjacentHTML('beforeend',`<div class="BookingSurveySuccessToast-module-scss-module__xUKt_a__toast"><div class="BookingSurveySuccessToast-module-scss-module__xUKt_a__message"><strong>${esc(VIEW.toast)}</strong></div></div>`);
+function render(){(P[VIEW.page]||P.home)();pwModal();if(VIEW.toast)R().insertAdjacentHTML('beforeend',`<div class="BookingSurveySuccessToast-module-scss-module__xUKt_a__toast"><div class="BookingSurveySuccessToast-module-scss-module__xUKt_a__message"><strong>${esc(VIEW.toast)}</strong></div></div>`);
  try{parent.postMessage({type:'gl-render',page:VIEW.page},'*')}catch(e){}}
 window.addEventListener('DOMContentLoaded',()=>{R().addEventListener('click',e=>{const a=e.target.closest('a');if(a)e.preventDefault()});render()});
 </script></body></html>
