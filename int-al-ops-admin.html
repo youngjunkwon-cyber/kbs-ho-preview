@@ -228,7 +228,7 @@ function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=ri(i+1);[a
 const dg=n=>{let s='';for(let i=0;i<n;i++)s+=ri(10);return s};
 const tmOf=(date,lo=8,hi=21)=>{let h=lo+ri(hi-lo);if(date===T)h=Math.min(h,14);return pad(h)+':'+pad(ri(60))};
 const tsOf=(date,sec,lo,hi)=>date+' '+tmOf(date,lo,hi)+(sec?':'+pad(ri(60)):'');
-const CHS=['웹','알리페이'];/* 화면 표시·필터용 2값. 내부 시드는 r.ch(3값) + r.cv(표시값) */
+const CHS=['웹','알리페이 중국','알리페이 홍콩'];/* 화면 표시·필터용 3값(통합 PRD v1.32: 채널 기록값 그대로). r.cv = r.ch */
 const LANGS=['중국어(간체)','중국어(번체)','영어','일본어','인도네시아어','몽골어'];
 const CATS=['피부과','성형외과','에스테틱','헤어/메이크업'];
 const inRange=(d,f,t)=>{d=d.slice(0,10);return (!f||d>=f)&&(!t||d<=t)};
@@ -406,7 +406,7 @@ const STAT=[];
 })();
 
 /* ========= 7) 설문 ========= */
-const SV_RES={'웹':60,'알리페이':19};
+const SV_RES={'웹':60,'알리페이 중국':12,'알리페이 홍콩':7};
 const SV_EXP=['처음이에요','와본 적 있어요','살고 있어요'];
 const SV_INT=['화장품 쇼핑','K-pop 팬 활동','뷰티 팝업스토어','한복 체험','피부 진단','굿즈 쇼핑','뷰티 디바이스 쇼핑','영양제 쇼핑','향수 만들기','안경 맞추기'];
 const SURVEY=[
@@ -423,7 +423,7 @@ const SURVEY=[
 const ageOf=b=>{const y=+b.slice(0,4);let a=2026-y;if(b.slice(5)>T.slice(5))a--;return a};
 const ageB=a=>a<20?'10대':a<30?'20대':a<40?'30대':a<50?'40대':'50대 이상';
 
-[RES,CONS,CHATS,PCHATS,REV,STAT,SURVEY].forEach(a=>a.forEach(r=>{r.cv=r.ch==='웹'?'웹':'알리페이'}));
+[RES,CONS,CHATS,PCHATS,REV,STAT,SURVEY].forEach(a=>a.forEach(r=>{r.cv=r.ch}));
 /* 전화번호 정리: +1은 나라별 지역번호로, 같은 이름은 모든 목록에서 같은 번호 */
 (function(){const AR={'캐나다':['416','647','437','604','778','514','438','403','587','613'],'미국':['212','646','917','213','310','415','312','206','617','702']};
   const fix=(ph,nat)=>{const m=/^\+1 (\d{10})$/.exec(ph||'');if(!m)return ph;const d=m[1],a=(AR[nat]||AR['미국']);return '+1 '+a[(+d.slice(0,2))%a.length]+String(2+(+d[3])%8)+d.slice(4)};
@@ -625,7 +625,7 @@ function vRev(){
 
 /* ========= 화면: 문의 통계 ========= */
 const COL={'스토어':'#4b7bf5','상품':'#52c8c8','중국어(간체)':'#4b7bf5','영어':'#52c8c8','중국어(번체)':'#c77dff','일본어':'#f0975c','인도네시아어':'#7bc94a','몽골어':'#f6c344',
- '웹':'#52c8c8','알리페이':'#4b7bf5','채팅문의':'#4b7bf5','상담문의':'#f0975c','메신저상담':'#52c8c8','K-뷰티 메신저':'#4b7bf5','입점사 메신저':'#52c8c8',
+ '웹':'#52c8c8','알리페이 중국':'#4b7bf5','알리페이 홍콩':'#c77dff','채팅문의':'#4b7bf5','상담문의':'#f0975c','메신저상담':'#52c8c8','K-뷰티 메신저':'#4b7bf5','입점사 메신저':'#52c8c8',
  '왓츠앱':'#52c8c8','라인':'#4b7bf5','위챗':'#f0975c','카카오':'#f6c344','샤오홍슈':'#c77dff','페이스북':'#7bc94a'};
 const WAYS=['채팅문의','상담문의','메신저상담'];
 const MTYPES=['왓츠앱','라인','위챗','카카오','샤오홍슈','페이스북'];
@@ -691,7 +691,7 @@ function vStat(){
     const ag=aggData(rows);
     const ar=k=>`<span class="ar" data-act="sort" data-v="${k}">${s.sortK===k?(s.sortD>0?'▲':'▼'):'⇅'}</span>`;
     const sh=(l,k,cls)=>`<th class="${cls||''}" rowspan="1">${l}${ar(k)}</th>`;
-    const hdr=`<tr><th rowspan="2" style="text-align:center">스토어명${ar('name')}</th><th rowspan="2">총 문의 건수${ar('total')}</th><th colspan="2">문의구분</th><th colspan="6">언어구분</th><th colspan="2" class="new">유입 채널</th><th colspan="3">문의 방식</th></tr>
+    const hdr=`<tr><th rowspan="2" style="text-align:center">스토어명${ar('name')}</th><th rowspan="2">총 문의 건수${ar('total')}</th><th colspan="2">문의구분</th><th colspan="6">언어구분</th><th colspan="3" class="new">유입 채널</th><th colspan="3">문의 방식</th></tr>
      <tr>${sh('스토어','k:스토어')}${sh('상품','k:상품')}${['중국어(간체)','중국어(번체)','영어','일본어','인니어','몽골어'].map((l,i)=>sh(l,'l:'+LANGS[i])).join('')}${CHS.map(c=>sh(c,'c:'+c,'new')).join('')}${WAYS.map(w=>sh(w,'w:'+w)).join('')}</tr>`;
     const keys=['total','k:스토어','k:상품'].concat(LANGS.map(l=>'l:'+l),CHS.map(c=>'c:'+c),WAYS.map(w=>'w:'+w));
     tab=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span class="sec-t" style="margin:0">스토어별 집계</span><button class="btnx" data-act="nop">엑셀 다운로드</button></div>
@@ -791,7 +791,7 @@ function go(name){
   render();window.scrollTo(0,0);
 }
 function resetDB(){S=D();CONS.forEach(r=>r.status=r.st0);_lastV=null;render()}
-function setCh(v){if(v==='알리페이 중국'||v==='알리페이 홍콩')v='알리페이';const s=S[_v];if(!('ch' in s))return;s.ch=v;if('qd' in s)s.q=s.qd;s.page=1;render()}
+function setCh(v){const s=S[_v];if(!('ch' in s))return;s.ch=v;if('qd' in s)s.q=s.qd;s.page=1;render()}
 window.go=go;window.resetDB=resetDB;window.render=render;window.setCh=setCh;
 Object.defineProperty(window,'VIEW',{get:()=>_v});
 Object.defineProperty(window,'STATE',{get:()=>S});

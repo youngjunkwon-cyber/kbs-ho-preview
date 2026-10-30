@@ -2643,7 +2643,7 @@ function pRes() {
   var sels = $$('form .ant-select'), stSel = sels[0], ownSel = sels[2];
   var kindSel = ownSel.cloneNode(true); ownSel.before(kindSel); mark(kindSel); /* 언어 바로 뒤: 유입 채널 → 예약 구분 → 등록 주체 */
   var ichSel = ownSel.cloneNode(true); kindSel.before(ichSel); /* 유입 채널 → 예약 구분 */ mark(ichSel); ichSel.setAttribute('data-test', 'ich-sel'); setSelect(ichSel, h.ich ? '유입 채널 ' + h.ich : '', '유입 채널 전체');
-  ichSel.onclick = function () { dropdown(ichSel, [['', '유입 채널 전체'], ['웹', '웹'], ['알리페이', '알리페이']], h.ich, function (v) { h.ich = v; PB.render(); }, ACC); };
+  ichSel.onclick = function () { dropdown(ichSel, [['', '유입 채널 전체'], ['웹', '웹'], ['알리페이 중국', '알리페이 중국'], ['알리페이 홍콩', '알리페이 홍콩']], h.ich, function (v) { h.ich = v; PB.render(); }, ACC); };
   setSelect(stSel, h.st ? '예약상태 ' + h.st : '', '예약상태 전체');
   var lgSel = sels[1]; if (lgSel) { setSelect(lgSel, h.rlang ? '언어 ' + PB.LANGS[h.rlang] : '', '언어 전체'); lgSel.setAttribute('data-test', 'lang-sel'); lgSel.onclick = function () { dropdown(lgSel, [['', '언어 전체']].concat(Object.keys(PB.LANGS).map(function (k) { return [k, PB.LANGS[k]]; })), h.rlang, function (v) { h.rlang = v; PB.render(); }, ACC); }; }
   setSelect(kindSel, h.kind ? '예약 구분 ' + h.kind : '', '예약 구분 전체');

@@ -2976,7 +2976,7 @@ function pRes() {
   setSelect(stSel, b.st, '상태 선택'); setSelect(kindSel, b.kind, '예약 구분'); setSelect(ownSel, b.owner, '등록 주체');
   stSel.onclick = function () { dropdown(stSel, [['', '전체'], ['예약', '예약'], ['방문완료', '방문완료'], ['미방문', '미방문'], ['고객취소', '고객취소'], ['매장취소', '매장취소'], ['변경요청', '변경요청'], ['변경완료', '변경완료'], ['변경거절', '변경거절']], b.st, function (v) { b.st = v; PB.render(); }, ACC); };
   var ichItem = kindItem.cloneNode(true); kindItem.before(mark(ichItem)); /* 필터 순서: 유입 채널 → 예약 구분(통합 PRD 기본값) */ var ichSel = $('.ant-select', ichItem); setSelect(ichSel, b.ich, '유입 채널'); ichSel.setAttribute('data-test', 'ich-sel');
-  ichSel.onclick = function () { dropdown(ichSel, [['', '전체'], ['웹', '웹'], ['알리페이', '알리페이']], b.ich, function (v) { b.ich = v; PB.render(); }, ACC); };
+  ichSel.onclick = function () { dropdown(ichSel, [['', '전체'], ['웹', '웹'], ['알리페이 중국', '알리페이 중국'], ['알리페이 홍콩', '알리페이 홍콩']], b.ich, function (v) { b.ich = v; PB.render(); }, ACC); };
   kindSel.onclick = function () { dropdown(kindSel, [['', '전체'], ['상품 예약', '상품 예약'], ['스토어 예약', '스토어 예약']], b.kind, function (v) { b.kind = v; PB.render(); }, ACC); };
   ownSel.onclick = function () { dropdown(ownSel, [['', '전체'], ['고객', '고객'], ['매장', '매장']], b.owner, function (v) { b.owner = v; PB.render(); }, ACC); };
   var inp = $$('form input.ant-input').filter(function (i) { return /여권명/.test(i.placeholder); })[0];
@@ -3094,7 +3094,7 @@ function pEdit() {
   var msgCol = byText(document, 'label', '메신저 설정').closest('.ant-col.ant-col-12'), nc = msgCol.cloneNode(true);
   var nl = $('label', nc); nl.textContent = '예약'; nl.title = '예약'; nl.setAttribute('for', 'productForm_isActiveBooking');
   var g = $('[role=radiogroup]', nc); g.id = 'productForm_isActiveBooking'; $$('input', g).forEach(function (i) { i.name = 'isActiveBooking'; });
-  var lock = !s.bookingSetting, aliOnly = p.exposeCh === 'ali'; radioSet(g, !lock && !aliOnly && p.book.web ? 'y' : 'n', lock || aliOnly || base) /* 기본 설정이면 예약 줄도 잠김(PRD v1.13), 이때는 상품 값을 흐리게 */ /* 예약 설정·노출 채널 잠금은 꺼짐으로 흐리게(통합 PRD v1.31 기본값 15) */; g.setAttribute('data-test', 'prod-book-web');
+  var lock = !s.bookingSetting, aliOnly = p.exposeCh === 'ali'; radioSet(g, p.book.web ? 'y' : 'n', lock || aliOnly || base) /* 기본 설정이면 예약 줄도 잠김(PRD v1.13), 이때는 상품 값을 흐리게 */ /* 예약 설정·노출 채널 잠금도 저장된 값을 흐리게(통합 PRD v1.32 기본값 15). 풀리면 꺼진 상태로 시작 */; g.setAttribute('data-test', 'prod-book-web');
   $$('label.ant-radio-wrapper', g).forEach(function (l) { l.onclick = function (e) { e.preventDefault(); if (base) return; if (!s.bookingSetting) { toast('예약설정에서 예약을 사용하면 켤 수 있습니다.'); return; } if (aliOnly) return; var on = $('input', l).value === 'y'; if (on && !p.book.web && seats(p).web.length >= 2) { seatToast('웹', seats(p).web); return; } p.book.web = on; PB.render(); }; });
   if (aliOnly && !lock) { var ax = document.createElement('div'); ax.className = 'pb-lockhint'; ax.setAttribute('data-test', 'lockmsg-web'); ax.textContent = '알리페이 앱에만 노출되는 상태에서는 웹 버튼을 수정할 수 없습니다. 다시 열리면 꺼진 상태로 시작합니다.'; $('.ant-form-item-control', nc).appendChild(ax); }
   if (!s.bookingSetting) { var ex = document.createElement('div'); ex.className = 'ant-form-item-explain ant-form-item-explain-connected'; ex.innerHTML = '<div class="pb-lockhint" data-test="lockmsg">예약설정에서 예약을 사용하면 켤 수 있습니다.</div>'; $('.ant-form-item-control', nc).appendChild(ex); }
@@ -3104,7 +3104,7 @@ function pEdit() {
   var hA = holder.cloneNode(true), lbA = $('label', hA); $$('[data-test=lockmsg-web]', hA).forEach(function (x) { x.remove(); }); lbA.textContent = '예약 (알리페이 앱)'; lbA.title = lbA.textContent; lbA.setAttribute('for', 'productForm_isActiveBookingAli');
   var gA = $('[role=radiogroup]', hA); gA.id = 'productForm_isActiveBookingAli'; $$('input', gA).forEach(function (i) { i.name = 'isActiveBookingAli'; }); /* 잠금 안내는 줄마다(스토어 화면과 같음): 복제된 안내를 그대로 둔다 */
   var webOnly = p.exposeCh === 'web', outLang = ['zh', 'en'].indexOf(p.lang) < 0, lockA = lock || webOnly || outLang || base;
-  radioSet(gA, !lock && !webOnly && !outLang && p.book.ali ? 'y' : 'n', lockA); /* 예약 설정·노출 채널·대상 외 언어 잠금은 꺼짐으로 흐리게 */ gA.setAttribute('data-test', 'prod-book-ali');
+  radioSet(gA, p.book.ali ? 'y' : 'n', lockA); /* 예약 설정·노출 채널·대상 외 언어 잠금은 저장된 값을 흐리게(통합 PRD v1.32) */ gA.setAttribute('data-test', 'prod-book-ali');
   $$('label.ant-radio-wrapper', gA).forEach(function (l) { l.onclick = function (e) { e.preventDefault(); if (base) return; if (!s.bookingSetting) { toast('예약설정에서 예약을 사용하면 켤 수 있습니다.'); return; } if (webOnly || outLang) return; var on = $('input', l).value === 'y'; if (on && !p.book.ali && seats(p).ali.length >= 2) { seatToast('알리페이 앱', seats(p).ali); return; } p.book.ali = on; PB.render(); }; });
   if (webOnly && !lock) { var wx = document.createElement('div'); wx.className = 'pb-lockhint'; wx.setAttribute('data-test', 'lockmsg-ali'); wx.textContent = '웹에만 노출되는 상태에서는 알리페이 앱 버튼을 수정할 수 없습니다. 다시 열리면 꺼진 상태로 시작합니다.'; gA.closest('.ant-form-item-control').appendChild(wx); }
   holder.after(mark(hA));
@@ -3195,7 +3195,7 @@ function sinqDetail(rows) {
   var td = function (tr, txt, span) { var c = document.createElement('td'); if (span) c.setAttribute('rowspan', span); c.textContent = txt; tr.appendChild(c); return c; };
   dates.forEach(function (d) {
     var dr = rows.filter(function (x) { return x.d === d; }), leaves = [];
-    ['스토어', '상품'].forEach(function (k) { var kr = dr.filter(function (x) { return x.kind === k; }); langs.forEach(function (l) { var lr = kr.filter(function (x) { return x.lang === l; }); ['웹', '알리페이'].forEach(function (ic) { var ir = lr.filter(function (x) { return x.ich === ic; }); SINQ_DET_ORDER.forEach(function (n) { var c = ir.filter(function (x) { return sinqDetailName(x) === n; }).length; if (c) leaves.push({ k: k, l: l, i: ic, n: n, c: c, kc: kr.length, lc: lr.length, ic: ir.length }); }); }); }); });
+    ['스토어', '상품'].forEach(function (k) { var kr = dr.filter(function (x) { return x.kind === k; }); langs.forEach(function (l) { var lr = kr.filter(function (x) { return x.lang === l; }); ['웹', '알리페이 중국', '알리페이 홍콩'].forEach(function (ic) { var ir = lr.filter(function (x) { return x.ich === ic; }); SINQ_DET_ORDER.forEach(function (n) { var c = ir.filter(function (x) { return sinqDetailName(x) === n; }).length; if (c) leaves.push({ k: k, l: l, i: ic, n: n, c: c, kc: kr.length, lc: lr.length, ic: ir.length }); }); }); }); });
     leaves.forEach(function (v, i) {
       var tr = document.createElement('tr'), prev = leaves[i - 1];
       if (i === 0) { td(tr, d, leaves.length); td(tr, store, leaves.length); td(tr, dr.length, leaves.length).setAttribute('data-test', 'sinq-d-total-' + d); }
@@ -3208,24 +3208,24 @@ function sinqDetail(rows) {
   });
 }
 function sinqRename() { var w = document.createTreeWalker(document.getElementById('app'), NodeFilter.SHOW_TEXT), n, R = [['스토어별 문의 채널 분포', '스토어별 문의 방식 분포'], ['채널구분', '문의 방식'], ['문의 채널', '문의 방식']]; while ((n = w.nextNode())) { var t = n.nodeValue; R.forEach(function (r) { t = t.split(r[0]).join(r[1]); }); if (t !== n.nodeValue) n.nodeValue = t; } }
-/* 언어 필터 뒤 유입 채널 필터(전체·웹·알리페이) */
+/* 언어 필터 뒤 유입 채널 필터(전체·웹·알리페이 중국·알리페이 홍콩, 통합 PRD v1.32) */
 function sinqIchFilter() {
   var b = B(), ls = $$('.ant-select').filter(function (s) { return /언어/.test(s.textContent); })[0]; if (!ls) return;
   var it = ls.closest('.ant-form-item') || ls.closest('.ant-col') || ls, cp = it.cloneNode(true); it.after(mark(cp)); var sel = cp.classList.contains('ant-select') ? cp : $('.ant-select', cp);
   setSelect(sel, b.sich, '유입 채널'); sel.setAttribute('data-test', 'sinq-ich-sel'); var lb = $('label', cp); if (lb) lb.textContent = '유입 채널';
-  sel.onclick = function () { dropdown(sel, [['', '전체'], ['웹', '웹'], ['알리페이', '알리페이']], b.sich, function (v) { b.sich = v; PB.render(); }, ACC); };
+  sel.onclick = function () { dropdown(sel, [['', '전체'], ['웹', '웹'], ['알리페이 중국', '알리페이 중국'], ['알리페이 홍콩', '알리페이 홍콩']], b.sich, function (v) { b.sich = v; PB.render(); }, ACC); };
 }
 /* 집계 표 유입 채널 그룹: 언어구분 그룹 바로 뒤 */
 function sinqIchCols(hr, tr, by) {
   return function () {
     var g0 = $$('th', hr[0]), lg = g0.filter(function (t) { return t.textContent.trim() === '언어구분'; })[0]; if (!lg) return;
-    var ng = lg.cloneNode(true); ng.textContent = '유입 채널'; ng.colSpan = 2; lg.after(mark(ng));
+    var ng = lg.cloneNode(true); ng.textContent = '유입 채널'; ng.colSpan = 3; lg.after(mark(ng));
     /* 머리 둘째 줄: 문의구분 2 + 언어구분 6 = 마지막 언어 칸 7. 본문·colgroup·측정행: 스토어명·총 건수 2칸이 앞에 있어 9 */
     var subLang = $$('th', hr[1])[7], LI = 9, cg = $('colgroup'), mr = $('tr.ant-table-measure-row');
-    ['알리페이', '웹'].forEach(function (n) { var t = subLang.cloneNode(true), ti = $('.ant-table-column-title', t); if (ti) ti.textContent = n; else t.textContent = n; t.setAttribute('aria-label', n); subLang.after(mark(t)); });
-    var w = tr.cells[LI]; ['알리페이', '웹'].forEach(function (n) { var x = w.cloneNode(true); x.textContent = by('ich', n); x.setAttribute('data-test', 'sinq-col-ich-' + n); w.after(mark(x)); });
-    if (cg && cg.children[LI]) { var cc = cg.children[LI]; cc.after(cc.cloneNode(true)); cc.after(cc.cloneNode(true)); }
-    if (mr && mr.children[LI]) { var mc = mr.children[LI]; mc.after(measureLabel(mc.cloneNode(true), '알리페이')); mc.after(measureLabel(mc.cloneNode(true), '웹')); }
+    ['알리페이 홍콩', '알리페이 중국', '웹'].forEach(function (n) { var t = subLang.cloneNode(true), ti = $('.ant-table-column-title', t); if (ti) ti.textContent = n; else t.textContent = n; t.setAttribute('aria-label', n); subLang.after(mark(t)); });
+    var w = tr.cells[LI]; ['알리페이 홍콩', '알리페이 중국', '웹'].forEach(function (n) { var x = w.cloneNode(true); x.textContent = by('ich', n); x.setAttribute('data-test', 'sinq-col-ich-' + n); w.after(mark(x)); });
+    if (cg && cg.children[LI]) { var cc = cg.children[LI]; cc.after(cc.cloneNode(true)); cc.after(cc.cloneNode(true)); cc.after(cc.cloneNode(true)); }
+    if (mr && mr.children[LI]) { var mc = mr.children[LI]; mc.after(measureLabel(mc.cloneNode(true), '알리페이 홍콩')); mc.after(measureLabel(mc.cloneNode(true), '알리페이 중국')); mc.after(measureLabel(mc.cloneNode(true), '웹')); }
   };
 }
 /* 상세 보기 머리: 언어 건수 뒤 유입 채널 · 유입 채널 건수 */
@@ -3262,7 +3262,7 @@ function pSinq() {
   var by = function (k, v) { return cnt(function (x) { return x[k] === v; }); };
   panels('문의구분').forEach(function (p) { legend(p, [['스토어', by('kind', '스토어')], ['상품', by('kind', '상품')]]); });
   panels('언어구분').forEach(function (p) { legend(p, Object.keys(SINQ_LANG).map(function (l) { return [SINQ_LANG[l], by('lang', l)]; })); });
-  panels('언어구분').forEach(function (p) { if (p.nextElementSibling && p.nextElementSibling.getAttribute('data-test') === 'sinq-card-ich') return; var q = p.cloneNode(true); $('strong', q).textContent = '유입 채널'; q.setAttribute('data-test', 'sinq-card-ich'); p.after(mark(q)); legend(q, [['웹', by('ich', '웹')], ['알리페이', by('ich', '알리페이')]]); });
+  panels('언어구분').forEach(function (p) { if (p.nextElementSibling && p.nextElementSibling.getAttribute('data-test') === 'sinq-card-ich') return; var q = p.cloneNode(true); $('strong', q).textContent = '유입 채널'; q.setAttribute('data-test', 'sinq-card-ich'); p.after(mark(q)); legend(q, [['웹', by('ich', '웹')], ['알리페이 중국', by('ich', '알리페이 중국')], ['알리페이 홍콩', by('ich', '알리페이 홍콩')]]); });
   panels('채널구분').forEach(function (p) { legend(p, [['채팅문의', by('ch', '채팅문의')], ['상담문의', by('ch', '상담문의')], ['메신저상담', by('ch', '메신저상담')], ['플랫폼 예약', by('ch', '플랫폼 예약'), 'sinq-card-pb']]); });
   var ms = function (l) { return cnt(function (x) { return x.ch === '메신저상담' && x.lang === l; }); };
   panels('메신저구분').forEach(function (p) { legend(p, [['K-뷰티 메신저', 0], ['입점사 메신저', by('ch', '메신저상담')]]); });

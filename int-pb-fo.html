@@ -1122,7 +1122,7 @@ document.documentElement.style.setProperty('--pb-acc-bg', '#fff9fb');
 function F() { return PB.S.fo; }
 function meName() { return F().ch === 'ali' ? 'Wang Siyu' : PB.ME; }
 /* 예약 상세 고객 정보: 알리페이 회원 예약은 예약의 값(이메일 없음, 1부 FO-CH-13), 웹은 시안 고객(Kaitlyn Chan) */
-function guestOf(b) { var ali = b.ch === '알리페이', NAT = { '중국': 'China', '홍콩': 'Hong Kong', '캐나다': 'Canada' }; return ali ? { ali: true, nat: NAT[b.nation] || b.nation, pn: b.name.toUpperCase(), mid: b.name.toLowerCase().split(' ').join('.') } : { ali: false, nat: 'Canada', pn: 'KAITLYN CHAN', mid: 'kaitlyn.chan' }; }
+function guestOf(b) { var ali = b.ch !== '웹', NAT = { '중국': 'China', '홍콩': 'Hong Kong', '캐나다': 'Canada' }; return ali ? { ali: true, nat: NAT[b.nation] || b.nation, pn: b.name.toUpperCase(), mid: b.name.toLowerCase().split(' ').join('.') } : { ali: false, nat: 'Canada', pn: 'KAITLYN CHAN', mid: 'kaitlyn.chan' }; }
 function chOut(p, ch) { return (ch === 'ali' && (p.exposeCh === 'web' || ['zh', 'tw', 'en'].indexOf(p.lang) < 0)) || (ch === 'web' && p.exposeCh === 'ali'); }
 function nav(screen) { var f = F(); f.screen = screen; PB.render(); }
 var SUB_EN = { '보톡스': 'Botox', '스킨부스터': 'Skin Boosters', '여드름/흉터': 'Acne/Scar', '리프팅': 'Lifting', '색소/점/문신': 'Pigmentation/Mole/Tattoo', '필러': 'Filler', '바디': 'Body' };
@@ -1391,7 +1391,7 @@ function pDone() {
   var f = F(), b = bookingById(f.lastNo), app = document.getElementById('app'); app.innerHTML = ''; app.appendChild(header('', 'store'));
   var d = b.visit.slice(0, 10), vd = wdEn(d) + ', ' + d.slice(5, 7) + '/' + d.slice(8, 10) + '/' + d.slice(0, 4) + ' ' + b.visit.slice(11) + ' (KST)';
   var w = document.createElement('main'); w.className = 'pb-done';
-  w.innerHTML = '<section class="pb-dn-hero"><span class="pb-dn-ic"><svg width="23" height="16" viewBox="0 0 23 16" fill="none"><path d="M2 8l6.5 6L21 2" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><h1>Your booking is complete</h1><p>' + (b.ch === '알리페이' ? 'We sent the confirmation details by text message' : 'We sent the confirmation details to your email') + '</p></div></section>'
+  w.innerHTML = '<section class="pb-dn-hero"><span class="pb-dn-ic"><svg width="23" height="16" viewBox="0 0 23 16" fill="none"><path d="M2 8l6.5 6L21 2" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><h1>Your booking is complete</h1><p>' + (b.ch !== '웹' ? 'We sent the confirmation details by text message' : 'We sent the confirmation details to your email') + '</p></div></section>'
     + '<section class="pb-dn-sum"><dl><div><dt>Store</dt><dd>' + esc(PB.DB.store.nameEn) + '</dd></div>'
     + '<div class="pb-new" data-test="fo-done-prod"' + (b.snap ? '' : ' data-kind="consult"') + '><dt>Product</dt><dd>' + esc(b.snap ? b.snap.name : 'Decide at the store') + '</dd></div>'
     + '<div><dt>Visit date</dt><dd>' + vd + '</dd></div><div><dt>Booking number</dt><dd>' + b.rno + '</dd></div></dl>'

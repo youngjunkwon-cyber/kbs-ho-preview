@@ -210,6 +210,7 @@ const MSG = {
   capHead:     '버튼은 웹과 알리페이 앱 각각 2개까지 켤 수 있습니다.',
   capOn: (chName, list) => '버튼은 최대 2개까지 설정 가능합니다.',
   lockCol:     ch => (ch === WEB ? '웹에만 노출되는 상태에서는 알리페이 앱 버튼을' : '알리페이 앱에만 노출되는 상태에서는 웹 버튼을') + ' 수정할 수 없습니다. 다시 열리면 꺼진 상태로 시작합니다.',
+  lockColAd:   ch => (ch === WEB ? '웹에만 노출되는 상태에서는 알리페이 앱 버튼을' : '알리페이 앱에만 노출되는 상태에서는 웹 버튼을') + ' 수정할 수 없습니다. 설정값은 유지됩니다.', /* 배너 하단 버튼: 잠금이 풀리면 저장된 값으로 돌아옴(통합 PRD v1.32) */
   storeFixed:  (ch, what) => '스토어의 노출 채널이 ' + ch + '이라 이 ' + what + '도 같은 채널에만 노출됩니다. 스토어 > 정보관리의 기본정보에서 바꿀 수 있습니다.',
   storeChange: (ch, n, m) => (n || m) ? ch + euro(ch) + ' 지정하면 ' + [n ? '상품 ' + n + '건' : '', m ? '칼럼 ' + m + '건' : ''].filter(Boolean).join('과 ') + '이 ' + other(ch) + '에 노출되지 않습니다.' : '',
   storeAll:    '지원언어와 무관하게 이 설정 하나가 모든 언어에 적용됩니다. 웹이나 알리페이 앱으로 정하면 이 스토어의 상품과 칼럼도 그 채널에만 노출됩니다.',
@@ -612,7 +613,7 @@ function btnTable(kind, obj) {
   const webLock = effCh === ALI || locked;
   const chWebLock = effCh === ALI, chAliLock = !lOk || effCh === WEB;
   let html = BTN_TBL_HEAD; const bkOn = isStore ? obj.bookingEnabled : S(obj.store).bookingEnabled;
-  rows.forEach(r => { const e0 = eff.btns[r.k], e = { web: chWebLock ? false : e0.web, ali: chAliLock ? false : e0.ali }; /* 노출 채널·대상 외 언어·지원언어·예약 설정 때문에 잠긴 칸은 꺼짐으로 흐리게(통합 PRD v1.31 기본값 15). 기본 설정 잠금은 스토어 값 그대로 */
+  rows.forEach(r => { const e = (r.needBooking && !bkOn && obj.btns && obj.btns[r.k]) ? obj.btns[r.k] : eff.btns[r.k]; /* 잠긴 칸은 저장된 값을 흐리게(통합 PRD v1.32 기본값 15). 예약 설정이 꺼진 예약 줄은 상품 값 */
     let webDis = webLock, aliDis = aliLock || r.aliHardOff, note = ''; if (r.own) { webDis = chWebLock || locked; aliDis = chAliLock || locked; } /* 예약 행: 기본 설정 잠금도 다른 행과 같음(PRD v1.13) */
     if (r.aliHardOff) note = MSG.hardOff;
     if (r.needBooking && !bkOn) { webDis = true; aliDis = true; note = MSG.needBooking; }
@@ -946,7 +947,7 @@ function modal_ad() {
       '<div class="row"><div class="lbl"><span class="req">*</span>버튼 표시여부</div><div class="val"><div style="display:flex;gap:36px;flex-wrap:wrap;align-items:center">' +
       '<span class="' + (webLockBtn ? 'lock' : '') + '"><span class="tblnote" style="margin-right:8px">웹</span>' + onoff('bshw', b.btn.web, "setAdBtnShow('web',%V%)", webLockBtn, ['활성화', '비활성화']) + '</span>' +
       '<span class="' + (aliLockBtn ? 'lock' : '') + '"><span class="tblnote" style="margin-right:8px">알리페이 앱</span>' + onoff('bsha', extBtn ? false : b.btn.ali, "setAdBtnShow('ali',%V%)", aliLockBtn, ['활성화', '비활성화']) + '</span></div>' +
-      (!lOk ? '' : eff !== ALLCH ? '<div class="hint">' + MSG.lockCol(eff) + '</div>' : extBtn ? '<div class="hint">' + MSG.bnBtnExtLock + '</div>' : '') + '</div></div>' +
+      (!lOk ? '' : eff !== ALLCH ? '<div class="hint">' + MSG.lockColAd(eff) + '</div>' : extBtn ? '<div class="hint">' + MSG.bnBtnExtLock + '</div>' : '') + '</div></div>' +
       '<div class="row"><div class="lbl"><span class="req">*</span>버튼 텍스트</div><div class="val"><input type="text" class="fin" value="' + esc(b.btn.label) + '" style="width:260px" readonly></div></div>' +
       '<div class="row"><div class="lbl"><span class="req">*</span>버튼 링크 종류</div><div class="val"><select onchange="setBtnLinkKind(this.value)">' + ['링크없음', '외부링크', '내부링크'].map(v => '<option' + (v === b.btn.linkKind ? ' selected' : '') + '>' + v + '</option>').join('') + '</select></div></div>' +
       (b.btn.linkKind === '외부링크' ? '<div class="row"><div class="lbl">버튼 링크</div><div class="val"><input type="text" class="fin" style="width:100%" value="' + esc(b.btn.url || '') + '" readonly></div></div>' : '') +
@@ -1254,24 +1255,31 @@ window.alertBox = alertBox; window.MSG = MSG;
 
 /* 기존 배너는 저장된 상태라 연결 대상의 마지막 저장 이름을 갖고 있다 */
 DB.ads.forEach(b => { stampName(b.inner); if (b.btn) stampName(b.btn.inner); });
-/* 잠긴 버튼 칸은 꺼짐(2026-10-30, 통합 PRD v1.31 결정 1·기본값 15): 노출 채널·대상 외 언어·지원언어·예약 설정 때문에 잠긴 칸은 값을 끄고,
-   잠금이 풀리면 꺼진 상태로 시작한다(꺼지기 전 값으로 돌아오지 않음). 그래서 잠금 해제·예약 재사용으로 버튼이 3개가 되는 일이 없다.
-   배너 하단 버튼의 외부링크 잠금과 기본 설정 상품 잠금은 해당 없음(저장값 유지) */
-function offLocked(kind, o) {
+/* 잠긴 버튼 칸(통합 PRD v1.32 결정 1·기본값 15): 노출 채널·대상 외 언어·지원언어·예약 설정 때문에 잠긴 칸은 저장된 값을 지우지 않고 흐리게 보이고,
+   잠금이 풀리는 순간 꺼진 상태로 시작한다(꺼지기 전 값으로 돌아오지 않음). 그래서 잠금 해제·예약 재사용으로 버튼이 3개가 되는 일이 없다.
+   배너 하단 버튼(노출 채널·외부링크 잠금)과 기본 설정 상품 잠금은 해당 없음: 저장값을 흐리게 보이고 풀리면 저장값으로 돌아온다 */
+function lockState(kind, o) {
   const rows = kind === 'store' ? ROWS_STORE : ROWS_PRODUCT_B;
   const ch = kind === 'store' ? effChStore(o) : effChProduct(o);
   const aliL = ch === WEB || (kind !== 'store' && !langOk(o.lang)), webL = ch === ALI;
   const bkOff = kind === 'store' ? !o.bookingEnabled : !(S(o.store) || {}).bookingEnabled;
-  rows.forEach(r => { const b = o.btns && o.btns[r.k]; if (!b) return; if (aliL) b.ali = false; if (webL) b.web = false; if (r.needBooking && bkOff) { b.web = false; b.ali = false; } });
+  const m = {}; rows.forEach(r => { const bk = !!r.needBooking && bkOff; m[r.k + '|web'] = webL || bk; m[r.k + '|ali'] = aliL || bk; }); return m;
 }
-/* 랜딩페이지 배너 하단 버튼 표시여부: 노출 채널(대상 외 언어로 웹 고정 포함) 때문에 잠긴 열은 비활성화, 잠금이 풀리면 비활성화로 시작. 버튼 링크 종류 외부링크 잠금은 저장값 유지(PRD 1부 7장) */
-function offLockedAd(b) { if (!b.btn) return; const ch = effChAd(b); if (ch === WEB) b.btn.ali = false; if (ch === ALI) b.btn.web = false; }
-/* 스토어를 저장할 때 그 스토어 상품의 잠금이 풀린 칸은 꺼진 상태로 시작(노출 채널·지원언어로 잠겼던 열, 예약 설정을 다시 켠 예약 줄) */
-function reopenOff(kind, obj) { if (kind !== 'store' || !EDITSNAP || EDITSNAP.kind !== 'store' || EDITSNAP.id !== obj.id) return; const old = JSON.parse(EDITSNAP.json), oc = effChStore(old), nc = effChStore(obj);
-  DB.products.filter(p => p.store === obj.id).forEach(p => { Object.keys(p.btns || {}).forEach(k => { const x = p.btns[k]; if (oc === WEB && nc !== WEB) x.ali = false; if (oc === ALI && nc !== ALI) x.web = false; }); if (!old.bookingEnabled && obj.bookingEnabled && p.btns && p.btns.booking) p.btns.booking = { web: false, ali: false }; }); }
-/* 수정 중인 스토어의 상품은 그 스토어를 저장한 뒤 맞춘다(취소하면 스토어만 되돌리므로) */
-function offLockedAll() { const sk = EDITSNAP && EDITSNAP.kind === 'store' ? EDITSNAP.id : null; DB.stores.forEach(st => offLocked('store', st)); DB.products.forEach(p => { if (p.store !== sk) offLocked('product', p); }); DB.ads.forEach(offLockedAd); }
-offLockedAll();
+function zeroOpened(o, prev, now) { Object.keys(now).forEach(k => { if (prev[k] && !now[k]) { const p = k.split('|'), b = o.btns && o.btns[p[0]]; if (b) b[p[1]] = false; } }); }
+/* 수정 화면에서 조작해 잠금이 풀린 칸은 바로 끈다(수정 화면 하나 단위로 직전 렌더와 비교. 취소하면 수정 전 값으로 돌아감) */
+let LOCKSES = null;
+function offUnlockedEdit() {
+  const kind = VIEW.name === 's-edit' ? 'store' : VIEW.name === 'p-edit' ? 'product' : null, o = kind ? (kind === 'store' ? S(VIEW.id) : P(VIEW.id)) : null;
+  if (!o) { LOCKSES = null; return; }
+  const now = lockState(kind, o); if (LOCKSES && LOCKSES.kind === kind && LOCKSES.id === VIEW.id) zeroOpened(o, LOCKSES.m, now);
+  LOCKSES = { kind, id: VIEW.id, m: now };
+}
+/* 스토어를 저장할 때 그 스토어 상품의 잠금이 풀린 칸도 꺼진 상태로 시작(스토어 노출 채널·지원언어로 잠겼던 열, 예약 설정을 다시 켠 예약 줄) */
+function reopenOff(kind, obj) { if (kind !== 'store' || !EDITSNAP || EDITSNAP.kind !== 'store' || EDITSNAP.id !== obj.id) return; const old = JSON.parse(EDITSNAP.json); /* 수정 전 스토어 값으로 잠시 바꿔 상품 잠금을 잰다 */
+  const oldS = S(obj.id), keep = Object.assign({}, oldS);
+  Object.keys(oldS).forEach(k => delete oldS[k]); Object.assign(oldS, old); const before = DB.products.filter(p => p.store === obj.id).map(p => lockState('product', p));
+  Object.keys(oldS).forEach(k => delete oldS[k]); Object.assign(oldS, keep);
+  DB.products.filter(p => p.store === obj.id).forEach((p, i) => zeroOpened(p, before[i], lockState('product', p))); }
 const BASE = JSON.stringify({ products: DB.products, stores: DB.stores, ads: DB.ads, collections: DB.collections, magazines: DB.magazines, influencers: DB.influencers, collTypes: DB.collTypes, columns: DB.columns });
 function applyBase() { const b = JSON.parse(BASE); Object.keys(b).forEach(k => { DB[k].length = 0; b[k].forEach(x => DB[k].push(x)); }); window.EDBUF = null; }
 function clearFilters() { Object.keys(FILTERS).forEach(k => { FILTERS[k].ch = CHF; FILTERS[k].rsn = '전체'; }); }
@@ -1279,7 +1287,7 @@ window.resetDB = function () { EDITSNAP = null; PAGESNAP = null; ADFULL = null; 
 
 /* ------------------------------- 렌더 ------------------------------- */
 function render() {
-  offLockedAll();
+  offUnlockedEdit();
   const map = { 'p-list': screen_pList, 'p-edit': screen_pEdit, 's-list': screen_sList, 's-edit': screen_sEdit, 'a-list': screen_aList, 'c-list': screen_cList, 'm-edit': screen_mEdit, 'col-list': screen_colList, 'col-edit': screen_colEdit, 'btn-spec': screen_btnSpec, 'h-edit': screen_hEdit };
   const isHost = VIEW.name === 'h-edit';
   document.body.classList.toggle('host', isHost);

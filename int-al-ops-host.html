@@ -260,7 +260,7 @@ td small{display:block;color:var(--tx3);font-size:11.5px;margin-top:3.5px}
 /* ===== 기본 상수 ===== */
 var TODAY='2026-10-07',NOWTS='2026-10-07 12:00';
 var CHS=['웹','알리페이 중국','알리페이 홍콩'];
-var CHOPT=[['전체','유입 채널 전체'],['웹','유입 채널 웹'],['알리페이','유입 채널 알리페이']];
+var CHOPT=[['전체','유입 채널 전체'],['웹','유입 채널 웹'],['알리페이 중국','유입 채널 알리페이 중국'],['알리페이 홍콩','유입 채널 알리페이 홍콩']];
 var PERIODS=['이번 주','지난주','1개월','3개월','전체'];
 var PRANGE={'이번 주':['2026-10-05','2026-10-11'],'지난주':['2026-09-28','2026-10-04'],'1개월':['2026-09-07','2026-10-07'],'3개월':['2026-07-07','2026-10-07'],'전체':['0000-00-00','9999-99-99']};
 /* 방문 숫자 [스토어 방문, 상품 방문] 기간 x 채널. 메신저 문의는 MSG 시드, 채팅 문의, 예약 확정(취소 제외), 방문 완료는 채팅내역·예약 목록에서 센다 */
@@ -456,9 +456,9 @@ function freshState(){
 var S;
 /* ===== 유틸 ===== */
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
-/* 화면에는 웹 / 알리페이 두 값만 보인다. 내부 시드는 웹 / 알리페이 중국 / 알리페이 홍콩 그대로 */
-function dch(c){return c==='웹'?'웹':'알리페이';}
-function chOk(c,f){return f==='전체'||(f==='웹'?c==='웹':c!=='웹');}
+/* 화면에도 채널 기록값 그대로 웹 / 알리페이 중국 / 알리페이 홍콩 셋을 보인다(통합 PRD v1.32) */
+function dch(c){return c;}
+function chOk(c,f){return f==='전체'||c===f;}
 function chB(c){return '<span class="chb new" title="유입 채널">'+dch(c)+'</span>';}
 function getP(path){var p=path.split('.'),o=S;for(var i=0;i<p.length;i++)o=o[p[i]];return o;}
 function setP(path,v){var p=path.split('.'),o=S;for(var i=0;i<p.length-1;i++)o=o[p[i]];o[p[p.length-1]]=v;}
@@ -530,7 +530,7 @@ function statsOf(chs){
 }
 function stats(){
  var d=S.dash;
- return statsOf(d.ch==='전체'?CHS:(d.ch==='웹'?['웹']:['알리페이 중국','알리페이 홍콩']));
+ return statsOf(d.ch==='전체'?CHS:[d.ch]);
 }
 function viewDash(){
  var d=S.dash,st=stats();
@@ -771,7 +771,6 @@ window.go=function(n){if(!VIEWS[n])return;S.view=n;if(['live','chatlog','consult
 window.resetDB=function(){freshDB();S=freshState();render();};
 Object.defineProperty(window,'VIEW',{get:function(){return S.view;}});
 window.setCh=function(v){
- if(v==='알리페이 중국'||v==='알리페이 홍콩')v='알리페이';
  if(S.view==='dash')return;
  var m={res:'res.ch',chatlog:'chatlog.ch',live:'live.ch',consult:'consult.ch',rev:'rev.ch'};
  setP(m[S.view],v);if(S[S.view].page!=null)S[S.view].page=1;render();

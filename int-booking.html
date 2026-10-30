@@ -68,7 +68,7 @@ function seedBookings(P){
  ['2026-10-18 15:00','2026-10-10 08:24','Kaitlyn Chan','캐나다','en','WhatsApp','예약','고객','상품',101,89000,'신규','웹','Please use a gentle product for sensitive skin.'],
  ['2026-10-18 14:00','2026-10-09 10:58','Evelyn Lee','캐나다','en','WhatsApp','예약','고객','스토어',null,null,'신규','웹',''],
  ['2026-10-17 11:00','2026-10-11 21:14','Rina Takeda','일본','ja','LINE','예약','고객','스토어',102,null,'신규','웹',''],
- ['2026-10-16 16:00','2026-10-08 09:40','Wang Siyu','중국','zh','WeChat','변경요청','고객','상품',107,null,'변경','알리페이',''],
+ ['2026-10-16 16:00','2026-10-08 09:40','Wang Siyu','중국','zh','WeChat','변경요청','고객','상품',107,null,'변경','알리페이 중국',''],
  ['2026-10-15 13:00','2026-10-07 13:05','Mia Tan','싱가포르','en','WhatsApp','예약','매장',null,108,null,'','웹','전화로 접수'],
  ['2026-10-12 10:00','2026-10-02 12:00','Claire Wald','미국','en','WhatsApp','예약','고객','상품',106,null,'방문결과','웹',''],
  ['2026-10-10 14:00','2026-10-01 18:24','Yuko Hamada','일본','ja','LINE','방문완료','고객','스토어',null,null,'','웹',''],
@@ -76,7 +76,7 @@ function seedBookings(P){
  ['2026-10-05 10:00','2026-09-30 15:20','Aigerim Nurlanova','카자흐스탄','en','KakaoTalk','미방문','고객','스토어',null,null,'','웹',''],
  ['2026-10-03 15:00','2026-09-25 05:14','Madison Piao','미국','en','WeChat','고객취소','고객','상품',101,92000,'','웹',''],
  ['2026-09-27 14:00','2026-09-24 02:56','Elina Petrova','러시아','en','WhatsApp','방문완료','매장',null,null,null,'','웹','현장 방문'],
- ['2026-09-20 11:00','2026-09-15 16:20','Chen Yuxuan','중국','zh','WeChat','방문완료','고객','상품',107,null,'','알리페이',''],
+ ['2026-09-20 11:00','2026-09-15 16:20','Chen Yuxuan','중국','zh','WeChat','방문완료','고객','상품',107,null,'','알리페이 중국',''],
  ['2026-09-12 12:00','2026-09-08 10:11','Chloe Tan','싱가포르','en','WhatsApp','매장취소','고객','상품',108,null,'','웹','']
  ];
  var out=[];A.forEach(function(a,i){out.push(mk(a,i));});out.slice().sort(function(x,y){return x.recv<y.recv?-1:1;}).forEach(function(b,k,arr){b.rno=rnoFor(b.recv,b.lang,arr.slice(0,k));});return out;
@@ -92,7 +92,7 @@ function seedCollections(){return [
  {id:3,name:'秋のおすすめ',lang:'ja',type:'추천상품',period:'2026-10-01 ~ 2026-11-30',items:[102,104]}
 ];}
 var DB,S;
-function freshDB(){var P=seedProducts();DB={store:seedStore(),prods:P,books:seedBookings(P),cols:seedCollections()};bookLockOff();}
+function freshDB(){var P=seedProducts();DB={store:seedStore(),prods:P,books:seedBookings(P),cols:seedCollections()};}
 function freshState(){return {surf:'HOST',mark:true,
  fo:{lang:'en',ch:'web',screen:'store',entry:'store',pid:null,sel:'',date:TODAY,time:'',err:null,lastNo:null,myNo:null,tab:'upcoming'},
  host:{ich:'',view:'dash',dtab:'전체',st:'',kind:'',owner:'',q:'',qd:'',ptab:'전체',open:null,editPid:null,man:{date:'',time:'',name:'',lang:'',pid:''},statPer:'전체'},
@@ -137,7 +137,7 @@ function foSubmit(){
  var pid=f.entry==='product'?f.pid:(f.sel?+f.sel:null);
  if(pid){var j=judgeBookable(prodById(pid),f.lang,f.ch);if(!j.ok){if(f.entry==='product')f.err={kind:'prodGone'};else{f.err={kind:'pickAgain'};f.sel='';}return;}}
  var p=pid?prodById(pid):null,no=DB.books.length+1;
- DB.books.push({no:no,visit:f.date+' '+f.time,recv:NOWTS,name:f.ch==='ali'?'Wang Siyu':ME,nation:f.ch==='ali'?'중국':'캐나다',lang:f.lang,contact:f.msg||'WhatsApp',mid:f.mid||(f.ch==='ali'?'13800000099':'4165550199'),status:'예약',owner:'고객',route:f.entry==='product'?'상품':'스토어',prodId:pid,snap:p?snapOf(p):null,need:'신규',ch:f.ch==='web'?'웹':'알리페이',req:'',phone:f.ch==='ali'?'+86 13800000099':'+1 4165550199',rno:rnoFor(NOWTS,f.lang,DB.books)});
+ DB.books.push({no:no,visit:f.date+' '+f.time,recv:NOWTS,name:f.ch==='ali'?'Wang Siyu':ME,nation:f.ch==='ali'?'중국':'캐나다',lang:f.lang,contact:f.msg||'WhatsApp',mid:f.mid||(f.ch==='ali'?'13800000099':'4165550199'),status:'예약',owner:'고객',route:f.entry==='product'?'상품':'스토어',prodId:pid,snap:p?snapOf(p):null,need:'신규',ch:f.ch==='web'?'웹':'알리페이 중국' /* 유입 채널 = 채널 기록값(통합 PRD v1.32). 시안의 알리페이 회원 Wang Siyu는 알리페이 중국 월렛 */,req:'',phone:f.ch==='ali'?'+86 13800000099':'+1 4165550199',rno:rnoFor(NOWTS,f.lang,DB.books)});
  f.lastNo=no;f.screen='done';f.time='';f.agree=false; /* 다음 예약은 동의 체크 없이 시작(라이브 정보 입력 화면은 처음에 미체크) */
 }
 function manSave(){
@@ -150,11 +150,11 @@ function manSave(){
  S.host.man={date:'',time:'',name:'',lang:'',pid:''};S.host.view='res';S.host.open=no;
  return '';
 }
-function bookOff(){DB.store.bookingSetting=false;bookReset();}
-/* 통합 PRD v1.31 결정 1(2026-10-30): 예약 설정이 꺼지면 스토어 예약 버튼·상품 예약 버튼은 꺼짐으로 잠기고, 다시 켜면 둘 다 꺼진 상태로 시작(꺼지기 전 값으로 돌아오지 않음) */
+function bookOff(){DB.store.bookingSetting=false;} /* 통합 PRD v1.32 결정 1: 끌 때는 값을 지우지 않고 잠그기만(저장된 값을 흐리게) */
+/* 통합 PRD v1.32 결정 1(2026-10-30): 예약 설정을 다시 켜면 스토어 예약 버튼·상품 예약 버튼 둘 다 꺼진 상태로 시작(꺼지기 전 값으로 돌아오지 않음) */
 function bookReset(){DB.store.btn.web=false;DB.store.btn.ali=false;DB.prods.forEach(function(p){p.book.web=false;p.book.ali=false;});}
-/* 노출 채널·대상 외 언어로 잠긴 예약 칸도 꺼짐(1부 7장, 기본값 15) */
-function bookLockOff(){DB.prods.forEach(function(p){if(p.exposeCh==='web'||['zh','en'].indexOf(p.lang)<0)p.book.ali=false;if(p.exposeCh==='ali')p.book.web=false;});}
+/* 노출 채널·대상 외 언어로 잠긴 예약 칸: 잠긴 동안 저장값 유지, 잠금이 풀리는 순간 꺼짐(1부 7장, 기본값 15) */
+function bookLk(p){return {web:p.exposeCh==='ali',ali:p.exposeCh==='web'||['zh','en'].indexOf(p.lang)<0};}
 
 /* ===== 렌더 ===== */
 function swHTML(){
@@ -177,7 +177,7 @@ function render(){
 window.PB={
  get DB(){return DB;},get S(){return S;},TODAY:TODAY,NOWTS:NOWTS,LANGS:LANGS,TIMES:TIMES,ME:ME,
  /* 기존 문의 표본(BO 스토어 문의 통계 · HOST 대시보드 공용): [문의구분, 언어, 채널, 접수일, 유입 채널, 접수 시각] */
- SINQ_BASE:[['스토어','en','메신저상담','2026-10-03','웹','11:40'],['상품','en','메신저상담','2026-10-05','웹','15:12'],['상품','ja','메신저상담','2026-10-06','웹','10:05'],['스토어','zh','채팅문의','2026-10-08','알리페이','13:31'],['상품','en','상담문의','2026-10-09','알리페이','16:48'],['상품','en','메신저상담','2026-10-11','웹','09:27'],['스토어','ja','메신저상담','2026-10-12','웹','10:16']],
+ SINQ_BASE:[['스토어','en','메신저상담','2026-10-03','웹','11:40'],['상품','en','메신저상담','2026-10-05','웹','15:12'],['상품','ja','메신저상담','2026-10-06','웹','10:05'],['스토어','zh','채팅문의','2026-10-08','알리페이 중국','13:31'],['상품','en','상담문의','2026-10-09','알리페이 홍콩','16:48'],['상품','en','메신저상담','2026-10-11','웹','09:27'],['스토어','ja','메신저상담','2026-10-12','웹','10:16']],
  addDays:addDays,wdKo:wdKo,won:won,prodById:prodById,prodVisible:prodVisible,prodBookBtn:prodBookBtn,storeBookBtn:storeBookBtn,judgeBookable:judgeBookable,
  foOptions:foOptions,manualOptions:manualOptions,bookingKind:bookingKind,prodBookCount:prodBookCount,slotOpen:slotOpen,needList:needList,
  foSubmit:foSubmit,manSave:manSave,bookOff:bookOff,render:render,
@@ -192,10 +192,10 @@ window.foOpenStore=function(lang,ch){S.surf='FO';if(lang)S.fo.lang=lang;if(ch)S.
 window.foOpenProduct=function(id,lang,ch){S.surf='FO';if(lang)S.fo.lang=lang;if(ch)S.fo.ch=ch;S.fo.pid=id;S.fo.screen='product';S.fo.err=null;render();};
 /* 예약하기 URL 진입(PRD 5.2): 스토어 예약 URL = 스토어 진입(유입경로 스토어), 상품 예약 URL = 상품 고정(유입경로 상품). 스토어 페이지 · 상품 상세를 거치지 않고 예약 화면이 바로 열림 */
 window.foOpenUrl=function(kind,pid,lang,ch){S.surf='FO';if(lang)S.fo.lang=lang;if(ch)S.fo.ch=ch;var f=S.fo;f.err=null;f.accTop={};f.sel='';f.time='';f.date=TODAY;f.cat='All';f.showN=5;f.acc={};f.back=null;f.entry=kind==='product'?'product':'store';if(kind==='product')f.pid=+pid;f.viaUrl=true;f.screen='book';render();};
-window.setProd=function(id,patch){var p=prodById(id);Object.keys(patch).forEach(function(k){if(k==='book')Object.assign(p.book,patch.book);else p[k]=patch[k];});bookLockOff();render();};
+window.setProd=function(id,patch){var p=prodById(id),b=bookLk(p);Object.keys(patch).forEach(function(k){if(k==='book')Object.assign(p.book,patch.book);else p[k]=patch[k];});var a=bookLk(p);if(b.web&&!a.web)p.book.web=false;if(b.ali&&!a.ali)p.book.ali=false;render();};
 /* 상품이 많은 매장 보기용: 예약 가능한 영어 상품 n개 추가 (id 201~) */
 window.addDemoProducts=function(n){var subs=['보톡스','스킨부스터','리프팅','여드름/흉터','색소/점/문신'],names=['Glow Facial','Aqua Peel','Jawline Botox','Rejuran Healer','Ultherapy 300','Thermage FLX','Pico Toning','Acne Scar Laser','Chin Filler','Neck Lift','Exosome Care','LDM Hydration'];for(var i=0;i<n;i++){var id=201+i;DB.prods.push({id:id,lang:'en',name:'Abijou '+names[i%names.length],price:50000+i*10000,status:'approved',active:true,hidden:false,deleted:false,mode:'기본',book:{web:true,ali:false},exposeCh:null,cat:'피부과',sub:subs[i%subs.length],reg:'2026-09-0'+(1+i%9)+' 10:00',chat:1,cons:0,rev:0,views:100,inner:20,direct:5,bclk:0});}render();};
-window.setStore=function(patch){var was=DB.store.bookingSetting;Object.keys(patch).forEach(function(k){if(k==='btn')Object.assign(DB.store.btn,patch.btn);else DB.store[k]=patch[k];});if('bookingSetting' in patch&&!!patch.bookingSetting!==!!was&&!patch.btn)bookReset();render();};
+window.setStore=function(patch){var was=DB.store.bookingSetting;Object.keys(patch).forEach(function(k){if(k==='btn')Object.assign(DB.store.btn,patch.btn);else DB.store[k]=patch[k];});if('bookingSetting' in patch&&patch.bookingSetting&&!was&&!patch.btn)bookReset();render();};
 window.openHostBooking=function(no){S.surf='HOST';S.host.view='res';S.host.open=no;render();};
 window.openBoBooking=function(no){S.surf='BO';S.bo.view='res';S.bo.open=no;render();};
 Object.defineProperty(window,'VIEW',{get:function(){return S.surf+':'+(S.surf==='HOST'?S.host.view:S.surf==='BO'?S.bo.view:S.fo.screen);}});
