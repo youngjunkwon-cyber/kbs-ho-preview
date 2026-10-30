@@ -1909,7 +1909,7 @@ function judgeGoogle(db,sub){
 }
 function judgeConnect(db,memberId,sub){return db.members.find(m=>m.googleSub===sub&&m.status!=='deleted'&&m.id!==memberId)?{result:'taken'}:{result:'link'}}
 function judgeEmailCheck(db,email,purpose){
- const m=db.members.find(x=>x.status!=='deleted'&&norm(x.email)===norm(email));
+ const m=db.members.find(x=>x.status!=='deleted'&&x.via!=='alipay'&&norm(x.email)===norm(email));
  if(purpose==='signup'){if(!m)return{result:'send'};if(m.googleSub)return{result:'google'};return{result:'dup'}}
  if(!m)return{result:'none'};return{result:'send'};
 }
@@ -1960,7 +1960,7 @@ function googleDone(sub){
  if(j.result==='error'){VIEW.page=backOf();toast('Login failed. Please try again.');render();return}
 }
 function emailLogin(){const e=val('le'),p=val('lp');VIEW.form.email=e;VIEW.form.pw=p;VIEW.err={};
- const m=DB.members.find(x=>live(x)&&norm(x.email)===norm(e));
+ const m=DB.members.find(x=>live(x)&&x.via!=='alipay'&&norm(x.email)===norm(e));
  if(m&&m.googleSub&&!m.password){VIEW.err.login='This account uses Google login. Please log in with Google.';render();return}
  if(!m||m.password!==p){VIEW.err.login='Email or password is incorrect.';render();return}
  DB.remembered=VIEW.form.rem?m.email:null;afterLogin(m)}
@@ -2064,8 +2064,8 @@ P.signup=()=>{R().innerHTML=envBar()+tpl('t_signup');header();const F=VIEW.form;
  const upd=()=>{const okE=F.gv||(F.codeVerified&&!pwError(F.pw||'')&&F.pw===F.pw2);sb.disabled=!(okE&&(F.nick||'').trim()&&F.ag.svc&&F.ag.pp)};upd();
  on(sb,()=>{if(sb.disabled)return;const v=val('snk');const e=/\s/.test(v)?'Spaces are not allowed.':DB.members.some(x=>x.status!=='deleted'&&x.via!=='alipay'&&x.nickname.toLowerCase()===v.toLowerCase())?'This nickname is already in use.':null;if(e){VIEW.err.nick=e;F.nick=v;render();return}
   const gv=F.gv,emailV=gv?gv.email:norm(F.e);
-  if(gv){const dupG=DB.members.some(x=>x.status!=='deleted'&&x.googleSub===gv.sub),dupE=DB.members.some(x=>x.status!=='deleted'&&norm(x.email)===emailV);if(dupG||dupE){F.nick=v;F.gv=null;VIEW.err.e=dupE?'This email is already registered.':'This Google account is already linked to another K-Beauty Station account.';render();return}}
-  else if(DB.members.some(x=>x.status!=='deleted'&&norm(x.email)===emailV)){F.nick=v;VIEW.err.e='This email is already registered.';render();return}
+  if(gv){const dupG=DB.members.some(x=>x.status!=='deleted'&&x.googleSub===gv.sub),dupE=DB.members.some(x=>x.status!=='deleted'&&x.via!=='alipay'&&norm(x.email)===emailV);if(dupG||dupE){F.nick=v;F.gv=null;VIEW.err.e=dupE?'This email is already registered.':'This Google account is already linked to another K-Beauty Station account.';render();return}}
+  else if(DB.members.some(x=>x.status!=='deleted'&&x.via!=='alipay'&&norm(x.email)===emailV)){F.nick=v;VIEW.err.e='This email is already registered.';render();return}
   const m={id:++DB.seq,email:emailV,nickname:v,joined:'2026. 10. 27',lang:DB.lang,verified:true,password:gv?null:F.pw,googleSub:gv?gv.sub:null,gEmail:gv?gv.email:null,googleAt:gv?stamp():null,status:'active',via:gv?'google':'email',marketing:!!F.ag.mk,linkNoticeShown:true,termsAt:new Date().toLocaleString('ko-KR')};DB.members.push(m);VIEW.form={};afterLogin(m,'Sign up successful.')});
  if(VIEW.err.nick)nk.closest('label').appendChild(el(`<p class="index-module-scss-module__X-Toyq__formError gl-new" style="margin:4px 0 0">${esc(VIEW.err.nick)}</p>`));
  if(VIEW.err.e){ie.setAttribute('aria-invalid','true');ie.style.borderColor='#EB003B';const em=el(`<p class="index-module-scss-module__X-Toyq__formError gl-new" style="margin:4px 0 0">${esc(VIEW.err.e)}</p>`);const gvb=flow.querySelector('.gl-new');if(gvb)flow.insertBefore(em,gvb);else flow.appendChild(em);if(VIEW.err.g){const gb=el(`<div class="gl-new" style="margin-top:8px">${gbtn()}${AGREE}</div>`);flow.appendChild(gb);on(gb.querySelector('[data-k=gstart]'),()=>startGoogle('login'));hookAgree(gb)}}};
