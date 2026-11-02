@@ -1909,7 +1909,7 @@ const norm=e=>(e||'').trim().toLowerCase();
 const me=()=>DB.members.find(m=>m.id===DB.session);
 const live=m=>m&&m.status!=='deleted';
 const gAcc=sub=>DB.google.find(g=>g.sub===sub);
-const trusted=g=>/@gmail\.com$/i.test(g.email);
+const isGmail=g=>/@(gmail|googlemail)\.com$/i.test(g.email);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const MON=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const WD=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
@@ -1926,7 +1926,7 @@ function judgeGoogle(db,sub){
  if(!same)return{result:'signup'};
  if(same.verified===false)return{result:'unverified-member',member:same};
  if(same.googleSub)return{result:'signup-blocked',member:same};
- return trusted(g)?{result:'autolink',member:same}:{result:'pwlink',member:same};
+ return isGmail(g)?{result:'autolink',member:same}:{result:'pwlink',member:same};
 }
 function judgeConnect(db,memberId,sub){return db.members.find(m=>m.googleSub===sub&&m.status!=='deleted'&&m.id!==memberId)?{result:'taken'}:{result:'link'}}
 function judgeEmailCheck(db,email,purpose){
@@ -1967,7 +1967,7 @@ function googlePick(sub){
 function googleDone(sub){
  const g=gAcc(sub);
  if(VIEW.gFor==='verify'){const j=judgeGoogle(DB,sub);VIEW.err={};
-  if(j.result==='signup'&&!trusted(g)){VIEW.page='signup';toast("This email can\'t be verified with Google. Please use Get Verification Code.");render();return}
+  if(j.result==='signup'&&!isGmail(g)){VIEW.page='signup';toast("This email can\'t be verified with Google. Please use Get Verification Code.");render();return}
   if(j.result==='signup'){VIEW.page='signup';VIEW.form.gv={sub,email:g.email.toLowerCase()};VIEW.form.e=g.email.toLowerCase();VIEW.form.codeSent=false;VIEW.form.codeVerified=false;VIEW.form.codeErr=null;if(!(VIEW.form.nick||'').trim())VIEW.form.nick=nickFor();render();return}
   VIEW.form.gv=null;if(j.result==='login'||j.result==='autolink')VIEW.form={}}
  if(VIEW.gFor==='connect'){const m=me();VIEW.page='account';if(g.emailVerified===false)toast('Login failed. Please try again.');else if(judgeConnect(DB,m.id,sub).result==='taken')toast('This Google account is already linked to another K-Beauty Station account.');else if(m.googleSub===sub){}else{m.googleSub=sub;m.gEmail=g.email.toLowerCase();m.googleAt=stamp();m.linkNoticeShown=true;toast('Your Google account is now linked.')}render();return}
