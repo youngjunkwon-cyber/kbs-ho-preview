@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>알리페이 채널 분기 시안 검수 (v3.15)</title>
+<title>알리페이 채널 분기 시안 검수 (v3.16)</title>
 <style>
 *{box-sizing:border-box}
 html,body{height:100%}
@@ -241,15 +241,9 @@ dialog textarea{width:100%;height:320px;font-family:ui-monospace,Menlo,monospace
 <div class="introOv alOv" id="alOv" hidden><div class="ioIn">
 <div class="ioHd"><b>알리페이 확인 사항</b><span class="sp"></span><button class="btn" id="alCopy">메일 본문 복사</button><button class="btn" id="alClose">닫고 시안 보기</button></div>
 <div class="ioPrem alNote">알리페이 기술 담당에게 서면으로 확인받는 항목입니다. 알리페이 문서가 중국 월렛과 홍콩 월렛을 따로 안내해서 한쪽에만 해당하는 항목은 앞에 월렛을 적었습니다. 2026년 10월 28일 회신과 지난 회신, 알리페이 개발자 문서, 알리페이 콘솔로 이미 답을 받은 것과 우리가 직접 할 일은 아래에 따로 적었습니다.</div>
-<div class="ioF alSec"><div class="ioT">답을 기다리는 것</div>
-<div class="alGrp" data-grp="중국 월렛"><div class="alGh">중국 월렛</div>
-<ol class="alList" start="1">
-<li><b>호출 권한 개통</b><span class="alTag">관문 오픈 차단. 진입 관문을 열기 전에 답이 필요합니다</span>
-<p>알리페이 중국 사용자 인증 안내에 getAuthCode와 getSiteInfo 호출 권한은 솔루션 아키텍트에게 요청하도록 되어 있습니다. 미니프로그램 韩美站(ID 2102020206420316)에 이 권한을 열어 주세요. 홍콩 안내에는 이 단계가 없습니다. 권한이 열린 뒤 진입 관문을 켭니다.</p></li>
-</ol></div>
-</div>
 <div class="ioF alSec"><div class="ioT">이미 답을 받은 것</div>
 <table class="alTbl"><thead><tr><th>항목</th><th>답</th><th>근거</th></tr></thead><tbody>
+<tr><td>중국 월렛: getAuthCode·getSiteInfo 호출에 솔루션 아키텍트의 승인이 필요한지</td><td>별도 심사가 없고 승인 없이 호출할 수 있습니다. 가이드의 "솔루션 아키텍트에게 문의" 문구는 오해였습니다. 사용 주의사항·가이드는 따로 공유받습니다.</td><td>2026년 11월 2일 사공명 부장 회신</td></tr>
 <tr><td>진입 때 필수 항목 동의를 받고 이어서 계정 권한(getAuthCode)을 요청하는 구조가 "미니프로그램을 열 때 권한 허용을 유도하지 말 것" 지침에 어긋나는지, 그리고 심사 기간</td><td>플랫폼 자체의 별도 심사 요건은 없고, 같은 구조가 다른 미니프로그램에도 있어 심사에 문제가 없을 것이라는 회신입니다. 중국은 정보 수집·동의 절차의 보완 요청이 올 수 있으며 그때 알리페이 중국과 협의합니다. 심사 기간은 홍콩 최소 영업일 3일(2단계 심사, 첫 출시는 담당자 테스트가 있어 1주 이상), 중국 영업일 2일입니다.</td><td>2026년 10월 28일 알리페이 회신</td></tr>
 <tr><td>홍콩 월렛: 테스트 계정을 받을 수 있는지</td><td>받을 수 있습니다. 사용 예정일 약 1주 전에 신청하고, 한 번 받으면 약 3일 쓸 수 있습니다. 홍콩 월렛에서 확인할 항목을 미리 정해 일정에 맞춰 신청합니다.</td><td>2026년 10월 28일 알리페이 회신</td></tr>
 <tr><td>홍콩 월렛: 검색 키워드 등록 절차와 의료 관련 단어 가능 여부</td><td>콘솔 Keywords 칸에 넣는 것만으로는 반영되지 않고 홍콩 월렛에 따로 신청해 심사를 받습니다(신청은 알리페이 담당자가 지원). 한 번에 5개 정도를 권장하고 최대 30개입니다. 의료 키워드를 금지하는 규정은 없으나 실제 서비스 범위와 의료기관 허가 범위를 넘으면 안 되고, "韓國醫美"처럼 범위가 넓은 표현은 통과하지 않을 수 있습니다. 미니프로그램 이름에도 같은 규칙이 적용됩니다. 키워드는 출시 준비 때 정해 신청합니다.</td><td>2026년 10월 28일 알리페이 회신</td></tr>
@@ -267,7 +261,7 @@ dialog textarea{width:100%;height:320px;font-family:ui-monospace,Menlo,monospace
 <li><b>가맹점 공개 키 등록</b><p>콘솔의 개발 설정(Development Configuration)에 가맹점 공개 키를 등록합니다. 지금은 미등록입니다.</p></li>
 <li><b>중국 월렛 API 호출 위임</b><p>콘솔 상태가 "Authorization Required"입니다. 같은 계정으로 알리페이 중국에 로그인해 승인합니다.</p></li>
 </ol></div>
-<div class="ioLog">자세한 처리 기준은 PRD v3.15 16장에 있습니다.</div>
+<div class="ioLog">자세한 처리 기준은 PRD v3.16 16장에 있습니다.</div>
 </div></div>
 
 <div class="pinLayer" id="pinLayer"></div>
