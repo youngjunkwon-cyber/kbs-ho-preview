@@ -1995,7 +1995,7 @@ function sendCode(purpose){const e=val(purpose==='signup'?'se':'fe');VIEW.form.e
  if(j.result==='google')VIEW.err.e=purpose==='signup'?'This email is registered with Google. Please log in with Google.':'This account uses Google login. Please log in with Google.';
  else if(j.result==='dup')VIEW.err.e='This email is already registered.';
  else if(j.result==='none')VIEW.err.e='Unregistered email';
- else{if(purpose==='signup'){VIEW.form.codeSent=true;VIEW.form.codeVerified=false;VIEW.form.code='';VIEW.form.codeErr=null}toast('Verification code has been sent.')}render()}
+ else{if(purpose==='signup'){VIEW.form.codeSent=true;VIEW.form.codeVerified=false;VIEW.form.code='';VIEW.form.codeErr=null;toast('Verification code has been sent.')}else{VIEW.fp={email:norm(e)};VIEW.alert={t:'Verification code has been sent.',go:'verify'}}}render()}
 function pwError(a){return !a?'Please enter your password.':a.length<8?'Password must be at least 8 characters.':a.length>20?'Password must be at most 20 characters.':!/[A-Z]/.test(a)?'Please include an uppercase letter.':!/[a-z]/.test(a)?'Please include a lowercase letter.':!/\d/.test(a)?'Please include a number.':!/[^A-Za-z0-9\s]/.test(a)?'Please include a special character.':/\s/.test(a)?'Spaces are not allowed.':null}
 function setPw(){const a=val('np'),b=val('cp');VIEW.err={};
  const pe=pwError(a);if(pe){VIEW.err.np=pe;render();return}if(a!==b){VIEW.err.cp='Passwords do not match.';render();return}
@@ -2127,7 +2127,17 @@ P.google=()=>{const bar=`<div class="gbar"><button data-k="gx">✕</button>accou
 P.spin=()=>{R().innerHTML='<div class="gpage"><div class="spin"><i></i>accounts.google.com</div></div>'};
 P.external=()=>{R().innerHTML=`<div class="inapp"><b>${({line:'LINE',kakao:'KakaoTalk','ig-ios':'Instagram','ig-android':'Instagram',fb:'Facebook','fb-android':'Facebook'})[DB.envFrom]||'KakaoTalk'}</b>&nbsp;k-beautystation.com</div><div class="spin"><i></i>Opening in your browser</div>`};
 
-function render(){(P[VIEW.page]||P.home)();pwModal();if(VIEW.toast)R().insertAdjacentHTML('beforeend',`<div class="BookingSurveySuccessToast-module-scss-module__xUKt_a__toast"><div class="BookingSurveySuccessToast-module-scss-module__xUKt_a__message"><strong>${esc(VIEW.toast)}</strong></div></div>`);
+
+/* 비밀번호 찾기 뒷부분 (STG 흐름 그대로: 코드 확인 → 새 비밀번호 → "Password reset." 알림 → 로그인) */
+function alertModal(){if(!VIEW.alert)return;R().insertAdjacentHTML('beforeend',modal(esc(VIEW.alert.t),`<div class="gl-mbody"><div class="gl-mbtns">${btn('OK','alok')}</div></div>`));const fin=()=>{const a=VIEW.alert;VIEW.alert=null;if(a.fn)a.fn();else if(a.go)go(a.go);else render()};R().querySelectorAll('[data-k=mclose]').forEach(b=>on(b,fin));on($('[data-k=alok]'),fin)}
+function keepModal(){if(VIEW.modal!=='keepg'||!VIEW.keep)return;const k=VIEW.keep;R().insertAdjacentHTML('beforeend',modal('Keep Google connected?',`<div class="gl-mbody"><p class="gl-mdesc">Your password has been changed. The Google account ${esc(k.email)} is connected to this account. If you don't recognize it, disconnect it.</p><div class="gl-mbtns">${btn('Disconnect','kdisc','outline')}${btn('Keep','kkeep')}</div></div>`));const keep=()=>{VIEW.keep=null;go('login')};R().querySelectorAll('[data-k=mclose]').forEach(b=>on(b,keep));on($('[data-k=kkeep]'),keep);on($('[data-k=kdisc]'),()=>{const m=DB.members.find(x=>x.id===k.id);if(m){m.googleSub=null;m.gEmail=null;m.googleAt=null}VIEW.keep=null;go('login')})}
+function fpPage(title,fields,btnText,onSubmit){R().innerHTML=envBar()+tpl('t_forgot');header();const h=$('h1');if(h)h.textContent=title;const form=$('form');if(form){form.innerHTML=fields;form.classList.add('gl-new')}const b=$('[class*="F9n-4q__page__footer"] button');if(b){b.textContent=btnText;on(b,onSubmit)}}
+P.verify=()=>fpPage('Verify Code',field('Verification Code','vc','text','',null),'Verification Successful',()=>{const v=val('vc').trim();if(!v){VIEW.alert={t:'Please enter the verification code.'};render();return}if(v!=='123456'){VIEW.alert={t:'Verification failed. Please try again.'};render();return}VIEW.alert={t:'Verification successful.',go:'reset'};render()});
+P.reset=()=>fpPage('Reset Password',field('Password','rp1','password','',VIEW.err.rp1)+field('Confirm Password','rp2','password','',VIEW.err.rp2),'Reset Password',()=>{const a=val('rp1'),b=val('rp2');VIEW.err={};const e1=pwError(a);if(e1){VIEW.err.rp1=e1;render();return}if(a!==b){VIEW.err.rp2='Passwords do not match.';render();return}
+ const m=DB.members.find(x=>x.status!=='deleted'&&x.via!=='alipay'&&norm(x.email)===(VIEW.fp&&VIEW.fp.email));if(!m){go('login');return}m.password=a;DB.othersLoggedOut=(DB.othersLoggedOut||0)+1;
+ const ge=m.googleSub?(m.gEmail||(gAcc(m.googleSub)||{}).email||''):'';
+ VIEW.alert={t:'Password reset.',fn:()=>{if(ge&&!/@(gmail|googlemail)\.com$/i.test(ge)){VIEW.keep={id:m.id,email:ge.toLowerCase()};VIEW.modal='keepg';render()}else go('login')}};render()});
+function render(){(P[VIEW.page]||P.home)();pwModal();keepModal();alertModal();if(VIEW.toast)R().insertAdjacentHTML('beforeend',`<div class="BookingSurveySuccessToast-module-scss-module__xUKt_a__toast"><div class="BookingSurveySuccessToast-module-scss-module__xUKt_a__message"><strong>${esc(VIEW.toast)}</strong></div></div>`);
  try{parent.postMessage({type:'gl-render',page:VIEW.page},'*')}catch(e){}}
 window.addEventListener('DOMContentLoaded',()=>{R().addEventListener('click',e=>{const a=e.target.closest('a');if(a)e.preventDefault()});render()});
 </script></body></html>
