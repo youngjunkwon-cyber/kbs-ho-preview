@@ -2935,8 +2935,9 @@ function pageFit() {
     if ($('.ant-pagination-jump-next', pg) || $$('.ant-pagination-item', pg).length > 1) return;
     var nx = $('.ant-pagination-next', pg); if (nx) { nx.classList.add('ant-pagination-disabled'); nx.setAttribute('aria-disabled', 'true'); var bt = $('button', nx); if (bt) bt.disabled = true; }
     var tbl = pg.closest('.ant-table-wrapper') || pg.parentElement; var n = tbl ? $$('tbody tr.ant-table-row', tbl).length : 0;
-    var lab = $$('.ant-pagination-options *', pg).filter(function (e) { return !e.children.length && /^\d+ \/ 페이지$/.test(e.textContent.trim()); })[0];
-    if (lab && n) { var cur = parseInt(lab.textContent, 10), want = [10, 20, 50, 100].filter(function (k) { return k >= n; })[0] || 100; if (cur < n) { lab.textContent = want + ' / 페이지'; var tt = lab.closest('[title]'); if (tt) tt.setAttribute('title', want + ' / 페이지'); } }
+    /* 페이지 크기 글자: 셀렉트 안 글자 노드(옆에 input 이 붙어 있어 자식 없는 요소로는 찾지 못함) */
+    var labN = null; $$('.ant-pagination-options *', pg).some(function (e) { return Array.prototype.slice.call(e.childNodes).some(function (c) { if (c.nodeType === 3 && /^\d+ \/ 페이지$/.test(c.textContent.trim())) { labN = c; return true; } return false; }); });
+    if (labN && n) { var cur = parseInt(labN.textContent, 10), want = [10, 20, 50, 100].filter(function (k) { return k >= n; })[0] || 100; if (cur < n) { labN.textContent = want + ' / 페이지'; var tt = labN.parentElement.closest('[title]'); if (tt) tt.setAttribute('title', want + ' / 페이지'); } }
   });
 }
 /* 렌더 진입점: 화면별 draw 를 감싸 스크롤·표시 상태를 처리 */
@@ -2963,7 +2964,9 @@ function fillDrawer(pre, b, qrCls) {
   $('h3', ps).textContent = '예약 상품'; ps.setAttribute('data-test', 'prod-block'); var box = $('[class*=readonlyBox]', ps); box.classList.add('pb-prodbox');
   if (!b.snap) { ps.setAttribute('data-kind', 'consult'); box.textContent = '스토어 예약'; }
   else { var lp = PB.prodById(b.prodId), live = lp && PB.prodVisible(lp, b.snap.lang);
-    box.innerHTML = '<span class="pb-prodbox-t"><b>' + esc(b.snap.name) + '</b><span>' + PB.won(b.snap.price) + '원</span></span>' + (live ? '<a class="pb-prod-l" href="#" onclick="event.preventDefault();toast(\'시안에서는 동작하지 않습니다\')">상품 보기</a>' : ''); }
+    box.innerHTML = '<span class="pb-prodbox-t"><b>' + esc(b.snap.name) + '</b><span>' + PB.won(b.snap.price) + '원</span></span>' + (live ? '<a class="pb-prod-l" href="#" data-test="prod-view">상품 보기</a>' : '');
+    /* 상품 보기 = 그 상품을 예약한 언어로 고객 화면 상품 상세(시안 안에서 고객 화면으로 넘어감) */
+    var lk = $('.pb-prod-l', box); if (lk) lk.onclick = function (e) { e.preventDefault(); e.stopPropagation(); PB.S.fo.back = null; parent.foOpenProduct(b.prodId, b.snap.lang); }; }
   (cr || $('h2', cont)).after(mark(ps));
   var qr = b.contact === 'WeChat' || b.contact === 'LINE';
   var V = { '매장': PB.DB.store.name, '여권명': b.name, '국적': b.nation, '언어': langLabel(b.lang), '전화번호': b.phone, '예약 번호': b.rno, '접수 시각': b.recv, '등록 방식': b.owner,
@@ -2980,7 +2983,7 @@ function fillDrawer(pre, b, qrCls) {
     } else if (k in V) dd.textContent = V[k];
     r.setAttribute('data-k', k);
   });
-  /* 유입경로는 BO 상세에만(PRD v1.9 2부 5.8: HOST에는 보이지 않음) */
+  /* 유입경로는 BO 상세에만(선행 PRD v1.3 5.8: HOST에는 보이지 않음) */
   if (bo) { var last = $$('[class*=detailRow]', dl).pop(), rr = last.cloneNode(true); $('dt', rr).textContent = '유입경로'; $('dd', rr).textContent = b.route || '-'; rr.setAttribute('data-k', '유입경로'); dl.appendChild(mark(rr)); }
   $$('section', cont).forEach(function (s) {
     var h = $('h3', s).textContent.trim();
@@ -3014,11 +3017,17 @@ function timeModal(pre, b, dt) {
   var t = tpl(pre === 'bd' ? 'bm_시간변경' : 'hm_시간변경'), root = t.firstElementChild; document.getElementById('app').appendChild(root);
   var ob = $('[class*=originalBooking]', root); $('strong', ob).textContent = b.visit.slice(0, 10) + ' (' + PB.wdKo(b.visit.slice(0, 10)) + ') ' + b.visit.slice(11);
   var pr = ob.cloneNode(true), pv = b.snap ? b.snap.name : '스토어 예약'; $('span', pr).textContent = '예약 상품'; $('span', pr).classList.add('pb-mlab'); $('strong', pr).textContent = pv; $('strong', pr).title = pv; $('strong', pr).classList.add('pb-mval'); pr.setAttribute('data-test', 'modal-prod'); ob.after(mark(pr));
-  var di = $('input#bookingDate', root); if (di) di.value = b.visit.slice(0, 10);
-  var tv = $('[class*=ant-select-content]', root) || $('.ant-select-selection-item', root); if (tv && tv.firstChild && tv.firstChild.nodeType === 3) tv.firstChild.textContent = b.visit.slice(11);
+  /* 새 날짜 · 새 시간: 칸을 누르면 고르는 목록. 다음 = 바로 바꾼다(시안은 확인 단계 생략). 매장 · 운영자가 바꾸는 예약은 나이 판정 없음(PRD 5.13) */
+  var nv = { date: b.visit.slice(0, 10), time: b.visit.slice(11) };
+  var di = $('input#bookingDate', root), dp = di && di.closest('.ant-picker'), ts = $('.ant-select', root);
+  var tv = $('[class*=ant-select-content]', root) || $('.ant-select-selection-item', root);
+  var paint = function () { if (di) { di.value = nv.date; di.readOnly = true; } if (tv && tv.firstChild && tv.firstChild.nodeType === 3) tv.firstChild.textContent = nv.time || ''; if (tv) tv.title = nv.time || ''; };
+  paint();
+  if (dp) { dp.setAttribute('data-test', 'tm-date'); dp.onclick = function (e) { e.preventDefault(); var o = []; for (var i = 0; i <= 30; i++) { var d = PB.addDays(PB.TODAY, i); o.push([d, d + ' (' + PB.wdKo(d) + ')']); } dropdown(dp, o, nv.date, function (v) { nv.date = v; paint(); }, ACC); }; }
+  if (ts) { ts.setAttribute('data-test', 'tm-time'); ts.onclick = function (e) { e.preventDefault(); dropdown(ts, PB.TIMES.map(function (t) { return [t, t]; }), nv.time, function (v) { nv.time = v; paint(); }, ACC); }; }
   root.setAttribute('data-test', 'time-modal');
-  var close = function () { root.remove(); };
-  $$('button', root).forEach(function (x) { var t2 = x.textContent.trim(); if (t2 === '닫기' || x.classList.contains('ant-modal-close')) x.onclick = close; else if (t2 === '다음') x.onclick = function () { toast('시안에서는 동작하지 않습니다'); }; });
+  var close = function () { closeDD(); root.remove(); };
+  $$('button', root).forEach(function (x) { var t2 = x.textContent.trim(); if (t2 === '닫기' || x.classList.contains('ant-modal-close')) x.onclick = close; else if (t2 === '다음') { x.setAttribute('data-test', 'tm-next'); x.onclick = function () { var err = PB.staffChange(b.no, nv.date, nv.time); if (err) { toast(err); return; } close(); toast('예약 시간을 변경했습니다.'); PB.render(); }; } });
   var wrap = $('.ant-modal-wrap', root); if (wrap) wrap.onclick = function (e) { if (e.target === wrap) close(); };
 }
 
@@ -3198,7 +3207,7 @@ function pEdit() {
   /* 다른 버튼 줄과 같은 켜고 끄는 칸 하나(PRD 5.3, 결정 5). 예약 설정이 꺼졌거나 기본 설정이면 잠기고 저장된 값을 흐리게 */
   var lock = !s.bookingSetting; radioSet(g, p.book ? 'y' : 'n', lock || base); g.setAttribute('data-test', 'prod-book');
   $$('label.ant-radio-wrapper', g).forEach(function (l) { l.onclick = function (e) { e.preventDefault(); if (base) return; if (!s.bookingSetting) { toast('예약설정에서 예약을 사용하면 켤 수 있습니다.'); return; } p.book = $('input', l).value === 'y'; PB.render(); }; });
-  if (!s.bookingSetting) { var ex = document.createElement('div'); ex.className = 'ant-form-item-explain ant-form-item-explain-connected'; ex.innerHTML = '<div class="pb-lockhint" data-test="lockmsg">예약설정에서 예약을 사용하면 켤 수 있습니다.</div>'; $('.ant-form-item-control', nc).appendChild(ex); }
+  if (!s.bookingSetting && !base) { var ex = document.createElement('div'); ex.className = 'ant-form-item-explain ant-form-item-explain-connected'; ex.innerHTML = '<div class="pb-lockhint" data-test="lockmsg">예약설정에서 예약을 사용하면 켤 수 있습니다.</div>'; $('.ant-form-item-control', nc).appendChild(ex); }
   var holder = msgCol.cloneNode(false); holder.style.cssText = msgCol.style.cssText; holder.appendChild($('.ant-form-item', nc)); msgCol.after(mark(holder));
   if (base) { var bh = document.createElement('div'); bh.className = 'pb-seatline'; bh.setAttribute('data-test', 'base-hint'); bh.textContent = '기본 설정 적용 중입니다. 개별 설정을 선택하면 수정할 수 있습니다.'; holder.after(mark(bh)); }
   /* 버튼 조합은 지금 웹 규칙: 최대 2개, 메신저 왼쪽, 나머지 한 자리는 예약 > 외부링크 > 상담접수. 셋 이상 켜도 저장은 막지 않음(PRD 5.3) */
@@ -3227,6 +3236,13 @@ function pStore() {
   if (g) { radioSet(g, s.btn ? 'y' : 'n', !s.bookingSetting); g.setAttribute('data-test', 'store-btn');
     $$('label.ant-radio-wrapper', g).forEach(function (l) { l.onclick = function (e) { e.preventDefault(); if (!s.bookingSetting) return; s.btn = $('input', l).value === 'y'; PB.render(); }; }); }
   $$('button').forEach(function (x) { if (/^(저장|수정|취소|목록)$/.test(x.textContent.trim())) x.onclick = function () { if (x.textContent.trim() === '목록' || x.textContent.trim() === '취소') go('slist'); else toast('시안에서는 동작하지 않습니다'); }; });
+  /* 위쪽 바로가기 줄: 항목이 한 줄에 다 들어가지 않아 "버튼 및 메신저 설정"이 취소 · 저장 버튼 쪽에서 잘리던 것을 두 줄로 감싼다(항목 · 순서는 실화면 그대로) */
+  var anc = $('.ant-anchor'); if (anc) { anc.style.flexWrap = 'wrap'; anc.style.rowGap = '2px'; anc.style.overflow = 'visible'; anc.setAttribute('data-test', 'store-anchor');
+    for (var ap = anc.parentElement; ap && ap !== document.body; ap = ap.parentElement) { if (/sticky/.test(ap.style.position)) { ap.style.height = 'auto'; ap.style.minHeight = '40px'; ap.style.padding = '4px 0'; ap.style.alignItems = 'flex-start'; break; } ap.style.overflowX = 'visible'; ap.style.height = 'auto'; } }
+  /* 오른쪽 고객 화면 미리보기(실화면 부품) 하단 버튼: 시안 고객 화면 스토어 페이지와 같은 구성. 스토어 예약 버튼이 보이면(예약 설정 ON + 스토어 예약 버튼 ON) Chat on 옆에 Book now */
+  var pf = $('[class*=previewRoot] footer'); if (pf) { var pm = $('button', pf); $$('.pb-pv-book', pf).forEach(function (x) { x.remove(); }); pf.setAttribute('data-test', 'store-preview-footer');
+    if (PB.storeBookBtn()) { if (pm) pm.style.flex = '0 0 140px'; var pbk = document.createElement('button'); pbk.type = 'button'; pbk.className = 'pb-pv-book'; pbk.textContent = 'Book now'; pbk.style.cssText = 'flex:1 1 0%;height:52px;border:0;border-radius:8px;background:#fb6f92;color:#fff;font-size:16px;font-weight:700;cursor:pointer'; pbk.onclick = function () { toast('시안에서는 동작하지 않습니다'); }; pf.appendChild(mark(pbk)); }
+    else if (pm) pm.style.flex = ''; }
   if (LASTKEY !== 'bo:store') setTimeout(function () { var t = byText(document, 'h5', '예약 사용 여부'); if (!t) return; var el = t.parentElement; while (el && el !== document.body) { var cs = getComputedStyle(el); if (/(auto|scroll)/.test(cs.overflowY) && el.scrollHeight > el.clientHeight) break; el = el.parentElement; } var top = t.getBoundingClientRect().top; if (el && el !== document.body) el.scrollTop += top - el.getBoundingClientRect().top - 190; else window.scrollBy(0, top - 240); }, 0);
 }
 

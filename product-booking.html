@@ -33,7 +33,7 @@ body{font-family:Pretendard,"Noto Sans KR","Malgun Gothic",sans-serif;font-size:
 </div></div>
 <script>
 'use strict';
-/* 상품 예약 선행 배포 시안: 알리페이 채널 분기 작업 전의 화면과 동작만 그린다(선행 PRD v1.0, 부록 B의 항목은 없음) */
+/* 상품 예약 선행 배포 시안: 알리페이 채널 분기 작업 전의 화면과 동작만 그린다(선행 PRD v1.3, 부록 B의 항목은 없음) */
 /* ===== 기준 시각 ===== */
 var TODAY='2026-10-12',NOWTS='2026-10-12 12:00';
 var LANGS={en:'영어',ja:'일본어',zh:'중국어(간체)'};
@@ -84,7 +84,7 @@ function seedBookings(P){
  var out=[];A.forEach(function(a,i){out.push(mk(a,i));});out.slice().sort(function(x,y){return x.recv<y.recv?-1:1;}).forEach(function(b,k,arr){b.rno=rnoFor(b.recv,b.lang,arr.slice(0,k));});return out;
  function mk(a,i){
   var p=a[9]?byId[a[9]]:null,snap=p?snapOf(p):null;if(snap&&a[10])snap.price=a[10];
-  return {no:i+1,visit:a[0],recv:a[1],name:a[2],nation:a[3],lang:a[4],contact:a[5],status:a[6],owner:a[7],route:a[8],prodId:a[9],snap:snap,need:a[11],req:a[12],phone:(({'중국':'+86 138000001','홍콩':'+852 600001','일본':'+81 9000001','러시아':'+7 9000001','카자흐스탄':'+7 7000001','말레이시아':'+60 120001','싱가포르':'+65 80001'}[a[3]]||'+1 41655501')+(10+i)),rno:null,chg:a[6]==='변경요청'?'2026-10-17 13:00':null,cancelBy:a[6]==='고객취소'?'고객':a[6]==='매장취소'?'매장':null,cancelAt:/취소/.test(a[6])?a[1].slice(0,10)===a[0].slice(0,10)?a[1]+':40':(function(){var t=new Date(a[0].slice(0,10)+'T00:00:00Z');t.setUTCDate(t.getUTCDate()-2);return t.toISOString().slice(0,10)+' 18:51:12';})():null,cancelReason:a[6]==='고객취소'?'고객 직접 취소':a[6]==='매장취소'?'매장 사정':null};
+  return {no:i+1,visit:a[0],recv:a[1],name:a[2],nation:a[3],lang:a[4],contact:a[5],status:a[6],owner:a[7],route:a[8],prodId:a[9],snap:snap,need:a[11],req:a[12],birth:a[2]===ME?'1996-04-12':'1995-05-20',phone:(({'중국':'+86 138000001','홍콩':'+852 600001','일본':'+81 9000001','러시아':'+7 9000001','카자흐스탄':'+7 7000001','말레이시아':'+60 120001','싱가포르':'+65 80001'}[a[3]]||'+1 41655501')+(10+i)),rno:null,chg:a[6]==='변경요청'?'2026-10-17 13:00':null,cancelBy:a[6]==='고객취소'?'고객':a[6]==='매장취소'?'매장':null,cancelAt:/취소/.test(a[6])?a[1].slice(0,10)===a[0].slice(0,10)?a[1]+':40':(function(){var t=new Date(a[0].slice(0,10)+'T00:00:00Z');t.setUTCDate(t.getUTCDate()-2);return t.toISOString().slice(0,10)+' 18:51:12';})():null,cancelReason:a[6]==='고객취소'?'고객 직접 취소':a[6]==='매장취소'?'매장 사정':null};
  }
 }
 function seedCollections(){return [
@@ -96,7 +96,7 @@ var DB,S;
 function freshDB(){var P=seedProducts();DB={store:seedStore(),prods:P,books:seedBookings(P),cols:seedCollections()};}
 function freshState(){return {surf:'HOST',mark:true,
  fo:{lang:'en',screen:'store',entry:'store',pid:null,sel:'',date:TODAY,time:'',err:null,lastNo:null,myNo:null,tab:'upcoming'},
- host:{view:'dash',dtab:'전체',st:'',kind:'',owner:'',q:'',qd:'',ptab:'전체',open:null,editPid:null,man:{date:'',time:'',name:'',lang:'',pid:''},statPer:'전체'},
+ host:{view:'dash',dtab:'전체',st:'',kind:'',owner:'',q:'',qd:'',ptab:'전체',open:null,editPid:null,man:{date:'',time:'',name:'',lang:'',pid:'',birth:'',f:{}},statPer:'전체'},
  bo:{view:'res',st:'',kind:'',owner:'',q:'',qd:'',open:null,lang:'',editPid:null,col:null,offModal:false,sper:'오늘'}};}
 
 /* ===== 판정 (순수 함수) ===== */
@@ -131,19 +131,23 @@ function needList(t){return DB.books.filter(function(b){return b.need&&(t==='전
 var ME='Kaitlyn Chan';
 
 /* ===== 동작 ===== */
-/* 클리닉 스토어(피부과·성형외과·치과·메디컬체크) 예약 나이: 방문 예정일 기준 만 18세 이상. 예약 요청을 누를 때 판정, 저장하지 않음 */
+/* 클리닉 스토어(피부과·성형외과·치과·메디컬체크) 예약 나이: 방문 예정일 기준 만 18세 이상. 예약 요청을 누를 때 판정, 저장하지 않음(PRD 5.13)
+   스토어 카테고리가 여럿이면(DB.store.cats) 그중 하나라도 클리닉이면 대상 */
 var CLINIC_CATS=['피부과','성형외과','치과','메디컬체크'];
+function storeCats(){var s=DB.store;return s.cats&&s.cats.length?s.cats:[s.cat];}
+function isClinic(){return storeCats().some(function(c){return CLINIC_CATS.indexOf(c)>=0;});}
 function ageOn(birth,day){var b=birth.split('-'),d=day.split('-'),a=(+d[0])-(+b[0]);if(+b[1]>+d[1]||(+b[1]===+d[1]&&+b[2]>+d[2]))a--;return a;}
+function under18(birth,day){return isClinic()&&!!birth&&/^\d{4}-\d{2}-\d{2}$/.test(birth)&&ageOn(birth,day)<18;}
 function foSubmit(){
  var f=S.fo;f.err=null;
- if(CLINIC_CATS.indexOf(DB.store.cat)>=0&&f.birth&&/^\d{4}-\d{2}-\d{2}$/.test(f.birth)&&ageOn(f.birth,f.date)<18){f.err={kind:'age18'};return;}
+ if(under18(f.birth,f.date)){f.err={kind:'age18'};return;}
  if(!f.time){f.err={kind:'time'};return;}
  if(!slotOpen(f.date,f.time)){f.err={kind:'slot'};f.time='';return;}
  if(!DB.store.bookingSetting){f.err={kind:'closed'};return;} /* 예약 설정이 꺼진 뒤면 상품이 없어도 막음 */
  var pid=f.entry==='product'?f.pid:(f.sel?+f.sel:null);
  if(pid){var j=judgeBookable(prodById(pid),f.lang);if(!j.ok){if(f.entry==='product')f.err={kind:'prodGone'};else{f.err={kind:'pickAgain'};f.sel='';}return;}}
  var p=pid?prodById(pid):null,no=DB.books.length+1;
- DB.books.push({no:no,visit:f.date+' '+f.time,recv:NOWTS,name:ME,nation:'캐나다',lang:f.lang,contact:f.msg||'WhatsApp',mid:f.mid||'4165550199',status:'예약',owner:'고객',route:f.entry==='product'?'상품':'스토어',prodId:pid,snap:p?snapOf(p):null,need:'신규',req:'',phone:'+1 4165550199',rno:rnoFor(NOWTS,f.lang,DB.books)});
+ DB.books.push({no:no,visit:f.date+' '+f.time,recv:NOWTS,name:ME,nation:'캐나다',lang:f.lang,contact:f.msg||'WhatsApp',mid:f.mid||'4165550199',status:'예약',owner:'고객',route:f.entry==='product'?'상품':'스토어',prodId:pid,snap:p?snapOf(p):null,need:'신규',req:'',birth:f.birth||'',phone:'+1 4165550199',rno:rnoFor(NOWTS,f.lang,DB.books)});
  f.lastNo=no;f.screen='done';f.time='';f.agree=false; /* 다음 예약은 동의 체크 없이 시작(라이브 정보 입력 화면은 처음에 미체크) */
 }
 function manSave(){
@@ -152,9 +156,30 @@ function manSave(){
  if(!m.date||!m.time)return '방문 일시를 선택해주세요';
  if(!m.lang)return '언어를 선택해주세요';
  var p=m.pid?prodById(m.pid):null,no=DB.books.length+1;
- DB.books.push({no:no,visit:m.date+' '+m.time,recv:NOWTS,name:m.name.trim(),nation:'-',lang:m.lang,contact:'-',status:'예약',owner:'매장',route:null,prodId:p?p.id:null,snap:p?snapOf(p):null,need:'',req:'',phone:'-',rno:rnoFor(NOWTS,m.lang,DB.books)});
- S.host.man={date:'',time:'',name:'',lang:'',pid:''};S.host.view='res';S.host.open=no;
+ DB.books.push({no:no,visit:m.date+' '+m.time,recv:NOWTS,name:m.name.trim(),nation:'-',lang:m.lang,contact:'-',status:'예약',owner:'매장',route:null,prodId:p?p.id:null,snap:p?snapOf(p):null,need:'',req:(m.f&&m.f.req)||'',birth:m.birth||'',phone:'-',rno:rnoFor(NOWTS,m.lang,DB.books)});
+ S.host.man={date:'',time:'',name:'',lang:'',pid:'',birth:'',f:{}};S.host.view='res';S.host.open=no;
  return '';
+}
+/* 고객 예약 변경(일시 변경 신청): 예약에 저장된 생년월일과 바꾼 날짜로 클리닉 나이를 다시 판정(PRD 5.13). 만 18세 미만이면 변경하지 않음 */
+function foChange(){
+ var f=S.fo,b=DB.books.filter(function(x){return x.no===f.chgNo;})[0];f.err=null;if(!b)return;
+ if(under18(b.birth,f.date)){f.err={kind:'age18'};return;}
+ if(!f.time){f.err={kind:'time'};return;}
+ if(!slotOpen(f.date,f.time)){f.err={kind:'slot'};f.time='';return;}
+ b.chg=f.date+' '+f.time;b.status='변경요청';b.need='변경';
+ f.mode='';f.chgNo=null;f.myNo=b.no;f.time='';f.screen='mydetail';f.flash='chg';
+}
+/* 매장(HOST) · 운영자(BO)가 바꾸는 예약 시간: 나이 판정 없음(PRD 5.13 "막지 않는 것"). 시안은 확인 단계 없이 바로 바꾼다 */
+function staffChange(no,date,time){
+ var b=DB.books.filter(function(x){return x.no===no;})[0];if(!b||!date||!time)return '방문 날짜와 시간을 선택해주세요';
+ b.visit=date+' '+time;
+ return '';
+}
+/* 배포 전에 고객이 잡은 예약(상품 정보 · 유입경로 없음) 한 건 추가. 접수일은 시드의 첫 상품 예약(09-08)보다 앞: 화면에는 스토어 예약 · 유입경로 "-" · Decide at the store (PRD 10장 데이터) */
+function addPreDeployBooking(){
+ var no=DB.books.length+1;
+ DB.books.push({no:no,visit:'2026-10-20 14:00',recv:'2026-09-05 10:12',name:ME,nation:'캐나다',lang:'en',contact:'WhatsApp',status:'예약',owner:'고객',route:null,prodId:null,snap:null,need:'',req:'',birth:'1996-04-12',phone:'+1 4165550199',rno:rnoFor('2026-09-05 10:12','en',DB.books)});
+ render();return no;
 }
 function bookOff(){DB.store.bookingSetting=false;} /* PRD 부록 A 결정 1: 끌 때는 값을 지우지 않고 잠그기만(저장된 값을 흐리게) */
 /* 결정 1(2026-10-30): 예약 설정을 다시 켜면 스토어 예약 버튼·상품 예약 버튼 둘 다 꺼진 상태로 시작(꺼지기 전 값으로 돌아오지 않음) */
@@ -167,7 +192,7 @@ function swHTML(){
  return '<b>상품 예약 선행 배포 시안</b>'+['FO','HOST','BO'].map(function(x){return '<button class="s'+(s===x?' on':'')+'" data-surf="'+x+'">'+{FO:'고객 화면',HOST:'입점사 (HOST)',BO:'운영사 (BO)'}[x]+'</button>';}).join('')
   +'<span class="sp"></span>'
   +(s==='FO'?'<span>언어</span><select data-sw="lang">'+[['en','English'],['ja','日本語'],['zh','简体中文']].map(function(o){return '<option value="'+o[0]+'"'+(f.lang===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>':'')
-  +(s==='FO'?'<span>예약 URL로 열기</span><select data-url="1"><option value="">고르기</option><option value="store">스토어 예약 URL</option>'+DB.prods.filter(function(p){return p.lang===f.lang&&!p.deleted;}).map(function(p){return '<option value="p'+p.id+'">상품 예약 URL · '+p.name.replace(/</g,'&lt;')+'</option>';}).join('')+'</select>':'')
+  +(s==='FO'?'<span>예약 URL로 열기</span><select data-url="1"><option value="">고르기</option><option value="store">스토어 예약 URL</option>'+DB.prods.slice().sort(function(a,b){return (a.lang===f.lang?0:1)-(b.lang===f.lang?0:1);}).map(function(p){return '<option value="p'+p.id+'">상품 예약 URL · '+p.name.replace(/</g,'&lt;')+(p.lang!==f.lang?' ('+LANGS[p.lang]+' 상품)':'')+(p.deleted?' (삭제됨)':'')+'</option>';}).join('')+'</select>':'')
   +'<label><input type="checkbox" data-sw="mark"'+(S.mark?' checked':'')+'>이번에 추가한 요소 표시</label>'
   +'<span style="color:#888">기준 시각 '+NOWTS+'</span>';
 }
@@ -185,7 +210,7 @@ window.PB={
  SINQ_BASE:[['스토어','en','메신저상담','2026-10-03','11:40'],['상품','en','메신저상담','2026-10-05','15:12'],['상품','ja','메신저상담','2026-10-06','10:05'],['스토어','zh','채팅문의','2026-10-08','13:31'],['상품','en','상담문의','2026-10-09','16:48'],['상품','en','메신저상담','2026-10-11','09:27'],['스토어','ja','메신저상담','2026-10-12','10:16']],
  addDays:addDays,wdKo:wdKo,won:won,prodById:prodById,prodVisible:prodVisible,prodBookBtn:prodBookBtn,storeBookBtn:storeBookBtn,judgeBookable:judgeBookable,prodButtons:prodButtons,
  foOptions:foOptions,manualOptions:manualOptions,bookingKind:bookingKind,prodBookCount:prodBookCount,slotOpen:slotOpen,needList:needList,
- foSubmit:foSubmit,manSave:manSave,bookOff:bookOff,bookOn:bookOn,render:render,
+ foSubmit:foSubmit,foChange:foChange,staffChange:staffChange,isClinic:isClinic,manSave:manSave,bookOff:bookOff,bookOn:bookOn,render:render,
  go:function(surf,view){window.go(surf,view);},
  ready:function(surf){if(S&&S.surf===surf)render();}
 };
@@ -197,6 +222,10 @@ window.foOpenStore=function(lang){S.surf='FO';if(lang)S.fo.lang=lang;S.fo.screen
 window.foOpenProduct=function(id,lang){S.surf='FO';if(lang)S.fo.lang=lang;S.fo.pid=id;S.fo.screen='product';S.fo.err=null;render();};
 /* 예약하기 URL 진입(PRD 5.2): 스토어 예약 URL = 스토어 진입(유입경로 스토어), 상품 예약 URL = 상품 고정(유입경로 상품). 스토어 페이지 · 상품 상세를 거치지 않고 예약 화면이 바로 열림 */
 window.foOpenUrl=function(kind,pid,lang){S.surf='FO';if(lang)S.fo.lang=lang;var f=S.fo;f.err=null;f.accTop={};f.sel='';f.time='';f.date=TODAY;f.cat='All';f.showN=5;f.acc={};f.back=null;f.entry=kind==='product'?'product':'store';if(kind==='product')f.pid=+pid;f.viaUrl=true;f.screen='book';render();};
+/* 예약 중 화면 언어 바꾸기(PRD 5.2): 고른 상품을 풀고 I'll decide at the store 로. 상품 고정 진입이면 예약 화면에서 예약할 수 없는 상품 안내 */
+function foLangSet(v){var f=S.fo;if(f.lang===v)return;f.lang=v;f.err=null;f.sel='';f.cat='All';f.showN=5;if(f.mode!=='change'&&f.entry==='product'&&f.screen==='info')f.screen='book';}
+window.foLang=function(v){foLangSet(v);render();};
+window.addPreDeployBooking=addPreDeployBooking;
 window.setProd=function(id,patch){var p=prodById(id);Object.keys(patch).forEach(function(k){if(k==='wb')p.wb=Object.assign({},p.wb||{},patch.wb);else p[k]=patch[k];});render();};
 /* 상품이 많은 매장 보기용: 예약 가능한 영어 상품 n개 추가 (id 201~) */
 window.addDemoProducts=function(n){var subs=['보톡스','스킨부스터','리프팅','여드름/흉터','색소/점/문신'],names=['Glow Facial','Aqua Peel','Jawline Botox','Rejuran Healer','Ultherapy 300','Thermage FLX','Pico Toning','Acne Scar Laser','Chin Filler','Neck Lift','Exosome Care','LDM Hydration'];for(var i=0;i<n;i++){var id=201+i;DB.prods.push({id:id,lang:'en',name:'Abijou '+names[i%names.length],price:50000+i*10000,status:'approved',active:true,hidden:false,deleted:false,mode:'기본',book:true,cat:'피부과',sub:subs[i%subs.length],reg:'2026-09-0'+(1+i%9)+' 10:00',chat:1,cons:0,rev:0,views:100,inner:20,direct:5,bclk:0});}render();};
@@ -211,7 +240,7 @@ window.frameDoc=function(s){return frameOf(s||S.surf).contentDocument;};
 
 document.addEventListener('click',function(e){var t=e.target.closest('[data-surf]');if(t){S.surf=t.getAttribute('data-surf');render();}});
 document.addEventListener('change',function(e){var t=e.target;if(t.hasAttribute('data-url')){var v=t.value;if(v==='store')window.foOpenUrl('store');else if(v)window.foOpenUrl('product',+v.slice(1));return;}if(!t.hasAttribute('data-sw'))return;var k=t.getAttribute('data-sw');
- if(k==='mark'){S.mark=t.checked;}else{S.fo[k]=t.value;S.fo.err=null;if(S.fo.screen==='book'&&S.fo.entry==='store')S.fo.sel='';}render();});
+ if(k==='mark'){S.mark=t.checked;}else{foLangSet(t.value);}render();});
 freshDB();S=freshState();render();
 </script>
 </body>
