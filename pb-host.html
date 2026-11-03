@@ -2315,6 +2315,11 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 .pb-prodbox-t{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
 .pb-prodbox-t b{font-weight:700}
 .pb-prodbox .pb-prod-l{margin:0;flex:none}
+
+/* 잠금 안내(회색) */
+.pb-lockhint{color:#8c8c8c;font-size:13px;margin-top:4px;line-height:1.5}
+
+.pb-offbox{background:#fff7e6;border:1px solid #ffd591;color:#ad4e00;border-radius:6px;padding:8px 12px;font-size:13px;line-height:1.5;margin:0 0 12px}
 .pb-prodline.pb-hiB{font-size:15px !important;font-weight:700 !important;color:#212121 !important;margin-top:2px}
 /* 예약 목록 고객 칸 둘째 줄(상품명): 표가 넘쳐 예약상태 칸이 가려지지 않게 한 줄 말줄임(전체 이름은 마우스 올리면) */
 [data-test=col-prod]{display:inline-block;max-width:116px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:top}
@@ -2324,6 +2329,10 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 /* 시간 변경 모달 예약 상품 줄: 라벨 한 줄 고정, 값 말줄임 */
 .pb-mlab{white-space:nowrap;flex-shrink:0}
 .pb-mval{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* 대시보드 카드 날짜는 한 줄 */
+[class*=bookingGrid] > button strong{white-space:nowrap}
+
 </style></head>
 <body><div id="app"></div>
 <template id="T_h_dash">
@@ -2411,11 +2420,37 @@ function restoreScroll() { SC_SEL.forEach(function (s) { $$(s).forEach(function 
 /* 실제 이동·제출은 막는다 */
 document.addEventListener('submit', function (e) { e.preventDefault(); }, true);
 document.addEventListener('click', function (e) { var a = e.target.closest('a[href]'); if (a) e.preventDefault(); }, true);
+/* 그리지 않은 동작: 화면마다 지정한 컨트롤(NA_LIST: [선택자, 글자 정규식])에만 안내 토스트. 이미 동작이 있는 것은 건드리지 않음 */
+function naBind(list, msg) {
+  list.forEach(function (it) {
+    $$(it[0]).filter(function (e) { return !it[1] || it[1].test(e.textContent.replace(/\s+/g, ' ').trim()); }).forEach(function (el) {
+      if (el.onclick || el.disabled || el.__na) return;
+      /* 이미 동작이 걸린 바깥 · 안쪽 요소가 있으면 건드리지 않는다 */
+      for (var p = el.parentElement; p && p !== document.body; p = p.parentElement) if (p.onclick) return;
+      var rows = it[2] === 'rows'; /* 표 행: 행 안의 버튼 · 스위치 · 링크는 각자 동작하고, 그 밖의 자리를 누르면 안내 */
+      if (!rows && $$('*', el).some(function (q) { return q.onclick || q.onmousedown; })) return;
+      el.__na = true;
+      el.onclick = function (e) { var inner = rows && e.target.closest('button, a, input, .ant-switch, .ant-select, .ant-checkbox-wrapper'); if (inner && inner !== el && el.contains(inner)) return; e.preventDefault(); e.stopPropagation(); toast(msg); };
+    });
+  });
+}
+/* 한 쪽뿐인 목록의 페이지 줄: 다음 페이지 화살표는 끈 모양, 페이지 크기 표시는 지금 행이 한 쪽에 다 들어가는 값(10 · 20 · 50 · 100) */
+function pageFit() {
+  $$('.ant-pagination').forEach(function (pg) {
+    if ($('.ant-pagination-jump-next', pg) || $$('.ant-pagination-item', pg).length > 1) return;
+    var nx = $('.ant-pagination-next', pg); if (nx) { nx.classList.add('ant-pagination-disabled'); nx.setAttribute('aria-disabled', 'true'); var bt = $('button', nx); if (bt) bt.disabled = true; }
+    var tbl = pg.closest('.ant-table-wrapper') || pg.parentElement; var n = tbl ? $$('tbody tr.ant-table-row', tbl).length : 0;
+    var lab = $$('.ant-pagination-options *', pg).filter(function (e) { return !e.children.length && /^\d+ \/ 페이지$/.test(e.textContent.trim()); })[0];
+    if (lab && n) { var cur = parseInt(lab.textContent, 10), want = [10, 20, 50, 100].filter(function (k) { return k >= n; })[0] || 100; if (cur < n) { lab.textContent = want + ' / 페이지'; var tt = lab.closest('[title]'); if (tt) tt.setAttribute('title', want + ' / 페이지'); } }
+  });
+}
 /* 렌더 진입점: 화면별 draw 를 감싸 스크롤·표시 상태를 처리 */
 function frameDraw(key, build) {
   var same = LASTKEY === key; if (same) saveScroll(); closeDD();
   document.body.classList.toggle('pb-mark', !!PB.S.mark);
   build();
+  pageFit();
+  if (typeof NA_LIST === 'function') naBind(NA_LIST(), NA_MSG);
   if (same) restoreScroll(); else window.scrollTo(0, 0);
   LASTKEY = key;
 }
@@ -2443,14 +2478,15 @@ function fillDrawer(pre, b, qrCls) {
     var k = $('dt', r).textContent.trim(), dd = $('dd', r);
     if (k === '메신저') {
       var mv = $('[class*=messengerValue]', dd), sp = $('span', mv), btn = $('button', mv);
-      sp.textContent = qr ? b.contact : b.contact === '-' ? '-' : b.contact + ' ' + b.phone.replace(/\D/g, '');
+      sp.textContent = qr ? b.contact : b.contact === '-' ? '-' : b.contact + ' ' + (b.mid || b.phone.replace(/^\+\d+\s+/, '').replace(/\D/g, '')); /* 고객이 넣은 메신저 아이디. 시드는 국가번호를 뺀 번호(라이브 캡처) */
       if (qr && !btn) { btn = document.createElement('button'); btn.type = 'button'; btn.className = qrCls; btn.textContent = 'QR 보기'; mv.appendChild(btn); }
       if (!qr && btn) btn.remove();
       if (btn && qr) btn.onclick = function () { toast('시안에서는 동작하지 않습니다'); };
     } else if (k in V) dd.textContent = V[k];
     r.setAttribute('data-k', k);
   });
-  var last = $$('[class*=detailRow]', dl).pop(), rr = last.cloneNode(true); $('dt', rr).textContent = '유입경로'; $('dd', rr).textContent = b.route || '-'; rr.setAttribute('data-k', '유입경로'); dl.appendChild(mark(rr));
+  /* 유입경로는 BO 상세에만(PRD v1.9 2부 5.8: HOST에는 보이지 않음) */
+  if (bo) { var last = $$('[class*=detailRow]', dl).pop(), rr = last.cloneNode(true); $('dt', rr).textContent = '유입경로'; $('dd', rr).textContent = b.route || '-'; rr.setAttribute('data-k', '유입경로'); dl.appendChild(mark(rr)); }
   $$('section', cont).forEach(function (s) {
     var h = $('h3', s).textContent.trim();
     if (h === '고객 요청사항') $('p', s).textContent = b.req || '남긴 내용 없음';
@@ -2510,9 +2546,22 @@ function draw() {
   frameDraw('host:' + h.view + (h.view === 'prod' ? ':' + (h.pApplied ? 'r' : '') : ''), function () {
     var app = document.getElementById('app'); app.innerHTML = '';
     var t = tpl(HV[h.view]); while (t.firstChild) app.appendChild(t.firstChild);
+    hostMenu(h.view);
     ({ dash: pDash, res: pRes, manual: pManual, prod: pProd, pstat: pStat, pedit: pEdit })[h.view]();
     if (h.view === 'res' && h.open != null) openDrawer();
   });
+}
+function hostMenu(v) {
+  var mn = $('.ant-menu-root'); if (!mn) return; var subs = $$(':scope > li.ant-menu-submenu', mn);
+  var chat = subs.filter(function (s) { return /채팅 관리/.test($('.ant-menu-submenu-title', s).textContent); })[0]; if (!chat) return;
+  var leaf = $('li.ant-menu-item', chat);
+  subs.forEach(function (s) { if (s !== chat && /상담 관리|예약 관리/.test($('.ant-menu-submenu-title', s).textContent)) s.remove(); });
+  chat.className = 'ant-menu-submenu ant-menu-submenu-inline ant-menu-submenu-open' + (/res|manual/.test(v) ? ' ant-menu-submenu-selected' : '');
+  $('.ant-menu-submenu-title .ant-menu-title-content', chat).textContent = '문의 · 방문 예약'; mark($('.ant-menu-submenu-title', chat)); chat.setAttribute('data-test', 'host-menu-inq');
+  var ul = $('ul.ant-menu-sub', chat); ul.innerHTML = '';
+  ['실시간 채팅', '채팅내역조회', '메신저상담', '상담접수', '예약 현황', '예약 시간 설정'].forEach(function (n) { var li = leaf.cloneNode(true); li.className = 'ant-menu-item ant-menu-item-only-child' + (n === '예약 현황' && /res|manual/.test(v) ? ' ant-menu-item-selected' : ''); $('.ant-menu-title-content', li).textContent = n; ul.appendChild(li); });
+  $$(':scope > li.ant-menu-item', mn).forEach(function (li) { var t = li.textContent.trim(); li.classList.toggle('ant-menu-item-selected', (t === '대시보드' && v === 'dash') || (t === '상품 관리' && /prod|pstat|pedit/.test(v))); });
+  var dash = $$(':scope > li', mn)[0]; if (dash) dash.after(chat);
 }
 /* 사이드바 이동 */
 document.addEventListener('click', function (e) {
@@ -2548,15 +2597,22 @@ function pDash() {
   var ps = PB.DB.prods.filter(function (p) { return !p.deleted; }), mb = $('[class*=managementBlock]');
   if (mb) { $('[class*=managementTitle]', mb).textContent = '상품 ' + ps.length + '개'; var cnt = { '승인': ps.filter(function (p) { return p.status === 'approved'; }).length, '대기': ps.filter(function (p) { return p.status === 'pending'; }).length, '반려': ps.filter(function (p) { return p.status === 'rejected'; }).length };
     $$('[class*=managementStatusLinks] button', mb).forEach(function (x) { var k = $('span', x).textContent.trim(); if (k in cnt) $('strong', x).textContent = cnt[k]; }); }
-  /* 통계 칸: 스토어 방문·상품 방문은 항상, 메신저 문의·채팅 문의·예약 확정·방문 완료는 값이 있을 때만 보인다 */
+  /* 통계 칸: 스토어 방문·상품 방문은 항상, 메신저 문의, 채팅 문의, 예약 확정, 방문 완료는 값이 있을 때만 보인다 */
   var PER = { '이번 주': ['2026-10-12', '2026-10-18'], '지난주': ['2026-10-05', '2026-10-11'], '1개월': ['2026-09-13', '2026-10-12'], '3개월': ['2026-07-14', '2026-10-12'], '전체': ['0000', '9999'] };
   h.per = h.per || '이번 주'; var pr = PER[h.per], inR = function (d) { return d >= pr[0] && d <= pr[1]; };
-  var MV = { '스토어 방문': 0, '상품 방문': 0, '메신저 문의': 0, '채팅 문의': 0,
+  /* 메신저 · 채팅 문의는 BO 스토어 문의 통계와 같은 표본(PB.SINQ_BASE)에서 셈 */
+  var SQ = PB.SINQ_BASE.filter(function (x) { return inR(x[3]); }), MSQ = SQ.filter(function (x) { return x[2] === '메신저상담'; }), MAPP = { en: 'WhatsApp', ja: 'LINE', zh: 'WeChat', tw: 'WeChat' };
+  var MV = { '스토어 방문': 0, '상품 방문': 0, '메신저 문의': MSQ.length, '채팅 문의': SQ.filter(function (x) { return x[2] === '채팅문의'; }).length,
     '예약 확정': PB.DB.books.filter(function (x) { return inR(x.recv.slice(0, 10)) && !/취소/.test(x.status); /* 확정 건만, 취소는 세지 않음 (사용자 결정 2026-10-14) */ }).length,
     '방문 완료': PB.DB.books.filter(function (x) { return x.status === '방문완료' && inR(x.visit.slice(0, 10)); }).length };
   var FIX = { '스토어 방문': 1, '상품 방문': 1 }, mg = $('[class*=metricGrid]'), shown = 0;
   $$('[class*=metricCard]', mg).forEach(function (cd) { var k = $(':scope > span:not([class*=metricIcon])', cd).textContent.trim(), v = MV[k] || 0; var st = $('strong', cd); st.firstChild.textContent = v; var on = FIX[k] || v > 0; cd.style.display = on ? '' : 'none'; cd.setAttribute('data-test', 'metric-' + k); if (on) shown++; });
   if (mg) mg.style.gridTemplateColumns = 'repeat(' + shown + ', minmax(0px, 1fr))';
+  /* 메신저 문의 상세: 앱별 건수와 접수 목록(최근 순) */
+  var md = $('[class*=messengerDetail]'); if (md) {
+    $$('[class*=messengerCards] > div', md).forEach(function (cd) { var k = $('span', cd).textContent.trim(); $('strong', cd).textContent = MSQ.filter(function (x) { return MAPP[x[1]] === k; }).length + '건'; });
+    var tb = $('tbody', md); if (tb && MSQ.length) { var tr0 = '<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td></tr>'; tb.innerHTML = MSQ.slice().sort(function (a, c) { return a[3] + a[4] < c[3] + c[4] ? 1 : -1; }).map(function (x) { return tr0.replace('{0}', x[0]).replace('{1}', MAPP[x[1]]).replace('{2}', PB.LANGS[x[1]]).replace('{3}', x[3] + ' ' + x[4]); }).join(''); tb.setAttribute('data-test', 'msg-rows'); }
+  }
   var seg = $$('.ant-segmented-item'); seg.forEach(function (lb) { var t = lb.textContent.trim(), on = t === h.per; lb.classList.toggle('ant-segmented-item-selected', on); lb.classList.toggle('ant-segmented-item-selected-text', on); var ip = $('input', lb); if (ip) ip.checked = on; lb.onclick = function (e) { e.preventDefault(); h.per = t; PB.render(); }; });
   var mv = byText(document, 'button', '예약 관리 이동'); if (mv) mv.onclick = function () { go('res'); };
 }
@@ -2568,6 +2624,7 @@ function filtered() {
     if (h.st && b.status !== h.st) return false;
     if (h.kind && PB.bookingKind(b) !== h.kind) return false;
     if (h.owner && b.owner !== h.owner) return false;
+    if (h.rlang && b.lang !== h.rlang) return false;
     if (q) { var hay = [b.name, b.phone, b.rno, b.req, b.snap ? b.snap.name : ''].join(' ').toLowerCase(); if (hay.indexOf(q) < 0) return false; }
     return true;
   }).sort(function (a, b) { return a.visit < b.visit ? 1 : -1; });
@@ -2577,14 +2634,15 @@ function pRes() {
   var head = $('[class*=pageHeader__right] button'); if (head) head.onclick = function () { go('manual'); };
   /* 필터 */
   var sels = $$('form .ant-select'), stSel = sels[0], ownSel = sels[2];
-  var kindSel = ownSel.cloneNode(true); ownSel.after(kindSel); mark(kindSel);
+  var kindSel = ownSel.cloneNode(true); ownSel.before(kindSel); mark(kindSel); kindSel.setAttribute('data-test', 'kind-sel'); /* 언어 바로 뒤: 언어 → 예약 구분 → 등록 주체 */
   setSelect(stSel, h.st ? '예약상태 ' + h.st : '', '예약상태 전체');
+  var lgSel = sels[1]; if (lgSel) { setSelect(lgSel, h.rlang ? '언어 ' + PB.LANGS[h.rlang] : '', '언어 전체'); lgSel.setAttribute('data-test', 'lang-sel'); lgSel.onclick = function () { dropdown(lgSel, [['', '언어 전체']].concat(Object.keys(PB.LANGS).map(function (k) { return [k, PB.LANGS[k]]; })), h.rlang, function (v) { h.rlang = v; PB.render(); }, ACC); }; }
   setSelect(kindSel, h.kind ? '예약 구분 ' + h.kind : '', '예약 구분 전체');
   setSelect(ownSel, h.owner ? (h.owner === '고객' ? '고객 직접 예약' : '수기 등록 예약') : '', '등록 주체 전체');
   stSel.onclick = function () { dropdown(stSel, [['', '예약상태 전체'], ['예약', '예약'], ['방문완료', '방문완료'], ['미방문', '미방문'], ['고객취소', '고객취소'], ['매장취소', '매장취소'], ['변경요청', '변경요청'], ['변경완료', '변경완료'], ['변경거절', '변경거절']], h.st, function (v) { h.st = v; PB.render(); }, ACC); };
   kindSel.onclick = function () { dropdown(kindSel, [['', '예약 구분 전체'], ['상품 예약', '상품 예약'], ['스토어 예약', '스토어 예약']], h.kind, function (v) { h.kind = v; PB.render(); }, ACC); };
   ownSel.onclick = function () { dropdown(ownSel, [['', '등록 주체 전체'], ['고객', '고객 직접 예약'], ['매장', '수기 등록 예약']], h.owner, function (v) { h.owner = v; PB.render(); }, ACC); };
-  var inp = $('form input.ant-input'); inp.placeholder = '여권명·연락처·예약번호·요청사항·매장 메모·상품명'; inp.value = h.qd; inp.style.minWidth = '300px'; mark(inp);
+  var inp = $('form input.ant-input'); inp.placeholder = '여권명·연락처·예약번호·요청사항·매장 메모·상품명'; inp.value = h.qd; inp.style.width = 'auto'; inp.style.minWidth = '300px'; inp.style.maxWidth = '420px'; inp.style.flex = '1 1 300px'; inp.parentElement.style.flexWrap = 'wrap'; /* 검색 대상 끝 "상품명"까지 보이게. 폭이 모자라면(1440) 같은 카드 안 다음 줄로(7차 감사) */ mark(inp);
   inp.oninput = function () { h.qd = inp.value; }; inp.onkeydown = function (e) { if (e.key === 'Enter') { h.q = h.qd; PB.render(); } };
   var sb = byText(document, 'form button', '검색'); if (sb) sb.onclick = function () { h.q = h.qd; PB.render(); };
   /* 표 */
@@ -2599,7 +2657,7 @@ function pRes() {
     $('button', td[7]).onclick = function () { h.open = b.no; PB.render(); };
     tb.appendChild(r);
   });
-  if (!rows.length) { var er = document.createElement('tr'); er.innerHTML = '<td colspan="9" style="text-align:center;padding:40px;color:#999">데이터 없음</td>'; tb.appendChild(er); }
+  if (!rows.length) { var er = document.createElement('tr'); er.innerHTML = '<td colspan="' + rt.children.length + '" style="text-align:center;padding:40px;color:#999">데이터 없음</td>'; tb.appendChild(er); }
   textSet($('.ant-card-head-title'), '예약목록 (' + rows.length + ')');
   $$('.ant-pagination-item').forEach(function (li, i) { if (i > 0) li.remove(); });
   /* 오른쪽 처리 필요 */
@@ -2621,6 +2679,12 @@ function pRes() {
       var metas = $$('[class*=bookingMeta]', c); metas[0].textContent = b.nation; metas[1].textContent = b.rno;
       { var pl = metas[0].cloneNode(true); pl.textContent = b.snap ? b.snap.name : '스토어 예약'; pl.title = pl.textContent; pl.classList.add('pb-prodline', 'pb-hiB'); pl.setAttribute('data-test', 'card-prod'); $('[class*=customerName]', c).before(mark(pl)); }
       $('[class*=receivedAt]', c).textContent = '접수 ' + b.recv;
+      { var pt = $('[class*=statusTag], .ant-tag', c); if (!pt) {
+        /* 날짜는 자르지 않는다: 날짜와 상태 배지가 한 줄에 안 들어가면 배지가 다음 줄 오른쪽으로 내려감(PRD 5.12) */
+        var dt2 = $('[class*=bookingDateTime]', c), sb2 = $('[class*=statusBadge]', c), hd2 = dt2.parentElement, gp2 = document.createElement('span');
+        gp2.style.cssText = 'display:inline-flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0'; dt2.after(gp2); if (sb2) gp2.appendChild(sb2);
+        dt2.style.flexShrink = '0'; dt2.style.overflow = 'visible'; hd2.style.flexWrap = 'wrap'; hd2.style.columnGap = '8px'; hd2.style.rowGap = '4px';
+      } }
       c.setAttribute('aria-label', b.name + ' 예약 상세 열기');
       c.onclick = function () { h.open = b.no; PB.render(); };
       cl.appendChild(c);
@@ -2645,6 +2709,7 @@ function pManual() {
   var dateIn = $('.ant-picker input'); dateIn.value = m.date; dateIn.readOnly = true;
   dateIn.closest('.ant-picker').onclick = function (e) { var o = []; for (var i = 1; i <= 14; i++) { var d = PB.addDays(PB.TODAY, i); o.push([d, d + ' (' + PB.wdKo(d) + ')']); } dropdown(e.currentTarget, o, m.date, function (v) { m.date = v; PB.render(); }, ACC); };
   var timeSel = $$('.ant-select')[0]; setSelect(timeSel, m.time, '방문 시간을 선택해주세요'); timeSel.classList.toggle('ant-select-disabled', !m.date); /* 실화면: 날짜 고르기 전엔 시간 칸 비활성 */
+  $$('input', timeSel).forEach(function (x) { x.disabled = !m.date; if (m.date) x.removeAttribute('disabled'); }); /* 날짜를 고르면 칸 안쪽을 눌러도 열리게 */
   timeSel.onclick = function () { if (!m.date) { toast('방문 날짜를 먼저 선택해주세요'); return; } dropdown(timeSel, PB.TIMES.map(function (t) { return [t, t]; }), m.time, function (v) { m.time = v; PB.render(); }, ACC); };
   /* 예약 상품 (신설): 방문 일시 카드 안에 한 줄 */
   var visitCard = byText(document, 'h5', '방문 일시').closest('.ant-card-body');
@@ -2658,6 +2723,8 @@ function pManual() {
   var name = $('input[placeholder*="영문명"]'); if (name) { name.value = m.name; name.oninput = function () { m.name = name.value; }; name.setAttribute('data-m', 'name'); }
   var ls = $('.ant-select', langItem); setSelect(ls, m.lang ? langLabel(m.lang) : '', '언어를 선택해주세요');
   ls.onclick = function () { dropdown(ls, Object.keys(PB.LANGS).map(function (k) { return [k, PB.LANGS[k]]; }), m.lang, function (v) { if (v !== m.lang) { var cp = m.pid ? PB.prodById(m.pid) : null; if (cp && cp.lang !== v) m.pid = ''; } m.lang = v; PB.render(); }, ACC); };
+  /* 정보 저장 동의 체크: 누르면 체크 모양이 바뀌고 값이 남는다(11차 감사 9번) */
+  var cw = $('label.ant-checkbox-wrapper'); if (cw) { var ci = $('input.ant-checkbox-input', cw), cbx = $('.ant-checkbox', cw); var paint = function () { cw.classList.toggle('ant-checkbox-wrapper-checked', !!m.consent); if (cbx) cbx.classList.toggle('ant-checkbox-checked', !!m.consent); if (ci) ci.checked = !!m.consent; }; paint(); if (ci) ci.onchange = function () { m.consent = ci.checked; paint(); }; }
 }
 
 /* ---------- 상품 관리 ---------- */
@@ -2680,10 +2747,10 @@ function pProd() {
   $$('.ant-pagination-item').forEach(function (li, i) { if (i > 0) li.remove(); });
   prodCols(ps);
 }
-/* 상품 관리 "예약수" 칼럼(PRD 5.10: 컬럼 설정 "통계" 묶음에서 켬). 시안은 컬럼 설정 창을 그리지 않고, 켠 목록만 보여 줌: 관리 칸 바로 앞, 가운데 정렬 숫자(실화면 추가 칼럼 칸 모양) */
+/* 상품 관리 목록에는 "예약수" 칼럼을 넣지 않음(PRD v1.10 2부 5.10: HOST 상품 관리에는 다른 수치 칼럼도 없어 통일). 칼럼 설정은 실화면 그대로 */
 function prodCols(ps) {
-  var h = H(), cb = byText(document, 'button', '컬럼 설정'); if (cb) cb.onclick = function () { toast('시안에서는 동작하지 않습니다'); };
-  if (!h.pApplied) return;
+  var cb = byText(document, 'button', '컬럼 설정'); if (cb) cb.onclick = function () { toast('시안에서는 동작하지 않습니다'); };
+  return;
   var ths = $$('thead tr:first-child th'), mi = ths.length - 1, nth = ths[mi - 1].cloneNode(true); nth.textContent = '예약수'; nth.style.textAlign = 'center'; nth.setAttribute('data-test', 'hprod-th-pb'); ths[mi].before(mark(nth));
   var cg = $('colgroup'); if (cg && cg.children[mi - 1]) cg.children[mi - 1].after(cg.children[mi - 1].cloneNode(true));
   var mr = $('tr.ant-table-measure-row'); if (mr && mr.children[mi - 1]) { var mc = mr.children[mi - 1].cloneNode(true), tl = $$('*', mc).filter(function (e) { return !e.children.length && e.textContent.trim(); })[0]; if (tl) tl.textContent = '예약수'; mr.children[mi - 1].after(mc); }
@@ -2721,10 +2788,25 @@ function pEdit() {
   var p = PB.prodById(H().editPid) || PB.DB.prods[0];
   var nm = $('input#name') || $$('input').filter(function (i) { return i.id === 'name'; })[0]; if (nm) nm.value = p.name;
   var pr = $('input#price'); if (pr) pr.value = PB.won(p.price);
+  [['언어', langLabel(p.lang)], ['세부분류', p.sub]].forEach(function (kv) { var it = $$('.ant-form-item').filter(function (f) { var l = $('label', f); return l && l.textContent.replace(/\*/g, '').trim() === kv[0]; })[0]; if (!it) return; var sl = $('.ant-select', it); if (sl) setSelect(sl, kv[1], ''); });
   var ds = $('textarea'); if (ds) ds.value = p.name;
   $$('[class*=pageHeader__right] button').forEach(function (b) { var t = b.textContent.trim(); if (t === '목록') b.onclick = function () { go('prod'); }; else b.onclick = function () { toast('시안에서는 동작하지 않습니다'); }; });
   /* 예약 버튼 상태 줄은 넣지 않는다 (입점사는 예약 버튼을 보거나 바꾸지 않음, 2026-10-14 결정) */
 }
 window.draw = draw;
 PB.ready('HOST');
+/* 2026-10-19 10차 · 11차: 실화면 스냅샷에서 가져왔지만 시안에서 동작을 그리지 않은 HOST 컨트롤에 안내 토스트.
+   화면마다 대상을 적어 두고, 이미 동작이 걸린 것은 naBind 가 건너뛴다 */
+var NA_MSG = '시안에서는 동작하지 않습니다';
+var NA_PAGE = [['.ant-pagination-item:not(.ant-pagination-item-active)'], ['.ant-pagination-next:not(.ant-pagination-disabled)'], ['.ant-pagination-jump-next'], ['.ant-pagination-options .ant-select']];
+function NA_LIST() {
+  var v = H().view, L = [['button[class*=_sidebar__logoButton_]'], ['button.ant-dropdown-trigger[class*=_appLayout__header__userBtn_]']];
+  if (v === 'dash') L = L.concat([['[class*=_todoItem_] > button.ant-btn', /^(답장하기|수정하기|확인하기)$/], ['button[class*=_managementTitle_]'], ['[class*=_managementStatusLinks_] > button'], ['[class*=_sectionHeader_] button.ant-btn', /^채팅 전체 보기$/], ['[class*=_chatTable_] > button']]);
+  if (v === 'res') L = L.concat(NA_PAGE, [['tr.ant-table-row', null, 'rows'], ['.ant-flex > button.ant-btn', /^(1주일|1개월|3개월|6개월)$/], ['.ant-select'], ['.ant-picker:not(.ant-picker-disabled)']]);
+  if (v === 'manual') L = L.concat([['.ant-select']]); /* 생년월일 칸은 직접 입력하는 칸이라 안내를 걸지 않음 */
+  if (v === 'prod') L = L.concat(NA_PAGE, [['.ant-space-item > button.ant-btn-primary', /^상품등록$/], ['form .ant-select'], ['button.ant-btn', /^검색$/], ['th.ant-table-column-has-sorters'], ['.ant-table-tbody .ant-switch'], ['tr.ant-table-row', null, 'rows']]);
+  if (v === 'pstat') L = L.concat(NA_PAGE, [['form .ant-select'], ['button.ant-btn', /^검색$/], ['th.ant-table-column-has-sorters'], ['tr.ant-table-row', null, 'rows']]);
+  if (v === 'pedit') L = L.concat([['form .ant-select'], ['.ant-switch'], ['.ant-upload'], ['button.ant-btn', /^연결하기$/], ['.ant-radio-wrapper:not(.ant-radio-wrapper-checked)']]);
+  return L;
+}
 </script></body></html>
