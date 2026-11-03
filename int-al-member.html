@@ -800,6 +800,8 @@ function resetDB(keepRows) {
     agAge: false,         // 쓰지 않음(나이 확인 단계 삭제, 2026-10-17)
     toast: '',
     booked: 0,            // 이 시안에서 보낸 예약 요청 수 (알리페이 회원 목록의 예약 칸)
+    bkPast: 0,            // 그중 방문 일시가 지난 예약 수. 시안에서 보낸 예약은 모두 방문 전(D-8)이라 검수 케이스에서만 올린다
+    wdErr: false,         // 탈퇴 막힘 안내(방문 전 예약이 남은 회원)
     prof: null,           // 회원 정보에 저장된 프로필 (수정 가능)
     sub: 'home',          // 마이페이지 안의 화면: home(마이페이지) | acct(계정 설정)
     draft: null,          // 계정 설정에서 편집 중인 값(저장을 눌러야 회원 정보에 들어간다)
@@ -870,7 +872,7 @@ var CAPS = {
   fo08: '상단 상태의 차단 이유 버튼으로 세 가지(동의 창 닫기 / 프로필 거부 / 식별 실패)를 바꿔 볼 수 있습니다. 헤더, 메뉴, 검색이 없습니다. 동의 창을 닫았을 때, 알리페이 권한 창에서 필수 권한(프로필)을 거부했을 때, 식별에 실패했을 때 머무는 화면입니다. 둘러보기는 없습니다. 버튼은 하나입니다. 식별 실패의 다시 시도는 계정 식별부터 다시 진행하고, 동의 창에서 동의하고 시작하기를 이미 눌렀으면 알리페이 권한 창부터, 아니면 동의 창부터 다시 띄웁니다.',
   fo10: '알리페이 식별이 로그인을 대신합니다. 로그인 주소로 직접 들어오면 My Page로 보냅니다. 알리페이 채널에서는 자체 로그인 경로를 숨깁니다. 점선 박스가 웹 채널에는 있고 알리페이 채널에는 없는 자리입니다. 진입 관문을 통과해야 들어오므로 비로그인 상태 자체가 없습니다.',
   fo11: 'My Page는 현행 화면과 같은 구성입니다. Nickname과 Joined, 알리페이 계정 안내, Booking History, My Activity, Explore, Customer Center가 있고 Change account information 버튼으로 Account Settings에 들어갑니다. Account Settings에서는 칸을 눌러 예시 값으로 바꾸고 Save를 눌러야 회원 정보에 저장됩니다(알리페이 회원 탭에서 확인). Phone Number는 예약이나 계정 설정에서 인증한 번호가 있으면 채워지고, 없으면 빈 칸을 눌러 입력해 Get verification code로 문자 인증을 마치면 바로 저장됩니다. Use a different number로 바꾼 뒤 문자 인증을 마쳐도 바로 저장됩니다. 이메일, 비밀번호 변경, 로그아웃 자리가 없습니다. Marketing messages는 여기서 켜고 끕니다. 알리페이 계정에 닉네임이 없으면 Nickname 자리에 알리페이 회원이 보입니다(회원이 되기 전에 상단 닉네임 비우기로 확인).',
-  fo12: 'My Page > Account Settings의 기존 탈퇴 경로를 그대로 씁니다. 알리페이 연결과 권한이 끊기고 다시 들어오면 새 회원이 되어 진입 관문을 다시 거칩니다.',
+  fo12: 'My Page > Account Settings의 기존 탈퇴 경로를 그대로 씁니다. 알리페이 연결과 권한이 끊기고 다시 들어오면 새 회원이 되어 진입 관문을 다시 거칩니다. 방문 전 예약(변경 요청 · 변경된 예약 포함)이 남아 있으면 탈퇴하지 않고 안내 창 안에 웹과 같은 빨간 문구를 띄웁니다.',
   fo13: '회원 정보에서 채운 값은 고칠 수 있고 고친 값은 회원 정보에 저장됩니다. 이메일 칸이 없습니다. 휴대폰 번호는 알리페이에서 받지 않습니다. 첫 예약 때 직접 입력하고 문자 인증을 하며, 두 번째 예약부터는 회원 정보에 저장된 인증 번호가 채워지고 인증을 건너뜁니다. 고치면 그때 인증합니다. Passport name은 직접 입력합니다. Book은 웹 예약과 같은 필수값(이메일 제외)이 모두 차야 켜집니다. 클리닉 스토어(피부과·성형외과·치과·메디컬체크)는 방문 예정일 기준 만 18세 이상만 예약할 수 있어, 만 18세 미만이면 Book을 눌렀을 때 요청을 보내지 않고 알림 창이 뜹니다(상단 클리닉 스토어로 바꿔 확인). 입력한 값은 그대로 남습니다. Nationality·Gender·Date of birth는 칸을 벗어나는 순간 회원 정보에 들어가고, Mobile phone number·Messenger contact·Passport name은 요청 전에 나가면 남지 않습니다. 상단 상담접수 폼 보기로 알리페이 채널 상담접수 폼을 볼 수 있습니다.',
   bo11: '검색어는 알리페이 식별자, 닉네임, 이름, 연락처를 봅니다. 식별자는 완전 일치로 찾습니다. 빈 값은 알리페이 계정에 값이 없던 항목입니다. 회원 메뉴 아래에 새로 두는 화면입니다. 칼럼은 알리페이가 주는 항목에 맞춘 18개입니다. 이메일과 프로필 동의 여부 칼럼이 없습니다. 연락처는 예약이나 계정 설정에서 인증한 번호입니다. 회원이면 프로필 제공에 항상 동의한 상태입니다.'
 };
@@ -879,7 +881,7 @@ function h(s) { return s == null ? '' : String(s); }
 function dash(v) { return v ? h(v) : '<span class="dash">-</span>'; }
 /* FO-CH-13을 떠나거나 새로 열 때: 예약 요청·상담접수 전에 넣은 값은 남기지 않는다 */
 function reset13() { S.userSet = {}; S.done13 = false; S.age18 = false; S.passport = ''; S.minor13 = ''; S.rmsg = ''; S.rchip = ''; S.cd = null; S.doneC = false; S.tel = S.mtel; S.telVerified = !!S.mtel; S.telEdited = false; S.telSaved = S.mtelSaved; }
-function go(v) { if (v === 'fo11') S.sub = 'home'; if ((S.view === 'fo13' && v !== 'fo13') || (v === 'fo13' && (S.view !== 'fo13' || S.done13 || S.doneC))) reset13(); S.view = v; render(); }
+function go(v) { S.wdErr = false; if (v === 'fo11') S.sub = 'home'; if ((S.view === 'fo13' && v !== 'fo13') || (v === 'fo13' && (S.view !== 'fo13' || S.done13 || S.doneC))) reset13(); S.view = v; render(); }
 function setF13(m) { S.f13 = m; if (S.view === 'fo13') reset13(); render(); }
 
 /* 클리닉 스토어 예약 나이: 방문 예정일 기준 만 18세 이상 */
@@ -1053,6 +1055,7 @@ function fo12() {
     '<div class="sec"><div class="h">탈퇴하면 이렇게 됩니다</div><div class="box"><div class="sub" style="margin-top:0">' +
     '알리페이 계정과의 연결이 끊깁니다.<br>예약 내역과 채팅 기록을 볼 수 없습니다.<br>다시 들어오면 같은 알리페이 계정이라도 새 회원으로 시작합니다.<br>알리페이 앱 쪽 계정에는 아무 영향이 없습니다.' +
     '</div></div></div><div class="note">보관과 파기는 개인정보 처리방침을 따릅니다.</div>' +
+    (S.wdErr ? '<div class="err" data-test="al-withdraw-err">You can&#39;t delete your account while you have an upcoming booking. Please try again after your visit.</div>' : '') +
     '<div class="cta" onclick="withdraw()">탈퇴하기</div>' +
     '', '', '‹', false, false, '⚙', false, 'openAcct()');
 }
@@ -1132,7 +1135,11 @@ function syncMe() {
   me.tel = S.mtel; me.pp = S.passportSaved || ''; me.bk = S.booked || 0; me.ns = 0; me.profd = S.joined ? clk(0) : ''; me.mkt = S.agMkt ? '동의' : '미동의'; me.mktd = (S.joined && S.agMkt && S.mktDate) ? S.mktDate.replace(' (월)', '') : '';
 }
 /* 탈퇴: 지금 회원 행을 탈퇴로 남긴다. 다시 들어오면 같은 알리페이 식별자로 새 회원번호·가입일의 새 행이 생긴다 */
+/* 방문 전 예약 수: 방문 일시가 아직 지나지 않은 예약(변경 요청 · 변경된 예약 포함). 시안은 상태를 따로 두지 않고 보낸 예약 수 - 방문 일시가 지난 예약 수로 센다 */
+function upcomingBk() { return Math.max(0, (S.booked || 0) - (S.bkPast || 0)); }
 function withdraw() {
+  /* 통합 PRD v1.37: 방문 전 예약이 있으면 탈퇴를 막고 탈퇴 안내 창 안에 웹과 같은 빨간 문구를 띄운다 */
+  if (upcomingBk() > 0) { S.wdErr = true; render(); return; }
   syncMe(); var old = {}; for (var k in MEM[0]) old[k] = MEM[0][k];
   old.self = false; old.snap = true; old.quit = clk(40);
   MEM.splice(1, 0, old); GEN++;
@@ -1415,7 +1422,8 @@ function fo12() {
   if (!S.joined || !S.prof) return phoneNote('회원 탈퇴', '회원이 만들어진 뒤에 보이는 화면입니다. 위쪽 처음으로를 누른 뒤 진입 동의 창에서 동의를 마쳐 주세요.');
   return rPhone(rHeader('Delete Membership', 'openAcct()', 'home') + '<main class="' + RWD + '" data-test="al-withdraw-page"><div class="' + RWD + '__content"><div class="' + RWD + '__content__intro"><div class="' + RWD + '__content__intro__title"><span class="' + RWD + '__content__intro__title__text">Membership Withdrawal Notice</span></div>' +
     '<div class="' + RWD + '__content__intro__description" data-test="al-withdraw-lines">' + ['알리페이 계정과의 연결이 끊깁니다.', '예약 내역과 채팅 기록을 볼 수 없습니다.', '다시 들어오면 같은 알리페이 계정이라도 새 회원으로 시작합니다.', '알리페이 앱 쪽 계정에는 아무 영향이 없습니다.'].map(function (x) { return '<p class="' + RWD + '__content__intro__description__text">' + x + '</p>'; }).join('') + '</div></div>' +
-    '<p class="rf-wnote" data-test="al-withdraw-note">보관과 파기는 개인정보 처리방침을 따릅니다.</p></div>' +
+    '<p class="rf-wnote" data-test="al-withdraw-note">보관과 파기는 개인정보 처리방침을 따릅니다.</p>' +
+    (S.wdErr ? '<p class="rf-err" style="margin-top:8px" data-test="al-withdraw-err">You can&#39;t delete your account while you have an upcoming booking. Please try again after your visit.</p>' : '') + '</div>' +
     '<div class="' + RWD + '__footer"><button type="button" class="' + RAC + 'saveButton" data-test="al-withdraw" onclick="withdraw()">Still Want to Withdraw?</button></div></main>', '');
 }
 

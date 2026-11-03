@@ -63,19 +63,19 @@ function seedProducts(){
 function snapOf(p){return {name:p.name,price:p.price,lang:p.lang};}
 function seedBookings(P){
  var byId={};P.forEach(function(p){byId[p.id]=p;});
- // [방문, 접수, 이름, 국적, 언어, 메신저, 상태, 등록주체, 유입경로, 상품id, 스냅샷가격, 처리필요, 채널, 요청사항]
+ // [방문, 접수, 이름, 국적, 언어, 메신저, 상태, 등록주체, 유입경로, 상품id, 스냅샷가격, 처리필요, 채널, 요청사항] (채널: 수기 예약=등록 주체 매장은 '-', 통합 PRD v1.37)
  var A=[
  ['2026-10-18 15:00','2026-10-10 08:24','Kaitlyn Chan','캐나다','en','WhatsApp','예약','고객','상품',101,89000,'신규','웹','Please use a gentle product for sensitive skin.'],
  ['2026-10-18 14:00','2026-10-09 10:58','Evelyn Lee','캐나다','en','WhatsApp','예약','고객','스토어',null,null,'신규','웹',''],
  ['2026-10-17 11:00','2026-10-11 21:14','Rina Takeda','일본','ja','LINE','예약','고객','스토어',102,null,'신규','웹',''],
  ['2026-10-16 16:00','2026-10-08 09:40','Wang Siyu','중국','zh','WeChat','변경요청','고객','상품',107,null,'변경','알리페이 중국',''],
- ['2026-10-15 13:00','2026-10-07 13:05','Mia Tan','싱가포르','en','WhatsApp','예약','매장',null,108,null,'','웹','전화로 접수'],
+ ['2026-10-15 13:00','2026-10-07 13:05','Mia Tan','싱가포르','en','WhatsApp','예약','매장',null,108,null,'','-','전화로 접수'],
  ['2026-10-12 10:00','2026-10-02 12:00','Claire Wald','미국','en','WhatsApp','예약','고객','상품',106,null,'방문결과','웹',''],
  ['2026-10-10 14:00','2026-10-01 18:24','Yuko Hamada','일본','ja','LINE','방문완료','고객','스토어',null,null,'','웹',''],
  ['2026-10-09 12:00','2026-09-28 23:37','Hui Ping Ho','말레이시아','en','WhatsApp','방문완료','고객','상품',103,null,'','웹',''],
  ['2026-10-05 10:00','2026-09-30 15:20','Aigerim Nurlanova','카자흐스탄','en','KakaoTalk','미방문','고객','스토어',null,null,'','웹',''],
  ['2026-10-03 15:00','2026-09-25 05:14','Madison Piao','미국','en','WeChat','고객취소','고객','상품',101,92000,'','웹',''],
- ['2026-09-27 14:00','2026-09-24 02:56','Elina Petrova','러시아','en','WhatsApp','방문완료','매장',null,null,null,'','웹','현장 방문'],
+ ['2026-09-27 14:00','2026-09-24 02:56','Elina Petrova','러시아','en','WhatsApp','방문완료','매장',null,null,null,'','-','현장 방문'],
  ['2026-09-20 11:00','2026-09-15 16:20','Chen Yuxuan','중국','zh','WeChat','방문완료','고객','상품',107,null,'','알리페이 중국',''],
  ['2026-09-12 12:00','2026-09-08 10:11','Chloe Tan','싱가포르','en','WhatsApp','매장취소','고객','상품',108,null,'','웹','']
  ];
@@ -146,7 +146,7 @@ function manSave(){
  if(!m.date||!m.time)return '방문 일시를 선택해주세요';
  if(!m.lang)return '언어를 선택해주세요';
  var p=m.pid?prodById(m.pid):null,no=DB.books.length+1;
- DB.books.push({no:no,visit:m.date+' '+m.time,recv:NOWTS,name:m.name.trim(),nation:'-',lang:m.lang,contact:'-',status:'예약',owner:'매장',route:null,prodId:p?p.id:null,snap:p?snapOf(p):null,need:'',ch:'웹',req:'',phone:'-',rno:rnoFor(NOWTS,m.lang,DB.books)});
+ DB.books.push({no:no,visit:m.date+' '+m.time,recv:NOWTS,name:m.name.trim(),nation:'-',lang:m.lang,contact:'-',status:'예약',owner:'매장',route:null,prodId:p?p.id:null,snap:p?snapOf(p):null,need:'',ch:'-' /* 수기 예약(등록 주체 매장)은 유입 채널 없음: 표는 "-", 채널 필터 하나를 고르면 빠지고 전체에만 보임(통합 PRD v1.37) */,req:'',phone:'-',rno:rnoFor(NOWTS,m.lang,DB.books)});
  S.host.man={date:'',time:'',name:'',lang:'',pid:''};S.host.view='res';S.host.open=no;
  return '';
 }

@@ -424,6 +424,8 @@ const ageOf=b=>{const y=+b.slice(0,4);let a=2026-y;if(b.slice(5)>T.slice(5))a--;
 const ageB=a=>a<20?'10대':a<30?'20대':a<40?'30대':a<50?'40대':'50대 이상';
 
 [RES,CONS,CHATS,PCHATS,REV,STAT,SURVEY].forEach(a=>a.forEach(r=>{r.cv=r.ch}));
+/* 수기 예약(등록 주체 관리자, 운영자가 대신 등록)은 유입 채널 없음: 표는 "-", 채널 하나를 고르면 빠지고 전체에만 보임(통합 PRD v1.37) */
+RES.forEach(r=>{if(r.reg==='관리자'){r.ch='-';r.cv='-';}});
 /* 전화번호 정리: +1은 나라별 지역번호로, 같은 이름은 모든 목록에서 같은 번호 */
 (function(){const AR={'캐나다':['416','647','437','604','778','514','438','403','587','613'],'미국':['212','646','917','213','310','415','312','206','617','702']};
   const fix=(ph,nat)=>{const m=/^\+1 (\d{10})$/.exec(ph||'');if(!m)return ph;const d=m[1],a=(AR[nat]||AR['미국']);return '+1 '+a[(+d.slice(0,2))%a.length]+String(2+(+d[3])%8)+d.slice(4)};
@@ -512,7 +514,7 @@ function resDrawer(){
   const foot=cancelled?'<div class="dfoot"><div class="dinfo">취소된 예약이에요. 이 시간은 다시 예약받을 수 있어요.</div></div>'
     :(r.status==='예약'?'<div class="dfoot"><div class="dinfo">매장 대신 취소할 수 있어요. 취소하면 고객에게 취소 사유가 함께 안내돼요.</div><div class="dbtn" data-act="nop">예약 변경</div><div class="dbtn red" data-act="nop">강제 취소</div></div>':'');
   return '<div class="dov" data-act="rclose"></div><aside class="dwr"><div class="dhd"><span>예약 상세</span><span class="dx" data-act="rclose">&times;</span></div><div class="dscroll">'
-   +'<div class="dst"><span class="dstp '+pillCls+'"><i></i>'+r.status+'</span><span class="dchb new" title="유입 채널">'+r.cv+'</span></div>'
+   +'<div class="dst"><span class="dstp '+pillCls+'"><i></i>'+r.status+'</span>'+(r.cv==='-'?'':'<span class="dchb new" title="유입 채널">'+r.cv+'</span>')+'</div>'
    +'<div class="dti">'+title+'</div>'+body
    +'<div class="dsec">고객 요청사항</div><div class="dtb">'+(r.req?esc(r.req):'남긴 내용 없음')+'</div>'+notes
    +'<div class="dsec">처리 이력</div>'+H.map(h=>'<div class="dhis"><div><b>'+h[0]+'</b><small>'+h[1]+(h[1].length<=16?':'+pad((num*3)%60):'')+'</small></div><em>'+h[2]+'</em></div>').join('')+'</div>'+foot+'</aside>';

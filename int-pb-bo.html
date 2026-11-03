@@ -3003,7 +3003,7 @@ function pRes() {
 function openDrawer() {
   var b = B(), x = PB.DB.books.filter(function (y) { return y.no === b.open; })[0]; if (!x) return;
   var dw = fillDrawer('bd', x, '_qrLinkButton_cl90o_140'); dw.setAttribute('data-test', 'bdrawer');
-  var sb0 = $('[class*=statusBadge]', dw); if (sb0) { var cb0 = document.createElement('span'); cb0.className = 'pb-chb'; cb0.title = '유입 채널'; cb0.textContent = x.ch; cb0.setAttribute('data-test', 'ich-badge'); var wr0 = document.createElement('div'); wr0.style.cssText = 'display:flex;gap:6px;align-items:center;align-self:flex-start'; sb0.before(wr0); wr0.appendChild(sb0); wr0.appendChild(mark(cb0)); cb0.style.marginLeft = '0'; }
+  var sb0 = $('[class*=statusBadge]', dw); if (sb0) { var cb0 = document.createElement('span'); cb0.className = 'pb-chb'; cb0.title = '유입 채널'; cb0.textContent = x.ch; cb0.setAttribute('data-test', 'ich-badge'); var wr0 = document.createElement('div'); wr0.style.cssText = 'display:flex;gap:6px;align-items:center;align-self:flex-start'; sb0.before(wr0); wr0.appendChild(sb0); if (x.ch !== '-') wr0.appendChild(mark(cb0)); /* 수기 예약(유입 채널 "-")은 배지 없음 */ cb0.style.marginLeft = '0'; }
   var close = function () { b.open = null; PB.render(); }; $('.ant-drawer-close', dw).onclick = close; var mk = $('.ant-drawer-mask', dw); if (mk) mk.onclick = close;
 }
 

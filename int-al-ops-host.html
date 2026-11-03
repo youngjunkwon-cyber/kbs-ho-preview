@@ -298,7 +298,7 @@ function phoneOf(name,nation,i){
 /* ===== 시드 ===== */
 function seedRes(){
  var A=[
- // [방문, 접수, 이름, 예약번호, 국적, 언어, 연락, 상태, 등록주체, 채널, 요청사항, 메모, 처리필요]
+ // [방문, 접수, 이름, 예약번호, 국적, 언어, 연락, 상태, 등록주체, 채널, 요청사항, 메모, 처리필요] (채널: 등록 주체 매장=수기 예약은 '-')
  ['2026-10-18 15:00','2026-10-01 08:24','Kaitlyn Chan','261001068EN01','캐나다','영어','WhatsApp','예약','고객','웹','Please use a gentle product for sensitive skin.','','신규'],
  ['2026-10-18 14:00','2026-09-29 10:58','Evelyn Lee','260929068EN01','캐나다','영어','WhatsApp','예약','고객','웹','','','신규'],
  ['2026-10-18 13:00','2026-10-01 08:28','shiyi Chen','261001068EN02','캐나다','영어','WeChat','예약','고객','웹','Two people, we would like to sit together.','','신규'],
@@ -310,7 +310,7 @@ function seedRes(){
  ['2026-09-22 10:00','2026-09-02 12:00','yuko hgmada','260902068JA01','일본','일본어','LINE','방문완료','고객','웹','','',''],
  ['2026-09-12 12:00','2026-09-08 23:37','Yaya Robinson','260908068JA01','일본','일본어','LINE','방문완료','고객','웹','','',''],
  ['2026-09-07 10:00','2026-09-06 18:24','KAJIKAWA HINANO','260906068JA01','일본','일본어','LINE','방문완료','고객','웹','','',''],
- ['2026-09-01 12:00','2026-08-21 21:38','NISHIJIMA CHISAKI','260821068JA01','일본','일본어','LINE','방문완료','매장','웹','','전화로 접수한 건','' ],
+ ['2026-09-01 12:00','2026-08-21 21:38','NISHIJIMA CHISAKI','260821068JA01','일본','일본어','LINE','방문완료','매장','-','','전화로 접수한 건','' ],
  ['2026-10-03 08:00','2026-09-28 20:35','Hui Ping Ho','260928068EN01','말레이시아','영어','WhatsApp','방문완료','고객','웹','','',''],
  ['2026-10-01 10:00','2026-09-30 15:20','Altynbekova Kymbat','260930068EN01','카자흐스탄','영어','KakaoTalk','방문완료','고객','웹','','',''],
  ['2026-09-28 06:00','2026-08-16 04:48','Madison Piao','260816068EN01','미국','영어','WeChat','고객취소','고객','웹','','',''],
@@ -322,7 +322,7 @@ function seedRes(){
  ['2026-09-18 14:30','2026-09-10 10:11','Wong Mei Ling','260910068ZT01','홍콩(중국 특별행정구)','중국어(번체)','WhatsApp','고객취소','고객','알리페이 홍콩','','',''],
  ['2026-09-15 16:00','2026-09-09 14:30','张文静','260909068ZH01','중국','중국어(간체)','WeChat','방문완료','고객','알리페이 중국','','',''],
  ['2026-09-10 10:30','2026-09-03 19:00','Patricia Farinas','260903068EN01','미국','영어','KakaoTalk','방문완료','고객','웹','','',''],
- ['2026-09-05 12:00','2026-09-01 09:09','Chloe Tan','260901068EN01','싱가포르','영어','WhatsApp','미방문','매장','웹','','매장에서 직접 등록','' ],
+ ['2026-09-05 12:00','2026-09-01 09:09','Chloe Tan','260901068EN01','싱가포르','영어','WhatsApp','미방문','매장','-','','매장에서 직접 등록','' ],
  ['2026-08-28 13:00','2026-08-20 15:12','Cheung Siu Wai','260820068ZT01','홍콩(중국 특별행정구)','중국어(번체)','WhatsApp','방문완료','고객','알리페이 홍콩','','','']
  ];
  return A.map(function(a,i){var p=phoneOf(a[2],a[4],i+3);return {no:i+1,visit:a[0],recv:a[1],name:a[2],rno:a[3],nation:a[4],lang:a[5],contact:a[6],status:a[7],owner:a[8],ch:a[9],req:a[10],memo:a[11],need:a[12],phone:p.text,local:p.local};});
@@ -459,7 +459,7 @@ function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return
 /* 화면에도 채널 기록값 그대로 웹 / 알리페이 중국 / 알리페이 홍콩 셋을 보인다(통합 PRD v1.32) */
 function dch(c){return c;}
 function chOk(c,f){return f==='전체'||c===f;}
-function chB(c){return '<span class="chb new" title="유입 채널">'+dch(c)+'</span>';}
+function chB(c){if(c==='-')return ''; /* 수기 예약(등록 주체 매장)은 유입 채널 없음: 배지 생략(통합 PRD v1.37) */return '<span class="chb new" title="유입 채널">'+dch(c)+'</span>';}
 function getP(path){var p=path.split('.'),o=S;for(var i=0;i<p.length;i++)o=o[p[i]];return o;}
 function setP(path,v){var p=path.split('.'),o=S;for(var i=0;i<p.length-1;i++)o=o[p[i]];o[p[p.length-1]]=v;}
 function ic(n){
@@ -524,8 +524,9 @@ function statsOf(chs){
  var m=DB.msg.filter(function(x){return chs.indexOf(x.ch)>=0&&inRange(x.at,rg[0],rg[1]);});
  var inCh=function(x){return chs.indexOf(x.ch)>=0;};
  var chat=DB.chatlog.filter(function(x){return inCh(x)&&inRange(x.last,rg[0],rg[1]);}).length;
- var conf=DB.res.filter(function(x){return inCh(x)&&x.status!=='고객취소'&&inRange(x.recv,rg[0],rg[1]);}).length;
- var done=DB.res.filter(function(x){return inCh(x)&&x.status==='방문완료'&&inRange(x.visit,rg[0],rg[1]);}).length;
+ var inR=function(x){return inCh(x)||(chs===CHS&&x.ch==='-');}; /* 수기 예약(유입 채널 '-')은 전체 합계에만 */
+ var conf=DB.res.filter(function(x){return inR(x)&&x.status!=='고객취소'&&inRange(x.recv,rg[0],rg[1]);}).length;
+ var done=DB.res.filter(function(x){return inR(x)&&x.status==='방문완료'&&inRange(x.visit,rg[0],rg[1]);}).length;
  return {store:a[0],prod:a[1],msg:m.length,chat:chat,conf:conf,done:done,rows:m,wa:m.filter(function(x){return x.app==='WhatsApp';}).length,li:m.filter(function(x){return x.app==='LINE';}).length,wc:m.filter(function(x){return x.app==='WeChat';}).length};
 }
 function stats(){
