@@ -2693,6 +2693,10 @@ div:has(> #store-form-preview) > div:first-child{flex:1 1 480px!important;min-wi
 
 /* 좁은 칸 안내는 단어 단위 줄바꿈, 주황 안내는 스위치와 띄움 */
 .pb-lockhint{word-break:keep-all}
+/* 잠긴 예약 줄: 라디오 오른쪽에 안내. 라디오는 줄바꿈 없이, 안내는 남은 폭 안에서 블록으로 줄바꿈 */
+.pb-bookrow{display:flex;align-items:center;gap:12px;flex-wrap:nowrap}
+.pb-bookrow>.ant-radio-group{flex:0 0 auto;white-space:nowrap}
+.pb-lockhint.pb-lockside{flex:1 1 0;min-width:96px;margin-top:0;line-height:1.4}
 .pb-offbox{margin-right:16px !important}
 </style></head>
 <body><div id="app"></div>
@@ -3211,7 +3215,8 @@ function pEdit() {
   /* 다른 버튼 줄과 같은 켜고 끄는 칸 하나(PRD 5.3, 결정 5). 예약 설정이 꺼졌거나 기본 설정이면 잠기고 저장된 값을 흐리게 */
   var lock = !s.bookingSetting; radioSet(g, p.book ? 'y' : 'n', lock || base); g.setAttribute('data-test', 'prod-book');
   $$('label.ant-radio-wrapper', g).forEach(function (l) { l.onclick = function (e) { e.preventDefault(); if (base) return; if (!s.bookingSetting) { toast('예약설정에서 예약을 사용하면 켤 수 있습니다.'); return; } p.book = $('input', l).value === 'y'; PB.render(); }; });
-  if (!s.bookingSetting && !base) { var ex = document.createElement('div'); ex.className = 'ant-form-item-explain ant-form-item-explain-connected'; ex.innerHTML = '<div class="pb-lockhint" data-test="lockmsg">예약설정에서 예약을 사용하면 켤 수 있습니다.</div>'; $('.ant-form-item-control', nc).appendChild(ex); }
+  /* 잠긴 예약 줄 오른쪽 안내(PRD 5.3): 라디오와 같은 줄 오른쪽. 좁으면 오른쪽 칸 안에서 줄바꿈 */
+  if (!s.bookingSetting && !base) { var ic = $('.ant-form-item-control-input-content', nc); ic.classList.add('pb-bookrow'); var ex = document.createElement('div'); ex.className = 'pb-lockhint pb-lockside'; ex.setAttribute('data-test', 'lockmsg'); ex.textContent = '예약설정에서 예약을 사용하면 켤 수 있습니다.'; ic.appendChild(ex); }
   var holder = msgCol.cloneNode(false); holder.style.cssText = msgCol.style.cssText; holder.appendChild($('.ant-form-item', nc)); msgCol.after(mark(holder));
   if (base) { var bh = document.createElement('div'); bh.className = 'pb-seatline'; bh.setAttribute('data-test', 'base-hint'); bh.textContent = '기본 설정 적용 중입니다. 개별 설정을 선택하면 수정할 수 있습니다.'; holder.after(mark(bh)); }
   /* 버튼 조합은 지금 웹 규칙: 최대 2개, 메신저 왼쪽, 나머지 한 자리는 예약 > 외부링크 > 상담접수. 셋 이상 켜도 저장은 막지 않음(PRD 5.3) */
