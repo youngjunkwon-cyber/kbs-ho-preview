@@ -3311,6 +3311,8 @@ function pSinq() {
   /* 도넛 카드 6개 높이를 가장 큰 카드에 맞춤(줄바꿈돼도 같음) */
   var dp = $$('[class*=summaryPanel]').filter(function (p) { return $('[class*=donutChart]', p); }); dp.forEach(function (p) { p.style.minHeight = ''; });
   var dh = Math.max.apply(null, dp.map(function (p) { return p.offsetHeight; }).concat([0])); if (dh) dp.forEach(function (p) { p.style.minHeight = dh + 'px'; p.style.boxSizing = 'border-box'; });
+  /* 렌더 뒤에 창 폭이 바뀌어도(체크리스트 넓게 등) 다시 맞춤 */
+  if (!window.__pbDonutRs) { window.__pbDonutRs = 1; window.addEventListener('resize', function () { var q = $$('[class*=summaryPanel]').filter(function (p) { return $('[class*=donutChart]', p); }); if (!q.length) return; q.forEach(function (p) { p.style.minHeight = ''; }); var m = Math.max.apply(null, q.map(function (p) { return p.offsetHeight; }).concat([0])); if (m) q.forEach(function (p) { p.style.minHeight = m + 'px'; p.style.boxSizing = 'border-box'; }); }); }
   /* 탭: 스토어별 집계 / 상세 보기 */
   $$('.ant-tabs-tab').forEach(function (tb) { var k = tb.getAttribute('data-node-key'); if (!k) return; tb.setAttribute('data-test', 'sinq-tab-' + k); tb.onclick = function () { b.stab = k === 'detail' ? 'detail' : ''; PB.render(); }; });
   $$('button').filter(function (x) { return x.textContent.trim() === '엑셀 다운로드'; }).forEach(function (x) { x.onclick = function () { toast('시안에서는 동작하지 않습니다'); }; });

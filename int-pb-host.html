@@ -2285,7 +2285,9 @@ body { background-color: rgb(240, 242, 245); }
 :root { --editor-content-color-image-caption-background: #f7f7f7; --editor-content-color-image-caption-text: #333; }
 :root { --editor-content-image-style-spacing: 1.5em; --editor-content-inline-image-style-spacing: calc(var(--editor-content-image-style-spacing) / 2); }
 :root { --editor-content-color-table-caption-background: #f7f7f7; --editor-content-color-table-caption-text: #333; }
-html body { overflow-y: hidden; }</style>
+html body { overflow-y: hidden; }.pb-native-date{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;border:0;padding:0}
+.ant-picker-suffix.pb-cal{cursor:pointer;pointer-events:auto}
+</style>
 <style>/* 시안용 추가 스타일: 이번에 더한 요소 표시, 드롭다운, 토스트, 상품 영역 */
 body.pb-mark .pb-new{outline:1.5px dashed #ff4f8b !important;outline-offset:2px}
 body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
@@ -2733,6 +2735,17 @@ function pManual() {
   var wrap = document.createElement('div'); wrap.style.marginTop = '8px'; wrap.appendChild(mark(item)); visitCard.appendChild(wrap);
   /* 이름·언어 */
   var name = $('input[placeholder*="영문명"]'); if (name) { name.value = m.name; name.oninput = function () { m.name = name.value; }; name.setAttribute('data-m', 'name'); }
+  /* 생년월일: 직접 입력(YYYY-MM-DD) 또는 달력 아이콘으로 날짜 선택. 값은 다시 그려도 남는다 */
+  var bi = $('input#birthDate'); if (bi) { bi.value = m.birth || ''; bi.setAttribute('data-m', 'birth'); bi.oninput = function () { m.birth = bi.value; };
+    var bp = bi.closest('.ant-picker'), sfx = bp && $('.ant-picker-suffix', bp);
+    if (sfx) { sfx.classList.add('pb-cal'); sfx.setAttribute('data-test', 'birth-cal'); sfx.onclick = function (e) { e.preventDefault(); e.stopPropagation();
+      var nd = document.createElement('input'); nd.type = 'date'; nd.className = 'pb-native-date'; nd.max = PB.TODAY; if (/^\d{4}-\d{2}-\d{2}$/.test(m.birth || '')) nd.value = m.birth; bp.style.position = 'relative'; bp.appendChild(nd);
+      nd.onchange = function () { if (nd.value) { m.birth = nd.value; bi.value = nd.value; } nd.remove(); };
+      nd.onblur = function () { setTimeout(function () { if (nd.parentElement) nd.remove(); }, 300); };
+      try { if (nd.showPicker) nd.showPicker(); else { nd.remove(); bi.focus(); } } catch (er) { nd.remove(); bi.focus(); } }; } }
+  /* 나머지 직접 입력 칸(이메일 · 연락처 · 메신저 아이디 · 요청사항): 다른 칸을 고르면 다시 그려지므로 값을 기억해 둔다 */
+  m.f = m.f || {};
+  $$('input.ant-input, textarea.ant-input').forEach(function (x) { if (x === name || x === bi) return; var k = x.placeholder || x.id; if (!k) return; if (x.tagName === 'TEXTAREA') k = 'req'; if (m.f[k] != null) x.value = m.f[k]; x.addEventListener('input', function () { m.f[k] = x.value; }); });
   var ls = $('.ant-select', langItem); setSelect(ls, m.lang ? langLabel(m.lang) : '', '언어를 선택해주세요');
   ls.onclick = function () { dropdown(ls, Object.keys(PB.LANGS).map(function (k) { return [k, PB.LANGS[k]]; }), m.lang, function (v) { if (v !== m.lang) { var cp = m.pid ? PB.prodById(m.pid) : null; if (cp && cp.lang !== v) m.pid = ''; } m.lang = v; PB.render(); }, ACC); };
   /* 정보 저장 동의 체크: 누르면 체크 모양이 바뀌고 값이 남는다(11차 감사 9번) */
