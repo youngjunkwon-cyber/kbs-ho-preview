@@ -1234,14 +1234,16 @@ function pProduct() {
   var pr = $('[class*=price__value]'); if (pr) pr.textContent = krw(p.price);
   $$('[class*=description__text]').forEach(function (d) { d.textContent = p.name; });
   /* 하단 버튼 줄: 상품 상세 실화면 부품(Bwsfja productDetailFooter). 메신저 = 검은 messengerButton(STG 상품 3222 실측), 예약 = productDetailFooter__button--primary1
-     버튼 조합은 지금 웹 규칙(PRD 5.3): 최대 2개, 메신저 왼쪽, 나머지 한 자리는 예약 > 외부링크 > 상담접수 순으로 켜진 것 하나(PB.prodButtons) */
+     버튼 조합은 지금 웹 규칙(PRD 5.3): 최대 2개, 메신저 왼쪽, 나머지는 예약 > 외부링크 > 상담접수 순(PB.prodButtons) */
   var nf = $('footer[class*=productDetailFooter]'); if (!nf) { nf = document.createElement('footer'); nf.className = 'index-module-scss-module__Bwsfja__productDetailFooter'; document.getElementById('app').appendChild(nf); } nf.innerHTML = '';
-  var bl = PB.prodButtons(p, f.lang), slot = bl.filter(function (x) { return x !== '메신저'; })[0] || ''; nf.setAttribute('data-buttons', bl.join(','));
+  var bl = PB.prodButtons(p, f.lang), slots = bl.filter(function (x) { return x !== '메신저'; }); nf.setAttribute('data-buttons', bl.join(','));
   if (bl.indexOf('메신저') >= 0) nf.appendChild(msgButton('WeChat'));
-  var book = document.createElement('button'); book.type = 'button'; book.className = 'index-module-scss-module__Bwsfja__productDetailFooter__button index-module-scss-module__Bwsfja__productDetailFooter__button--primary1'; book.textContent = 'Book now'; nf.appendChild(book);
-  if (slot === '예약') { book.setAttribute('data-test', 'prod-book'); book.onclick = function () { p.bclk = (p.bclk || 0) + 1; startBook('product'); }; mark(book); }
-  else if (slot) { /* 외부링크 · 상담접수 자리: 버튼 문구는 시안 표기(실화면 문구는 그대로 씀) */ book.textContent = slot === '외부링크' ? 'Visit link' : 'Request consultation'; book.setAttribute('data-test', 'prod-slot'); book.setAttribute('data-slot', slot); book.onclick = function () { toast('Not available in this mockup'); }; }
-  else { book.remove(); var only = $('.pb-msg1', nf); if (only) only.setAttribute('data-test', 'fo-msg-solo'); if (!nf.children.length) { nf.setAttribute('data-test', 'fo-footer-empty'); nf.style.display = 'none'; } }
+  slots.forEach(function (slot) {
+    var book = document.createElement('button'); book.type = 'button'; book.className = 'index-module-scss-module__Bwsfja__productDetailFooter__button index-module-scss-module__Bwsfja__productDetailFooter__button--primary1'; book.textContent = 'Book now'; nf.appendChild(book);
+    if (slot === '예약') { book.setAttribute('data-test', 'prod-book'); book.onclick = function () { p.bclk = (p.bclk || 0) + 1; startBook('product'); }; mark(book); }
+    else { /* 외부링크 · 상담접수 자리: 버튼 문구는 시안 표기(실화면 문구는 그대로 씀) */ book.textContent = slot === '외부링크' ? 'Visit link' : 'Request consultation'; book.setAttribute('data-test', 'prod-slot'); book.setAttribute('data-slot', slot); book.onclick = function () { toast('Not available in this mockup'); }; }
+  });
+  if (!slots.length) { var only = $('.pb-msg1', nf); if (only) only.setAttribute('data-test', 'fo-msg-solo'); if (!nf.children.length) { nf.setAttribute('data-test', 'fo-footer-empty'); nf.style.display = 'none'; } }
 }
 
 /* ---------- 예약 일정 (상품 영역 추가) ---------- */
@@ -1250,7 +1252,7 @@ function pBook() {
   if (!PB.DB.store.bookingSetting) { var app = document.getElementById('app'); app.innerHTML = ''; app.appendChild(header('Book', 'store')); var s = document.createElement('div'); s.className = 'pb-stop'; s.innerHTML = '<b>Bookings are unavailable right now</b><span>This store has temporarily paused bookings</span>'; app.appendChild(s); return; }
   $('header [class*=headerTitle]').textContent = f.mode === 'change' ? 'Request a change' : 'Book';
   if (f.mode === 'change') { pChange(); return; }
-  /* 상품 고정 진입(상품 상세 [예약] · 상품 예약 URL)인데 그 상품을 지금 이 언어로 예약할 수 없으면 들어오자마자 안내(PRD 5.2: 버튼 꺼짐 · 노출 아님 · 삭제 · 다른 언어 상품, 예약 중 언어를 바꾼 경우 포함) */
+  /* 상품 고정 진입(상품 상세 [예약] · 상품 예약 URL)인데 그 상품을 지금 이 언어로 예약할 수 없으면 들어오자마자 안내(PRD 5.2: 버튼 꺼짐 · 노출 아님 · 삭제 · 다른 언어 상품) */
   if (f.entry === 'product') { var up = PB.prodById(f.pid); if (!up || !PB.judgeBookable(up, f.lang).ok) { $$('[class*=scheduleCalendar], [class*=scheduleDivider], [class*=timeSection], [class*=scheduleFooter]').forEach(function (x) { x.remove(); }); var ub = document.createElement('div'); ub.className = 'pb-ferr box'; ub.setAttribute('data-test', 'fo-url-err'); ub.innerHTML = "This product can't be booked right now.<button class='pb-ferr-b' type='button'>Go to store page</button>"; var si = $('[class*=scheduleIntro]'); if (si) si.after(mark(ub)); else ($('main') || document.getElementById('app')).prepend(mark(ub)); $('button', ub).onclick = function () { f.viaUrl = false; nav('store'); }; $$('header button').forEach(function (b, i) { b.onclick = function () { f.viaUrl = false; nav('store'); }; }); return; } }
   $$('header button').forEach(function (b, i) { b.onclick = function () { nav(i === 0 ? (f.entry === 'product' ? 'product' : 'store') : 'store'); }; });
   /* 상품 영역 */

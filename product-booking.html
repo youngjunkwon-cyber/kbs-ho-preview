@@ -51,12 +51,12 @@ function seedProducts(){
  // [id, lang, name, price, status, active, hidden, deleted, mode, book(예약 줄), sub]
  var A=[
  [101,'en','Abijou Botox',99000,'approved',1,0,0,'기본',1,'보톡스'],
- [102,'ja','Abijou ボトックス',99000,'approved',1,0,0,'기본',0,'보톡스'],
+ [102,'ja','Abijou ボトックス',99000,'approved',1,0,0,'개별',0,'보톡스'],
  [103,'en','Abijou Skin Booster',190000,'approved',1,0,0,'개별',1,'스킨부스터'],
  [104,'ja','Abijou スキンブースター',190000,'approved',1,0,0,'개별',0,'스킨부스터'],
  [105,'en','Abijou Lifting',270000,'pending',1,0,0,'기본',0,'리프팅'],
  [106,'en','Abijou Laser Toning',150000,'approved',1,1,0,'기본',0,'색소/점/문신'],
- [107,'zh','Abijou 肉毒杆菌',99000,'approved',1,0,0,'기본',0,'보톡스'],
+ [107,'zh','Abijou 肉毒杆菌',99000,'approved',1,0,0,'개별',0,'보톡스'],
  [108,'en','Abijou Acne Care',120000,'approved',1,0,0,'개별',1,'여드름/흉터'],
  [109,'zh','Abijou 皮肤护理',120000,'approved',1,0,0,'개별',1,'여드름/흉터']
  ];
@@ -102,8 +102,9 @@ function freshState(){return {surf:'HOST',mark:true,
 /* ===== 판정 (순수 함수) ===== */
 function prodById(id){return DB.prods.filter(function(p){return p.id===+id;})[0]||null;}
 function storeBookBtn(){var s=DB.store;return !!(s.bookingSetting&&s.btn);}
-/* 상품 예약 버튼: 예약 설정에만 묶임. 기본 설정 상품도 스토어 예약 버튼 값을 따르지 않고 상품 값을 씀(PRD 5.3) */
-function prodBookBtn(p){if(!DB.store.bookingSetting)return false;return !!p.book;}
+/* 상품 예약 버튼(PRD 5.3, 2026-11-04): 기본 설정 상품은 스토어 예약 버튼 값을 그대로 따르고, 개별 설정 상품은 상품 값 */
+function prodBookVal(p){return p.mode==='기본'?!!DB.store.btn:!!p.book;}
+function prodBookBtn(p){if(!DB.store.bookingSetting)return false;return prodBookVal(p);}
 function prodVisible(p,lang){return p.status==='approved'&&p.active&&!p.hidden&&!p.deleted&&p.lang===lang;}
 function judgeBookable(p,lang){
  var conds=[['예약 설정',DB.store.bookingSetting],['상품 노출',prodVisible(p,lang)],['상품 예약 버튼',prodBookBtn(p)]];
@@ -111,17 +112,18 @@ function judgeBookable(p,lang){
  return {ok:!bad,reason:bad?bad[0]:'',conds:conds};
 }
 function foOptions(lang){return DB.prods.filter(function(p){return judgeBookable(p,lang).ok;});}
-/* 상품 상세 하단 버튼(지금 웹 규칙, PRD 5.3): 최대 2개, 메신저는 왼쪽, 나머지 한 자리는 예약 > 외부링크 > 상담접수 순으로 켜져 있는 것 하나.
-   기본 설정 상품은 다른 버튼을 스토어 값(STORE_WB: 메신저만 ON)으로 보고, 예약은 상품 값. 저장은 막지 않음 */
+/* 상품 상세 하단 버튼(지금 웹 규칙, PRD 5.3): 최대 2개, 메신저는 왼쪽, 나머지는 예약 > 외부링크 > 상담접수 순.
+   기본 설정 상품은 다른 버튼을 스토어 값(STORE_WB: 메신저만 ON)으로, 예약은 스토어 예약 버튼 값으로 본다. 셋째 칸은 BO에서 켤 수 없다(배포 전부터 셋 이상이면 앞의 2개) */
 var STORE_WB={'메신저':true};
 function prodButtons(p,lang){
  var src=p.mode==='기본'?STORE_WB:(p.wb||{}),out=[];
  if(src['메신저'])out.push('메신저');
- var slot=judgeBookable(p,lang||p.lang).ok?'예약':src['외부링크']?'외부링크':src['상담접수']?'상담접수':null;
- if(slot)out.push(slot);
- return out;
+ if(judgeBookable(p,lang||p.lang).ok)out.push('예약');
+ if(src['외부링크'])out.push('외부링크');
+ if(src['상담접수'])out.push('상담접수');
+ return out.slice(0,2);
 }
-function manualOptions(lang){if(!lang)return [];return DB.prods.filter(function(p){return p.status==='approved'&&!p.deleted&&p.lang===lang;});} /* 수기 예약: 예약자 정보에서 고른 언어의 상품만, 언어 전에는 없음 */
+function manualOptions(lang){if(!lang)return [];return DB.prods.filter(function(p){return p.status==='approved'&&p.active&&!p.hidden&&!p.deleted&&p.lang===lang;});} /* 수기 예약: 예약자 정보에서 고른 언어의 상품 중 활성이고 히든이 아닌 상품만(비활성·히든·삭제 제외, 2026-11-04). 언어 전에는 없음 */
 function bookingKind(b){return b.prodId?'상품 예약':'스토어 예약';}
 function prodBookCount(pid,from,to){return DB.books.filter(function(b){var d=b.recv.slice(0,10);return b.prodId===pid&&(!from||d>=from)&&(!to||d<=to);}).length;}
 var TIMES=['10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30'];
@@ -208,7 +210,7 @@ window.PB={
  get DB(){return DB;},get S(){return S;},TODAY:TODAY,NOWTS:NOWTS,LANGS:LANGS,TIMES:TIMES,ME:ME,STORE_WB:STORE_WB,
  /* 기존 문의 표본(BO 스토어 문의 통계 · HOST 대시보드 공용): [문의구분, 언어, 채널, 접수일, 접수 시각] */
  SINQ_BASE:[['스토어','en','메신저상담','2026-10-03','11:40'],['상품','en','메신저상담','2026-10-05','15:12'],['상품','ja','메신저상담','2026-10-06','10:05'],['스토어','zh','채팅문의','2026-10-08','13:31'],['상품','en','상담문의','2026-10-09','16:48'],['상품','en','메신저상담','2026-10-11','09:27'],['스토어','ja','메신저상담','2026-10-12','10:16']],
- addDays:addDays,wdKo:wdKo,won:won,prodById:prodById,prodVisible:prodVisible,prodBookBtn:prodBookBtn,storeBookBtn:storeBookBtn,judgeBookable:judgeBookable,prodButtons:prodButtons,
+ addDays:addDays,wdKo:wdKo,won:won,prodById:prodById,prodVisible:prodVisible,prodBookBtn:prodBookBtn,prodBookVal:prodBookVal,storeBookBtn:storeBookBtn,judgeBookable:judgeBookable,prodButtons:prodButtons,
  foOptions:foOptions,manualOptions:manualOptions,bookingKind:bookingKind,prodBookCount:prodBookCount,slotOpen:slotOpen,needList:needList,
  foSubmit:foSubmit,foChange:foChange,staffChange:staffChange,isClinic:isClinic,manSave:manSave,bookOff:bookOff,bookOn:bookOn,render:render,
  go:function(surf,view){window.go(surf,view);},

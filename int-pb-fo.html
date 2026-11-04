@@ -1239,12 +1239,17 @@ function pProduct() {
     else { var rT = rli.cloneNode(true); rul.innerHTML = ''; rul.setAttribute('data-test', 'fo-recs'); recs.slice(0, 10).forEach(function (q) { var li = rT.cloneNode(true), a = $('a', li), im = $('img', li), hd = $('[class*=__header]', li), pr = $('[class*=__price]', li); $('h3', li).textContent = q.name; if (pr) { var sp = $$('span', pr); if (sp[0]) sp[0].textContent = PB.won(q.price); pr.setAttribute('aria-label', 'price ' + PB.won(q.price) + ' KRW'); } if (im) { im.removeAttribute('src'); im.style.visibility = 'hidden'; im.style.aspectRatio = '180 / 121'; im.style.width = '100%'; } if (hd) hd.style.background = thumbColor(q.id); var sn = $('[class*=__storeName]', li); if (sn) sn.textContent = PB.DB.store.nameEn; a.setAttribute('aria-label', q.name + ' product detail view'); a.removeAttribute('href'); a.onclick = function (e) { e.preventDefault(); f.pid = q.id; PB.render(); }; rul.appendChild(li); }); } }
   var pr = $('[class*=price__value]'); if (pr) pr.textContent = krw(p.price);
   $$('[class*=description__text]').forEach(function (d) { d.textContent = p.name; });
-  /* 하단 버튼 줄: 상품 상세 실화면 부품(Bwsfja productDetailFooter). 메신저 = 검은 messengerButton(STG 상품 3222 실측), 예약 = productDetailFooter__button--primary1 */
+  /* 하단 버튼 줄: 상품 상세 실화면 부품(Bwsfja productDetailFooter). 메신저 = 검은 messengerButton(STG 상품 3222 실측), 예약 = productDetailFooter__button--primary1
+     버튼은 PB.prodButtons: 메신저(웹, 왼쪽)와 예약. 기본 설정 상품의 예약은 스토어 예약 버튼의 그 채널 값(통합 PRD v1.44). 상담접수 · 외부링크는 그리지 않는다 */
   var nf = $('footer[class*=productDetailFooter]'); if (!nf) { nf = document.createElement('footer'); nf.className = 'index-module-scss-module__Bwsfja__productDetailFooter'; document.getElementById('app').appendChild(nf); } nf.innerHTML = '';
-  var msgOn = p.mode === '기본' ? true : !!(p.wb && p.wb['메신저']);
-  if (f.ch !== 'ali' && msgOn) nf.appendChild(msgButton('WeChat'));
-  var book = document.createElement('button'); book.type = 'button'; book.className = 'index-module-scss-module__Bwsfja__productDetailFooter__button index-module-scss-module__Bwsfja__productDetailFooter__button--primary1'; book.textContent = 'Book now'; nf.appendChild(book);
-  if (!PB.judgeBookable(p, f.lang, f.ch).ok) { book.remove(); var only = $('.pb-msg1', nf); if (only) only.setAttribute('data-test', 'fo-msg-solo'); if (!nf.children.length) { nf.setAttribute('data-test', 'fo-footer-empty'); nf.style.display = 'none'; } } else { book.setAttribute('data-test', 'prod-book'); book.onclick = function () { p.bclk = (p.bclk || 0) + 1; startBook('product'); }; mark(book); }
+  var bl = PB.prodButtons(p, f.lang, f.ch), slots = bl.filter(function (x) { return x !== '메신저'; }); nf.setAttribute('data-buttons', bl.join(','));
+  if (bl.indexOf('메신저') >= 0) nf.appendChild(msgButton('WeChat'));
+  slots.forEach(function (slot) {
+    var book = document.createElement('button'); book.type = 'button'; book.className = 'index-module-scss-module__Bwsfja__productDetailFooter__button index-module-scss-module__Bwsfja__productDetailFooter__button--primary1'; book.textContent = 'Book now'; nf.appendChild(book);
+    if (slot === '예약') { book.setAttribute('data-test', 'prod-book'); book.onclick = function () { p.bclk = (p.bclk || 0) + 1; startBook('product'); }; mark(book); }
+    else { /* 외부링크 · 상담접수 자리: 버튼 문구는 시안 표기(실화면 문구는 그대로 씀) */ book.textContent = slot === '외부링크' ? 'Visit link' : 'Request consultation'; book.setAttribute('data-test', 'prod-slot'); book.setAttribute('data-slot', slot); book.onclick = function () { toast('Not available in this mockup'); }; }
+  });
+  if (!slots.length) { var only = $('.pb-msg1', nf); if (only) only.setAttribute('data-test', 'fo-msg-solo'); if (!nf.children.length) { nf.setAttribute('data-test', 'fo-footer-empty'); nf.style.display = 'none'; } }
 }
 
 /* ---------- 예약 일정 (상품 영역 추가) ---------- */

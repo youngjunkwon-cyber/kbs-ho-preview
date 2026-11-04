@@ -2669,6 +2669,18 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 .pb-modal-f{margin-top:24px;display:flex;justify-content:flex-end;gap:8px}
 .pb-mb{height:32px;padding:4px 15px;border-radius:6px;border:1px solid #d9d9d9;background:#fff;font-size:14px;cursor:pointer;font-family:inherit}
 .pb-mb.pri{background:#1677ff;border-color:#1677ff;color:#fff}
+.pb-colmodal{width:560px;max-width:calc(100vw - 32px);top:50%;transform:translate(-50%,-50%);max-height:calc(100vh - 32px);overflow-y:auto;overflow-x:hidden;box-sizing:border-box}
+.pb-cm-row{display:flex;align-items:center;gap:12px;margin-top:12px}
+.pb-cm-row>label{flex:none;width:100px;color:rgba(0,0,0,.88)}
+.pb-cm-row>div{flex:1;min-width:0}
+.pb-cm-row .ant-input{width:100%;box-sizing:border-box}
+.pb-cm-sub{margin:20px 0 8px;font-weight:600}
+.pb-colwide{width:1000px}
+.pb-collist{width:calc(100vw - 48px)}
+.pb-colmodal .pb-sub{position:static;min-width:0}
+.pb-colwide .pb-sub,.pb-collist .pb-sub{width:auto !important;white-space:nowrap}
+.pb-xscroll{overflow-x:auto;max-width:100%}
+.pb-mini{margin-left:8px;height:24px;padding:0 8px;font-size:12px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;color:rgba(0,0,0,.45)}
 .pb-sub{border-collapse:collapse;width:auto !important;min-width:480px;table-layout:auto !important;position:sticky;left:16px;font-size:13px;background:#fff}
 .pb-sub th,.pb-sub td{border:1px solid #f0f0f0;padding:7px 12px;text-align:left}
 .pb-sub th{background:#fafafa;font-weight:600}
@@ -2783,7 +2795,7 @@ function dropdown(anchor, opts, cur, onPick, accent) {
   setTimeout(function () { document.addEventListener('mousedown', function h(e) { if (DD && !DD.contains(e.target)) { closeDD(); } document.removeEventListener('mousedown', h); }); }, 0);
 }
 var toastT = null;
-function toast(m) { var el = document.getElementById('pb-toast'); if (!el) { el = document.createElement('div'); el.id = 'pb-toast'; document.body.appendChild(el); } el.textContent = m; el.className = 'on'; clearTimeout(toastT); toastT = setTimeout(function () { el.className = ''; }, 2000); }
+function toast(m, ms) { var el = document.getElementById('pb-toast'); if (!el) { el = document.createElement('div'); el.id = 'pb-toast'; document.body.appendChild(el); } el.textContent = m; el.className = 'on'; clearTimeout(toastT); toastT = setTimeout(function () { el.className = ''; }, ms || 2000); }
 /* 스크롤 유지 */
 var SC = {}, LASTKEY = null;
 var SC_SEL = ['.ant-layout-content', 'main', '[class*=scrollArea]', '.ant-table-content', '.ant-table-body', '.ant-drawer-body', '#pb-phone-scroll'];
@@ -2912,7 +2924,7 @@ var BV = { res: 'b_res', prod: 'b_prod', pedit: 'b_pedit', col: 'b_col', sinq: '
 var ACC = '#1677ff';
 document.documentElement.style.setProperty('--pb-acc-bg', '#e6f4ff');
 function B() { return PB.S.bo; }
-function go(v) { var b = B(); b.view = v; b.open = null; PB.render(); }
+function go(v) { var b = B(); b.view = v; b.open = null; b.colEdit = null; b.colList = null; PB.render(); }
 function langLabel(l) { return PB.LANGS[l] || l; }
 function draw() {
   var b = B();
@@ -2926,6 +2938,8 @@ function draw() {
     if (b.view === 'res' && b.open != null) openDrawer();
     $$('.pb-modal, .pb-modal-mask').forEach(function (x) { (x.parentElement && x.parentElement !== document.body ? x.parentElement : x).remove(); });
     if (b.offModal) offModal();
+    if (b.view === 'col' && b.colEdit) colEditModal();
+    if (b.view === 'col' && b.colList) colListModal();
   });
 }
 document.addEventListener('click', function (e) {
@@ -3084,7 +3098,7 @@ function pEdit() {
   ['활성화', '히든 여부'].forEach(function (n) { var l = byText(document, 'label', n); if (l) { var g = l.closest('.ant-form-item').querySelector('[role=radiogroup]'); radioSet(g, (n === '활성화' ? p.active : p.hidden) ? 'y' : 'n', false); } });
   /* 개별 / 기본 */
   var modeLabels = $$('label.ant-radio-wrapper', mg);
-  modeLabels.forEach(function (l) { var isBase = /기본/.test(l.textContent); var on = isBase === base; l.classList.toggle('ant-radio-wrapper-checked', on); $('.ant-radio', l).classList.toggle('ant-radio-checked', on); l.onclick = function (e) { e.preventDefault(); if (!isBase && p.mode === '기본') { p.wb = Object.assign({}, STORE_WB); /* 개별로 바꾸는 순간 다른 버튼은 스토어 값을 복사. 예약 줄은 상품 값 그대로 */ } p.mode = isBase ? '기본' : '개별'; PB.render(); }; });
+  modeLabels.forEach(function (l) { var isBase = /기본/.test(l.textContent); var on = isBase === base; l.classList.toggle('ant-radio-wrapper-checked', on); $('.ant-radio', l).classList.toggle('ant-radio-checked', on); l.onclick = function (e) { e.preventDefault(); if (!isBase && p.mode === '기본') { p.wb = Object.assign({}, STORE_WB); p.book = { web: !!s.btn.web, ali: !!s.btn.ali }; /* 개별로 바꾸는 순간 예약 줄까지 두 열 모두 스토어 값을 복사(통합 PRD v1.44, 2026-11-04) */ } p.mode = isBase ? '기본' : '개별'; PB.render(); }; });
   /* 기존 버튼 4종: 기본 설정이면 잠김 */
   p.wb = p.wb || {};
   WB.forEach(function (w) { var l = byText(document, 'label', w[0]); if (!l) return; var g = l.closest('.ant-form-item').querySelector('[role=radiogroup]'); if (base) { radioSet(g, STORE_WB[w[1]] ? 'y' : 'n', true); return; }
@@ -3094,17 +3108,17 @@ function pEdit() {
   var msgCol = byText(document, 'label', '메신저 설정').closest('.ant-col.ant-col-12'), nc = msgCol.cloneNode(true);
   var nl = $('label', nc); nl.textContent = '예약'; nl.title = '예약'; nl.setAttribute('for', 'productForm_isActiveBooking');
   var g = $('[role=radiogroup]', nc); g.id = 'productForm_isActiveBooking'; $$('input', g).forEach(function (i) { i.name = 'isActiveBooking'; });
-  var lock = !s.bookingSetting, aliOnly = p.exposeCh === 'ali'; radioSet(g, p.book.web ? 'y' : 'n', lock || aliOnly || base) /* 기본 설정이면 예약 줄도 잠김(PRD v1.13), 이때는 상품 값을 흐리게 */ /* 예약 설정·노출 채널 잠금도 저장된 값을 흐리게(통합 PRD v1.32 기본값 15). 풀리면 꺼진 상태로 시작 */; g.setAttribute('data-test', 'prod-book-web');
+  var lock = !s.bookingSetting, aliOnly = p.exposeCh === 'ali'; radioSet(g, PB.prodBookVal(p, 'web') ? 'y' : 'n', lock || aliOnly || base) /* 기본 설정이면 예약 줄도 잠기고 다른 줄처럼 스토어 예약 버튼 값(웹 열)을 흐리게(통합 PRD v1.44) */ /* 예약 설정·노출 채널 잠금도 저장된 값을 흐리게(통합 PRD v1.32 기본값 15). 풀리면 꺼진 상태로 시작 */; g.setAttribute('data-test', 'prod-book-web');
   $$('label.ant-radio-wrapper', g).forEach(function (l) { l.onclick = function (e) { e.preventDefault(); if (base) return; if (!s.bookingSetting) { toast('예약설정에서 예약을 사용하면 켤 수 있습니다.'); return; } if (aliOnly) return; var on = $('input', l).value === 'y'; if (on && !p.book.web && seats(p).web.length >= 2) { seatToast('웹', seats(p).web); return; } p.book.web = on; PB.render(); }; });
   if (aliOnly && !lock) { var ax = document.createElement('div'); ax.className = 'pb-lockhint'; ax.setAttribute('data-test', 'lockmsg-web'); ax.textContent = '알리페이 앱에만 노출되는 상태에서는 웹 버튼을 수정할 수 없습니다. 다시 열리면 꺼진 상태로 시작합니다.'; $('.ant-form-item-control', nc).appendChild(ax); }
   if (!s.bookingSetting) { var ex = document.createElement('div'); ex.className = 'ant-form-item-explain ant-form-item-explain-connected'; ex.innerHTML = '<div class="pb-lockhint" data-test="lockmsg">예약설정에서 예약을 사용하면 켤 수 있습니다.</div>'; $('.ant-form-item-control', nc).appendChild(ex); }
   var row = msgCol.parentElement, holder = msgCol.cloneNode(false); holder.style.cssText = msgCol.style.cssText; holder.appendChild($('.ant-form-item', nc)); msgCol.after(mark(holder));
   nl.textContent = '예약 (웹)'; nl.title = '예약 (웹)';
-  /* 예약 (알리페이 앱): 노출 채널이 웹뿐이거나 대상 외 언어(일본어 등) 상품이면 잠김. 기본 설정이어도 상품마다 따로 */
+  /* 예약 (알리페이 앱): 노출 채널이 웹뿐이거나 대상 외 언어(일본어 등) 상품이면 잠김. 기본 설정이면 스토어 예약 버튼 알리페이 열 값 */
   var hA = holder.cloneNode(true), lbA = $('label', hA); $$('[data-test=lockmsg-web]', hA).forEach(function (x) { x.remove(); }); lbA.textContent = '예약 (알리페이 앱)'; lbA.title = lbA.textContent; lbA.setAttribute('for', 'productForm_isActiveBookingAli');
   var gA = $('[role=radiogroup]', hA); gA.id = 'productForm_isActiveBookingAli'; $$('input', gA).forEach(function (i) { i.name = 'isActiveBookingAli'; }); /* 잠금 안내는 줄마다(스토어 화면과 같음): 복제된 안내를 그대로 둔다 */
   var webOnly = p.exposeCh === 'web', outLang = ['zh', 'en'].indexOf(p.lang) < 0, lockA = lock || webOnly || outLang || base;
-  radioSet(gA, p.book.ali ? 'y' : 'n', lockA); /* 예약 설정·노출 채널·대상 외 언어 잠금은 저장된 값을 흐리게(통합 PRD v1.32) */ gA.setAttribute('data-test', 'prod-book-ali');
+  radioSet(gA, PB.prodBookVal(p, 'ali') ? 'y' : 'n', lockA); /* 예약 설정·노출 채널·대상 외 언어 잠금은 저장된 값을 흐리게(통합 PRD v1.32) */ gA.setAttribute('data-test', 'prod-book-ali');
   $$('label.ant-radio-wrapper', gA).forEach(function (l) { l.onclick = function (e) { e.preventDefault(); if (base) return; if (!s.bookingSetting) { toast('예약설정에서 예약을 사용하면 켤 수 있습니다.'); return; } if (webOnly || outLang) return; var on = $('input', l).value === 'y'; if (on && !p.book.ali && seats(p).ali.length >= 2) { seatToast('알리페이 앱', seats(p).ali); return; } p.book.ali = on; PB.render(); }; });
   if (webOnly && !lock) { var wx = document.createElement('div'); wx.className = 'pb-lockhint'; wx.setAttribute('data-test', 'lockmsg-ali'); wx.textContent = '웹에만 노출되는 상태에서는 알리페이 앱 버튼을 수정할 수 없습니다. 다시 열리면 꺼진 상태로 시작합니다.'; gA.closest('.ant-form-item-control').appendChild(wx); }
   holder.after(mark(hA));
@@ -3112,9 +3126,7 @@ function pEdit() {
     var st = seats(p), nm = function (a) { return a.length ? ' (' + a.join(' / ') + ')' : ''; }, sl = document.createElement('div'); sl.className = 'pb-seatline'; sl.setAttribute('data-test', 'seat-line');
     sl.textContent = '웹 ' + st.web.length + '개' + nm(st.web) + ', 알리페이 앱 ' + st.ali.length + '개' + nm(st.ali) + '입니다. 각각 2개까지 켤 수 있습니다.'; hA.after(mark(sl));
     if (base) { var bh = document.createElement('div'); bh.className = 'pb-seatline'; bh.setAttribute('data-test', 'base-hint'); bh.textContent = '기본 설정 적용 중입니다. 개별 설정을 선택하면 수정할 수 있습니다.'; sl.after(mark(bh)); }
-    var ov = [['웹', st.web.length], ['알리페이 앱', st.ali.length]].filter(function (x) { return x[1] > 2; });
-    if (ov.length) { var rd = document.createElement('div'); rd.className = 'pb-seatover'; rd.setAttribute('data-test', 'seat-over'); rd.textContent = ov.map(function (x) { return x[0] + ' 버튼 ' + x[1] + '개입니다.'; }).join(' ') + (ov.length > 1 ? ' 각각 2개 이하여야 저장할 수 있습니다.' : ' 2개 이하여야 저장할 수 있습니다.'); sl.after(mark(rd)); }
-    $$('button').forEach(function (x) { if (x.textContent.trim() === '수정') x.onclick = function () { if (ov.length) seatBlock(st); else toast('시안에서는 동작하지 않습니다'); }; });
+    /* 기본 설정 상품은 예약 줄까지 스토어 값을 그대로 따르므로 자리가 넘치지 않는다. 넘침 빨간 안내·저장 차단 없음(통합 PRD v1.44, 2026-11-04) */
   }
 }
 /* 버튼 자리 수(1부 7장·8장, 3부 8): 켠 항목마다 한 자리, 채널마다 최대 2자리. 잠긴 열은 0개로 셈. 예약 줄도 같은 규칙 */
@@ -3123,18 +3135,12 @@ var WB = [['상담접수', '상담접수'], ['문의하기(상담+채팅)로 통
 function seats(p) {
   var s = PB.DB.store, live = s.bookingSetting, webLock = p.exposeCh === 'ali', aliLock = p.exposeCh === 'web' || ['zh', 'en'].indexOf(p.lang) < 0;
   var src = p.mode === '기본' ? STORE_WB : (p.wb || {}); /* 기본 설정이면 다른 버튼은 스토어 값으로 셈 */
-  var web = webLock ? [] : WB.filter(function (w) { return src[w[1]]; }).map(function (w) { return w[1]; }); if (!webLock && live && p.book.web) web.push('예약');
+  var web = webLock ? [] : WB.filter(function (w) { return src[w[1]]; }).map(function (w) { return w[1]; }); if (!webLock && live && PB.prodBookVal(p, 'web')) web.push('예약');
   /* 알리페이 열의 다른 버튼은 이 시안에 그리지 않으므로 세지 않음(상품 버튼 표 전체는 어드민 시안에서 봄) */
-  var ali = aliLock ? [] : (p.ab || []).slice(); if (!aliLock && live && p.book.ali) ali.push('예약');
+  var ali = aliLock ? [] : (p.ab || []).slice(); if (!aliLock && live && PB.prodBookVal(p, 'ali')) ali.push('예약');
   return { web: web, ali: ali };
 }
-function seatToast(ch, list) { toast('버튼은 최대 2개까지 설정 가능합니다.'); }
-function seatBlock(st) {
-  var nm = function (a) { return a.length ? ' (' + a.join(' / ') + ')' : ''; }, m = document.createElement('div');
-  m.innerHTML = '<div class="pb-modal-mask"></div><div class="pb-modal" data-test="seat-modal"><div class="pb-modal-t">저장할 수 없습니다</div><div class="pb-modal-c"></div><div class="pb-modal-f"><button class="pb-mb pri">확인</button></div></div>';
-  $('.pb-modal-c', m).textContent = '웹과 알리페이 앱 각각 2개까지 켤 수 있습니다. 지금은 웹 ' + st.web.length + '개' + nm(st.web) + ', 알리페이 앱 ' + st.ali.length + '개' + nm(st.ali) + '입니다. 각각 2개 이하여야 저장할 수 있습니다.';
-  document.body.appendChild(m); $('.pb-mb', m).onclick = function () { m.remove(); };
-}
+function seatToast(ch, list) { toast('버튼은 최대 2개까지 설정 가능합니다.', 4000); }
 
 function offModal() {
   var b = B(), m = document.createElement('div');
@@ -3143,7 +3149,9 @@ function offModal() {
   $$('.pb-mb', m).forEach(function (x) { x.onclick = function () { m.remove(); b.offModal = false; if (x.getAttribute('data-v') === 'y') { PB.bookOff(); toast('예약 설정을 저장했습니다.'); } PB.render(); }; });
 }
 
-/* ---------- 기획전 관리 ---------- */
+/* ---------- 기획전 관리 ----------
+   라이브 실측(2026-11-04): 관리 칸·수정 버튼·행 펼침은 없다. 기획전명을 누르면 "기획전 수정" 창(폭 1000), 상품 수를 누르면 "대상 상품 목록 - 총 N개" 창.
+   대상 상품별 예약수는 두 창에 보인다(통합 PRD v1.44 2부 5.10) */
 function pCol() {
   var b = B(); addFilter('언어', 'cxch', CH_OPTS, false); addFilter('노출채널', 'crsn', RSN_OPTS, false);
   var colX = function (c) { return ['zh', 'tw', 'en'].indexOf(c.lang) < 0 ? '웹' : '전체'; };
@@ -3155,17 +3163,47 @@ function pCol() {
       var kc = r.children[fi].cloneNode(true); kc.textContent = c.items.reduce(function (a, id) { return a + (PB.prodById(id).bclk || 0); }, 0); kc.setAttribute('data-test', 'colclk-' + c.id); r.children[fi].after(mark(kc));
       var nc = r.children[si].cloneNode(true); nc.textContent = sum; nc.setAttribute('data-test', 'col-' + c.id); r.children[si].after(mark(nc)); clickSum(r);
       setCell(r, '기획전 상태', '활성'); setCell(r, '언어', langLabel(c.lang)); setCell(r, '노출 기간', c.period); setCell(r, '유형', c.type); setCell(r, '기획전명', c.name); setCell(r, '상품', c.items.length); setCell(r, '스토어', 0);
-      r.style.cursor = 'pointer'; r.onclick = function () { b.col = b.col === c.id ? null : c.id; PB.render(); };
+      var nm = r.children[colIdx('기획전명')], pc = r.children[colIdx('상품')];
+      [[nm, 'colname-' + c.id, function () { b.colEdit = c.id; }], [pc, 'colprod-' + c.id, function () { b.colList = c.id; }]].forEach(function (x) {
+        if (!x[0]) return; x[0].style.color = ACC; x[0].style.cursor = 'pointer'; x[0].setAttribute('data-test', x[1]);
+        x[0].onclick = function (e) { e.stopPropagation(); x[2](); PB.render(); };
+      });
       tb.appendChild(r);
-      if (b.col === c.id) {
-        var er = document.createElement('tr'); er.className = 'ant-table-expanded-row pb-new';
-        var tot = 0, rows = c.items.map(function (id) { var p = PB.prodById(id), n = PB.prodBookCount(id); tot += n; return '<tr><td>' + esc(p.name) + '</td><td>' + langLabel(p.lang) + '</td><td data-test="colp-' + id + '" style="text-align:right;font-weight:600">' + n + '</td></tr>'; }).join('');
-        er.innerHTML = '<td colspan="' + r.children.length + '" style="background:#fafafa;padding:12px 16px"><table class="pb-sub"><thead><tr><th>대상 상품</th><th>언어</th><th style="text-align:right">예약수</th></tr></thead><tbody>' + rows + '<tr class="pb-sub-tot"><td>합계</td><td></td><td data-test="col-total" style="text-align:right">' + tot + '</td></tr></tbody></table></td>';
-        tb.appendChild(er);
-      }
     });
   });
   $$('.ant-pagination-item').forEach(function (li, i) { if (i > 0) li.remove(); });
+}
+function swTag(on) { return on ? '활성' : '비활성'; }
+/* 기획전 수정 창(라이브 구성): 기본 정보 + 상품 N개 선택 + 상품 표. 상품 표의 조회수 바로 다음에 예약수 */
+function colEditModal() {
+  var b = B(), c = PB.DB.cols.filter(function (x) { return x.id === b.colEdit; })[0]; if (!c) { b.colEdit = null; return; }
+  var inp = function (v) { return '<input class="ant-input ant-input-disabled css-19u5a7b ant-input-outlined css-var-root" disabled value="' + esc(v) + '">'; };
+  var row = function (l, v) { return '<div class="pb-cm-row"><label>' + l + '</label><div>' + v + '</div></div>'; };
+  var st = PB.DB.store;
+  var rows = c.items.map(function (id, k) { var p = PB.prodById(id); return '<tr><td><input type="checkbox" disabled></td><td>' + (c.items.length - k) + '</td><td>' + esc(p.name) + '</td><td>' + langLabel(p.lang) + '</td><td>' + esc(st.nameEn) + ' (' + esc(st.name) + ')</td><td style="text-align:right">' + PB.won(p.price) + ' KRW</td><td style="text-align:right">' + (p.views || 0) + '</td><td style="text-align:right">' + (p.inner || 0) + '</td><td style="text-align:right">' + (p.direct || 0) + '</td><td data-test="colmp-' + id + '" class="pb-new" style="text-align:right;font-weight:600">' + PB.prodBookCount(id) + '</td><td>활성</td><td>' + swTag(p.active) + '</td><td>' + (p.hidden ? 'ON' : 'OFF') + '</td><td></td></tr>'; }).join('');
+  var m = document.createElement('div');
+  m.innerHTML = '<div class="pb-modal-mask"></div><div class="pb-modal pb-colmodal pb-colwide" data-test="colmodal"><div class="pb-modal-t">기획전 수정</div><div class="pb-modal-c">'
+    + row('기획전명(내부)', inp(c.name)) + row('언어', inp(langLabel(c.lang))) + row('기획전 유형', inp(c.type)) + row('노출 기간', inp(c.period))
+    + '<div class="pb-cm-sub">상품 ' + c.items.length + '개 선택 <button type="button" class="pb-mini" disabled>상품 추가</button> <button type="button" class="pb-mini" disabled>선택된 상품 삭제</button></div>'
+    + '<div class="pb-xscroll"><table class="pb-sub"><thead><tr><th></th><th>No.</th><th>상품명</th><th>언어</th><th>스토어명(언어)</th><th>가격</th><th>노출수</th><th>클릭수</th><th>조회수</th><th class="pb-new" style="text-align:right">예약수</th><th>스토어 활성화</th><th>상품 활성화</th><th>히든</th><th>action</th></tr></thead><tbody>' + rows + '</tbody></table></div>'
+    + '</div><div class="pb-modal-f"><button class="pb-mb" data-v="n">취소</button><button class="pb-mb pri" data-v="y">확인</button></div></div>';
+  document.body.appendChild(m);
+  $$('.pb-mb', m).forEach(function (x) { x.onclick = function () { if (x.getAttribute('data-v') === 'y') { toast('시안에서는 동작하지 않습니다'); return; } b.colEdit = null; PB.render(); }; });
+  $('.pb-modal-mask', m).onclick = function () { b.colEdit = null; PB.render(); };
+}
+/* 대상 상품 목록 창(라이브 구성): 상품별 수치. 상담수 바로 다음에 예약수, 버튼별 칸 맨 끝(페이스북 다음)에 예약하기 */
+function colListModal() {
+  var b = B(), c = PB.DB.cols.filter(function (x) { return x.id === b.colList; })[0]; if (!c) { b.colList = null; return; }
+  var st = PB.DB.store, z = '<td style="text-align:right">0</td>';
+  var rows = c.items.map(function (id, k) { var p = PB.prodById(id), clk = p.bclk || 0;
+    return '<tr><td>' + (c.items.length - k) + '</td><td>' + esc(p.name) + '</td><td>' + langLabel(p.lang) + '</td><td>' + esc(st.code) + '</td><td>' + esc(p.cat) + '</td><td>' + esc(p.sub) + '</td><td style="text-align:right">' + (p.views || 0) + '</td><td style="text-align:right">' + (p.inner || 0) + '</td><td style="text-align:right">' + (p.direct || 0) + '</td><td style="text-align:right">' + (p.chat || 0) + '</td><td style="text-align:right">' + (p.cons || 0) + '</td><td data-test="collp-' + id + '" class="pb-new" style="text-align:right;font-weight:600">' + PB.prodBookCount(id) + '</td><td style="text-align:right">' + clk + '</td>' + z + z + z + z + z + z + z + z + z + '<td data-test="collk-' + id + '" class="pb-new" style="text-align:right">' + clk + '</td><td>활성</td><td>' + swTag(p.active) + '</td><td>' + (p.hidden ? 'ON' : 'OFF') + '</td></tr>'; }).join('');
+  var m = document.createElement('div');
+  m.innerHTML = '<div class="pb-modal-mask"></div><div class="pb-modal pb-colmodal pb-collist" data-test="collist"><div class="pb-modal-t">대상 상품 목록 - 총 ' + c.items.length + '개</div><div class="pb-modal-c">'
+    + '<div class="pb-xscroll"><table class="pb-sub"><thead><tr><th>No.</th><th>상품명</th><th>언어</th><th>스토어코드</th><th>카테고리</th><th>세부 분류</th><th>노출수</th><th>내부 진입수</th><th>직접 유입수</th><th>채팅수</th><th>상담수</th><th class="pb-new">예약수</th><th>버튼 클릭수</th><th>상담접수</th><th>인앱채팅</th><th>외부링크</th><th>위챗</th><th>샤오홍슈</th><th>왓츠앱</th><th>라인</th><th>카카오톡</th><th>페이스북</th><th class="pb-new">예약하기</th><th>스토어 활성화</th><th>상품 활성화</th><th>히든</th></tr></thead><tbody>' + rows + '</tbody></table></div>'
+    + '</div><div class="pb-modal-f"><button class="pb-mb pri" data-v="n">닫기</button></div></div>';
+  document.body.appendChild(m);
+  $$('.pb-mb', m).forEach(function (x) { x.onclick = function () { b.colList = null; PB.render(); }; });
+  $('.pb-modal-mask', m).onclick = function () { b.colList = null; PB.render(); };
 }
 /* ---------- 통계 > 스토어 문의 통계: 채널구분에 "플랫폼 예약" ----------
    플랫폼 예약 = 플랫폼 안에서 고객이 접수한 예약 전부(스토어·상품, 웹·알리페이). HOST 수기 예약·외부 링크 예약 제외.

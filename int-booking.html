@@ -49,12 +49,12 @@ function seedProducts(){
  // [id, lang, name, price, status, active, hidden, deleted, mode, bookWeb, bookAli, exposeCh, sub]
  var A=[
  [101,'en','Abijou Botox',99000,'approved',1,0,0,'기본',1,0,'both','보톡스'],
- [102,'ja','Abijou ボトックス',99000,'approved',1,0,0,'기본',0,0,'both','보톡스'],
+ [102,'ja','Abijou ボトックス',99000,'approved',1,0,0,'개별',0,0,'both','보톡스'],
  [103,'en','Abijou Skin Booster',190000,'approved',1,0,0,'개별',1,0,'both','스킨부스터'],
  [104,'ja','Abijou スキンブースター',190000,'approved',1,0,0,'개별',0,0,'both','스킨부스터'],
  [105,'en','Abijou Lifting',270000,'pending',1,0,0,'기본',0,0,'both','리프팅'],
  [106,'en','Abijou Laser Toning',150000,'approved',1,1,0,'기본',0,0,'both','색소/점/문신'],
- [107,'zh','Abijou 肉毒杆菌',99000,'approved',1,0,0,'기본',0,0,'both','보톡스'],
+ [107,'zh','Abijou 肉毒杆菌',99000,'approved',1,0,0,'개별',0,0,'both','보톡스'],
  [108,'en','Abijou Acne Care',120000,'approved',1,0,0,'개별',1,1,'both','여드름/흉터'],
  [109,'zh','Abijou 皮肤护理',120000,'approved',1,0,0,'개별',1,1,'web','여드름/흉터']
  ];
@@ -101,12 +101,14 @@ function freshState(){return {surf:'HOST',mark:true,
 /* ===== 판정 (순수 함수) ===== */
 function prodById(id){return DB.prods.filter(function(p){return p.id===+id;})[0]||null;}
 function storeBookBtn(ch){var s=DB.store;return !!(s.bookingSetting&&s.btn[ch]);}
-/* 상품 예약 버튼: 예약 설정에만 묶임. 기본 설정이면 스토어 예약 버튼 값을 따름 */
+/* 상품 예약 줄 값(통합 PRD v1.44 2부 5.3, 2026-11-04): 기본 설정 상품은 다른 버튼처럼 스토어 예약 버튼의 그 채널 값을 그대로 따르고, 개별 설정 상품은 상품 값 */
+function prodBookVal(p,ch){return p.mode==='기본'?!!DB.store.btn[ch]:!!p.book[ch];}
+/* 상품 예약 버튼: 예약 설정에 묶임 */
 function prodBookBtn(p,ch){
  if(!DB.store.bookingSetting)return false;
  if(ch==='ali'&&(p.exposeCh==='web'||['zh','en'].indexOf(p.lang)<0))return false; /* 알리페이 열: 노출 채널 웹 · 대상 외 언어는 잠김 */
  if(ch==='web'&&p.exposeCh==='ali')return false; /* 웹 열: 노출 채널 알리페이 앱이면 잠김 */
- return !!p.book[ch]; /* 예약 줄은 기본 설정 상품도 상품마다 따로(스토어 값을 따르지 않음) */
+ return prodBookVal(p,ch);
 }
 function prodVisible(p,lang){return p.status==='approved'&&p.active&&!p.hidden&&!p.deleted&&p.lang===lang;}
 function judgeBookable(p,lang,ch){
@@ -115,7 +117,16 @@ function judgeBookable(p,lang,ch){
  return {ok:!bad,reason:bad?bad[0]:'',conds:conds};
 }
 function foOptions(lang,ch){return DB.prods.filter(function(p){return judgeBookable(p,lang,ch).ok;});}
-function manualOptions(lang){if(!lang)return [];return DB.prods.filter(function(p){return p.status==='approved'&&!p.deleted&&p.lang===lang;});} /* 수기 예약: 예약자 정보에서 고른 언어의 상품만, 언어 전에는 없음 */
+/* 상품 상세 하단 버튼: 메신저(웹, 왼쪽)와 예약만 그린다. 웹 메신저는 기본 설정 상품이면 스토어 값(STORE_WB: 메신저만 ON), 개별 설정이면 상품 값.
+   상담접수 · 외부링크 버튼과 알리페이 채널의 상담접수 버튼은 그리지 않는다(실화면 근거 없음, 콘솔 "시안으로 보지 않는 것"). 셋째 칸은 BO에서 토스트로 막는다 */
+var STORE_WB={'메신저':true};
+function prodButtons(p,lang,ch){
+ ch=ch||'web';var out=[];
+ if(ch==='web'&&(p.mode==='기본'?STORE_WB:(p.wb||{}))['메신저'])out.push('메신저');
+ if(judgeBookable(p,lang||p.lang,ch).ok)out.push('예약');
+ return out;
+}
+function manualOptions(lang){if(!lang)return [];return DB.prods.filter(function(p){return p.status==='approved'&&p.active&&!p.hidden&&!p.deleted&&p.lang===lang;});} /* 수기 예약: 예약자 정보에서 고른 언어의 상품 중 활성이고 히든이 아닌 상품만(비활성·히든·삭제 제외, 2026-11-04). 언어 전에는 없음 */
 function bookingKind(b){return b.prodId?'상품 예약':'스토어 예약';}
 function prodBookCount(pid,from,to){return DB.books.filter(function(b){var d=b.recv.slice(0,10);return b.prodId===pid&&(!from||d>=from)&&(!to||d<=to);}).length;}
 var TIMES=['10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30'];
@@ -175,10 +186,10 @@ function render(){
 }
 /* 자식 프레임이 쓰는 창구 */
 window.PB={
- get DB(){return DB;},get S(){return S;},TODAY:TODAY,NOWTS:NOWTS,LANGS:LANGS,TIMES:TIMES,ME:ME,
+ get DB(){return DB;},get S(){return S;},TODAY:TODAY,NOWTS:NOWTS,LANGS:LANGS,TIMES:TIMES,ME:ME,STORE_WB:STORE_WB,
  /* 기존 문의 표본(BO 스토어 문의 통계 · HOST 대시보드 공용): [문의구분, 언어, 채널, 접수일, 유입 채널, 접수 시각] */
  SINQ_BASE:[['스토어','en','메신저상담','2026-10-03','웹','11:40'],['상품','en','메신저상담','2026-10-05','웹','15:12'],['상품','ja','메신저상담','2026-10-06','웹','10:05'],['스토어','zh','채팅문의','2026-10-08','알리페이 중국','13:31'],['상품','en','상담문의','2026-10-09','알리페이 홍콩','16:48'],['상품','en','메신저상담','2026-10-11','웹','09:27'],['스토어','ja','메신저상담','2026-10-12','웹','10:16']],
- addDays:addDays,wdKo:wdKo,won:won,prodById:prodById,prodVisible:prodVisible,prodBookBtn:prodBookBtn,storeBookBtn:storeBookBtn,judgeBookable:judgeBookable,
+ addDays:addDays,wdKo:wdKo,won:won,prodById:prodById,prodVisible:prodVisible,prodBookBtn:prodBookBtn,prodBookVal:prodBookVal,storeBookBtn:storeBookBtn,judgeBookable:judgeBookable,prodButtons:prodButtons,
  foOptions:foOptions,manualOptions:manualOptions,bookingKind:bookingKind,prodBookCount:prodBookCount,slotOpen:slotOpen,needList:needList,
  foSubmit:foSubmit,manSave:manSave,bookOff:bookOff,render:render,
  go:function(surf,view){window.go(surf,view);},

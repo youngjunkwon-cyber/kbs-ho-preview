@@ -2683,6 +2683,11 @@ div:has(> #store-form-preview) > div:first-child{flex:1 1 480px!important;min-wi
 .pb-cm-row .ant-input{width:100%;box-sizing:border-box}
 .pb-cm-sub{margin:20px 0 8px;font-weight:600}
 .pb-colmodal .pb-sub{position:static;width:100% !important;min-width:0}
+.pb-colwide{width:1000px}
+.pb-collist{width:calc(100vw - 48px)}
+.pb-colwide .pb-sub,.pb-collist .pb-sub{width:auto !important;white-space:nowrap}
+.pb-xscroll{overflow-x:auto;max-width:100%}
+.pb-mini{margin-left:8px;height:24px;padding:0 8px;font-size:12px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;color:rgba(0,0,0,.45)}
 .pb-prod-l{color:#1677ff !important}
 /* 스토어 문의 통계 시안: 도넛·그래프 자리 */
 .pb-donut{width:130px;height:130px;margin:24px auto 0;border-radius:50%;-webkit-mask:radial-gradient(circle,transparent 55%,#000 56%);mask:radial-gradient(circle,transparent 55%,#000 56%)}
@@ -2922,7 +2927,7 @@ function dropdown(anchor, opts, cur, onPick, accent) {
   setTimeout(function () { document.addEventListener('mousedown', function h(e) { if (DD && !DD.contains(e.target)) { closeDD(); } document.removeEventListener('mousedown', h); }); }, 0);
 }
 var toastT = null;
-function toast(m) { var el = document.getElementById('pb-toast'); if (!el) { el = document.createElement('div'); el.id = 'pb-toast'; document.body.appendChild(el); } el.textContent = m; el.className = 'on'; clearTimeout(toastT); toastT = setTimeout(function () { el.className = ''; }, 2000); }
+function toast(m, ms) { var el = document.getElementById('pb-toast'); if (!el) { el = document.createElement('div'); el.id = 'pb-toast'; document.body.appendChild(el); } el.textContent = m; el.className = 'on'; clearTimeout(toastT); toastT = setTimeout(function () { el.className = ''; }, ms || 2000); }
 /* 스크롤 유지 */
 var SC = {}, LASTKEY = null;
 var SC_SEL = ['.ant-layout-content', 'main', '[class*=scrollArea]', '.ant-table-content', '.ant-table-body', '.ant-drawer-body', '#pb-phone-scroll'];
@@ -3060,7 +3065,7 @@ var BV = { res: 'b_res', prod: 'b_prod', pedit: 'b_pedit', col: 'b_col', store: 
 var ACC = '#1677ff';
 document.documentElement.style.setProperty('--pb-acc-bg', '#e6f4ff');
 function B() { return PB.S.bo; }
-function go(v) { var b = B(); b.view = v; b.open = null; b.colEdit = null; PB.render(); }
+function go(v) { var b = B(); b.view = v; b.open = null; b.colEdit = null; b.colList = null; PB.render(); }
 function langLabel(l) { return PB.LANGS[l] || l; }
 function draw() {
   var b = B();
@@ -3075,6 +3080,7 @@ function draw() {
     $$('.pb-modal, .pb-modal-mask').forEach(function (x) { (x.parentElement && x.parentElement !== document.body ? x.parentElement : x).remove(); });
     if (b.offModal) offModal();
     if (b.view === 'col' && b.colEdit) colEditModal();
+    if (b.view === 'col' && b.colList) colListModal();
   });
 }
 document.addEventListener('click', function (e) {
@@ -3211,24 +3217,28 @@ function pEdit() {
   ['활성화', '히든 여부'].forEach(function (n) { var l = byText(document, 'label', n); if (l) { var g = l.closest('.ant-form-item').querySelector('[role=radiogroup]'); radioSet(g, (n === '활성화' ? p.active : p.hidden) ? 'y' : 'n', false); } });
   /* 개별 / 기본 */
   var modeLabels = $$('label.ant-radio-wrapper', mg);
-  modeLabels.forEach(function (l) { var isBase = /기본/.test(l.textContent); var on = isBase === base; l.classList.toggle('ant-radio-wrapper-checked', on); $('.ant-radio', l).classList.toggle('ant-radio-checked', on); l.onclick = function (e) { e.preventDefault(); if (!isBase && p.mode === '기본') { p.wb = Object.assign({}, STORE_WB); /* 개별로 바꾸는 순간 다른 버튼은 스토어 값을 복사. 예약 줄은 상품 값 그대로 */ } p.mode = isBase ? '기본' : '개별'; PB.render(); }; });
+  modeLabels.forEach(function (l) { var isBase = /기본/.test(l.textContent); var on = isBase === base; l.classList.toggle('ant-radio-wrapper-checked', on); $('.ant-radio', l).classList.toggle('ant-radio-checked', on); l.onclick = function (e) { e.preventDefault(); if (!isBase && p.mode === '기본') { p.wb = Object.assign({}, STORE_WB); p.book = !!s.btn; /* 개별로 바꾸는 순간 예약 줄까지 스토어 값을 복사(2026-11-04) */ } p.mode = isBase ? '기본' : '개별'; PB.render(); }; });
   /* 기존 버튼 4종: 기본 설정이면 잠김 */
   p.wb = p.wb || {};
+  /* 켜진 자리 수(PRD 5.3): 칸마다 한 자리, 상담접수와 문의하기는 함께 한 자리, 잠긴 예약 줄은 세지 않음 */
+  var seats = function () { var w = p.wb; return ((w['상담접수'] || w['문의하기']) ? 1 : 0) + (w['외부링크'] ? 1 : 0) + (w['메신저'] ? 1 : 0) + (s.bookingSetting && p.book ? 1 : 0); };
+  var FULL = '버튼은 최대 2개까지 설정 가능합니다.';
   WB.forEach(function (w) { var l = byText(document, 'label', w[0]); if (!l) return; var g = l.closest('.ant-form-item').querySelector('[role=radiogroup]'); if (base) { radioSet(g, STORE_WB[w[1]] ? 'y' : 'n', true); return; }
     radioSet(g, p.wb[w[1]] ? 'y' : 'n', false); g.setAttribute('data-test', 'wb-' + w[1]);
-    $$('label.ant-radio-wrapper', g).forEach(function (lb) { lb.onclick = function (e) { e.preventDefault(); var on = $('input', lb).value === 'y'; p.wb[w[1]] = on; PB.render(); }; }); });
+    $$('label.ant-radio-wrapper', g).forEach(function (lb) { lb.onclick = function (e) { e.preventDefault(); var on = $('input', lb).value === 'y'; if (on && !p.wb[w[1]]) { var pair = (w[1] === '상담접수' && p.wb['문의하기']) || (w[1] === '문의하기' && p.wb['상담접수']); if (!pair && seats() >= 2) { toast(FULL, 4000); return; } } p.wb[w[1]] = on; PB.render(); }; }); });
   /* 예약 (신설) */
   var msgCol = byText(document, 'label', '메신저 설정').closest('.ant-col.ant-col-12'), nc = msgCol.cloneNode(true);
   var nl = $('label', nc); nl.textContent = '예약'; nl.title = '예약'; nl.setAttribute('for', 'productForm_isActiveBooking');
   var g = $('[role=radiogroup]', nc); g.id = 'productForm_isActiveBooking'; $$('input', g).forEach(function (i) { i.name = 'isActiveBooking'; });
   /* 다른 버튼 줄과 같은 켜고 끄는 칸 하나(PRD 5.3, 결정 5). 예약 설정이 꺼졌거나 기본 설정이면 잠기고 저장된 값을 흐리게 */
-  var lock = !s.bookingSetting; radioSet(g, p.book ? 'y' : 'n', lock || base); g.setAttribute('data-test', 'prod-book');
-  $$('label.ant-radio-wrapper', g).forEach(function (l) { l.onclick = function (e) { e.preventDefault(); if (base) return; if (!s.bookingSetting) { toast('예약설정에서 예약을 사용하면 켤 수 있습니다.'); return; } p.book = $('input', l).value === 'y'; PB.render(); }; });
+  /* 기본 설정 상품은 다른 줄처럼 스토어 예약 버튼 값을 보인다(2026-11-04) */
+  var lock = !s.bookingSetting; radioSet(g, (base ? s.btn : p.book) ? 'y' : 'n', lock || base); g.setAttribute('data-test', 'prod-book');
+  $$('label.ant-radio-wrapper', g).forEach(function (l) { l.onclick = function (e) { e.preventDefault(); if (base) return; if (!s.bookingSetting) { toast('예약설정에서 예약을 사용하면 켤 수 있습니다.'); return; } var on = $('input', l).value === 'y'; if (on && !p.book && seats() >= 2) { toast(FULL, 4000); return; } p.book = on; PB.render(); }; });
   /* 잠긴 예약 줄 오른쪽 안내(PRD 5.3): 라디오와 같은 줄 오른쪽. 좁으면 오른쪽 칸 안에서 줄바꿈 */
   if (!s.bookingSetting && !base) { var ic = $('.ant-form-item-control-input-content', nc); ic.classList.add('pb-bookrow'); var ex = document.createElement('div'); ex.className = 'pb-lockhint pb-lockside'; ex.setAttribute('data-test', 'lockmsg'); ex.textContent = '예약설정에서 예약을 사용하면 켤 수 있습니다.'; ic.appendChild(ex); }
   var holder = msgCol.cloneNode(false); holder.style.cssText = msgCol.style.cssText; holder.appendChild($('.ant-form-item', nc)); msgCol.after(mark(holder));
   if (base) { var bh = document.createElement('div'); bh.className = 'pb-seatline'; bh.setAttribute('data-test', 'base-hint'); bh.textContent = '기본 설정 적용 중입니다. 개별 설정을 선택하면 수정할 수 있습니다.'; holder.after(mark(bh)); }
-  /* 버튼 조합은 지금 웹 규칙: 최대 2개, 메신저 왼쪽, 나머지 한 자리는 예약 > 외부링크 > 상담접수. 셋 이상 켜도 저장은 막지 않음(PRD 5.3) */
+  /* 버튼 조합은 지금 웹 규칙: 최대 2개(셋째 칸은 위 토스트로 막음), 메신저 왼쪽, 나머지는 예약 > 외부링크 > 상담접수(PRD 5.3) */
 }
 var STORE_WB = PB.STORE_WB; /* 시안 스토어 정보 수정의 버튼 값(스냅샷): 메신저만 ON */
 var WB = [['상담접수', '상담접수'], ['문의하기(상담+채팅)로 통합 노출', '문의하기'], ['외부링크 설정', '외부링크'], ['메신저 설정', '메신저']];
@@ -3264,50 +3274,59 @@ function pStore() {
   if (LASTKEY !== 'bo:store') setTimeout(function () { var t = byText(document, 'h5', '예약 사용 여부'); if (!t) return; var el = t.parentElement; while (el && el !== document.body) { var cs = getComputedStyle(el); if (/(auto|scroll)/.test(cs.overflowY) && el.scrollHeight > el.clientHeight) break; el = el.parentElement; } var top = t.getBoundingClientRect().top, off = 190, sa = $('.ant-anchor'); for (var sp = sa; sp && sp !== document.body; sp = sp.parentElement) { var scs = getComputedStyle(sp); if (scs.position === 'sticky') { off = Math.max(off, (parseFloat(scs.top) || 0) + sp.offsetHeight + 48); break; } } if (el && el !== document.body) el.scrollTop += top - el.getBoundingClientRect().top - off; else window.scrollBy(0, top - 240); }, 0);
 }
 
-/* ---------- 기획전 관리 ---------- */
+/* ---------- 기획전 관리 ----------
+   라이브 실측(2026-11-04): 기획전명을 누르면 "기획전 수정" 창(폭 1000), 상품 수를 누르면 "대상 상품 목록 - 총 N개" 창이 열린다. 관리 칸·펼침 행은 없다.
+   대상 상품별 예약수는 두 창에 보인다(PRD 5.10, 결정 16) */
 function pCol() {
   var b = B();
   var fi = colIdx('페이스북'), si = colIdx('상담수'); addCol('페이스북', '예약하기'); addCol('상담수', '예약수');
-  /* 관리 칸: 상품정보관리 목록과 같은 오른쪽 고정 칸 · 작은 수정 버튼. 수정 = 기획전 수정 창(PRD 5.10, 대상 상품별 예약수) */
-  var mi = addCol('수정일', '관리'), mth = $$('thead tr:first-child th')[mi];
-  mth.className = 'ant-table-cell ant-table-cell-fix ant-table-cell-fix-end ant-table-cell-fix-end-shadow ant-table-cell-fix-end-shadow-show'; mth.setAttribute('style', 'inset-inline-end: 0px; --z-offset: 7; --z-offset-reverse: 1; text-align: center;');
   rowsFrom(function (tb, rt) {
     PB.DB.cols.forEach(function (c) {
       var r = rt.cloneNode(true), sum = c.items.reduce(function (a, id) { return a + PB.prodBookCount(id); }, 0);
       var kc = r.children[fi].cloneNode(true); kc.textContent = c.items.reduce(function (a, id) { return a + (PB.prodById(id).bclk || 0); }, 0); kc.setAttribute('data-test', 'colclk-' + c.id); r.children[fi].after(mark(kc));
       var nc = r.children[si].cloneNode(true); nc.textContent = sum; nc.setAttribute('data-test', 'col-' + c.id); r.children[si].after(mark(nc)); clickSum(r);
       setCell(r, '기획전 상태', '활성'); setCell(r, '언어', langLabel(c.lang)); setCell(r, '노출 기간', c.period); setCell(r, '유형', c.type); setCell(r, '기획전명', c.name); setCell(r, '상품', c.items.length); setCell(r, '스토어', 0);
-      var mc = r.children[mi - 1].cloneNode(false); mc.className = 'ant-table-cell ant-table-cell-fix ant-table-cell-fix-end ant-table-cell-fix-end-shadow ant-table-cell-fix-end-shadow-show'; mc.setAttribute('style', 'inset-inline-end: 0px; --z-offset: 7; --z-offset-reverse: 1; text-align: center;');
-      mc.innerHTML = '<button type="button" data-test="coledit-' + c.id + '" class="ant-btn css-19u5a7b css-var-root ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-sm"><span>수정</span></button>';
-      $('button', mc).onclick = function (e) { e.stopPropagation(); b.colEdit = c.id; PB.render(); };
-      r.children[mi - 1].after(mark(mc));
-      r.style.cursor = 'pointer'; r.onclick = function () { b.col = b.col === c.id ? null : c.id; PB.render(); };
+      var nm = r.children[colIdx('기획전명')], pc = r.children[colIdx('상품')];
+      [[nm, 'colname-' + c.id, function () { b.colEdit = c.id; }], [pc, 'colprod-' + c.id, function () { b.colList = c.id; }]].forEach(function (x) {
+        x[0].style.color = ACC; x[0].style.cursor = 'pointer'; x[0].setAttribute('data-test', x[1]);
+        x[0].onclick = function (e) { e.stopPropagation(); x[2](); PB.render(); };
+      });
       tb.appendChild(r);
-      if (b.col === c.id) {
-        var er = document.createElement('tr'); er.className = 'ant-table-expanded-row pb-new';
-        var tot = 0, rows = c.items.map(function (id) { var p = PB.prodById(id), n = PB.prodBookCount(id); tot += n; return '<tr><td>' + esc(p.name) + '</td><td>' + langLabel(p.lang) + '</td><td data-test="colp-' + id + '" style="text-align:right;font-weight:600">' + n + '</td></tr>'; }).join('');
-        er.innerHTML = '<td colspan="' + r.children.length + '" style="background:#fafafa;padding:12px 16px"><table class="pb-sub"><thead><tr><th>대상 상품</th><th>언어</th><th style="text-align:right">예약수</th></tr></thead><tbody>' + rows + '<tr class="pb-sub-tot"><td>합계</td><td></td><td data-test="col-total" style="text-align:right">' + tot + '</td></tr></tbody></table></td>';
-        tb.appendChild(er);
-      }
     });
   });
   $$('.ant-pagination-item').forEach(function (li, i) { if (i > 0) li.remove(); });
 }
-/* 기획전 수정 창: 기본 정보는 읽기 전용, 대상 상품 표에 상품별 예약수(펼친 대상 상품 표와 같은 값, PRD 5.10) */
+function swTag(on) { return on ? '활성' : '비활성'; }
+/* 기획전 수정 창(라이브 구성): 기본 정보 + 상품 N개 선택 + 상품 표. 상품 표의 조회수 바로 다음에 예약수 */
 function colEditModal() {
   var b = B(), c = PB.DB.cols.filter(function (x) { return x.id === b.colEdit; })[0]; if (!c) { b.colEdit = null; return; }
   var inp = function (v) { return '<input class="ant-input ant-input-disabled css-19u5a7b ant-input-outlined css-var-root" disabled value="' + esc(v) + '">'; };
   var row = function (l, v) { return '<div class="pb-cm-row"><label>' + l + '</label><div>' + v + '</div></div>'; };
-  var rows = c.items.map(function (id) { var p = PB.prodById(id); return '<tr><td>' + esc(p.name) + '</td><td>' + langLabel(p.lang) + '</td><td data-test="colmp-' + id + '" style="text-align:right;font-weight:600">' + PB.prodBookCount(id) + '</td></tr>'; }).join('');
+  var st = PB.DB.store;
+  var rows = c.items.map(function (id, k) { var p = PB.prodById(id); return '<tr><td><input type="checkbox" disabled></td><td>' + (c.items.length - k) + '</td><td>' + esc(p.name) + '</td><td>' + langLabel(p.lang) + '</td><td>' + esc(st.nameEn) + ' (' + esc(st.name) + ')</td><td style="text-align:right">' + PB.won(p.price) + ' KRW</td><td style="text-align:right">' + (p.views || 0) + '</td><td style="text-align:right">' + (p.inner || 0) + '</td><td style="text-align:right">' + (p.direct || 0) + '</td><td data-test="colmp-' + id + '" class="pb-new" style="text-align:right;font-weight:600">' + PB.prodBookCount(id) + '</td><td>활성</td><td>' + swTag(p.active) + '</td><td>' + (p.hidden ? 'ON' : 'OFF') + '</td><td></td></tr>'; }).join('');
   var m = document.createElement('div');
-  m.innerHTML = '<div class="pb-modal-mask"></div><div class="pb-modal pb-colmodal pb-new" data-test="colmodal"><div class="pb-modal-t">기획전 수정</div><div class="pb-modal-c">'
-    + row('기획전명', inp(c.name)) + row('언어', inp(langLabel(c.lang))) + row('유형', inp(c.type)) + row('노출 기간', inp(c.period))
-    + row('기획전 상태', '<button type="button" role="switch" aria-checked="true" disabled class="ant-switch ant-switch-checked ant-switch-disabled css-19u5a7b css-var-root"><div class="ant-switch-handle"></div><span class="ant-switch-inner"><span class="ant-switch-inner-checked">활성</span><span class="ant-switch-inner-unchecked"></span></span></button>')
-    + '<div class="pb-cm-sub">대상 상품</div><table class="pb-sub"><thead><tr><th>상품명</th><th>언어</th><th style="text-align:right">예약수</th></tr></thead><tbody>' + rows + '</tbody></table>'
-    + '</div><div class="pb-modal-f"><button class="pb-mb" data-v="n">취소</button><button class="pb-mb pri" data-v="y">저장</button></div></div>';
+  m.innerHTML = '<div class="pb-modal-mask"></div><div class="pb-modal pb-colmodal pb-colwide" data-test="colmodal"><div class="pb-modal-t">기획전 수정</div><div class="pb-modal-c">'
+    + row('기획전명(내부)', inp(c.name)) + row('언어', inp(langLabel(c.lang))) + row('기획전 유형', inp(c.type)) + row('노출 기간', inp(c.period))
+    + '<div class="pb-cm-sub">상품 ' + c.items.length + '개 선택 <button type="button" class="pb-mini" disabled>상품 추가</button> <button type="button" class="pb-mini" disabled>선택된 상품 삭제</button></div>'
+    + '<div class="pb-xscroll"><table class="pb-sub"><thead><tr><th></th><th>No.</th><th>상품명</th><th>언어</th><th>스토어명(언어)</th><th>가격</th><th>노출수</th><th>클릭수</th><th>조회수</th><th class="pb-new" style="text-align:right">예약수</th><th>스토어 활성화</th><th>상품 활성화</th><th>히든</th><th>action</th></tr></thead><tbody>' + rows + '</tbody></table></div>'
+    + '</div><div class="pb-modal-f"><button class="pb-mb" data-v="n">취소</button><button class="pb-mb pri" data-v="y">확인</button></div></div>';
   document.body.appendChild(m);
   $$('.pb-mb', m).forEach(function (x) { x.onclick = function () { if (x.getAttribute('data-v') === 'y') { toast('시안에서는 동작하지 않습니다'); return; } b.colEdit = null; PB.render(); }; });
   $('.pb-modal-mask', m).onclick = function () { b.colEdit = null; PB.render(); };
+}
+/* 대상 상품 목록 창(라이브 구성): 상품별 수치. 상담수 바로 다음에 예약수, 버튼별 칸 맨 끝(페이스북 다음)에 예약하기 */
+function colListModal() {
+  var b = B(), c = PB.DB.cols.filter(function (x) { return x.id === b.colList; })[0]; if (!c) { b.colList = null; return; }
+  var st = PB.DB.store, z = '<td style="text-align:right">0</td>';
+  var rows = c.items.map(function (id, k) { var p = PB.prodById(id), clk = p.bclk || 0;
+    return '<tr><td>' + (c.items.length - k) + '</td><td>' + esc(p.name) + '</td><td>' + langLabel(p.lang) + '</td><td>' + esc(st.code) + '</td><td>' + esc(p.cat) + '</td><td>' + esc(p.sub) + '</td><td style="text-align:right">' + (p.views || 0) + '</td><td style="text-align:right">' + (p.inner || 0) + '</td><td style="text-align:right">' + (p.direct || 0) + '</td><td style="text-align:right">' + (p.chat || 0) + '</td><td style="text-align:right">' + (p.cons || 0) + '</td><td data-test="collp-' + id + '" class="pb-new" style="text-align:right;font-weight:600">' + PB.prodBookCount(id) + '</td><td style="text-align:right">' + clk + '</td>' + z + z + z + z + z + z + z + z + z + '<td data-test="collk-' + id + '" class="pb-new" style="text-align:right">' + clk + '</td><td>활성</td><td>' + swTag(p.active) + '</td><td>' + (p.hidden ? 'ON' : 'OFF') + '</td></tr>'; }).join('');
+  var m = document.createElement('div');
+  m.innerHTML = '<div class="pb-modal-mask"></div><div class="pb-modal pb-colmodal pb-collist" data-test="collist"><div class="pb-modal-t">대상 상품 목록 - 총 ' + c.items.length + '개</div><div class="pb-modal-c">'
+    + '<div class="pb-xscroll"><table class="pb-sub"><thead><tr><th>No.</th><th>상품명</th><th>언어</th><th>스토어코드</th><th>카테고리</th><th>세부 분류</th><th>노출수</th><th>내부 진입수</th><th>직접 유입수</th><th>채팅수</th><th>상담수</th><th class="pb-new">예약수</th><th>버튼 클릭수</th><th>상담접수</th><th>인앱채팅</th><th>외부링크</th><th>위챗</th><th>샤오홍슈</th><th>왓츠앱</th><th>라인</th><th>카카오톡</th><th>페이스북</th><th class="pb-new">예약하기</th><th>스토어 활성화</th><th>상품 활성화</th><th>히든</th></tr></thead><tbody>' + rows + '</tbody></table></div>'
+    + '</div><div class="pb-modal-f"><button class="pb-mb pri" data-v="n">닫기</button></div></div>';
+  document.body.appendChild(m);
+  $$('.pb-mb', m).forEach(function (x) { x.onclick = function () { b.colList = null; PB.render(); }; });
+  $('.pb-modal-mask', m).onclick = function () { b.colList = null; PB.render(); };
 }
 /* ---------- 통계 > 스토어 문의 통계: 채널구분에 "플랫폼 예약" ----------
    플랫폼 예약 = 플랫폼 안에서 고객이 접수한 예약 전부(스토어 예약·상품 예약). HOST 수기 예약·외부 링크 예약 제외.
