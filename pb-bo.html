@@ -2667,6 +2667,8 @@ div:has(> #store-form-preview) > div:first-child{flex:1 1 480px!important;min-wi
 .pb-modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:2000}
 .pb-modal{position:fixed;top:100px;left:50%;transform:translateX(-50%);width:416px;background:#fff;border-radius:8px;box-shadow:0 6px 16px 0 rgba(0,0,0,.08),0 3px 6px -4px rgba(0,0,0,.12),0 9px 28px 8px rgba(0,0,0,.05);padding:20px 24px;z-index:2001;font-size:14px}
 .pb-modal-t{font-size:16px;font-weight:600;color:rgba(0,0,0,.88);line-height:1.5}
+.pb-collist .pb-modal-t{display:flex;align-items:center;justify-content:space-between}
+.pb-mx{border:0;background:none;font-size:16px;color:rgba(0,0,0,.45);cursor:pointer;padding:0 4px;line-height:1}
 .pb-modal-c{margin-top:8px;color:rgba(0,0,0,.88);line-height:1.5715}
 .pb-modal-f{margin-top:24px;display:flex;justify-content:flex-end;gap:8px}
 .pb-mb{height:32px;padding:4px 15px;border-radius:6px;border:1px solid #d9d9d9;background:#fff;font-size:14px;cursor:pointer;font-family:inherit}
@@ -3321,11 +3323,12 @@ function colListModal() {
   var rows = c.items.map(function (id, k) { var p = PB.prodById(id), clk = p.bclk || 0;
     return '<tr><td>' + (c.items.length - k) + '</td><td>' + esc(p.name) + '</td><td>' + langLabel(p.lang) + '</td><td>' + esc(st.code) + '</td><td>' + esc(p.cat) + '</td><td>' + esc(p.sub) + '</td><td style="text-align:right">' + (p.views || 0) + '</td><td style="text-align:right">' + (p.inner || 0) + '</td><td style="text-align:right">' + (p.direct || 0) + '</td><td style="text-align:right">' + (p.chat || 0) + '</td><td style="text-align:right">' + (p.cons || 0) + '</td><td data-test="collp-' + id + '" class="pb-new" style="text-align:right;font-weight:600">' + PB.prodBookCount(id) + '</td><td style="text-align:right">' + clk + '</td>' + z + z + z + z + z + z + z + z + z + '<td data-test="collk-' + id + '" class="pb-new" style="text-align:right">' + clk + '</td><td>활성</td><td>' + swTag(p.active) + '</td><td>' + (p.hidden ? 'ON' : 'OFF') + '</td></tr>'; }).join('');
   var m = document.createElement('div');
-  m.innerHTML = '<div class="pb-modal-mask"></div><div class="pb-modal pb-colmodal pb-collist" data-test="collist"><div class="pb-modal-t">대상 상품 목록 - 총 ' + c.items.length + '개</div><div class="pb-modal-c">'
+  m.innerHTML = '<div class="pb-modal-mask"></div><div class="pb-modal pb-colmodal pb-collist" data-test="collist"><div class="pb-modal-t">대상 상품 목록 - 총 ' + c.items.length + '개<button type="button" class="pb-mx" data-test="collist-x" aria-label="닫기">✕</button></div><div class="pb-modal-c">'
     + '<div class="pb-xscroll"><table class="pb-sub"><thead><tr><th>No.</th><th>상품명</th><th>언어</th><th>스토어코드</th><th>카테고리</th><th>세부 분류</th><th>노출수</th><th>내부 진입수</th><th>직접 유입수</th><th>채팅수</th><th>상담수</th><th class="pb-new">예약수</th><th>버튼 클릭수</th><th>상담접수</th><th>인앱채팅</th><th>외부링크</th><th>위챗</th><th>샤오홍슈</th><th>왓츠앱</th><th>라인</th><th>카카오톡</th><th>페이스북</th><th class="pb-new">예약하기</th><th>스토어 활성화</th><th>상품 활성화</th><th>히든</th></tr></thead><tbody>' + rows + '</tbody></table></div>'
     + '</div><div class="pb-modal-f"><button class="pb-mb pri" data-v="n">닫기</button></div></div>';
   document.body.appendChild(m);
   $$('.pb-mb', m).forEach(function (x) { x.onclick = function () { b.colList = null; PB.render(); }; });
+  $('.pb-mx', m).onclick = function () { b.colList = null; PB.render(); };
   $('.pb-modal-mask', m).onclick = function () { b.colList = null; PB.render(); };
 }
 /* ---------- 통계 > 스토어 문의 통계: 채널구분에 "플랫폼 예약" ----------
@@ -3429,7 +3432,6 @@ function pSlist() {
 
 }
 window.draw = draw;
-PB.ready('BO');
 /* 2026-10-19 10차 · 11차: 실화면 스냅샷에서 가져왔지만 시안에서 동작을 그리지 않은 BO 컨트롤에 안내 토스트.
    화면마다 대상(선택 칸 · 날짜 칸 · 기간 단추 · 버튼 · 정렬 머리글 · 표 안 스위치 · 페이지 단추)을 적어 두고, 이미 동작이 걸린 것은 naBind 가 건너뛴다 */
 var NA_MSG = '시안에서는 동작하지 않습니다';
@@ -3445,4 +3447,5 @@ function NA_LIST() {
   if (v === 'sinq') L = L.concat(NA_FORM, NA_PAGE, [['button.ant-btn', /^검색$/], ['th.ant-table-column-has-sorters'], ['th.ant-table-cell-fix-start', /^스토어명$/]]);
   return L;
 }
+PB.ready('BO');
 </script></body></html>
