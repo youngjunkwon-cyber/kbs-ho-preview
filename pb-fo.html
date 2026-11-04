@@ -1138,7 +1138,7 @@ function fullCard(o, f, accKey) {
   var ak = accKey || 'acc', Pc = 'StoreDetailProductCard-module-scss-module__qqh-iG__', open = !!(f[ak] = f[ak] || {})[o.id];
   var li = tpl('f_store9').querySelector('#store-section-products [class*=productGrid] li').cloneNode(true), art = li.querySelector('article');
   li.querySelector('h3').textContent = o.name; li.querySelector('p[class*=__price]').textContent = krw(o.price);
-  var more = li.querySelector('[class*=moreButton]'); more.onclick = function (e) { e.preventDefault(); e.stopPropagation(); f.back = { screen: f.screen, entry: f.entry, sel: f.sel }; f.pid = o.id; f.screen = 'product'; PB.render(); };
+  var more = li.querySelector('[class*=moreButton]'); more.setAttribute('aria-label', 'View details for product ' + o.name); more.removeAttribute('title'); more.onclick = function (e) { e.preventDefault(); e.stopPropagation(); f.back = { screen: f.screen, entry: f.entry, sel: f.sel }; f.pid = o.id; f.screen = 'product'; PB.render(); };
   var ic = li.querySelector('[class*=iconButton]'); ic.setAttribute('aria-expanded', open ? 'true' : 'false'); ic.setAttribute('data-test', (ak === 'accTop' ? 'fo-acc-top-' : 'fo-acc-') + o.id);
   ic.onclick = function (e) { e.stopPropagation(); f[ak][o.id] = !open; PB.render(); };
   if (open) { art.classList.add(Pc + 'cardOpen'); var d = DETAIL[o.sub] || DETAIL._, pn = document.createElement('div'); pn.className = Pc + 'detailPanel';

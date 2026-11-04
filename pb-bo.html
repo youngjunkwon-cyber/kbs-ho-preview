@@ -2640,6 +2640,10 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 .pb-foot-hint{font-size:12px;color:#8a9099;background:#f5f6f8;border-radius:6px;padding:8px 10px;margin:0 0 8px}
 .pb-foot-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .pb-foot-grid .pb-wide{grid-column:1/3}
+/* 스토어 정보 수정: 화면이 좁으면(입력 칸 480 + 미리보기 520이 한 줄에 안 들어가면) 오른쪽 미리보기를 입력 칸 아래로 내린다. 넓은 화면은 그대로 */
+div:has(> #store-form-preview){flex-wrap:wrap!important;container-type:inline-size}
+div:has(> #store-form-preview) > div:first-child{flex:1 1 480px!important;min-width:480px!important}
+@container (max-width:1023px){#store-form-preview{position:static!important;flex:1 1 100%!important;max-width:520px!important;min-width:0!important}}
 .pb-ro-row{margin:0 0 24px}
 .pb-ro{display:flex;align-items:center;gap:6px;border:1px solid #d9d9d9;border-radius:6px;padding:6px 11px;background:#fafafa;font-size:14px;width:fit-content}
 .pb-ro .ant-tag{margin:0}
@@ -3243,7 +3247,7 @@ function pStore() {
   var pf = $('[class*=previewRoot] footer'); if (pf) { var pm = $('button', pf); $$('.pb-pv-book', pf).forEach(function (x) { x.remove(); }); pf.setAttribute('data-test', 'store-preview-footer');
     if (PB.storeBookBtn()) { if (pm) pm.style.flex = '0 0 140px'; var pbk = document.createElement('button'); pbk.type = 'button'; pbk.className = 'pb-pv-book'; pbk.textContent = 'Book now'; pbk.style.cssText = 'flex:1 1 0%;height:52px;border:0;border-radius:8px;background:#fb6f92;color:#fff;font-size:16px;font-weight:700;cursor:pointer'; pbk.onclick = function () { toast('시안에서는 동작하지 않습니다'); }; pf.appendChild(mark(pbk)); }
     else if (pm) pm.style.flex = ''; }
-  if (LASTKEY !== 'bo:store') setTimeout(function () { var t = byText(document, 'h5', '예약 사용 여부'); if (!t) return; var el = t.parentElement; while (el && el !== document.body) { var cs = getComputedStyle(el); if (/(auto|scroll)/.test(cs.overflowY) && el.scrollHeight > el.clientHeight) break; el = el.parentElement; } var top = t.getBoundingClientRect().top; if (el && el !== document.body) el.scrollTop += top - el.getBoundingClientRect().top - 190; else window.scrollBy(0, top - 240); }, 0);
+  if (LASTKEY !== 'bo:store') setTimeout(function () { var t = byText(document, 'h5', '예약 사용 여부'); if (!t) return; var el = t.parentElement; while (el && el !== document.body) { var cs = getComputedStyle(el); if (/(auto|scroll)/.test(cs.overflowY) && el.scrollHeight > el.clientHeight) break; el = el.parentElement; } var top = t.getBoundingClientRect().top, off = 190, sa = $('.ant-anchor'); for (var sp = sa; sp && sp !== document.body; sp = sp.parentElement) { var scs = getComputedStyle(sp); if (scs.position === 'sticky') { off = Math.max(off, (parseFloat(scs.top) || 0) + sp.offsetHeight + 48); break; } } if (el && el !== document.body) el.scrollTop += top - el.getBoundingClientRect().top - off; else window.scrollBy(0, top - 240); }, 0);
 }
 
 /* ---------- 기획전 관리 ---------- */
