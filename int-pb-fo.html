@@ -876,6 +876,14 @@ body.pb-mark .pb-new{outline:none !important}
 .pb-alert h3{margin:0 0 8px;font-size:16px;font-weight:700;color:#2d2d2d}
 .pb-alert p{margin:0 0 20px;font-size:14px;line-height:1.5;color:#555}
 .pb-alert button{width:100%;height:48px;border:0;border-radius:12px;background:#fb6f92;color:#fff;font-family:Pretendard;font-size:16px;font-weight:700;cursor:pointer}
+.pb-alert{position:relative}
+.pb-alert .pb-x{position:absolute;top:8px;right:8px;width:32px;height:32px;padding:0;background:none;color:#2d2d2d;font-size:18px;font-weight:400;border-radius:0}
+.pb-agechk{display:flex;gap:8px;align-items:flex-start;margin:0 0 20px;font-size:14px;line-height:1.5;color:#2d2d2d;cursor:pointer}
+.pb-agechk input{width:18px;height:18px;margin:2px 0 0;flex:none;accent-color:#fb6f92}
+.pb-btns{display:flex;gap:8px}
+.pb-alert .pb-btns button{flex:1}
+.pb-alert .pb-btns .sec{background:#fff;color:#2d2d2d;border:1px solid #ddd}
+.pb-alert button:disabled{background:#e5e5e5;color:#aaa;cursor:default}
 
 /* 내 예약 정렬 칸 (캡처: 테두리 있는 알약 + 아래 꺾쇠) */
 .pb-sort{display:inline-flex;align-items:center;gap:4px;border:1px solid #f0f0f0}
@@ -1120,6 +1128,17 @@ var FV = { store: 'f_store9', product: 'f_prod_s', book: 'f_book_s' };
 var ACC = '#fb6f92';
 document.documentElement.style.setProperty('--pb-acc-bg', '#fff9fb');
 function F() { return PB.S.fo; }
+/* 클리닉 스토어 만 18세 미만 확인 창(PRD 5.13, 2026-11-06): 막지 않고 체크박스 1개 동의 후 진행. 문구는 확정 전 초안.
+   체크 전 Confirm 비활성. Confirm = 동의(f.ageOk) 후 원래 동작 다시 실행. Cancel · ✕ = 창만 닫고 입력값 유지 */
+function ageConfirm(onOk) {
+  var f = F(), dm = document.createElement('div'); dm.className = 'pb-alert-dim'; dm.setAttribute('data-test', 'fo-age18');
+  dm.innerHTML = '<div class="pb-alert" role="dialog" aria-modal="true"><button type="button" class="pb-x" aria-label="Close" data-test="fo-age18-x">✕</button><h3>Please check before booking</h3><p>This store is only for guests aged 18 or older on the visit date.</p><label class="pb-agechk"><input type="checkbox" data-test="fo-age18-chk"><span>I understand that the store may refuse treatment or entry if I am under 18 on the visit date.</span></label><div class="pb-btns"><button type="button" class="sec" data-test="fo-age18-cancel">Cancel</button><button type="button" data-test="fo-age18-ok" disabled>Confirm</button></div></div>';
+  var chk = $('input', dm), ok = $('[data-test=fo-age18-ok]', dm), close = function () { f.err = null; f.ageOk = false; PB.render(); };
+  chk.onchange = function () { ok.disabled = !chk.checked; };
+  $('[data-test=fo-age18-x]', dm).onclick = close; $('[data-test=fo-age18-cancel]', dm).onclick = close;
+  ok.onclick = function () { if (ok.disabled) return; f.err = null; f.ageOk = true; onOk(); };
+  document.getElementById('app').appendChild(mark(dm));
+}
 function meName() { return F().ch === 'ali' ? 'Wang Siyu' : PB.ME; }
 /* 예약 상세 고객 정보: 알리페이 회원 예약은 예약의 값(이메일 없음, 1부 FO-CH-13), 웹은 시안 고객(Kaitlyn Chan) */
 function guestOf(b) { var ali = /알리페이/.test(b.ch) /* 수기 예약 '-'는 알리페이 아님 */, NAT = { '중국': 'China', '홍콩': 'Hong Kong', '캐나다': 'Canada' }; return ali ? { ali: true, nat: NAT[b.nation] || b.nation, pn: b.name.toUpperCase(), mid: b.name.toLowerCase().split(' ').join('.') } : { ali: false, nat: 'Canada', pn: 'KAITLYN CHAN', mid: 'kaitlyn.chan' }; }
@@ -1367,12 +1386,8 @@ function pInfo() {
   var paint = function (el) { if (f.agree) { var sv = $('svg', el); if (sv) sv.outerHTML = CHK; } };
   if (box) box.checked = !!f.agree; paint(allB); paint(row);
   allB.onclick = function () { f.agree = !f.agree; PB.render(); }; row.onclick = function (e) { e.preventDefault(); f.agree = !f.agree; PB.render(); };
-  /* 클리닉 스토어 만 18세 미만: 요청을 보내지 않고 알림 창. 확인 = 창만 닫고 입력값 유지 */
-  if (f.err && f.err.kind === 'age18') {
-    var dm = document.createElement('div'); dm.className = 'pb-alert-dim'; dm.setAttribute('data-test', 'fo-age18');
-    dm.innerHTML = '<div class="pb-alert" role="alertdialog" aria-modal="true"><h3>Booking unavailable</h3><p>This store accepts bookings only from guests aged 18 or older on the visit date.</p><button type="button">OK</button></div>';
-    $('button', dm).onclick = function () { f.err = null; PB.render(); }; document.getElementById('app').appendChild(mark(dm));
-  }
+  /* 클리닉 스토어 만 18세 미만: 확인 창. Confirm = 동의하고 Book 을 다시 실행 */
+  if (f.err && f.err.kind === 'age18') ageConfirm(function () { sb.onclick({ preventDefault: function () {} }); });
   var sb = $('[class*=informationFooter] button'); sb.setAttribute('data-test', 'fo-submit'); sb.disabled = !f.agree;
   sb.onclick = function (e) { e.preventDefault(); if (sb.disabled) return; if (bi) f.birth = bi.value; PB.foSubmit(); var er = f.err; if (er && (er.kind === 'pickAgain' || er.kind === 'slot' || er.kind === 'time' || er.kind === 'closed')) { f.screen = 'book'; } PB.render(); };
 }

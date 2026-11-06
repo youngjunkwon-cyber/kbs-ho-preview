@@ -142,7 +142,7 @@ function ageOn(birth,day){var b=birth.split('-'),d=day.split('-'),a=(+d[0])-(+b[
 function under18(birth,day){return isClinic()&&!!birth&&/^\d{4}-\d{2}-\d{2}$/.test(birth)&&ageOn(birth,day)<18;}
 function foSubmit(){
  var f=S.fo;f.err=null;
- if(under18(f.birth,f.date)){f.err={kind:'age18'};return;}
+ var u18=under18(f.birth,f.date);if(u18&&!f.ageOk){f.err={kind:'age18'};return;}f.ageOk=false; /* 만 18세 미만은 확인 창 동의(f.ageOk) 뒤에만 진행(PRD 5.13) */
  if(!f.time){f.err={kind:'time'};return;}
  if(!slotOpen(f.date,f.time)){f.err={kind:'slot'};f.time='';return;}
  if(!DB.store.bookingSetting){f.err={kind:'closed'};return;} /* 예약 설정이 꺼진 뒤면 상품이 없어도 막음 */
@@ -150,6 +150,7 @@ function foSubmit(){
  if(pid){var j=judgeBookable(prodById(pid),f.lang);if(!j.ok){if(f.entry==='product')f.err={kind:'prodGone'};else{f.err={kind:'pickAgain'};f.sel='';}return;}}
  var p=pid?prodById(pid):null,no=DB.books.length+1;
  DB.books.push({no:no,visit:f.date+' '+f.time,recv:NOWTS,name:ME,nation:'캐나다',lang:f.lang,contact:f.msg||'WhatsApp',mid:f.mid||'4165550199',status:'예약',owner:'고객',route:f.entry==='product'?'상품':'스토어',prodId:pid,snap:p?snapOf(p):null,need:'신규',req:'',birth:f.birth||'',phone:'+1 4165550199',rno:rnoFor(NOWTS,f.lang,DB.books)});
+ DB.books[DB.books.length-1].ageConsentAt=u18?NOWTS:null; /* 나이 확인 동의 시각: 저장만 하고 HOST·BO 화면에는 보이지 않음 */
  f.lastNo=no;f.screen='done';f.time='';f.agree=false; /* 다음 예약은 동의 체크 없이 시작(라이브 정보 입력 화면은 처음에 미체크) */
 }
 function manSave(){
@@ -162,13 +163,13 @@ function manSave(){
  S.host.man={date:'',time:'',name:'',lang:'',pid:'',birth:'',f:{}};S.host.view='res';S.host.open=no;
  return '';
 }
-/* 고객 예약 변경(일시 변경 신청): 예약에 저장된 생년월일과 바꾼 날짜로 클리닉 나이를 다시 판정(PRD 5.13). 만 18세 미만이면 변경하지 않음 */
+/* 고객 예약 변경(일시 변경 신청): 예약에 저장된 생년월일과 바꾼 날짜로 클리닉 나이를 다시 판정(PRD 5.13). 만 18세 미만이면 확인 창 동의 뒤에만 변경 */
 function foChange(){
  var f=S.fo,b=DB.books.filter(function(x){return x.no===f.chgNo;})[0];f.err=null;if(!b)return;
- if(under18(b.birth,f.date)){f.err={kind:'age18'};return;}
+ var u18=under18(b.birth,f.date);if(u18&&!f.ageOk){f.err={kind:'age18'};return;}f.ageOk=false;
  if(!f.time){f.err={kind:'time'};return;}
  if(!slotOpen(f.date,f.time)){f.err={kind:'slot'};f.time='';return;}
- b.chg=f.date+' '+f.time;b.status='변경요청';b.need='변경';
+ b.chg=f.date+' '+f.time;if(u18)b.ageConsentAt=NOWTS;b.status='변경요청';b.need='변경';
  f.mode='';f.chgNo=null;f.myNo=b.no;f.time='';f.screen='mydetail';f.flash='chg';
 }
 /* 매장(HOST) · 운영자(BO)가 바꾸는 예약 시간: 나이 판정 없음(PRD 5.13 "막지 않는 것"). 시안은 확인 단계 없이 바로 바꾼다 */

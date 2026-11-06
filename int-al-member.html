@@ -587,6 +587,14 @@ td.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;letter-
 .pb-alert h3{margin:0 0 8px;font-size:16px;font-weight:700;color:#2d2d2d}
 .pb-alert p{margin:0 0 20px;font-size:14px;line-height:1.5;color:#555}
 .pb-alert button{width:100%;height:48px;border:0;border-radius:12px;background:#fb6f92;color:#fff;font-family:Pretendard;font-size:16px;font-weight:700;cursor:pointer}
+.pb-alert{position:relative}
+.pb-alert .pb-x{position:absolute;top:8px;right:8px;width:32px;height:32px;padding:0;background:none;color:#2d2d2d;font-size:18px;font-weight:400;border-radius:0}
+.pb-agechk{display:flex;gap:8px;align-items:flex-start;margin:0 0 20px;font-size:14px;line-height:1.5;color:#2d2d2d;cursor:pointer}
+.pb-agechk input{width:18px;height:18px;margin:2px 0 0;flex:none;accent-color:#fb6f92}
+.pb-btns{display:flex;gap:8px}
+.pb-alert .pb-btns button{flex:1}
+.pb-alert .pb-btns .sec{background:#fff;color:#2d2d2d;border:1px solid #ddd}
+.pb-alert button:disabled{background:#e5e5e5;color:#aaa;cursor:default}
 .pb-sort{display:inline-flex;align-items:center;gap:4px;border:1px solid #f0f0f0}
 .pb-mp{background:#fff;font-family:Pretendard,sans-serif;color:#2d2d2d}
 .pb-mp-name{padding:24px 16px 20px;border-bottom:1px solid #f2f2f2}
@@ -809,7 +817,7 @@ function resetDB(keepRows) {
     rmsg: '',             // 예약 입력 화면의 연락 메신저 (회원 정보에서 채우지 않는다)
     done13: false,        // 예약 요청을 보낸 뒤 (현행 예약 완료 화면 자리)
     clinic13: false,      // 예약하는 스토어가 클리닉(피부과·성형외과·치과·메디컬체크)인지
-    age18: false,         // 클리닉 스토어 만 18세 미만 알림 창
+    age18: false,         // 클리닉 스토어 만 18세 미만 확인 창(체크박스 1개 동의 후 진행)
     agreed: false,        // 동의 창에서 동의하고 시작하기를 누른 뒤인가 (식별 실패의 다시 시도가 권한 창부터 띄운다)
     noNick: false,        // 알리페이 계정에 닉네임이 없는 경우 (마이페이지 닉네임 자리에 알리페이 회원)
     minor13: '',          // 쓰지 않음(2026-10-17)
@@ -873,21 +881,21 @@ var CAPS = {
   fo10: '알리페이 식별이 로그인을 대신합니다. 로그인 주소로 직접 들어오면 My Page로 보냅니다. 알리페이 채널에서는 자체 로그인 경로를 숨깁니다. 점선 박스가 웹 채널에는 있고 알리페이 채널에는 없는 자리입니다. 진입 관문을 통과해야 들어오므로 비로그인 상태 자체가 없습니다.',
   fo11: 'My Page는 현행 화면과 같은 구성입니다. Nickname과 Joined, 알리페이 계정 안내, Booking History, My Activity, Explore, Customer Center가 있고 Change account information 버튼으로 Account Settings에 들어갑니다. Account Settings에서는 칸을 눌러 예시 값으로 바꾸고 Save를 눌러야 회원 정보에 저장됩니다(알리페이 회원 탭에서 확인). Phone Number는 예약이나 계정 설정에서 인증한 번호가 있으면 채워지고, 없으면 빈 칸을 눌러 입력해 Get verification code로 문자 인증을 마치면 바로 저장됩니다. Use a different number로 바꾼 뒤 문자 인증을 마쳐도 바로 저장됩니다. 이메일, 비밀번호 변경, 로그아웃 자리가 없습니다. Marketing messages는 여기서 켜고 끕니다. 알리페이 계정에 닉네임이 없으면 Nickname 자리에 알리페이 회원이 보입니다(회원이 되기 전에 상단 닉네임 비우기로 확인).',
   fo12: 'My Page > Account Settings의 기존 탈퇴 경로를 그대로 씁니다. 알리페이 연결과 권한이 끊기고 다시 들어오면 새 회원이 되어 진입 관문을 다시 거칩니다. 방문 전 예약(변경 요청 · 변경된 예약 포함)이 남아 있으면 탈퇴하지 않고 안내 창 안에 웹과 같은 빨간 문구를 띄웁니다.',
-  fo13: '회원 정보에서 채운 값은 고칠 수 있고 고친 값은 회원 정보에 저장됩니다. 이메일 칸이 없습니다. 휴대폰 번호는 알리페이에서 받지 않습니다. 첫 예약 때 직접 입력하고 문자 인증을 하며, 두 번째 예약부터는 회원 정보에 저장된 인증 번호가 채워지고 인증을 건너뜁니다. 고치면 그때 인증합니다. Passport name은 직접 입력합니다. Book은 웹 예약과 같은 필수값(이메일 제외)이 모두 차야 켜집니다. 클리닉 스토어(피부과·성형외과·치과·메디컬체크)는 방문 예정일 기준 만 18세 이상만 예약할 수 있어, 만 18세 미만이면 Book을 눌렀을 때 요청을 보내지 않고 알림 창이 뜹니다(상단 클리닉 스토어로 바꿔 확인). 입력한 값은 그대로 남습니다. Nationality·Gender·Date of birth는 칸을 벗어나는 순간 회원 정보에 들어가고, Mobile phone number·Messenger contact·Passport name은 요청 전에 나가면 남지 않습니다. 상단 상담접수 폼 보기로 알리페이 채널 상담접수 폼을 볼 수 있습니다.',
+  fo13: '회원 정보에서 채운 값은 고칠 수 있고 고친 값은 회원 정보에 저장됩니다. 이메일 칸이 없습니다. 휴대폰 번호는 알리페이에서 받지 않습니다. 첫 예약 때 직접 입력하고 문자 인증을 하며, 두 번째 예약부터는 회원 정보에 저장된 인증 번호가 채워지고 인증을 건너뜁니다. 고치면 그때 인증합니다. Passport name은 직접 입력합니다. Book은 웹 예약과 같은 필수값(이메일 제외)이 모두 차야 켜집니다. 클리닉 스토어(피부과·성형외과·치과·메디컬체크)는 방문 예정일 기준 만 18세 이상만 이용할 수 있어, 만 18세 미만이면 Book을 눌렀을 때 바로 보내지 않고 체크박스 1개가 있는 확인 창이 뜹니다(상단 클리닉 스토어로 바꿔 확인). 체크하고 Confirm을 누르면 예약되고, Cancel을 누르면 입력한 값이 그대로 남습니다. Nationality·Gender·Date of birth는 칸을 벗어나는 순간 회원 정보에 들어가고, Mobile phone number·Messenger contact·Passport name은 요청 전에 나가면 남지 않습니다. 상단 상담접수 폼 보기로 알리페이 채널 상담접수 폼을 볼 수 있습니다.',
   bo11: '검색어는 알리페이 식별자, 닉네임, 이름, 연락처를 봅니다. 식별자는 완전 일치로 찾습니다. 빈 값은 알리페이 계정에 값이 없던 항목입니다. 회원 메뉴 아래에 새로 두는 화면입니다. 칼럼은 알리페이가 주는 항목에 맞춘 18개입니다. 이메일과 프로필 동의 여부 칼럼이 없습니다. 연락처는 예약이나 계정 설정에서 인증한 번호입니다. 회원이면 프로필 제공에 항상 동의한 상태입니다.'
 };
 
 function h(s) { return s == null ? '' : String(s); }
 function dash(v) { return v ? h(v) : '<span class="dash">-</span>'; }
 /* FO-CH-13을 떠나거나 새로 열 때: 예약 요청·상담접수 전에 넣은 값은 남기지 않는다 */
-function reset13() { S.userSet = {}; S.done13 = false; S.age18 = false; S.passport = ''; S.minor13 = ''; S.rmsg = ''; S.rchip = ''; S.cd = null; S.doneC = false; S.tel = S.mtel; S.telVerified = !!S.mtel; S.telEdited = false; S.telSaved = S.mtelSaved; }
+function reset13() { S.userSet = {}; S.done13 = false; S.age18 = false; S.age18chk = false; S.age18ok = false; S.passport = ''; S.minor13 = ''; S.rmsg = ''; S.rchip = ''; S.cd = null; S.doneC = false; S.tel = S.mtel; S.telVerified = !!S.mtel; S.telEdited = false; S.telSaved = S.mtelSaved; }
 function go(v) { S.wdErr = false; if (v === 'fo11') S.sub = 'home'; if ((S.view === 'fo13' && v !== 'fo13') || (v === 'fo13' && (S.view !== 'fo13' || S.done13 || S.doneC))) reset13(); S.view = v; render(); }
 function setF13(m) { S.f13 = m; if (S.view === 'fo13') reset13(); render(); }
 
 /* 클리닉 스토어 예약 나이: 방문 예정일 기준 만 18세 이상 */
 var VISIT13 = '2026-10-20';
 function adult18(b) { if (!b) return false; var q = b.split('-'), v = VISIT13.split('-'), age = (+v[0]) - (+q[0]); if (+q[1] > +v[1] || (+q[1] === +v[1] && +q[2] > +v[2])) age--; return age >= 18; }
-function submit13() { if (S.clinic13 && !adult18(S.prof.birth)) { S.age18 = true; render(); return; } S.passportSaved = S.passport; S.passport = ''; S.booked = (S.booked || 0) + 1; S.telSaved = true; S.telEdited = false; S.mtel = S.tel; S.mtelSaved = true; S.mtelDraft = ''; S.userSet = {}; S.done13 = true; render(); }
+function submit13() { if (S.clinic13 && !adult18(S.prof.birth) && !S.age18ok) { S.age18 = true; S.age18chk = false; render(); return; } S.age18ok = false; S.passportSaved = S.passport; S.passport = ''; S.booked = (S.booked || 0) + 1; S.telSaved = true; S.telEdited = false; S.mtel = S.tel; S.mtelSaved = true; S.mtelDraft = ''; S.userSet = {}; S.done13 = true; render(); }
 
 /* 예시 값 순환: 지금 값의 다음 값. 목록에 없으면 첫 값 */
 function nextEx(e, cur) { return e[(e.indexOf(cur) + 1) % e.length]; }
@@ -1087,7 +1095,7 @@ function fo13() {
     '<div class="gone" style="margin:8px 0 0">(시안 주석) 현행 예약 폼의 동의 항목은<br>그대로 있습니다. 이 시안에서는 생략했습니다</div>' +
     '<div class="gone" style="margin:12px 0 0">(시안 주석) 알리페이 채널에서는 이 자리가 없습니다<br>이메일</div>' +
     '</div></div>' +
-    '<div class="cta ' + (ready ? '' : 'dis') + '" ' + (ready ? 'onclick="submit13()"' : '') + '>예약 요청</div>', S.age18 ? '<div class="dim"><div class="mdl"><h3>예약할 수 없습니다</h3><p class="d">이 스토어는 방문일 기준 만 18세 이상만 예약할 수 있습니다.</p><div class="cta" onclick="S.age18=false;render()">확인</div></div></div>' : '', '‹');
+    '<div class="cta ' + (ready ? '' : 'dis') + '" ' + (ready ? 'onclick="submit13()"' : '') + '>예약 요청</div>', S.age18 ? '<div class="dim"><div class="mdl" data-test="al-age18"><h3>예약 전 확인해 주세요</h3><p class="d">이 스토어는 방문일 기준 만 18세 이상만 이용할 수 있습니다.</p><label style="display:flex;gap:8px;align-items:flex-start;font-size:12.5px;line-height:1.6;cursor:pointer"><input type="checkbox" data-test="al-age18-chk" style="margin:3px 0 0;flex:none"' + (S.age18chk ? ' checked' : '') + ' onchange="S.age18chk=this.checked;render()"><span>방문일 기준 만 18세 미만이면 매장에서 시술이나 방문이 거절될 수 있음을 확인합니다.</span></label><div style="display:flex;gap:8px"><div class="cta" style="flex:1;background:#fff;color:#333;border:1px solid #ddd" data-test="al-age18-cancel" onclick="S.age18=false;S.age18chk=false;render()">취소</div><div class="cta' + (S.age18chk ? '' : ' dis') + '" style="flex:1" data-test="al-age18-ok"' + (S.age18chk ? ' onclick="S.age18=false;S.age18chk=false;S.age18ok=true;submit13()"' : '') + '>확인</div></div></div></div>' : '', '‹');
 }
 
 /* FO-CH-13 상담접수 폼 (알리페이 채널). 이메일 칸 없음, 프로필 항목은 회원 정보에서 채움, 메신저 앱 열기 버튼 없음 */
@@ -1461,7 +1469,7 @@ function fo13() {
   var req = '<div class="' + RBI + 'informationField"><div class="' + RBI + 'informationFieldHeading">' + rLabel('Requests', 0) + '<p>Tell us about questions, preferred treatments, or interpretation needs. More detail helps the store prepare.</p></div><textarea name="customerRequest" rows="3" maxlength="1000" placeholder="e.g. I would like a consultation. Is English interpretation available I am also curious about recovery time."></textarea></div>';
   /* 웹 예약과 같은 필수값. 이메일만 뺀다 */
   var ready = S.passport && p.nation && p.sex && p.birth && S.tel && S.telVerified && S.rmsg;
-  var ov = S.age18 ? '<div class="pb-alert-dim" data-test="fo-age18"><div class="pb-alert" role="alertdialog" aria-modal="true"><h3>Booking unavailable</h3><p>This store accepts bookings only from guests aged 18 or older on the visit date.</p><button type="button" data-test="fo-age18-ok" onclick="S.age18=false;render()">OK</button></div></div>' : '';
+  var ov = S.age18 ? '<div class="pb-alert-dim" data-test="fo-age18"><div class="pb-alert" role="dialog" aria-modal="true"><button type="button" class="pb-x" aria-label="Close" data-test="fo-age18-x" onclick="S.age18=false;S.age18chk=false;render()">✕</button><h3>Please check before booking</h3><p>This store is only for guests aged 18 or older on the visit date.</p><label class="pb-agechk"><input type="checkbox" data-test="fo-age18-chk"' + (S.age18chk ? ' checked' : '') + ' onchange="S.age18chk=this.checked;render()"><span>I understand that the store may refuse treatment or entry if I am under 18 on the visit date.</span></label><div class="pb-btns"><button type="button" class="sec" data-test="fo-age18-cancel" onclick="S.age18=false;S.age18chk=false;render()">Cancel</button><button type="button" data-test="fo-age18-ok"' + (S.age18chk ? ' onclick="S.age18=false;S.age18chk=false;S.age18ok=true;submit13()"' : ' disabled') + '>Confirm</button></div></div></div>' : '';
   return rPhone(rHeader('Book', "go('fo11')", 'home') + '<main class="' + RBI + 'page ' + RBI + 'informationPage" data-test="al-book-page"><form class="' + RBI + 'informationForm" onsubmit="return false">' +
     '<div class="' + RBI + 'bookingNotice" data-test="bk-sum"><span class="' + RBI + 'bookingNoticeDot" aria-hidden="true"></span><strong data-test="fo-info-prod">Abijou 肉毒杆菌</strong><span class="pb-fnote-hi2">at Abijou Clinic Myeongdong · 99,000 KRW</span><span class="pb-fnote">Selected time: Tue, Oct 20, 2026 14:00 (KST)</span></div>' +
     '<section class="' + RBI + 'informationSection">' + pass + '<div class="' + RBI + 'informationFieldRow">' + selF('Nationality', 'nation', 'Select a nationality') + selF('Gender', 'sex', 'Select a gender') + '</div>' + birth +

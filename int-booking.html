@@ -136,12 +136,12 @@ function needList(t){return DB.books.filter(function(b){return b.need&&(t==='전
 var ME='Kaitlyn Chan';
 
 /* ===== 동작 ===== */
-/* 클리닉 스토어(피부과·성형외과·치과·메디컬체크) 예약 나이: 방문 예정일 기준 만 18세 이상. 예약 요청을 누를 때 판정, 저장하지 않음 */
+/* 클리닉 스토어(피부과·성형외과·치과·메디컬체크) 예약 나이: 방문 예정일 기준 만 18세 이상. 예약 요청을 누를 때 판정. 만 18세 미만은 확인 창 동의 뒤 접수, 동의 시각만 저장 */
 var CLINIC_CATS=['피부과','성형외과','치과','메디컬체크'];
 function ageOn(birth,day){var b=birth.split('-'),d=day.split('-'),a=(+d[0])-(+b[0]);if(+b[1]>+d[1]||(+b[1]===+d[1]&&+b[2]>+d[2]))a--;return a;}
 function foSubmit(){
  var f=S.fo;f.err=null;
- if(CLINIC_CATS.indexOf(DB.store.cat)>=0&&f.birth&&/^\d{4}-\d{2}-\d{2}$/.test(f.birth)&&ageOn(f.birth,f.date)<18){f.err={kind:'age18'};return;}
+ var u18=CLINIC_CATS.indexOf(DB.store.cat)>=0&&!!f.birth&&/^\d{4}-\d{2}-\d{2}$/.test(f.birth)&&ageOn(f.birth,f.date)<18;if(u18&&!f.ageOk){f.err={kind:'age18'};return;}f.ageOk=false; /* 만 18세 미만은 확인 창 동의 뒤에만 진행 */
  if(!f.time){f.err={kind:'time'};return;}
  if(!slotOpen(f.date,f.time)){f.err={kind:'slot'};f.time='';return;}
  if(!DB.store.bookingSetting){f.err={kind:'closed'};return;} /* 예약 설정이 꺼진 뒤면 상품이 없어도 막음 */
@@ -149,6 +149,7 @@ function foSubmit(){
  if(pid){var j=judgeBookable(prodById(pid),f.lang,f.ch);if(!j.ok){if(f.entry==='product')f.err={kind:'prodGone'};else{f.err={kind:'pickAgain'};f.sel='';}return;}}
  var p=pid?prodById(pid):null,no=DB.books.length+1;
  DB.books.push({no:no,visit:f.date+' '+f.time,recv:NOWTS,name:f.ch==='ali'?'Wang Siyu':ME,nation:f.ch==='ali'?'중국':'캐나다',lang:f.lang,contact:f.msg||'WhatsApp',mid:f.mid||(f.ch==='ali'?'13800000099':'4165550199'),status:'예약',owner:'고객',route:f.entry==='product'?'상품':'스토어',prodId:pid,snap:p?snapOf(p):null,need:'신규',ch:f.ch==='web'?'웹':'알리페이 중국' /* 유입 채널 = 채널 기록값(통합 PRD v1.32). 시안의 알리페이 회원 Wang Siyu는 알리페이 중국 월렛 */,req:'',phone:f.ch==='ali'?'+86 13800000099':'+1 4165550199',rno:rnoFor(NOWTS,f.lang,DB.books)});
+ DB.books[DB.books.length-1].ageConsentAt=u18?NOWTS:null; /* 나이 확인 동의 시각: 저장만, 화면 미표시 */
  f.lastNo=no;f.screen='done';f.time='';f.agree=false; /* 다음 예약은 동의 체크 없이 시작(라이브 정보 입력 화면은 처음에 미체크) */
 }
 function manSave(){
