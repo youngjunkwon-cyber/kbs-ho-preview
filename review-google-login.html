@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>구글 로그인 리뷰</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<style>
+:root{--line:#DCDCDC;--ink:#222;--muted:#777}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Pretendard Variable",Pretendard,sans-serif;color:var(--ink);background:#F3F3F3;font-size:14px}
+.top{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--line);padding:12px max(20px,calc((100% - 1400px)/2));display:flex;gap:10px;align-items:center}
+.top h1{font-size:15px;margin:0}
+.top .s{color:var(--muted);font-size:13px}
+.top button{margin-left:auto;border:1px solid var(--line);background:#fff;border-radius:6px;padding:6px 10px;cursor:pointer;font:inherit}
+.main{display:flex;gap:20px;padding:20px;align-items:flex-start;max-width:1440px;margin:0 auto}
+.left{position:sticky;top:70px;flex:none;width:377px}
+.frame{width:377px;height:814px;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.frame iframe{width:375px;height:100%;border:0;display:block}
+.right{flex:1;min-width:0}
+.right h2{font-size:14px;margin:18px 0 8px;color:#444}
+.right h2:first-child{margin-top:0}
+.case{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px 16px;margin:0 0 8px}
+.case.open{border-color:#222}
+.case .h{display:flex;gap:8px;align-items:center}
+.case .t{font-weight:700;flex:1;font-size:15px}
+.case button{border:1px solid var(--line);background:#fff;border-radius:6px;padding:4px 12px;cursor:pointer;font:inherit}
+.case.open button{background:#222;color:#fff;border-color:#222}
+.case dl{display:grid;grid-template-columns:52px 1fr;gap:4px 10px;margin:8px 0 0;line-height:1.6}
+.case dt{color:var(--muted)}.case dd{margin:0}
+.bo{position:fixed;left:0;right:0;bottom:0;top:58px;background:#fff;z-index:30;display:none;border-top:2px solid #222}
+.bo.on{display:flex;flex-direction:column}
+.bo .bar{display:flex;gap:8px;align-items:center;padding:8px 16px;border-bottom:1px solid var(--line)}
+.bo .bar button{border:1px solid var(--line);background:#fff;border-radius:6px;padding:5px 10px;cursor:pointer;font:inherit;margin-left:auto}
+.bo iframe{flex:1;border:0;width:100%}
+</style>
+</head>
+<body>
+<div class="top"><h1>구글 로그인 리뷰</h1><span class="s">상황마다 "열기"를 누르면 왼쪽 시안이 그 상황으로 맞춰집니다.</span><button onclick="resetAll()">처음으로</button></div>
+<div class="main">
+<div class="left"><div class="frame"><iframe id="fr" src="gl-proto.html"></iframe></div></div>
+<div class="right">
+<h2>로그인 화면</h2>
+<div class="case" id="c0"><div class="h"><span class="t">로그인 화면</span><button class="ob" id="o0" onclick="openCase(0)">열기</button></div>
+<dl><dt>동작</dt><dd>맨 위에 구글 버튼, 그 아래 이메일 로그인 칸이 처음부터 다 보임</dd><dt>해 보기</dt><dd>로그인 화면을 봅니다.</dd></dl></div>
+<div class="case" id="c1"><div class="h"><span class="t">My Page (로그인 전)</span><button class="ob" id="o1" onclick="openCase(1)">열기</button></div>
+<dl><dt>동작</dt><dd>로그인 화면과 같은 구성의 카드</dd><dt>해 보기</dt><dd>홈 하단 MY PAGE를 누릅니다.</dd></dl></div>
+<div class="case" id="c2"><div class="h"><span class="t">비밀번호 없는 구글 회원이 이메일로 로그인</span><button class="ob" id="o2" onclick="openCase(2)">열기</button></div>
+<dl><dt>동작</dt><dd>"구글로 로그인하세요" 안내</dd><dt>해 보기</dt><dd>① googleonly@gmail.com + 아무 비밀번호 → Login / ② linked@gmail.com + pass1234 → Login</dd></dl></div>
+<h2>구글 로그인 결과</h2>
+<div class="case" id="c3"><div class="h"><span class="t">처음 보는 구글</span><button class="ob" id="o3" onclick="openCase(3)">열기</button></div>
+<dl><dt>동작</dt><dd>바로 가입하고 로그인. 닉네임 자동 생성</dd><dt>해 보기</dt><dd>(My Page에서 Continue with Google을 누른 상태로 열림) Alex Kim을 고릅니다.</dd></dl></div>
+<div class="case" id="c4"><div class="h"><span class="t">같은 이메일 회원 있음 (gmail)</span><button class="ob" id="o4" onclick="openCase(4)">열기</button></div>
+<dl><dt>동작</dt><dd>자동으로 연결하고 로그인. 첫 로그인 때 안내 한 번</dd><dt>해 보기</dt><dd>(My Page에서 Continue with Google을 누른 상태로 열림) Mina Park (verified@gmail.com)을 고릅니다.</dd></dl></div>
+<div class="case" id="c5"><div class="h"><span class="t">같은 이메일 회원 있음 (gmail 아님)</span><button class="ob" id="o5" onclick="openCase(5)">열기</button></div>
+<dl><dt>동작</dt><dd>비밀번호 확인 창을 거쳐 연결</dd><dt>해 보기</dt><dd>(회원 7 yuna.choi@yahoo.com, 비밀번호 pass1234가 있고 My Page에서 Continue with Google을 누른 상태로 열림) Yuna Choi → 창의 Password에 pass1234 → Connect</dd></dl></div>
+<div class="case" id="c6"><div class="h"><span class="t">같은 이메일 회원이 다른 구글에 연결됨</span><button class="ob" id="o6" onclick="openCase(6)">열기</button></div>
+<dl><dt>동작</dt><dd>막고 안내</dd><dt>해 보기</dt><dd>(My Page에서 Continue with Google을 누른 상태로 열림) Mina Park (verified@gmail.com)을 고릅니다.</dd></dl></div>
+<div class="case" id="c7"><div class="h"><span class="t">같은 이메일 회원이 이메일 미인증 (옛 회원)</span><button class="ob" id="o7" onclick="openCase(7)">열기</button></div>
+<dl><dt>동작</dt><dd>막고 이메일 로그인 안내</dd><dt>해 보기</dt><dd>(My Page에서 Continue with Google을 누른 상태로 열림) Mina Park (verified@gmail.com)을 고릅니다.</dd></dl></div>
+<h2>예약 중 로그인</h2>
+<div class="case" id="c8"><div class="h"><span class="t">예약 중 구글로 처음 가입</span><button class="ob" id="o8" onclick="openCase(8)">열기</button></div>
+<dl><dt>동작</dt><dd>가입 후 바로 예약자 정보 화면으로</dd><dt>해 보기</dt><dd>(DDYOU 28일 17:00을 고른 뒤 상태로 열림) 구글 계정 선택에서 Alex Kim</dd></dl></div>
+<div class="case" id="c9"><div class="h"><span class="t">예약 중 구글 화면에서 취소</span><button class="ob" id="o9" onclick="openCase(9)">열기</button></div>
+<dl><dt>동작</dt><dd>로그인 화면으로 돌아오고 고른 날짜·시간 유지</dd><dt>해 보기</dt><dd>(DDYOU 28일 17:00을 고른 뒤 상태로 열림) 구글 화면 왼쪽 위 ✕</dd></dl></div>
+<h2>이메일 가입·비밀번호 찾기</h2>
+<div class="case" id="c10"><div class="h"><span class="t">구글 회원의 이메일로 이메일 가입</span><button class="ob" id="o10" onclick="openCase(10)">열기</button></div>
+<dl><dt>동작</dt><dd>막고 구글 로그인 버튼 표시</dd><dt>해 보기</dt><dd>(My Page → Sign up with email로 들어온 상태로 열림) googleonly@gmail.com → Get Verification Code → 안내 아래 Continue with Google → Jane Doe</dd></dl></div>
+<div class="case" id="c11"><div class="h"><span class="t">가입 화면에서 구글로 이메일 인증</span><button class="ob" id="o11" onclick="openCase(11)">열기</button></div>
+<dl><dt>동작</dt><dd>코드 대신 구글로 인증하고 나머지는 그대로 입력</dd><dt>해 보기</dt><dd>(My Page → Sign up with email로 들어온 상태로 열림) Nickname은 비운 채 Verify with Google → Alex Kim → 필수 약관 두 개 체크 → Sign Up</dd></dl></div>
+<div class="case" id="c12"><div class="h"><span class="t">비밀번호 재설정 (gmail 아닌 구글이 연결된 회원)</span><button class="ob" id="o12" onclick="openCase(12)">열기</button></div>
+<dl><dt>동작</dt><dd>구글 연결을 유지할지 묻는 창</dd><dt>해 보기</dt><dd>(회원 7 yuna.choi@yahoo.com, Yuna Choi 구글 연결됨) yuna.choi@yahoo.com → Get Verification Code → 알림 OK → 코드 123456 → Verification Successful → 알림 OK → Password·Confirm Password에 Abcd1234! → Reset Password → 알림 "Password reset." OK → ① Keep / 다시 열어 ② Disconnect / 다시 열어 ③ ✕</dd></dl></div>
+<h2>계정 설정</h2>
+<div class="case" id="c13"><div class="h"><span class="t">구글 회원의 계정 설정</span><button class="ob" id="o13" onclick="openCase(13)">열기</button></div>
+<dl><dt>동작</dt><dd>Google 칸에 연결 상태 표시</dd><dt>해 보기</dt><dd>화면을 봅니다.</dd></dl></div>
+<div class="case" id="c14"><div class="h"><span class="t">구글 연결 해제</span><button class="ob" id="o14" onclick="openCase(14)">열기</button></div>
+<dl><dt>동작</dt><dd>확인 창 뒤 해제</dd><dt>해 보기</dt><dd>Disconnect → Disconnect</dd></dl></div>
+<div class="case" id="c15"><div class="h"><span class="t">구글 회원이 비밀번호 만들기</span><button class="ob" id="o15" onclick="openCase(15)">열기</button></div>
+<dl><dt>동작</dt><dd>Set Password로 비밀번호를 만들면 이메일 로그인도 됨</dd><dt>해 보기</dt><dd>Set Password → New Password에 Abcd1234! → Confirm New Password에 Abcd1234! → Save</dd></dl></div>
+<div class="case" id="c16"><div class="h"><span class="t">닉네임 바꾸기</span><button class="ob" id="o16" onclick="openCase(16)">열기</button></div>
+<dl><dt>동작</dt><dd>My Page Name 카드의 Change</dd><dt>해 보기</dt><dd>Name 옆 Change → New Nickname에 JaneBeauty → Save</dd></dl></div>
+<h2>탈퇴</h2>
+<div class="case" id="c17"><div class="h"><span class="t">비밀번호 없는 구글 회원 탈퇴</span><button class="ob" id="o17" onclick="openCase(17)">열기</button></div>
+<dl><dt>동작</dt><dd>구글로 본인 확인 후 탈퇴</dd><dt>해 보기</dt><dd>맨 아래 Delete Account → Still Want to Withdraw? → Continue with Google → Jane Doe</dd></dl></div>
+<div class="case" id="c18"><div class="h"><span class="t">방문 전 예약이 남은 회원 탈퇴</span><button class="ob" id="o18" onclick="openCase(18)">열기</button></div>
+<dl><dt>동작</dt><dd>막고 안내</dd><dt>해 보기</dt><dd>(방문 전 예약이 남아 있는 회원 1) Delete Account → Still Want to Withdraw? 창에서 다음</dd></dl></div>
+<h2>앱 안 브라우저</h2>
+<div class="case" id="c19"><div class="h"><span class="t">LINE 앱에서 예약 중 구글 로그인</span><button class="ob" id="o19" onclick="openCase(19)">열기</button></div>
+<dl><dt>동작</dt><dd>기본 브라우저로 넘겨서 진행</dd><dt>해 보기</dt><dd>(LINE 앱 안, 날짜·시간을 고른 뒤 로그인 화면으로 열림) Continue with Google</dd></dl></div>
+<div class="case" id="c20"><div class="h"><span class="t">안드로이드 인스타그램 앱</span><button class="ob" id="o20" onclick="openCase(20)">열기</button></div>
+<dl><dt>동작</dt><dd>기본 브라우저로 넘겨서 진행</dd><dt>해 보기</dt><dd>Continue with Google</dd></dl></div>
+<h2>BO</h2>
+<div class="case" id="c21"><div class="h"><span class="t">BO 회원 목록</span><button class="ob" id="o21" onclick="openCase(21)">열기</button></div>
+<dl><dt>동작</dt><dd>가입 경로·구글 연결이 새 칼럼으로 보임</dd><dt>해 보기</dt><dd>아래 BO 화면 회원 목록 맨 위 줄을 봅니다.</dd></dl></div>
+</div>
+</div>
+<div class="bo" id="bo"><div class="bar"><b>BO 회원 &gt; 정보조회</b><button onclick="showBO(false)">닫기</button></div><iframe id="bof" src="about:blank"></iframe></div>
+<script>
+const ITEMS=[{"id":"A-01","setup":"go('login')","bo":false},{"id":"A-08","setup":"go('myout')","bo":false},{"id":"A-06","setup":"go('login')","bo":false},{"id":"B-01","setup":"go('myout');startGoogle('login')","bo":false},{"id":"B-03","setup":"go('myout');startGoogle('login')","bo":false},{"id":"B-30","setup":"DB.members.push({id:7,email:'yuna.choi@yahoo.com',nickname:'YunaC',verified:true,password:'pass1234',googleSub:null,status:'active',via:'email',marketing:false,linkNoticeShown:false});go('myout');startGoogle('login')","bo":false},{"id":"B-15","setup":"DB.members[0].googleSub='g-other';DB.members[0].linkNoticeShown=true;go('myout');startGoogle('login')","bo":false},{"id":"B-19","setup":"DB.members[0].verified=false;go('myout');startGoogle('login')","bo":false},{"id":"C-02","setup":"VIEW.pick={date:'2026-10-28',time:'17:00'};DB.booking={store:'DDYOU',date:'2026-10-28',time:'17:00'};go('login',{returnTo:'bookinfo'});startGoogle('login')","bo":false},{"id":"C-05","setup":"VIEW.pick={date:'2026-10-28',time:'17:00'};DB.booking={store:'DDYOU',date:'2026-10-28',time:'17:00'};go('login',{returnTo:'bookinfo'});startGoogle('login')","bo":false},{"id":"D-01","setup":"go('signup',{returnTo:'myin'})","bo":false},{"id":"D-08","setup":"go('signup',{returnTo:'myin'})","bo":false},{"id":"D-07a","setup":"DB.members.push({id:7,email:'yuna.choi@yahoo.com',nickname:'YunaC',verified:true,password:'pass1234',googleSub:'g-yahoo',gEmail:'yuna.choi@yahoo.com',googleAt:'2026-10-20 10:00',status:'active',via:'email',marketing:false,linkNoticeShown:true});go('forgot')","bo":false},{"id":"E-01","setup":"DB.session=3;go('account')","bo":false},{"id":"E-07","setup":"DB.session=5;go('account')","bo":false},{"id":"E-02","setup":"DB.session=3;go('account')","bo":false},{"id":"E-13","setup":"DB.session=3;go('myin')","bo":false},{"id":"F-01","setup":"DB.session=3;go('account')","bo":false},{"id":"F-07","setup":"DB.session=1;DB.members[0].upcoming=true;go('account')","bo":false},{"id":"C-10","setup":"DB.env='line';VIEW.pick={date:'2026-10-28',time:'17:00'};DB.booking={store:'DDYOU',date:'2026-10-28',time:'17:00'};go('login',{returnTo:'bookinfo'});","bo":false},{"id":"J-05","setup":"DB.env='ig-android';go('login')","bo":false},{"id":"H-01","setup":"googleDone('g-new')","bo":true}];
+const W=()=>document.getElementById('fr').contentWindow;
+function showBO(on){document.getElementById('bo').classList.toggle('on',on);if(on){const f=document.getElementById('bof');if(f.src.indexOf('gl-bo.html')<0)f.src='gl-bo.html?v='+Date.now();else if(f.contentWindow.boSet)f.contentWindow.boSet({via:'',q:''})}}
+function mark(i){document.querySelectorAll('.case').forEach(e=>e.classList.remove('open'));const c=document.getElementById('c'+i);if(c)c.classList.add('open')}
+function openCase(i,retry){const it=ITEMS[i];try{W().resetDB();W().eval(it.setup)}catch(e){if(!retry){const f=document.getElementById('fr');f.onload=()=>{f.onload=null;openCase(i,true)};f.src='gl-proto.html?'+Date.now();return}alert('세팅 실패: '+e.message)}try{W().scrollTo(0,0)}catch(e){}showBO(it.bo);mark(i)}
+function resetAll(){try{W().resetDB()}catch(e){}showBO(false);mark(-1)}
+</script>
+</body>
+</html>
