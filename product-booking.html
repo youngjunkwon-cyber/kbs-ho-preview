@@ -133,7 +133,7 @@ function needList(t){return DB.books.filter(function(b){return b.need&&(t==='전
 var ME='Kaitlyn Chan';
 
 /* ===== 동작 ===== */
-/* 클리닉 스토어(피부과·성형외과·치과·메디컬체크) 예약 나이: 방문 예정일 기준 만 18세 이상. 예약 요청을 누를 때 판정, 저장하지 않음(PRD 5.13)
+/* 클리닉 스토어(피부과·성형외과·치과·메디컬체크) 예약 나이: 방문 예정일 기준 만 18세 이상. 예약 요청을 누를 때 판정. 만 18세 미만은 확인 창 동의 뒤 접수하고 동의 여부·시각을 저장(화면 미표시)(PRD 5.13)
    스토어 카테고리가 여럿이면(DB.store.cats) 그중 하나라도 클리닉이면 대상 */
 var CLINIC_CATS=['피부과','성형외과','치과','메디컬체크'];
 function storeCats(){var s=DB.store;return s.cats&&s.cats.length?s.cats:[s.cat];}
@@ -169,7 +169,7 @@ function foChange(){
  var u18=under18(b.birth,f.date);if(u18&&!f.ageOk){f.err={kind:'age18'};return;}f.ageOk=false;
  if(!f.time){f.err={kind:'time'};return;}
  if(!slotOpen(f.date,f.time)){f.err={kind:'slot'};f.time='';return;}
- b.chg=f.date+' '+f.time;if(u18)b.ageConsentAt=NOWTS;b.status='변경요청';b.need='변경';
+ b.chg=f.date+' '+f.time;b.chgAt=NOWTS+':00';if(u18)b.ageConsentAt=NOWTS;b.status='변경요청';b.need='변경';
  f.mode='';f.chgNo=null;f.myNo=b.no;f.time='';f.screen='mydetail';f.flash='chg';
 }
 /* 매장(HOST) · 운영자(BO)가 바꾸는 예약 시간: 나이 판정 없음(PRD 5.13 "막지 않는 것"). 시안은 확인 단계 없이 바로 바꾼다 */

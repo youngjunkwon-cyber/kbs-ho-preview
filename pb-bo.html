@@ -3020,7 +3020,7 @@ function fillDrawer(pre, b, qrCls) {
   if (b.status === '미방문') hist.push(['노쇼 처리', '매장', b.visit.slice(0, 10) + ' 18:56:22']);
   if (b.status === '고객취소') hist.push(['예약 취소', '고객', b.cancelAt]);
   if (b.status === '매장취소') hist.push(['예약 취소 (' + b.cancelReason + ')', '매장', b.cancelAt]);
-  if (b.chg) hist.push(['시간 변경 신청 (' + sh(b.visit) + ' → ' + sh(b.chg) + ')', '고객', PB.addDays(b.recv.slice(0, 10), 1) + ' 14:21:39']);
+  if (b.chg) hist.push(['시간 변경 신청 (' + sh(b.visit) + ' → ' + sh(b.chg) + ')', '고객', (b.chgAt || PB.addDays(b.recv.slice(0, 10), 1) + ' 14:21:39')]);
   hist.push(b.owner === '고객' ? ['접수 (고객 직접 예약)', '고객', b.recv + ':16'] : ['접수 (매장 수기 등록)', '매장', b.recv + ':04']);
   var hl = $('[class*=historyList]', cont), hiT = $('[class*=historyItem]', hl).cloneNode(true); hl.innerHTML = '';
   hist.forEach(function (x) { var it = hiT.cloneNode(true), sp = $$('span', it); sp[0].textContent = x[0]; sp[1].textContent = x[1]; $('time', it).textContent = x[2]; hl.appendChild(it); });
@@ -3219,7 +3219,7 @@ function pEdit() {
   ['활성화', '히든 여부'].forEach(function (n) { var l = byText(document, 'label', n); if (l) { var g = l.closest('.ant-form-item').querySelector('[role=radiogroup]'); radioSet(g, (n === '활성화' ? p.active : p.hidden) ? 'y' : 'n', false); } });
   /* 개별 / 기본 */
   var modeLabels = $$('label.ant-radio-wrapper', mg);
-  modeLabels.forEach(function (l) { var isBase = /기본/.test(l.textContent); var on = isBase === base; l.classList.toggle('ant-radio-wrapper-checked', on); $('.ant-radio', l).classList.toggle('ant-radio-checked', on); l.onclick = function (e) { e.preventDefault(); if (!isBase && p.mode === '기본') { p.wb = Object.assign({}, STORE_WB); p.book = !!s.btn; /* 개별로 바꾸는 순간 예약 줄까지 스토어 값을 복사(2026-11-04) */ } p.mode = isBase ? '기본' : '개별'; PB.render(); }; });
+  modeLabels.forEach(function (l) { var isBase = /기본/.test(l.textContent); var on = isBase === base; l.classList.toggle('ant-radio-wrapper-checked', on); $('.ant-radio', l).classList.toggle('ant-radio-checked', on); var ip = $('input', l); if (ip) ip.checked = on; l.onclick = function (e) { e.preventDefault(); if (!isBase && p.mode === '기본') { p.wb = Object.assign({}, STORE_WB); p.book = !!s.btn; /* 개별로 바꾸는 순간 예약 줄까지 스토어 값을 복사(2026-11-04) */ } p.mode = isBase ? '기본' : '개별'; PB.render(); }; });
   /* 기존 버튼 4종: 기본 설정이면 잠김 */
   p.wb = p.wb || {};
   /* 켜진 자리 수(PRD 5.3): 칸마다 한 자리, 상담접수와 문의하기는 함께 한 자리, 잠긴 예약 줄은 세지 않음 */

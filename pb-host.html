@@ -2507,7 +2507,7 @@ function fillDrawer(pre, b, qrCls) {
   if (b.status === '미방문') hist.push(['노쇼 처리', '매장', b.visit.slice(0, 10) + ' 18:56:22']);
   if (b.status === '고객취소') hist.push(['예약 취소', '고객', b.cancelAt]);
   if (b.status === '매장취소') hist.push(['예약 취소 (' + b.cancelReason + ')', '매장', b.cancelAt]);
-  if (b.chg) hist.push(['시간 변경 신청 (' + sh(b.visit) + ' → ' + sh(b.chg) + ')', '고객', PB.addDays(b.recv.slice(0, 10), 1) + ' 14:21:39']);
+  if (b.chg) hist.push(['시간 변경 신청 (' + sh(b.visit) + ' → ' + sh(b.chg) + ')', '고객', (b.chgAt || PB.addDays(b.recv.slice(0, 10), 1) + ' 14:21:39')]);
   hist.push(b.owner === '고객' ? ['접수 (고객 직접 예약)', '고객', b.recv + ':16'] : ['접수 (매장 수기 등록)', '매장', b.recv + ':04']);
   var hl = $('[class*=historyList]', cont), hiT = $('[class*=historyItem]', hl).cloneNode(true); hl.innerHTML = '';
   hist.forEach(function (x) { var it = hiT.cloneNode(true), sp = $$('span', it); sp[0].textContent = x[0]; sp[1].textContent = x[1]; $('time', it).textContent = x[2]; hl.appendChild(it); });
