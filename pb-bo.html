@@ -2986,10 +2986,10 @@ function fillDrawer(pre, b, qrCls) {
   var sec0 = $$('section', cont).filter(function (s) { return $('[class*=readonlyBox]', s); })[0], ps = sec0.cloneNode(true);
   $('h3', ps).textContent = '예약 상품'; ps.setAttribute('data-test', 'prod-block'); var box = $('[class*=readonlyBox]', ps); box.classList.add('pb-prodbox');
   if (!b.snap) { ps.setAttribute('data-kind', 'consult'); box.textContent = '스토어 예약'; }
-  else { var lp = PB.prodById(b.prodId), live = lp && PB.prodVisible(lp, b.snap.lang);
-    box.innerHTML = '<span class="pb-prodbox-t"><b>' + esc(b.snap.name) + '</b><span>' + PB.won(b.snap.price) + '원</span></span>' + (live ? '<a class="pb-prod-l" href="#" data-test="prod-view">상품 보기</a>' : '');
+  else { /* 상품 보기: 예약에 저장한 고객 상품 상세 주소를 그대로 연다. 상품이 내려갔으면 그 주소의 화면 그대로(PRD v1.14 5.4 · 5.9) */
+    box.innerHTML = '<span class="pb-prodbox-t"><b>' + esc(b.snap.name) + '</b><span>' + PB.won(b.snap.price) + '원</span></span><a class="pb-prod-l" href="#" data-test="prod-view">상품 보기</a>';
     /* 상품 보기 = 그 상품을 예약한 언어로 고객 화면 상품 상세(시안 안에서 고객 화면으로 넘어감) */
-    var lk = $('.pb-prod-l', box); if (lk) lk.onclick = function (e) { e.preventDefault(); e.stopPropagation(); PB.S.fo.back = null; parent.foOpenProduct(b.prodId, b.snap.lang); }; }
+    var lk = $('.pb-prod-l', box); if (lk) lk.onclick = function (e) { e.preventDefault(); e.stopPropagation(); PB.S.fo.back = null; PB.openSaved(b.snap); }; }
   (cr || $('h2', cont)).after(mark(ps));
   var qr = b.contact === 'WeChat' || b.contact === 'LINE';
   var V = { '매장': PB.DB.store.name, '여권명': b.name, '국적': b.nation, '언어': langLabel(b.lang), '전화번호': b.phone, '예약 번호': b.rno, '접수 시각': b.recv, '등록 방식': b.owner,
@@ -3113,7 +3113,7 @@ function filtered() {
     if (b.kind && PB.bookingKind(x) !== b.kind) return false;
     if (b.owner && x.owner !== b.owner) return false;
     if (b.rlang && x.lang !== b.rlang) return false;
-    if (q) { var hay = [x.name, x.phone, x.rno, x.req, x.snap ? x.snap.name : ''].join(' ').toLowerCase(); if (hay.indexOf(q) < 0) return false; }
+    if (q) { var hay = [x.name, x.phone, x.rno, x.req, x.snap ? x.snap.name + ' ' + (x.snap.nameEn || '') : ''].join(' ').toLowerCase(); /* 상품명: 예약 언어 상품명과 영어 상품명 부분 일치(PRD v1.14 5.9) */ if (hay.indexOf(q) < 0) return false; }
     return true;
   }).sort(function (a, c) { return a.visit < c.visit ? 1 : -1; });
 }
