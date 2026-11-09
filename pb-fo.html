@@ -893,6 +893,9 @@ body.pb-mark .pb-new{outline:none !important}
 .pb-btns{display:flex;gap:8px}
 .pb-alert .pb-btns button{flex:1}
 .pb-alert .pb-btns .sec{background:#fff;color:#2d2d2d;border:1px solid #ddd}
+.pb-unb{text-align:center}
+.pb-unb-ic{display:block;margin:0 auto 12px}
+.pb-unb h3{margin:0 0 8px}
 /* 안내 토스트 (PRD 5.5): 화면 아래 고정, 좌우 16px, 하단 버튼 위 16px */
 .pb-ntoast{position:fixed;left:16px;right:16px;bottom:16px;z-index:5000;display:flex;align-items:center;gap:10px;background:#2d2d2d;color:#fff;border-radius:12px;padding:12px 12px 12px 14px;box-shadow:0 6px 16px rgba(0,0,0,.18);font-family:Pretendard}
 .pb-ntoast .ic{flex:none;width:20px;height:20px}
@@ -1167,11 +1170,17 @@ var AGE18_EN = '[Required] I am 18 or older as of the visit date';
 /* 안내 토스트(PRD 5.5 · 5.2): 경고 아이콘, 제목 한 줄, 설명 한 줄, 오른쪽 버튼 하나. 3초 뒤 저절로 사라지고 버튼을 누르면 바로 사라지며 동작 */
 var TOASTS = {
   slot: { t: 'The selected time is no longer available', d: 'Please choose another time.', b: 'OK' },
-  pickAgain: { t: "This product can't be booked right now", d: 'Choose another product or book with "I\'ll decide at the store."', b: 'OK' },
-  prodGone: { t: "This product can't be booked right now", d: 'Please choose another product on the store page.', b: 'Go', go: 'store' },
-  urlGone: { t: "This product can't be booked right now", d: 'Please choose another product on the store page.', b: 'Go', go: 'store' }
+  pickAgain: { t: "This product can't be booked right now", d: 'Choose another product or book with "I\'ll decide at the store."', b: 'OK' }
 };
 var TOAST_T = null;
+/* 상품 예약 불가 모달(PRD v2.2 5.5 · 결정 32): 상품 예약 URL 예약 불가, 상품 상세로 들어와 정보 입력 중 상품 예약 불가 두 경우.
+   화면 가운데, 뒤 화면 흐리게. 경고 아이콘 · 제목 · 설명 · [Go to store page] 하나. 닫기 없음, 바깥을 눌러도 안 닫힘 */
+function unbModal() {
+  var f = F(), dm = document.createElement('div'); dm.className = 'pb-alert-dim pb-new'; dm.setAttribute('data-test', 'fo-unb');
+  dm.innerHTML = '<div class="pb-alert pb-unb" role="alertdialog" aria-modal="true"><svg class="pb-unb-ic" width="40" height="40" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="10" fill="#fb6f92"/><path d="M10 5.5v5.5M10 14v.2" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg><h3 data-test="fo-unb-t">This product can\'t be booked right now.</h3><p data-test="fo-unb-d">Please choose another product on the store page.</p><button type="button" data-test="fo-unb-go">Go to store page</button></div>';
+  $('[data-test=fo-unb-go]', dm).onclick = function () { f.err = null; f.viaUrl = false; f.toast = null; nav('store'); };
+  document.getElementById('app').appendChild(dm);
+}
 function drawToast() {
   var f = F(), old = document.getElementById('pb-ntoast'); if (old) old.remove(); clearTimeout(TOAST_T);
   var tt = f.toast; if (!tt) return; var left = tt.until - Date.now(); if (left <= 0) { f.toast = null; return; }
@@ -1347,15 +1356,12 @@ function pBook() {
   $('header [class*=headerTitle]').textContent = f.mode === 'change' ? 'Request booking change' : 'Book';
   if (f.mode === 'change') { pChange(); return; }
   var nb = $('[class*=scheduleNextButton]'); nb.setAttribute('data-test', 'fo-next');
-  /* 상품 고정 진입(상품 상세 [예약] · 상품 예약 URL)인데 그 상품을 지금 예약할 수 없으면 들어오자마자 안내(PRD v1.14 5.2 · 5.5 예약 불가 조건, 언어 조건 없음).
-     스토어명 · 주소 아래 문구 + 안내 토스트 [Go](스토어 페이지로). 날짜 · 시간 영역과 하단 버튼은 두지 않음.
-     정보 입력 화면에서 예약 불가 안내를 받은 뒤 뒤로 와도 이 화면 */
+  /* 상품 고정 진입(상품 상세 [예약] · 상품 예약 URL)인데 그 상품을 지금 예약할 수 없으면 들어오자마자 상품 예약 불가 모달(PRD v2.2 5.2 · 5.5, 예약 불가 조건에 언어 없음).
+     모달 뒤로 스토어명 · 주소만 흐리게 보이고, 날짜 · 시간 영역과 하단 버튼은 두지 않음. 위쪽 빨간 안내 문구 없음 */
   if (f.entry === 'product') { var up = PB.prodById(f.pid); if (!up || !PB.judgeBookable(up, f.lang).ok) {
-    var ub = document.createElement('p'); ub.className = 'pb-ferr'; ub.style.margin = '8px 16px 0'; ub.setAttribute('data-test', 'fo-url-err'); ub.textContent = "This product can't be booked right now.";
-    var si = $('[class*=scheduleIntro]'); if (si) si.after(mark(ub)); else ($('main') || document.getElementById('app')).prepend(mark(ub));
     $$('header button').forEach(function (b) { b.onclick = function () { f.viaUrl = false; f.toast = null; nav('store'); }; });
     $$('[class*=scheduleCalendar], [class*=scheduleDivider], [class*=timeSection], [class*=scheduleFooter]').forEach(function (x) { x.remove(); });
-    if (!f.ubShown) { f.ubShown = true; PB.showToast('urlGone'); }
+    unbModal();
     return; } }
   $$('header button').forEach(function (b, i) { b.onclick = function () { nav(i === 0 ? (f.entry === 'product' ? 'product' : 'store') : 'store'); }; });
   /* 상품 영역 */
@@ -1482,9 +1488,8 @@ function pInfo() {
     + '<span class="pb-sum-r" data-test="fo-info-time">Time : ' + f.date + ' (' + wdEn(f.date) + ') ' + f.time + ' (KST)</span>';
   nt.appendChild(box);
   var form = $('form'); form.onsubmit = function (e) { e.preventDefault(); };
-  /* 상품 상세로 들어온 예약인데 Book 순간 상품이 내려감: 위쪽 문구 + 안내 토스트 [Go](스토어 페이지로). 토스트가 사라져도 문구는 남고 Book 은 꺼진 채(PRD 5.5) */
+  /* 상품 상세로 들어온 예약인데 Book 순간 상품이 예약 불가: 상품 예약 불가 모달(PRD v2.2 5.5). 뒤의 입력값은 그대로, 예약하기는 꺼짐. 위쪽 빨간 안내 문구 없음 */
   var gone = !!(f.err && f.err.kind === 'prodGone');
-  if (gone) { var eb = document.createElement('p'); eb.className = 'pb-ferr'; eb.style.margin = '0 0 12px'; eb.setAttribute('data-test', 'fo-err'); eb.textContent = "This product can't be booked right now."; nt.before(mark(eb)); }
   /* 예시 데이터 */
   var setIn = function (sel, v) { var x = $(sel); if (x) { x.value = v; x.setAttribute('value', v); } };
   setIn('input[name=passportName]', 'KAITLYN CHAN'); f.birth = f.birth || '1996-04-12'; setIn('input[name=birthDate]', f.birth); var bi = $('input[name=birthDate]'); if (bi) { bi.readOnly = false; bi.oninput = function () { f.birth = bi.value; }; } setIn('input[type=email]', 'kaitlyn@example.com (Verified)'); setIn('input[name=messengerId]', f.mid != null ? f.mid : '4165550199'); var mid0 = $('input[name=messengerId]'); if (mid0) mid0.oninput = function () { f.mid = mid0.value; };
@@ -1514,6 +1519,7 @@ function pInfo() {
   allB.setAttribute('data-test', 'fo-agree-all'); allB.setAttribute('aria-pressed', allOn ? 'true' : 'false'); paint(allB, allOn);
   allB.onclick = function () { var v = !allOn; keys.forEach(function (k) { f[k] = v; }); PB.render(); };
   var sb = $('[class*=informationFooter] button'); sb.setAttribute('data-test', 'fo-submit'); sb.disabled = gone || !f.agree || (cl && !f.age18);
+  if (gone) unbModal();
   sb.onclick = function (e) { e.preventDefault(); if (sb.disabled) return; if (bi) f.birth = bi.value; PB.foSubmit(); var er = f.err; if (er && (er.kind === 'pickAgain' || er.kind === 'noneLeft' || er.kind === 'slot' || er.kind === 'time' || er.kind === 'closed')) { f.screen = 'book'; } PB.render(); };
 }
 

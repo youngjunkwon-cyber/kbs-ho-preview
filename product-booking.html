@@ -33,7 +33,7 @@ body{font-family:Pretendard,"Noto Sans KR","Malgun Gothic",sans-serif;font-size:
 </div></div>
 <script>
 'use strict';
-/* 상품 예약 선행 배포 시안: 알리페이 채널 분기 작업 전의 화면과 동작만 그린다(선행 PRD v1.14, 부록 B의 항목은 없음) */
+/* 상품 예약 선행 배포 시안: 알리페이 채널 분기 작업 전의 화면과 동작만 그린다(선행 PRD v2.2, 부록 B의 항목은 없음) */
 /* ===== 기준 시각 ===== */
 var TODAY='2026-10-12',NOWTS='2026-10-12 12:00';
 var LANGS={en:'영어',ja:'일본어',zh:'중국어(간체)'};
@@ -161,7 +161,7 @@ function foSubmit(){
  if(!DB.store.bookingSetting){f.err={kind:'closed'};return;} /* 예약 설정이 꺼진 뒤면 상품이 없어도 막음 */
  var pid=f.entry==='product'?f.pid:selPid(f);
  if(pid){var j=judgeBookable(prodById(pid),f.lang);if(!j.ok){
-  if(f.entry==='product'){f.err={kind:'prodGone'};showToast('prodGone');}
+  if(f.entry==='product'){f.err={kind:'prodGone'};} /* 상품 예약 불가 모달(고객 화면이 그림, PRD v2.2 5.5) */
   else{f.sel='';if(foOptions(f.lang).length){f.err={kind:'pickAgain'};f.pickAgain=true;showToast('pickAgain');}else{f.err={kind:'noneLeft'};f.noneLeft=true;}} /* 남은 상품이 없으면 빨간 글자 안내(토스트 아님, 고를 상품이 없는 동안 계속) */
   return;}} /* 상품 예약 불가와 시간 마감이 함께면 상품 예약 불가를 먼저(PRD v1.14 5.5) */
  /* 시간 마감: 예약 화면으로 돌아가 시간 선택을 비우고(고른 상품은 그대로) 토스트(PRD 5.5) */
