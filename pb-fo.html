@@ -1408,7 +1408,10 @@ function pBook() {
   if (noPick) { f.sel = ''; f.pickAgain = false; } else f.noneLeft = false;
   var ts = $$('[class*=timeSection]').filter(function (x) { return x !== sec; })[0], dv = $('[class*=scheduleDivider]');
   if (!noPick) { ts.after(mark(sec)); if (dv) sec.before(dv.cloneNode(true)); }
-  else if (f.noneLeft) { var ne = document.createElement('p'); ne.className = 'pb-ferr'; ne.setAttribute('data-test', 'fo-err'); ne.textContent = "This product can't be booked right now. You can still book and decide at the store."; ne.style.margin = '8px 16px 0'; ts.after(mark(ne)); }
+  else if (f.noneLeft) { /* [Book] 때 고를 상품이 하나도 남지 않음(PRD v2.3 5.5 · 결정 33): 상품 영역에 I'll decide at the store 카드 하나만 선택된 채 고정(바꾸거나 해제 불가). 제목 · 보조 문구 · 탭 · 다른 카드 · View More · 안내 문구 · 토스트 없음. 고를 상품이 없는 동안 유지 */
+    var nsec = document.createElement('section'); nsec.className = 'BookingSchedulePage-module-scss-module__TxJ5FW__timeSection pb-fsec'; nsec.setAttribute('data-test', 'fo-noneleft');
+    var ng = src.querySelector('[class*=productGrid]').cloneNode(false), nli = decideCard(), nart = nli.querySelector('article'); nart.setAttribute('data-test', 'fo-pick-store'); nart.classList.add('pb-pick-on', 'pb-fixcard'); nart.setAttribute('aria-selected', 'true'); nart.insertAdjacentHTML('beforeend', CHK_ON); ng.appendChild(nli); nsec.appendChild(ng);
+    ts.after(mark(nsec)); if (dv) nsec.before(dv.cloneNode(true)); }
   bookCalendarAndTimes(f);
   /* 하단 버튼(PRD 5.11): 시간 안 고름 → Please select a time / 상품 영역이 있는데 안 고름 → Please select a product / 고른 상품이 예약 불가가 됨 → Please choose another product / 다 고름 → 날짜 · 시간 */
   var needPick = f.entry !== 'product' && !noPick && !f.sel;
