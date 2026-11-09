@@ -33,7 +33,7 @@ body{font-family:Pretendard,"Noto Sans KR","Malgun Gothic",sans-serif;font-size:
 </div></div>
 <script>
 'use strict';
-/* 상품 예약 선행 배포 시안: 알리페이 채널 분기 작업 전의 화면과 동작만 그린다(선행 PRD v1.12, 부록 B의 항목은 없음) */
+/* 상품 예약 선행 배포 시안: 알리페이 채널 분기 작업 전의 화면과 동작만 그린다(선행 PRD v1.13, 부록 B의 항목은 없음) */
 /* ===== 기준 시각 ===== */
 var TODAY='2026-10-12',NOWTS='2026-10-12 12:00';
 var LANGS={en:'영어',ja:'일본어',zh:'중국어(간체)'};
@@ -98,7 +98,7 @@ var DB,S;
 /* meConsults = 시안 고객(Kaitlyn Chan)의 구)상담접수 내역 건수. 0이면 예약 목록의 "View previous consultation requests" 버튼을 두지 않음(PRD 5.11) */
 function freshDB(){var P=seedProducts();DB={store:seedStore(),prods:P,books:seedBookings(P),cols:seedCollections(),meConsults:2};}
 function freshState(){return {surf:'HOST',mark:true,
- fo:{lang:'en',screen:'store',entry:'store',pid:null,sel:'',date:TODAY,time:'',err:null,lastNo:null,myNo:null,tab:'upcoming',agree:false,age18:false,mkt:false,chgAge:false,pickAgain:false,moreId:null,toast:null},
+ fo:{lang:'en',screen:'store',entry:'store',pid:null,sel:'',date:TODAY,time:'',err:null,lastNo:null,myNo:null,tab:'upcoming',agree:false,age18:false,mkt:false,chgAge:false,chgSheet:false,pickAgain:false,moreId:null,toast:null},
  host:{view:'dash',dtab:'전체',st:'',kind:'',owner:'',q:'',qd:'',ptab:'전체',open:null,editPid:null,man:{date:'',time:'',name:'',lang:'',pid:'',birth:'',f:{}},statPer:'전체'},
  bo:{view:'res',st:'',kind:'',owner:'',q:'',qd:'',open:null,lang:'',editPid:null,col:null,offModal:false,sper:'오늘'}};}
 
@@ -176,7 +176,7 @@ function manSave(){
  S.host.man={date:'',time:'',name:'',lang:'',pid:'',birth:'',f:{}};S.host.view='res';S.host.open=no;
  return '';
 }
-/* 고객 예약 변경(일시 변경 신청): 클리닉 스토어면 변경 화면의 18세 체크 줄(f.chgAge)을 체크해야 보낼 수 있고, 보내면 동의 시각을 그때로 바꾼다(PRD 5.13). 날짜를 늦추든 앞당기든 같다 */
+/* 고객 예약 변경(일시 변경 신청): 클리닉 스토어면 변경 확인 시트의 18세 체크 줄(f.chgAge)을 체크해야 보낼 수 있고, 보내면 동의 시각을 변경 신청 시각으로 덮어써 하나만 남긴다(PRD v1.13 5.13). 날짜를 늦추든 앞당기든 같다 */
 function foChange(){
  var f=S.fo,b=DB.books.filter(function(x){return x.no===f.chgNo;})[0];f.err=null;if(!b)return;
  var cl=isClinic();if(cl&&!f.chgAge){f.err={kind:'age18'};return;}

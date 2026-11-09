@@ -906,9 +906,20 @@ body.pb-mark .pb-new{outline:none !important}
 .pb-sum-r{display:block;font-size:13px;font-weight:500;color:#c6c6c6;line-height:1.45}
 .pb-sum-r:first-of-type{margin-top:6px}
 /* 동의 항목: 18세 · 마케팅 줄은 라이브 [필수] 줄과 같은 부품 */
-.pb-chgage{margin:16px 16px 0;padding:14px 0 0;border-top:1px solid #f0f0f0}
-.pb-chgage label{display:flex;gap:8px;align-items:flex-start;font-size:14px;font-weight:500;line-height:1.45;color:#2d2d2d;cursor:pointer}
-.pb-chgage input{width:20px;height:20px;margin:0;flex:none;accent-color:#fb6f92}
+/* 예약 변경 확인 시트(아래에서 올라오는 창): 제목 · 안내 문구 · 클리닉이면 18세 체크 줄 · [Cancel] [Request change] */
+.pb-sheet-dim{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;z-index:9999}
+.pb-sheet{width:100%;background:#fff;border-radius:16px 16px 0 0;padding:24px 20px 20px;font-family:Pretendard}
+.pb-sheet h3{margin:0 0 8px;font-size:16px;font-weight:700;color:#2d2d2d;line-height:1.4}
+.pb-sheet-g{margin:0 0 16px;padding-left:18px;font-size:14px;line-height:1.5;color:#555}
+.pb-chgbanner{margin:12px 16px 0;padding:12px 14px;border-radius:10px;background:#fff0f4;display:flex;flex-direction:column;gap:2px;font-family:Pretendard}
+.pb-chgbanner strong{font-size:14px;font-weight:700;color:#2d2d2d}
+.pb-chgbanner span{font-size:13px;color:#555}
+.pb-chgdh{margin:16px 16px 8px;font-size:16px;font-weight:700;color:#2d2d2d}
+.pb-chgage-s{display:flex;gap:8px;align-items:flex-start;margin:0 0 20px;padding-top:14px;border-top:1px solid #f0f0f0;font-size:14px;font-weight:500;line-height:1.45;color:#2d2d2d;cursor:pointer}
+.pb-chgage-s input{width:20px;height:20px;margin:0;flex:none;accent-color:#fb6f92}
+.pb-sheet button{flex:1;height:48px;border:0;border-radius:12px;background:#fb6f92;color:#fff;font-family:Pretendard;font-size:16px;font-weight:700;cursor:pointer}
+.pb-sheet .sec{background:#fff;color:#2d2d2d;border:1px solid #ddd}
+.pb-sheet button:disabled{background:#e5e5e5;color:#aaa;cursor:default}
 /* 예약 상세: 상품 없는 예약은 카드 대신 회색 한 줄 (라벨형) */
 .pb-noprod{font-size:14px;font-weight:500;color:#8e8e8e;line-height:1.45}
 
@@ -1332,7 +1343,7 @@ function moreModal(o) {
 function pBook() {
   var f = F();
   if (!PB.DB.store.bookingSetting) { var app = document.getElementById('app'); app.innerHTML = ''; app.appendChild(header('Book', 'store')); var s = document.createElement('div'); s.className = 'pb-stop'; s.innerHTML = '<b>Bookings are unavailable right now</b><span>This store has temporarily paused bookings</span>'; app.appendChild(s); return; }
-  $('header [class*=headerTitle]').textContent = f.mode === 'change' ? 'Request a change' : 'Book';
+  $('header [class*=headerTitle]').textContent = f.mode === 'change' ? 'Request booking change' : 'Book';
   if (f.mode === 'change') { pChange(); return; }
   var nb = $('[class*=scheduleNextButton]'); nb.setAttribute('data-test', 'fo-next');
   /* 상품 고정 진입(상품 상세 [예약] · 상품 예약 URL)인데 그 상품을 지금 이 언어로 예약할 수 없으면 들어오자마자 안내(PRD 5.2: 버튼 꺼짐 · 노출 아님 · 삭제 · 다른 언어 상품).
@@ -1424,20 +1435,35 @@ function bookCalendarAndTimes(f) {
 }
 /* ---------- 고객 예약 변경(일시 변경 신청, 시안 단순화) ----------
    스토어 예약과 같은 예약 일정 화면에서 새 날짜 · 시간을 고른다. 상품은 바꿀 수 없어 상품 영역이 없다(PRD 5.2).
-   클리닉 스토어면 시간 아래에 정보 입력 화면과 같은 문구의 18세 체크 줄. 체크해야 변경 신청을 보낼 수 있다(PRD 5.13, 체크 줄 디자인은 디자이너에게 따로 받음) */
-function startChange(b) { var f = F(); f.mode = 'change'; f.chgNo = b.no; f.date = b.visit.slice(0, 10); f.time = ''; f.err = null; f.chgAge = false; f.toast = null; nav('book'); }
+   본 화면 구성 · 문구는 STG 실측(2026-11-09) 그대로: 타이틀 Request booking change, 헤더 바로 아래 배너(스토어명 · 주소 영역 없음)(You are requesting a booking change / Current booking: …), 제목 Select a new visit date, 시간 칸 제목 New visit time (KST).
+   날짜 · 시간을 고르면 하단 "New time: Wed, Nov 18 15:00 (KST)" 형식 버튼이 켜지고(18세와 무관, 고르기 전 "Select a new date and time"), 누르면 변경 확인 시트가 뜬다.
+   시트 제목 · 안내 3줄 · 버튼은 STG 실측 그대로. 클리닉 스토어면 안내 3줄 아래에 18세 체크 줄. 체크해야 [Request change] 가 켜지고, 시트를 열 때마다 체크가 풀린 채 시작한다(PRD v1.13 5.13) */
+function startChange(b) { var f = F(); f.mode = 'change'; f.chgNo = b.no; f.date = b.visit.slice(0, 10); f.time = ''; f.err = null; f.chgAge = false; f.chgSheet = false; f.toast = null; nav('book'); }
+function chgSheet(f, cl) {
+  var dm = document.createElement('div'); dm.className = 'pb-sheet-dim pb-new'; dm.setAttribute('data-test', 'fo-chg-sheet');
+  dm.innerHTML = '<div class="pb-sheet" role="dialog" aria-modal="true"><h3 data-test="fo-chg-sheet-t">Your request may not be available depending on the store.</h3>'
+    + '<ul class="pb-sheet-g" data-test="fo-chg-sheet-g"><li>If approved, your booking number stays the same.</li><li>Your previous time may become available to others.</li><li>A new request replaces any request already pending.</li></ul>'
+    + (cl ? '<label class="pb-chgage-s" data-test="fo-chg-age18-row"><input type="checkbox" data-test="fo-chg-age18"' + (f.chgAge ? ' checked' : '') + '><span>' + esc(AGE18_EN) + '</span></label>' : '')
+    + '<div class="pb-btns"><button type="button" class="sec" data-test="fo-chg-cancel">Cancel</button><button type="button" data-test="fo-chg-send"' + (cl && !f.chgAge ? ' disabled' : '') + '>Request change</button></div></div>';
+  var ck = $('[data-test=fo-chg-age18]', dm); if (ck) ck.onchange = function () { f.chgAge = ck.checked; PB.render(); };
+  $('[data-test=fo-chg-cancel]', dm).onclick = function () { f.chgSheet = false; f.chgAge = false; PB.render(); };
+  var sd = $('[data-test=fo-chg-send]', dm); sd.onclick = function () { if (sd.disabled) return; f.chgSheet = false; PB.foChange(); PB.render(); };
+  document.getElementById('app').appendChild(dm);
+}
 function pChange() {
   var f = F();
-  $$('header button').forEach(function (b, i) { b.onclick = function () { f.mode = ''; f.err = null; nav(i === 0 ? 'mydetail' : 'store'); }; });
+  $$('header button').forEach(function (b, i) { b.onclick = function () { f.mode = ''; f.err = null; f.chgSheet = false; nav(i === 0 ? 'mydetail' : 'store'); }; });
   bookCalendarAndTimes(f);
-  var cl = PB.isClinic();
-  if (cl) { var ts = $$('[class*=timeSection]')[0], row = document.createElement('div'); row.className = 'pb-chgage pb-new'; row.setAttribute('data-test', 'fo-chg-age18-row');
-    row.innerHTML = '<label><input type="checkbox" data-test="fo-chg-age18"' + (f.chgAge ? ' checked' : '') + '><span>' + esc(AGE18_EN) + '</span></label>'; ts.after(row);
-    $('input', row).onchange = function () { f.chgAge = this.checked; PB.render(); }; }
+  var cl = PB.isClinic(), bk = PB.DB.books.filter(function (x) { return x.no === f.chgNo; })[0];
+  /* 위쪽 배너 · 날짜 제목 · 시간 칸 제목(STG 실측) */
+  if (bk) { var cd = bk.visit.slice(0, 10), bn = document.createElement('div'); bn.className = 'pb-chgbanner'; bn.setAttribute('data-test', 'fo-chg-banner'); bn.innerHTML = '<strong>You are requesting a booking change</strong><span>Current booking: ' + wdEn(cd) + ', ' + cd.slice(5, 7) + '/' + cd.slice(8, 10) + '/' + cd.slice(0, 4) + ' ' + bk.visit.slice(11) + ' (KST)</span>'; var si = $('[class*=scheduleIntro]'); if (si) { si.before(bn); si.remove(); } } /* 변경 화면에는 스토어명 · 주소 영역이 없음(STG 실측): 헤더 바로 아래 배너 */
+  var cal = $('[class*=scheduleCalendar]'); if (cal) { var dh = document.createElement('h2'); dh.className = 'pb-chgdh'; dh.setAttribute('data-test', 'fo-chg-date-h'); dh.textContent = 'Select a new visit date'; cal.before(dh); }
+  var th = $('[class*=timeSection] h2'); if (th) th.textContent = 'New visit time (KST)';
   var nb = $('[class*=scheduleNextButton]'); nb.onclick = null;
-  if (f.time) { nb.disabled = cl && !f.chgAge; nb.textContent = f.date + ' (' + wdEn(f.date) + ') ' + f.time; nb.onclick = function () { if (nb.disabled) return; PB.foChange(); PB.render(); }; }
-  else { nb.disabled = true; nb.textContent = 'Please select a time'; }
+  if (f.time) { nb.disabled = false; nb.textContent = 'New time: ' + wdEn(f.date) + ', ' + monEn(f.date) + ' ' + (+f.date.slice(8)) + ' ' + f.time + ' (KST)'; nb.onclick = function () { f.chgSheet = true; f.chgAge = false; PB.render(); }; } /* 시트를 열 때마다 체크 해제로 시작 */
+  else { nb.disabled = true; nb.textContent = 'Select a new date and time'; f.chgSheet = false; }
   nb.setAttribute('data-test', 'fo-chg-next');
+  if (f.chgSheet) chgSheet(f, cl);
 }
 /* ---------- 예약자 정보 (실측 수치로 재현) ---------- */
 function pInfo() {
