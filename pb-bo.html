@@ -3235,7 +3235,7 @@ function pEdit() {
   /* 다른 버튼 줄과 같은 켜고 끄는 칸 하나(PRD 5.3, 결정 5). 예약 설정이 꺼졌거나 기본 설정이면 잠기고 저장된 값을 흐리게 */
   /* 기본 설정 상품은 다른 줄처럼 스토어 예약 버튼 값을 보인다(2026-11-04) */
   var lock = !s.bookingSetting; radioSet(g, (base ? s.btn : p.book) ? 'y' : 'n', lock || base); g.setAttribute('data-test', 'prod-book');
-  $$('label.ant-radio-wrapper', g).forEach(function (l) { l.onclick = function (e) { e.preventDefault(); if (base) return; if (!s.bookingSetting) { toast('예약설정에서 예약을 사용하면 켤 수 있습니다.'); return; } var on = $('input', l).value === 'y'; if (on && !p.book && seats() >= 2) { toast(FULL, 4000); return; } p.book = on; PB.render(); }; });
+  $$('label.ant-radio-wrapper', g).forEach(function (l) { l.onclick = function (e) { e.preventDefault(); if (base) return; if (!s.bookingSetting) return; /* 잠긴 예약 줄은 눌러도 아무것도 뜨지 않음. 안내는 줄 옆 글로만(PRD 5.3) */ var on = $('input', l).value === 'y'; if (on && !p.book && seats() >= 2) { toast(FULL, 4000); return; } p.book = on; PB.render(); }; });
   /* 잠긴 예약 줄 오른쪽 안내(PRD 5.3): 라디오와 같은 줄 오른쪽. 좁으면 오른쪽 칸 안에서 줄바꿈 */
   if (!s.bookingSetting && !base) { var ic = $('.ant-form-item-control-input-content', nc); ic.classList.add('pb-bookrow'); var ex = document.createElement('div'); ex.className = 'pb-lockhint pb-lockside'; ex.setAttribute('data-test', 'lockmsg'); ex.textContent = '예약설정에서 예약을 사용하면 켤 수 있습니다.'; ic.appendChild(ex); }
   var holder = msgCol.cloneNode(false); holder.style.cssText = msgCol.style.cssText; holder.appendChild($('.ant-form-item', nc)); msgCol.after(mark(holder));

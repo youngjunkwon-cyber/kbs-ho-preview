@@ -33,7 +33,7 @@ body{font-family:Pretendard,"Noto Sans KR","Malgun Gothic",sans-serif;font-size:
 </div></div>
 <script>
 'use strict';
-/* 상품 예약 선행 배포 시안: 알리페이 채널 분기 작업 전의 화면과 동작만 그린다(선행 PRD v2.3, 부록 B의 항목은 없음) */
+/* 상품 예약 선행 배포 시안: 알리페이 채널 분기 작업 전의 화면과 동작만 그린다(선행 PRD v2.4, 부록 B의 항목은 없음) */
 /* ===== 기준 시각 ===== */
 var TODAY='2026-10-12',NOWTS='2026-10-12 12:00';
 var LANGS={en:'영어',ja:'일본어',zh:'중국어(간체)'};
@@ -168,9 +168,9 @@ function foSubmit(){
  if(!slotOpen(f.date,f.time)){f.err={kind:'slot'};f.time='';showToast('slot');return;}
  if(f.entry!=='product'&&!pid&&f.sel!=='store'&&foOptions(f.lang).length){f.err={kind:'pick'};return;} /* 스토어 진입은 상품 고르기 필수(I'll decide at the store 포함) */
  var p=pid?prodById(pid):null,no=DB.books.length+1,cl=isClinic(),bl=p?p.lang:f.lang; /* 상품이 붙으면 그 상품 언어로 예약(상품 예약 URL은 화면 언어와 상관없음, PRD v1.14 5.2) */
- DB.books.push({no:no,visit:f.date+' '+f.time,recv:NOWTS,name:ME,nation:'캐나다',lang:bl,contact:f.msg||'WhatsApp',mid:f.mid||'4165550199',status:'예약',owner:'고객',route:f.entry==='product'?'상품':'스토어',prodId:pid,snap:p?snapOf(p):null,need:'신규',req:'',birth:f.birth||'',phone:'+1 4165550199',rno:rnoFor(NOWTS,bl,DB.books),
+ DB.books.push({no:no,visit:f.date+' '+f.time,recv:NOWTS,name:ME,nation:'캐나다',lang:bl,contact:f.msg||'WhatsApp',mid:f.mid||'4165550199',status:'예약',owner:'고객',route:f.entry==='product'?'상품':'스토어',prodId:pid,snap:p?snapOf(p):null,need:'신규',req:f.req||'',birth:f.birth||'',phone:'+1 4165550199',rno:rnoFor(NOWTS,bl,DB.books),
   ageConsent:cl?true:null,ageConsentAt:cl?NOWTS:null}); /* 18세 동의 시각: 저장만 하고 HOST · BO 화면에는 보이지 않음 */
- f.lastNo=no;f.screen='done';f.time='';f.noneLeft=false;f.agree=false;f.age18=false;f.mkt=false;f.pickAgain=false;f.toast=null; /* 다음 예약은 동의 체크 없이 시작(라이브 정보 입력 화면은 처음에 미체크) */
+ f.lastNo=no;f.screen='done';f.time='';f.noneLeft=false;f.req='';f.pn=null;f.agree=false;f.age18=false;f.mkt=false;f.pickAgain=false;f.toast=null; /* 다음 예약은 동의 체크 없이 시작(라이브 정보 입력 화면은 처음에 미체크) */
 }
 function manSave(){
  var m=S.host.man;
