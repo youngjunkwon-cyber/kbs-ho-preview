@@ -873,20 +873,44 @@ body.pb-mark .pb-new{outline:none !important}
 .pb-fhead{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .pb-freset{border:0;background:none;padding:0;font-family:Pretendard;font-size:14px;font-weight:500;color:#8e8e8e;text-decoration:underline;cursor:pointer}
 .pb-prodslot [class*=productGrid] li{margin:4px 0 0}
-/* 클리닉 나이 확인 창 (FO 공통 버튼 색) */
+/* 상품 고르기 (PRD 5.11): 제목 필수 표시 · 보조 문구 · 첫 카드 I'll decide at the store · 선택 표시 · [More] */
+.pb-fsec h2 em{font-style:normal;color:#fb6f92;margin-left:2px}
+.pb-fsub{margin:4px 0 12px;font-size:13px;font-weight:500;color:#8e8e8e;line-height:1.4}
+.pb-fdesc{margin:6px 0 0;font-size:13px;color:#8e8e8e;line-height:1.4}
+.pb-pick-on{position:relative}
+.pb-pick-chk{position:absolute;top:12px;right:12px;width:20px;height:20px;border-radius:50%;background:#fb6f92;display:flex;align-items:center;justify-content:center}
+.pb-pick-on [class*=productNameRow]{padding-right:28px}
+.pb-kpbtn{border:1px solid #e4e4e4;background:#fff;border-radius:6px;height:28px;padding:0 10px;font:500 13px Pretendard,sans-serif;color:#555;cursor:pointer;margin-left:auto}
+.pb-fixcard [class*=priceRow]{justify-content:flex-start}
+/* 상품 더보기 모달 */
 .pb-alert-dim{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:24px;z-index:9999}
-.pb-alert{width:100%;max-width:327px;background:#fff;border-radius:12px;padding:24px 20px 16px;font-family:Pretendard}
-.pb-alert h3{margin:0 0 8px;font-size:16px;font-weight:700;color:#2d2d2d}
+.pb-alert{position:relative;width:100%;max-width:327px;background:#fff;border-radius:12px;padding:24px 20px 16px;font-family:Pretendard}
+.pb-alert h3{margin:0 32px 8px 0;font-size:16px;font-weight:700;color:#2d2d2d;line-height:1.4;overflow-wrap:anywhere}
 .pb-alert p{margin:0 0 20px;font-size:14px;line-height:1.5;color:#555}
+.pb-alert h3+.pb-btns{margin-top:16px}
 .pb-alert button{width:100%;height:48px;border:0;border-radius:12px;background:#fb6f92;color:#fff;font-family:Pretendard;font-size:16px;font-weight:700;cursor:pointer}
-.pb-alert{position:relative}
 .pb-alert .pb-x{position:absolute;top:8px;right:8px;width:32px;height:32px;padding:0;background:none;color:#2d2d2d;font-size:18px;font-weight:400;border-radius:0}
-.pb-agechk{display:flex;gap:8px;align-items:flex-start;margin:0 0 20px;font-size:14px;line-height:1.5;color:#2d2d2d;cursor:pointer}
-.pb-agechk input{width:18px;height:18px;margin:2px 0 0;flex:none;accent-color:#fb6f92}
 .pb-btns{display:flex;gap:8px}
 .pb-alert .pb-btns button{flex:1}
 .pb-alert .pb-btns .sec{background:#fff;color:#2d2d2d;border:1px solid #ddd}
-.pb-alert button:disabled{background:#e5e5e5;color:#aaa;cursor:default}
+/* 안내 토스트 (PRD 5.5): 화면 아래 고정, 좌우 16px, 하단 버튼 위 16px */
+.pb-ntoast{position:fixed;left:16px;right:16px;bottom:16px;z-index:5000;display:flex;align-items:center;gap:10px;background:#2d2d2d;color:#fff;border-radius:12px;padding:12px 12px 12px 14px;box-shadow:0 6px 16px rgba(0,0,0,.18);font-family:Pretendard}
+.pb-ntoast .ic{flex:none;width:20px;height:20px}
+.pb-ntoast .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.pb-ntoast .tx b{font-size:14px;font-weight:700;line-height:1.35}
+.pb-ntoast .tx span{font-size:12px;font-weight:500;color:#c6c6c6;line-height:1.35}
+.pb-ntoast button{flex:none;height:32px;padding:0 12px;border:0;border-radius:8px;background:#fb6f92;color:#fff;font:700 13px Pretendard,sans-serif;cursor:pointer}
+/* 정보 입력 요약 카드 (PRD 5.11) */
+.pb-sum-hd{display:block;font-size:12px;font-weight:600;color:#fb6f92;margin-bottom:4px}
+.pb-sum-t{display:block;font-size:16px;font-weight:700;color:#fff;line-height:1.35;overflow-wrap:anywhere}
+.pb-sum-r{display:block;font-size:13px;font-weight:500;color:#c6c6c6;line-height:1.45}
+.pb-sum-r:first-of-type{margin-top:6px}
+/* 동의 항목: 18세 · 마케팅 줄은 라이브 [필수] 줄과 같은 부품 */
+.pb-chgage{margin:16px 16px 0;padding:14px 0 0;border-top:1px solid #f0f0f0}
+.pb-chgage label{display:flex;gap:8px;align-items:flex-start;font-size:14px;font-weight:500;line-height:1.45;color:#2d2d2d;cursor:pointer}
+.pb-chgage input{width:20px;height:20px;margin:0;flex:none;accent-color:#fb6f92}
+/* 예약 상세: 상품 없는 예약은 카드 대신 회색 한 줄 (라벨형) */
+.pb-noprod{font-size:14px;font-weight:500;color:#8e8e8e;line-height:1.45}
 
 /* 내 예약 정렬 칸 (캡처: 테두리 있는 알약 + 아래 꺾쇠) */
 .pb-sort{display:inline-flex;align-items:center;gap:4px;border:1px solid #f0f0f0}
@@ -1127,16 +1151,27 @@ var FV = { store: 'f_store9', product: 'f_prod_s', book: 'f_book_s' };
 var ACC = '#fb6f92';
 document.documentElement.style.setProperty('--pb-acc-bg', '#fff9fb');
 function F() { return PB.S.fo; }
-/* 클리닉 스토어 만 18세 미만 확인 창(PRD 5.13, 2026-11-06): 막지 않고 체크박스 1개 동의 후 진행. 문구는 확정 전 초안.
-   체크 전 Confirm 비활성. Confirm = 동의(f.ageOk) 후 원래 동작 다시 실행. Cancel · ✕ = 창만 닫고 입력값 유지 */
-function ageConfirm(onOk) {
-  var f = F(), dm = document.createElement('div'); dm.className = 'pb-alert-dim'; dm.setAttribute('data-test', 'fo-age18');
-  dm.innerHTML = '<div class="pb-alert" role="dialog" aria-modal="true"><button type="button" class="pb-x" aria-label="Close" data-test="fo-age18-x">✕</button><h3>Please check before booking</h3><p>This store is only for guests aged 18 or older on the visit date.</p><label class="pb-agechk"><input type="checkbox" data-test="fo-age18-chk"><span>I understand that the store may refuse treatment or entry if I am under 18 on the visit date.</span></label><div class="pb-btns"><button type="button" class="sec" data-test="fo-age18-cancel">Cancel</button><button type="button" data-test="fo-age18-ok" disabled>Confirm</button></div></div>';
-  var chk = $('input', dm), ok = $('[data-test=fo-age18-ok]', dm), close = function () { f.err = null; f.ageOk = false; PB.render(); };
-  chk.onchange = function () { ok.disabled = !chk.checked; };
-  $('[data-test=fo-age18-x]', dm).onclick = close; $('[data-test=fo-age18-cancel]', dm).onclick = close;
-  ok.onclick = function () { if (ok.disabled) return; f.err = null; f.ageOk = true; onOk(); };
-  document.getElementById('app').appendChild(mark(dm));
+/* 클리닉 스토어 만 18세(PRD 5.13, 2026-11-10): 확인 창 대신 동의 체크. 정보 입력 화면 동의 항목과 예약 변경 화면의 체크 줄 */
+var AGE18_EN = '[Required] I am 18 or older as of the visit date';
+/* 안내 토스트(PRD 5.5 · 5.2): 경고 아이콘, 제목 한 줄, 설명 한 줄, 오른쪽 버튼 하나. 3초 뒤 저절로 사라지고 버튼을 누르면 바로 사라지며 동작 */
+var TOASTS = {
+  slot: { t: 'The selected time is no longer available', d: 'Please choose another time.', b: 'OK' },
+  pickAgain: { t: "This product can't be booked right now", d: 'Choose another product or book with "I\'ll decide at the store."', b: 'OK' },
+  prodGone: { t: "This product can't be booked right now", d: 'Please choose another product on the store page.', b: 'Go', go: 'store' },
+  urlGone: { t: "This product can't be booked right now", d: 'Please choose another product on the store page.', b: 'Go', go: 'store' }
+};
+var TOAST_T = null;
+function drawToast() {
+  var f = F(), old = document.getElementById('pb-ntoast'); if (old) old.remove(); clearTimeout(TOAST_T);
+  var tt = f.toast; if (!tt) return; var left = tt.until - Date.now(); if (left <= 0) { f.toast = null; return; }
+  var T = TOASTS[tt.k]; if (!T) return;
+  var el = document.createElement('div'); el.id = 'pb-ntoast'; el.className = 'pb-ntoast pb-new'; el.setAttribute('role', 'status'); el.setAttribute('data-test', 'fo-toast'); el.setAttribute('data-kind', tt.k);
+  el.innerHTML = '<svg class="ic" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="10" fill="#fb6f92"/><path d="M10 5.5v5.5M10 14v.2" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg><div class="tx"><b data-test="fo-toast-t">' + esc(T.t) + '</b><span data-test="fo-toast-d">' + esc(T.d) + '</span></div><button type="button" data-test="fo-toast-btn">' + T.b + '</button>';
+  /* 하단 버튼 위 16px(하단 버튼이 없으면 화면 아래 16px) */
+  var ft = $('[class*=scheduleFooter], [class*=informationFooter]:not([class*=Spacer])'); if (ft && ft.offsetHeight) el.style.bottom = (ft.offsetHeight + 16) + 'px';
+  $('button', el).onclick = function () { f.toast = null; el.remove(); clearTimeout(TOAST_T); if (T.go === 'store') { f.err = null; f.viaUrl = false; nav('store'); } };
+  document.body.appendChild(el);
+  TOAST_T = setTimeout(function () { if (F().toast === tt) F().toast = null; el.remove(); }, left);
 }
 function meName() { return PB.ME; }
 /* 예약 상세 고객 정보: 시안 고객(Kaitlyn Chan) */
@@ -1176,6 +1211,7 @@ function draw() {
     ({ store: pStore, product: pProduct, book: pBook, info: pInfo, done: pDone, my: pMy, mydetail: pMyDetail, mypage: pMyPage })[f.screen]();
     var sc = $('#app'); if (sc) sc.setAttribute('data-screen', f.screen);
   });
+  drawToast();
 }
 /* 공통 헤더 (스냅샷 예약 화면 헤더를 복제) */
 function header(title, back) {
@@ -1233,7 +1269,7 @@ function soloMessenger(ft, name) {
   nb.onclick = function () { toast('Not available in this mockup'); };
   bs[0].replaceWith(nb);
 }
-function startBook(entry) { var f = F(); f.mode = ''; f.accTop = {}; f.viaUrl = false; f.entry = entry; f.sel = ''; f.time = ''; f.err = null; f.date = PB.TODAY; /* 실화면: 처음엔 오늘이 선택돼 있음 */ f.cat = 'All'; f.showN = 5; f.acc = {}; nav('book'); }
+function startBook(entry) { var f = F(); f.mode = ''; f.accTop = {}; f.viaUrl = false; f.entry = entry; f.sel = ''; f.pickAgain = false; f.moreId = null; f.toast = null; f.ubShown = false; f.time = ''; f.err = null; f.date = PB.TODAY; /* 실화면: 처음엔 오늘이 선택돼 있음 */ f.cat = 'All'; f.showN = 5; f.acc = {}; nav('book'); }
 
 /* ---------- 상품 상세 ---------- */
 function pProduct() {
@@ -1266,66 +1302,104 @@ function pProduct() {
 }
 
 /* ---------- 예약 일정 (상품 영역 추가) ---------- */
+/* 예약 화면 상품 카드(PRD 5.11): 스토어 상세 상품 카드 부품에서 상품명 · 가격만 남기고, 고르는 목록이면 오른쪽 아래 [More] */
+var CHK_ON = '<span class="pb-pick-chk" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6.2l2.3 2.3L9.5 3.8" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+function pickCard(o, withMore) {
+  var li = tpl('f_store9').querySelector('#store-section-products [class*=productGrid] li').cloneNode(true);
+  li.querySelector('h3').textContent = o.name; li.querySelector('p[class*=__price]').textContent = krw(o.price);
+  var acts = li.querySelector('[class*=__actions]'); acts.innerHTML = '';
+  if (withMore) { var mb = document.createElement('button'); mb.type = 'button'; mb.className = 'pb-kpbtn'; mb.textContent = 'More'; mb.setAttribute('data-test', 'fo-kp-' + o.id); mb.setAttribute('aria-label', 'More about ' + o.name); acts.appendChild(mb); }
+  else acts.remove();
+  return li;
+}
+/* 첫 카드 "I'll decide at the store"(설명 한 줄, [More] 없음) */
+function decideCard() {
+  var li = tpl('f_store9').querySelector('#store-section-products [class*=productGrid] li').cloneNode(true), art = li.querySelector('article');
+  li.querySelector('h3').textContent = "I'll decide at the store"; $$('[class*=__divider], [class*=priceRow]', art).forEach(function (e) { e.remove(); });
+  var d = document.createElement('p'); d.className = 'pb-fdesc'; d.textContent = 'You can decide at the store.'; li.querySelector('[class*=productNameRow]').after(d);
+  return li;
+}
+/* 상품 더보기 모달([More]): 제목(상품명) · ✕ · 설명(핵심 포인트, 비어 있으면 칸 없음) · [View details] · [Select] */
+function moreModal(o) {
+  var f = F(), dm = document.createElement('div'); dm.className = 'pb-alert-dim pb-new'; dm.setAttribute('data-test', 'fo-mm');
+  dm.innerHTML = '<div class="pb-alert" role="dialog" aria-modal="true"><button type="button" class="pb-x" aria-label="Close" data-test="fo-mm-x">✕</button><h3 data-test="fo-mm-t">' + esc(o.name) + '</h3>' + (o.kp ? '<p data-test="fo-mm-desc">' + esc(o.kp) + '</p>' : '') + '<div class="pb-btns"><button type="button" class="sec" data-test="fo-mm-detail">View details</button><button type="button" data-test="fo-mm-select">Select</button></div></div>';
+  var close = function () { f.moreId = null; PB.render(); };
+  $('[data-test=fo-mm-x]', dm).onclick = close; dm.onclick = function (e) { if (e.target === dm) close(); };
+  $('[data-test=fo-mm-detail]', dm).onclick = function () { f.moreId = null; f.back = { screen: 'book', entry: f.entry, sel: f.sel }; f.pid = o.id; f.screen = 'product'; PB.render(); };
+  $('[data-test=fo-mm-select]', dm).onclick = function () { f.moreId = null; f.sel = o.id; f.pickAgain = false; if (f.err && f.err.kind === 'pickAgain') f.err = null; PB.render(); };
+  document.getElementById('app').appendChild(dm);
+}
 function pBook() {
   var f = F();
   if (!PB.DB.store.bookingSetting) { var app = document.getElementById('app'); app.innerHTML = ''; app.appendChild(header('Book', 'store')); var s = document.createElement('div'); s.className = 'pb-stop'; s.innerHTML = '<b>Bookings are unavailable right now</b><span>This store has temporarily paused bookings</span>'; app.appendChild(s); return; }
   $('header [class*=headerTitle]').textContent = f.mode === 'change' ? 'Request a change' : 'Book';
   if (f.mode === 'change') { pChange(); return; }
-  /* 상품 고정 진입(상품 상세 [예약] · 상품 예약 URL)인데 그 상품을 지금 이 언어로 예약할 수 없으면 들어오자마자 안내(PRD 5.2: 버튼 꺼짐 · 노출 아님 · 삭제 · 다른 언어 상품) */
-  if (f.entry === 'product') { var up = PB.prodById(f.pid); if (!up || !PB.judgeBookable(up, f.lang).ok) { $$('[class*=scheduleCalendar], [class*=scheduleDivider], [class*=timeSection], [class*=scheduleFooter]').forEach(function (x) { x.remove(); }); var ub = document.createElement('div'); ub.className = 'pb-ferr box'; ub.setAttribute('data-test', 'fo-url-err'); ub.innerHTML = "This product can't be booked right now.<button class='pb-ferr-b' type='button'>Go to store page</button>"; var si = $('[class*=scheduleIntro]'); if (si) si.after(mark(ub)); else ($('main') || document.getElementById('app')).prepend(mark(ub)); $('button', ub).onclick = function () { f.viaUrl = false; nav('store'); }; $$('header button').forEach(function (b, i) { b.onclick = function () { f.viaUrl = false; nav('store'); }; }); return; } }
+  var nb = $('[class*=scheduleNextButton]'); nb.setAttribute('data-test', 'fo-next');
+  /* 상품 고정 진입(상품 상세 [예약] · 상품 예약 URL)인데 그 상품을 지금 이 언어로 예약할 수 없으면 들어오자마자 안내(PRD 5.2: 버튼 꺼짐 · 노출 아님 · 삭제 · 다른 언어 상품).
+     스토어명 · 주소 아래 문구 + 안내 토스트 [Go](스토어 페이지로). 날짜 · 시간은 고를 수 없고 하단 버튼은 꺼짐 */
+  if (f.entry === 'product') { var up = PB.prodById(f.pid); if (!up || !PB.judgeBookable(up, f.lang).ok) {
+    var ub = document.createElement('p'); ub.className = 'pb-ferr'; ub.style.margin = '8px 16px 0'; ub.setAttribute('data-test', 'fo-url-err'); ub.textContent = "This product can't be booked right now.";
+    var si = $('[class*=scheduleIntro]'); if (si) si.after(mark(ub)); else ($('main') || document.getElementById('app')).prepend(mark(ub));
+    $$('header button').forEach(function (b) { b.onclick = function () { f.viaUrl = false; f.toast = null; nav('store'); }; });
+    var t0 = f.time; f.time = ''; bookCalendarAndTimes(f); f.time = t0;
+    $$('[class*=__days] button, [class*=timeGrid] button').forEach(function (b) { b.disabled = true; b.onclick = null; });
+    nb.disabled = true; nb.textContent = 'Please choose another product'; nb.onclick = null;
+    if (!f.ubShown) { f.ubShown = true; PB.showToast('urlGone'); }
+    return; } }
   $$('header button').forEach(function (b, i) { b.onclick = function () { nav(i === 0 ? (f.entry === 'product' ? 'product' : 'store') : 'store'); }; });
   /* 상품 영역 */
-  var intro = $('[class*=scheduleIntro]'), sec = document.createElement('section'); sec.className = 'BookingSchedulePage-module-scss-module__TxJ5FW__timeSection pb-fsec'; sec.innerHTML = '<h2>Product</h2>';
-  if (f.entry === 'product') { var p = PB.prodById(f.pid); var bx = fullCard(p, f).querySelector('article'); bx.setAttribute('data-test', 'fo-fixed'); sec.appendChild(bx); }
+  var sec = document.createElement('section'); sec.className = 'BookingSchedulePage-module-scss-module__TxJ5FW__timeSection pb-fsec'; sec.innerHTML = '<h2>Product</h2>';
+  var src = tpl('f_store9').querySelector('#store-section-products');
+  var opts = f.entry === 'product' ? [] : PB.foOptions(f.lang);
+  if (f.entry === 'product') { var p = PB.prodById(f.pid); var fg = src.querySelector('[class*=productGrid]').cloneNode(false); var fli = pickCard(p, false), fa = fli.querySelector('article'); fa.setAttribute('data-test', 'fo-fixed'); fa.classList.add('pb-fixcard'); fg.appendChild(fli); sec.appendChild(fg); }
   else {
-    /* 스토어 진입: 날짜·시간 아래에 상품 선택(항상 펼침). 맨 위 "I'll decide at the store / Decide at the store"(= 스토어 예약)이 기본 선택.
-       아래 스토어 페이지 상품 카드 UI(칩 · View Details · 설명 화살표 · 5개씩 더 보기) 중 하나를 고르면 그 상품으로 바뀜(하나만).
-       고른 상품 카드를 다시 누르면 풀리고 I'll decide at the store / Decide at the store 으로 돌아감 */
-    sec.querySelector('h2').textContent = 'Select a product (optional)';
-    var opts = PB.foOptions(f.lang), cur = f.sel ? PB.prodById(f.sel) : null, src = tpl('f_store9').querySelector('#store-section-products');
+    /* 스토어 진입(PRD 5.2 · 5.11, 2026-11-10): 날짜 · 시간 아래 상품 고르기 필수. 처음에는 아무것도 골라져 있지 않다.
+       제목 "Select a product" + 필수 표시, 보조 문구. 세부분류 탭(All + 세부분류). 첫 카드 I'll decide at the store 는 탭과 상관없이 늘 맨 위([More] 없음).
+       상품 카드는 상품명 · 가격 · [More], 5개씩 [View More Products]. 카드를 누르면 그 카드가 선택(하나만), 다른 카드를 누르면 바뀜. Reset 없음 */
+    if (f.sel && f.sel !== 'store' && !opts.some(function (o) { return String(o.id) === String(f.sel); })) { f.sel = ''; f.pickAgain = true; } /* 고른 상품이 그 사이 예약할 수 없게 됨 */
+    sec.querySelector('h2').innerHTML = 'Select a product<em>*</em>';
+    var sub = document.createElement('p'); sub.className = 'pb-fsub'; sub.setAttribute('data-test', 'fo-select-sub'); sub.textContent = 'Not sure yet? Choose "I\'ll decide at the store."'; sec.appendChild(sub);
+    var cur = f.sel && f.sel !== 'store' ? PB.prodById(f.sel) : null;
     var inner = document.createElement('div'); inner.className = 'pb-fpick'; inner.setAttribute('data-test', 'fo-select');
-    inner.setAttribute('data-options', JSON.stringify(opts.map(function (o) { return o.name; }))); inner.setAttribute('data-selected', cur ? cur.name : "I'll decide at the store");
-    if (f.err && f.err.kind === 'pickAgain') { var er = document.createElement('p'); er.className = 'pb-ferr'; er.setAttribute('data-test', 'fo-err'); er.textContent = "This product can't be booked right now. Please choose again."; sec.appendChild(er); }
-    /* 맨 위 칸 = 지금 선택. 기본은 I'll decide at the store / Decide at the store 카드(같은 카드 부품, 이름만), 상품을 고르면 이 자리가 고른 상품 카드로 바뀐다 */
-    var vg = src.querySelector('[class*=productGrid]').cloneNode(false), vli, va;
-    if (cur) { vli = fullCard(cur, f, 'accTop'); va = vli.querySelector('article'); va.setAttribute('data-test', 'fo-selcard'); }
-    else { vli = src.querySelector('[class*=productGrid] li').cloneNode(true); va = vli.querySelector('article'); vli.querySelector('h3').textContent = "I'll decide at the store"; $$('[class*=__divider], [class*=priceRow]', va).forEach(function (e) { e.remove(); }); va.setAttribute('data-test', 'fo-pick-consult'); }
-    va.classList.add('pb-pick-on'); vg.appendChild(vli); inner.appendChild(vg);
-    /* Reset: 상품을 골랐을 때만, 제목 줄 오른쪽. 누르면 I'll decide at the store / Decide at the store 으로 */
-    if (cur) { var h2r = sec.querySelector('h2'), hr = document.createElement('div'); hr.className = 'pb-fhead'; h2r.before(hr); hr.appendChild(h2r);
-      var rb = document.createElement('button'); rb.type = 'button'; rb.className = 'pb-freset'; rb.textContent = 'Reset'; rb.setAttribute('data-test', 'fo-reset'); rb.onclick = function () { f.sel = ''; PB.render(); }; hr.appendChild(rb); }
+    inner.setAttribute('data-options', JSON.stringify(opts.map(function (o) { return o.name; }))); inner.setAttribute('data-selected', cur ? cur.name : f.sel === 'store' ? "I'll decide at the store" : '');
     var tabs = src.querySelector('[class*=categoryTabs]').cloneNode(true), tabT = tabs.children[0].cloneNode(true), onCls = tabT.className.split(' ').filter(function (c) { return /categoryTabActive/.test(c); })[0];
     var grid = src.querySelector('[class*=productGrid]').cloneNode(false);
     var cats = ['All']; opts.forEach(function (o) { var c = SUB_EN[o.sub] || o.sub; if (cats.indexOf(c) < 0) cats.push(c); });
     if (cats.indexOf(f.cat || 'All') < 0) f.cat = 'All';
     tabs.innerHTML = '';
     cats.forEach(function (c) { var t = tabT.cloneNode(true); t.textContent = c; var on = (f.cat || 'All') === c; t.className = tabT.className.split(' ').filter(function (x) { return x !== onCls; }).join(' ') + (on ? ' ' + onCls : ''); t.setAttribute('aria-selected', on ? 'true' : 'false'); t.onclick = function () { f.cat = c; f.showN = 5; PB.render(); }; tabs.appendChild(t); });
-    /* 처음 5개, View More Products 로 5개씩 추가 (실화면과 같음) */
+    var pick = function (v) { f.sel = v; f.pickAgain = false; if (f.err && f.err.kind === 'pickAgain') f.err = null; PB.render(); };
+    var dli = decideCard(), dart = dli.querySelector('article'); dart.setAttribute('data-test', 'fo-pick-store'); dart.classList.add('pb-pcard');
+    if (f.sel === 'store') { dart.classList.add('pb-pick-on'); dart.setAttribute('aria-selected', 'true'); dart.insertAdjacentHTML('beforeend', CHK_ON); }
+    dart.onclick = function () { pick('store'); }; grid.appendChild(dli);
     var all = opts.filter(function (o) { return (f.cat || 'All') === 'All' || (SUB_EN[o.sub] || o.sub) === f.cat; });
     var lim = f.showN || 5;
     all.slice(0, lim).forEach(function (o) {
-      var li = fullCard(o, f), art = li.querySelector('article'), on = String(f.sel || '') === String(o.id);
-      art.setAttribute('data-test', 'fo-pick-' + o.id); if (on) art.classList.add('pb-pick-on');
-      art.onclick = function () { f.sel = on ? '' : o.id; if (f.err && f.err.kind === 'pickAgain') f.err = null; PB.render(); };
+      var li = pickCard(o, true), art = li.querySelector('article'), on = String(f.sel || '') === String(o.id);
+      art.setAttribute('data-test', 'fo-pick-' + o.id); art.classList.add('pb-pcard'); if (on) { art.classList.add('pb-pick-on'); art.setAttribute('aria-selected', 'true'); art.insertAdjacentHTML('beforeend', CHK_ON); }
+      art.onclick = function (e) { if (e.target.closest('.pb-kpbtn')) return; pick(o.id); };
+      $('.pb-kpbtn', li).onclick = function (e) { e.stopPropagation(); f.moreId = o.id; PB.render(); };
       grid.appendChild(li);
     });
-    if (opts.length) { inner.appendChild(tabs); inner.appendChild(grid); }
+    inner.appendChild(tabs); inner.appendChild(grid);
     if (all.length > lim) { var mbox = src.querySelector('[class*=moreProductsContainer]').cloneNode(true); mbox.setAttribute('data-test', 'fo-more'); mbox.querySelector('button').onclick = function () { f.showN = lim + 5; PB.render(); }; inner.appendChild(mbox); }
     sec.appendChild(inner);
   }
   /* 위치: 날짜 → 시간 → 상품 (상품 상세 진입도 같은 자리) */
-  /* 스토어 진입인데 고를 수 있는 상품이 없으면(예약 줄이 켜진 상품이 없을 때) 상품 영역을 두지 않는다 = 지금 스토어 예약 화면 그대로 */
-  var noPick = f.entry !== 'product' && !PB.foOptions(f.lang).length;
-  if (noPick) f.sel = '';
+  /* 스토어 진입인데 고를 수 있는 상품이 없으면(예약 줄이 켜진 상품이 없을 때) 상품 영역을 두지 않는다 = 지금 스토어 예약 화면 그대로, 상품 고르기도 필수 아님 */
+  var noPick = f.entry !== 'product' && !opts.length;
+  if (noPick) { f.sel = ''; f.pickAgain = false; }
   var ts = $$('[class*=timeSection]').filter(function (x) { return x !== sec; })[0], dv = $('[class*=scheduleDivider]');
   if (!noPick) { ts.after(mark(sec)); if (dv) sec.before(dv.cloneNode(true)); }
-  else if (f.err && f.err.kind === 'pickAgain') { var ne = $('.pb-ferr', sec); ne.textContent = "This product can't be booked right now. You can still book and decide at the store."; ne.style.margin = '8px 16px 0'; ts.after(ne); }
+  else if (f.err && f.err.kind === 'noneLeft') { var ne = document.createElement('p'); ne.className = 'pb-ferr'; ne.setAttribute('data-test', 'fo-err'); ne.textContent = "This product can't be booked right now. You can still book and decide at the store."; ne.style.margin = '8px 16px 0'; ts.after(mark(ne)); }
   bookCalendarAndTimes(f);
-  /* 다음 버튼 */
-  var nb = $('[class*=scheduleNextButton]');
-  if (f.time) { nb.disabled = false; nb.textContent = f.date + ' (' + wdEn(f.date) + ') ' + f.time; nb.onclick = function () { f.err = null; nav('info'); }; }
-  else { nb.disabled = true; nb.textContent = 'Please select a time'; }
-  nb.setAttribute('data-test', 'fo-next');
+  /* 하단 버튼(PRD 5.11): 시간 안 고름 → Please select a time / 상품 영역이 있는데 안 고름 → Please select a product / 고른 상품이 예약 불가가 됨 → Please choose another product / 다 고름 → 날짜 · 시간 */
+  var needPick = f.entry !== 'product' && !noPick && !f.sel;
+  nb.onclick = null;
+  if (!f.time) { nb.disabled = true; nb.textContent = 'Please select a time'; }
+  else if (needPick) { nb.disabled = true; nb.textContent = f.pickAgain ? 'Please choose another product' : 'Please select a product'; }
+  else { nb.disabled = false; nb.textContent = f.date + ' (' + wdEn(f.date) + ') ' + f.time; nb.onclick = function () { f.err = null; nav('info'); }; }
+  if (f.moreId) { var mo = PB.prodById(f.moreId); if (mo) moreModal(mo); else f.moreId = null; }
 }
 
 /* 예약 일정 화면의 달력 · 시간(예약 · 예약 변경 공통) */
@@ -1347,35 +1421,43 @@ function bookCalendarAndTimes(f) {
   var tSel = 'BookingSchedulePage-module-scss-module__TxJ5FW__timeSelected';
   grid.innerHTML = '';
   PB.TIMES.forEach(function (t) { if ((f.date + ' ' + t) <= PB.NOWTS) return; /* 실화면(STG 2026-10-14): 오늘의 지난 시간은 흐리게가 아니라 아예 안 보임 */ var b = tT.cloneNode(true); b.textContent = t; var ok = PB.slotOpen(f.date, t); if (!ok) return; /* 실화면(STG 2026-10-14): 자리가 찬 시간도 목록에서 빠짐 */ if (f.time === t) b.classList.add(tSel); b.onclick = function () { f.time = t; if (f.err && /slot|time/.test(f.err.kind)) f.err = null; PB.render(); }; grid.appendChild(b); });
-  if (f.err && f.err.kind === 'slot') { var se = document.createElement('p'); se.className = 'pb-ferr'; se.textContent = 'This time was just taken. Please pick another time.'; grid.after(se); }
 }
 /* ---------- 고객 예약 변경(일시 변경 신청, 시안 단순화) ----------
    스토어 예약과 같은 예약 일정 화면에서 새 날짜 · 시간을 고른다. 상품은 바꿀 수 없어 상품 영역이 없다(PRD 5.2).
-   보내기를 누르면 예약에 저장된 생년월일과 바꾼 날짜로 클리닉 나이를 다시 판정(PRD 5.13). 만 18세 미만이면 같은 확인 창을 띄우고 동의해야 바꾼다 */
-function startChange(b) { var f = F(); f.mode = 'change'; f.chgNo = b.no; f.date = b.visit.slice(0, 10); f.time = ''; f.err = null; nav('book'); }
+   클리닉 스토어면 시간 아래에 정보 입력 화면과 같은 문구의 18세 체크 줄. 체크해야 변경 신청을 보낼 수 있다(PRD 5.13, 체크 줄 디자인은 디자이너에게 따로 받음) */
+function startChange(b) { var f = F(); f.mode = 'change'; f.chgNo = b.no; f.date = b.visit.slice(0, 10); f.time = ''; f.err = null; f.chgAge = false; f.toast = null; nav('book'); }
 function pChange() {
   var f = F();
   $$('header button').forEach(function (b, i) { b.onclick = function () { f.mode = ''; f.err = null; nav(i === 0 ? 'mydetail' : 'store'); }; });
-  if (f.err && f.err.kind === 'age18') ageConfirm(function () { PB.foChange(); PB.render(); });
   bookCalendarAndTimes(f);
-  var nb = $('[class*=scheduleNextButton]');
-  if (f.time) { nb.disabled = false; nb.textContent = f.date + ' (' + wdEn(f.date) + ') ' + f.time; nb.onclick = function () { PB.foChange(); PB.render(); }; }
+  var cl = PB.isClinic();
+  if (cl) { var ts = $$('[class*=timeSection]')[0], row = document.createElement('div'); row.className = 'pb-chgage pb-new'; row.setAttribute('data-test', 'fo-chg-age18-row');
+    row.innerHTML = '<label><input type="checkbox" data-test="fo-chg-age18"' + (f.chgAge ? ' checked' : '') + '><span>' + esc(AGE18_EN) + '</span></label>'; ts.after(row);
+    $('input', row).onchange = function () { f.chgAge = this.checked; PB.render(); }; }
+  var nb = $('[class*=scheduleNextButton]'); nb.onclick = null;
+  if (f.time) { nb.disabled = cl && !f.chgAge; nb.textContent = f.date + ' (' + wdEn(f.date) + ') ' + f.time; nb.onclick = function () { if (nb.disabled) return; PB.foChange(); PB.render(); }; }
   else { nb.disabled = true; nb.textContent = 'Please select a time'; }
   nb.setAttribute('data-test', 'fo-chg-next');
 }
 /* ---------- 예약자 정보 (실측 수치로 재현) ---------- */
 function pInfo() {
-  /* 라이브 정보 입력 화면 스냅샷(f_info_live) 그대로. 새 요소 = 검은 요약 카드의 Product 한 줄뿐. 값은 시안 예시 데이터 */
+  /* 라이브 정보 입력 화면 스냅샷(f_info_live) 그대로. 새 요소 = 위쪽 요약 카드(배너와 카드를 하나로) 구성과 동의 항목 18세 · 마케팅 줄. 값은 시안 예시 데이터 */
   var f = F(), app = document.getElementById('app'); app.innerHTML = '';
   var t = tpl('f_info_live'); $$('[class*=routeProgressBar], .react-modal-sheet-root', t).forEach(function (e) { e.remove(); }); while (t.firstChild) app.appendChild(t.firstChild);
   var hb = $$('header button'); if (hb[0]) hb[0].onclick = function () { nav('book'); }; if (hb[1]) hb[1].onclick = function () { nav('store'); };
-  var pid = f.entry === 'product' ? f.pid : (f.sel ? +f.sel : null), p = pid ? PB.prodById(pid) : null;
-  var when = wdEn(f.date) + ', ' + monEn(f.date) + ' ' + (+f.date.slice(8)) + ', 2026 ' + f.time + ' (KST)';
-  var nt = $('[class*=bookingNotice]'); $('strong', nt).textContent = 'Booking at ' + PB.DB.store.nameEn; var sp = $$('span', nt).filter(function (x) { return !/Dot/.test(x.className); })[0]; sp.textContent = 'Selected time: ' + when; sp.classList.add('pb-fnote');
-  /* 상품 예약: 상품명이 제목, 아래 줄 "at 스토어명 · 가격", 그다음 Selected time */
-  { var st0 = $('strong', nt); st0.textContent = p ? p.name : 'Decide at the store'; mark(st0); st0.setAttribute('data-test', 'fo-info-prod'); var sb2 = sp.cloneNode(false); sb2.className = 'pb-fnote-hi2'; sb2.textContent = 'at ' + PB.DB.store.nameEn + (p ? ' · ' + krw(p.price) : ''); st0.after(mark(sb2)); } /* 상품 없는 예약 = I'll decide at the store / Decide at the store */
+  var pid = f.entry === 'product' ? f.pid : PB.selPid(f), p = pid ? PB.prodById(pid) : null;
+  /* 요약 카드(PRD 5.11): 머리 줄 "Booking a store visit". 상품 예약 = 제목 상품명(줄여 자르지 않음) + Price / Store / Time, 상품 없는 예약 = "You chose to decide at the store" + Store / Time */
+  var nt = $('[class*=bookingNotice]'), dot = $('[class*=bookingNoticeDot]', nt); nt.innerHTML = ''; if (dot) nt.appendChild(dot); nt.setAttribute('data-test', 'fo-info-sum');
+  var box = document.createElement('div'); box.className = 'pb-new'; box.style.minWidth = '0';
+  box.innerHTML = '<span class="pb-sum-hd" data-test="fo-info-head">Booking a store visit</span><strong class="pb-sum-t" data-test="fo-info-prod">' + esc(p ? p.name : 'You chose to decide at the store') + '</strong>'
+    + (p ? '<span class="pb-sum-r" data-test="fo-info-price">Price : ' + krw(p.price) + '</span>' : '')
+    + '<span class="pb-sum-r" data-test="fo-info-store">Store : ' + esc(PB.DB.store.nameEn) + '</span>'
+    + '<span class="pb-sum-r" data-test="fo-info-time">Time : ' + f.date + ' (' + wdEn(f.date) + ') ' + f.time + ' (KST)</span>';
+  nt.appendChild(box);
   var form = $('form'); form.onsubmit = function (e) { e.preventDefault(); };
-  if (f.err && f.err.kind === 'prodGone') { var eb = document.createElement('div'); eb.className = 'pb-ferr box'; eb.setAttribute('data-test', 'fo-err'); eb.innerHTML = "This product can't be booked right now.<button class='pb-ferr-b' type='button' data-go='store'>Go to store page</button>"; nt.before(eb); $('[data-go]', eb).onclick = function () { f.err = null; nav('store'); }; }
+  /* 상품 상세로 들어온 예약인데 Book 순간 상품이 내려감: 위쪽 문구 + 안내 토스트 [Go](스토어 페이지로). 토스트가 사라져도 문구는 남고 Book 은 꺼진 채(PRD 5.5) */
+  var gone = !!(f.err && f.err.kind === 'prodGone');
+  if (gone) { var eb = document.createElement('p'); eb.className = 'pb-ferr'; eb.style.margin = '0 0 12px'; eb.setAttribute('data-test', 'fo-err'); eb.textContent = "This product can't be booked right now."; nt.before(mark(eb)); }
   /* 예시 데이터 */
   var setIn = function (sel, v) { var x = $(sel); if (x) { x.value = v; x.setAttribute('value', v); } };
   setIn('input[name=passportName]', 'KAITLYN CHAN'); f.birth = f.birth || '1996-04-12'; setIn('input[name=birthDate]', f.birth); var bi = $('input[name=birthDate]'); if (bi) { bi.readOnly = false; bi.oninput = function () { f.birth = bi.value; }; } setIn('input[type=email]', 'kaitlyn@example.com (Verified)'); setIn('input[name=messengerId]', f.mid != null ? f.mid : '4165550199'); var mid0 = $('input[name=messengerId]'); if (mid0) mid0.oninput = function () { f.mid = mid0.value; };
@@ -1385,16 +1467,27 @@ function pInfo() {
   var ICON = { WhatsApp: 'whatsapp.0hq-eh2chewsx.png', LINE: 'line.3qblh4j4u4rrq.png', WeChat: 'wechat.38ybbwvm7ncvr.png', KakaoTalk: 'kakaotalk.0y3rqbtj5gp03.png' };
   var chips = $$('[class*=messengerChips] button'), selCls = 'BookingInformationPage-module-scss-module__oG4JGG__messengerChipSelected'; f.msg = f.msg || 'WhatsApp';
   chips.forEach(function (b) { var n = b.textContent.trim(), im = $('img', b); if (im) { im.removeAttribute('srcset'); im.src = 'https://www.k-beautystation.com/_next/static/immutable/media/' + ICON[n]; } var on = n === f.msg; b.classList.toggle(selCls, on); b.setAttribute('aria-checked', on ? 'true' : 'false'); b.onclick = function () { f.msg = n; PB.render(); }; });
-  /* 동의: 처음엔 미체크(실화면). 체크해야 Book 활성 */
+  /* 동의(PRD 5.11 · 5.13, 문구는 라이브 그대로): Agree to all / [Required] 제3자 제공 / 클리닉만 [Required] 18세 / [Optional] 마케팅.
+     처음엔 모두 미체크(실화면). Agree to all = 아래 항목 모두 켜기(18세 포함), 하나라도 풀면 Agree to all 도 풀림. 필수 항목을 모두 체크해야 Book 활성 */
   var CHK = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3.5" y="3.5" width="17" height="17" rx="2" fill="currentColor"/><path d="M8 12.2l2.7 2.7L16 9.5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  var allB = $('[class*=agreementAll]'), row = $('[class*=agreementRow] label'), box = $('input[type=checkbox]', row);
-  var paint = function (el) { if (f.agree) { var sv = $('svg', el); if (sv) sv.outerHTML = CHK; } };
-  if (box) box.checked = !!f.agree; paint(allB); paint(row);
-  allB.onclick = function () { f.agree = !f.agree; PB.render(); }; row.onclick = function (e) { e.preventDefault(); f.agree = !f.agree; PB.render(); };
-  /* 클리닉 스토어 만 18세 미만: 확인 창. Confirm = 동의하고 Book 을 다시 실행 */
-  if (f.err && f.err.kind === 'age18') ageConfirm(function () { sb.onclick({ preventDefault: function () {} }); });
-  var sb = $('[class*=informationFooter] button'); sb.setAttribute('data-test', 'fo-submit'); sb.disabled = !f.agree;
-  sb.onclick = function (e) { e.preventDefault(); if (sb.disabled) return; if (bi) f.birth = bi.value; PB.foSubmit(); var er = f.err; if (er && (er.kind === 'pickAgain' || er.kind === 'slot' || er.kind === 'time' || er.kind === 'closed')) { f.screen = 'book'; } PB.render(); };
+  var cl = PB.isClinic(), allB = $('[class*=agreementAll]'), row0 = $('[class*=agreementRow]');
+  var mkRow = function (txt, key, test, withArrow) {
+    var r = row0.cloneNode(true), lab = $('label', r), cp = $('[class*=agreementCopy]', r); r.classList.add('pb-new'); r.setAttribute('data-test', test + '-row');
+    cp.innerHTML = '<span>' + esc(txt) + '</span>'; var inp = $('input', r); inp.setAttribute('data-test', test); if (key === 'mkt') inp.removeAttribute('required');
+    var db = $('[class*=agreementDetailsButton]', r); if (db) { if (withArrow) db.setAttribute('aria-label', txt); else db.remove(); }
+    r.setAttribute('data-key', key); return r;
+  };
+  row0.setAttribute('data-key', 'agree'); $('input', row0).setAttribute('data-test', 'fo-agree-3p'); row0.setAttribute('data-test', 'fo-agree-3p-row');
+  var rows = [row0], last = row0;
+  if (cl) { var ra = mkRow(AGE18_EN, 'age18', 'fo-age18', false); last.after(ra); last = ra; rows.push(ra); }
+  var rm = mkRow('[Optional] Consent to receive marketing information', 'mkt', 'fo-agree-mkt', true); last.after(rm); rows.push(rm);
+  var keys = rows.map(function (r) { return r.getAttribute('data-key'); }), allOn = keys.every(function (k) { return !!f[k]; });
+  var paint = function (el, on) { var sv = $('svg', el); if (on && sv) sv.outerHTML = CHK; };
+  rows.forEach(function (r) { var k = r.getAttribute('data-key'), inp = $('input', r); inp.checked = !!f[k]; paint($('label', r), !!f[k]); $('label', r).onclick = function (e) { e.preventDefault(); f[k] = !f[k]; PB.render(); }; });
+  allB.setAttribute('data-test', 'fo-agree-all'); allB.setAttribute('aria-pressed', allOn ? 'true' : 'false'); paint(allB, allOn);
+  allB.onclick = function () { var v = !allOn; keys.forEach(function (k) { f[k] = v; }); PB.render(); };
+  var sb = $('[class*=informationFooter] button'); sb.setAttribute('data-test', 'fo-submit'); sb.disabled = gone || !f.agree || (cl && !f.age18);
+  sb.onclick = function (e) { e.preventDefault(); if (sb.disabled) return; if (bi) f.birth = bi.value; PB.foSubmit(); var er = f.err; if (er && (er.kind === 'pickAgain' || er.kind === 'noneLeft' || er.kind === 'slot' || er.kind === 'time' || er.kind === 'closed')) { f.screen = 'book'; } PB.render(); };
 }
 
 /* ---------- 예약 완료 / 내 예약 (실측 수치로 재현) ---------- */
@@ -1405,14 +1498,16 @@ function detailRows(b) {
   return '<div class="pb-row"><span>Scheduled visit</span><b>' + d + ' (' + wdEn(d) + ') ' + b.visit.slice(11) + '</b></div><div class="pb-row"><span>Booking number</span><b>' + b.rno + '</b></div><div class="pb-row"><span>Address</span><b>B1, 78 Namdaemun-ro, Jung-gu, Seoul (Myeong-dong 1-ga, Timewalk Myeongdong Building)</b></div>';
 }
 function prodSection(b, testId) {
-  /* 예약 완료·내 예약 상세의 Product: 자리만 만들고, 카드(FO 메인 ProductCard)는 fillProdSlots 에서 채운다 */
-  return '<div class="pb-row pb-new" data-test="' + testId + '"' + (b.snap ? '' : ' data-kind="consult"') + '><span>Product</span><div class="pb-prodslot" data-bno="' + b.no + '"></div></div>';
+  /* 내 예약 상세의 Product: 상품 예약은 자리만 만들고 카드(상품명 · 가격 · 스토어명 · 별점)는 fillProdSlots 에서 채운다.
+     상품 없는 예약은 카드 대신 회색 한 줄 "You'll decide on a product at the store"(라벨형, PRD 5.11) */
+  if (!b.snap) return '<div class="pb-row pb-new" data-test="' + testId + '" data-kind="consult"><span>Product</span><div class="pb-noprod">You\'ll decide on a product at the store</div></div>';
+  return '<div class="pb-row pb-new" data-test="' + testId + '"><span>Product</span><div class="pb-prodslot" data-bno="' + b.no + '"></div></div>';
 }
 /* 예약 완료·상세 제목: 예약 후 화면은 스토어명이 제목(상품은 아래 Product 영역) */
 function detTitle(b, storeLead) { return '<h1 class="pb-det-t">' + storeLead + '<br>' + esc(PB.DB.store.nameEn) + '</h1>'; }
 function pDone() {
   /* STG 실화면(2026-10-14 테스트 예약): 제목 없는 헤더 · 초록 체크 · "Your booking is complete" · Store / Visit date / Booking number 표 · View booking details · 관심사 설문 카드.
-     이번 추가: 표의 Store 바로 아래 "Product" 한 줄(상품 없는 예약은 I'll decide at the store / Decide at the store) */
+     이번 추가: 표의 Store 바로 아래 "Product" 한 줄(상품 없는 예약은 "Decide at the store", PRD 5.11) */
   var f = F(), b = bookingById(f.lastNo), app = document.getElementById('app'); app.innerHTML = ''; app.appendChild(header('', 'store'));
   var d = b.visit.slice(0, 10), vd = wdEn(d) + ', ' + d.slice(5, 7) + '/' + d.slice(8, 10) + '/' + d.slice(0, 4) + ' ' + b.visit.slice(11) + ' (KST)';
   var w = document.createElement('main'); w.className = 'pb-done';
@@ -1430,7 +1525,7 @@ function pDone() {
 function myCard(b) {
   var d = b.visit.slice(0, 10), dd = Math.round((new Date(d) - new Date(PB.TODAY)) / 864e5), Dd = (b.status === '예약' || b.status === '변경요청' ? ' (D-' + dd + ')' : '');
   return '<div class="pb-card">' + badge(b.status) + '<div class="pb-card-n">' + esc(PB.DB.store.nameEn) + Dd + '</div>'
-    + '<div class="pb-card-p pb-hiA pb-new" data-test="fo-card-prod">' + esc(b.snap ? b.snap.name : 'Decide at the store') + '</div>'
+    + '<div class="pb-card-p pb-hiA pb-new" data-test="fo-card-prod">' + esc(b.snap ? b.snap.name : 'You\'ll decide on a product at the store') + '</div>'
     + '<div class="pb-hr"></div><div class="pb-card-dt"><div><span>Date</span><b>' + d + ' (' + wdEn(d).toUpperCase() + ')</b></div><div><span>TIME</span><b>' + b.visit.slice(11) + ' (KST)</b></div></div><button class="pb-pk sm" data-no="' + b.no + '">View details</button></div>';
 }
 var IC = {
@@ -1476,9 +1571,10 @@ function pMy() {
   w.innerHTML = '<div class="pb-my-h"><b>' + ttl + '</b><b>' + list.length + ' booking(s)</b></div><div class="pb-tabs">' + [['upcoming', 'Upcoming'], ['visited', 'Visited'], ['cancelled', 'Cancelled']].map(function (t) { return '<button class="' + (f.tab === t[0] ? 'on' : '') + '" data-tab="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div>'
     + '<div class="pb-my-body"><div class="pb-my-bar"><span>' + list.length + ' total</span><span class="pb-sort">Visit date &amp; time ' + IC.down + '</span></div>'
     + (list.length ? list.map(myCard).join('') : '<div class="pb-empty"><b>You don\'t have any active bookings yet</b><span>Your bookings will appear here.</span></div>')
-    + '<div class="pb-prev">View previous consultation requests ›</div></div>';
+    + (PB.DB.meConsults > 0 ? '<div class="pb-prev" data-test="fo-prev-cons">View previous consultation requests ›</div>' : '') + '</div>'; /* 구)상담접수 내역 보기: 그 회원의 상담접수 내역이 있을 때만(PRD 5.11) */
   app.appendChild(w);
   $$('[data-tab]', w).forEach(function (t) { t.onclick = function () { f.tab = t.getAttribute('data-tab'); PB.render(); }; });
+  var pv = $('.pb-prev', w); if (pv) pv.onclick = function () { toast('Not available in this mockup'); };
   $$('[data-no]', w).forEach(function (t) { t.onclick = function () { f.myNo = +t.getAttribute('data-no'); nav('mydetail'); }; });
 }
 function pMyDetail() {
@@ -1495,7 +1591,7 @@ function pMyDetail() {
   if (f.flash === 'chg') { f.flash = null; toast('Your change request has been sent.'); }
 }
 function fillProdSlots(w) {
-  /* 예약 완료·내 예약 상세 Product: FO 메인 상품 카드(ProductCard: 이미지·상품명·가격·스토어명·별점) 실화면 부품 그대로 */
+  /* 내 예약 상세 Product(상품 예약만): FO 메인 상품 카드(ProductCard) 부품에 상품명 · 가격(저장값) · 스토어명 · 별점(그 스토어의 지금 별점, 스토어 페이지 머리와 같은 값, PRD 5.11) */
   $$('.pb-prodslot', w).forEach(function (slot) {
     var b = bookingById(+slot.getAttribute('data-bno')), card = tpl('fc_card').firstElementChild, a = card.querySelector('a'), p = b.snap ? (PB.prodById(b.prodId) || {}) : null;
     var hd = card.querySelector('[class*=__header]'), im = card.querySelector('img'); im.style.aspectRatio = '180 / 121'; im.style.objectFit = 'cover'; /* 실측: 카드 180x223, 이미지 180x121 (380px 폭 기준) */ if (b.snap) { im.removeAttribute('src'); im.style.visibility = 'hidden'; hd.style.background = thumbColor(b.prodId); } else im.src = 'https://image.kbstations.com/2025/06/25/e3de94ab-8ed5-4ac8-8f32-af57daafc04b'; /* 스토어 예약 = 스토어 대표 이미지 */
@@ -1506,8 +1602,7 @@ function fillProdSlots(w) {
     var rr = card.querySelector('[class*=reviewRating]'), rc = card.querySelector('[class*=reviewCount]'); if (rr) rr.textContent = '4.9'; if (rc) rc.textContent = '(5,000+)';
     a.setAttribute('aria-label', b.snap ? b.snap.name + ' product detail view' : 'Decide at the store'); if (!b.snap) a.style.cursor = 'default';
     var live = p && p.id && PB.prodVisible(p, b.snap.lang);
-    /* 상품이 지금 노출 중이 아니면 별점을 숨긴다(선행 PRD v1.3 5.11) */
-    if (b.snap && !live) { var rv = card.querySelector('[class*=PyeaxG__review]'); if (rv) { rv.style.display = 'none'; rv.setAttribute('data-test', 'fo-card-rating-hidden'); } }
+    card.setAttribute('data-test', 'fo-my-card');
     /* 상품 상세는 예약한 언어로 연다(다른 언어로 보고 있어도 404가 나지 않게). 상품 없는 예약 카드는 누르는 동작 없음 */
     a.onclick = function (e) { e.preventDefault(); if (live) { F().back = { screen: F().screen }; F().lang = b.snap.lang; F().pid = p.id; nav('product'); } };
     card.style.width = '180px'; slot.appendChild(card);
