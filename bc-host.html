@@ -2430,6 +2430,33 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 .bc-chip.bc-sel .bc-x{color:rgba(255,255,255,.75)}
 .bc-chip.bc-sel .bc-man{background:#fff}
 .bc-chip.bc-sel:hover{border-color:#212121}
+/* ===== 상태 색: 각 화면 예약 상세 창 상태 칩 색(--c 점 · --cb 바탕 · --cf 글자)을 칩에 주입 ===== */
+.bc-chip{background:var(--cb,#fff);border-color:color-mix(in srgb,var(--c,#d9d9de) 30%,#fff);border-left-color:var(--c,#d9d9de)!important;color:var(--cf,#1d1d22)}
+.bc-chip:hover{border-color:var(--c)}
+
+.bc-chip.bc-g-cx{opacity:.55;color:#55555c}
+.bc-chip.bc-need{background:var(--cb,#fff)}
+.bc-tag{background:var(--bc-need-bg,#d4380d);color:var(--bc-need-fg,#fff)!important;border-radius:3px;padding:0 5px;font-weight:700}
+.bc-chip.bc-chg{border:1px dashed var(--bc-chg)!important;border-left:3px dashed var(--bc-chg)!important;background:var(--bc-chgbg,#fff);color:var(--bc-chgfg,#212121)}
+.bc-chip.bc-chg .bc-cl{color:var(--bc-chgfg,#212121)}
+.bc-mb{flex:none;display:inline-block;font-size:10.5px;line-height:14px;padding:0 4px;border:1px solid #c4c4cc;border-radius:3px;color:#6b6b73;background:#fff;font-style:normal;font-weight:500}
+/* 열린 예약: 두 화면 상태 색 어디에도 없는 보라 채움 */
+.bc-chip.bc-sel,.bc-chip.bc-sel.bc-chg{background:#6741D9!important;color:#fff!important;border-color:#6741D9!important;border-left-color:#fff!important;opacity:1}
+.bc-chip.bc-sel.bc-chg{border-color:#fff!important}
+.bc-chip.bc-sel .bc-tag{background:#fff;color:#6741D9!important}
+.bc-chip.bc-sel .bc-cl,.bc-chip.bc-sel .bc-x{color:#fff!important}
+.bc-chip.bc-sel .bc-mb{background:transparent;border-color:#fff;color:#fff}
+/* 범례: 상태 토글 칩 = 상세 창 상태 칩 모양(연한 바탕 + 점 + 글자) */
+.bc-sc .bc-sw{display:none}
+.bc-sc::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--c);flex:none}
+.bc-sc.on{background:var(--cb);border-color:color-mix(in srgb,var(--c) 40%,#fff);color:var(--cf)}
+.bc-sc.on b{color:var(--cf)}
+.bc-sc:not(.on){background:#fff;border-color:#e3e3e8;color:#a3a3ab}
+.bc-sc:not(.on)::before{background:#d0d0d6}
+.bc-sw-chg{background:var(--bc-chgbg,#fff)!important;border:1px dashed var(--bc-chg)!important;border-left:3px dashed var(--bc-chg)!important}
+.bc-sw-sel{background:#6741D9!important;border-color:#6741D9!important;border-left-color:#fff!important}
+.bc-tag-sw{font-style:normal;font-size:10.5px;line-height:16px}
+.bc-grp2.bc-wrapped{border-left:0;padding-left:0}
 </style></head>
 <body><div id="app"></div>
 <template id="T_h_res">
@@ -2594,13 +2621,17 @@ var GRP = { '예약': 'up', '변경완료': 'up', '변경거절': 'up', '변경�
 /* 상태 칩 줄의 묶음(필터 겸 범례) */
 var ROWG = [['예약', '예약', ['예약', '변경완료', '변경거절'], 'up'], ['변경요청', '변경요청', ['변경요청'], 'up'], ['방문완료', '방문완료', ['방문완료'], 'done'], ['취소노쇼', '취소 · 노쇼', ['고객취소', '매장취소', '미방문'], 'cx']];
 function rowKey(status) { for (var i = 0; i < ROWG.length; i++) if (ROWG[i][2].indexOf(status) >= 0) return ROWG[i][0]; return ''; }
+/* 상태 색: 예약류 파랑 / 변경요청 주황 / 방문완료 초록 / 취소 · 노쇼 회색 */
+var SCOL = { '예약': 'blue', '변경완료': 'blue', '변경거절': 'blue', '변경요청': 'orange', '방문완료': 'green', '고객취소': 'gray', '매장취소': 'gray', '미방문': 'gray' };
+var ROWCOL = { '예약': 'blue', '변경요청': 'orange', '방문완료': 'green', '취소노쇼': 'gray' };
 var NEEDTAG = { '신규': '확인 필요', '방문결과': '방문 결과', '변경': '변경 신청' };
 function chipEl(c, onOpen) {
   var e = document.createElement('button'); e.type = 'button';
   var o = CALOPT, man = c.b.owner === '매장', need = !c.chg && o.need ? o.need(c.b) : '';
   e.className = 'bc-chip bc-g-' + (GRP[c.b.status] || 'up') + (c.chg ? ' bc-chg' : '') + (need ? ' bc-need' : '') + (o.sel != null && o.sel === c.b.no ? ' bc-sel' : '');
+  e.setAttribute('style', scStyle(c.b.status));
   e.innerHTML = '<span class="bc-t">' + c.ts.slice(11, 16) + '</span>' + (c.chg ? '<span class="bc-cl">변경 신청</span>' : '') + '<span class="bc-n">' + esc(c.b.name) + '</span>'
-    + (o.st && o.st.cv === 'day' && !c.chg ? '<span class="bc-x"><span>' + esc(c.b.nation) + '</span><span>' + esc(langLabel(c.b.lang)) + '</span><span>' + esc(c.b.status) + '</span>' + (man ? '<span>수기</span>' : '') + '</span>' : '') + (need ? '<span class="bc-tag">' + NEEDTAG[need] + '</span>' : '') + (man ? '<i class="bc-man" aria-label="수기"></i>' : '');
+    + (o.st && o.st.cv === 'day' && !c.chg ? '<span class="bc-x"><span>' + esc(c.b.nation) + '</span><span>' + esc(langLabel(c.b.lang)) + '</span><span>' + esc(c.b.status) + '</span>' + '' + '</span>' : '') + (need ? '<span class="bc-tag">' + NEEDTAG[need] + '</span>' : '') + (man ? '<span class="bc-mb">수기</span>' : '');
   e.setAttribute('aria-label', c.ts.slice(11, 16) + ' ' + c.b.name);
   e.setAttribute('data-test', (c.chg ? 'chip-chg-' : 'chip-') + c.b.no);
   e.onclick = function (ev) { ev.stopPropagation(); onOpen(c.b.no); };
@@ -2629,18 +2660,23 @@ function statusRow(o) {
   var vis = o.list.filter(function (b) { return inView(st, b.visit.slice(0, 10)); });
   ROWG.forEach(function (g) {
     var n = vis.filter(function (b) { return g[2].indexOf(b.status) >= 0; }).length, on = !off[g[0]] && (!st.st || g[2].indexOf(st.st) >= 0);
-    var x = document.createElement('button'); x.type = 'button'; x.className = 'bc-sc bc-g-' + g[3] + (on ? ' on' : ''); x.setAttribute('aria-pressed', on ? 'true' : 'false'); x.setAttribute('data-test', 'srow-' + g[0]);
+    var x = document.createElement('button'); x.type = 'button'; x.setAttribute('style', scStyle(g[2][0])); x.className = 'bc-sc bc-g-' + g[3] + (on ? ' on' : ''); x.setAttribute('aria-pressed', on ? 'true' : 'false'); x.setAttribute('data-test', 'srow-' + g[0]);
     x.innerHTML = '<i class="bc-sw bc-g-' + g[3] + '"></i><span>' + g[1] + '</span><b>' + n + '</b>';
     x.onclick = function () { if (st.st) { var keep = rowKey(st.st); st.st = ''; ROWG.forEach(function (h) { off[h[0]] = h[0] !== keep; }); } off[g[0]] = !off[g[0]]; PB.render(); };
     g1.appendChild(x);
   });
   /* 표시 묶음: 누르지 않는 설명 */
   var g2 = document.createElement('div'); g2.className = 'bc-grp bc-grp2'; g2.setAttribute('data-test', 'srow-legend');
-  g2.innerHTML = '<span class="bc-glab">표시</span>' + (o.need ? '<span class="bc-li"><i class="bc-sw bc-sw-need"></i>처리 필요</span>' : '') + '<span class="bc-li"><i class="bc-sw bc-sw-chg"></i>변경 신청</span><span class="bc-li"><i class="bc-man"></i>수기</span><span class="bc-li"><i class="bc-sw bc-sw-sel"></i>열린 예약</span>';
+  g2.innerHTML = '<span class="bc-glab">표시</span>' + (o.need ? '<span class="bc-li"><i class="bc-tag bc-tag-sw">확인 필요</i>처리 필요</span>' : '') + '<span class="bc-li"><i class="bc-sw bc-sw-chg"></i>변경 신청</span><span class="bc-li"><i class="bc-mb">수기</i>수기 등록 예약</span><span class="bc-li"><i class="bc-sw bc-sw-sel"></i>열린 예약</span>';
   row.appendChild(g2);
+  /* 줄이 바뀌어 표시 묶음이 아래로 내려가면 구분선 숨김 */
+  var chk = function () { if (!g2.isConnected) { window.removeEventListener('resize', chk); return; } g2.classList.toggle('bc-wrapped', g2.offsetTop > g1.offsetTop + 2); };
+  setTimeout(chk, 0); window.addEventListener('resize', chk);
   return row;
 }
 function renderCal(opts) {
+  statusColors(opts.pre);
+  var CH = SCOLORS._chg; if (CH) { document.documentElement.style.setProperty('--bc-chg', CH.bd && !/rgba(0, 0, 0, 0)/.test(CH.bd) ? CH.bd : CH.fg); document.documentElement.style.setProperty('--bc-chgbg', CH.bg); document.documentElement.style.setProperty('--bc-chgfg', CH.fg); }
   closePop();
   CALOPT = opts; var wrap = document.createElement('div'); wrap.className = 'bc-calwrap'; mark(wrap); wrap.appendChild(statusRow(opts));
   var off = opts.st.off || {}; opts = Object.assign({}, opts, { list: opts.list.filter(function (b) { return !off[rowKey(b.status)]; }) }); CALOPT = opts;
@@ -2722,6 +2758,28 @@ function fixLabel(lb) { var t = lb.cloneNode(false); t.textContent = '2026-11-08
 function moveSearch(sb, inp) { if (!sb || !inp) return; var box = inp.closest('.ant-input-affix-wrapper') || inp, fi = box.closest('.ant-form-item'); var at = fi && fi.parentNode && !fi.contains(sb) ? fi : box; at.after(sb); sb.classList.add('bc-sbtn'); mark(sb);
   /* 줄이 좁으면 검색어 칸만 줄여 버튼이 같은 줄에 남게 */
   var row = at.parentNode; if (row && getComputedStyle(row).flexWrap === 'wrap') { var g = parseFloat(getComputedStyle(row).columnGap) || 0, used = 0, n = 0; Array.prototype.forEach.call(row.children, function (k) { if (getComputedStyle(k).display === 'none') return; n++; var cs = getComputedStyle(k); used += (parseFloat(cs.marginLeft) || 0) + (parseFloat(cs.marginRight) || 0); if (k !== at) used += k.getBoundingClientRect().width; }); var free = Math.floor(row.getBoundingClientRect().width - used - g * (n - 1) - 4); if (free < at.getBoundingClientRect().width) { var w = Math.max(180, free); at.style.width = w + 'px'; at.style.maxWidth = w + 'px'; at.style.flex = 'none'; box.style.width = '100%'; box.style.minWidth = '0'; inp.style.minWidth = '0'; } } }
+/* 상태 색 = 그 화면 예약 상세 창 맨 위 상태 칩(상태별 실화면 스냅샷)에서 그대로 읽음. 스냅샷이 없는 상태는 회색 */
+var SCOLORS = null;
+function statusColors(pre) {
+  if (SCOLORS) return SCOLORS; SCOLORS = {};
+  var box = document.createElement('div'); box.style.cssText = 'position:absolute;left:-99999px;top:0;visibility:hidden;width:480px'; document.body.appendChild(box);
+  ['예약', '변경요청', '변경완료', '변경거절', '방문완료', '미방문', '고객취소', '매장취소'].forEach(function (s) {
+    var t = document.getElementById('T_' + pre + '_' + s); if (!t) return;
+    var d = document.createElement('div'); d.appendChild(t.content.cloneNode(true)); box.appendChild(d);
+    d.querySelectorAll('.ant-drawer, .ant-drawer-content-wrapper, .ant-drawer-mask').forEach(function (x) { x.style.position = 'static'; });
+    var bg = d.querySelector('[class*=statusBadge]'); if (!bg) return;
+    var cs = getComputedStyle(bg), dotEl = bg.querySelector('[class*=statusDot]'), img = bg.querySelector('img'), dot = '';
+    if (dotEl) dot = getComputedStyle(dotEl).backgroundColor;
+    if (!dot && img) { var m = /fill=['"]?(%23|#)([0-9a-fA-F]{6})/.exec(decodeURIComponent(img.getAttribute('src') || '')) || /fill='%23([0-9a-fA-F]{6})/.exec(img.getAttribute('src') || ''); if (m) dot = '#' + (m[2] || m[1]); }
+    var c = dot || cs.color, b = cs.backgroundColor; if (!b || /rgba\(0, 0, 0, 0\)|transparent/.test(b)) b = 'color-mix(in srgb,' + c + ' 10%,#fff)';
+    if (/^(#fff(fff)?|rgb(255, 255, 255))$/i.test(c)) c = b; /* 점이 흰색인 채움 칩(HOST 방문완료)은 바탕색을 막대색으로 */
+    SCOLORS[s] = { c: c, cb: b, fg: cs.color };
+    if (s === '변경요청') { var cr = d.querySelector('[class*=changeRequestBox]'); if (cr) { var cc = getComputedStyle(cr); SCOLORS._chg = { bg: cc.backgroundColor, bd: cc.borderTopColor, fg: getComputedStyle(cr.querySelector('strong') || cr).color }; } }
+    d.remove();
+  });
+  box.remove(); return SCOLORS;
+}
+function scStyle(status) { var m = SCOLORS && SCOLORS[status]; return m ? '--c:' + m.c + ';--cb:' + m.cb + ';--cf:' + m.fg : '--c:#a3a3ab;--cb:#f4f4f6;--cf:#55555c'; }
 
 /* ===== HOST 예약 관리(예약 현황): 실화면 스냅샷 그대로 + [목록 | 캘린더] ===== */
 function H() { return PB.S.host; }
@@ -2776,6 +2834,8 @@ function pRes() {
   ACC = getComputedStyle(byText(document, 'form button', '검색')).backgroundColor || ACC;
   document.documentElement.style.setProperty('--bc-acc', ACC);
   /* 변경 신청 점선 칩 글자색 = 실화면 처리 필요 카드의 변경요청 표시 색 */
+  /* 처리 필요 배지 색 = 처리 필요 패널 건수 배지 색 */
+  var tb = $('[class*=totalBadge]'); if (tb) { var tcs = getComputedStyle(tb); document.documentElement.style.setProperty('--bc-need-bg', tcs.backgroundColor); document.documentElement.style.setProperty('--bc-need-fg', tcs.color); }
   var ct = $$('[class*=scrollArea] span').filter(function (t) { return t.textContent.trim() === '변경요청' && !t.children.length; })[0]; if (ct) document.documentElement.style.setProperty('--bc-chg', getComputedStyle(ct).color);
   var head = $('[class*=pageHeader__right] button'); if (head) head.onclick = function () { toast('시안에서는 동작하지 않습니다'); };
   /* 필터: 예약상태 · 언어 · 등록 주체 · 검색 (실화면 그대로, 시안에서 실제로 거름) */
@@ -2831,7 +2891,7 @@ function calMode(card, rows) {
   var tw = $('.ant-table-wrapper', card); tw.style.display = 'none';
   var all = storeBooks(), shown = rows.filter(function (b) { return calRange(h, b); });
   textSet($('.ant-card-head-title'), '예약목록 (' + shown.length + ')');
-  tw.parentNode.appendChild(renderCal({ list: rows, all: all, set: PB.setOf(PB.DB.store.id), st: h, sel: h.open,
+  tw.parentNode.appendChild(renderCal({ list: rows, all: all, set: PB.setOf(PB.DB.store.id), st: h, sel: h.open, pre: 'hd',
     /* 상태 표시 = 목록 예약상태 칸 그대로(글자만). 처리 필요 = 오른쪽 처리 필요 패널에 올라가는 건 */
     need: function (b) { return b.need || ''; },
     open: function (no) { h.open = no; PB.render(); } }));
