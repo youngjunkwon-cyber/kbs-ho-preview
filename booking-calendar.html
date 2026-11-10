@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>예약 캘린더 보기 시안 | K-Beauty Station</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:Pretendard,"Noto Sans KR","Malgun Gothic",sans-serif;font-size:12px;background:#fff;overflow:hidden}
+#app{height:100vh;display:flex;flex-direction:column}
+#sw{min-height:36px;flex:none;flex-wrap:wrap;row-gap:4px;padding:6px 12px;background:#1f1f1f;color:#ddd;display:flex;align-items:center;gap:6px;font-size:11.5px}
+#sw b{color:#fff;margin-right:4px;white-space:nowrap}
+#sw .s{height:24px;padding:0 10px;border:1px solid #444;border-radius:4px;background:transparent;color:#ccc;cursor:pointer;font:inherit}
+#sw .s.on{background:#fff;color:#111;border-color:#fff;font-weight:700}
+#sw .sp{flex:1}
+#sw label{display:flex;align-items:center;gap:4px;cursor:pointer;white-space:nowrap}
+#sw span{white-space:nowrap}
+#frames{flex:1;min-height:0;position:relative}
+#frames iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:none;background:#fff}
+#frames iframe.on{display:block}
+</style>
+</head>
+<body>
+<div id="app"><div id="sw"></div><div id="frames">
+<iframe id="f-HOST" src="bc-host.html" title="입점사"></iframe>
+<iframe id="f-BO" src="bc-bo.html" title="운영사"></iframe>
+</div></div>
+<script>
+'use strict';
+/* 예약 캘린더 보기 시안: HOST 예약 관리(예약 현황) · BO 예약 관리에 [목록 | 캘린더] 를 더한다. 나머지는 실화면 그대로 */
+var TODAY='2026-11-10',NOWTS='2026-11-10 12:00';
+var LANGS={en:'영어',ja:'일본어',zh:'중국어(간체)'};
+var LANG_RNO={en:'EN',ja:'JP',zh:'CN'};
+function addDays(d,n){var t=new Date(d+'T00:00:00Z');t.setUTCDate(t.getUTCDate()+n);return t.toISOString().slice(0,10);}
+function wdKo(d){return ['일','월','화','수','목','금','토'][new Date(d+'T00:00:00Z').getUTCDay()];}
+/* ===== 스토어와 예약 설정(STG GET /bookings/settings/{storeId} 형태) ===== */
+var STORES=[{id:9,name:'아비쥬 명동점',cat:'피부과',code:'009'},{id:173,name:'셀파바이청담',cat:'헤어',code:'173'}];
+/* 요일별 받는 시간(분). times = 간격마다 켜고 끈 값 */
+function mkSet(interval,max,days,offTimes){
+ return {intervalMinute:interval,maxBookingCount:max,bookingDeadline:60,schedules:['SUN','MON','TUE','WED','THU','FRI','SAT'].map(function(k){var d=days[k];var st=d?d[0]:600,en=d?d[1]:1140,times=[];for(var m=st;m<en;m+=interval)times.push({timeMinute:m,isActive:offTimes.indexOf(m)<0});return {dayOfWeek:k,startMinute:st,endMinute:en,isActive:!!d,times:times};})};
+}
+/* 아비쥬 명동점: 30분 간격 · 한 시간에 2건 · 수요일 휴무 · 13:00 꺼 둠 · 일요일 11~17시 · 토요일 10~18시 · 평일 10~19시 */
+var SETTINGS={
+ 9:mkSet(30,2,{SUN:[660,1020],MON:[600,1140],TUE:[600,1140],WED:null,THU:[600,1140],FRI:[600,1140],SAT:[600,1080]},[780]),
+ 173:mkSet(60,1,{SUN:null,MON:[600,1200],TUE:[600,1200],WED:[600,1200],THU:[600,1200],FRI:[600,1200],SAT:[600,1200]},[])
+};
+/* ===== 예약 (예시 영문 여권명, 실제 개인정보 아님) ===== */
+function seedBookings(){
+ // [스토어, 방문, 접수, 이름, 국적, 언어, 메신저, 상태, 등록주체, 처리필요, 변경 신청 시각]
+ var A=[
+ [9,'2026-10-29 13:30','2026-10-22 11:05','Isabella Rossi','이탈리아','en','WhatsApp','방문완료','고객','',null],
+ [9,'2026-11-02 10:00','2026-10-27 09:12','Hannah Brooks','미국','en','WhatsApp','방문완료','고객','',null],
+ [9,'2026-11-02 14:00','2026-10-28 20:41','Yui Sato','일본','ja','LINE','방문완료','고객','',null],
+ [9,'2026-11-03 11:00','2026-10-30 08:16','Li Mei','중국','zh','WeChat','미방문','고객','',null],
+ [9,'2026-11-05 15:30','2026-10-31 17:02','Olivia Grant','캐나다','en','WhatsApp','고객취소','고객','',null],
+ [9,'2026-11-06 16:00','2026-11-04 14:30','Aya Mori','일본','ja','-','방문완료','매장','',null],
+ [9,'2026-11-07 10:30','2026-11-01 10:47','Sophie Martin','프랑스','en','WhatsApp','방문완료','고객','',null],
+ [9,'2026-11-09 12:00','2026-11-03 22:15','Nur Aisyah','말레이시아','en','WhatsApp','방문완료','고객','',null],
+ [9,'2026-11-10 10:30','2026-11-05 16:20','Chloe Tan','싱가포르','en','WhatsApp','예약','고객','방문결과',null],
+ [9,'2026-11-10 15:00','2026-11-06 09:33','Elina Petrova','러시아','en','WhatsApp','예약','고객','',null],
+ [9,'2026-11-12 10:00','2026-11-09 08:24','Kaitlyn Chan','캐나다','en','WhatsApp','예약','고객','신규',null],
+ [9,'2026-11-12 10:00','2026-11-09 19:50','Grace Lim','싱가포르','en','WhatsApp','예약','고객','신규',null],
+ [9,'2026-11-12 11:30','2026-11-08 21:14','Haruka Ito','일본','ja','LINE','예약','고객','',null],
+ [9,'2026-11-12 14:00','2026-11-07 13:05','Zhang Wei','중국','zh','-','예약','매장','',null],
+ [9,'2026-11-12 15:00','2026-11-06 10:58','Emily Carter','미국','en','WhatsApp','매장취소','고객','',null],
+ [9,'2026-11-12 16:30','2026-11-08 11:40','Chloe Wong','홍콩','zh','WhatsApp','예약','고객','',null],
+ [9,'2026-11-12 20:00','2026-11-09 18:10','Amelia Scott','영국','en','-','예약','매장','',null],
+ [9,'2026-11-13 11:00','2026-11-04 09:40','Wang Siyu','중국','zh','WeChat','변경요청','고객','변경','2026-11-14 15:00'],
+ [9,'2026-11-13 14:30','2026-11-07 15:26','Rina Takeda','일본','ja','LINE','예약','고객','',null],
+ [9,'2026-11-13 14:30','2026-11-05 12:18','Mia Tan','싱가포르','en','WhatsApp','고객취소','고객','',null],
+ [9,'2026-11-14 10:00','2026-11-09 10:58','Evelyn Lee','캐나다','en','WhatsApp','예약','고객','신규',null],
+ [9,'2026-11-14 15:00','2026-11-02 12:00','Claire Wald','미국','en','WhatsApp','예약','고객','',null],
+ [9,'2026-11-16 11:00','2026-11-03 18:24','Yuko Hamada','일본','ja','LINE','변경요청','고객','변경','2026-11-17 16:00'],
+ [9,'2026-11-16 17:00','2026-11-06 23:37','Hui Ping Ho','말레이시아','en','WhatsApp','예약','고객','',null],
+ [9,'2026-11-17 16:00','2026-11-08 15:20','Aigerim Nurlanova','카자흐스탄','en','KakaoTalk','예약','고객','',null],
+ [9,'2026-11-19 10:30','2026-11-09 16:45','Madison Piao','미국','en','-','예약','매장','',null],
+ [9,'2026-11-21 12:00','2026-11-09 07:52','Chen Yuxuan','중국','zh','WeChat','예약','고객','',null],
+ [9,'2026-11-24 18:30','2026-11-09 20:03','Sakura Ono','일본','ja','LINE','예약','고객','',null],
+ [9,'2026-11-28 11:00','2026-11-08 13:36','Lucas Meyer','독일','en','WhatsApp','예약','고객','',null],
+ [9,'2026-12-03 14:00','2026-11-09 09:15','Ava Nguyen','호주','en','WhatsApp','예약','고객','',null],
+ [173,'2026-11-12 13:00','2026-11-07 10:12','Noah Turner','미국','en','WhatsApp','예약','고객','',null],
+ [173,'2026-11-18 11:00','2026-11-08 17:44','Ella Reyes','필리핀','en','WhatsApp','예약','고객','',null],
+ [173,'2026-11-20 15:00','2026-11-09 12:30','Mai Tran','베트남','en','WhatsApp','방문완료','고객','',null]
+ ];
+ var PH={'중국':'+86 138000001','홍콩':'+852 600001','일본':'+81 9000001','러시아':'+7 9000001','카자흐스탄':'+7 7000001','말레이시아':'+60 120001','싱가포르':'+65 80001'};
+ var out=A.map(function(a,i){
+  var st=a[7],cancel=/취소/.test(st);
+  return {no:i+1,store:a[0],storeName:storeById(a[0]).name,visit:a[1],recv:a[2],name:a[3],nation:a[4],lang:a[5],contact:a[6],status:st,owner:a[8],need:a[9],chg:a[10],req:'',
+   phone:a[8]==='매장'?'-':(PH[a[4]]||'+1 41655501')+(10+i),rno:null,
+   cancelBy:st==='고객취소'?'고객':st==='매장취소'?'매장':null,cancelAt:cancel?addDays(a[1].slice(0,10),-2)+' 18:51:12':null,cancelReason:st==='고객취소'?'고객 직접 취소':st==='매장취소'?'매장 사정':null};
+ });
+ /* 예약번호 = 접수일 YYMMDD + 스토어 번호 + 언어 코드 + 그날 접수 순번 */
+ out.slice().sort(function(x,y){return x.recv<y.recv?-1:1;}).forEach(function(b,k,arr){var d=b.recv.slice(0,10),n=arr.slice(0,k).filter(function(x){return x.recv.slice(0,10)===d;}).length+1;b.rno=d.slice(2).replace(/-/g,'')+storeById(b.store).code+LANG_RNO[b.lang]+(n<10?'0'+n:n);});
+ return out;
+}
+function storeById(id){return STORES.filter(function(s){return s.id===+id;})[0]||null;}
+var DB,S;
+function freshDB(){DB={store:STORES[0],stores:STORES,books:null};DB.books=seedBookings();}
+function freshState(){return {surf:'HOST',mark:false,
+ host:{mode:'list',cv:'month',anchor:TODAY,st:'',lang:'',owner:'',q:'',qd:'',ptab:'전체',open:null},
+ bo:{mode:'list',cv:'month',anchor:TODAY,store:null,st:'',lang:'',owner:'',q:'',qd:'',open:null}};}
+/* HOST 처리 필요: 이 스토어(아비쥬 명동점) 예약만 */
+function needList(t){return DB.books.filter(function(b){return b.store===DB.store.id&&b.need&&(t==='전체'||b.need===t);}).sort(function(a,b){return a.visit<b.visit?1:-1;});}
+/* ===== 렌더 ===== */
+function swHTML(){
+ var s=S.surf;
+ return '<b>예약 캘린더 보기 시안</b>'+['HOST','BO'].map(function(x){return '<button class="s'+(s===x?' on':'')+'" data-surf="'+x+'">'+{HOST:'입점사 (HOST)',BO:'운영사 (BO)'}[x]+'</button>';}).join('')
+  +'<span class="sp"></span><label><input type="checkbox" data-sw="mark"'+(S.mark?' checked':'')+'>이번에 추가한 요소 표시</label>'
+  +'<span style="color:#888">기준 시각 '+NOWTS+'</span>';
+}
+function frameOf(s){return document.getElementById('f-'+s);}
+function render(){
+ document.getElementById('sw').innerHTML=swHTML();
+ ['HOST','BO'].forEach(function(s){frameOf(s).classList.toggle('on',S.surf===s);});
+ var w=frameOf(S.surf).contentWindow;
+ if(w&&typeof w.draw==='function')w.draw();
+}
+window.PB={
+ get DB(){return DB;},get S(){return S;},TODAY:TODAY,NOWTS:NOWTS,LANGS:LANGS,
+ addDays:addDays,wdKo:wdKo,needList:needList,storeById:storeById,setOf:function(id){return SETTINGS[id];},render:render,
+ ready:function(surf){if(S&&S.surf===surf)render();}
+};
+window.render=render;
+Object.defineProperty(window,'STATE',{get:function(){return S;}});
+Object.defineProperty(window,'DBX',{get:function(){return DB;}});
+window.frameDoc=function(s){return frameOf(s||S.surf).contentDocument;};
+window.go=function(surf){S.surf=surf;render();};
+document.addEventListener('click',function(e){var t=e.target.closest('[data-surf]');if(t){S.surf=t.getAttribute('data-surf');render();}});
+document.addEventListener('change',function(e){var t=e.target;if(t.getAttribute('data-sw')==='mark'){S.mark=t.checked;render();}});
+freshDB();S=freshState();render();
+</script>
+</body>
+</html>
