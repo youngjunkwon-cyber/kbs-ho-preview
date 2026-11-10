@@ -2745,6 +2745,16 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 .bc-pop .bc-chip>.bc-n{flex:0 1 auto;max-width:100%}
 .bc-label{display:inline-block;text-align:center;flex:none}
 .bc-sbtn{margin-left:8px;flex:none}
+/* 상세 창이 열린 예약 칩: 진한 외곽선(처리 필요 연분홍 바탕과 구분) */
+.bc-chip.bc-sel{outline:2px solid #212121;outline-offset:1px;z-index:1}
+/* 일 보기 */
+.bc-wgrid.bc-dgrid{grid-template-columns:56px minmax(0,1fr)}
+.bc-dgrid .bc-chip{flex-wrap:nowrap}
+.bc-dgrid .bc-chip .bc-n{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:0 1 auto}
+.bc-x{display:inline-flex;gap:10px;color:#6b6b73;font-size:12px;min-width:0;overflow:hidden;white-space:nowrap;margin-left:6px}
+.bc-x span{flex:none}
+.bc-dgrid .bc-chip{width:auto;max-width:100%;align-self:flex-start;min-width:280px}
+.bc-seg{grid-template-columns:none!important;grid-auto-flow:column}
 </style></head>
 <body><div id="app"></div>
 <template id="T_b_res">
@@ -2913,9 +2923,9 @@ var NEEDTAG = { '신규': '확인 필요', '방문결과': '방문 결과', '변
 function chipEl(c, onOpen) {
   var e = document.createElement('button'); e.type = 'button';
   var o = CALOPT, man = c.b.owner === '매장', need = !c.chg && o.need ? o.need(c.b) : '';
-  e.className = 'bc-chip bc-g-' + (GRP[c.b.status] || 'up') + (c.chg ? ' bc-chg' : '') + (need ? ' bc-need' : '');
+  e.className = 'bc-chip bc-g-' + (GRP[c.b.status] || 'up') + (c.chg ? ' bc-chg' : '') + (need ? ' bc-need' : '') + (o.sel != null && o.sel === c.b.no ? ' bc-sel' : '');
   e.innerHTML = '<span class="bc-t">' + c.ts.slice(11, 16) + '</span>' + (c.chg ? '<span class="bc-cl">변경 신청</span>' : '') + '<span class="bc-n">' + esc(c.b.name) + '</span>'
-    + (need ? '<span class="bc-tag">' + NEEDTAG[need] + '</span>' : '') + (man ? '<i class="bc-man" aria-label="수기"></i>' : '');
+    + (o.st && o.st.cv === 'day' && !c.chg ? '<span class="bc-x"><span>' + esc(c.b.nation) + '</span><span>' + esc(langLabel(c.b.lang)) + '</span><span>' + esc(c.b.status) + '</span>' + (man ? '<span>수기</span>' : '') + '</span>' : '') + (need ? '<span class="bc-tag">' + NEEDTAG[need] + '</span>' : '') + (man ? '<i class="bc-man" aria-label="수기"></i>' : '');
   e.setAttribute('aria-label', c.ts.slice(11, 16) + ' ' + c.b.name);
   e.setAttribute('data-test', (c.chg ? 'chip-chg-' : 'chip-') + c.b.no);
   e.onclick = function (ev) { ev.stopPropagation(); onOpen(c.b.no); };
@@ -2925,16 +2935,18 @@ function chipEl(c, onOpen) {
 
 function calLabel(st) {
   if (st.cv === 'month') return st.anchor.slice(0, 4) + '년 ' + (+st.anchor.slice(5, 7)) + '월';
+  if (st.cv === 'day') return st.anchor + ' (' + WD[dow(st.anchor)] + ')';
   var s = weekStart(st.anchor); return s + ' ~ ' + PB.addDays(s, 6);
 }
 function calMove(st, n) {
   if (st.cv === 'week') { st.anchor = PB.addDays(st.anchor, 7 * n); return; }
+  if (st.cv === 'day') { st.anchor = PB.addDays(st.anchor, n); return; }
   var y = +st.anchor.slice(0, 4), m = +st.anchor.slice(5, 7) - 1 + n; y += Math.floor(m / 12); m = ((m % 12) + 12) % 12;
   st.anchor = y + '-' + (m < 9 ? '0' : '') + (m + 1) + '-01';
 }
 var CALOPT = null;
 /* 지금 보이는 달 · 주 안인가(방문일 기준) */
-function inView(st, d) { if (st.cv === 'month') return d.slice(0, 7) === st.anchor.slice(0, 7); var s = weekStart(st.anchor); return d >= s && d <= PB.addDays(s, 6); }
+function inView(st, d) { if (st.cv === 'day') return d === st.anchor; if (st.cv === 'month') return d.slice(0, 7) === st.anchor.slice(0, 7); var s = weekStart(st.anchor); return d >= s && d <= PB.addDays(s, 6); }
 /* 상태 칩 줄(필터 겸 범례): 건수는 지금 보이는 기간, 누르면 그 묶음 표시를 켜고 끔. 예약상태 필터를 고른 상태에서 누르면 필터를 풀고 칩 기준으로 */
 function statusRow(o) {
   var st = o.st, off = st.off || (st.off = {}), row = document.createElement('div'); row.className = 'bc-srow'; row.setAttribute('data-test', 'cal-srow');
@@ -2954,7 +2966,7 @@ function renderCal(opts) {
   CALOPT = opts; var wrap = document.createElement('div'); wrap.className = 'bc-calwrap'; mark(wrap); wrap.appendChild(statusRow(opts));
   var off = opts.st.off || {}; opts = Object.assign({}, opts, { list: opts.list.filter(function (b) { return !off[rowKey(b.status)]; }) }); CALOPT = opts;
   var root = document.createElement('div'); root.className = 'bc-cal'; root.setAttribute('data-test', 'cal-' + opts.st.cv);
-  if (opts.st.cv === 'month') monthView(root, opts); else weekView(root, opts);
+  if (opts.st.cv === 'month') monthView(root, opts); else weekView(root, opts, opts.st.cv === 'day');
   wrap.appendChild(root); return wrap;
 }
 function monthView(root, o) {
@@ -2977,16 +2989,18 @@ function monthView(root, o) {
   }
   root.appendChild(grid);
 }
-function weekView(root, o) {
-  var s = weekStart(o.st.anchor), days = [], iv = o.set.intervalMinute;
-  for (var i = 0; i < 7; i++) days.push(PB.addDays(s, i));
-  var chips = chipsOf(o.list).filter(function (c) { return c.ts.slice(0, 10) >= days[0] && c.ts.slice(0, 10) <= days[6]; });
+/* 주 보기 · 일 보기(하루 한 칸, 같은 규칙) */
+function weekView(root, o, oneDay) {
+  var s = oneDay ? o.st.anchor : weekStart(o.st.anchor), days = [], iv = o.set.intervalMinute;
+  for (var i = 0; i < (oneDay ? 1 : 7); i++) days.push(PB.addDays(s, i));
+  var last = days[days.length - 1];
+  var chips = chipsOf(o.list).filter(function (c) { return c.ts.slice(0, 10) >= days[0] && c.ts.slice(0, 10) <= last; });
   /* 세로 범위: 이 주 예약 받는 가장 이른 ~ 늦은 시간, 그 밖의 예약(수기 등)이 있으면 그 시간까지 넓힘 */
   var lo = 1e9, hi = -1;
   days.forEach(function (d) { var sc = sched(o.set, d); if (sc && sc.isActive) { lo = Math.min(lo, sc.startMinute); hi = Math.max(hi, sc.endMinute); } });
   chips.forEach(function (c) { var m = Math.floor(minOf(c.ts) / iv) * iv; lo = Math.min(lo, m); hi = Math.max(hi, m + iv); });
   if (hi < 0) { o.set.schedules.forEach(function (sc) { lo = Math.min(lo, sc.startMinute); hi = Math.max(hi, sc.endMinute); }); }
-  var g = document.createElement('div'); g.className = 'bc-wgrid';
+  var g = document.createElement('div'); g.className = 'bc-wgrid' + (oneDay ? ' bc-dgrid' : '');
   var corner = document.createElement('div'); corner.className = 'bc-wh bc-wcorner'; g.appendChild(corner);
   days.forEach(function (d) { var h = document.createElement('div'); h.className = 'bc-wh' + (d === PB.TODAY ? ' bc-today' : ''); h.innerHTML = '<span class="bc-wd">' + WD[dow(d)] + '</span><span class="bc-wdn">' + (+d.slice(8, 10)) + '</span>'; h.setAttribute('data-date', d); g.appendChild(h); });
   for (var m = lo; m < hi; m += iv) {
@@ -3110,11 +3124,12 @@ function pRes() {
     var cv = document.createElement('div'); cv.className = 'bc-bseg bc-cvseg'; cv.setAttribute('data-test', 'cv');
     cv.appendChild(mk('월', b.cv === 'month', 'cv-month', function () { b.cv = 'month'; PB.render(); }));
     cv.appendChild(mk('주', b.cv === 'week', 'cv-week', function () { b.cv = 'week'; PB.render(); }));
+    cv.appendChild(mk('일', b.cv === 'day', 'cv-day', function () { b.cv = 'day'; PB.render(); }));
     nav.appendChild(cv);
     row.insertBefore(nav, row.firstChild); fixLabel(lb);
     moveSearch(sb, inp);
     tw.style.display = 'none';
-    tw.parentNode.insertBefore(renderCal({ list: rows, all: PB.DB.books.filter(function (x) { return x.store === b.store; }), set: PB.setOf(b.store), st: b,
+    tw.parentNode.insertBefore(renderCal({ list: rows, all: PB.DB.books.filter(function (x) { return x.store === b.store; }), set: PB.setOf(b.store), st: b, sel: b.open,
       /* 상태 표시 = 목록 상태 칸 그대로(점 + 색 글자). BO에는 처리 필요 개념이 없어 강조 없음 */
      
       open: function (no) { b.open = no; PB.render(); } }), tw.nextSibling);
