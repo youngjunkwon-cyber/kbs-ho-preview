@@ -2797,6 +2797,43 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 .bc-tag-sw{font-style:normal;font-size:10.5px;line-height:16px}
 .bc-grp2.bc-wrapped{border-left:0;padding-left:0}
 .bc-chip.bc-g-ns{opacity:1}
+/* ===== 칩 배치 고정: 항상 2줄 · 같은 높이 (일 보기만 한 줄) ===== */
+.bc-chip{display:flex!important;flex-direction:column!important;flex-wrap:nowrap!important;align-items:stretch!important;justify-content:center;gap:0!important;height:40px!important;min-height:40px!important;padding:2px 7px!important;line-height:18px!important;flex:none}
+.bc-r1,.bc-r2{display:flex;align-items:center;gap:6px;min-width:0;height:18px;white-space:nowrap}
+.bc-r1{overflow:hidden}
+.bc-r1 .bc-t{flex:0 0 auto;max-width:none!important;overflow:visible!important;text-overflow:clip!important}
+.bc-badge{margin-left:auto;flex:none;display:inline-flex;align-items:center}
+.bc-badge>*{flex:none;max-width:none!important;overflow:visible!important;white-space:nowrap}
+.bc-badge .bc-tag{margin:0;line-height:15px}
+.bc-badge .bc-cl{font-size:10.5px;font-weight:700;line-height:15px;padding:0 5px;border:1px dashed var(--bc-chg);border-radius:3px;background:#fff}
+.bc-r2 .bc-n{flex:0 1 auto!important;min-width:0;max-width:none!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;word-break:normal!important}
+.bc-ms{flex:none;font-size:10.5px;color:#8c8c94}
+.bc-chip.bc-sel .bc-ms{color:#fff}
+.bc-chip.bc-sel .bc-badge .bc-cl{background:transparent;border-color:#fff}
+/* 좁은 칸: 배지 → 같은 색 점 */
+.bc-dots .bc-badge>*{font-size:0!important;width:8px;height:8px;padding:0!important;border-radius:50%;line-height:0}
+.bc-dots .bc-badge .bc-cl{background:var(--bc-chg)}
+.bc-dots .bc-badge .bc-mb{background:#a3a3ab;border-color:#a3a3ab}
+/* 일 보기: 넓으니 한 줄 */
+.bc-dgrid .bc-chip{flex-direction:row!important;align-items:center!important;justify-content:flex-start;height:28px!important;min-height:28px!important;gap:8px!important}
+.bc-dgrid .bc-r1,.bc-dgrid .bc-r2{display:contents}
+.bc-dgrid .bc-badge{order:5;margin-left:8px}
+.bc-dgrid .bc-r2 .bc-n{flex:none!important}
+/* 점 모드(좁은 칸): 칩 안 여백을 줄여 시각 + 점이 한 줄에 들어가게 */
+.bc-dots .bc-chip:not(.bc-dchip){padding-left:4px!important;padding-right:4px!important}
+.bc-dots .bc-r1,.bc-dots .bc-r2{gap:3px}
+.bc-dots .bc-r1 .bc-t{font-size:11.5px;letter-spacing:-.2px}
+.bc-dots .bc-badge{margin-left:auto}
+/* 점 모드: 점은 칩 오른쪽 위 모서리에 고정(시각 글자와 겹치지 않게) */
+.bc-dots .bc-chip:not(.bc-dchip) .bc-badge{position:absolute;right:3px;top:4px;margin:0}
+.bc-dots .bc-badge>*{width:6px!important;height:6px!important}
+.bc-dots .bc-chip:not(.bc-dchip) .bc-badge{right:2px;top:2px}
+.bc-dots .bc-badge>*{width:5px!important;height:5px!important}
+.bc-dots .bc-r1 .bc-t{font-size:11px;letter-spacing:-.3px}
+.bc-dots .bc-chip:not(.bc-dchip){padding-left:3px!important;border-left-width:2px!important}
+.bc-dots.bc-cal .bc-wgrid:not(.bc-dgrid){grid-template-columns:46px repeat(7,minmax(0,1fr))}
+.bc-dots .bc-wc{padding-left:3px;padding-right:3px}
+.bc-nav{flex-wrap:wrap;row-gap:8px;min-width:0;max-width:100%}
 </style></head>
 <body><div id="app"></div>
 <template id="T_b_res">
@@ -2970,8 +3007,11 @@ function chipEl(c, onOpen) {
   var o = CALOPT, man = c.b.owner === '매장', need = !c.chg && o.need ? o.need(c.b) : '';
   e.className = 'bc-chip bc-g-' + (GRP[c.b.status] || 'up') + (c.chg ? ' bc-chg' : '') + (need ? ' bc-need' : '') + (o.sel != null && o.sel === c.b.no ? ' bc-sel' : '');
   e.setAttribute('style', scStyle(c.b.status));
-  e.innerHTML = '<span class="bc-t">' + c.ts.slice(11, 16) + '</span>' + (c.chg ? '<span class="bc-cl">변경 신청</span>' : '') + '<span class="bc-n">' + esc(c.b.name) + '</span>'
-    + (o.st && o.st.cv === 'day' && !c.chg ? '<span class="bc-x"><span>' + esc(c.b.nation) + '</span><span>' + esc(langLabel(c.b.lang)) + '</span><span>' + esc(c.b.status) + '</span>' + '' + '</span>' : '') + (need ? '<span class="bc-tag">' + NEEDTAG[need] + '</span>' : '') + (man ? '<span class="bc-mb">수기</span>' : '');
+  /* 고정 2줄: 1줄 = 시각 + 오른쪽 배지 자리(처리 필요 > 변경 신청 > 수기), 2줄 = 고객명(+ 배지 자리를 못 쓴 수기) */
+  var badge = need ? '<span class="bc-tag">' + NEEDTAG[need] + '</span>' : c.chg ? '<span class="bc-cl">변경 신청</span>' : man ? '<span class="bc-mb">수기</span>' : '';
+  var man2 = man && (need || c.chg) ? '<span class="bc-ms">수기</span>' : '';
+  var x = o.st && o.st.cv === 'day' && !c.chg ? '<span class="bc-x"><span>' + esc(c.b.nation) + '</span><span>' + esc(langLabel(c.b.lang)) + '</span><span>' + esc(c.b.status) + '</span></span>' : '';
+  e.innerHTML = '<span class="bc-r1"><span class="bc-t">' + c.ts.slice(11, 16) + '</span>' + (badge ? '<span class="bc-badge">' + badge + '</span>' : '') + '</span><span class="bc-r2"><span class="bc-n">' + esc(c.b.name) + '</span>' + man2 + x + '</span>';
   e.setAttribute('aria-label', c.ts.slice(11, 16) + ' ' + c.b.name);
   e.setAttribute('data-test', (c.chg ? 'chip-chg-' : 'chip-') + c.b.no);
   e.onclick = function (ev) { ev.stopPropagation(); onOpen(c.b.no); };
@@ -3022,7 +3062,7 @@ function renderCal(opts) {
   var off = opts.st.off || {}; opts = Object.assign({}, opts, { list: opts.list.filter(function (b) { return !off[rowKey(b.status)]; }) }); CALOPT = opts;
   var root = document.createElement('div'); root.className = 'bc-cal'; root.setAttribute('data-test', 'cal-' + opts.st.cv);
   if (opts.st.cv === 'month') monthView(root, opts); else weekView(root, opts, opts.st.cv === 'day');
-  wrap.appendChild(root); return wrap;
+  wrap.appendChild(root); setTimeout(function () { fitBadges(root); }, 0); return wrap;
 }
 function monthView(root, o) {
   var a = o.st.anchor, first = a.slice(0, 8) + '01', ym = a.slice(0, 7), s = weekStart(first);
@@ -3132,6 +3172,14 @@ function rgbOf(v) { var sm = /color\(srgb ([\d.]+) ([\d.]+) ([\d.]+)/.exec(v); i
 function lum(c) { var f = function (v) { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]); }
 function contrast(a, b) { var x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); }
 function mixDark(v) { var c = rgbOf(v); return 'rgb(' + c.map(function (n) { return Math.round(n * 0.82); }).join(', ') + ')'; }
+
+/* 칸이 좁아 시각과 배지가 겹치면 모든 칩의 배지를 한꺼번에 같은 색 점으로 */
+function fitBadges(root) {
+  if (!root.isConnected) return; root.classList.remove('bc-dots');
+  var tight = Array.prototype.some.call(root.querySelectorAll('.bc-chip:not(.bc-dchip) .bc-r1'), function (r) { return r.scrollWidth > r.clientWidth + 0.5; });
+  root.classList.toggle('bc-dots', tight);
+}
+window.addEventListener('resize', function () { var r = document.querySelector('.bc-cal'); if (r) fitBadges(r); });
 
 /* ===== BO 예약 > 예약 관리: 실화면 스냅샷 그대로 + [목록 | 캘린더] (스토어 하나 고른 뒤에만) ===== */
 var ACC = '#1677ff';
