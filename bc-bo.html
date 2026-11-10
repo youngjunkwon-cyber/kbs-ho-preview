@@ -2834,6 +2834,9 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 .bc-dots.bc-cal .bc-wgrid:not(.bc-dgrid){grid-template-columns:46px repeat(7,minmax(0,1fr))}
 .bc-dots .bc-wc{padding-left:3px;padding-right:3px}
 .bc-nav{flex-wrap:wrap;row-gap:8px;min-width:0;max-width:100%}
+.bc-cal .bc-chip.bc-chg,.bc-pop .bc-chip.bc-chg{border:1px solid var(--bc-chg)!important;border-left:3px solid var(--bc-chg)!important}
+.bc-dots .bc-chip:not(.bc-dchip) .bc-r2 .bc-arr{font-size:10px;letter-spacing:-.4px}
+.bc-dots .bc-chip.bc-chg:not(.bc-dchip){border-left-width:2px!important}
 </style></head>
 <body><div id="app"></div>
 <template id="T_b_res">
@@ -2990,7 +2993,7 @@ function slotCount(all, d, m, set) { var iv = set.intervalMinute; return all.fil
 /* 화면에 놓을 칩: 예약은 방문 시각에, 변경 신청 대기는 신청한 새 시각에 점선 칩 하나 더 */
 function chipsOf(list) {
   var out = [];
-  list.forEach(function (b) { out.push({ b: b, ts: b.visit, chg: false }); /* 변경 신청한 새 시간 자리에는 칩을 따로 그리지 않음 */ });
+  list.forEach(function (b) { out.push({ b: b, ts: b.visit, chg: false }); if (b.status === '변경요청' && b.chg) out.push({ b: b, ts: b.chg, chg: true }); /* 요청한 새 시간 칩 */ });
   return out.sort(function (a, c) { return a.ts < c.ts ? -1 : a.ts > c.ts ? 1 : (a.chg ? 1 : 0) - (c.chg ? 1 : 0); });
 }
 /* 칩 묶음: 다가오는 예약 / 끝난 예약 / 취소 · 노쇼 (왼쪽 막대 색) */
@@ -3005,13 +3008,16 @@ var NEEDTAG = { '신규': '신규', '방문결과': '방문결과', '변경': '�
 function chipEl(c, onOpen) {
   var e = document.createElement('button'); e.type = 'button';
   var o = CALOPT, man = c.b.owner === '매장', need = !c.chg && o.need ? o.need(c.b) : '';
-  e.className = 'bc-chip bc-g-' + (GRP[c.b.status] || 'up') + (c.chg ? ' bc-chg' : '') + (need ? ' bc-need' : '') + (o.sel != null && o.sel === c.b.no ? ' bc-sel' : '');
+  e.className = 'bc-chip bc-g-' + (GRP[c.b.status] || 'up') + (c.chg ? ' bc-chg' : '') + (need && !(c.b.status === '변경요청' && c.b.chg) ? ' bc-need' : '') + (o.sel != null && o.sel === c.b.no ? ' bc-sel' : '');
   e.setAttribute('style', scStyle(c.b.status));
   /* 고정 2줄: 1줄 = 시각 + 오른쪽 배지 자리(처리 필요 > 변경 신청 > 수기), 2줄 = 고객명(+ 배지 자리를 못 쓴 수기) */
-  var badge = need ? '<span class="bc-tag">' + NEEDTAG[need] + '</span>' : c.chg ? '<span class="bc-cl">변경 신청</span>' : man ? '<span class="bc-mb">수기</span>' : '';
-  var man2 = man && (need || c.chg) ? '<span class="bc-ms">수기</span>' : '';
+  var md = function (ts) { return (+ts.slice(5, 7)) + '/' + (+ts.slice(8, 10)) + ' ' + ts.slice(11, 16); };
+  var cr = c.b.status === '변경요청' && !!c.b.chg; /* 변경 요청 쌍: 원래 칩 = '변경 요청' 배지 + → 요청 시각, 요청 칩 = '요청 시간' 배지 + ← 원래 시각 */
+  var badge = c.chg ? '<span class="bc-cr">요청 시간</span>' : cr ? '<span class="bc-cr">변경 요청</span>' : need ? '<span class="bc-tag">' + NEEDTAG[need] + '</span>' : man ? '<span class="bc-mb">수기</span>' : '';
+  var man2 = man && (need || cr) ? '<span class="bc-ms">수기</span>' : '';
+  var arr = c.chg ? '<span class="bc-arr">← ' + md(c.b.visit) + '</span>' : cr ? '<span class="bc-arr">→ ' + md(c.b.chg) + '</span>' : '';
   var x = o.st && o.st.cv === 'day' && !c.chg ? '<span class="bc-x"><span>' + esc(c.b.nation) + '</span><span>' + esc(langLabel(c.b.lang)) + '</span><span>' + esc(c.b.status) + '</span></span>' : '';
-  e.innerHTML = '<span class="bc-r1"><span class="bc-t">' + c.ts.slice(11, 16) + '</span>' + (badge ? '<span class="bc-badge">' + badge + '</span>' : '') + '</span><span class="bc-r2"><span class="bc-n">' + esc(c.b.name) + '</span>' + man2 + x + '</span>';
+  e.innerHTML = '<span class="bc-r1"><span class="bc-t">' + c.ts.slice(11, 16) + '</span>' + (badge ? '<span class="bc-badge">' + badge + '</span>' : '') + '</span><span class="bc-r2"><span class="bc-n">' + esc(c.b.name) + '</span>' + arr + man2 + x + '</span>';
   e.setAttribute('aria-label', c.ts.slice(11, 16) + ' ' + c.b.name);
   e.setAttribute('data-test', (c.chg ? 'chip-chg-' : 'chip-') + c.b.no);
   e.onclick = function (ev) { ev.stopPropagation(); onOpen(c.b.no); };
@@ -3047,7 +3053,7 @@ function statusRow(o) {
   });
   /* 표시 묶음: 누르지 않는 설명 */
   var g2 = document.createElement('div'); g2.className = 'bc-grp bc-grp2'; g2.setAttribute('data-test', 'srow-legend');
-  g2.innerHTML = (o.need ? '<span class="bc-li"><i class="bc-tag bc-tag-sw">신규</i>처리 필요</span>' : '') + '<span class="bc-li"><i class="bc-mb">수기</i>수기 등록</span>';
+  g2.innerHTML = (o.need ? '<span class="bc-li"><i class="bc-tag bc-tag-sw">신규</i>처리 필요</span>' : '') + '<span class="bc-li"><i class="bc-sw bc-sw-req"></i>요청 시간</span><span class="bc-li"><i class="bc-mb">수기</i>수기 등록</span>';
   row.appendChild(g2);
   /* 줄이 바뀌어 표시 묶음이 아래로 내려가면 구분선 숨김 */
   var chk = function () { if (!g2.isConnected) { window.removeEventListener('resize', chk); return; } g2.classList.toggle('bc-wrapped', g2.offsetTop > g1.offsetTop + 2); };
@@ -3056,6 +3062,7 @@ function statusRow(o) {
 }
 function renderCal(opts) {
   statusColors(opts.pre);
+  var CRc = SCOLORS['변경요청']; if (CRc) { document.documentElement.style.setProperty('--bc-crbg', CRc.cb); document.documentElement.style.setProperty('--bc-crfg', CRc.fg); }
   var CH = SCOLORS._chg; if (CH) { document.documentElement.style.setProperty('--bc-chg', CH.bd && !/rgba(0, 0, 0, 0)/.test(CH.bd) ? CH.bd : CH.fg); document.documentElement.style.setProperty('--bc-chgbg', CH.bg); document.documentElement.style.setProperty('--bc-chgfg', CH.fg); }
   closePop();
   CALOPT = opts; var wrap = document.createElement('div'); wrap.className = 'bc-calwrap'; mark(wrap); wrap.appendChild(statusRow(opts));
@@ -3120,7 +3127,7 @@ function dayPop(cell, d, list, o) {
   closePop();
   var p = document.createElement('div'); p.className = 'bc-pop'; p.setAttribute('data-test', 'day-pop'); p.setAttribute('role', 'dialog'); mark(p);
   var hd = document.createElement('div'); hd.className = 'bc-pop-h';
-  hd.innerHTML = '<strong>' + (+d.slice(5, 7)) + '월 ' + (+d.slice(8, 10)) + '일 (' + WD[dow(d)] + ') · ' + list.length + '건</strong>';
+  hd.innerHTML = '<strong>' + (+d.slice(5, 7)) + '월 ' + (+d.slice(8, 10)) + '일 (' + WD[dow(d)] + ') · ' + list.filter(function (c) { return !c.chg; }).length + '건</strong>';
   var x = document.createElement('button'); x.type = 'button'; x.className = 'bc-pop-x'; x.setAttribute('aria-label', '닫기'); x.setAttribute('data-test', 'day-pop-close'); x.textContent = '✕'; x.onclick = closePop; hd.appendChild(x); p.appendChild(hd);
   var body = document.createElement('div'); body.className = 'bc-pop-b bc-mcell-like';
   list.forEach(function (c) { body.appendChild(chipEl(c, function (no) { closePop(); o.open(no); })); });
