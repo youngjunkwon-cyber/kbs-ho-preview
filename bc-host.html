@@ -2656,7 +2656,7 @@ function inView(st, d) { if (st.cv === 'day') return d === st.anchor; if (st.cv 
 /* 상태 칩 줄(필터 겸 범례): 건수는 지금 보이는 기간, 누르면 그 묶음 표시를 켜고 끔. 예약상태 필터를 고른 상태에서 누르면 필터를 풀고 칩 기준으로 */
 function statusRow(o) {
   var st = o.st, off = st.off || (st.off = {}), row = document.createElement('div'); row.className = 'bc-srow'; row.setAttribute('data-test', 'cal-srow');
-  var g1 = document.createElement('div'); g1.className = 'bc-grp'; g1.setAttribute('data-test', 'srow-status'); g1.innerHTML = '<span class="bc-glab">상태</span>'; row.appendChild(g1);
+  var g1 = document.createElement('div'); g1.className = 'bc-grp'; g1.setAttribute('data-test', 'srow-status'); g1.innerHTML = '<span class="bc-glab">' + (o.stLabel || '상태') + '</span>'; row.appendChild(g1);
   var vis = o.list.filter(function (b) { return inView(st, b.visit.slice(0, 10)); });
   ROWG.forEach(function (g) {
     var n = vis.filter(function (b) { return g[2].indexOf(b.status) >= 0; }).length, on = !off[g[0]] && (!st.st || g[2].indexOf(st.st) >= 0);
@@ -2667,7 +2667,7 @@ function statusRow(o) {
   });
   /* 표시 묶음: 누르지 않는 설명 */
   var g2 = document.createElement('div'); g2.className = 'bc-grp bc-grp2'; g2.setAttribute('data-test', 'srow-legend');
-  g2.innerHTML = '<span class="bc-glab">표시</span>' + (o.need ? '<span class="bc-li"><i class="bc-tag bc-tag-sw">확인 필요</i>처리 필요</span>' : '') + '<span class="bc-li"><i class="bc-sw bc-sw-chg"></i>변경 신청</span><span class="bc-li"><i class="bc-mb">수기</i>수기 등록 예약</span><span class="bc-li"><i class="bc-sw bc-sw-sel"></i>열린 예약</span>';
+  g2.innerHTML = (o.need ? '<span class="bc-li"><i class="bc-tag bc-tag-sw">확인 필요</i>처리 필요</span>' : '') + '<span class="bc-li"><i class="bc-sw bc-sw-chg"></i>변경 신청</span><span class="bc-li"><i class="bc-mb">수기</i>수기 등록</span>';
   row.appendChild(g2);
   /* 줄이 바뀌어 표시 묶음이 아래로 내려가면 구분선 숨김 */
   var chk = function () { if (!g2.isConnected) { window.removeEventListener('resize', chk); return; } g2.classList.toggle('bc-wrapped', g2.offsetTop > g1.offsetTop + 2); };
@@ -2891,7 +2891,7 @@ function calMode(card, rows) {
   var tw = $('.ant-table-wrapper', card); tw.style.display = 'none';
   var all = storeBooks(), shown = rows.filter(function (b) { return calRange(h, b); });
   textSet($('.ant-card-head-title'), '예약목록 (' + shown.length + ')');
-  tw.parentNode.appendChild(renderCal({ list: rows, all: all, set: PB.setOf(PB.DB.store.id), st: h, sel: h.open, pre: 'hd',
+  tw.parentNode.appendChild(renderCal({ list: rows, all: all, set: PB.setOf(PB.DB.store.id), st: h, sel: h.open, pre: 'hd', stLabel: '예약상태',
     /* 상태 표시 = 목록 예약상태 칸 그대로(글자만). 처리 필요 = 오른쪽 처리 필요 패널에 올라가는 건 */
     need: function (b) { return b.need || ''; },
     open: function (no) { h.open = no; PB.render(); } }));
