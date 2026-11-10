@@ -2499,6 +2499,17 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 
 .bc-dots .bc-chip.bc-chg:not(.bc-dchip){border-left-width:2px!important}
 .bc-short .bc-ad{display:none}
+/* ===== BO: 칩 3줄(시각+배지 / 스토어명 / 고객명), 스토어 다중 선택 태그 ===== */
+.bc-rs{display:block;height:18px;line-height:18px;font-size:11.5px;color:#6b6b73;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.bc-chip:has(.bc-rs){height:58px!important;min-height:58px!important}
+.bc-chip.bc-sel .bc-rs{color:rgba(255,255,255,.8)}
+.bc-dgrid .bc-chip .bc-rs{order:2;flex:none;max-width:180px}
+.bc-dgrid .bc-chip:has(.bc-rs){height:28px!important;min-height:28px!important}
+.bc-swrap{height:auto!important;min-height:32px;flex-wrap:wrap;gap:4px;cursor:pointer;max-width:520px}
+.bc-stag{display:inline-flex;align-items:center;gap:4px;margin:0!important;font-size:12px;line-height:20px;padding:0 6px;background:#f5f5f5;border:1px solid #e5e5e5;border-radius:4px;color:rgba(0,0,0,.88)}
+.bc-stag-x{cursor:pointer;color:rgba(0,0,0,.45);font-size:13px;line-height:1}
+.bc-stag-x:hover{color:rgba(0,0,0,.88)}
+.bc-swrap input[placeholder=""]{width:8px!important;min-width:8px}
 </style></head>
 <body><div id="app"></div>
 <template id="T_h_res">
@@ -2648,7 +2659,7 @@ function minOf(ts) { return +ts.slice(11, 13) * 60 + +ts.slice(14, 16); }
 function weekStart(d) { return PB.addDays(d, -dow(d)); }
 function sched(set, d) { var k = DOW[dow(d)]; return set.schedules.filter(function (s) { return s.dayOfWeek === k; })[0]; }
 /* 그 시간에 예약을 받는가: 요일 켜짐 + 받는 시간 안 + 그 시간 켜짐 */
-function accepting(set, d, m) { var s = sched(set, d); if (!s || !s.isActive || m < s.startMinute || m >= s.endMinute) return false; var t = s.times.filter(function (x) { return x.timeMinute === m; })[0]; return !t || t.isActive; }
+function accepting(set, d, m) { if (set.open) return true; /* 스토어 0개 · 여러 개: 예약 설정을 하나로 정할 수 없어 회색 · 마감 없음 */ var s = sched(set, d); if (!s || !s.isActive || m < s.startMinute || m >= s.endMinute) return false; var t = s.times.filter(function (x) { return x.timeMinute === m; })[0]; return !t || t.isActive; }
 var DIM = { '고객취소': 1, '매장취소': 1, '미방문': 1 };
 /* 칸이 찼는가: 그 시간 예약 중 취소 · 노쇼를 뺀 수(필터와 상관없이 스토어 전체 예약) */
 function slotCount(all, d, m, set) { var iv = set.intervalMinute; return all.filter(function (b) { var bm = minOf(b.visit); return b.visit.slice(0, 10) === d && bm >= m && bm < m + iv && !DIM[b.status]; }).length; }
@@ -2679,7 +2690,7 @@ function chipEl(c, onOpen) {
   var man2 = man && (need || cr) ? '<span class="bc-ms">수기</span>' : '';
   var arr = c.chg ? '<span class="bc-arr">← ' + md(c.b.visit) + '</span>' : cr ? '<span class="bc-arr">→ ' + md(c.b.chg) + '</span>' : '';
   var x = o.st && o.st.cv === 'day' && !c.chg ? '<span class="bc-x"><span>' + esc(c.b.nation) + '</span><span>' + esc(langLabel(c.b.lang)) + '</span><span>' + esc(c.b.status) + '</span></span>' : '';
-  e.innerHTML = '<span class="bc-r1"><span class="bc-t">' + c.ts.slice(11, 16) + '</span>' + (badge ? '<span class="bc-badge">' + badge + '</span>' : '') + '</span><span class="bc-r2"><span class="bc-n">' + esc(c.b.name) + '</span>' + arr + man2 + x + '</span>';
+  e.innerHTML = '<span class="bc-r1"><span class="bc-t">' + c.ts.slice(11, 16) + '</span>' + (badge ? '<span class="bc-badge">' + badge + '</span>' : '') + '</span>' + (o.showStore ? '<span class="bc-rs">' + esc(c.b.storeName || '') + '</span>' : '') + '<span class="bc-r2"><span class="bc-n">' + esc(c.b.name) + '</span>' + arr + man2 + x + '</span>';
   e.setAttribute('aria-label', c.ts.slice(11, 16) + ' ' + c.b.name);
   e.setAttribute('data-test', (c.chg ? 'chip-chg-' : 'chip-') + c.b.no);
   e.onclick = function (ev) { ev.stopPropagation(); onOpen(c.b.no); };
@@ -2743,7 +2754,7 @@ function monthView(root, o) {
   for (var d = s; ; d = PB.addDays(d, 1)) {
     if (d.slice(0, 7) > ym && dow(d) === 0) break;
     var sc = sched(o.set, d), cell = document.createElement('div');
-    cell.className = 'bc-mcell' + (d.slice(0, 7) !== ym ? ' bc-out' : '') + (!sc || !sc.isActive ? ' bc-off' : '') + (d === PB.TODAY ? ' bc-today' : '');
+    cell.className = 'bc-mcell' + (d.slice(0, 7) !== ym ? ' bc-out' : '') + (!o.set.open && (!sc || !sc.isActive) ? ' bc-off' : '') + (d === PB.TODAY ? ' bc-today' : '');
     cell.setAttribute('data-date', d);
     cell.innerHTML = '<div class="bc-dn"><span>' + (+d.slice(8, 10)) + '</span></div>';
     var mine = chips.filter(function (c) { return c.ts.slice(0, 10) === d; });

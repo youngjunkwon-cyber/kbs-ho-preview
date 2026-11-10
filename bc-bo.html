@@ -2838,6 +2838,17 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 
 .bc-dots .bc-chip.bc-chg:not(.bc-dchip){border-left-width:2px!important}
 .bc-short .bc-ad{display:none}
+/* ===== BO: 칩 3줄(시각+배지 / 스토어명 / 고객명), 스토어 다중 선택 태그 ===== */
+.bc-rs{display:block;height:18px;line-height:18px;font-size:11.5px;color:#6b6b73;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.bc-chip:has(.bc-rs){height:58px!important;min-height:58px!important}
+.bc-chip.bc-sel .bc-rs{color:rgba(255,255,255,.8)}
+.bc-dgrid .bc-chip .bc-rs{order:2;flex:none;max-width:180px}
+.bc-dgrid .bc-chip:has(.bc-rs){height:28px!important;min-height:28px!important}
+.bc-swrap{height:auto!important;min-height:32px;flex-wrap:wrap;gap:4px;cursor:pointer;max-width:520px}
+.bc-stag{display:inline-flex;align-items:center;gap:4px;margin:0!important;font-size:12px;line-height:20px;padding:0 6px;background:#f5f5f5;border:1px solid #e5e5e5;border-radius:4px;color:rgba(0,0,0,.88)}
+.bc-stag-x{cursor:pointer;color:rgba(0,0,0,.45);font-size:13px;line-height:1}
+.bc-stag-x:hover{color:rgba(0,0,0,.88)}
+.bc-swrap input[placeholder=""]{width:8px!important;min-width:8px}
 </style></head>
 <body><div id="app"></div>
 <template id="T_b_res">
@@ -2987,7 +2998,7 @@ function minOf(ts) { return +ts.slice(11, 13) * 60 + +ts.slice(14, 16); }
 function weekStart(d) { return PB.addDays(d, -dow(d)); }
 function sched(set, d) { var k = DOW[dow(d)]; return set.schedules.filter(function (s) { return s.dayOfWeek === k; })[0]; }
 /* 그 시간에 예약을 받는가: 요일 켜짐 + 받는 시간 안 + 그 시간 켜짐 */
-function accepting(set, d, m) { var s = sched(set, d); if (!s || !s.isActive || m < s.startMinute || m >= s.endMinute) return false; var t = s.times.filter(function (x) { return x.timeMinute === m; })[0]; return !t || t.isActive; }
+function accepting(set, d, m) { if (set.open) return true; /* 스토어 0개 · 여러 개: 예약 설정을 하나로 정할 수 없어 회색 · 마감 없음 */ var s = sched(set, d); if (!s || !s.isActive || m < s.startMinute || m >= s.endMinute) return false; var t = s.times.filter(function (x) { return x.timeMinute === m; })[0]; return !t || t.isActive; }
 var DIM = { '고객취소': 1, '매장취소': 1, '미방문': 1 };
 /* 칸이 찼는가: 그 시간 예약 중 취소 · 노쇼를 뺀 수(필터와 상관없이 스토어 전체 예약) */
 function slotCount(all, d, m, set) { var iv = set.intervalMinute; return all.filter(function (b) { var bm = minOf(b.visit); return b.visit.slice(0, 10) === d && bm >= m && bm < m + iv && !DIM[b.status]; }).length; }
@@ -3018,7 +3029,7 @@ function chipEl(c, onOpen) {
   var man2 = man && (need || cr) ? '<span class="bc-ms">수기</span>' : '';
   var arr = c.chg ? '<span class="bc-arr">← ' + md(c.b.visit) + '</span>' : cr ? '<span class="bc-arr">→ ' + md(c.b.chg) + '</span>' : '';
   var x = o.st && o.st.cv === 'day' && !c.chg ? '<span class="bc-x"><span>' + esc(c.b.nation) + '</span><span>' + esc(langLabel(c.b.lang)) + '</span><span>' + esc(c.b.status) + '</span></span>' : '';
-  e.innerHTML = '<span class="bc-r1"><span class="bc-t">' + c.ts.slice(11, 16) + '</span>' + (badge ? '<span class="bc-badge">' + badge + '</span>' : '') + '</span><span class="bc-r2"><span class="bc-n">' + esc(c.b.name) + '</span>' + arr + man2 + x + '</span>';
+  e.innerHTML = '<span class="bc-r1"><span class="bc-t">' + c.ts.slice(11, 16) + '</span>' + (badge ? '<span class="bc-badge">' + badge + '</span>' : '') + '</span>' + (o.showStore ? '<span class="bc-rs">' + esc(c.b.storeName || '') + '</span>' : '') + '<span class="bc-r2"><span class="bc-n">' + esc(c.b.name) + '</span>' + arr + man2 + x + '</span>';
   e.setAttribute('aria-label', c.ts.slice(11, 16) + ' ' + c.b.name);
   e.setAttribute('data-test', (c.chg ? 'chip-chg-' : 'chip-') + c.b.no);
   e.onclick = function (ev) { ev.stopPropagation(); onOpen(c.b.no); };
@@ -3082,7 +3093,7 @@ function monthView(root, o) {
   for (var d = s; ; d = PB.addDays(d, 1)) {
     if (d.slice(0, 7) > ym && dow(d) === 0) break;
     var sc = sched(o.set, d), cell = document.createElement('div');
-    cell.className = 'bc-mcell' + (d.slice(0, 7) !== ym ? ' bc-out' : '') + (!sc || !sc.isActive ? ' bc-off' : '') + (d === PB.TODAY ? ' bc-today' : '');
+    cell.className = 'bc-mcell' + (d.slice(0, 7) !== ym ? ' bc-out' : '') + (!o.set.open && (!sc || !sc.isActive) ? ' bc-off' : '') + (d === PB.TODAY ? ' bc-today' : '');
     cell.setAttribute('data-date', d);
     cell.innerHTML = '<div class="bc-dn"><span>' + (+d.slice(8, 10)) + '</span></div>';
     var mine = chips.filter(function (c) { return c.ts.slice(0, 10) === d; });
@@ -3223,7 +3234,7 @@ var DOT = { '예약': 'rgb(46, 107, 229)', '방문완료': 'rgb(33, 153, 89)', '
 function filtered() {
   var b = B(), q = b.q.trim().toLowerCase();
   return PB.DB.books.filter(function (x) {
-    if (b.store && x.store !== b.store) return false;
+    if (b.stores.length && b.stores.indexOf(x.store) < 0) return false;
     if (b.st && x.status !== b.st) return false;
     if (b.lang && x.lang !== b.lang) return false;
     if (b.owner && x.owner !== b.owner) return false;
@@ -3232,17 +3243,19 @@ function filtered() {
   }).sort(function (a, c) { return a.visit < c.visit ? 1 : -1; });
 }
 function pRes() {
-  var b = B(), all = PB.DB.books;
+  var b = B(), all = PB.DB.books.filter(function (x) { return !b.stores.length || b.stores.indexOf(x.store) >= 0; }); /* 요약 카드 = 고른 스토어 기준(안 고르면 전체) */
   /* 상단 요약 카드: 실화면 그대로(시안 데이터로 다시 셈) */
   var st = $$('.ant-statistic'), vals = [all.length, all.filter(function (x) { return x.status === '예약'; }).length, all.filter(function (x) { return x.status === '방문완료'; }).length, all.filter(function (x) { return x.status === '미방문'; }).length];
   vals.push(vals[2] + vals[3] ? Math.round(vals[3] / (vals[2] + vals[3]) * 100) : 0);
   st.forEach(function (s, i) { var c = $('.ant-statistic-content-value-int', s); if (c && vals[i] != null) c.textContent = String(vals[i]); });
   /* 필터 */
   var sIn = $('form input[placeholder="스토어 선택"]'), sWrap = sIn.closest('.ant-input-affix-wrapper') || sIn, clr = $('.ant-input-clear-icon', sWrap);
-  var cur = b.store ? PB.storeById(b.store) : null; sIn.value = cur ? cur.name : ''; sIn.readOnly = true; sIn.setAttribute('data-test', 'store-input');
-  if (clr) { clr.classList.toggle('ant-input-clear-icon-hidden', !cur); clr.onclick = function (e) { e.stopPropagation(); b.store = null; b.open = null; /* 저장된 보기(목록/캘린더)는 그대로, 스토어가 없으면 목록으로만 보임 */ PB.render(); }; }
+  /* 스토어 다중 선택: 고른 스토어는 태그(개별 x), 입력칸 x = 전체 지우기. 아무것도 안 고르면 전체 스토어 */
+  var picked = b.stores.map(function (id) { return PB.storeById(id); }); sIn.value = ''; sIn.readOnly = true; sIn.placeholder = picked.length ? '' : '스토어 선택'; sIn.setAttribute('data-test', 'store-input'); mark(sWrap); sWrap.classList.toggle('bc-swrap', picked.length > 0);
+  picked.forEach(function (s) { var t = document.createElement('span'); t.className = 'ant-tag bc-stag'; t.setAttribute('data-test', 'store-tag-' + s.id); t.innerHTML = '<span>' + esc(s.name) + '</span>'; var x = document.createElement('span'); x.className = 'bc-stag-x'; x.textContent = '×'; x.setAttribute('aria-label', s.name + ' 빼기'); x.onclick = function (e) { e.stopPropagation(); b.stores = b.stores.filter(function (i) { return i !== s.id; }); b.open = null; PB.render(); }; t.appendChild(x); sIn.before(t); });
+  if (clr) { clr.classList.toggle('ant-input-clear-icon-hidden', !picked.length); clr.setAttribute('data-test', 'store-clear'); clr.onclick = function (e) { e.stopPropagation(); b.stores = []; b.open = null; PB.render(); }; }
   sWrap.style.cursor = 'pointer';
-  sWrap.onclick = function () { dropdown(sWrap, PB.DB.stores.map(function (s) { return [s.id, s.name]; }), b.store, function (v) { b.store = +v; PB.render(); }, ACC); };
+  sWrap.onclick = function () { dropdown(sWrap, PB.DB.stores.map(function (s) { return [s.id, (b.stores.indexOf(s.id) >= 0 ? '✓ ' : '') + s.name]; }), null, function (v) { v = +v; b.stores = b.stores.indexOf(v) >= 0 ? b.stores.filter(function (i) { return i !== v; }) : b.stores.concat([v]); b.open = null; PB.render(); }, ACC); };
   var catSel = selByPh('카테고리 선택'); if (catSel) catSel.onclick = function () { toast('시안에서는 동작하지 않습니다'); };
   var stSel = selByPh('상태 선택'), lgSel = selByPh('언어 선택'), ownSel = selByPh('등록 주체');
   setSelect(stSel, b.st, '상태 선택'); setSelect(lgSel, b.lang ? langLabel(b.lang) : '', '언어 선택'); setSelect(ownSel, b.owner, '등록 주체');
@@ -3259,12 +3272,12 @@ function pRes() {
   var kids = Array.prototype.slice.call(row.children); p1 = p1.cloneNode(true);
   var mk = function (txt, on, test, fn) { var x = p1.cloneNode(true); x.className = on ? onCls : offCls; x.querySelector('span').textContent = txt; x.setAttribute('data-test', test); x.onclick = fn; return x; };
   var tg = document.createElement('div'); tg.className = 'bc-bseg'; tg.setAttribute('data-test', 'mode'); mark(tg);
-  if (!b.store) { var hint = document.createElement('span'); hint.className = 'bc-hint'; hint.textContent = '스토어를 선택하면 캘린더로 볼 수 있습니다.'; hint.setAttribute('data-test', 'cal-hint'); tg.appendChild(hint); }
-  tg.appendChild(mk('목록', b.mode === 'list' || !b.store, 'mode-list', function () { b.mode = 'list'; b.open = null; PB.render(); }));
-  var cb = mk('캘린더', b.mode === 'cal' && !!b.store, 'mode-cal', function () { if (!b.store) return; b.mode = 'cal'; b.open = null; PB.render(); }); if (!b.store) cb.disabled = true; tg.appendChild(cb);
+
+  tg.appendChild(mk('목록', b.mode === 'list', 'mode-list', function () { b.mode = 'list'; b.open = null; PB.render(); }));
+  var cb = mk('캘린더', b.mode === 'cal', 'mode-cal', function () { b.mode = 'cal'; b.open = null; PB.render(); }); tg.appendChild(cb);
   row.appendChild(tg);
   var rows = filtered(), tw = $('.ant-table-wrapper');
-  if (b.mode === 'cal' && b.store) {
+  if (b.mode === 'cal') {
     kids.forEach(function (k) { if (!k.contains(sb)) k.style.display = 'none'; });
     var nav = document.createElement('div'); nav.className = 'bc-nav'; mark(nav);
     var nb = function (txt, test, fn) { var x = mk(txt, false, test, fn); if (txt.length === 1) x.classList.add('bc-arrow'); return x; };
@@ -3280,7 +3293,7 @@ function pRes() {
     row.insertBefore(nav, row.firstChild); fixLabel(lb);
     moveSearch(sb, inp);
     tw.style.display = 'none';
-    tw.parentNode.insertBefore(renderCal({ list: rows, all: PB.DB.books.filter(function (x) { return x.store === b.store; }), set: PB.setOf(b.store), st: b, sel: b.open, pre: 'bd', stLabel: '상태',
+    tw.parentNode.insertBefore(renderCal({ list: rows, all: PB.DB.books.filter(function (x) { return !b.stores.length || b.stores.indexOf(x.store) >= 0; }), set: b.stores.length === 1 ? PB.setOf(b.stores[0]) : PB.openSet(), showStore: true, st: b, sel: b.open, pre: 'bd', stLabel: '상태',
       /* 상태 표시 = 목록 상태 칸 그대로(점 + 색 글자). BO에는 처리 필요 개념이 없어 강조 없음 */
      
       open: function (no) { b.open = no; PB.render(); } }), tw.nextSibling);

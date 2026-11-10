@@ -36,7 +36,7 @@ var LANG_RNO={en:'EN',ja:'JP',zh:'CN'};
 function addDays(d,n){var t=new Date(d+'T00:00:00Z');t.setUTCDate(t.getUTCDate()+n);return t.toISOString().slice(0,10);}
 function wdKo(d){return ['일','월','화','수','목','금','토'][new Date(d+'T00:00:00Z').getUTCDay()];}
 /* ===== 스토어와 예약 설정(STG GET /bookings/settings/{storeId} 형태) ===== */
-var STORES=[{id:9,name:'아비쥬 명동점',cat:'피부과',code:'009'},{id:173,name:'셀파바이청담',cat:'헤어',code:'173'}];
+var STORES=[{id:9,name:'아비쥬 명동점',cat:'피부과',code:'009'},{id:209,name:'셀린의원 명동',cat:'피부과',code:'209'},{id:202,name:'청담본샵 seoul',cat:'헤어/메이크업',code:'202'}]; /* STG 스토어명 · 카테고리(스토어 정보 관리 실화면). 209 · 202 예약 설정은 시안용 예시 */
 /* 요일별 받는 시간(분). times = 간격마다 켜고 끈 값 */
 function mkSet(interval,max,days,offTimes){
  return {intervalMinute:interval,maxBookingCount:max,bookingDeadline:60,schedules:['SUN','MON','TUE','WED','THU','FRI','SAT'].map(function(k){var d=days[k];var st=d?d[0]:600,en=d?d[1]:1140,times=[];for(var m=st;m<en;m+=interval)times.push({timeMinute:m,isActive:offTimes.indexOf(m)<0});return {dayOfWeek:k,startMinute:st,endMinute:en,isActive:!!d,times:times};})};
@@ -44,7 +44,8 @@ function mkSet(interval,max,days,offTimes){
 /* 아비쥬 명동점: 30분 간격 · 한 시간에 2건 · 수요일 휴무 · 13:00 꺼 둠 · 일요일 11~17시 · 토요일 10~18시 · 평일 10~19시 */
 var SETTINGS={
  9:mkSet(30,2,{SUN:[660,1020],MON:[600,1140],TUE:[600,1140],WED:null,THU:[600,1140],FRI:[600,1140],SAT:[600,1080]},[780]),
- 173:mkSet(60,1,{SUN:null,MON:[600,1200],TUE:[600,1200],WED:[600,1200],THU:[600,1200],FRI:[600,1200],SAT:[600,1200]},[])
+ 209:mkSet(30,1,{SUN:null,MON:[600,1140],TUE:[600,1140],WED:[600,1140],THU:[600,1140],FRI:[600,1140],SAT:[600,1080]},[]),
+ 202:mkSet(60,2,{SUN:[660,1200],MON:[660,1200],TUE:[660,1200],WED:[660,1200],THU:[660,1200],FRI:[660,1200],SAT:[660,1200]},[])
 };
 /* ===== 예약 (예시 영문 여권명, 실제 개인정보 아님) ===== */
 function seedBookings(){
@@ -82,9 +83,13 @@ function seedBookings(){
  [9,'2026-12-03 14:00','2026-11-09 09:15','Ava Nguyen','호주','en','WhatsApp','예약','고객','',null],
  [9,'2026-11-14 16:30','2026-11-09 21:05','Nora Hill','미국','en','WhatsApp','예약','고객','',null],
  [9,'2026-11-14 17:00','2026-11-09 22:40','Lena Fischer','독일','en','WhatsApp','예약','고객','',null],
- [173,'2026-11-12 13:00','2026-11-07 10:12','Noah Turner','미국','en','WhatsApp','예약','고객','',null],
- [173,'2026-11-18 11:00','2026-11-08 17:44','Ella Reyes','필리핀','en','WhatsApp','예약','고객','',null],
- [173,'2026-11-20 15:00','2026-11-09 12:30','Mai Tran','베트남','en','WhatsApp','방문완료','고객','',null]
+ [209,'2026-11-05 16:00','2026-11-01 11:20','Jade Wilson','호주','en','WhatsApp','방문완료','고객','',null],
+ [209,'2026-11-12 11:00','2026-11-07 10:12','Sofia Bianchi','이탈리아','en','WhatsApp','예약','고객','',null],
+ [209,'2026-11-12 14:30','2026-11-08 15:02','Lin Mei','대만','zh','LINE','예약','고객','',null],
+ [209,'2026-11-13 10:00','2026-11-09 09:41','Anna Kowalska','폴란드','en','WhatsApp','예약','매장','',null],
+ [202,'2026-11-12 13:00','2026-11-07 10:12','Noah Turner','미국','en','WhatsApp','예약','고객','',null],
+ [202,'2026-11-14 18:00','2026-11-08 17:44','Ella Reyes','필리핀','en','WhatsApp','예약','고객','',null],
+ [202,'2026-11-18 20:00','2026-11-09 12:30','Mai Tran','베트남','en','WhatsApp','고객취소','고객','',null]
  ];
  var PH={'중국':'+86 138000001','홍콩':'+852 600001','일본':'+81 9000001','러시아':'+7 9000001','카자흐스탄':'+7 7000001','말레이시아':'+60 120001','싱가포르':'+65 80001'};
  var out=A.map(function(a,i){
@@ -106,7 +111,7 @@ function loadView(k){try{var v=JSON.parse(localStorage.getItem(VKEY[k])||'null')
 function saveView(){try{localStorage.setItem(VKEY.HOST,JSON.stringify({mode:S.host.mode,cv:S.host.cv}));localStorage.setItem(VKEY.BO,JSON.stringify({mode:S.bo.mode,cv:S.bo.cv}));}catch(e){}}
 function freshState(){var vh=loadView('HOST'),vb=loadView('BO');return {surf:'HOST',mark:false,
  host:{mode:vh.mode,cv:vh.cv,anchor:TODAY,st:'',lang:'',owner:'',q:'',qd:'',ptab:'전체',open:null},
- bo:{mode:vb.mode,cv:vb.cv,anchor:TODAY,store:null,st:'',lang:'',owner:'',q:'',qd:'',open:null}};}
+ bo:{mode:vb.mode,cv:vb.cv,anchor:TODAY,stores:[],st:'',lang:'',owner:'',q:'',qd:'',open:null}};}
 /* HOST 처리 필요: 이 스토어(아비쥬 명동점) 예약만 */
 function needList(t){return DB.books.filter(function(b){return b.store===DB.store.id&&b.need&&(t==='전체'||b.need===t);}).sort(function(a,b){return a.visit<b.visit?1:-1;});}
 /* ===== 렌더 ===== */
@@ -126,7 +131,7 @@ function render(){
 }
 window.PB={
  get DB(){return DB;},get S(){return S;},TODAY:TODAY,NOWTS:NOWTS,LANGS:LANGS,
- addDays:addDays,wdKo:wdKo,needList:needList,storeById:storeById,setOf:function(id){return SETTINGS[id];},render:render,
+ addDays:addDays,wdKo:wdKo,needList:needList,storeById:storeById,setOf:function(id){return SETTINGS[id];},openSet:function(){var o=mkSet(30,1e9,{SUN:[540,1260],MON:[540,1260],TUE:[540,1260],WED:[540,1260],THU:[540,1260],FRI:[540,1260],SAT:[540,1260]},[]);o.open=true;return o;},render:render,
  ready:function(surf){if(S&&S.surf===surf)render();}
 };
 window.render=render;
