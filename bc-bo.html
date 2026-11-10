@@ -2712,18 +2712,6 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 .bc-chip.bc-need{background:color-mix(in srgb,var(--bc-acc) 9%,#fff)}
 .bc-tag{flex:none;margin-left:auto;font-size:10.5px;font-weight:600;color:var(--bc-acc);line-height:16px;white-space:nowrap}
 .bc-man{position:absolute;right:3px;bottom:3px;width:5px;height:5px;border-radius:50%;background:#8c8c94}
-.bc-sm .bc-man{position:static;display:inline-block;margin-right:5px}
-/* 상태 칩 줄 */
-.bc-srow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:2px 0 10px}
-.bc-sc{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border:1px solid #e3e3e8;border-radius:14px;background:#fff;font:inherit;font-size:12.5px;color:#8c8c94;cursor:pointer}
-.bc-sc i{width:3px;height:12px;border-radius:1px;background:var(--bc-done)}
-.bc-sc.bc-g-up i{background:#3a3a42}
-.bc-sc.bc-g-cx i{opacity:.45}
-.bc-sc b{font-weight:700;font-variant-numeric:tabular-nums}
-.bc-sc.on{color:#212121;border-color:#bdbdc4}
-.bc-sc:not(.on){background:#f7f7f9}
-.bc-sc:not(.on) i{opacity:.35}
-.bc-sm{display:inline-flex;align-items:center;font-size:12.5px;color:#6b6b73;margin-left:6px}
 /* 주 보기 칩: 두 줄까지 */
 .bc-wc .bc-chip{height:auto;min-height:24px;flex-wrap:wrap;row-gap:0;padding-top:2px;padding-bottom:2px;line-height:18px}
 .bc-wc .bc-chip .bc-n{white-space:normal;overflow:visible;word-break:break-word}
@@ -2746,7 +2734,6 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 .bc-label{display:inline-block;text-align:center;flex:none}
 .bc-sbtn{margin-left:8px;flex:none}
 /* 상세 창이 열린 예약 칩: 진한 외곽선(처리 필요 연분홍 바탕과 구분) */
-.bc-chip.bc-sel{outline:2px solid #212121;outline-offset:1px;z-index:1}
 /* 일 보기 */
 .bc-wgrid.bc-dgrid{grid-template-columns:56px minmax(0,1fr)}
 .bc-dgrid .bc-chip{flex-wrap:nowrap}
@@ -2755,6 +2742,33 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 .bc-x span{flex:none}
 .bc-dgrid .bc-chip{width:auto;max-width:100%;align-self:flex-start;min-width:280px}
 .bc-seg{grid-template-columns:none!important;grid-auto-flow:column}
+/* 상태 칩 줄: 왼쪽 상태(토글) | 오른쪽 표시(설명) */
+.bc-srow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:2px 0 10px}
+.bc-grp{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.bc-grp2{border-left:1px solid #e3e3e8;padding-left:14px;gap:6px 14px}
+.bc-glab{font-size:11.5px;color:#8c8c94;margin-right:2px}
+.bc-sc{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border:1px solid #d9d9de;border-radius:14px;background:#f0f0f2;font:inherit;font-size:12.5px;color:#212121;cursor:pointer}
+.bc-sc b{font-weight:700;font-variant-numeric:tabular-nums}
+.bc-sc:not(.on){background:#fff;border-color:#e8e8ec;color:#b5b5bb}
+.bc-sc:not(.on) .bc-sw{opacity:.35}
+.bc-li{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:#555;cursor:default}
+/* 견본 = 캘린더 칩 축소판 */
+.bc-sw{display:inline-block;flex:none;width:18px;height:12px;border:1px solid #d9d9de;border-left-width:3px;border-radius:2px;background:#fff;box-sizing:border-box}
+.bc-sw.bc-g-up{border-left-color:#3a3a42}
+.bc-sw.bc-g-done{border-left-color:#c4c4cc}
+.bc-sw.bc-g-cx{border-left-color:#c4c4cc;opacity:.5;background:linear-gradient(#fff 5px,#8c8c94 5px,#8c8c94 6px,#fff 6px)}
+.bc-sc:not(.on) .bc-sw.bc-g-cx{opacity:.2}
+.bc-sw-need{border-left-color:#3a3a42;background:color-mix(in srgb,var(--bc-acc) 9%,#fff)}
+.bc-sw-chg{border-style:dashed;border-color:var(--bc-chg,#eb8c1a);border-left-color:#3a3a42}
+.bc-sw-sel{background:#212121;border-color:#212121;border-left-color:#fff}
+.bc-li .bc-man{position:static;display:inline-block}
+/* 열린 예약 칩: 반전 채움 */
+.bc-chip.bc-sel{background:#212121;color:#fff;border-color:#212121;border-left-color:#fff;opacity:1}
+.bc-chip.bc-sel.bc-chg{border-color:#b5b5bb;border-left-color:#fff}
+.bc-chip.bc-sel .bc-tag,.bc-chip.bc-sel .bc-cl{color:#fff}
+.bc-chip.bc-sel .bc-x{color:rgba(255,255,255,.75)}
+.bc-chip.bc-sel .bc-man{background:#fff}
+.bc-chip.bc-sel:hover{border-color:#212121}
 </style></head>
 <body><div id="app"></div>
 <template id="T_b_res">
@@ -2950,15 +2964,19 @@ function inView(st, d) { if (st.cv === 'day') return d === st.anchor; if (st.cv 
 /* 상태 칩 줄(필터 겸 범례): 건수는 지금 보이는 기간, 누르면 그 묶음 표시를 켜고 끔. 예약상태 필터를 고른 상태에서 누르면 필터를 풀고 칩 기준으로 */
 function statusRow(o) {
   var st = o.st, off = st.off || (st.off = {}), row = document.createElement('div'); row.className = 'bc-srow'; row.setAttribute('data-test', 'cal-srow');
+  var g1 = document.createElement('div'); g1.className = 'bc-grp'; g1.setAttribute('data-test', 'srow-status'); g1.innerHTML = '<span class="bc-glab">상태</span>'; row.appendChild(g1);
   var vis = o.list.filter(function (b) { return inView(st, b.visit.slice(0, 10)); });
   ROWG.forEach(function (g) {
     var n = vis.filter(function (b) { return g[2].indexOf(b.status) >= 0; }).length, on = !off[g[0]] && (!st.st || g[2].indexOf(st.st) >= 0);
     var x = document.createElement('button'); x.type = 'button'; x.className = 'bc-sc bc-g-' + g[3] + (on ? ' on' : ''); x.setAttribute('aria-pressed', on ? 'true' : 'false'); x.setAttribute('data-test', 'srow-' + g[0]);
-    x.innerHTML = '<i></i><span>' + g[1] + '</span><b>' + n + '</b>';
+    x.innerHTML = '<i class="bc-sw bc-g-' + g[3] + '"></i><span>' + g[1] + '</span><b>' + n + '</b>';
     x.onclick = function () { if (st.st) { var keep = rowKey(st.st); st.st = ''; ROWG.forEach(function (h) { off[h[0]] = h[0] !== keep; }); } off[g[0]] = !off[g[0]]; PB.render(); };
-    row.appendChild(x);
+    g1.appendChild(x);
   });
-  var m = document.createElement('span'); m.className = 'bc-sm'; m.innerHTML = '<i class="bc-man"></i>수기 예약'; row.appendChild(m);
+  /* 표시 묶음: 누르지 않는 설명 */
+  var g2 = document.createElement('div'); g2.className = 'bc-grp bc-grp2'; g2.setAttribute('data-test', 'srow-legend');
+  g2.innerHTML = '<span class="bc-glab">표시</span>' + (o.need ? '<span class="bc-li"><i class="bc-sw bc-sw-need"></i>처리 필요</span>' : '') + '<span class="bc-li"><i class="bc-sw bc-sw-chg"></i>변경 신청</span><span class="bc-li"><i class="bc-man"></i>수기</span><span class="bc-li"><i class="bc-sw bc-sw-sel"></i>열린 예약</span>';
+  row.appendChild(g2);
   return row;
 }
 function renderCal(opts) {
