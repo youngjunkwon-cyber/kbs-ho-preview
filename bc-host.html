@@ -2496,8 +2496,9 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 .bc-dots .bc-wc{padding-left:3px;padding-right:3px}
 .bc-nav{flex-wrap:wrap;row-gap:8px;min-width:0;max-width:100%}
 .bc-cal .bc-chip.bc-chg,.bc-pop .bc-chip.bc-chg{border:1px solid var(--bc-chg)!important;border-left:3px solid var(--bc-chg)!important}
-.bc-dots .bc-chip:not(.bc-dchip) .bc-r2 .bc-arr{font-size:10px;letter-spacing:-.4px}
+
 .bc-dots .bc-chip.bc-chg:not(.bc-dchip){border-left-width:2px!important}
+.bc-short .bc-ad{display:none}
 </style></head>
 <body><div id="app"></div>
 <template id="T_h_res">
@@ -2672,7 +2673,7 @@ function chipEl(c, onOpen) {
   e.className = 'bc-chip bc-g-' + (GRP[c.b.status] || 'up') + (c.chg ? ' bc-chg' : '') + (need && !(c.b.status === '변경요청' && c.b.chg) ? ' bc-need' : '') + (o.sel != null && o.sel === c.b.no ? ' bc-sel' : '');
   e.setAttribute('style', scStyle(c.b.status));
   /* 고정 2줄: 1줄 = 시각 + 오른쪽 배지 자리(처리 필요 > 변경 신청 > 수기), 2줄 = 고객명(+ 배지 자리를 못 쓴 수기) */
-  var md = function (ts) { return (+ts.slice(5, 7)) + '/' + (+ts.slice(8, 10)) + ' ' + ts.slice(11, 16); };
+  var md = function (ts) { return '<span class="bc-ad">' + (+ts.slice(5, 7)) + '/' + (+ts.slice(8, 10)) + ' </span>' + ts.slice(11, 16); };
   var cr = c.b.status === '변경요청' && !!c.b.chg; /* 변경 요청 쌍: 원래 칩 = '변경 요청' 배지 + → 요청 시각, 요청 칩 = '요청 시간' 배지 + ← 원래 시각 */
   var badge = c.chg ? '<span class="bc-cr">요청 시간</span>' : cr ? '<span class="bc-cr">변경 요청</span>' : need ? '<span class="bc-tag">' + NEEDTAG[need] + '</span>' : man ? '<span class="bc-mb">수기</span>' : '';
   var man2 = man && (need || cr) ? '<span class="bc-ms">수기</span>' : '';
@@ -2843,9 +2844,12 @@ function mixDark(v) { var c = rgbOf(v); return 'rgb(' + c.map(function (n) { ret
 
 /* 칸이 좁아 시각과 배지가 겹치면 모든 칩의 배지를 한꺼번에 같은 색 점으로 */
 function fitBadges(root) {
-  if (!root.isConnected) return; root.classList.remove('bc-dots');
+  if (!root.isConnected) return; root.classList.remove('bc-dots', 'bc-short');
   var tight = Array.prototype.some.call(root.querySelectorAll('.bc-chip:not(.bc-dchip) .bc-r1'), function (r) { return r.scrollWidth > r.clientWidth + 0.5; });
   root.classList.toggle('bc-dots', tight);
+  /* 화살표 뒤 날짜 · 시각이 칩에 안 들어가면 화면 전체 칩에서 날짜를 빼고 시각만 */
+  var shortA = Array.prototype.some.call(root.querySelectorAll('.bc-chip:not(.bc-dchip) .bc-arr'), function (a) { var ch = a.closest('.bc-chip'), cs = getComputedStyle(ch); return a.getBoundingClientRect().right > ch.getBoundingClientRect().right - parseFloat(cs.borderRightWidth) - parseFloat(cs.paddingRight) + 0.5; });
+  root.classList.toggle('bc-short', shortA);
 }
 window.addEventListener('resize', function () { var r = document.querySelector('.bc-cal'); if (r) fitBadges(r); });
 
