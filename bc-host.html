@@ -2393,6 +2393,8 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 .bc-mcell .bc-chip>span:not(.bc-n){flex:none}
 .bc-mcell .bc-chip>.bc-n{flex:0 1 auto;max-width:100%}
 .bc-chip .bc-cl{flex:none}
+/* 아주 좁은 칸(1100 이하): 꼬리표 · 변경 신청 글자도 칩 안에서 말줄임 */
+.bc-chip .bc-tag,.bc-chip .bc-cl,.bc-chip .bc-t{max-width:100%;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 </style></head>
 <body><div id="app"></div>
 <template id="T_h_res">
