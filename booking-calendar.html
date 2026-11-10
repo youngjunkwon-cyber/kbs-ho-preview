@@ -81,6 +81,7 @@ function seedBookings(){
  [9,'2026-11-28 11:00','2026-11-08 13:36','Lucas Meyer','독일','en','WhatsApp','예약','고객','',null],
  [9,'2026-12-03 14:00','2026-11-09 09:15','Ava Nguyen','호주','en','WhatsApp','예약','고객','',null],
  [9,'2026-11-14 16:30','2026-11-09 21:05','Nora Hill','미국','en','WhatsApp','예약','고객','',null],
+ [9,'2026-11-14 17:00','2026-11-09 22:40','Lena Fischer','독일','en','WhatsApp','예약','고객','',null],
  [173,'2026-11-12 13:00','2026-11-07 10:12','Noah Turner','미국','en','WhatsApp','예약','고객','',null],
  [173,'2026-11-18 11:00','2026-11-08 17:44','Ella Reyes','필리핀','en','WhatsApp','예약','고객','',null],
  [173,'2026-11-20 15:00','2026-11-09 12:30','Mai Tran','베트남','en','WhatsApp','방문완료','고객','',null]
@@ -99,9 +100,9 @@ function seedBookings(){
 function storeById(id){return STORES.filter(function(s){return s.id===+id;})[0]||null;}
 var DB,S;
 function freshDB(){DB={store:STORES[0],stores:STORES,books:null};DB.books=seedBookings();}
-/* 마지막으로 본 보기(목록/캘린더, 월/주/일)를 계정 기준으로 기억: 시안은 localStorage로 흉내(계정 하나 가정). 저장값이 없으면 캘린더(월) */
+/* 마지막으로 본 보기(목록/캘린더, 월/주/일)를 계정 기준으로 기억: 시안은 localStorage로 흉내(계정 하나 가정). 저장값이 없으면 목록. 날짜는 저장하지 않고 들어올 때마다 오늘 기준 */
 var VKEY={HOST:'kbs.bookingView.HOST',BO:'kbs.bookingView.BO'};
-function loadView(k){try{var v=JSON.parse(localStorage.getItem(VKEY[k])||'null');if(v&&/^(list|cal)$/.test(v.mode)&&/^(month|week|day)$/.test(v.cv))return v;}catch(e){}return {mode:'cal',cv:'month'};}
+function loadView(k){try{var v=JSON.parse(localStorage.getItem(VKEY[k])||'null');if(v&&/^(list|cal)$/.test(v.mode)&&/^(month|week|day)$/.test(v.cv))return v;}catch(e){}return {mode:'list',cv:'month'};}
 function saveView(){try{localStorage.setItem(VKEY.HOST,JSON.stringify({mode:S.host.mode,cv:S.host.cv}));localStorage.setItem(VKEY.BO,JSON.stringify({mode:S.bo.mode,cv:S.bo.cv}));}catch(e){}}
 function freshState(){var vh=loadView('HOST'),vb=loadView('BO');return {surf:'HOST',mark:false,
  host:{mode:vh.mode,cv:vh.cv,anchor:TODAY,st:'',lang:'',owner:'',q:'',qd:'',ptab:'전체',open:null},

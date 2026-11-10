@@ -2651,7 +2651,7 @@ function slotCount(all, d, m, set) { var iv = set.intervalMinute; return all.fil
 /* 화면에 놓을 칩: 예약은 방문 시각에, 변경 신청 대기는 신청한 새 시각에 점선 칩 하나 더 */
 function chipsOf(list) {
   var out = [];
-  list.forEach(function (b) { out.push({ b: b, ts: b.visit, chg: false }); if (b.status === '변경요청' && b.chg) out.push({ b: b, ts: b.chg, chg: true }); });
+  list.forEach(function (b) { out.push({ b: b, ts: b.visit, chg: false }); /* 변경 신청한 새 시간 자리에는 칩을 따로 그리지 않음 */ });
   return out.sort(function (a, c) { return a.ts < c.ts ? -1 : a.ts > c.ts ? 1 : (a.chg ? 1 : 0) - (c.chg ? 1 : 0); });
 }
 /* 칩 묶음: 다가오는 예약 / 끝난 예약 / 취소 · 노쇼 (왼쪽 막대 색) */
@@ -2662,7 +2662,7 @@ function rowKey(status) { for (var i = 0; i < ROWG.length; i++) if (ROWG[i][2].i
 /* 상태 색: 예약류 파랑 / 변경요청 주황 / 방문완료 초록 / 취소 · 노쇼 회색 */
 var SCOL = { '예약': 'blue', '변경완료': 'blue', '변경거절': 'blue', '변경요청': 'orange', '방문완료': 'green', '고객취소': 'gray', '매장취소': 'gray', '미방문': 'gray' };
 var ROWCOL = { '예약': 'blue', '변경요청': 'orange', '방문완료': 'green', '취소노쇼': 'gray' };
-var NEEDTAG = { '신규': '확인 필요', '방문결과': '방문 결과', '변경': '변경 신청' };
+var NEEDTAG = { '신규': '신규', '방문결과': '방문결과', '변경': '변경' }; /* 처리 필요 패널 탭 이름과 같게 */
 function chipEl(c, onOpen) {
   var e = document.createElement('button'); e.type = 'button';
   var o = CALOPT, man = c.b.owner === '매장', need = !c.chg && o.need ? o.need(c.b) : '';
@@ -2708,7 +2708,7 @@ function statusRow(o) {
   });
   /* 표시 묶음: 누르지 않는 설명 */
   var g2 = document.createElement('div'); g2.className = 'bc-grp bc-grp2'; g2.setAttribute('data-test', 'srow-legend');
-  g2.innerHTML = (o.need ? '<span class="bc-li"><i class="bc-tag bc-tag-sw">확인 필요</i>처리 필요</span>' : '') + '<span class="bc-li"><i class="bc-sw bc-sw-chg"></i>변경 신청</span><span class="bc-li"><i class="bc-mb">수기</i>수기 등록</span>';
+  g2.innerHTML = (o.need ? '<span class="bc-li"><i class="bc-tag bc-tag-sw">신규</i>처리 필요</span>' : '') + '<span class="bc-li"><i class="bc-mb">수기</i>수기 등록</span>';
   row.appendChild(g2);
   /* 줄이 바뀌어 표시 묶음이 아래로 내려가면 구분선 숨김 */
   var chk = function () { if (!g2.isConnected) { window.removeEventListener('resize', chk); return; } g2.classList.toggle('bc-wrapped', g2.offsetTop > g1.offsetTop + 2); };
@@ -2740,7 +2740,7 @@ function monthView(root, o) {
     cell.innerHTML = '<div class="bc-dn"><span>' + (+d.slice(8, 10)) + '</span></div>';
     var mine = chips.filter(function (c) { return c.ts.slice(0, 10) === d; });
     mine.slice(0, 3).forEach(function (c) { cell.appendChild(chipEl(c, o.open)); });
-    if (mine.length > 3) { var mo = document.createElement('button'); mo.type = 'button'; mo.className = 'bc-more'; mo.textContent = '+' + (mine.length - 3) + '건'; mo.setAttribute('data-test', 'more-' + d); (function (dd, list, cl) { mo.onclick = function (ev) { ev.stopPropagation(); dayPop(cl, dd, list, o); }; })(d, mine, cell); cell.appendChild(mo); }
+    if (mine.length > 3) { var mo = document.createElement('button'); mo.type = 'button'; mo.className = 'bc-more'; mo.textContent = '+' + (mine.length - 3); mo.setAttribute('data-test', 'more-' + d); (function (dd, list, cl) { mo.onclick = function (ev) { ev.stopPropagation(); dayPop(cl, dd, list, o); }; })(d, mine, cell); cell.appendChild(mo); }
     grid.appendChild(cell);
   }
   root.appendChild(grid);
@@ -2841,6 +2841,9 @@ function fitBadges(root) {
   root.classList.toggle('bc-dots', tight);
 }
 window.addEventListener('resize', function () { var r = document.querySelector('.bc-cal'); if (r) fitBadges(r); });
+
+/* 일 보기로 바꿀 때 기준 날짜: 직전에 보던 기간에 오늘이 있으면 오늘, 없으면 그 기간 첫날(월 = 1일, 주 = 일요일) */
+function toDay(st) { if (st.cv !== 'day') st.anchor = inView(st, PB.TODAY) ? PB.TODAY : st.cv === 'month' ? st.anchor.slice(0, 8) + '01' : weekStart(st.anchor); st.cv = 'day'; }
 
 /* ===== HOST 예약 관리(예약 현황): 실화면 스냅샷 그대로 + [목록 | 캘린더] ===== */
 function H() { return PB.S.host; }
@@ -2945,7 +2948,7 @@ function calMode(card, rows) {
   nav.appendChild(mk('›', 'next', function () { calMove(h, 1); PB.render(); }));
   nav.appendChild(mk('오늘', 'today', function () { h.anchor = PB.TODAY; PB.render(); }));
   var lb = document.createElement('strong'); lb.className = 'bc-label'; lb.textContent = calLabel(h); lb.setAttribute('data-test', 'cal-label'); nav.appendChild(lb);
-  nav.appendChild(segTabs([['month', '월'], ['week', '주'], ['day', '일']], h.cv, function (v) { h.cv = v; PB.render(); }, 'cv'));
+  nav.appendChild(segTabs([['month', '월'], ['week', '주'], ['day', '일']], h.cv, function (v) { if (v === 'day') toDay(h); else h.cv = v; PB.render(); }, 'cv'));
   var first = kids.filter(function (k) { return !k.contains(sb); })[0]; row.insertBefore(nav, first || row.firstChild); fixLabel(lb);
   moveSearch(sb, $('form input.ant-input'));
   /* 표 대신 캘린더 */
