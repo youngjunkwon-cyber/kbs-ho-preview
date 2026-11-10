@@ -2510,6 +2510,14 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 .bc-stag-x{cursor:pointer;color:rgba(0,0,0,.45);font-size:13px;line-height:1}
 .bc-stag-x:hover{color:rgba(0,0,0,.88)}
 .bc-swrap input[placeholder=""]{width:8px!important;min-width:8px}
+/* ===== BO: 칩 2줄(1줄 = 시각 + 스토어명 + 배지), 월 칸 높이 고정, 주 · 일 안쪽 스크롤 ===== */
+.bc-chip:has(.bc-rs){height:40px!important;min-height:40px!important}
+.bc-r1 .bc-rs{display:block;flex:0 1 auto;min-width:0;height:18px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11.5px;color:#6b6b73}
+.bc-fit .bc-mcell{height:var(--bc-cellh,150px);min-height:0;overflow:hidden}
+.bc-fit:not([data-test=cal-month]){max-height:calc(100vh - 140px);overflow:auto;border-top:1px solid var(--bc-line)}
+.bc-fit .bc-wh{position:sticky;top:0;z-index:3}
+.bc-fit .bc-wgrid{border-top:0}
+.bc-dgrid .bc-chip .bc-rs{order:0}
 </style></head>
 <body><div id="app"></div>
 <template id="T_h_res">
@@ -2566,7 +2574,7 @@ var toastT = null;
 function toast(m) { var el = document.getElementById('pb-toast'); if (!el) { el = document.createElement('div'); el.id = 'pb-toast'; document.body.appendChild(el); } el.textContent = m; el.className = 'on'; clearTimeout(toastT); toastT = setTimeout(function () { el.className = ''; }, 2000); }
 /* 스크롤 유지 */
 var SC = {}, LASTKEY = null;
-var SC_SEL = ['.ant-layout-content', 'main', '[class*=scrollArea]', '.ant-table-content', '.ant-table-body', '.ant-drawer-body', '#pb-phone-scroll'];
+var SC_SEL = ['.ant-layout-content', 'main', '[class*=scrollArea]', '.ant-table-content', '.ant-table-body', '.ant-drawer-body', '#pb-phone-scroll', '.bc-cal'];
 function saveScroll() { SC = { _w: [window.scrollX, window.scrollY] }; SC_SEL.forEach(function (s) { $$(s).forEach(function (e, i) { SC[s + i] = [e.scrollLeft, e.scrollTop]; }); }); }
 function restoreScroll() { SC_SEL.forEach(function (s) { $$(s).forEach(function (e, i) { var v = SC[s + i]; if (v) { e.scrollLeft = v[0]; e.scrollTop = v[1]; } }); }); if (SC._w) window.scrollTo(SC._w[0], SC._w[1]); }
 /* 실제 이동·제출은 막는다 */
@@ -2690,7 +2698,7 @@ function chipEl(c, onOpen) {
   var man2 = man && (need || cr) ? '<span class="bc-ms">수기</span>' : '';
   var arr = c.chg ? '<span class="bc-arr">← ' + md(c.b.visit) + '</span>' : cr ? '<span class="bc-arr">→ ' + md(c.b.chg) + '</span>' : '';
   var x = o.st && o.st.cv === 'day' && !c.chg ? '<span class="bc-x"><span>' + esc(c.b.nation) + '</span><span>' + esc(langLabel(c.b.lang)) + '</span><span>' + esc(c.b.status) + '</span></span>' : '';
-  e.innerHTML = '<span class="bc-r1"><span class="bc-t">' + c.ts.slice(11, 16) + '</span>' + (badge ? '<span class="bc-badge">' + badge + '</span>' : '') + '</span>' + (o.showStore ? '<span class="bc-rs">' + esc(c.b.storeName || '') + '</span>' : '') + '<span class="bc-r2"><span class="bc-n">' + esc(c.b.name) + '</span>' + arr + man2 + x + '</span>';
+  e.innerHTML = '<span class="bc-r1"><span class="bc-t">' + c.ts.slice(11, 16) + '</span>' + (o.showStore ? '<span class="bc-rs">' + esc(c.b.storeName || '') + '</span>' : '') + (badge ? '<span class="bc-badge">' + badge + '</span>' : '') + '</span><span class="bc-r2"><span class="bc-n">' + esc(c.b.name) + '</span>' + arr + man2 + x + '</span>';
   e.setAttribute('aria-label', c.ts.slice(11, 16) + ' ' + c.b.name);
   e.setAttribute('data-test', (c.chg ? 'chip-chg-' : 'chip-') + c.b.no);
   e.onclick = function (ev) { ev.stopPropagation(); onOpen(c.b.no); };
@@ -2740,9 +2748,9 @@ function renderCal(opts) {
   closePop();
   CALOPT = opts; var wrap = document.createElement('div'); wrap.className = 'bc-calwrap'; mark(wrap); wrap.appendChild(statusRow(opts));
   var off = opts.st.off || {}; opts = Object.assign({}, opts, { list: opts.list.filter(function (b) { return !off[rowKey(b.status)]; }) }); CALOPT = opts;
-  var root = document.createElement('div'); root.className = 'bc-cal'; root.setAttribute('data-test', 'cal-' + opts.st.cv);
+  var root = document.createElement('div'); root.className = 'bc-cal' + (opts.fit ? ' bc-fit' : ''); if (opts.fit) root.style.setProperty('--bc-cellh', monthFit().cellH + 'px'); root.setAttribute('data-test', 'cal-' + opts.st.cv);
   if (opts.st.cv === 'month') monthView(root, opts); else weekView(root, opts, opts.st.cv === 'day');
-  wrap.appendChild(root); setTimeout(function () { fitBadges(root); }, 0); return wrap;
+  wrap.appendChild(root); setTimeout(function () { fitBadges(root); if (opts.fit) fitScroll(root, opts.st); }, 0); return wrap;
 }
 function monthView(root, o) {
   var a = o.st.anchor, first = a.slice(0, 8) + '01', ym = a.slice(0, 7), s = weekStart(first);
@@ -2758,8 +2766,8 @@ function monthView(root, o) {
     cell.setAttribute('data-date', d);
     cell.innerHTML = '<div class="bc-dn"><span>' + (+d.slice(8, 10)) + '</span></div>';
     var mine = chips.filter(function (c) { return c.ts.slice(0, 10) === d; });
-    mine.slice(0, 3).forEach(function (c) { cell.appendChild(chipEl(c, o.open)); });
-    if (mine.length > 3) { var mo = document.createElement('button'); mo.type = 'button'; mo.className = 'bc-more'; mo.textContent = '+' + (mine.length - 3); mo.setAttribute('data-test', 'more-' + d); (function (dd, list, cl) { mo.onclick = function (ev) { ev.stopPropagation(); dayPop(cl, dd, list, o); }; })(d, mine, cell); cell.appendChild(mo); }
+    var MX = o.maxChips || 3; mine.slice(0, MX).forEach(function (c) { cell.appendChild(chipEl(c, o.open)); });
+    if (mine.length > MX) { var mo = document.createElement('button'); mo.type = 'button'; mo.className = 'bc-more'; mo.textContent = '+' + (mine.length - MX); mo.setAttribute('data-test', 'more-' + d); (function (dd, list, cl) { mo.onclick = function (ev) { ev.stopPropagation(); dayPop(cl, dd, list, o); }; })(d, mine, cell); cell.appendChild(mo); }
     grid.appendChild(cell);
   }
   root.appendChild(grid);
@@ -2866,6 +2874,16 @@ window.addEventListener('resize', function () { var r = document.querySelector('
 
 /* 일 보기로 바꿀 때 기준 날짜: 직전에 보던 기간에 오늘이 있으면 오늘, 없으면 그 기간 첫날(월 = 1일, 주 = 일요일) */
 function toDay(st) { if (st.cv !== 'day') st.anchor = inView(st, PB.TODAY) ? PB.TODAY : st.cv === 'month' ? st.anchor.slice(0, 8) + '01' : weekStart(st.anchor); st.cv = 'day'; }
+
+/* BO: 주 · 일 보기는 캘린더 안에서만 세로 스크롤(머리줄 고정). 기간 · 보기가 바뀔 때만 첫 예약 시간 근처로 */
+function fitScroll(root, st) {
+  if (st.cv === 'month') return; var k = st.cv + st.anchor + (st.stores || []).join(',');
+  if (st._sk === k) return; st._sk = k;
+  var first = root.querySelector('.bc-wc .bc-chip'), head = root.querySelector('.bc-wh');
+  if (first) { var cell = first.closest('.bc-wc'); root.scrollTop = Math.max(0, cell.getBoundingClientRect().top - root.getBoundingClientRect().top + root.scrollTop - (head ? head.offsetHeight : 0) - 4); }
+}
+/* BO 월 보기: 창 높이에 맞춰 칸 높이 고정, 칸에 들어가는 만큼만 칩(최대 2), 나머지 +N */
+function monthFit() { var weeksH = Math.max(100, Math.min(150, Math.floor((window.innerHeight - 140) / 5))); return { cellH: weeksH, max: Math.max(1, Math.min(2, Math.floor((weeksH - 24 - 14 - 22) / 43))) }; }
 
 /* ===== HOST 예약 관리(예약 현황): 실화면 스냅샷 그대로 + [목록 | 캘린더] ===== */
 function H() { return PB.S.host; }
