@@ -99,9 +99,13 @@ function seedBookings(){
 function storeById(id){return STORES.filter(function(s){return s.id===+id;})[0]||null;}
 var DB,S;
 function freshDB(){DB={store:STORES[0],stores:STORES,books:null};DB.books=seedBookings();}
-function freshState(){return {surf:'HOST',mark:false,
- host:{mode:'list',cv:'month',anchor:TODAY,st:'',lang:'',owner:'',q:'',qd:'',ptab:'전체',open:null},
- bo:{mode:'list',cv:'month',anchor:TODAY,store:null,st:'',lang:'',owner:'',q:'',qd:'',open:null}};}
+/* 마지막으로 본 보기(목록/캘린더, 월/주/일)를 계정 기준으로 기억: 시안은 localStorage로 흉내(계정 하나 가정). 저장값이 없으면 캘린더(월) */
+var VKEY={HOST:'kbs.bookingView.HOST',BO:'kbs.bookingView.BO'};
+function loadView(k){try{var v=JSON.parse(localStorage.getItem(VKEY[k])||'null');if(v&&/^(list|cal)$/.test(v.mode)&&/^(month|week|day)$/.test(v.cv))return v;}catch(e){}return {mode:'cal',cv:'month'};}
+function saveView(){try{localStorage.setItem(VKEY.HOST,JSON.stringify({mode:S.host.mode,cv:S.host.cv}));localStorage.setItem(VKEY.BO,JSON.stringify({mode:S.bo.mode,cv:S.bo.cv}));}catch(e){}}
+function freshState(){var vh=loadView('HOST'),vb=loadView('BO');return {surf:'HOST',mark:false,
+ host:{mode:vh.mode,cv:vh.cv,anchor:TODAY,st:'',lang:'',owner:'',q:'',qd:'',ptab:'전체',open:null},
+ bo:{mode:vb.mode,cv:vb.cv,anchor:TODAY,store:null,st:'',lang:'',owner:'',q:'',qd:'',open:null}};}
 /* HOST 처리 필요: 이 스토어(아비쥬 명동점) 예약만 */
 function needList(t){return DB.books.filter(function(b){return b.store===DB.store.id&&b.need&&(t==='전체'||b.need===t);}).sort(function(a,b){return a.visit<b.visit?1:-1;});}
 /* ===== 렌더 ===== */
@@ -113,6 +117,7 @@ function swHTML(){
 }
 function frameOf(s){return document.getElementById('f-'+s);}
 function render(){
+ saveView();
  document.getElementById('sw').innerHTML=swHTML();
  ['HOST','BO'].forEach(function(s){frameOf(s).classList.toggle('on',S.surf===s);});
  var w=frameOf(S.surf).contentWindow;

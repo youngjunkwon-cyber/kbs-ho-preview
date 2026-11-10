@@ -3165,7 +3165,7 @@ function pRes() {
   /* 필터 */
   var sIn = $('form input[placeholder="스토어 선택"]'), sWrap = sIn.closest('.ant-input-affix-wrapper') || sIn, clr = $('.ant-input-clear-icon', sWrap);
   var cur = b.store ? PB.storeById(b.store) : null; sIn.value = cur ? cur.name : ''; sIn.readOnly = true; sIn.setAttribute('data-test', 'store-input');
-  if (clr) { clr.classList.toggle('ant-input-clear-icon-hidden', !cur); clr.onclick = function (e) { e.stopPropagation(); b.store = null; b.mode = 'list'; b.open = null; PB.render(); }; }
+  if (clr) { clr.classList.toggle('ant-input-clear-icon-hidden', !cur); clr.onclick = function (e) { e.stopPropagation(); b.store = null; b.open = null; /* 저장된 보기(목록/캘린더)는 그대로, 스토어가 없으면 목록으로만 보임 */ PB.render(); }; }
   sWrap.style.cursor = 'pointer';
   sWrap.onclick = function () { dropdown(sWrap, PB.DB.stores.map(function (s) { return [s.id, s.name]; }), b.store, function (v) { b.store = +v; PB.render(); }, ACC); };
   var catSel = selByPh('카테고리 선택'); if (catSel) catSel.onclick = function () { toast('시안에서는 동작하지 않습니다'); };
@@ -3185,8 +3185,8 @@ function pRes() {
   var mk = function (txt, on, test, fn) { var x = p1.cloneNode(true); x.className = on ? onCls : offCls; x.querySelector('span').textContent = txt; x.setAttribute('data-test', test); x.onclick = fn; return x; };
   var tg = document.createElement('div'); tg.className = 'bc-bseg'; tg.setAttribute('data-test', 'mode'); mark(tg);
   if (!b.store) { var hint = document.createElement('span'); hint.className = 'bc-hint'; hint.textContent = '스토어를 선택하면 캘린더로 볼 수 있습니다.'; hint.setAttribute('data-test', 'cal-hint'); tg.appendChild(hint); }
-  tg.appendChild(mk('목록', b.mode === 'list', 'mode-list', function () { b.mode = 'list'; b.open = null; PB.render(); }));
-  var cb = mk('캘린더', b.mode === 'cal', 'mode-cal', function () { if (!b.store) return; b.mode = 'cal'; b.open = null; PB.render(); }); if (!b.store) cb.disabled = true; tg.appendChild(cb);
+  tg.appendChild(mk('목록', b.mode === 'list' || !b.store, 'mode-list', function () { b.mode = 'list'; b.open = null; PB.render(); }));
+  var cb = mk('캘린더', b.mode === 'cal' && !!b.store, 'mode-cal', function () { if (!b.store) return; b.mode = 'cal'; b.open = null; PB.render(); }); if (!b.store) cb.disabled = true; tg.appendChild(cb);
   row.appendChild(tg);
   var rows = filtered(), tw = $('.ant-table-wrapper');
   if (b.mode === 'cal' && b.store) {
