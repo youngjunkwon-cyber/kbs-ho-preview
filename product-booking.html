@@ -33,7 +33,7 @@ body{font-family:Pretendard,"Noto Sans KR","Malgun Gothic",sans-serif;font-size:
 </div></div>
 <script>
 'use strict';
-/* 상품 예약 선행 배포 시안: 알리페이 채널 분기 작업 전의 화면과 동작만 그린다(선행 PRD v2.4, 부록 B의 항목은 없음) */
+/* 상품 예약 선행 배포 시안: 알리페이 채널 분기 작업 전의 화면과 동작만 그린다(선행 PRD v2.6, 부록 B의 항목은 없음) */
 /* ===== 기준 시각 ===== */
 var TODAY='2026-10-12',NOWTS='2026-10-12 12:00';
 var LANGS={en:'영어',ja:'일본어',zh:'중국어(간체)'};
@@ -144,7 +144,7 @@ var ME='Kaitlyn Chan';
 /* ===== 동작 ===== */
 /* 클리닉 스토어(피부과·성형외과·치과·메디컬체크·안과) 예약 나이(PRD 5.13, 2026-11-10): 방문일 기준 만 18세 이상 동의 체크.
    정보 입력 화면 동의 항목 "[Required] I am 18 or older as of the visit date"(f.age18)를 체크해야 Book 이 켜진다. 생년월일로 따로 판정하지 않고 확인 창도 없다.
-   동의 여부 · 시각(ageConsent · ageConsentAt)은 예약에 저장만 하고 HOST · BO 화면에는 보이지 않는다.
+   동의 시각(ageConsentAt) 하나만 예약에 저장하고(비클리닉 · 매장 · 운영자 대리 등록은 빈 값) 하고 HOST · BO 화면에는 보이지 않는다.
    스토어 카테고리가 여럿이면(DB.store.cats) 그중 하나라도 클리닉이면 대상 */
 var CLINIC_CATS=['피부과','성형외과','치과','메디컬체크','안과'];
 function storeCats(){var s=DB.store;return s.cats&&s.cats.length?s.cats:[s.cat];}
@@ -169,7 +169,7 @@ function foSubmit(){
  if(f.entry!=='product'&&!pid&&f.sel!=='store'&&foOptions(f.lang).length){f.err={kind:'pick'};return;} /* 스토어 진입은 상품 고르기 필수(I'll decide at the store 포함) */
  var p=pid?prodById(pid):null,no=DB.books.length+1,cl=isClinic(),bl=p?p.lang:f.lang; /* 상품이 붙으면 그 상품 언어로 예약(상품 예약 URL은 화면 언어와 상관없음, PRD v1.14 5.2) */
  DB.books.push({no:no,visit:f.date+' '+f.time,recv:NOWTS,name:ME,nation:'캐나다',lang:bl,contact:f.msg||'WhatsApp',mid:f.mid||'4165550199',status:'예약',owner:'고객',route:f.entry==='product'?'상품':'스토어',prodId:pid,snap:p?snapOf(p):null,need:'신규',req:f.req||'',birth:f.birth||'',phone:'+1 4165550199',rno:rnoFor(NOWTS,bl,DB.books),
-  ageConsent:cl?true:null,ageConsentAt:cl?NOWTS:null}); /* 18세 동의 시각: 저장만 하고 HOST · BO 화면에는 보이지 않음 */
+  ageConsentAt:cl?NOWTS:null}); /* 18세 동의 시각: 저장만 하고 HOST · BO 화면에는 보이지 않음 */
  f.lastNo=no;f.screen='done';f.time='';f.noneLeft=false;f.req='';f.pn=null;f.agree=false;f.age18=false;f.mkt=false;f.pickAgain=false;f.toast=null; /* 다음 예약은 동의 체크 없이 시작(라이브 정보 입력 화면은 처음에 미체크) */
 }
 function manSave(){
@@ -178,7 +178,7 @@ function manSave(){
  if(!m.date||!m.time)return '방문 일시를 선택해주세요';
  if(!m.lang)return '언어를 선택해주세요';
  var p=m.pid?prodById(m.pid):null,no=DB.books.length+1;
- DB.books.push({no:no,visit:m.date+' '+m.time,recv:NOWTS,name:m.name.trim(),nation:'-',lang:m.lang,contact:'-',status:'예약',owner:'매장',route:null,prodId:p?p.id:null,snap:p?snapOf(p):null,need:'',req:(m.f&&m.f.req)||'',birth:m.birth||'',phone:'-',rno:rnoFor(NOWTS,m.lang,DB.books)});
+ DB.books.push({no:no,visit:m.date+' '+m.time,recv:NOWTS,name:m.name.trim(),nation:'-',lang:m.lang,contact:'-',status:'예약',owner:'매장',route:null,ageConsentAt:null,prodId:p?p.id:null,snap:p?snapOf(p):null,need:'',req:(m.f&&m.f.req)||'',birth:m.birth||'',phone:'-',rno:rnoFor(NOWTS,m.lang,DB.books)});
  S.host.man={date:'',time:'',name:'',lang:'',pid:'',birth:'',f:{}};S.host.view='res';S.host.open=no;
  return '';
 }
@@ -194,7 +194,7 @@ function foChange(){
 /* 매장(HOST) · 운영자(BO)가 바꾸는 예약 시간: 18세 체크 없음(PRD 5.13 "적용하지 않는 것"). 시안은 확인 단계 없이 바로 바꾼다 */
 function staffChange(no,date,time){
  var b=DB.books.filter(function(x){return x.no===no;})[0];if(!b||!date||!time)return '방문 날짜와 시간을 선택해주세요';
- b.visit=date+' '+time;
+ b.visit=date+' '+time;if(b.chg){if(b.chgAgeAt)b.ageConsentAt=b.chgAgeAt;b.chg=null;b.chgAgeAt=null;b.status='예약';b.need='';} /* 변경요청 중인 예약을 매장 · 운영자가 직접 바꾸면 그 변경으로 확정(동의 시각 덮어씀, PRD v2.6) */
  return '';
 }
 /* 배포 전에 고객이 잡은 예약(상품 정보 · 유입경로 없음) 한 건 추가. 접수일은 시드의 첫 상품 예약(09-08)보다 앞: 화면에는 스토어 예약 · 유입경로 "-" · Decide at the store (PRD 10장 데이터) */
@@ -204,11 +204,11 @@ function addPreDeployBooking(){
  render();return no;
 }
 /* 변경 확정(매장 수락): 신청 때 받은 동의 시각으로 덮어써 하나만 남김. 거절이면 기존 기록 그대로(PRD v1.14 5.13) */
-function chgAccept(no){var b=DB.books.filter(function(x){return x.no===no;})[0];if(!b||!b.chg)return;b.visit=b.chg;if(b.chgAgeAt){b.ageConsent=true;b.ageConsentAt=b.chgAgeAt;}b.chg=null;b.chgAgeAt=null;b.status='예약';b.need='';}
+/* 변경 확정: 매장 수락 · 운영자 대리 수락 · 매장 직접 변경 모두 신청 때 받은 동의 시각으로 덮어씀(PRD v2.6) */
+function chgAccept(no){var b=DB.books.filter(function(x){return x.no===no;})[0];if(!b||!b.chg)return;b.visit=b.chg;if(b.chgAgeAt)b.ageConsentAt=b.chgAgeAt;b.chg=null;b.chgAgeAt=null;b.status='예약';b.need='';}
 function chgReject(no){var b=DB.books.filter(function(x){return x.no===no;})[0];if(!b||!b.chg)return;b.chg=null;b.chgAgeAt=null;b.status='예약';b.need='';}
 function bookOff(){DB.store.bookingSetting=false;} /* PRD 부록 A 결정 1: 끌 때는 값을 지우지 않고 잠그기만(저장된 값을 흐리게) */
-/* 결정 1(2026-10-30, 2026-11-10 수정): 예약 설정을 다시 켜면 스토어 예약 버튼은 꺼진 상태로 시작하고, 개별 설정 상품의 예약 버튼은 그 상품 값을 그대로 유지(기본 설정 상품은 스토어 값을 따르므로 함께 꺼짐) */
-function bookReset(){DB.store.btn=false;}
+function bookReset(){DB.store.btn=false;DB.prods.forEach(function(p){if(p.mode==='개별')p.book=false;});} /* 결정 1(v2.6 원래대로): 다시 켜면 스토어 예약 버튼과 개별 설정 상품 예약 버튼 모두 OFF로 시작(다른 버튼 값은 그대로) */
 function bookOn(){if(!DB.store.bookingSetting){DB.store.bookingSetting=true;bookReset();}}
 
 /* ===== 렌더 ===== */

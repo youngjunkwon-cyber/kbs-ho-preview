@@ -1373,7 +1373,7 @@ function pBook() {
     /* 스토어 진입(PRD 5.2 · 5.11, 2026-11-10): 날짜 · 시간 아래 상품 고르기 필수. 처음에는 아무것도 골라져 있지 않다.
        제목 "Select a product" + 필수 표시, 보조 문구. 세부분류 탭(All + 세부분류). 첫 카드 I'll decide at the store 는 탭과 상관없이 늘 맨 위([More] 없음).
        상품 카드는 상품명 · 가격 · [More], 5개씩 [View More Products]. 카드를 누르면 그 카드가 선택(하나만), 다른 카드를 누르면 바뀜. Reset 없음 */
-    if (f.sel && f.sel !== 'store' && !opts.some(function (o) { return String(o.id) === String(f.sel); })) { f.sel = ''; f.pickAgain = true; } /* 고른 상품이 그 사이 예약할 수 없게 됨 */
+    if (f.sel && f.sel !== 'store' && !opts.some(function (o) { return String(o.id) === String(f.sel); })) { f.sel = ''; f.pickAgain = true; PB.showToast('pickAgain'); } /* 돌아왔을 때 고른 상품이 예약 불가가 됐으면 [Book] 때와 같이 선택 비움 + 토스트 [OK](PRD v2.6) */ /* 고른 상품이 그 사이 예약할 수 없게 됨 */
     sec.querySelector('h2').innerHTML = 'Select a product<em>*</em>';
     var sub = document.createElement('p'); sub.className = 'pb-fsub'; sub.setAttribute('data-test', 'fo-select-sub'); sub.textContent = 'Not sure yet? Choose "I\'ll decide at the store."'; sec.appendChild(sub);
     var cur = f.sel && f.sel !== 'store' ? PB.prodById(f.sel) : null;
@@ -1482,6 +1482,7 @@ function pInfo() {
   var t = tpl('f_info_live'); $$('[class*=routeProgressBar], .react-modal-sheet-root', t).forEach(function (e) { e.remove(); }); while (t.firstChild) app.appendChild(t.firstChild);
   var hb = $$('header button'); if (hb[0]) hb[0].onclick = function () { f.showSel = true; nav('book'); }; if (hb[1]) hb[1].onclick = function () { nav('store'); };
   var pid = f.entry === 'product' ? f.pid : PB.selPid(f), p = pid ? PB.prodById(pid) : null;
+  f.noneLeft = false; /* 고를 상품 없음 고정은 그 화면에서만. 예약 화면을 다시 그리면 그 순간 상품 수로 다시 판정(PRD v2.6) */
   /* 요약 카드(PRD 5.11): 머리 줄 "Booking a store visit". 상품 예약 = 제목 상품명(줄여 자르지 않음) + Price / Store / Time, 상품 없는 예약 = "You chose to decide at the store" + Store / Time */
   var nt = $('[class*=bookingNotice]'), dot = $('[class*=bookingNoticeDot]', nt); nt.innerHTML = ''; if (dot) nt.appendChild(dot); nt.setAttribute('data-test', 'fo-info-sum');
   var box = document.createElement('div'); box.className = 'pb-new'; box.style.minWidth = '0';
