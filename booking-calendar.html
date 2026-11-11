@@ -41,7 +41,7 @@ var STORES=[{id:9,name:'아비쥬 명동점',cat:'피부과',code:'009'},{id:209
 function mkSet(interval,max,days,offTimes){
  return {intervalMinute:interval,maxBookingCount:max,bookingDeadline:60,schedules:['SUN','MON','TUE','WED','THU','FRI','SAT'].map(function(k){var d=days[k];var st=d?d[0]:600,en=d?d[1]:1140,times=[];for(var m=st;m<en;m+=interval)times.push({timeMinute:m,isActive:offTimes.indexOf(m)<0});return {dayOfWeek:k,startMinute:st,endMinute:en,isActive:!!d,times:times};})};
 }
-/* 아비쥬 명동점: 30분 간격 · 한 시간에 2건 · 수요일 휴무 · 13:00 꺼 둠 · 일요일 11~17시 · 토요일 10~18시 · 평일 10~19시 */
+/* 아비쥬 명동점: 30분 간격 · 30분 칸마다 2건 · 수요일 휴무 · 13:00 꺼 둠 · 일요일 11~17시 · 토요일 10~18시 · 평일 10~19시 */
 var SETTINGS={
  9:mkSet(30,2,{SUN:[660,1020],MON:[600,1140],TUE:[600,1140],WED:null,THU:[600,1140],FRI:[600,1140],SAT:[600,1080]},[780]),
  209:mkSet(30,1,{SUN:null,MON:[600,1140],TUE:[600,1140],WED:[600,1140],THU:[600,1140],FRI:[600,1140],SAT:[600,1080]},[]),
@@ -109,8 +109,10 @@ function freshDB(){DB={store:STORES[0],stores:STORES,books:null};DB.books=seedBo
 var VKEY={HOST:'kbs.bookingView.HOST',BO:'kbs.bookingView.BO'};
 /* 저장값 = 보기 하나(list/month/week/day). 예전 형식 {mode, cv}는 새 값으로 바꿔 읽음 */
 function loadView(k){try{var v=JSON.parse(localStorage.getItem(VKEY[k])||'null');if(v&&!v.view&&v.mode)v={view:v.mode==='list'?'list':v.cv};if(v&&/^(list|month|week|day)$/.test(v.view))return {mode:v.view==='list'?'list':'cal',cv:v.view==='list'?'month':v.view};}catch(e){}return {mode:'list',cv:'month'};}
-function saveView(){try{localStorage.setItem(VKEY.HOST,JSON.stringify({view:S.host.mode==='list'?'list':S.host.cv}));localStorage.setItem(VKEY.BO,JSON.stringify({view:S.bo.mode==='list'?'list':S.bo.cv}));}catch(e){}}
-function freshState(){var vh=loadView('HOST'),vb=loadView('BO');return {surf:'HOST',mark:false,
+/* 왼쪽 메뉴 접힘도 계정별 기억(시안은 localStorage) */
+function loadLnb(k){try{return localStorage.getItem('kbs.lnbCollapsed.'+k)==='1';}catch(e){return false;}}
+function saveView(){try{localStorage.setItem('kbs.lnbCollapsed.HOST',S.lnb.HOST?'1':'0');localStorage.setItem('kbs.lnbCollapsed.BO',S.lnb.BO?'1':'0');localStorage.setItem(VKEY.HOST,JSON.stringify({view:S.host.mode==='list'?'list':S.host.cv}));localStorage.setItem(VKEY.BO,JSON.stringify({view:S.bo.mode==='list'?'list':S.bo.cv}));}catch(e){}}
+function freshState(){var vh=loadView('HOST'),vb=loadView('BO');return {surf:'HOST',mark:false,lnb:{HOST:loadLnb('HOST'),BO:loadLnb('BO')},
  host:{mode:vh.mode,cv:vh.cv,anchor:TODAY,st:'',lang:'',owner:'',q:'',qd:'',ptab:'전체',open:null},
  bo:{mode:vb.mode,cv:vb.cv,anchor:TODAY,stores:[],st:'',lang:'',owner:'',q:'',qd:'',open:null}};}
 /* HOST 처리 필요: 이 스토어(아비쥬 명동점) 예약만 */
