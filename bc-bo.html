@@ -2874,6 +2874,33 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 .bc-nav ~ .bc-srow{flex:1 1 0;min-width:0}
 .bc-hassr .ant-card-head-title{flex:0 0 auto!important}
 .bc-hassr .ant-card-head{padding-top:6px;padding-bottom:6px}
+/* ===== 칩은 흰 바탕 + 연회색 테두리, 색은 왼쪽 막대 · 시각 글자 · 작은 배지 글자에만 ===== */
+.bc-chip,.bc-chip.bc-need,.bc-cal .bc-chip.bc-chg,.bc-pop .bc-chip.bc-chg{background:#fff!important;border-top:1px solid #e3e3e8!important;border-right:1px solid #e3e3e8!important;border-bottom:1px solid #e3e3e8!important;color:#1d1d22!important}
+.bc-chip{border-left:3px solid var(--c,#d9d9de)!important}
+.bc-chip .bc-t{color:var(--ct,#1d1d22)}
+.bc-chip:hover{border-top-color:#bdbdc4!important;border-right-color:#bdbdc4!important;border-bottom-color:#bdbdc4!important}
+.bc-chip.bc-g-cx .bc-t{color:#55555c}
+.bc-cal .bc-chip.bc-chg,.bc-pop .bc-chip.bc-chg{border-left:3px dashed var(--bc-crfg,#b45309)!important}
+.bc-chip .bc-rs{color:#55555c}
+.bc-arr{color:var(--bc-crfg,#b45309)}
+.bc-tag{background:transparent!important;color:var(--bc-need-bg,#b45309)!important;border:1px solid var(--bc-need-bg,#b45309);padding:0 4px;font-weight:700}
+.bc-cr{background:transparent!important}
+.bc-dots .bc-badge .bc-tag{background:var(--bc-need-bg,#b45309)!important}
+.bc-dots .bc-badge .bc-cr{background:var(--bc-crfg,#b45309)!important}
+/* 열린 예약: 보라 채움 유지 */
+.bc-chip.bc-sel,.bc-cal .bc-chip.bc-sel.bc-chg,.bc-pop .bc-chip.bc-sel.bc-chg{background:#6741D9!important;color:#fff!important;border-color:#6741D9!important;border-left:3px solid #fff!important}
+.bc-chip.bc-sel .bc-t,.bc-chip.bc-sel .bc-rs,.bc-chip.bc-sel .bc-arr{color:#fff!important}
+.bc-chip.bc-sel .bc-tag{color:#fff!important;border-color:#fff}
+/* 범례 토글: 흰 바탕 + 색 점, 켜짐 = 진한 글자 · 진한 테두리 */
+.bc-sc.on{background:#fff!important;border-color:#9a9aa3!important;color:#1d1d22!important;font-weight:600}
+.bc-sc.on b{color:#1d1d22!important}
+.bc-sc:not(.on){background:#fff!important;border-color:#ececef!important;color:#a3a3ab!important;font-weight:400}
+.bc-sw-req{background:#fff!important;border:1px solid #e3e3e8!important;border-left:3px dashed var(--bc-crfg,#b45309)!important}
+.bc-chip:not(.bc-sel) .bc-cr{color:var(--bc-crfg,#b45309)!important;border-color:var(--bc-crfg,#b45309)!important}
+.bc-chip:not(.bc-sel) .bc-arr{color:var(--bc-crfg,#b45309)!important}
+.bc-chip.bc-sel .bc-cr{color:#fff!important;border-color:#fff!important}
+.bc-cr{display:inline-block;font-size:10.5px;font-weight:700;line-height:15px;padding:0 4px;border:1px solid var(--bc-crfg,#b45309);border-radius:3px}
+.bc-dots .bc-badge .bc-cr{border:0}
 </style></head>
 <body><div id="app"></div>
 <template id="T_b_res">
@@ -3202,13 +3229,14 @@ function statusColors(pre) {
     if (lum(rgbOf(b)) < 0.2) { if (lum(rgbOf(c)) > 0.6) c = b; b = '#F4F4F6'; fg = '#33333A'; }
     /* 글자 대비 4.5:1 미만이면 같은 색을 어둡게 */
     for (var k = 0; k < 8 && contrast(rgbOf(fg), rgbOf(b)) < 4.5; k++) fg = mixDark(fg);
-    SCOLORS[s] = { c: c, cb: b, fg: fg };
+    var ct = c; for (var k2 = 0; k2 < 10 && contrast(rgbOf(ct), [255, 255, 255]) < 4.5; k2++) ct = mixDark(ct); /* 흰 바탕 위 시각 글자 = 상태 색(대비 4.5:1까지 어둡게) */
+    SCOLORS[s] = { c: c, cb: b, fg: fg, ct: ct };
     if (s === '변경요청') { var cr = d.querySelector('[class*=changeRequestBox]'); if (cr) { var cc = getComputedStyle(cr); SCOLORS._chg = { bg: cc.backgroundColor, bd: cc.borderTopColor, fg: getComputedStyle(cr.querySelector('strong') || cr).color }; } }
     d.remove();
   });
   box.remove(); return SCOLORS;
 }
-function scStyle(status) { var m = SCOLORS && SCOLORS[status]; return m ? '--c:' + m.c + ';--cb:' + m.cb + ';--cf:' + m.fg : '--c:#a3a3ab;--cb:#f4f4f6;--cf:#55555c'; }
+function scStyle(status) { var m = SCOLORS && SCOLORS[status]; return m ? '--c:' + m.c + ';--cb:' + m.cb + ';--cf:' + m.fg + ';--ct:' + m.ct : '--c:#a3a3ab;--cb:#f4f4f6;--cf:#55555c'; }
 
 /* 색 계산: rgb() · #hex · color(srgb …) 읽기, 상대 휘도, 대비 */
 var _cv = null;
