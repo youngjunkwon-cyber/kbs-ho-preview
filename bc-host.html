@@ -2587,6 +2587,17 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 .bc-nobadge .bc-chip{gap:3px!important;padding-left:4px!important;padding-right:3px!important}
 .bc-nobadge .bc-pn{width:13px;height:13px;font-size:9.5px}
 .bc-nobadge .bc-arr .bc-asp{display:none}
+/* 보기 세그먼트 = 필터 줄 오른쪽 끝 */
+.bc-viewseg{margin-left:auto!important;flex:none}
+.bc-nav{flex:none}
+.bc-nav ~ .bc-viewseg,.bc-viewseg{margin-left:auto!important}
+.bc-nav:not(.bc-nav-wrap){margin-left:auto}
+.bc-nav:not(.bc-nav-wrap) + .bc-viewseg{margin-left:8px!important}
+.bc-srow-strip{margin:0 0 0 auto!important;padding:4px 8px;flex:0 1 auto}
+.bc-sumstrip{flex-wrap:wrap}
+.bc-navgrp{display:flex;align-items:center;gap:8px;margin-left:auto;flex:none}
+.bc-navgrp .bc-nav{margin-left:0!important}
+.bc-navgrp .bc-viewseg{margin-left:0!important}
 </style></head>
 <body><div id="app"></div>
 <template id="T_h_res">
@@ -2938,9 +2949,9 @@ function mixDark(v) { var c = rgbOf(v); return 'rgb(' + c.map(function (n) { ret
 /* 칸이 좁아 시각과 배지가 겹치면 모든 칩의 배지를 한꺼번에 같은 색 점으로 */
 /* 한 줄 칩이 칸에 안 들어가면 화면 전체 칩을 한 번에 줄임: 이름 · 스토어명 말줄임(자동) → 화살표 뒤 날짜 생략 → 배지를 색 점으로. 시각은 항상 보존 */
 function fitBadges(root) {
-  if (!root.isConnected) return; root.classList.remove('bc-dots', 'bc-short', 'bc-nobadge');
+  if (!root.isConnected) return; root.classList.remove('bc-dots', 'bc-short', 'bc-nobadge', 'bc-noarr');
   var tight = function () { return Array.prototype.some.call(root.querySelectorAll('.bc-chip'), function (c) { return c.offsetParent !== null && c.scrollWidth > c.clientWidth + 0.5; }); };
-  if (tight()) { root.classList.add('bc-short'); if (tight()) { root.classList.add('bc-dots'); if (tight()) root.classList.add('bc-nobadge'); /* 그래도 넘치면 배지 점도 뺌. 시각 · 화살표 시각 · 짝 번호는 끝까지 보존 */ } }
+  if (tight()) { root.classList.add('bc-short'); if (tight()) { root.classList.add('bc-dots'); if (tight()) { root.classList.add('bc-nobadge'); if (tight()) root.classList.add('bc-noarr'); /* 그래도 넘치면 화살표 시각을 빼고 짝 번호 + 시각만(번호는 끝까지 보존) */ } } }
 }
 window.addEventListener('resize', function () { var r = document.querySelector('.bc-cal'); if (r) fitBadges(r); });
 
@@ -2987,6 +2998,24 @@ function layoutFit(root, o) {
 }
 window.addEventListener('resize', function () { var r = document.querySelector('.bc-cal'); if (r && CALOPT) { layoutFit(r, CALOPT); fitBadges(r); } });
 
+/* 보기 세그먼트 [목록 | 월 | 주 | 일] 고르기 */
+function pickView(st, v) { st.open = null; if (v === 'list') { st.mode = 'list'; return; } var wasList = st.mode === 'list'; st.mode = 'cal'; if (v === 'day') { if (wasList) { st.cv = 'day'; st.anchor = PB.TODAY; } else toDay(st); } else st.cv = v; }
+/* 필터 줄 한 줄 맞추기: 검색어 칸을 먼저 줄이고(최소 180px), 그래도 안 되면 이동 묶음만 다음 줄로. 보기 세그먼트는 줄 오른쪽 끝 고정 */
+function fitRow(row, inp, nav, seg, noWrap) {
+  if (!noWrap) { row.style.flexWrap = 'wrap'; row.style.rowGap = '8px'; }
+  var item = inp; while (item.parentElement && item.parentElement !== row) item = item.parentElement;
+  var box = inp.closest('.ant-input-affix-wrapper') || inp;
+  item.style.width = ''; item.style.maxWidth = ''; item.style.flex = '';
+  var kids = function () { return Array.prototype.filter.call(row.children, function (k) { return getComputedStyle(k).display !== 'none'; }); };
+  var gap = parseFloat(getComputedStyle(row).columnGap) || 0;
+  var need = function () { var w = 0, ks = kids(); ks.forEach(function (k) { var cs = getComputedStyle(k); w += k.getBoundingClientRect().width + (parseFloat(cs.marginLeft) || 0) + (parseFloat(cs.marginRight) || 0); }); return w + gap * (ks.length - 1); };
+  var rw = row.getBoundingClientRect().width, over = need() - rw + 2; if (over <= 0) return true;
+  var iw = item.getBoundingClientRect().width, nw = Math.floor(iw - over), set = function (w) { item.style.width = w + 'px'; item.style.maxWidth = w + 'px'; item.style.flex = 'none'; box.style.width = '100%'; box.style.minWidth = '0'; inp.style.minWidth = '0'; };
+  /* 검색어 칸은 150px까지 줄이고, 그래도 안 되면 오른쪽 묶음(이동 + 보기)이 다음 줄 오른쪽 끝으로 */
+  if (nw >= 150) { set(nw); return true; } /* 150px로도 안 되면 칸은 그대로 두고 오른쪽 묶음만 다음 줄로 */
+  return false;
+}
+
 /* ===== HOST 예약 관리(예약 현황): 실화면 스냅샷 그대로 + [목록 | 캘린더] ===== */
 function H() { return PB.S.host; }
 function langLabel(l) { return PB.LANGS[l] || l; }
@@ -3032,7 +3061,7 @@ function filtered() {
 /* 실화면 "처리 필요" 탭 부품(회색 바탕 + 고른 칸 흰색)을 복제해 두 칸짜리 전환 버튼을 만든다 */
 function segTabs(items, cur, onPick, test) {
   var ft = $$('[class*=filterTabs] > button').filter(function (x) { return !x.closest('.bc-seg'); }), wrap = ft[0].parentNode.cloneNode(false), on = ft[0].className, off = ft[1].className;
-  items.forEach(function (it) { var b = document.createElement('button'); b.type = 'button'; b.className = it[0] === cur ? on : off; b.textContent = it[1]; b.setAttribute('data-test', test + '-' + it[0]); b.onclick = function () { onPick(it[0]); }; wrap.appendChild(b); });
+  items.forEach(function (it) { var b = document.createElement('button'); b.type = 'button'; b.className = it[0] === cur ? on : off; b.textContent = it[1]; b.setAttribute('data-test', it[2] || (test + '-' + it[0])); b.onclick = function () { onPick(it[0]); }; wrap.appendChild(b); });
   wrap.classList.add('bc-seg'); wrap.setAttribute('data-test', test); return mark(wrap);
 }
 function pRes() {
@@ -3057,10 +3086,11 @@ function pRes() {
   var sb = byText(document, 'form button', '검색'); sb.onclick = function () { h.q = h.qd; PB.render(); };
   $$('form button').forEach(function (b) { if (/^(1주일|1개월|3개월|6개월)$/.test(b.textContent.trim())) b.onclick = function () { toast('시안에서는 동작하지 않습니다'); }; });
   var rows = filtered(), card = $('.ant-card-head-title').closest('.ant-card');
-  /* 카드 머리 오른쪽: [목록 | 캘린더] */
-  var hw = $('.ant-card-head-wrapper', card) || $('.ant-card-head', card), ex = document.createElement('div'); ex.className = 'ant-card-extra';
-  ex.appendChild(segTabs([['list', '목록'], ['cal', '캘린더']], h.mode, function (v) { h.mode = v; h.open = null; PB.render(); }, 'mode')); hw.appendChild(ex);
-  if (h.mode === 'cal') calMode(card, rows); else listMode(rows);
+  /* 보기 세그먼트 [목록 | 월 | 주 | 일]: 필터 줄 오른쪽 끝, 목록 · 캘린더 모두 같은 자리 */
+  var row1 = stSel.parentNode; while (row1 && !row1.contains(inp)) row1 = row1.parentNode;
+  var seg = segTabs([['list', '목록', 'mode-list'], ['month', '월', 'cv-month'], ['week', '주', 'cv-week'], ['day', '일', 'cv-day']], h.mode === 'list' ? 'list' : h.cv, function (v) { pickView(h, v); PB.render(); }, 'view'); /* HOST는 필터 영역이 좁아 세그먼트를 카드 머리 오른쪽(예전 [목록 | 캘린더] 자리)에 고정: 목록 · 캘린더 모두 같은 자리 */
+  var hw = $('.ant-card-head-wrapper', card) || $('.ant-card-head', card), ex = document.createElement('div'); ex.className = 'ant-card-extra'; ex.appendChild(seg); hw.appendChild(ex);
+  if (h.mode === 'cal') calMode(card, rows, row1, seg); else listMode(rows);
   needPanel();
 }
 function listMode(rows) {
@@ -3077,7 +3107,7 @@ function listMode(rows) {
   textSet($('.ant-card-head-title'), '예약목록 (' + rows.length + ')');
   $$('.ant-pagination-item').forEach(function (li, i) { if (i > 0) li.remove(); });
 }
-function calMode(card, rows) {
+function calMode(card, rows, row1, seg) {
   var h = H();
   /* 기간 줄: 기간 버튼 · 방문일 기준 · 정렬 · 기간 입력 대신 ‹ › [오늘] 과 [월 | 주]. 검색 버튼은 그대로 */
   var sb = byText(document, 'form button', '검색'), p1 = byText(document, 'form button', '1주일');
@@ -3090,9 +3120,10 @@ function calMode(card, rows) {
   nav.appendChild(mk('›', 'next', function () { calMove(h, 1); PB.render(); }));
   nav.appendChild(mk('오늘', 'today', function () { h.anchor = PB.TODAY; PB.render(); }));
   var lb = document.createElement('strong'); lb.className = 'bc-label'; lb.textContent = calLabel(h); lb.setAttribute('data-test', 'cal-label'); nav.appendChild(lb);
-  nav.appendChild(segTabs([['month', '월'], ['week', '주'], ['day', '일']], h.cv, function (v) { if (v === 'day') toDay(h); else h.cv = v; PB.render(); }, 'cv'));
-  var first = kids.filter(function (k) { return !k.contains(sb); })[0]; row.insertBefore(nav, first || row.firstChild); fixLabel(lb);
-  moveSearch(sb, $('form input.ant-input'));
+  /* 이동 묶음은 필터 줄 오른쪽(보기 세그먼트 앞)으로, 기간 줄은 비움 */
+  moveSearch(sb, $('form input.ant-input')); var grp = document.createElement('div'); grp.className = 'bc-navgrp'; grp.appendChild(nav); row1.appendChild(grp); fixLabel(lb); row.style.display = 'none';
+  /* 필터 줄에 이동 묶음까지 들어가면 한 줄, 안 되면 이동 묶음은 원래 기간 줄 자리로 */
+  if (!fitRow(row1, $('form input.ant-input'), null, grp, true)) { var it = $('form input.ant-input'); while (it.parentElement !== row1) it = it.parentElement; it.style.width = ''; it.style.maxWidth = ''; it.style.flex = ''; row.insertBefore(grp, row.firstChild); grp.style.marginLeft = '0'; row.style.display = ''; }
   /* 표 대신 캘린더 */
   var tw = $('.ant-table-wrapper', card); tw.style.display = 'none';
   var all = storeBooks(), shown = rows.filter(function (b) { return calRange(h, b); });
@@ -3103,7 +3134,7 @@ function calMode(card, rows) {
     open: function (no) { h.open = no; PB.render(); } }));
   /* 캘린더일 때만: 상태 칩 줄을 카드 머리(제목 오른쪽)로, 위쪽 여백 축소 */
   var sr = $('.bc-srow', card), ht = $('.ant-card-head-title', card); if (sr && ht) { ht.after(sr); sr.classList.add('bc-srow-head'); card.classList.add('bc-hassr'); }
-  var fwrap = $('form').parentElement; fwrap.style.paddingTop = '12px'; fwrap.style.paddingBottom = '12px';
+  var fwrap = $('form').parentElement; fwrap.style.paddingBottom = '12px'; /* 위 여백은 목록과 같게(보기 세그먼트가 위아래로 안 움직이게) */
   var cbody = $('.ant-card-body', card); cbody.style.padding = '12px 16px 16px';
 }
 /* 지금 보이는 달 · 주 안의 예약인가(제목 건수용) */

@@ -2926,6 +2926,17 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 .bc-nobadge .bc-chip{gap:3px!important;padding-left:4px!important;padding-right:3px!important}
 .bc-nobadge .bc-pn{width:13px;height:13px;font-size:9.5px}
 .bc-nobadge .bc-arr .bc-asp{display:none}
+/* 보기 세그먼트 = 필터 줄 오른쪽 끝 */
+.bc-viewseg{margin-left:auto!important;flex:none}
+.bc-nav{flex:none}
+.bc-nav ~ .bc-viewseg,.bc-viewseg{margin-left:auto!important}
+.bc-nav:not(.bc-nav-wrap){margin-left:auto}
+.bc-nav:not(.bc-nav-wrap) + .bc-viewseg{margin-left:8px!important}
+.bc-srow-strip{margin:0 0 0 auto!important;padding:4px 8px;flex:0 1 auto}
+.bc-sumstrip{flex-wrap:wrap}
+.bc-navgrp{display:flex;align-items:center;gap:8px;margin-left:auto;flex:none}
+.bc-navgrp .bc-nav{margin-left:0!important}
+.bc-navgrp .bc-viewseg{margin-left:0!important}
 </style></head>
 <body><div id="app"></div>
 <template id="T_b_res">
@@ -3277,9 +3288,9 @@ function mixDark(v) { var c = rgbOf(v); return 'rgb(' + c.map(function (n) { ret
 /* 칸이 좁아 시각과 배지가 겹치면 모든 칩의 배지를 한꺼번에 같은 색 점으로 */
 /* 한 줄 칩이 칸에 안 들어가면 화면 전체 칩을 한 번에 줄임: 이름 · 스토어명 말줄임(자동) → 화살표 뒤 날짜 생략 → 배지를 색 점으로. 시각은 항상 보존 */
 function fitBadges(root) {
-  if (!root.isConnected) return; root.classList.remove('bc-dots', 'bc-short', 'bc-nobadge');
+  if (!root.isConnected) return; root.classList.remove('bc-dots', 'bc-short', 'bc-nobadge', 'bc-noarr');
   var tight = function () { return Array.prototype.some.call(root.querySelectorAll('.bc-chip'), function (c) { return c.offsetParent !== null && c.scrollWidth > c.clientWidth + 0.5; }); };
-  if (tight()) { root.classList.add('bc-short'); if (tight()) { root.classList.add('bc-dots'); if (tight()) root.classList.add('bc-nobadge'); /* 그래도 넘치면 배지 점도 뺌. 시각 · 화살표 시각 · 짝 번호는 끝까지 보존 */ } }
+  if (tight()) { root.classList.add('bc-short'); if (tight()) { root.classList.add('bc-dots'); if (tight()) { root.classList.add('bc-nobadge'); if (tight()) root.classList.add('bc-noarr'); /* 그래도 넘치면 화살표 시각을 빼고 짝 번호 + 시각만(번호는 끝까지 보존) */ } } }
 }
 window.addEventListener('resize', function () { var r = document.querySelector('.bc-cal'); if (r) fitBadges(r); });
 
@@ -3325,6 +3336,24 @@ function layoutFit(root, o) {
   }
 }
 window.addEventListener('resize', function () { var r = document.querySelector('.bc-cal'); if (r && CALOPT) { layoutFit(r, CALOPT); fitBadges(r); } });
+
+/* 보기 세그먼트 [목록 | 월 | 주 | 일] 고르기 */
+function pickView(st, v) { st.open = null; if (v === 'list') { st.mode = 'list'; return; } var wasList = st.mode === 'list'; st.mode = 'cal'; if (v === 'day') { if (wasList) { st.cv = 'day'; st.anchor = PB.TODAY; } else toDay(st); } else st.cv = v; }
+/* 필터 줄 한 줄 맞추기: 검색어 칸을 먼저 줄이고(최소 180px), 그래도 안 되면 이동 묶음만 다음 줄로. 보기 세그먼트는 줄 오른쪽 끝 고정 */
+function fitRow(row, inp, nav, seg, noWrap) {
+  if (!noWrap) { row.style.flexWrap = 'wrap'; row.style.rowGap = '8px'; }
+  var item = inp; while (item.parentElement && item.parentElement !== row) item = item.parentElement;
+  var box = inp.closest('.ant-input-affix-wrapper') || inp;
+  item.style.width = ''; item.style.maxWidth = ''; item.style.flex = '';
+  var kids = function () { return Array.prototype.filter.call(row.children, function (k) { return getComputedStyle(k).display !== 'none'; }); };
+  var gap = parseFloat(getComputedStyle(row).columnGap) || 0;
+  var need = function () { var w = 0, ks = kids(); ks.forEach(function (k) { var cs = getComputedStyle(k); w += k.getBoundingClientRect().width + (parseFloat(cs.marginLeft) || 0) + (parseFloat(cs.marginRight) || 0); }); return w + gap * (ks.length - 1); };
+  var rw = row.getBoundingClientRect().width, over = need() - rw + 2; if (over <= 0) return true;
+  var iw = item.getBoundingClientRect().width, nw = Math.floor(iw - over), set = function (w) { item.style.width = w + 'px'; item.style.maxWidth = w + 'px'; item.style.flex = 'none'; box.style.width = '100%'; box.style.minWidth = '0'; inp.style.minWidth = '0'; };
+  /* 검색어 칸은 150px까지 줄이고, 그래도 안 되면 오른쪽 묶음(이동 + 보기)이 다음 줄 오른쪽 끝으로 */
+  if (nw >= 150) { set(nw); return true; } /* 150px로도 안 되면 칸은 그대로 두고 오른쪽 묶음만 다음 줄로 */
+  return false;
+}
 
 /* ===== BO 예약 > 예약 관리: 실화면 스냅샷 그대로 + [목록 | 캘린더] (스토어 하나 고른 뒤에만) ===== */
 var ACC = '#1677ff';
@@ -3393,10 +3422,10 @@ function pRes() {
   var mk = function (txt, on, test, fn) { var x = p1.cloneNode(true); x.className = on ? onCls : offCls; x.querySelector('span').textContent = txt; x.setAttribute('data-test', test); x.onclick = fn; return x; };
   var tg = document.createElement('div'); tg.className = 'bc-bseg'; tg.setAttribute('data-test', 'mode'); mark(tg);
 
-  tg.appendChild(mk('목록', b.mode === 'list', 'mode-list', function () { b.mode = 'list'; b.open = null; PB.render(); }));
-  var cb = mk('캘린더', b.mode === 'cal', 'mode-cal', function () { b.mode = 'cal'; b.open = null; PB.render(); }); tg.appendChild(cb);
-  row.appendChild(tg);
+  var vcur = b.mode === 'list' ? 'list' : b.cv; [['list', '목록', 'mode-list'], ['month', '월', 'cv-month'], ['week', '주', 'cv-week'], ['day', '일', 'cv-day']].forEach(function (it) { tg.appendChild(mk(it[1], vcur === it[0], it[2], function () { pickView(b, it[0]); PB.render(); })); }); tg.setAttribute('data-test', 'view'); tg.classList.add('bc-viewseg');
+  var row1 = stSel.parentNode; while (row1 && !row1.contains(inp)) row1 = row1.parentNode; row1.appendChild(tg);
   var rows = filtered(), tw = $('.ant-table-wrapper');
+  if (b.mode !== 'cal') fitRow(row1, inp, null, tg);
   if (b.mode === 'cal') {
     kids.forEach(function (k) { if (!k.contains(sb)) k.style.display = 'none'; });
     var nav = document.createElement('div'); nav.className = 'bc-nav'; mark(nav);
@@ -3405,24 +3434,20 @@ function pRes() {
     nav.appendChild(nb('›', 'next', function () { calMove(b, 1); PB.render(); }));
     nav.appendChild(nb('오늘', 'today', function () { b.anchor = PB.TODAY; PB.render(); }));
     var lb = document.createElement('strong'); lb.className = 'bc-label'; lb.textContent = calLabel(b); lb.setAttribute('data-test', 'cal-label'); nav.appendChild(lb);
-    var cv = document.createElement('div'); cv.className = 'bc-bseg bc-cvseg'; cv.setAttribute('data-test', 'cv');
-    cv.appendChild(mk('월', b.cv === 'month', 'cv-month', function () { b.cv = 'month'; PB.render(); }));
-    cv.appendChild(mk('주', b.cv === 'week', 'cv-week', function () { b.cv = 'week'; PB.render(); }));
-    cv.appendChild(mk('일', b.cv === 'day', 'cv-day', function () { toDay(b); PB.render(); }));
-    nav.appendChild(cv);
-    row.insertBefore(nav, row.firstChild); fixLabel(lb);
-    moveSearch(sb, inp);
+    moveSearch(sb, inp); var grp = document.createElement('div'); grp.className = 'bc-navgrp'; grp.appendChild(nav); grp.appendChild(tg); row1.appendChild(grp); fixLabel(lb); row.style.display = 'none';
     tw.style.display = 'none';
     tw.parentNode.insertBefore(renderCal({ list: rows, all: PB.DB.books.filter(function (x) { return !b.stores.length || b.stores.indexOf(x.store) >= 0; }), set: b.stores.length === 1 ? PB.setOf(b.stores[0]) : PB.openSet(), showStore: true, fit: true, st: b, sel: b.open, pre: 'bd', stLabel: '상태',
       /* 상태 표시 = 목록 상태 칸 그대로(점 + 색 글자). BO에는 처리 필요 개념이 없어 강조 없음 */
      
       open: function (no) { b.open = no; PB.render(); } }), tw.nextSibling);
     /* 캘린더일 때만: 상태 칩 줄을 이동 줄 오른쪽으로, 요약 카드 5개는 얇은 한 줄 띠로 */
-    var sr = $('.bc-srow'); if (sr) row.insertBefore(sr, tg);
+    var sr = $('.bc-srow');
     var srow0 = $$('.ant-statistic')[0], cardsRow = srow0 && srow0.closest('.ant-row');
     if (cardsRow) { var strip = document.createElement('div'); strip.className = 'bc-sumstrip'; strip.setAttribute('data-test', 'sum-strip'); mark(strip);
       $$('.ant-statistic', cardsRow).forEach(function (s2) { var it = document.createElement('span'); it.className = 'bc-sum-i'; var t = $('.ant-statistic-title', s2).textContent.trim(), v = $('.ant-statistic-content-value', s2).textContent.replace(/s+/g, '') + ($('.ant-statistic-content-suffix', s2) ? $('.ant-statistic-content-suffix', s2).textContent.trim() : ''); it.innerHTML = '<span>' + esc(t) + '</span><b>' + esc(v) + '</b>'; strip.appendChild(it); });
+      if (sr) { sr.classList.add('bc-srow-strip'); strip.appendChild(sr); } /* 상태 칩 줄은 요약 띠 오른쪽 */
       cardsRow.style.display = 'none'; cardsRow.after(strip); }
+    fitRow(row1, inp, null, grp);
     return;
   }
   /* 목록 */

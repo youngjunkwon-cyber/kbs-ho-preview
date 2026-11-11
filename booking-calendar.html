@@ -107,8 +107,9 @@ var DB,S;
 function freshDB(){DB={store:STORES[0],stores:STORES,books:null};DB.books=seedBookings();}
 /* 마지막으로 본 보기(목록/캘린더, 월/주/일)를 계정 기준으로 기억: 시안은 localStorage로 흉내(계정 하나 가정). 저장값이 없으면 목록. 날짜는 저장하지 않고 들어올 때마다 오늘 기준 */
 var VKEY={HOST:'kbs.bookingView.HOST',BO:'kbs.bookingView.BO'};
-function loadView(k){try{var v=JSON.parse(localStorage.getItem(VKEY[k])||'null');if(v&&/^(list|cal)$/.test(v.mode)&&/^(month|week|day)$/.test(v.cv))return v;}catch(e){}return {mode:'list',cv:'month'};}
-function saveView(){try{localStorage.setItem(VKEY.HOST,JSON.stringify({mode:S.host.mode,cv:S.host.cv}));localStorage.setItem(VKEY.BO,JSON.stringify({mode:S.bo.mode,cv:S.bo.cv}));}catch(e){}}
+/* 저장값 = 보기 하나(list/month/week/day). 예전 형식 {mode, cv}는 새 값으로 바꿔 읽음 */
+function loadView(k){try{var v=JSON.parse(localStorage.getItem(VKEY[k])||'null');if(v&&!v.view&&v.mode)v={view:v.mode==='list'?'list':v.cv};if(v&&/^(list|month|week|day)$/.test(v.view))return {mode:v.view==='list'?'list':'cal',cv:v.view==='list'?'month':v.view};}catch(e){}return {mode:'list',cv:'month'};}
+function saveView(){try{localStorage.setItem(VKEY.HOST,JSON.stringify({view:S.host.mode==='list'?'list':S.host.cv}));localStorage.setItem(VKEY.BO,JSON.stringify({view:S.bo.mode==='list'?'list':S.bo.cv}));}catch(e){}}
 function freshState(){var vh=loadView('HOST'),vb=loadView('BO');return {surf:'HOST',mark:false,
  host:{mode:vh.mode,cv:vh.cv,anchor:TODAY,st:'',lang:'',owner:'',q:'',qd:'',ptab:'전체',open:null},
  bo:{mode:vb.mode,cv:vb.cv,anchor:TODAY,stores:[],st:'',lang:'',owner:'',q:'',qd:'',open:null}};}
