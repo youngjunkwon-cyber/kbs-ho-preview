@@ -173,6 +173,24 @@ td small{display:block;color:var(--tx3);font-size:11.5px;margin-top:3.5px}
 .kv2.nw b{box-shadow:inset 0 -1px 0 var(--pk)}
 .sec{font-size:11px;color:var(--tx3);margin:12px 0 5px}
 .bx{border:1px solid var(--ln);border-radius:5px;padding:8.5px 9.5px;font-size:11px;line-height:1.45;min-height:41.5px}
+/* 예약 상품 칸 · 목록 · 카드 상품 줄: 상품 예약 시안과 같은 모양 */
+.bx.pbx{display:flex;align-items:center;gap:10px}
+/* 예약 현황 표: 1440 화면에서 예약상태 · 관리 칸이 가로 스크롤 뒤로 숨지 않게 칸 좌우 여백만 줄임(글자 크기 그대로, 상품 예약 시안과 같은 방식) */
+.restw{padding:0 14px}
+.restbl th,.restbl td{padding-left:6px;padding-right:6px}
+.restbl td:nth-child(5){white-space:normal;min-width:72px;max-width:92px;word-break:keep-all}
+.bx.pbx,.bx.pbs{font-size:12px;margin-bottom:12px}
+.pbx-t{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.pbx-t b{font-weight:700}
+.pbx-l{flex:none;font-size:12px;color:#e8537a;text-decoration:underline;cursor:pointer}
+td small.pl{max-width:116px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rc .lp,.pcard .lp{font-size:15px;font-weight:700;color:#212121;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.pcard .lp{margin-top:7.5px}
+.rc .lp+.l2,.pcard .lp+.l2{margin-top:2px}
+/* 처리 필요 카드: 날짜는 자르지 않고, 날짜와 배지가 한 줄에 안 들어가면 배지 묶음이 다음 줄 오른쪽으로 */
+.pcard .l1{flex-wrap:wrap;row-gap:4px}
+.pcard .l1 .rt{flex-shrink:0;margin-left:auto}
+.rt .bd,.rt .chb{white-space:nowrap}
 .dw textarea{width:100%;height:51px;border:1px solid var(--ln);border-radius:5px;padding:7.5px 9.5px;font-size:11px;resize:vertical;outline:none}
 .sv{display:block;margin:5px 0 0 auto;height:27px;padding:0 14.5px;border:1px solid var(--ln);background:#fff;border-radius:3.5px;font-size:11px;cursor:pointer}
 .hi{display:flex;justify-content:space-between;font-size:11px;font-weight:700;margin-bottom:6px}
@@ -326,8 +344,9 @@ function seedRes(){
  ['2026-08-28 13:00','2026-08-20 15:12','Cheung Siu Wai','260820068ZT01','홍콩(중국 특별행정구)','중국어(번체)','WhatsApp','방문완료','고객','알리페이 홍콩','','','']
  ];
  /* 예약 상품(상품 예약 기능 그대로 화면에 둠): 목록 고객 칸 둘째 줄 · 예약 상세 · 대시보드 예약 카드. 상품이 없으면 스토어 예약 */
+ var PNP=[55000,180000];/* 예약 상품 가격(시안용 값): 디자인 컷, 퍼스널 컬러 메이크업 */
  var PN=[{'영어':'Design Cut','일본어':'デザインカット','중국어(간체)':'设计剪发','중국어(번체)':'設計剪髮'},{'영어':'Personal Color Makeup','일본어':'パーソナルカラーメイク','중국어(간체)':'个人色彩彩妆','중국어(번체)':'個人色彩彩妝'}];
- return A.map(function(a,i){var p=phoneOf(a[2],a[4],i+3),pd=i%3===1?(PN[i%2][a[5]]||PN[i%2]['영어']):'';return {prod:pd,kind:pd?'상품 예약':'스토어 예약',no:i+1,visit:a[0],recv:a[1],name:a[2],rno:a[3],nation:a[4],lang:a[5],contact:a[6],status:a[7],owner:a[8],ch:a[9],req:a[10],memo:a[11],need:a[12],phone:p.text,local:p.local};});
+ return A.map(function(a,i){var p=phoneOf(a[2],a[4],i+3),pd=i%3===1?(PN[i%2][a[5]]||PN[i%2]['영어']):'';return {prod:pd,prodEn:pd?PN[i%2]['영어']:'',price:pd?PNP[i%2]:0,kind:pd?'상품 예약':'스토어 예약',no:i+1,visit:a[0],recv:a[1],name:a[2],rno:a[3],nation:a[4],lang:a[5],contact:a[6],status:a[7],owner:a[8],ch:a[9],req:a[10],memo:a[11],need:a[12],phone:p.text,local:p.local};});
 }
 function seedChatlog(L){
  var Z='您好,感谢您的咨询。请问有什么可以帮您?';
@@ -454,7 +473,7 @@ function freshState(){
   live:{kind:'전체',st:'전체',reply:'전체',unread:'전체',delay:'전체',ch:'전체',sel:null},
   consult:{st:'',lang:'',route:'',ch:'전체',member:'',sns:'',wait:'전체',per:'전체',from:'',to:'',fromd:'',tod:''},
   rev:{img:'',type:'',ch:'전체',q:'',qd:'',from:'',to:'',fromd:'',tod:'',exp:{}}};
-}
+}
 
 
 var S;
@@ -514,8 +533,8 @@ function shell(){
 function resCard(r,click){
  return '<div class="'+(click==='dash'?'rc':'pcard')+'" data-act="'+(click==='dash'?'dcard':'pcard')+'" data-v="'+r.no+'">'
   +'<div class="l1"><span>'+r.visit.slice(0,10)+(click==='dash'?' ('+['일','월','화','수','목','금','토'][new Date(r.visit.slice(0,10)+'T00:00:00Z').getUTCDay()]+') ':' ')+r.visit.slice(11)+'</span><span class="rt">'+chB(r.ch)+'<span class="bd">예약</span></span></div>'
+  +'<div class="lp" title="'+esc(r.prod||'스토어 예약')+'">'+esc(r.prod||'스토어 예약')+'</div>'
   +'<div class="l2">'+esc(r.name)+''+'</div><div class="l3">'+esc(r.nation)+'</div>'
-  +'<div class="l3" style="color:#8c8c8c">'+esc(r.prod||'스토어 예약')+'</div>'
   +'<div class="l5">'+r.rno+' &middot; 접수 '+r.recv+'</div></div>';
 }
 function needList(tab){
@@ -578,7 +597,7 @@ function resFiltered(){
   if(v.owner!=='전체'&&r.owner!==v.owner)return false;
   var bd=v.basis==='방문일'?r.visit:r.recv;
   if(!inRange(bd,from,to))return false;
-  if(q){var hay=[r.name,r.phone,r.phone.replace(/\D/g,''),r.rno,r.req,r.memo].join(' ').toLowerCase();if(hay.indexOf(q)<0)return false;}
+  if(q){var hay=[r.name,r.phone,r.phone.replace(/\D/g,''),r.rno,r.req,r.memo,r.prod,r.prodEn].join(' ').toLowerCase();/* 상품명: 예약 언어 상품명과 영어 상품명 부분 일치(상품 예약 기능 그대로) */if(hay.indexOf(q)<0)return false;}
   return true;});
  var key=v.sort==='방문일'?'visit':'recv';
  return a.sort(function(x,y){return x[key]<y[key]?1:-1;});
@@ -594,12 +613,12 @@ function viewRes(){
   +sel('res.ch',CHOPT,'new')
   +sel('res.kind',[['전체','예약 구분 전체'],['상품 예약','상품 예약'],['스토어 예약','스토어 예약']])
   +sel('res.owner',[['전체','등록 주체 전체'],['고객','등록 주체 고객'],['매장','등록 주체 매장']])
-  +inp('res.qd','여권명·연락처·예약번호·요청사항·매장 메모',212)+'</div><div class="fr">'
+  +inp('res.qd','여권명·연락처·예약번호·요청사항·매장 메모·상품명',296)+'</div><div class="fr">'
   +[['1w','1주일'],['1m','1개월'],['3m','3개월'],['6m','6개월']].map(function(b){return '<button class="btn'+(v.per===b[0]?' on':'')+'" data-act="rper" data-v="'+b[0]+'">'+b[1]+'</button>';}).join('')
   +sel('res.basis',[['방문일','방문일 기준'],['접수일','접수일 기준']])+sel('res.sort',[['방문일','방문일 순'],['접수일','접수일 순']])
   +drange('res')+'<button class="btn pk" data-act="search">검색</button></div></div>';
- h+='<div class="pagecard"><div class="pc-h">예약목록 ('+a.length+')</div><div class="tw"><table><thead><tr><th>방문일시</th><th>고객 (여권명)</th><th class="new">유입 채널</th><th>예약번호</th><th>국적</th><th>언어</th><th>연락</th><th>예약상태</th><th>관리</th></tr></thead><tbody>'
-  +(rows.length?rows.map(function(r){return '<tr><td>'+r.visit+'<small>접수 '+r.recv+'</small></td><td>'+esc(r.name)+'<small>'+esc(r.prod||'스토어 예약')+'</small></td><td>'+dch(r.ch)+'</td><td>'+r.rno+'</td><td>'+esc(r.nation)+'</td><td>'+r.lang+'</td><td>'+r.contact+'</td><td>'+r.status+'</td><td><button class="btn-s" data-act="ropen" data-v="'+r.no+'">상세</button></td></tr>';}).join(''):'<tr><td colspan="9" class="empty">조건에 맞는 예약이 없어요.</td></tr>')
+ h+='<div class="pagecard"><div class="pc-h">예약목록 ('+a.length+')</div><div class="tw restw"><table class="restbl"><thead><tr><th>방문일시</th><th>고객 (여권명)</th><th class="new">유입 채널</th><th>예약번호</th><th>국적</th><th>언어</th><th>연락</th><th>예약상태</th><th>관리</th></tr></thead><tbody>'
+  +(rows.length?rows.map(function(r){return '<tr><td>'+r.visit+'<small>접수 '+r.recv+'</small></td><td>'+esc(r.name)+'<small class="pl" title="'+esc(r.prod||'스토어 예약')+'">'+esc(r.prod||'스토어 예약')+'</small></td><td>'+dch(r.ch)+'</td><td>'+r.rno+'</td><td>'+esc(r.nation)+'</td><td>'+r.lang+'</td><td>'+r.contact+'</td><td>'+r.status+'</td><td><button class="btn-s" data-act="ropen" data-v="'+r.no+'">상세</button></td></tr>';}).join(''):'<tr><td colspan="9" class="empty">조건에 맞는 예약이 없어요.</td></tr>')
   +'</tbody></table></div>'+pager(v.page,a.length,size,'res.page')+'</div></div>';
  h+='<aside class="resp"><h3>처리 필요 <em>'+all.length+'</em></h3><div class="ptabs">'+ptabs.map(function(t){return '<span class="'+(v.ptab===t?'on':'')+'" data-act="ptab" data-v="'+t+'">'+t+' '+needList(t).length+'</span>';}).join('')+'</div>'
   +'<div class="pdesc">예약이나 방문 결과 처리가 필요한 예약이에요. 카드를 누르면 예약 상세가 열려요.</div>'
@@ -609,7 +628,7 @@ function viewRes(){
   var r=DB.res.filter(function(x){return x.no===v.open;})[0];
   if(r){
    h+='<div class="ov" data-act="rclose"></div><div class="dw"><div class="hd"><span data-act="rclose">&times;</span>예약 상세</div><div class="stw"><div class="stp"><i></i>'+r.status+'</div>'+chB(r.ch)+'</div><div class="dt">'+r.visit+'</div>'
-   +'<div class="sec">예약 상품</div><div class="bx">'+esc(r.prod||'스토어 예약')+'</div>'
+   +'<div class="sec">예약 상품</div>'+(r.prod?'<div class="bx pbx"><span class="pbx-t"><b>'+esc(r.prod)+'</b><span>'+r.price.toLocaleString('ko-KR')+'원</span></span><a class="pbx-l" data-act="nop">상품 보기</a></div>':'<div class="bx pbs">스토어 예약</div>')
    +'<div class="kv2"><span>여권명</span><b>'+esc(r.name)+''+'</b></div>'+kv('국적',r.nation)+kv('언어',r.lang)+kv('전화번호',r.phone)+kv('메신저',r.contact+' '+r.local)+kv('예약 번호',r.rno)+kv('접수 시각',r.recv)+kv('등록 방식',r.owner)
    +'<div class="sec">고객 요청사항</div><div class="bx">'+(r.req?esc(r.req):'<span style="color:#b5b5b5">요청사항이 없어요.</span>')+'</div>'
    +'<div class="sec">매장 메모</div><textarea id="memo" placeholder="고객에게는 안 보여요. 매장 안에서만 쓰는 메모예요.">'+esc(r.memo)+'</textarea><button class="sv" data-act="nop">저장</button>'
