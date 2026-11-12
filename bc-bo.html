@@ -3160,7 +3160,7 @@ function slotCount(all, d, m, set) { var iv = set.intervalMinute; return all.fil
 /* 화면에 놓을 칩: 예약은 방문 시각에, 변경 신청 대기는 신청한 새 시각에 점선 칩 하나 더 */
 function chipsOf(list) {
   var out = [];
-  list.forEach(function (b) { out.push({ b: b, ts: b.visit, chg: false }); if (b.status === '변경요청' && b.chg) out.push({ b: b, ts: b.chg, chg: true }); /* 요청한 새 시간 칩 */ });
+  list.forEach(function (b) { out.push({ b: b, ts: b.visit, chg: false }); /* 변경요청은 원래 시간 칩 하나만(요청 시간 칩 · 짝 번호 · 화살표 시각 없음) */ });
   return out.sort(function (a, c) { return a.ts < c.ts ? -1 : a.ts > c.ts ? 1 : (a.chg ? 1 : 0) - (c.chg ? 1 : 0); });
 }
 /* 칩 묶음: 다가오는 예약 / 끝난 예약 / 취소 · 노쇼 (왼쪽 막대 색) */
@@ -3175,16 +3175,16 @@ var NEEDTAG = { '신규': '신규', '방문결과': '방문결과', '변경': '�
 function chipEl(c, onOpen) {
   var e = document.createElement('button'); e.type = 'button';
   var o = CALOPT, man = c.b.owner === '매장', need = !c.chg && o.need ? o.need(c.b) : '';
-  e.className = 'bc-chip' + (man ? ' bc-manual' : '') + ' bc-g-' + (GRP[c.b.status] || 'up') + (c.chg ? ' bc-chg' : '') + (need && !(c.b.status === '변경요청' && c.b.chg) ? ' bc-need' : '') + (o.sel != null && o.sel === c.b.no ? ' bc-sel' : '');
+  e.className = 'bc-chip' + (man ? ' bc-manual' : '') + ' bc-g-' + (GRP[c.b.status] || 'up') + (c.chg ? ' bc-chg' : '') + (need ? ' bc-need' : '') + (o.sel != null && o.sel === c.b.no ? ' bc-sel' : '');
   e.setAttribute('style', scStyle(c.b.status));
   /* 고정 2줄: 1줄 = 시각 + 오른쪽 배지 자리(처리 필요 > 변경 신청 > 수기), 2줄 = 고객명(+ 배지 자리를 못 쓴 수기) */
   var md = function (ts) { return '<span class="bc-ad">' + (+ts.slice(5, 7)) + '/' + (+ts.slice(8, 10)) + ' </span>' + ts.slice(11, 16); };
   var cr = c.b.status === '변경요청' && !!c.b.chg; /* 변경 요청 쌍: 원래 칩 = '변경 요청' 배지 + → 요청 시각, 요청 칩 = '요청 시간' 배지 + ← 원래 시각 */
   var badge = c.chg ? '<span class="bc-cr">요청 시간</span>' : cr ? '<span class="bc-cr">변경 요청</span>' : need ? '<span class="bc-tag">' + NEEDTAG[need] + '</span>' : man ? '<span class="bc-mb">수기</span>' : '';
   var man2 = man && (need || cr) ? '<span class="bc-ms">수기</span>' : '';
-  var arr = c.chg ? '<span class="bc-arr">←<span class="bc-asp"> </span>' + md(c.b.visit) + '</span>' : cr ? '<span class="bc-arr">→<span class="bc-asp"> </span>' + md(c.b.chg) + '</span>' : '';
+  var arr = '', arr0 = c.chg ? '<span class="bc-arr">←<span class="bc-asp"> </span>' + md(c.b.visit) + '</span>' : cr ? '<span class="bc-arr">→<span class="bc-asp"> </span>' + md(c.b.chg) + '</span>' : '';
   var x = o.st && o.st.cv === 'day' && !c.chg ? '<span class="bc-x"><span>' + esc(c.b.nation) + '</span><span>' + esc(langLabel(c.b.lang)) + '</span><span>' + esc(c.b.status) + '</span></span>' : '';
-  var pn = cr && o.pn ? o.pn[c.b.no] : 0;
+  var pn = 0;
   e.innerHTML = '<span class="bc-r1">' + (pn ? '<span class="bc-pn" data-test="pn-' + c.b.no + '">' + pn + '</span>' : '') + '<span class="bc-t">' + c.ts.slice(11, 16) + '</span>' + (o.showStore ? '<span class="bc-rs">' + esc(c.b.storeName || '') + '</span>' : '') + (badge ? '<span class="bc-badge">' + badge + '</span>' : '') + '</span><span class="bc-r2"><span class="bc-n">' + esc(c.b.name) + '</span>' + arr + man2 + x + '</span>';
   e.setAttribute('aria-label', c.ts.slice(11, 16) + ' ' + c.b.name);
   e.setAttribute('data-test', (c.chg ? 'chip-chg-' : 'chip-') + c.b.no);
@@ -3228,7 +3228,7 @@ function statusRow(o) {
   });
   /* 표시 묶음: 누르지 않는 설명 */
   var g2 = document.createElement('div'); g2.className = 'bc-grp bc-grp2'; g2.setAttribute('data-test', 'srow-legend');
-  g2.innerHTML = (o.need ? '<span class="bc-li"><i class="bc-sw bc-sw-need"></i><i class="bc-tag bc-tag-sw">신규</i>처리 필요</span>' : '') + '<span class="bc-li"><i class="bc-sw bc-sw-req"></i><i class="bc-pn">1</i>요청 시간</span><span class="bc-li"><i class="bc-sw bc-sw-man"></i><i class="bc-mb">수기</i>수기 등록</span>';
+  g2.innerHTML = (o.need ? '<span class="bc-li"><i class="bc-sw bc-sw-need"></i><i class="bc-tag bc-tag-sw">신규</i>처리 필요</span>' : '') + '<span class="bc-li"><i class="bc-sw bc-sw-man"></i><i class="bc-mb">수기</i>수기 등록</span>';
   if (!o.listMode) row.appendChild(g2);
   /* 줄이 바뀌어 표시 묶음이 아래로 내려가면 구분선 숨김 */
   var chk = function () { if (!g2.isConnected) { window.removeEventListener('resize', chk); return; } g2.classList.toggle('bc-wrapped', g2.offsetTop > g1.offsetTop + 2); };
@@ -3365,7 +3365,7 @@ function mixDark(v) { var c = rgbOf(v); return 'rgb(' + c.map(function (n) { ret
 
 /* 줄임(화면 전체 칩 한 번에): 화살표 뒤 날짜 → (BO) 스토어명 숨김 → 화살표 시각 숨김 → 고객명 숨김 → 배지를 색 점으로. 시각 · 짝 번호는 항상 보존(보존 순서 시간 > 배지 > 이름) */
 function fitBadges(root) {
-  if (!root.isConnected) return; var ST = ['bc-short', 'bc-nostore', 'bc-noarr', 'bc-noname', 'bc-dots', 'bc-nobadge']; ST.forEach(function (k) { root.classList.remove(k); });
+  if (!root.isConnected) return; var ST = ['bc-nostore', 'bc-noname', 'bc-dots', 'bc-nobadge']; ST.forEach(function (k) { root.classList.remove(k); });
   var tight = function () { return Array.prototype.some.call(root.querySelectorAll('.bc-chip'), function (c) { return c.offsetParent !== null && c.scrollWidth > c.clientWidth + 0.5; }); };
   for (var i = 0; i < ST.length && tight(); i++) root.classList.add(ST[i]); /* 마지막 bc-nobadge 는 점도 못 들어갈 때만(비상) */
 }
