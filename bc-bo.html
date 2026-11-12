@@ -3035,6 +3035,7 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 
 /* 주 · 3일 보기 시간 칸 +N: 월 보기 +N 과 같은 알약 */
 .bc-wc .bc-smore{align-self:flex-start;font-size:13px!important;font-weight:600!important;color:#33333a!important;height:20px!important;line-height:18px!important;padding:0 8px!important;border:1px solid #d0d0d6!important;border-radius:10px!important;background:#fff!important;cursor:default}
+.bc-nav .bc-label{margin:0 2px!important}
 </style></head>
 <body><div id="app"></div>
 <template id="T_b_res">
@@ -3570,6 +3571,9 @@ function openPicker(lb, st) {
 function chipPick(chips, k) { var pr = function (c) { return c.classList.contains('bc-need') ? 0 : c.classList.contains('bc-g-done') ? 2 : (c.classList.contains('bc-g-cx') || c.classList.contains('bc-g-ns')) ? 3 : 1; };
   return Array.prototype.map.call(chips, function (c, i) { return [pr(c), i]; }).sort(function (a, b) { return a[0] - b[0] || a[1] - b[1]; }).slice(0, k).map(function (x) { return x[1]; }); }
 
+/* 이동 묶음 순서: [오늘] ‹ 기간 라벨 ▾ › */
+function navOrder(nav, lb) { var q = function (k) { return nav.querySelector('[data-test=' + k + ']'); }, t = q('today'), p = q('prev'), n = q('next'); if (!t || !p || !n) return; nav.insertBefore(t, nav.firstChild); nav.insertBefore(p, t.nextSibling); nav.insertBefore(lb, p.nextSibling); nav.insertBefore(n, lb.nextSibling); }
+
 /* ===== BO 예약 > 예약 관리: 실화면 스냅샷 그대로 + [목록 | 캘린더] (스토어 하나 고른 뒤에만) ===== */
 var ACC = '#1677ff';
 document.documentElement.style.setProperty('--pb-acc-bg', '#e6f4ff');
@@ -3649,7 +3653,7 @@ function pRes() {
     nav.appendChild(nb('오늘', 'today', function () { b.anchor = PB.TODAY; PB.render(); }));
     nav.appendChild(nb('›', 'next', function () { calMove(b, 1); PB.render(); }));
     var lb = document.createElement('strong'); lb.className = 'bc-label'; lb.textContent = calLabel(b); lb.setAttribute('data-test', 'cal-label'); lb.setAttribute('role', 'button'); lb.tabIndex = 0; (function (st) { lb.onclick = function (e) { e.stopPropagation(); openPicker(lb, st); }; })(b); nav.appendChild(lb);
-    moveSearch(sb, inp); var grp = document.createElement('div'); grp.className = 'bc-navgrp'; grp.appendChild(nav); grp.appendChild(tg); row1.appendChild(grp); fixLabel(lb); row.style.display = 'none';
+    moveSearch(sb, inp); var grp = document.createElement('div'); grp.className = 'bc-navgrp'; grp.appendChild(nav); grp.appendChild(tg); row1.appendChild(grp); navOrder(nav, lb); fixLabel(lb); row.style.display = 'none';
     tw.style.display = 'none';
     tw.parentNode.insertBefore(renderCal({ list: rows, all: PB.DB.books.filter(function (x) { return !b.stores.length || b.stores.indexOf(x.store) >= 0; }), count: filtered(true), set: b.stores.length === 1 ? PB.setOf(b.stores[0]) : PB.openSet(), showStore: true, fit: true, st: b, sel: b.open, pre: 'bd', stLabel: '상태',
       /* 상태 표시 = 목록 상태 칸 그대로(점 + 색 글자). BO에는 처리 필요 개념이 없어 강조 없음 */

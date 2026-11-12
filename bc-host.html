@@ -2696,6 +2696,7 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 
 /* 주 · 3일 보기 시간 칸 +N: 월 보기 +N 과 같은 알약 */
 .bc-wc .bc-smore{align-self:flex-start;font-size:13px!important;font-weight:600!important;color:#33333a!important;height:20px!important;line-height:18px!important;padding:0 8px!important;border:1px solid #d0d0d6!important;border-radius:10px!important;background:#fff!important;cursor:default}
+.bc-nav .bc-label{margin:0 2px!important}
 </style></head>
 <body><div id="app"></div>
 <template id="T_h_res">
@@ -3231,6 +3232,9 @@ function openPicker(lb, st) {
 function chipPick(chips, k) { var pr = function (c) { return c.classList.contains('bc-need') ? 0 : c.classList.contains('bc-g-done') ? 2 : (c.classList.contains('bc-g-cx') || c.classList.contains('bc-g-ns')) ? 3 : 1; };
   return Array.prototype.map.call(chips, function (c, i) { return [pr(c), i]; }).sort(function (a, b) { return a[0] - b[0] || a[1] - b[1]; }).slice(0, k).map(function (x) { return x[1]; }); }
 
+/* 이동 묶음 순서: [오늘] ‹ 기간 라벨 ▾ › */
+function navOrder(nav, lb) { var q = function (k) { return nav.querySelector('[data-test=' + k + ']'); }, t = q('today'), p = q('prev'), n = q('next'); if (!t || !p || !n) return; nav.insertBefore(t, nav.firstChild); nav.insertBefore(p, t.nextSibling); nav.insertBefore(lb, p.nextSibling); nav.insertBefore(n, lb.nextSibling); }
+
 /* ===== HOST 예약 관리(예약 현황): 실화면 스냅샷 그대로 + [목록 | 캘린더] ===== */
 function H() { return PB.S.host; }
 function langLabel(l) { return PB.LANGS[l] || l; }
@@ -3335,7 +3339,7 @@ function calMode(card, rows, row1, seg) {
   nav.appendChild(mk('›', 'next', function () { calMove(h, 1); PB.render(); }));
   var lb = document.createElement('strong'); lb.className = 'bc-label'; lb.textContent = calLabel(h); lb.setAttribute('data-test', 'cal-label'); lb.setAttribute('role', 'button'); lb.tabIndex = 0; (function (st) { lb.onclick = function (e) { e.stopPropagation(); openPicker(lb, st); }; })(h); nav.appendChild(lb);
   /* 이동 묶음은 카드 머리 줄(제목 오른쪽), 보기 버튼은 그 줄 오른쪽 끝. 기간 줄은 비움 */
-  moveSearch(sb, $('form input.ant-input')); var ht0 = $('.ant-card-head-title', card); ht0.after(nav); card.classList.add('bc-headnav'); fixLabel(lb); row.style.display = 'none';
+  moveSearch(sb, $('form input.ant-input')); var ht0 = $('.ant-card-head-title', card); ht0.after(nav); card.classList.add('bc-headnav'); var tw0 = ht0.cloneNode(true); tw0.textContent = '예약목록 (000)'; tw0.style.cssText = 'position:absolute;visibility:hidden;width:auto;flex:none'; ht0.parentNode.appendChild(tw0); ht0.style.minWidth = Math.ceil(tw0.getBoundingClientRect().width) + 'px'; tw0.remove(); /* 건수 자릿수가 바뀌어도 이동 묶음이 안 움직이게 */ navOrder(nav, lb); fixLabel(lb); row.style.display = 'none';
   /* 표 대신 캘린더 */
   var tw = $('.ant-table-wrapper', card); tw.style.display = 'none';
   var all = storeBooks(), shown = rows.filter(function (b) { return calRange(h, b); });
