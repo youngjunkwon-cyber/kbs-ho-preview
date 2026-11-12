@@ -2719,6 +2719,12 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 .bc-chip .bc-rs{flex:0 1 auto!important}
 .bc-chip .bc-n,.bc-chip .bc-r2 .bc-n,.bc-dgrid .bc-chip .bc-n{flex:0 1000 auto!important}
 .bc-chip .bc-x{flex:0 100000 auto!important}
+
+.bc-sgrp{display:flex;align-items:center;gap:8px;flex:0 1 auto;min-width:248px;max-width:100%}
+.bc-sgrp .bc-sbtn{margin-left:0!important}
+.bc-swrap{max-width:260px!important;flex-wrap:nowrap!important;overflow:hidden}
+.bc-stag{white-space:nowrap;max-width:150px;overflow:hidden;text-overflow:ellipsis}
+.bc-stag-more{flex:none}
 </style></head>
 <body><div id="app"></div>
 <template id="T_h_res">
@@ -3163,7 +3169,7 @@ function fitRow(row, inp, nav, seg, noWrap) {
   var rw = row.getBoundingClientRect().width, over = need() - rw + 2; if (over <= 0) return true;
   var iw = item.getBoundingClientRect().width, nw = Math.floor(iw - over), set = function (w) { item.style.width = w + 'px'; item.style.maxWidth = w + 'px'; item.style.flex = 'none'; box.style.width = '100%'; box.style.minWidth = '0'; inp.style.minWidth = '0'; };
   /* 검색어 칸은 150px까지 줄이고, 그래도 안 되면 오른쪽 묶음(이동 + 보기)이 다음 줄 오른쪽 끝으로 */
-  if (nw >= 150) { set(nw); return true; } /* 150px로도 안 되면 칸은 그대로 두고 오른쪽 묶음만 다음 줄로 */
+  if (nw >= 180) { set(nw); return true; } /* 150px로도 안 되면 칸은 그대로 두고 오른쪽 묶음만 다음 줄로 */
   return false;
 }
 
@@ -3280,6 +3286,16 @@ function hScrollDay(root, st) {
   }, { passive: false });
 }
 
+/* 캘린더일 때 검색어 칸 + [검색]을 한 묶음으로: 검색어 칸은 최소 180px, 줄이 모자라면 둘이 함께 다음 줄로 */
+function groupSearch(row, inp, sb) {
+  if (!row || !inp || !sb) return; var item = inp; while (item.parentElement && item.parentElement !== row) item = item.parentElement; if (item.parentElement !== row) return;
+  var g = document.createElement('div'); g.className = 'bc-sgrp'; g.setAttribute('data-test', 'search-group'); row.insertBefore(g, item); g.appendChild(item); g.appendChild(sb); mark(g);
+  var box = inp.closest('.ant-input-affix-wrapper') || inp; item.style.width = ''; item.style.maxWidth = ''; item.style.flex = '0 1 auto'; item.style.minWidth = '180px'; box.style.width = '100%'; box.style.minWidth = '0'; inp.style.minWidth = '0';
+  row.style.flexWrap = 'wrap'; row.style.rowGap = '8px';
+}
+/* 목록일 때도 검색어 칸 최소 180px, 모자라면 다음 줄로 */
+function minSearch(row, inp) { if (!row || !inp) return; var item = inp; while (item.parentElement && item.parentElement !== row) item = item.parentElement; if (item.parentElement !== row) return; item.style.minWidth = '180px'; item.style.flex = '0 1 auto'; row.style.flexWrap = 'wrap'; row.style.rowGap = '8px'; }
+
 /* ===== HOST 예약 관리(예약 현황): 실화면 스냅샷 그대로 + [목록 | 캘린더] ===== */
 function H() { return PB.S.host; }
 function langLabel(l) { return PB.LANGS[l] || l; }
@@ -3360,7 +3376,7 @@ function pRes() {
   var row1 = stSel.parentNode; while (row1 && !row1.contains(inp)) row1 = row1.parentNode;
   var seg = segTabs([['list', '목록', 'mode-list'], ['month', '월', 'cv-month'], ['week', '주', 'cv-week'], ['day', '일', 'cv-day']], h.mode === 'list' ? 'list' : h.cv, function (v) { pickView(h, v); PB.render(); }, 'view'); /* HOST는 필터 영역이 좁아 세그먼트를 카드 머리 오른쪽(예전 [목록 | 캘린더] 자리)에 고정: 목록 · 캘린더 모두 같은 자리 */
   var hw = $('.ant-card-head-wrapper', card) || $('.ant-card-head', card), ex = document.createElement('div'); ex.className = 'ant-card-extra'; seg.classList.add('bc-viewseg'); ex.appendChild(seg); hw.appendChild(ex);
-  if (h.mode === 'cal') calMode(card, rows, row1, seg); else { listMode(rows); listStatusRow(h, filtered(true), '취소 · 미방문', { n: PB.needList('전체').length }); }
+  if (h.mode === 'cal') calMode(card, rows, row1, seg); else { listMode(rows); minSearch(row1, inp); listStatusRow(h, filtered(true), '취소 · 미방문', { n: PB.needList('전체').length }); }
   needPanel();
 }
 function listMode(rows) {
@@ -3391,7 +3407,7 @@ function calMode(card, rows, row1, seg) {
   nav.appendChild(mk('›', 'next', function () { calMove(h, 1); PB.render(); }));
   var lb = document.createElement('strong'); lb.className = 'bc-label'; lb.textContent = calLabel(h); lb.setAttribute('data-test', 'cal-label'); lb.setAttribute('role', 'button'); lb.tabIndex = 0; (function (st) { lb.onclick = function (e) { e.stopPropagation(); openPicker(lb, st); }; })(h); nav.appendChild(lb);
   /* 이동 묶음은 카드 머리 줄(제목 오른쪽), 보기 버튼은 그 줄 오른쪽 끝. 기간 줄은 비움 */
-  moveSearch(sb, $('form input.ant-input')); var ht0 = $('.ant-card-head-title', card); ht0.after(nav); card.classList.add('bc-headnav'); var tw0 = ht0.cloneNode(true); tw0.textContent = '예약목록 (000)'; tw0.style.cssText = 'position:absolute;visibility:hidden;width:auto;flex:none'; ht0.parentNode.appendChild(tw0); ht0.style.minWidth = Math.ceil(tw0.getBoundingClientRect().width) + 'px'; tw0.remove(); /* 건수 자릿수가 바뀌어도 이동 묶음이 안 움직이게 */ navOrder(nav, lb); fixLabel(lb); row.style.display = 'none';
+  groupSearch(row1, $('form input.ant-input'), sb); var ht0 = $('.ant-card-head-title', card); ht0.after(nav); card.classList.add('bc-headnav'); var tw0 = ht0.cloneNode(true); tw0.textContent = '예약목록 (000)'; tw0.style.cssText = 'position:absolute;visibility:hidden;width:auto;flex:none'; ht0.parentNode.appendChild(tw0); ht0.style.minWidth = Math.ceil(tw0.getBoundingClientRect().width) + 'px'; tw0.remove(); /* 건수 자릿수가 바뀌어도 이동 묶음이 안 움직이게 */ navOrder(nav, lb); fixLabel(lb); row.style.display = 'none';
   /* 표 대신 캘린더 */
   var tw = $('.ant-table-wrapper', card); tw.style.display = 'none';
   var all = storeBooks(), shown = rows.filter(function (b) { return calRange(h, b); });

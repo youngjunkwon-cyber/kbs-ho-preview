@@ -3058,6 +3058,12 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 .bc-chip .bc-rs{flex:0 1 auto!important}
 .bc-chip .bc-n,.bc-chip .bc-r2 .bc-n,.bc-dgrid .bc-chip .bc-n{flex:0 1000 auto!important}
 .bc-chip .bc-x{flex:0 100000 auto!important}
+
+.bc-sgrp{display:flex;align-items:center;gap:8px;flex:0 1 auto;min-width:248px;max-width:100%}
+.bc-sgrp .bc-sbtn{margin-left:0!important}
+.bc-swrap{max-width:260px!important;flex-wrap:nowrap!important;overflow:hidden}
+.bc-stag{white-space:nowrap;max-width:150px;overflow:hidden;text-overflow:ellipsis}
+.bc-stag-more{flex:none}
 </style></head>
 <body><div id="app"></div>
 <template id="T_b_res">
@@ -3502,7 +3508,7 @@ function fitRow(row, inp, nav, seg, noWrap) {
   var rw = row.getBoundingClientRect().width, over = need() - rw + 2; if (over <= 0) return true;
   var iw = item.getBoundingClientRect().width, nw = Math.floor(iw - over), set = function (w) { item.style.width = w + 'px'; item.style.maxWidth = w + 'px'; item.style.flex = 'none'; box.style.width = '100%'; box.style.minWidth = '0'; inp.style.minWidth = '0'; };
   /* 검색어 칸은 150px까지 줄이고, 그래도 안 되면 오른쪽 묶음(이동 + 보기)이 다음 줄 오른쪽 끝으로 */
-  if (nw >= 150) { set(nw); return true; } /* 150px로도 안 되면 칸은 그대로 두고 오른쪽 묶음만 다음 줄로 */
+  if (nw >= 180) { set(nw); return true; } /* 150px로도 안 되면 칸은 그대로 두고 오른쪽 묶음만 다음 줄로 */
   return false;
 }
 
@@ -3619,6 +3625,16 @@ function hScrollDay(root, st) {
   }, { passive: false });
 }
 
+/* 캘린더일 때 검색어 칸 + [검색]을 한 묶음으로: 검색어 칸은 최소 180px, 줄이 모자라면 둘이 함께 다음 줄로 */
+function groupSearch(row, inp, sb) {
+  if (!row || !inp || !sb) return; var item = inp; while (item.parentElement && item.parentElement !== row) item = item.parentElement; if (item.parentElement !== row) return;
+  var g = document.createElement('div'); g.className = 'bc-sgrp'; g.setAttribute('data-test', 'search-group'); row.insertBefore(g, item); g.appendChild(item); g.appendChild(sb); mark(g);
+  var box = inp.closest('.ant-input-affix-wrapper') || inp; item.style.width = ''; item.style.maxWidth = ''; item.style.flex = '0 1 auto'; item.style.minWidth = '180px'; box.style.width = '100%'; box.style.minWidth = '0'; inp.style.minWidth = '0';
+  row.style.flexWrap = 'wrap'; row.style.rowGap = '8px';
+}
+/* 목록일 때도 검색어 칸 최소 180px, 모자라면 다음 줄로 */
+function minSearch(row, inp) { if (!row || !inp) return; var item = inp; while (item.parentElement && item.parentElement !== row) item = item.parentElement; if (item.parentElement !== row) return; item.style.minWidth = '180px'; item.style.flex = '0 1 auto'; row.style.flexWrap = 'wrap'; row.style.rowGap = '8px'; }
+
 /* ===== BO 예약 > 예약 관리: 실화면 스냅샷 그대로 + [목록 | 캘린더] (스토어 하나 고른 뒤에만) ===== */
 var ACC = '#1677ff';
 document.documentElement.style.setProperty('--pb-acc-bg', '#e6f4ff');
@@ -3666,7 +3682,9 @@ function pRes() {
   var sIn = $('form input[placeholder="스토어 선택"]'), sWrap = sIn.closest('.ant-input-affix-wrapper') || sIn, clr = $('.ant-input-clear-icon', sWrap);
   /* 스토어 다중 선택: 고른 스토어는 태그(개별 x), 입력칸 x = 전체 지우기. 아무것도 안 고르면 전체 스토어 */
   var picked = b.stores.map(function (id) { return PB.storeById(id); }); sIn.value = ''; sIn.readOnly = true; sIn.placeholder = picked.length ? '' : '스토어 선택'; sIn.setAttribute('data-test', 'store-input'); mark(sWrap); sWrap.classList.toggle('bc-swrap', picked.length > 0);
-  picked.forEach(function (s) { var t = document.createElement('span'); t.className = 'ant-tag bc-stag'; t.setAttribute('data-test', 'store-tag-' + s.id); t.innerHTML = '<span>' + esc(s.name) + '</span>'; var x = document.createElement('span'); x.className = 'bc-stag-x'; x.textContent = '×'; x.setAttribute('aria-label', s.name + ' 빼기'); x.onclick = function (e) { e.stopPropagation(); b.stores = b.stores.filter(function (i) { return i !== s.id; }); b.open = null; PB.render(); }; t.appendChild(x); sIn.before(t); });
+  /* 스토어 태그가 여럿이면 첫 태그 + "+N"으로 접음(전체는 드롭다운에서) */
+  picked.forEach(function (s, ix) { if (ix > 0) return; var t = document.createElement('span'); t.className = 'ant-tag bc-stag'; t.setAttribute('data-test', 'store-tag-' + s.id); t.innerHTML = '<span>' + esc(s.name) + '</span>'; var x = document.createElement('span'); x.className = 'bc-stag-x'; x.textContent = '×'; x.setAttribute('aria-label', s.name + ' 빼기'); x.onclick = function (e) { e.stopPropagation(); b.stores = b.stores.filter(function (i) { return i !== s.id; }); b.open = null; PB.render(); }; t.appendChild(x); sIn.before(t); });
+  if (picked.length > 1) { var more = document.createElement('span'); more.className = 'ant-tag bc-stag bc-stag-more'; more.setAttribute('data-test', 'store-tag-more'); more.textContent = '+' + (picked.length - 1); more.title = picked.map(function (s) { return s.name; }).join(', '); sIn.before(more); }
   if (clr) { clr.classList.toggle('ant-input-clear-icon-hidden', !picked.length); clr.setAttribute('data-test', 'store-clear'); clr.onclick = function (e) { e.stopPropagation(); b.stores = []; b.open = null; PB.render(); }; }
   sWrap.style.cursor = 'pointer';
   sWrap.onclick = function () { dropdown(sWrap, PB.DB.stores.map(function (s) { return [s.id, (b.stores.indexOf(s.id) >= 0 ? '✓ ' : '') + s.name]; }), null, function (v) { v = +v; b.stores = b.stores.indexOf(v) >= 0 ? b.stores.filter(function (i) { return i !== v; }) : b.stores.concat([v]); b.open = null; PB.render(); }, ACC); };
@@ -3702,7 +3720,7 @@ function pRes() {
     nav.appendChild(nb('오늘', 'today', function () { b.anchor = PB.TODAY; PB.render(); }));
     nav.appendChild(nb('›', 'next', function () { calMove(b, 1); PB.render(); }));
     var lb = document.createElement('strong'); lb.className = 'bc-label'; lb.textContent = calLabel(b); lb.setAttribute('data-test', 'cal-label'); lb.setAttribute('role', 'button'); lb.tabIndex = 0; (function (st) { lb.onclick = function (e) { e.stopPropagation(); openPicker(lb, st); }; })(b); nav.appendChild(lb);
-    moveSearch(sb, inp); var grp = document.createElement('div'); grp.className = 'bc-navgrp'; grp.appendChild(nav); grp.appendChild(tg); row1.appendChild(grp); navOrder(nav, lb); fixLabel(lb); row.style.display = 'none';
+    groupSearch(row1, inp, sb); var grp = document.createElement('div'); grp.className = 'bc-navgrp'; grp.appendChild(nav); grp.appendChild(tg); row1.appendChild(grp); navOrder(nav, lb); fixLabel(lb); row.style.display = 'none';
     tw.style.display = 'none';
     tw.parentNode.insertBefore(renderCal({ list: rows, all: PB.DB.books.filter(function (x) { return !b.stores.length || b.stores.indexOf(x.store) >= 0; }), count: filtered(true), set: b.stores.length === 1 ? PB.setOf(b.stores[0]) : PB.openSet(), showStore: true, fit: true, st: b, sel: b.open, pre: 'bd', stLabel: '상태',
       /* 상태 표시 = 목록 상태 칸 그대로(점 + 색 글자). BO에는 처리 필요 개념이 없어 강조 없음 */
@@ -3710,7 +3728,6 @@ function pRes() {
       open: function (no) { b.open = no; PB.render(); } }), tw.nextSibling);
     /* 캘린더일 때만: 상태 칩 줄을 이동 줄 오른쪽으로, 요약 카드 5개는 얇은 한 줄 띠로 */
     boStrip($('.bc-srow'));
-    fitRow(row1, inp, null, grp);
     return;
   }
   /* 목록 */
