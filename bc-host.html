@@ -2704,6 +2704,17 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 .bc-needchip i{font-style:normal}
 .bc-needchip.on{background:color-mix(in srgb,var(--bc-need-bg,#b45309) 8%,#fff)}
 .bc-need-on .bc-sc{opacity:.45}
+
+/* 상태 칩 = 누르면 그것만 보기: 기본은 중립(흰 바탕 · 상태 색 점 · 일반 테두리), 선택 = ✓ + 아주 옅은 해당 색 바탕 + 진한 테두리 */
+.bc-sc,.bc-sc:not(.on){background:#fff!important;border:1px solid #d9d9de!important;color:#33333a!important;font-weight:500;opacity:1!important}
+.bc-sc:not(.on)::before{background:var(--c)!important;opacity:1!important}
+.bc-sc.on{background:color-mix(in srgb,var(--c) 10%,#fff)!important;border-color:color-mix(in srgb,var(--c) 70%,#000)!important;color:#1d1d22!important;font-weight:600}
+.bc-sc.part{background:#fff!important;border:1px dashed color-mix(in srgb,var(--c) 70%,#000)!important;color:#1d1d22!important}
+.bc-sc .bc-ck,.bc-needchip .bc-ck{font-style:normal;font-weight:700;margin-right:-2px}
+.bc-needchip{border-color:#d9d9de!important;color:#33333a!important;font-weight:500}
+.bc-needchip::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--bc-need-bg,#b45309);flex:none}
+.bc-needchip.on{background:color-mix(in srgb,var(--bc-need-bg,#b45309) 10%,#fff)!important;border-color:var(--bc-need-bg,#b45309)!important;color:#1d1d22!important;font-weight:600}
+.bc-need-on .bc-sc{opacity:1!important}
 </style></head>
 <body><div id="app"></div>
 <template id="T_h_res">
@@ -2912,17 +2923,17 @@ function inView(st, d) { if (st.cv === 'day') return d >= st.anchor && d <= PB.a
 var ALLST = ['예약', '변경완료', '변경거절', '변경요청', '방문완료', '고객취소', '매장취소', '미방문'];
 function stOn(st, s) { return !st.sts || !st.sts.length || st.sts.indexOf(s) >= 0; }
 function stPass(st, b) { return stOn(st, b.status); }
-function grpState(st, g) { var n = g[2].filter(function (x) { return stOn(st, x); }).length; return n === g[2].length ? 'on' : n ? 'part' : 'off'; }
-function toggleGrp(st, g) { var cur = st.sts && st.sts.length ? st.sts.slice() : ALLST.slice(), next; if (grpState(st, g) === 'on') { next = cur.filter(function (x) { return g[2].indexOf(x) < 0; }); if (!next.length) return false; } else { next = cur.concat(g[2].filter(function (x) { return cur.indexOf(x) < 0; })); } st.sts = next.length >= ALLST.length ? [] : next; return true; }
+/* 칩 = 누르면 그것만 보기. 아무것도 안 고름(st.sts 빈 배열) = 전체 표시, 칩은 모두 선택 안 됨 */
+function grpState(st, g) { var sts = st.sts || []; if (!sts.length) return 'off'; var n = g[2].filter(function (x) { return sts.indexOf(x) >= 0; }).length; return n === g[2].length ? 'on' : n ? 'part' : 'off'; }
+function toggleGrp(st, g) { var cur = (st.sts || []).slice(); st.sts = grpState(st, g) === 'on' ? cur.filter(function (x) { return g[2].indexOf(x) < 0; }) : cur.concat(g[2].filter(function (x) { return cur.indexOf(x) < 0; })); return true; }
 function statusRow(o) {
   var st = o.st, row = document.createElement('div'); row.className = 'bc-srow' + (o.listMode ? ' bc-srow-list' : ''); row.setAttribute('data-test', 'cal-srow');
   var g1 = document.createElement('div'); g1.className = 'bc-grp'; g1.setAttribute('data-test', 'srow-status'); row.appendChild(g1);
   var vis = o.listMode ? o.count : o.count.filter(function (b) { return inView(st, b.visit.slice(0, 10)); });
-  var onCnt = ROWG.filter(function (g) { return grpState(st, g) !== 'off'; }).length;
   ROWG.forEach(function (g) {
-    var n = vis.filter(function (b) { return g[2].indexOf(b.status) >= 0; }).length, gs = grpState(st, g), last = gs === 'on' && onCnt === 1;
-    var x = document.createElement('button'); x.type = 'button'; x.setAttribute('style', scStyle(g[2][0])); x.className = 'bc-sc bc-g-' + g[3] + (gs === 'on' ? ' on' : gs === 'part' ? ' part' : '') + (last ? ' last' : ''); x.setAttribute('aria-pressed', gs === 'on' ? 'true' : gs === 'part' ? 'mixed' : 'false'); x.setAttribute('data-test', 'srow-' + g[0]);
-    x.innerHTML = '<i class="bc-sw bc-g-' + g[3] + '"></i><span>' + (g[0] === '취소노쇼' && o.cxLabel ? o.cxLabel : g[1]) + '</span><b>' + n + '</b>';
+    var n = vis.filter(function (b) { return g[2].indexOf(b.status) >= 0; }).length, gs = grpState(st, g);
+    var x = document.createElement('button'); x.type = 'button'; x.setAttribute('style', scStyle(g[2][0])); x.className = 'bc-sc bc-g-' + g[3] + (gs === 'on' ? ' on' : gs === 'part' ? ' part' : ''); x.setAttribute('aria-pressed', gs === 'on' ? 'true' : gs === 'part' ? 'mixed' : 'false'); x.setAttribute('data-test', 'srow-' + g[0]);
+    x.innerHTML = (gs === 'on' ? '<i class="bc-ck">✓</i>' : '') + '<i class="bc-sw bc-g-' + g[3] + '"></i><span>' + (g[0] === '취소노쇼' && o.cxLabel ? o.cxLabel : g[1]) + '</span><b>' + n + '</b>';
     x.onclick = function () { if (toggleGrp(st, g)) PB.render(); };
     g1.appendChild(x);
   });
@@ -2932,8 +2943,8 @@ function statusRow(o) {
   /* 범례 설명 견본은 넣지 않음. HOST만: 구분선 + 누르는 칩 '처리 필요 N'(처리 필요 패널과 같은 건수). 켜면 처리 필요 예약만(상태 칩과 AND) */
   if (o.needChip) { var nc = o.needChip, dv = document.createElement('span'); dv.className = 'bc-ndiv'; g1.appendChild(dv);
     var nb = document.createElement('button'); nb.type = 'button'; nb.className = 'bc-needchip' + (st.needOnly ? ' on' : ''); nb.setAttribute('aria-pressed', st.needOnly ? 'true' : 'false'); nb.setAttribute('data-test', 'srow-need');
-    nb.innerHTML = (st.needOnly ? '<i>✓</i>' : '') + '<span>처리 필요</span><b>' + nc.n + '</b>'; nb.onclick = function () { st.needOnly = !st.needOnly; PB.render(); }; g1.appendChild(nb);
-    row.classList.toggle('bc-need-on', !!st.needOnly); }
+    nb.innerHTML = (st.needOnly ? '<i class="bc-ck">✓</i>' : '') + '<span>처리 필요</span><b>' + nc.n + '</b>'; nb.onclick = function () { st.needOnly = !st.needOnly; PB.render(); }; g1.appendChild(nb);
+  }
   /* 줄이 바뀌어 표시 묶음이 아래로 내려가면 구분선 숨김 */
   var chk = function () { if (!g2.isConnected) { window.removeEventListener('resize', chk); return; } g2.classList.toggle('bc-wrapped', g2.offsetTop > g1.offsetTop + 2); };
   setTimeout(chk, 0); window.addEventListener('resize', chk);
@@ -3194,7 +3205,7 @@ function multiStatus(sel, st, ph, label, acc, cxLabel) {
     var tx = document.createElement('span'); tx.className = 'bc-mtext'; tx.setAttribute('data-test', 'st-text'); tx.textContent = parts.slice(0, 2).join(' · ') + (parts.length > 2 ? ' +' + (parts.length - 2) : ''); tx.title = parts.join(' · '); c.appendChild(tx);
     var x = document.createElement('span'); x.className = 'bc-mclear'; x.textContent = '×'; x.setAttribute('aria-label', '전체 지우기'); x.setAttribute('data-test', 'st-clear'); x.onmousedown = function (ev) { ev.stopPropagation(); ev.preventDefault(); st.sts = []; PB.render(); }; x.onclick = function (ev) { ev.stopPropagation(); }; c.appendChild(x); }
   sel.setAttribute('data-test', 'st-select'); mark(sel);
-  sel.onclick = function () { dropdown(sel, ALLST.map(function (s) { return [s, (stOn(st, s) && sts.length ? '✓ ' : '') + label(s)]; }), null, function (v) { var cur = sts.slice(), i = cur.indexOf(v); if (i >= 0) cur.splice(i, 1); else cur.push(v); st.sts = cur.length >= ALLST.length ? [] : cur; PB.render(); }, acc); };
+  sel.onclick = function () { dropdown(sel, ALLST.map(function (s) { return [s, (stOn(st, s) && sts.length ? '✓ ' : '') + label(s)]; }), null, function (v) { var cur = sts.slice(), i = cur.indexOf(v); if (i >= 0) cur.splice(i, 1); else cur.push(v); st.sts = cur; PB.render(); }, acc); };
 }
 
 /* 목록 보기: 상태 칩 줄을 기간 버튼 줄 오른쪽 끝에(건수 = 지금 필터 기준 목록 건수) */
