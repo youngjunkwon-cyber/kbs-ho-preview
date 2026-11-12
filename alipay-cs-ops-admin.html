@@ -312,6 +312,10 @@ const RES=[];
   });
   RES.forEach(r=>r.hay+=' '+r.no.toLowerCase());
 })();
+/* 예약 상품(상품 예약 기능 그대로 화면에 둠): 목록 고객 칸 둘째 줄과 예약 상세. 상품이 없으면 스토어 예약. 시드 난수를 쓰지 않고 예약번호로 정한다 */
+RES.forEach(r=>{let h=0;for(const c of r.no)h=(h*31+c.charCodeAt(0))%9973;const ps=PRODS[r.cat];
+  if(h%3===0){const p=ps[h%ps.length];r.prod=(r.lang==='영어'||r.lang==='인도네시아어'||r.lang==='몽골어')?p[1]:r.lang==='일본어'?p[3]:p[2];}else r.prod='';
+  r.kind=r.prod?'상품 예약':'스토어 예약';});
 
 /* ========= 2) 상담 ========= */
 const CONS_ST=['방문예정','예약중','상품예약','방문완료','고객취소','고객부재중','스토어취소','연락실패'];
@@ -403,6 +407,8 @@ const STAT=[];
     o.mg=ri(100)<39?'K-뷰티 메신저':'입점사 메신저';o.mt=wpick([['왓츠앱',61],['라인',32],['위챗',7]]);
     STAT.push(o);
   });
+  /* 플랫폼 예약 칸(상품 예약 기능 그대로): 고객이 접수한 예약 전부(수기 예약 제외), 접수일 기준. 유입 채널은 그 예약의 채널 기록값 */
+  RES.forEach(r=>{if(r.reg!=='고객')return;STAT.push({date:r.recv.slice(0,10),store:r.store,kind:r.prod?'상품':'스토어',lang:r.lang,way:'플랫폼 예약',mg:'',mt:'',ch:r.ch});});
 })();
 
 /* ========= 7) 설문 ========= */
@@ -436,7 +442,7 @@ RES.forEach(r=>{if(r.reg==='매장'){r.ch='-';r.cv='-';}});
 /* ========= 상태 ========= */
 let _v='cons',S,OPEN={'상담':true};
 const D=()=>({
- res:{open:null,ch:'전체',store:'',cat:'',status:'',lang:'',reg:'',q:'',qd:'',per:'all',from:'',to:'',base:'visit',sort:'visit',page:1,size:10},
+ res:{open:null,ch:'전체',store:'',cat:'',status:'',lang:'',kind:'',reg:'',q:'',qd:'',per:'all',from:'',to:'',base:'visit',sort:'visit',page:1,size:10},
  cons:{per:'',from:'',to:'',member:'',status:'',lang:'',route:'',ch:'전체',cat:'',store:'',q:'',qd:'',page:1,size:10},
  chats:{base:'first',per:'week',from:add(T,-7),to:T,room:'',route:'',ch:'전체',resp:'',lang:'',store:'',q:'',qd:'',page:1,size:10},
  prodchats:{base:'first',per:'week',from:add(T,-7),to:T,room:'',resp:'',lang:'',ch:'전체',cat:'',store:'',q:'',qd:'',page:1,size:10},
@@ -515,7 +521,7 @@ function resDrawer(){
     :(r.status==='예약'?'<div class="dfoot"><div class="dinfo">매장 대신 취소할 수 있어요. 취소하면 고객에게 취소 사유가 함께 안내돼요.</div><div class="dbtn" data-act="nop">예약 변경</div><div class="dbtn red" data-act="nop">강제 취소</div></div>':'');
   return '<div class="dov" data-act="rclose"></div><aside class="dwr"><div class="dhd"><span>예약 상세</span><span class="dx" data-act="rclose">&times;</span></div><div class="dscroll">'
    +'<div class="dst"><span class="dstp '+pillCls+'"><i></i>'+r.status+'</span>'+(r.cv==='-'?'':'<span class="dchb new" title="유입 채널">'+r.cv+'</span>')+'</div>'
-   +'<div class="dti">'+title+'</div>'+body
+   +'<div class="dti">'+title+'</div>'+'<div class="dsec">예약 상품</div><div class="dtb">'+esc(r.prod||'스토어 예약')+'</div>'+body
    +'<div class="dsec">고객 요청사항</div><div class="dtb">'+(r.req?esc(r.req):'남긴 내용 없음')+'</div>'+notes
    +'<div class="dsec">처리 이력</div>'+H.map(h=>'<div class="dhis"><div><b>'+h[0]+'</b><small>'+h[1]+(h[1].length<=16?':'+pad((num*3)%60):'')+'</small></div><em>'+h[2]+'</em></div>').join('')+'</div>'+foot+'</aside>';
 }
@@ -541,22 +547,22 @@ const thc=(l,cls)=>`<th class="${cls||''}">${l}</th>`;
 /* ========= 화면: 예약 ========= */
 function resRows(){
   const s=S.res;
-  const rows=RES.filter(r=>(s.ch==='전체'||r.cv===s.ch)&&(!s.store||r.store===s.store)&&(!s.cat||r.cat===s.cat)&&(!s.status||r.status===s.status)&&(!s.lang||r.lang===s.lang)&&(!s.reg||r.reg===s.reg)
+  const rows=RES.filter(r=>(s.ch==='전체'||r.cv===s.ch)&&(!s.store||r.store===s.store)&&(!s.cat||r.cat===s.cat)&&(!s.status||r.status===s.status)&&(!s.lang||r.lang===s.lang)&&(!s.kind||r.kind===s.kind)&&(!s.reg||r.reg===s.reg)
     &&inRange(s.base==='visit'?r.visit:r.recv,s.from,s.to)&&(!s.q||r.hay.indexOf(s.q.toLowerCase())>=0));
   const k=s.sort==='visit'?'visit':'recv';
   return rows.sort((a,b)=>a[k]<b[k]?1:a[k]>b[k]?-1:0);
 }
 function vRes(){
-  const s=S.res,rows=resRows(),crow=RES.filter(r=>s.ch==='전체'||r.cv===s.ch);
+  const s=S.res,rows=resRows(),crow=RES.filter(r=>(s.ch==='전체'||r.cv===s.ch)&&(!s.kind||r.kind===s.kind));/* 상단 카드는 유입 채널과 예약 구분(상품 예약 기능 그대로)을 따른다 */
   const up=crow.filter(r=>r.status==='예약').length,dn=crow.filter(r=>r.status==='방문완료').length,ns=crow.filter(r=>r.status==='노쇼').length;
   const rate=(dn+ns)?Math.round(ns/(dn+ns)*1000)/10:0;
   const cards=`<div class="cards">${[['전 매장 예약',crow.length,''],['방문 예정',up,''],['방문 완료',dn,''],['노쇼',ns,''],['노쇼율',rate,'%']].map(a=>`<div class="cd"><i>${a[0]}</i><b>${a[1]}${a[2]?`<u>${a[2]}</u>`:''}</b></div>`).join('')}</div>`;
   const f=`<div class="blk"><div class="fl col"><div class="r">
    ${sel('store','스토어 선택',STORES.map(x=>x.ko),{w:130})}${sel('cat','카테고리 선택',CATS,{w:130})}${sel('status','상태 선택',['예약','방문완료','노쇼','고객취소'],{w:110})}${sel('lang','언어 선택',LANGS,{w:116})}
-   ${chSel()}${sel('reg','등록 주체',['고객','매장'],{w:110})}${txt('여권명, 연락처, 예약번호, 요청사항, 매장메모',290)}</div>
+   ${chSel()}${sel('kind','예약 구분',['상품 예약','스토어 예약'],{w:110})}${sel('reg','등록 주체',['고객','매장'],{w:110})}${txt('여권명, 연락처, 예약번호, 요청사항, 매장메모',290)}</div>
    <div class="r">${perBtns([['전체','all'],['1주일','1w'],['1개월','1m'],['3개월','3m'],['6개월','6m'],['1년','1y']],true)}
    ${sel('base',null,[['visit','방문일 기준'],['recv','접수일 기준']],{w:118})}${sel('sort',null,[['visit','방문일순'],['recv','접수일순']],{w:104})}${rng()}${srch}</div></div></div>`;
-  const body=sliceP(rows).map(r=>`<tr><td><b>${esc(r.store)}</b><small>${r.cat}</small></td><td>${r.visit}<small>접수 ${r.recv}</small></td><td>${esc(r.name)}</td><td class="new">${r.cv}</td><td>${r.no}</td><td>${r.nat}</td><td>${r.lang}</td>
+  const body=sliceP(rows).map(r=>`<tr><td><b>${esc(r.store)}</b><small>${r.cat}</small></td><td>${r.visit}<small>접수 ${r.recv}</small></td><td>${esc(r.name)}<small>${esc(r.prod||'스토어 예약')}</small></td><td class="new">${r.cv}</td><td>${r.no}</td><td>${r.nat}</td><td>${r.lang}</td>
    <td><span class="dot ${r.status==='예약'?'b':r.status==='방문완료'?'ok':r.status==='노쇼'?'r':'g'}">${r.status}</span></td><td><span class="mb" data-act="rdet" data-v="${r.no}">상세</span>${r.status==='예약'?'<span class="mb red" data-act="nop">강제취소</span>':''}</td></tr>`).join('');
   const tbl=`<div class="blk"><div class="tw"><table class="tbl"><thead><tr>${thc('매장명')}${thc('방문일시')}${thc('고객(여권명)')}${thc('유입 채널','new')}${thc('예약번호')}${thc('국적')}${thc('언어')}${thc('상태')}${thc('관리')}</tr></thead><tbody>${body||EMPTY(9)}</tbody></table></div>${pager(rows.length,false)}</div>`;
   return page('예약 관리','우리 경유 전 매장 예약을 모니터링·처리합니다.',cards+f+tbl);
@@ -627,9 +633,9 @@ function vRev(){
 
 /* ========= 화면: 문의 통계 ========= */
 const COL={'스토어':'#4b7bf5','상품':'#52c8c8','중국어(간체)':'#4b7bf5','영어':'#52c8c8','중국어(번체)':'#c77dff','일본어':'#f0975c','인도네시아어':'#7bc94a','몽골어':'#f6c344',
- '웹':'#52c8c8','알리페이 중국':'#4b7bf5','알리페이 홍콩':'#c77dff','채팅문의':'#4b7bf5','상담문의':'#f0975c','메신저상담':'#52c8c8','K-뷰티 메신저':'#4b7bf5','입점사 메신저':'#52c8c8',
+ '웹':'#52c8c8','알리페이 중국':'#4b7bf5','알리페이 홍콩':'#c77dff','채팅문의':'#4b7bf5','상담문의':'#f0975c','메신저상담':'#52c8c8','플랫폼 예약':'#f6c344','K-뷰티 메신저':'#4b7bf5','입점사 메신저':'#52c8c8',
  '왓츠앱':'#52c8c8','라인':'#4b7bf5','위챗':'#f0975c','카카오':'#f6c344','샤오홍슈':'#c77dff','페이스북':'#7bc94a'};
-const WAYS=['채팅문의','상담문의','메신저상담'];
+const WAYS=['채팅문의','상담문의','메신저상담','플랫폼 예약'];
 const MTYPES=['왓츠앱','라인','위챗','카카오','샤오홍슈','페이스북'];
 function statRows(){
   const s=S.stat;
@@ -693,11 +699,11 @@ function vStat(){
     const ag=aggData(rows);
     const ar=k=>`<span class="ar" data-act="sort" data-v="${k}">${s.sortK===k?(s.sortD>0?'▲':'▼'):'⇅'}</span>`;
     const sh=(l,k,cls)=>`<th class="${cls||''}" rowspan="1">${l}${ar(k)}</th>`;
-    const hdr=`<tr><th rowspan="2" style="text-align:center">스토어명${ar('name')}</th><th rowspan="2">총 문의 건수${ar('total')}</th><th colspan="2">문의구분</th><th colspan="6">언어구분</th><th colspan="3" class="new">유입 채널</th><th colspan="3">문의 방식</th></tr>
+    const hdr=`<tr><th rowspan="2" style="text-align:center">스토어명${ar('name')}</th><th rowspan="2">총 문의 건수${ar('total')}</th><th colspan="2">문의구분</th><th colspan="6">언어구분</th><th colspan="3" class="new">유입 채널</th><th colspan="${WAYS.length}">문의 방식</th></tr>
      <tr>${sh('스토어','k:스토어')}${sh('상품','k:상품')}${['중국어(간체)','중국어(번체)','영어','일본어','인니어','몽골어'].map((l,i)=>sh(l,'l:'+LANGS[i])).join('')}${CHS.map(c=>sh(c,'c:'+c,'new')).join('')}${WAYS.map(w=>sh(w,'w:'+w)).join('')}</tr>`;
     const keys=['total','k:스토어','k:상품'].concat(LANGS.map(l=>'l:'+l),CHS.map(c=>'c:'+c),WAYS.map(w=>'w:'+w));
     tab=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span class="sec-t" style="margin:0">스토어별 집계</span><button class="btnx" data-act="nop">엑셀 다운로드</button></div>
-     <div class="tw"><table class="tbl g" id="aggT"><thead>${hdr}</thead><tbody>${ag.map(o=>`<tr><td>${esc(o.name)}</td>${keys.map(k=>`<td class="${k.indexOf('c:')===0?'new':''}">${o[k]}</td>`).join('')}</tr>`).join('')||EMPTY(15)}</tbody></table></div>`;
+     <div class="tw"><table class="tbl g" id="aggT"><thead>${hdr}</thead><tbody>${ag.map(o=>`<tr><td>${esc(o.name)}</td>${keys.map(k=>`<td class="${k.indexOf('c:')===0?'new':''}">${o[k]}</td>`).join('')}</tr>`).join('')||EMPTY(12+WAYS.length)}</tbody></table></div>`;
   }else{
     const mk=s.mode==='day'?(r=>r.date):(r=>r.date.slice(0,7));
     const lv=[mk,r=>r.store,r=>r.kind,r=>r.lang,r=>r.cv,detLabel];

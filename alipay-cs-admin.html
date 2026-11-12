@@ -380,7 +380,10 @@ const langOk = l => ALI_LANGS.indexOf(l) !== -1;
 /* 스토어 유효값 = 저장값 (스토어는 언어 무관) */
 const storeHasTargetLang = st => String(st.langs || '').split(',').some(x => langOk(x.trim()));
 const storeOutLangs = st => String(st.langs || '').split(',').map(x => x.trim()).filter(x => x && !langOk(x));
-function effChStore(st) { if (!storeHasTargetLang(st)) return WEB; return (st.channel === ALI && storeOutLangs(st).length) ? ALLCH : st.channel; }
+/* 스토어 유효값 = 지원언어에 대상 언어가 없으면 웹, 아니면 저장값(대상 외 언어가 켜진 스토어는 알리페이 앱이 될 수 없으므로 따로 바꾸지 않음) */
+function effChStore(st) { if (!storeHasTargetLang(st)) return WEB; return st.channel; }
+/* 알리페이 앱이 선택된 동안 지원언어의 일본어·인도네시아어·몽골어 칸은 비활성(켤 수 없음, 안내 문구 없음) */
+const outLangLocked = (st, L) => !langOk(L) && effChStore(st) === ALI && String(st.langs || '').split(',').map(x => x.trim()).indexOf(L) === -1;
 /* 상품·칼럼 유효값 = 대상 외 언어면 웹, 스토어가 고정이면 스토어 값, 아니면 자기 값 */
 function effChProduct(p) { if (!langOk(p.lang)) return WEB; const s = effChStore(S(p.store)); return s !== ALLCH ? s : p.channel; }
 const colLangOk = c => String(c.langs || '').split(',').some(x => langOk(x.trim()));
@@ -647,7 +650,7 @@ window.setBtn = function (kind, k, ch, on) {
   if (after.length > CAP && after.length > before.length) { obj.btns[k][ch] = keep; toast(MSG.capOn(chName, before)); render(); return; }
   render();
 };
-window.toggleLang = function (L) { const st = S(VIEW.id); const arr = String(st.langs || '').split(',').map(x => x.trim()).filter(Boolean); const i = arr.indexOf(L); if (i >= 0) arr.splice(i, 1); else arr.push(L); st.langs = arr.join(', '); render(); };
+window.toggleLang = function (L) { const st = S(VIEW.id); if (outLangLocked(st, L)) return; const arr = String(st.langs || '').split(',').map(x => x.trim()).filter(Boolean); const i = arr.indexOf(L); if (i >= 0) arr.splice(i, 1); else arr.push(L); st.langs = arr.join(', '); render(); };
 window.setCh = function (kind, v) {
   const obj = kind === 'store' ? S(VIEW.id) : kind === 'product' ? P(VIEW.id) : kind === 'ad' ? A(VIEW.id) : kind === 'coll' ? C(VIEW.id) : kind === 'mag' ? M('M1') : null;
   if (kind === 'store' && v === ALI) {
@@ -809,7 +812,7 @@ function screen_sEdit() {
       fld('노출 채널', false, chRadio('sch', effChStore(st), 'store', !storeHasTargetLang(st)) +
         '<div class="hint">' + MSG.storeAll + '</div>' +
         (im && (im.N || im.M) ? '<div class="notice">' + MSG.storeChange(st.channel, im.N, im.M) + '</div>' : '')) +
-      fld('지원언어', false, '<div class="chkrow">' + STLANG.map(L => '<label class="chkit" style="cursor:pointer"><input type="checkbox"' + (has(L) ? ' checked' : '') + ' onclick="toggleLang(\'' + L + '\')"> ' + L + '</label>').join('') + '</div>') +
+      fld('지원언어', false, '<div class="chkrow">' + STLANG.map(L => outLangLocked(st, L) ? '<label class="chkit" style="cursor:not-allowed;color:#bfbfbf"><input type="checkbox" disabled> ' + L + '</label>' : '<label class="chkit" style="cursor:pointer"><input type="checkbox"' + (has(L) ? ' checked' : '') + ' onclick="toggleLang(\'' + L + '\')"> ' + L + '</label>').join('') + '</div>') +
       fld('대표번호', true, fbox(st.tel)) + fld('사업자명', true, fbox(st.biz)) + fld('사업자번호', true, fbox(st.bizno)) + fld('이메일', true, fbox(st.email)) + '</div>';
   } else if (i === 8) {
     bd = '<div class="bd"><div class="row"><div class="lbl">예약 사용</div><div class="val">' + onoff('sbk', st.bookingEnabled, 'setBooking(%V%)', false, ['사용', '미사용']) +
@@ -1215,6 +1218,8 @@ window.saveColl = function () {
   confirmBox('저장할까요?', shown, done, function () {});
 };
 window.save = function (kind) { const obj = kind === 'store' ? S(VIEW.id) : P(VIEW.id); if (kind === 'store' && !String(obj.langs || '').split(',').map(x => x.trim()).filter(Boolean).length) { alertBox('저장할 수 없습니다', '지원언어를 1개 이상 선택해 주세요.'); return; }
+  /* 저장 시점 다시 확인(5장): 대상 외 언어 건이나 지원언어의 대상 외 언어가 있는데 알리페이 앱 전용이면 막는다. 화면과 같은 문구 */
+  if (kind === 'store' && effChStore(obj) === ALI) { const n = DB.products.filter(p => p.store === obj.id && !langOk(p.lang)).length, m = DB.columns.filter(c => c.store === obj.id && String(c.langs || '').split(',').some(x => !langOk(x.trim()))).length, L = storeOutLangs(obj); if (n || m || L.length) { alertBox('바꿀 수 없습니다', MSG.storeAliBlock(n, m, L)); return; } }
   /* 스토어 저장 때 기본 설정 상품 넘침 검사는 없다: 기본 설정 상품은 예약 줄까지 스토어 값을 따른다 */
   const done = () => { reopenOff(kind, obj); EDITSNAP = null; go(kind === 'store' ? 's-list' : 'p-list'); alertBox('저장했습니다', MSG.saveDone); };
   const rows = kind === 'store' ? ROWS_STORE : ROWS_PRODUCT_B;
