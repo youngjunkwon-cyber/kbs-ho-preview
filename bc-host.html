@@ -2665,6 +2665,37 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 .bc-nostore .bc-chip .bc-rs{display:none!important}
 .bc-dots .bc-chip .bc-badge .bc-cr{display:inline-block!important}
 .bc-mtext{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+
+/* 기간 라벨 = 날짜 고르기 열기(▾) */
+.bc-label{cursor:pointer;user-select:none}
+.bc-label::after{content:' ▾';font-size:11px;color:#8c8c94;font-weight:400}
+/* 날짜 고르기 창: antd 달력 모양 */
+.bc-pick{position:absolute;z-index:1100;background:#fff;border-radius:8px;box-shadow:0 6px 16px rgba(0,0,0,.08),0 3px 6px -4px rgba(0,0,0,.12),0 9px 28px 8px rgba(0,0,0,.05);padding:8px 12px 12px;font-size:14px;color:rgba(0,0,0,.88);width:280px}
+.bc-pick-h{display:flex;align-items:center;justify-content:space-between;height:40px;border-bottom:1px solid #f0f0f0;margin:0 -12px 8px;padding:0 8px}
+.bc-pick-h span{font-weight:600}
+.bc-pick-h button{width:28px;height:28px;border:0;background:none;color:rgba(0,0,0,.45);font-size:16px;cursor:pointer;border-radius:4px}
+.bc-pick-h button:hover{color:rgba(0,0,0,.88)}
+.bc-pick-m{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 6px;padding:8px 0}
+.bc-pick-m button{height:32px;border:0;background:none;border-radius:4px;cursor:pointer;font:inherit;color:inherit}
+.bc-pick-d .wd{display:inline-block;width:36px;text-align:center;font-size:13px;color:rgba(0,0,0,.65);line-height:28px}
+.bc-pick-row{display:flex}
+.bc-pick-row button{width:36px;height:30px;border:0;background:none;border-radius:4px;cursor:pointer;font:inherit;color:inherit}
+.bc-pick-row button.out{color:rgba(0,0,0,.25)}
+.bc-pick-m button:hover,.bc-pick-row:not(.wk) button:hover{background:rgba(0,0,0,.04)}
+.bc-pick-row.wk:hover button{background:rgba(0,0,0,.04)}
+.bc-pick-row button.in{background:color-mix(in srgb,var(--bc-acc) 12%,#fff)}
+.bc-pick-row button.sel,.bc-pick-m button.sel{background:var(--bc-acc)!important;color:#fff!important}
+.bc-pick-row button.today:not(.sel),.bc-pick-m button.today:not(.sel){box-shadow:inset 0 0 0 1px var(--bc-acc)}
+/* 3일 보기: 세 칸, 상세(국적 · 언어 · 상태)가 이름보다 먼저 줄어듦 */
+.bc-wgrid.bc-dgrid{grid-template-columns:56px repeat(3,minmax(0,1fr))!important}
+.bc-dgrid .bc-chip{width:100%!important;min-width:0!important;max-width:100%!important;align-self:stretch!important}
+.bc-chip .bc-x{flex:0 100000 auto!important;min-width:0}
+.bc-dgrid .bc-chip .bc-n{flex:0 1 auto!important;min-width:0!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.bc-chip .bc-x{display:block!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.bc-chip .bc-x>span{display:inline;margin-right:10px}
+
+/* 주 · 3일 보기 시간 칸 +N: 월 보기 +N 과 같은 알약 */
+.bc-wc .bc-smore{align-self:flex-start;font-size:13px!important;font-weight:600!important;color:#33333a!important;height:20px!important;line-height:18px!important;padding:0 8px!important;border:1px solid #d0d0d6!important;border-radius:10px!important;background:#fff!important;cursor:default}
 </style></head>
 <body><div id="app"></div>
 <template id="T_h_res">
@@ -2856,18 +2887,18 @@ function chipEl(c, onOpen) {
 
 function calLabel(st) {
   if (st.cv === 'month') return st.anchor.slice(0, 4) + '년 ' + (+st.anchor.slice(5, 7)) + '월';
-  if (st.cv === 'day') return st.anchor + ' (' + WD[dow(st.anchor)] + ')';
+  if (st.cv === 'day') { var e3 = PB.addDays(st.anchor, 2); return st.anchor + ' ~ ' + (e3.slice(0, 4) === st.anchor.slice(0, 4) ? e3.slice(5) : e3); } /* 일 보기 = 3일 */
   var s = weekStart(st.anchor), e = PB.addDays(s, 6); return s + ' ~ ' + (e.slice(0, 4) === s.slice(0, 4) ? e.slice(5) : e); /* 같은 해면 끝 날짜는 월-일만 */
 }
 function calMove(st, n) {
   if (st.cv === 'week') { st.anchor = PB.addDays(st.anchor, 7 * n); return; }
-  if (st.cv === 'day') { st.anchor = PB.addDays(st.anchor, n); return; }
+  if (st.cv === 'day') { st.anchor = PB.addDays(st.anchor, 3 * n); return; }
   var y = +st.anchor.slice(0, 4), m = +st.anchor.slice(5, 7) - 1 + n; y += Math.floor(m / 12); m = ((m % 12) + 12) % 12;
   st.anchor = y + '-' + (m < 9 ? '0' : '') + (m + 1) + '-01';
 }
 var CALOPT = null;
 /* 지금 보이는 달 · 주 안인가(방문일 기준) */
-function inView(st, d) { if (st.cv === 'day') return d === st.anchor; if (st.cv === 'month') return d.slice(0, 7) === st.anchor.slice(0, 7); var s = weekStart(st.anchor); return d >= s && d <= PB.addDays(s, 6); }
+function inView(st, d) { if (st.cv === 'day') return d >= st.anchor && d <= PB.addDays(st.anchor, 2); if (st.cv === 'month') return d.slice(0, 7) === st.anchor.slice(0, 7); var s = weekStart(st.anchor); return d >= s && d <= PB.addDays(s, 6); }
 /* 상태 칩 줄(필터 겸 범례): 건수는 지금 보이는 기간, 누르면 그 묶음 표시를 켜고 끔. 예약상태 필터를 고른 상태에서 누르면 필터를 풀고 칩 기준으로 */
 /* 예약상태 다중 선택(st.sts, 빈 배열 = 전체)과 상태 칩이 같은 거름: 칩 = 묶음 바로가기. 일부만 고르면 반쯤 켜짐, 마지막 하나는 못 끔 */
 var ALLST = ['예약', '변경완료', '변경거절', '변경요청', '방문완료', '고객취소', '매장취소', '미방문'];
@@ -2897,6 +2928,7 @@ function statusRow(o) {
   return row;
 }
 function renderCal(opts) {
+  closePicker();
   /* 변경 요청 쌍 번호: 지금 보이는 기간 안에서 원래 시간 순으로 1부터(한쪽만 보여도 붙임) */
   var pairs = opts.list.filter(function (b) { return b.status === '변경요청' && b.chg && (inView(opts.st, b.visit.slice(0, 10)) || inView(opts.st, b.chg.slice(0, 10))); }).sort(function (a, c) { return a.visit < c.visit ? -1 : 1; });
   opts.pn = {}; pairs.forEach(function (b, i) { opts.pn[b.no] = i + 1; });
@@ -2910,7 +2942,7 @@ function renderCal(opts) {
   if (opts.st.cv === 'month') monthView(root, opts); else weekView(root, opts, opts.st.cv === 'day');
   /* 캘린더 영역 폭이 바뀌면(메뉴 접기 · 펼치기, 창 크기) 줄임 단계 다시 */
   if (window.ResizeObserver) { var lw = 0; new ResizeObserver(function (en) { var w = Math.round(en[0].contentRect.width); if (w && w !== lw) { lw = w; fitBadges(root); } }).observe(root); }
-  wrap.appendChild(root); setTimeout(function () { layoutFit(root, opts); fitBadges(root); fitScroll(root, opts.st); if (opts.st.pop) { var pc = opts.st.cv === 'month' && root.querySelector('[data-date="' + opts.st.pop + '"]'); if (pc && pc._mine) dayPop(pc, opts.st.pop, pc._mine, CALOPT); else opts.st.pop = null; } }, 0); return wrap;
+  wrap.appendChild(root); setTimeout(function () { layoutFit(root, opts); fitBadges(root); fitScroll(root, opts.st); if (opts.st.pop) { var pc = opts.st.pop.length > 10 ? (opts.st.cv !== 'month' && root.querySelector('[data-slot="' + opts.st.pop + '"]')) : (opts.st.cv === 'month' && root.querySelector('[data-date="' + opts.st.pop + '"]')); if (pc && pc._mine) dayPop(pc, opts.st.pop, pc._mine, CALOPT); else opts.st.pop = null; } }, 0); return wrap;
 }
 function monthView(root, o) {
   var a = o.st.anchor, first = a.slice(0, 8) + '01', ym = a.slice(0, 7), s = weekStart(first);
@@ -2935,7 +2967,7 @@ function monthView(root, o) {
 /* 주 보기 · 일 보기(하루 한 칸, 같은 규칙) */
 function weekView(root, o, oneDay) {
   var s = oneDay ? o.st.anchor : weekStart(o.st.anchor), days = [], iv = o.set.intervalMinute;
-  for (var i = 0; i < (oneDay ? 1 : 7); i++) days.push(PB.addDays(s, i));
+  for (var i = 0; i < (oneDay ? 3 : 7); i++) days.push(PB.addDays(s, i));
   var last = days[days.length - 1];
   var chips = chipsOf(o.list).filter(function (c) { return c.ts.slice(0, 10) >= days[0] && c.ts.slice(0, 10) <= last; });
   /* 세로 범위: 이 주 예약 받는 가장 이른 ~ 늦은 시간, 그 밖의 예약(수기 등)이 있으면 그 시간까지 넓힘 */
@@ -2952,7 +2984,11 @@ function weekView(root, o, oneDay) {
       var c = document.createElement('div'), acc = accepting(o.set, d, m), n = slotCount(o.all, d, m, o.set), full = acc && n >= o.set.maxBookingCount;
       c.className = 'bc-wc' + (acc ? '' : ' bc-off'); c.setAttribute('data-slot', d + ' ' + hm(m));
       if (full) { var f = document.createElement('span'); f.className = 'bc-full'; f.textContent = '마감'; c.appendChild(f); c.classList.add('bc-isfull'); }
-      chips.filter(function (x) { var xm = minOf(x.ts); return x.ts.slice(0, 10) === d && xm >= m && xm < m + iv; }).forEach(function (x) { c.appendChild(chipEl(x, o.open)); });
+      var mine = chips.filter(function (x) { var xm = minOf(x.ts); return x.ts.slice(0, 10) === d && xm >= m && xm < m + iv; }); mine.forEach(function (x) { c.appendChild(chipEl(x, o.open)); });
+      /* 시간 칸 하나에 칩 최대 2개(처리 필요 → 정상 → 방문완료 → 취소 순으로 고르고 보이는 건 시간순), 나머지는 +N(누르면 그 칸 예약 전체 창) */
+      if (mine.length > 2) { var ce = c.querySelectorAll(':scope > .bc-chip'); var keep = chipPick(ce, 2); Array.prototype.forEach.call(ce, function (el, i) { el.hidden = keep.indexOf(i) < 0; });
+        var key = d + ' ' + hm(m), mo = document.createElement('button'); mo.type = 'button'; mo.className = 'bc-more bc-smore'; mo.textContent = '+' + (mine.length - 2); mo.setAttribute('data-test', 'more-' + key); c._mine = mine;
+        (function (cl, kk, list) { mo.onclick = function (ev) { ev.stopPropagation(); dayPop(cl, kk, list, o); }; })(c, key, mine); c.appendChild(mo); }
       g.appendChild(c);
     });
   }
@@ -2969,7 +3005,7 @@ function dayPop(cell, d, list, o) {
   closePop(); o.st.pop = d;
   var p = document.createElement('div'); p.className = 'bc-pop'; p.setAttribute('data-test', 'day-pop'); p.setAttribute('role', 'dialog'); mark(p);
   var hd = document.createElement('div'); hd.className = 'bc-pop-h';
-  hd.innerHTML = '<strong>' + (+d.slice(5, 7)) + '월 ' + (+d.slice(8, 10)) + '일 (' + WD[dow(d)] + ') · ' + list.filter(function (c) { return !c.chg; }).length + '건</strong>';
+  hd.innerHTML = '<strong>' + (+d.slice(5, 7)) + '월 ' + (+d.slice(8, 10)) + '일 (' + WD[dow(d.slice(0, 10))] + ')' + (d.length > 10 ? ' ' + d.slice(11) : '') + ' · ' + list.filter(function (c) { return !c.chg; }).length + '건</strong>';
   var x = document.createElement('button'); x.type = 'button'; x.className = 'bc-pop-x'; x.setAttribute('aria-label', '닫기'); x.setAttribute('data-test', 'day-pop-close'); x.textContent = '✕'; x.onclick = function () { closePop(true); }; hd.appendChild(x); p.appendChild(hd);
   var body = document.createElement('div'); body.className = 'bc-pop-b bc-mcell-like';
   list.forEach(function (c) { body.appendChild(chipEl(c, function (no) { o.open(no); })); }); /* 칩을 눌러도 창은 그대로 */
@@ -3120,7 +3156,7 @@ function lnbSetup(surf, acc, selBg, selFg) {
   Array.prototype.forEach.call(sider.querySelectorAll('*'), function (e) { if (!e.children.length && /^Copyright/.test(e.textContent.trim())) { var f = e.parentElement; f.style.display = col ? 'none' : ''; } });
   var tg = document.createElement('button'); tg.type = 'button'; tg.className = 'bc-lnb-tg'; tg.setAttribute('data-test', 'lnb-toggle'); tg.textContent = col ? '»' : '«'; tg.title = col ? '메뉴 펼치기' : '메뉴 접기'; tg.setAttribute('aria-label', tg.title);
   tg.onclick = function () { PB.S.lnb = PB.S.lnb || {}; PB.S.lnb[surf] = !col; PB.S._lnbAnim = surf; hideFly(); PB.render(); };
-  kids.insertBefore(tg, kids.firstChild); /* 메뉴가 길어도 보이게 맨 위 */
+  menu.parentElement.insertBefore(tg, menu); /* 메뉴 바로 위(로고 아래), 메뉴가 길어도 보이게 */
   Array.prototype.forEach.call(document.querySelectorAll('header *, .ant-layout-sider *'), function (e) { if (!e.children.length && e.textContent.trim() === 'Beauty Station') e.style.display = col ? 'none' : ''; }); /* 접히면 로고 글자 숨김(K 로고만) */
 }
 function showFly(li, t) {
@@ -3152,6 +3188,48 @@ function listStatusRow(st, count, cxLabel) {
   var row = p1.parentNode; while (row && !row.contains(sb)) row = row.parentNode; if (!row) return;
   var sr = statusRow({ st: st, count: count, listMode: true, cxLabel: cxLabel }); mark(sr); row.style.flexWrap = 'wrap'; row.style.rowGap = '8px'; row.appendChild(sr);
 }
+
+/* 기간 라벨 누르면 날짜 고르기(실화면 antd 달력 모양): 월 = 연 · 월, 주 = 날짜 누르면 그 주, 일 = 시작 날짜. 바깥 클릭 · Esc 닫힘, 고르면 바로 이동 */
+var PICK = null;
+function closePicker() { if (PICK) { PICK.remove(); PICK = null; document.removeEventListener('mousedown', pickOut, true); document.removeEventListener('keydown', pickKey, true); } }
+function pickOut(e) { if (PICK && !PICK.contains(e.target) && !(e.target.closest && e.target.closest('.bc-label'))) closePicker(); }
+function pickKey(e) { if (e.key === 'Escape') closePicker(); }
+function openPicker(lb, st) {
+  if (PICK) { closePicker(); return; }
+  var vy = +st.anchor.slice(0, 4), vm = +st.anchor.slice(5, 7) - 1, p = document.createElement('div'); p.className = 'bc-pick'; p.setAttribute('data-test', 'picker'); mark(p);
+  var pad = function (n) { return (n < 10 ? '0' : '') + n; }, ymd = function (y, m, d) { return y + '-' + pad(m + 1) + '-' + pad(d); };
+  var go = function (a) { st.anchor = a; closePicker(); PB.render(); };
+  var draw = function () {
+    p.innerHTML = ''; var hd = document.createElement('div'); hd.className = 'bc-pick-h';
+    var pv = document.createElement('button'); pv.type = 'button'; pv.textContent = '‹'; pv.setAttribute('data-test', 'pick-prev');
+    var nx = document.createElement('button'); nx.type = 'button'; nx.textContent = '›'; nx.setAttribute('data-test', 'pick-next');
+    var tt = document.createElement('span'); tt.textContent = st.cv === 'month' ? vy + '년' : vy + '년 ' + (vm + 1) + '월';
+    pv.onclick = function () { if (st.cv === 'month') vy--; else { vm--; if (vm < 0) { vm = 11; vy--; } } draw(); };
+    nx.onclick = function () { if (st.cv === 'month') vy++; else { vm++; if (vm > 11) { vm = 0; vy++; } } draw(); };
+    hd.appendChild(pv); hd.appendChild(tt); hd.appendChild(nx); p.appendChild(hd);
+    if (st.cv === 'month') {
+      var g = document.createElement('div'); g.className = 'bc-pick-m';
+      for (var m = 0; m < 12; m++) (function (m) { var c = document.createElement('button'); c.type = 'button'; c.textContent = (m + 1) + '월'; var key = vy + '-' + pad(m + 1);
+        if (key === st.anchor.slice(0, 7)) c.classList.add('sel'); if (key === PB.TODAY.slice(0, 7)) c.classList.add('today'); c.setAttribute('data-test', 'pick-' + key); c.onclick = function () { go(key + '-01'); }; g.appendChild(c); })(m);
+      p.appendChild(g);
+    } else {
+      var t = document.createElement('div'); t.className = 'bc-pick-d'; WD.forEach(function (w) { var x = document.createElement('span'); x.className = 'wd'; x.textContent = w; t.appendChild(x); });
+      var first = ymd(vy, vm, 1), s0 = weekStart(first), selS = st.cv === 'week' ? weekStart(st.anchor) : st.anchor, selE = st.cv === 'week' ? PB.addDays(selS, 6) : PB.addDays(st.anchor, 2);
+      for (var r = 0; r < 6; r++) { var row = document.createElement('div'); row.className = 'bc-pick-row' + (st.cv === 'week' ? ' wk' : '');
+        for (var k = 0; k < 7; k++) (function (d) { var c = document.createElement('button'); c.type = 'button'; c.textContent = +d.slice(8, 10); if (d.slice(5, 7) !== pad(vm + 1)) c.classList.add('out'); if (d >= selS && d <= selE) c.classList.add('in'); if (d === selS) c.classList.add('sel');
+          if (d === PB.TODAY) c.classList.add('today'); c.setAttribute('data-test', 'pick-' + d); c.onclick = function () { go(d); }; row.appendChild(c); })(PB.addDays(s0, r * 7 + k));
+        t.appendChild(row); }
+      p.appendChild(t);
+    }
+  };
+  draw(); document.body.appendChild(p);
+  var r0 = lb.getBoundingClientRect(); p.style.left = Math.max(8, Math.min(r0.left + r0.width / 2 - p.offsetWidth / 2, document.documentElement.clientWidth - p.offsetWidth - 8)) + 'px'; p.style.top = (r0.bottom + 6 + window.scrollY) + 'px';
+  PICK = p; document.addEventListener('mousedown', pickOut, true); document.addEventListener('keydown', pickKey, true);
+}
+
+/* 칸에 보일 칩 고르기(우선순위: 처리 필요 → 정상 → 방문완료 → 취소 · 미방문, 같은 묶음은 시간순) */
+function chipPick(chips, k) { var pr = function (c) { return c.classList.contains('bc-need') ? 0 : c.classList.contains('bc-g-done') ? 2 : (c.classList.contains('bc-g-cx') || c.classList.contains('bc-g-ns')) ? 3 : 1; };
+  return Array.prototype.map.call(chips, function (c, i) { return [pr(c), i]; }).sort(function (a, b) { return a[0] - b[0] || a[1] - b[1]; }).slice(0, k).map(function (x) { return x[1]; }); }
 
 /* ===== HOST 예약 관리(예약 현황): 실화면 스냅샷 그대로 + [목록 | 캘린더] ===== */
 function H() { return PB.S.host; }
@@ -3253,9 +3331,9 @@ function calMode(card, rows, row1, seg) {
   var nav = document.createElement('div'); nav.className = 'bc-nav'; mark(nav);
   var mk = function (txt, test, fn) { var b = p1.cloneNode(true); b.querySelector('span').textContent = txt; b.setAttribute('data-test', test); b.onclick = fn; if (txt.length === 1) b.classList.add('bc-arrow'); return b; };
   nav.appendChild(mk('‹', 'prev', function () { calMove(h, -1); PB.render(); }));
-  nav.appendChild(mk('›', 'next', function () { calMove(h, 1); PB.render(); }));
   nav.appendChild(mk('오늘', 'today', function () { h.anchor = PB.TODAY; PB.render(); }));
-  var lb = document.createElement('strong'); lb.className = 'bc-label'; lb.textContent = calLabel(h); lb.setAttribute('data-test', 'cal-label'); nav.appendChild(lb);
+  nav.appendChild(mk('›', 'next', function () { calMove(h, 1); PB.render(); }));
+  var lb = document.createElement('strong'); lb.className = 'bc-label'; lb.textContent = calLabel(h); lb.setAttribute('data-test', 'cal-label'); lb.setAttribute('role', 'button'); lb.tabIndex = 0; (function (st) { lb.onclick = function (e) { e.stopPropagation(); openPicker(lb, st); }; })(h); nav.appendChild(lb);
   /* 이동 묶음은 카드 머리 줄(제목 오른쪽), 보기 버튼은 그 줄 오른쪽 끝. 기간 줄은 비움 */
   moveSearch(sb, $('form input.ant-input')); var ht0 = $('.ant-card-head-title', card); ht0.after(nav); card.classList.add('bc-headnav'); fixLabel(lb); row.style.display = 'none';
   /* 표 대신 캘린더 */
@@ -3273,7 +3351,7 @@ function calMode(card, rows, row1, seg) {
 /* 지금 보이는 달 · 주 안의 예약인가(제목 건수용) */
 function calRange(st, b) {
   if (st.cv === 'month') return b.visit.slice(0, 7) === st.anchor.slice(0, 7);
-  if (st.cv === 'day') return b.visit.slice(0, 10) === st.anchor;
+  if (st.cv === 'day') { var dv = b.visit.slice(0, 10); return dv >= st.anchor && dv <= PB.addDays(st.anchor, 2); }
   var s = weekStart(st.anchor), d = b.visit.slice(0, 10); return d >= s && d <= PB.addDays(s, 6);
 }
 /* 오른쪽 처리 필요 (실화면 그대로, 시안 데이터) */
