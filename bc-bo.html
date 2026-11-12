@@ -3680,7 +3680,7 @@ function pRes() {
   var vcur = b.mode === 'list' ? 'list' : b.cv; [['list', '목록', 'mode-list'], ['month', '월', 'cv-month'], ['week', '주', 'cv-week'], ['day', '일', 'cv-day']].forEach(function (it) { tg.appendChild(mk(it[1], vcur === it[0], it[2], function () { pickView(b, it[0]); PB.render(); })); }); tg.setAttribute('data-test', 'view'); tg.classList.add('bc-viewseg');
   var row1 = stSel.parentNode; while (row1 && !row1.contains(inp)) row1 = row1.parentNode; row1.appendChild(tg);
   var rows = filtered(), tw = $('.ant-table-wrapper');
-  if (b.mode !== 'cal') { fitRow(row1, inp, null, tg); listStatusRow(b, filtered(true), '', false); }
+  if (b.mode !== 'cal') { fitRow(row1, inp, null, tg); var lsr = statusRow({ st: b, count: filtered(true), listMode: true }); mark(lsr); boStrip(lsr); }
   if (b.mode === 'cal') {
     kids.forEach(function (k) { if (!k.contains(sb)) k.style.display = 'none'; });
     var nav = document.createElement('div'); nav.className = 'bc-nav'; mark(nav);
@@ -3696,12 +3696,7 @@ function pRes() {
      
       open: function (no) { b.open = no; PB.render(); } }), tw.nextSibling);
     /* 캘린더일 때만: 상태 칩 줄을 이동 줄 오른쪽으로, 요약 카드 5개는 얇은 한 줄 띠로 */
-    var sr = $('.bc-srow');
-    var srow0 = $$('.ant-statistic')[0], cardsRow = srow0 && srow0.closest('.ant-row');
-    if (cardsRow) { var strip = document.createElement('div'); strip.className = 'bc-sumstrip'; strip.setAttribute('data-test', 'sum-strip'); mark(strip);
-      $$('.ant-statistic', cardsRow).forEach(function (s2) { var it = document.createElement('span'); it.className = 'bc-sum-i'; var t = $('.ant-statistic-title', s2).textContent.trim(), v = $('.ant-statistic-content-value', s2).textContent.replace(/s+/g, '') + ($('.ant-statistic-content-suffix', s2) ? $('.ant-statistic-content-suffix', s2).textContent.trim() : ''); it.innerHTML = '<span>' + esc(t) + '</span><b>' + esc(v) + '</b>'; strip.appendChild(it); });
-      if (sr) { sr.classList.add('bc-srow-strip'); strip.appendChild(sr); } /* 상태 칩 줄은 요약 띠 오른쪽 */
-      cardsRow.style.display = 'none'; cardsRow.after(strip); }
+    boStrip($('.bc-srow'));
     fitRow(row1, inp, null, grp);
     return;
   }
@@ -3727,4 +3722,12 @@ function openDrawer() {
 }
 window.draw = draw;
 PB.ready('BO');
+
+function boStrip(sr) { /* 요약 카드 5개 → 한 줄 띠(목록 · 캘린더 공통), 상태 칩 줄은 띠 안 오른쪽 */
+  var srow0 = $$('.ant-statistic')[0], cardsRow = srow0 && srow0.closest('.ant-row');
+  if (cardsRow) { var strip = document.createElement('div'); strip.className = 'bc-sumstrip'; strip.setAttribute('data-test', 'sum-strip'); mark(strip);
+    $$('.ant-statistic', cardsRow).forEach(function (s2) { var it = document.createElement('span'); it.className = 'bc-sum-i'; var t = $('.ant-statistic-title', s2).textContent.trim(), v = $('.ant-statistic-content-value', s2).textContent.replace(/s+/g, '') + ($('.ant-statistic-content-suffix', s2) ? $('.ant-statistic-content-suffix', s2).textContent.trim() : ''); it.innerHTML = '<span>' + esc(t) + '</span><b>' + esc(v) + '</b>'; strip.appendChild(it); });
+    if (sr) { sr.classList.add('bc-srow-strip'); strip.appendChild(sr); } /* 상태 칩 줄은 요약 띠 오른쪽 */
+    cardsRow.style.display = 'none'; cardsRow.after(strip); }
+}
 </script></body></html>
