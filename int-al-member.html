@@ -860,7 +860,7 @@ var EX = { passport: ['WANG XIAOMEI', 'WANG MEI'], name: ['왕샤오메이', '�
 var ANNO = {
   fo11: 'Change account information 버튼만 눌러 볼 수 있습니다. 나머지 메뉴는 현행 화면 그대로라 눌러도 "Not available in this mockup" 토스트만 뜹니다.',
   fo11b: 'Name (as in passport), Nationality, Gender, Date of Birth, Messenger 칸을 누르면 예시 값이 들어갑니다. Save를 눌러야 회원 정보에 저장됩니다. Phone Number는 Use a different number로 바꾸고 Get verification code로 문자 인증을 마치면 바로 저장됩니다. 번호가 없으면 빈 칸을 눌러 입력합니다.',
-  fo13: 'Passport name, Nationality부터 Date of birth까지, Mobile phone number, Messenger contact 칸을 누르면 예시 값이 들어갑니다. Date of birth 예시 값에는 방문 예정일(2026-10-20)에 만 17세인 2009-05-01, 그날 만 18세가 되는 2008-10-20도 있습니다.',
+  fo13: 'Passport name, Nationality부터 Date of birth까지, Mobile phone number, Messenger contact 칸을 누르면 예시 값이 들어갑니다. 클리닉 스토어로 바꾸면 동의 항목에 만 18세 체크 줄이 생기고, 체크해야 Book이 켜집니다. 생년월일로 나이를 판정하지 않습니다.',
   fo13c: 'Name, Mobile number, Social media ID 칸을 누르면 예시 값이 들어갑니다. 상담접수 폼에서 고친 값은 현행 상담접수 폼 로직 그대로라 회원 정보를 덮어쓰지 않습니다.'
 };
 var TOAST_T = null;
@@ -892,10 +892,10 @@ function reset13() { S.userSet = {}; S.done13 = false; S.age18 = false; S.age18c
 function go(v) { S.wdErr = false; if (v === 'fo11') S.sub = 'home'; if ((S.view === 'fo13' && v !== 'fo13') || (v === 'fo13' && (S.view !== 'fo13' || S.done13 || S.doneC))) reset13(); S.view = v; render(); }
 function setF13(m) { S.f13 = m; if (S.view === 'fo13') reset13(); render(); }
 
-/* 클리닉 스토어 예약 나이: 방문 예정일 기준 만 18세 이상 */
+/* 클리닉 스토어 예약 나이: 방문 예정일 기준 만 18세 이상. 생년월일로 판정하지 않고 동의 항목 체크 줄('[Required] I am 18 or older as of the visit date')로 받는다. 확인 창 없음(회원연동 PRD 4장) */
 var VISIT13 = '2026-10-20';
 function adult18(b) { if (!b) return false; var q = b.split('-'), v = VISIT13.split('-'), age = (+v[0]) - (+q[0]); if (+q[1] > +v[1] || (+q[1] === +v[1] && +q[2] > +v[2])) age--; return age >= 18; }
-function submit13() { if (S.clinic13 && !adult18(S.prof.birth) && !S.age18ok) { S.age18 = true; S.age18chk = false; render(); return; } S.age18ok = false; S.passportSaved = S.passport; S.passport = ''; S.booked = (S.booked || 0) + 1; S.telSaved = true; S.telEdited = false; S.mtel = S.tel; S.mtelSaved = true; S.mtelDraft = ''; S.userSet = {}; S.done13 = true; render(); }
+function submit13() { if (S.clinic13 && !S.age18chk) return; S.age18chk = false; S.passportSaved = S.passport; S.passport = ''; S.booked = (S.booked || 0) + 1; S.telSaved = true; S.telEdited = false; S.mtel = S.tel; S.mtelSaved = true; S.mtelDraft = ''; S.userSet = {}; S.done13 = true; render(); }
 
 /* 예시 값 순환: 지금 값의 다음 값. 목록에 없으면 첫 값 */
 function nextEx(e, cur) { return e[(e.indexOf(cur) + 1) % e.length]; }
@@ -927,7 +927,7 @@ function fo09() {
     return '<label class="ck"><input type="checkbox" ' + (S[r[0]] ? 'checked' : '') + ' onchange="S.' + r[0] + '=this.checked;render()">' +
       '<span class="tt">' + r[1] + ' ' + (r[2] ? '<span class="rq">필수</span>' : '<span class="op">선택</span>') + (r[4] ? '<span class="ds">' + r[4] + '</span>' : '') + '</span>' +
       (r[3] ? '<span class="vw" onclick="event.preventDefault();event.stopPropagation();S.open[\'' + r[0] + '\']=!S.open[\'' + r[0] + '\'];render()">' + (open ? '접기' : '보기') + '</span>' : '') + '</label>' +
-      (open && r[3] ? '<div class="full"><div class="gone" style="margin:0 0 8px;padding:6px 10px;font-size:11.5px">(시안 주석) 전문은 PRD 15장 확정본을 씁니다. 아래는 자리 확인용 예시입니다.</div>' + r[3] + '</div>' : '');
+      (open && r[3] ? '<div class="full"><div class="gone" style="margin:0 0 8px;padding:6px 10px;font-size:11.5px">(시안 주석) 전문은 게시하는 확정본을 씁니다. 아래는 자리 확인용 예시입니다.</div>' + r[3] + '</div>' : '');
   }).join('');
 
   var overlay;
@@ -1224,7 +1224,7 @@ function render() {
     (S.view === 'fo13' ? '<span class="kv">FO-CH-13 화면 <em>' + (S.f13 === 'consult' ? '상담접수 폼' : '예약 입력') + '</em></span>' +
       '<button onclick="setF13(S.f13===\'consult\'?\'book\':\'consult\')">' + (S.f13 === 'consult' ? '예약 입력 보기' : '상담접수 폼 보기') + '</button>' +
       (S.f13 === 'consult' ? '' : '<span class="kv">스토어 <em>' + (S.clinic13 ? '클리닉' : '클리닉 아님') + '</em></span><span class="kv">방문 예정일 <em>' + VISIT13 + '</em></span>' +
-      '<button onclick="S.clinic13=!S.clinic13;S.age18=false;render()">' + (S.clinic13 ? '클리닉 아닌 스토어로' : '클리닉 스토어로') + '</button>') : '') +
+      '<button onclick="S.clinic13=!S.clinic13;S.age18=false;S.age18chk=false;render()">' + (S.clinic13 ? '클리닉 아닌 스토어로' : '클리닉 스토어로') + '</button>') : '') +
     '<button onclick="var bm=S.birthMode;var w=S.wallet;var nn=S.noNick;resetDB();S.birthMode=bm;S.wallet=w;S.noNick=nn;render()">처음으로</button>';
   document.getElementById('cap').textContent = CAPS[S.view] || '';
   var m = { fo09: fo09, fo08: fo08, fo10: fo10, fo11: fo11, fo12: fo12, fo13: fo13, bo11: bo11 };
@@ -1322,7 +1322,7 @@ function rAgreeRow(k, name, req, full, desc, toggle) {
   return '<div class="' + RBI + 'agreementRow" data-test="al-ag-' + k + '"><label onclick="event.preventDefault();' + (toggle || 'S.' + k + '=!S.' + k + ';render()') + '"><input type="checkbox"' + (on ? ' checked' : '') + '>' + (on ? RIC.chk : RIC.box) +
     '<span class="' + RBI + 'agreementCopy"><span>' + name + (req ? '<span class="rf-req">필수</span>' : '<span class="rf-opt">선택</span>') + '</span>' + (desc ? '<span class="' + RBI + 'agreementDescription">' + desc + '</span>' : '') + '</span></label>' +
     (full ? '<button type="button" class="rf-view" data-test="al-view-' + k + '" onclick="S.open[\'' + k + '\']=!S.open[\'' + k + '\'];render()">' + (open ? '접기' : '보기') + '</button>' : '') + '</div>' +
-    (open && full ? '<div class="rf-full" data-test="al-full-' + k + '">' + rGone('전문은 PRD 15장 확정본을 씁니다. 아래는 자리 확인용 예시입니다.') + full + '</div>' : '');
+    (open && full ? '<div class="rf-full" data-test="al-full-' + k + '">' + rGone('전문은 게시하는 확정본을 씁니다. 아래는 자리 확인용 예시입니다.') + full + '</div>' : '');
 }
 function fo09() {
   if (S.joined) return phoneNote('K-Beauty Station', '회원이 만들어진 뒤에는 이 창이 뜨지 않습니다. 다음 진입부터는 바로 홈이 열립니다. 위쪽 탭에서 마이페이지를 열어 보세요.');
@@ -1468,14 +1468,16 @@ function fo13() {
     '<button type="button" class="' + RBI + 'qrUploadButton"' + RNA + '>Upload ID with a QR code <span aria-hidden="true">›</span></button>' + rGone('알리페이 채널에서는<br>앱 열기 버튼이 없습니다') + '</div>';
   var req = '<div class="' + RBI + 'informationField"><div class="' + RBI + 'informationFieldHeading">' + rLabel('Requests', 0) + '<p>Tell us about questions, preferred treatments, or interpretation needs. More detail helps the store prepare.</p></div><textarea name="customerRequest" rows="3" maxlength="1000" placeholder="e.g. I would like a consultation. Is English interpretation available I am also curious about recovery time."></textarea></div>';
   /* 웹 예약과 같은 필수값. 이메일만 뺀다 */
-  var ready = S.passport && p.nation && p.sex && p.birth && S.tel && S.telVerified && S.rmsg;
-  var ov = S.age18 ? '<div class="pb-alert-dim" data-test="fo-age18"><div class="pb-alert" role="dialog" aria-modal="true"><button type="button" class="pb-x" aria-label="Close" data-test="fo-age18-x" onclick="S.age18=false;S.age18chk=false;render()">✕</button><h3>Please check before booking</h3><p>This store is only for guests aged 18 or older on the visit date.</p><label class="pb-agechk"><input type="checkbox" data-test="fo-age18-chk"' + (S.age18chk ? ' checked' : '') + ' onchange="S.age18chk=this.checked;render()"><span>I understand that the store may refuse treatment or entry if I am under 18 on the visit date.</span></label><div class="pb-btns"><button type="button" class="sec" data-test="fo-age18-cancel" onclick="S.age18=false;S.age18chk=false;render()">Cancel</button><button type="button" data-test="fo-age18-ok"' + (S.age18chk ? ' onclick="S.age18=false;S.age18chk=false;S.age18ok=true;submit13()"' : ' disabled') + '>Confirm</button></div></div></div>' : '';
+  var ready = S.passport && p.nation && p.sex && p.birth && S.tel && S.telVerified && S.rmsg && (!S.clinic13 || S.age18chk);
+  /* 클리닉 스토어: 동의 항목에 만 18세 체크 줄(다른 [Required] 줄과 같은 모양, 상세 보기 화살표 없음). 체크하지 않으면 Book 꺼짐 */
+  var age = S.clinic13 ? '<label class="al-agerow" data-test="al-age18-row" style="display:flex;align-items:center;gap:10px;padding:14px 0 4px;font-family:Pretendard,sans-serif;font-size:14px;line-height:1.4;color:#2d2d2d;cursor:pointer"><input type="checkbox" data-test="al-age18-chk" style="width:20px;height:20px;margin:0;accent-color:#fb6f92;flex:none"' + (S.age18chk ? ' checked' : '') + ' onchange="S.age18chk=this.checked;render()"><span>[Required] I am 18 or older as of the visit date</span></label>' : '';
+  var ov = false ? '<div class="pb-alert-dim" data-test="fo-age18"><div class="pb-alert" role="dialog" aria-modal="true"><button type="button" class="pb-x" aria-label="Close" data-test="fo-age18-x" onclick="S.age18=false;S.age18chk=false;render()">✕</button><h3>Please check before booking</h3><p>This store is only for guests aged 18 or older on the visit date.</p><label class="pb-agechk"><input type="checkbox" data-test="fo-age18-chk"' + (S.age18chk ? ' checked' : '') + ' onchange="S.age18chk=this.checked;render()"><span>I understand that the store may refuse treatment or entry if I am under 18 on the visit date.</span></label><div class="pb-btns"><button type="button" class="sec" data-test="fo-age18-cancel" onclick="S.age18=false;S.age18chk=false;render()">Cancel</button><button type="button" data-test="fo-age18-ok"' + (S.age18chk ? ' onclick="S.age18=false;S.age18chk=false;S.age18ok=true;submit13()"' : ' disabled') + '>Confirm</button></div></div></div>' : '';
   return rPhone(rHeader('Book', "go('fo11')", 'home') + '<main class="' + RBI + 'page ' + RBI + 'informationPage" data-test="al-book-page"><form class="' + RBI + 'informationForm" onsubmit="return false">' +
     '<div class="' + RBI + 'bookingNotice" data-test="bk-sum"><span class="' + RBI + 'bookingNoticeDot" aria-hidden="true"></span><strong data-test="fo-info-prod">Abijou 肉毒杆菌</strong><span class="pb-fnote-hi2">at Abijou Clinic Myeongdong · 99,000 KRW</span><span class="pb-fnote">Selected time: Tue, Oct 20, 2026 14:00 (KST)</span></div>' +
     '<section class="' + RBI + 'informationSection">' + pass + '<div class="' + RBI + 'informationFieldRow">' + selF('Nationality', 'nation', 'Select a nationality') + selF('Gender', 'sex', 'Select a gender') + '</div>' + birth +
     rGone('알리페이 채널에서는 이 자리가 없습니다<br>이메일') + '</section><div class="' + RBI + 'informationDivider"></div>' +
     '<section class="' + RBI + 'informationSection"><div class="' + RBI + 'informationField" data-test="al-bk-tel">' + tel + '</div>' + msg + req +
-    rGone('현행 예약 폼의 동의 항목은<br>그대로 있습니다. 이 시안에서는 생략했습니다') + '</section>' +
+    rGone('현행 예약 폼의 동의 항목은<br>그대로 있습니다. 이 시안에서는 생략했습니다' + (S.clinic13 ? '<br>(아래 만 18세 줄도 Agree to all에 포함됩니다)' : '')) + age + '</section>' +
     '<div class="' + RBI + 'informationFooterSpacer"></div><div class="' + RBI + 'informationFooter"><button type="button" data-test="al-book"' + (ready ? ' onclick="submit13()"' : ' disabled') + '>Book</button><p>K-Beauty Station arranges bookings.\nThe selected store provides the treatment or service.</p></div></form></main>', ov);
 }
 

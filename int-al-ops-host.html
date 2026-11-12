@@ -452,7 +452,9 @@ function freshState(){
   live:{kind:'전체',st:'전체',reply:'전체',unread:'전체',delay:'전체',ch:'전체',sel:null},
   consult:{st:'',lang:'',route:'',ch:'전체',member:'',sns:'',wait:'전체',per:'전체',from:'',to:'',fromd:'',tod:''},
   rev:{img:'',type:'',ch:'전체',q:'',qd:'',from:'',to:'',fromd:'',tod:'',exp:{}}};
-}
+}
+/* 채널 분리 콘솔(?ch=1)에서는 대시보드 · 예약 현황도 이 시안에서 연다(상품 예약 없는 알리페이 화면) */
+var CHONLY=/[?&]ch=1(&|$)/.test(location.search);
 var S;
 /* ===== 유틸 ===== */
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
@@ -485,8 +487,8 @@ function pager(page,total,size,path){
 }
 /* ===== 셸 ===== */
 var NAV=[
- {t:'대시보드',ic:'home'},
- {g:'qa',t:'문의 · 방문 예약',ic:'chat',nw:1,sub:[{t:'실시간 채팅',go:'live'},{t:'채팅내역조회',go:'chatlog'},{t:'메신저상담'},{t:'상담접수',go:'consult'},{t:'예약 현황'},{t:'예약 시간 설정'}]},
+ {t:'대시보드',ic:'home',go:CHONLY?'dash':undefined},
+ {g:'qa',t:'문의 · 방문 예약',ic:'chat',nw:1,sub:[{t:'실시간 채팅',go:'live'},{t:'채팅내역조회',go:'chatlog'},{t:'메신저상담'},{t:'상담접수',go:'consult'},{t:'예약 현황',go:CHONLY?'res':undefined},{t:'예약 시간 설정'}]},
  {t:'상품 관리',ic:'grid'},
  {t:'리뷰 관리',ic:'star',go:'rev'},
  {t:'스토어 칼럼 관리',ic:'book'},
@@ -752,7 +754,7 @@ function viewRev(){
  return h;
 }
 /* ===== 렌더 ===== */
-var VIEWS={chatlog:viewChatlog,live:viewLive,consult:viewConsult,rev:viewRev};
+var VIEWS=Object.assign(CHONLY?{dash:viewDash,res:viewRes}:{},{chatlog:viewChatlog,live:viewLive,consult:viewConsult,rev:viewRev});
 function render(){
  var root=document.getElementById('root');
  var m=document.getElementById('main'),st=m?m.scrollTop:0,tw=document.querySelector('.tw'),twl=tw?tw.scrollLeft:0,li=document.querySelector('.li'),lis=li?li.scrollTop:0;
