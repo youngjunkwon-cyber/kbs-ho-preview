@@ -3137,6 +3137,11 @@ function fillDrawer(pre, b, qrCls) {
   var dt = function (v) { if (!v) return ''; if (!bo) return v.slice(0, 16); var d = v.slice(0, 10); return d + ' (' + PB.wdKo(d) + ') ' + v.slice(11, 16); };
   $('h2', cont).textContent = dt(b.visit);
   var cr = $('[class*=changeRequestBox]', cont); if (cr) $('strong', cr).textContent = dt(b.chg);
+  /* 예약 상품(상품 예약 배포): 드로어 섹션 부품(h3 + 읽기 전용 상자). 상품 없는 예약 = 스토어 예약 */
+  var sec0 = $$('section', cont).filter(function (s) { return $('[class*=readonlyBox]', s); })[0];
+  if (sec0) { var ps = sec0.cloneNode(true); $('h3', ps).textContent = '예약 상품'; ps.setAttribute('data-test', 'prod-block'); var box = $('[class*=readonlyBox]', ps); box.classList.add('pb-prodbox');
+    if (!b.prod) box.textContent = '스토어 예약'; else box.innerHTML = '<span class="pb-prodbox-t"><b>' + esc(b.prod) + '</b><span>' + Number(b.price || 0).toLocaleString('en-US') + '원</span></span>';
+    (cr || $('h2', cont)).after(ps); }
   var qr = b.contact === 'WeChat' || b.contact === 'LINE';
   var V = { '매장': b.storeName || PB.DB.store.name, '여권명': b.name, '국적': b.nation, '언어': langLabel(b.lang), '전화번호': b.phone, '예약 번호': b.rno, '접수 시각': b.recv, '등록 방식': b.owner,
     '취소 시각': b.cancelAt ? (bo ? b.cancelAt : b.cancelAt.slice(0, 16)) : '', '취소한 사람': b.cancelBy || '', '취소 사유': b.cancelReason || '' };
@@ -3646,6 +3651,7 @@ function filtered(noSt) { /* noSt = 예약상태 거름 빼고(칩 건수용) */
     if (!noSt && !stPass(b, x)) return false;
     if (b.lang && x.lang !== b.lang) return false;
     if (b.owner && x.owner !== b.owner) return false;
+    if (b.kind && (x.prod ? '상품 예약' : '스토어 예약') !== b.kind) return false;
     if (q) { var hay = [x.name, x.phone, x.rno, x.req].join(' ').toLowerCase(); if (hay.indexOf(q) < 0) return false; }
     return true;
   }).sort(function (a, c) { return a.visit < c.visit ? 1 : -1; });
@@ -3666,6 +3672,9 @@ function pRes() {
   sWrap.onclick = function () { dropdown(sWrap, PB.DB.stores.map(function (s) { return [s.id, (b.stores.indexOf(s.id) >= 0 ? '✓ ' : '') + s.name]; }), null, function (v) { v = +v; b.stores = b.stores.indexOf(v) >= 0 ? b.stores.filter(function (i) { return i !== v; }) : b.stores.concat([v]); b.open = null; PB.render(); }, ACC); };
   var catSel = selByPh('카테고리 선택'); if (catSel) catSel.onclick = function () { toast('시안에서는 동작하지 않습니다'); };
   var stSel = selByPh('상태 선택'), lgSel = selByPh('언어 선택'), ownSel = selByPh('등록 주체');
+  var ownItem = ownSel.closest('.ant-form-item') || ownSel, kindItem = ownItem.cloneNode(true); ownItem.before(kindItem); var kindSel = kindItem.classList.contains('ant-select') ? kindItem : $('.ant-select', kindItem); /* 예약 구분(상품 예약 배포) */
+  setSelect(kindSel, b.kind, '예약 구분'); kindSel.setAttribute('data-test', 'kind-select');
+  kindSel.onclick = function () { dropdown(kindSel, [['', '전체'], ['상품 예약', '상품 예약'], ['스토어 예약', '스토어 예약']], b.kind, function (v) { b.kind = v; PB.render(); }, ACC); };
   setSelect(lgSel, b.lang ? langLabel(b.lang) : '', '언어 선택'); setSelect(ownSel, b.owner, '등록 주체');
   multiStatus(stSel, b, '상태 선택', function (s) { return s; }, ACC, '취소·노쇼');
   lgSel.onclick = function () { dropdown(lgSel, [['', '전체']].concat(Object.keys(PB.LANGS).map(function (k) { return [k, PB.LANGS[k]]; })), b.lang, function (v) { b.lang = v; PB.render(); }, ACC); };

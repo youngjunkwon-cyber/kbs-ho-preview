@@ -2798,6 +2798,11 @@ function fillDrawer(pre, b, qrCls) {
   var dt = function (v) { if (!v) return ''; if (!bo) return v.slice(0, 16); var d = v.slice(0, 10); return d + ' (' + PB.wdKo(d) + ') ' + v.slice(11, 16); };
   $('h2', cont).textContent = dt(b.visit);
   var cr = $('[class*=changeRequestBox]', cont); if (cr) $('strong', cr).textContent = dt(b.chg);
+  /* 예약 상품(상품 예약 배포): 드로어 섹션 부품(h3 + 읽기 전용 상자). 상품 없는 예약 = 스토어 예약 */
+  var sec0 = $$('section', cont).filter(function (s) { return $('[class*=readonlyBox]', s); })[0];
+  if (sec0) { var ps = sec0.cloneNode(true); $('h3', ps).textContent = '예약 상품'; ps.setAttribute('data-test', 'prod-block'); var box = $('[class*=readonlyBox]', ps); box.classList.add('pb-prodbox');
+    if (!b.prod) box.textContent = '스토어 예약'; else box.innerHTML = '<span class="pb-prodbox-t"><b>' + esc(b.prod) + '</b><span>' + Number(b.price || 0).toLocaleString('en-US') + '원</span></span>';
+    (cr || $('h2', cont)).after(ps); }
   var qr = b.contact === 'WeChat' || b.contact === 'LINE';
   var V = { '매장': b.storeName || PB.DB.store.name, '여권명': b.name, '국적': b.nation, '언어': langLabel(b.lang), '전화번호': b.phone, '예약 번호': b.rno, '접수 시각': b.recv, '등록 방식': b.owner,
     '취소 시각': b.cancelAt ? (bo ? b.cancelAt : b.cancelAt.slice(0, 16)) : '', '취소한 사람': b.cancelBy || '', '취소 사유': b.cancelReason || '' };
@@ -3290,15 +3295,17 @@ function draw() {
 }
 /* 사이드바: 실화면 메뉴 그대로, 예약 관리를 펼치고 예약 현황을 고른 상태로(펼친 하위 메뉴 부품은 채팅 관리 것을 복제) */
 function hostMenu() {
+  /* 상품 예약 배포 뒤 메뉴(상품 예약 선행 배포 PRD 5.16): 채팅 관리 · 상담 관리 · 예약 관리를 "문의 · 방문 예약" 하나로 묶음. 하위 메뉴 이름 · 화면은 그대로 */
   var mn = $('.ant-menu-root'); if (!mn) return; var subs = $$(':scope > li.ant-menu-submenu', mn);
-  var tOf = function (s) { return $('.ant-menu-submenu-title', s).textContent.trim(); };
-  var chat = subs.filter(function (s) { return /채팅 관리/.test(tOf(s)); })[0], res = subs.filter(function (s) { return /예약 관리/.test(tOf(s)); })[0]; if (!chat || !res) return;
-  var leaf = $('li.ant-menu-item', chat), ul = $('ul.ant-menu-sub', chat).cloneNode(false), old = $('ul.ant-menu-sub', res);
-  ['예약 현황', '예약 시간 설정'].forEach(function (n) { var li = leaf.cloneNode(true); li.className = 'ant-menu-item ant-menu-item-only-child' + (n === '예약 현황' ? ' ant-menu-item-selected' : ''); $('.ant-menu-title-content', li).textContent = n; ul.appendChild(li); });
-  if (old) old.remove(); res.appendChild(ul);
-  res.className = chat.className.replace(/\s*ant-menu-submenu-selected/, '') + ' ant-menu-submenu-selected';
-  var arrowC = $('.ant-menu-submenu-arrow', chat), arrowR = $('.ant-menu-submenu-arrow', res); if (arrowC && arrowR) arrowR.replaceWith(arrowC.cloneNode(true));
-  $$('li.ant-menu-item', mn).forEach(function (li) { if (!res.contains(li)) li.classList.remove('ant-menu-item-selected'); });
+  var chat = subs.filter(function (s) { return /채팅 관리/.test($('.ant-menu-submenu-title', s).textContent); })[0]; if (!chat) return;
+  var leaf = $('li.ant-menu-item', chat);
+  subs.forEach(function (s) { if (s !== chat && /상담 관리|예약 관리/.test($('.ant-menu-submenu-title', s).textContent)) s.remove(); });
+  chat.className = 'ant-menu-submenu ant-menu-submenu-inline ant-menu-submenu-open ant-menu-submenu-selected';
+  $('.ant-menu-submenu-title .ant-menu-title-content', chat).textContent = '문의 · 방문 예약';
+  var ul = $('ul.ant-menu-sub', chat); ul.innerHTML = '';
+  ['실시간 채팅', '채팅내역조회', '메신저상담', '상담접수', '예약 현황', '예약 시간 설정'].forEach(function (n) { var li = leaf.cloneNode(true); li.className = 'ant-menu-item ant-menu-item-only-child' + (n === '예약 현황' ? ' ant-menu-item-selected' : ''); $('.ant-menu-title-content', li).textContent = n; ul.appendChild(li); });
+  $$(':scope > li.ant-menu-item', mn).forEach(function (li) { li.classList.remove('ant-menu-item-selected'); });
+  var dash = $$(':scope > li', mn)[0]; if (dash) dash.after(chat);
 }
 document.addEventListener('click', function (e) {
   var m = e.target.closest('.ant-menu-item, .ant-menu-submenu-title'); if (!m) return;
@@ -3313,6 +3320,7 @@ function filtered(noSt) { /* noSt = 예약상태 거름 빼고(칩 건수용) */
     if (!noSt && !stPass(h, b)) return false;
     if (h.lang && b.lang !== h.lang) return false;
     if (h.owner && b.owner !== h.owner) return false;
+    if (h.kind && (b.prod ? '상품 예약' : '스토어 예약') !== h.kind) return false;
     if (h.needOnly && !b.need) return false; /* 처리 필요 칩 */
     if (q) { var hay = [b.name, b.phone, b.rno, b.req].join(' ').toLowerCase(); if (hay.indexOf(q) < 0) return false; }
     return true;
@@ -3335,6 +3343,9 @@ function pRes() {
   var head = $('[class*=pageHeader__right] button'); if (head) head.onclick = function () { toast('시안에서는 동작하지 않습니다'); };
   /* 필터: 예약상태 · 언어 · 등록 주체 · 검색 (실화면 그대로, 시안에서 실제로 거름) */
   var sels = $$('form .ant-select'), stSel = sels[0], lgSel = sels[1], ownSel = sels[2];
+  var kindSel = ownSel.cloneNode(true); ownSel.before(kindSel); /* 예약 구분(상품 예약 배포) */
+  setSelect(kindSel, h.kind ? '예약 구분 ' + h.kind : '', '예약 구분 전체'); kindSel.setAttribute('data-test', 'kind-select');
+  kindSel.onclick = function () { dropdown(kindSel, [['', '예약 구분 전체'], ['상품 예약', '상품 예약'], ['스토어 예약', '스토어 예약']], h.kind, function (v) { h.kind = v; PB.render(); }, ACC); };
   setSelect(lgSel, h.lang ? '언어 ' + langLabel(h.lang) : '', '언어 전체');
   setSelect(ownSel, h.owner ? (h.owner === '고객' ? '고객 직접 예약' : '수기 등록 예약') : '', '등록 주체 전체');
   multiStatus(stSel, h, '예약상태 전체', function (s) { return s; }, ACC, '취소·미방문');
