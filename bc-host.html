@@ -2505,11 +2505,6 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 .bc-chip.bc-sel .bc-rs{color:rgba(255,255,255,.8)}
 .bc-dgrid .bc-chip .bc-rs{order:2;flex:none;max-width:180px}
 .bc-dgrid .bc-chip:has(.bc-rs){height:28px!important;min-height:28px!important}
-.bc-swrap{height:auto!important;min-height:32px;flex-wrap:wrap;gap:4px;cursor:pointer;max-width:520px}
-.bc-stag{display:inline-flex;align-items:center;gap:4px;margin:0!important;font-size:12px;line-height:20px;padding:0 6px;background:#f5f5f5;border:1px solid #e5e5e5;border-radius:4px;color:rgba(0,0,0,.88)}
-.bc-stag-x{cursor:pointer;color:rgba(0,0,0,.45);font-size:13px;line-height:1}
-.bc-stag-x:hover{color:rgba(0,0,0,.88)}
-.bc-swrap input[placeholder=""]{width:8px!important;min-width:8px}
 /* ===== BO: 칩 2줄(1줄 = 시각 + 스토어명 + 배지), 월 칸 높이 고정, 주 · 일 안쪽 스크롤 ===== */
 .bc-chip:has(.bc-rs){height:40px!important;min-height:40px!important}
 .bc-r1 .bc-rs{display:block;flex:0 1 auto;min-width:0;height:18px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11.5px;color:#6b6b73}
@@ -2722,9 +2717,12 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 
 .bc-sgrp{display:flex;align-items:center;gap:8px;flex:0 1 auto;min-width:248px;max-width:100%}
 .bc-sgrp .bc-sbtn{margin-left:0!important}
-.bc-swrap{max-width:260px!important;flex-wrap:nowrap!important;overflow:hidden}
-.bc-stag{white-space:nowrap;max-width:150px;overflow:hidden;text-overflow:ellipsis}
-.bc-stag-more{flex:none}
+
+/* 스토어 선택 칸: 고른 이름이 넘치면 말줄임 */
+[data-test=store-input]{text-overflow:ellipsis;cursor:pointer}
+[data-test=store-modal] .ant-modal{top:100px;padding-bottom:0}
+[data-test=store-modal] .ant-checkbox-indeterminate{background-color:var(--ant-color-bg-container);border-color:var(--ant-color-border)}
+[data-test=store-modal] .ant-checkbox-indeterminate::after{top:50%;inset-inline-start:50%;width:calc(var(--ant-font-size-lg) / 2);height:calc(var(--ant-font-size-lg) / 2);background-color:var(--ant-color-primary);border:0;transform:translate(-50%,-50%) scale(1);opacity:1;content:""}
 </style></head>
 <body><div id="app"></div>
 <template id="T_h_res">
