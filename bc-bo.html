@@ -3036,6 +3036,13 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 /* 주 · 3일 보기 시간 칸 +N: 월 보기 +N 과 같은 알약 */
 .bc-wc .bc-smore{align-self:flex-start;font-size:13px!important;font-weight:600!important;color:#33333a!important;height:20px!important;line-height:18px!important;padding:0 8px!important;border:1px solid #d0d0d6!important;border-radius:10px!important;background:#fff!important;cursor:default}
 .bc-nav .bc-label{margin:0 2px!important}
+
+/* HOST 처리 필요 칩: 처리 필요 표시 색 테두리 · 글자, 켜면 ✓ + 아주 옅은 바탕, 상태 칩은 흐리게 */
+.bc-ndiv{width:1px;height:18px;background:#e3e3e8;margin:0 4px}
+.bc-needchip{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border:1px solid var(--bc-need-bg,#b45309);border-radius:14px;background:#fff;color:var(--bc-need-bg,#b45309);font:inherit;font-size:12.5px;font-weight:600;cursor:pointer}
+.bc-needchip i{font-style:normal}
+.bc-needchip.on{background:color-mix(in srgb,var(--bc-need-bg,#b45309) 8%,#fff)}
+.bc-need-on .bc-sc{opacity:.45}
 </style></head>
 <body><div id="app"></div>
 <template id="T_b_res">
@@ -3261,7 +3268,11 @@ function statusRow(o) {
   /* 표시 묶음: 누르지 않는 설명 */
   var g2 = document.createElement('div'); g2.className = 'bc-grp bc-grp2'; g2.setAttribute('data-test', 'srow-legend');
   g2.innerHTML = (o.need ? '<span class="bc-li"><i class="bc-sw bc-sw-need"></i><i class="bc-tag bc-tag-sw">신규</i>처리 필요</span>' : '') + '<span class="bc-li"><i class="bc-sw bc-sw-man"></i><i class="bc-mb">수기</i>수기 등록</span>';
-  if (!o.listMode) row.appendChild(g2);
+  /* 범례 설명 견본은 넣지 않음. HOST만: 구분선 + 누르는 칩 '처리 필요 N'(처리 필요 패널과 같은 건수). 켜면 처리 필요 예약만(상태 칩과 AND) */
+  if (o.needChip) { var nc = o.needChip, dv = document.createElement('span'); dv.className = 'bc-ndiv'; g1.appendChild(dv);
+    var nb = document.createElement('button'); nb.type = 'button'; nb.className = 'bc-needchip' + (st.needOnly ? ' on' : ''); nb.setAttribute('aria-pressed', st.needOnly ? 'true' : 'false'); nb.setAttribute('data-test', 'srow-need');
+    nb.innerHTML = (st.needOnly ? '<i>✓</i>' : '') + '<span>처리 필요</span><b>' + nc.n + '</b>'; nb.onclick = function () { st.needOnly = !st.needOnly; PB.render(); }; g1.appendChild(nb);
+    row.classList.toggle('bc-need-on', !!st.needOnly); }
   /* 줄이 바뀌어 표시 묶음이 아래로 내려가면 구분선 숨김 */
   var chk = function () { if (!g2.isConnected) { window.removeEventListener('resize', chk); return; } g2.classList.toggle('bc-wrapped', g2.offsetTop > g1.offsetTop + 2); };
   setTimeout(chk, 0); window.addEventListener('resize', chk);
@@ -3526,10 +3537,10 @@ function multiStatus(sel, st, ph, label, acc, cxLabel) {
 }
 
 /* 목록 보기: 상태 칩 줄을 기간 버튼 줄 오른쪽 끝에(건수 = 지금 필터 기준 목록 건수) */
-function listStatusRow(st, count, cxLabel) {
+function listStatusRow(st, count, cxLabel, needChip) {
   var sb = byText(document, 'form button', '검색'), p1 = byText(document, 'form button', '1주일'); if (!p1) return;
   var row = p1.parentNode; while (row && !row.contains(sb)) row = row.parentNode; if (!row) return;
-  var sr = statusRow({ st: st, count: count, listMode: true, cxLabel: cxLabel }); mark(sr); row.style.flexWrap = 'wrap'; row.style.rowGap = '8px'; row.appendChild(sr);
+  var sr = statusRow({ st: st, count: count, listMode: true, cxLabel: cxLabel, needChip: needChip }); mark(sr); row.style.flexWrap = 'wrap'; row.style.rowGap = '8px'; row.appendChild(sr);
 }
 
 /* 기간 라벨 누르면 날짜 고르기(실화면 antd 달력 모양): 월 = 연 · 월, 주 = 날짜 누르면 그 주, 일 = 시작 날짜. 바깥 클릭 · Esc 닫힘, 고르면 바로 이동 */
