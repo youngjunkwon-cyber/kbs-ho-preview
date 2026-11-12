@@ -3054,6 +3054,10 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 .bc-needchip::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--bc-need-bg,#b45309);flex:none}
 .bc-needchip.on{background:color-mix(in srgb,var(--bc-need-bg,#b45309) 10%,#fff)!important;border-color:var(--bc-need-bg,#b45309)!important;color:#1d1d22!important;font-weight:600}
 .bc-need-on .bc-sc{opacity:1!important}
+/* BO: 고객명이 먼저 줄고 스토어명은 가능한 한 전체 */
+.bc-chip .bc-rs{flex:0 1 auto!important}
+.bc-chip .bc-n,.bc-chip .bc-r2 .bc-n,.bc-dgrid .bc-chip .bc-n{flex:0 1000 auto!important}
+.bc-chip .bc-x{flex:0 100000 auto!important}
 </style></head>
 <body><div id="app"></div>
 <template id="T_b_res">
@@ -3425,7 +3429,7 @@ function mixDark(v) { var c = rgbOf(v); return 'rgb(' + c.map(function (n) { ret
 
 /* 줄임(화면 전체 칩 한 번에): 화살표 뒤 날짜 → (BO) 스토어명 숨김 → 화살표 시각 숨김 → 고객명 숨김 → 배지를 색 점으로. 시각 · 짝 번호는 항상 보존(보존 순서 시간 > 배지 > 이름) */
 function fitBadges(root) {
-  if (!root.isConnected) return; var ST = ['bc-nostore', 'bc-noname', 'bc-dots', 'bc-nobadge']; ST.forEach(function (k) { root.classList.remove(k); });
+  if (!root.isConnected) return; var ST = ['bc-noname', 'bc-nostore', 'bc-dots', 'bc-nobadge']; /* 보존: 시간 > 배지 > 스토어명 > 고객명 */ ST.forEach(function (k) { root.classList.remove(k); });
   var tight = function () { return Array.prototype.some.call(root.querySelectorAll('.bc-chip'), function (c) { return c.offsetParent !== null && c.scrollWidth > c.clientWidth + 0.5; }); };
   for (var i = 0; i < ST.length && tight(); i++) root.classList.add(ST[i]); /* 마지막 bc-nobadge 는 점도 못 들어갈 때만(비상) */
 }
