@@ -3721,6 +3721,7 @@ function filtered(noSt) { /* noSt = 예약상태 거름 빼고(칩 건수용) */
 function pRes() {
   /* 세로 스크롤 막대 자리를 늘 비워 둠: 막대가 생기고 없어질 때 필터 줄 폭이 바뀌어 칸이 줄을 넘나들지 않게 */
   var spr = scrollParent($('form')); if (spr && spr !== document.scrollingElement) spr.style.scrollbarGutter = 'stable';
+  statusColors('bd'); /* 상태 칩 색 점: 목록으로 처음 열어도 예약 상세 창 상태 색으로(캘린더를 거치지 않아도) */
   var b = B(), all = PB.DB.books.filter(function (x) { return !b.stores.length || b.stores.indexOf(x.store) >= 0; }); /* 요약 카드 = 고른 스토어 기준(안 고르면 전체) */
   /* 상단 요약 카드: 실화면 그대로(시안 데이터로 다시 셈) */
   var st = $$('.ant-statistic'), vals = [all.length, all.filter(function (x) { return x.status === '예약'; }).length, all.filter(function (x) { return x.status === '방문완료'; }).length, all.filter(function (x) { return x.status === '미방문'; }).length];

@@ -3398,6 +3398,7 @@ function pRes() {
   /* 세로 스크롤 막대 자리를 늘 비워 둠: 목록(표가 길어 스크롤 생김) ↔ 월 · 주 · 일 사이에 보기 버튼이 좌우로 움직이지 않게 */
   var spr = scrollParent($('.ant-card-head-title')); if (spr && spr !== document.scrollingElement) spr.style.scrollbarGutter = 'stable';
   ACC = getComputedStyle(byText(document, 'form button', '검색')).backgroundColor || ACC;
+  statusColors('hd'); /* 상태 칩 색 점: 목록으로 처음 열어도 예약 상세 창 상태 색으로(캘린더를 거치지 않아도) */
   document.documentElement.style.setProperty('--bc-acc', ACC);
   /* 변경 신청 점선 칩 글자색 = 실화면 처리 필요 카드의 변경요청 표시 색 */
   /* 처리 필요 배지 색 = 처리 필요 패널 건수 배지 색 */
