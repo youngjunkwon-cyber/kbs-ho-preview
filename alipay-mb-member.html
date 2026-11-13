@@ -703,7 +703,7 @@ td.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;letter-
 .rf input[readonly]{cursor:pointer}
 .rf textarea{cursor:text}
 /* 회원 정보 · 알리페이 계정 채움 표시와 회색 안내(통합 시안 pb-autotag · pb-fohint 와 같은 값) */
-.rf .rf-err{color:#f5222d;margin:0;padding:0 8px;font-size:12px;font-weight:500;line-height:16px}
+.rf .rf-err{color:#eb003b;margin:0;padding:0 8px;font-size:12px;font-weight:400;line-height:130%}
 /* 시안 주석 점선 상자(휴대폰 화면 안) */
 .rf .gone{margin:0;padding:12px 14px;border:1px dashed #d9d9d9;border-radius:8px;color:#8e8e8e;font-size:12px;line-height:1.6;background:#fafafa;font-weight:500}
 .rf .rf-gap{display:flex;flex-direction:column;gap:8px;padding:12px 16px}
@@ -817,8 +817,8 @@ function resetDB(keepRows) {
     rmsg: '',             // 예약 입력 화면의 연락 메신저 (회원 정보에서 채우지 않는다)
     done13: false,        // 예약 요청을 보낸 뒤 (현행 예약 완료 화면 자리)
     clinic13: false,      // 예약하는 스토어가 클리닉(피부과·성형외과·치과·메디컬체크)인지
-    age18: false,         // 클리닉 스토어 만 18세 미만 확인 창(체크박스 1개 동의 후 진행)
-    agreed: false,        // 동의 창에서 동의하고 시작하기를 누른 뒤인가 (식별 실패의 다시 시도가 권한 창부터 띄운다)
+    age18: false,         // 쓰지 않음(만 18세는 동의 항목 체크 줄로 받는다)
+    agreed: false,        // 동의 창에서 동의하고 시작하기를 누른 뒤인가 (가입 전 이용자의 식별 실패 다시 시도가 권한 창부터 띄운다. 이미 가입한 회원은 식별되면 바로 로그인)
     noNick: false,        // 알리페이 계정에 닉네임이 없는 경우 (마이페이지 닉네임 자리에 알리페이 회원)
     minor13: '',          // 쓰지 않음(2026-10-17)
     f13: 'book',          // FO-CH-13 화면: book(예약 입력) | consult(상담접수 폼)
@@ -860,7 +860,7 @@ var EX = { passport: ['WANG XIAOMEI', 'WANG MEI'], name: ['왕샤오메이', '�
 var ANNO = {
   fo11: 'Change account information 버튼만 눌러 볼 수 있습니다. 나머지 메뉴는 현행 화면 그대로라 눌러도 "Not available in this mockup" 토스트만 뜹니다.',
   fo11b: 'Name (as in passport), Nationality, Gender, Date of Birth, Messenger 칸을 누르면 예시 값이 들어갑니다. Save를 눌러야 회원 정보에 저장됩니다. Phone Number는 Use a different number로 바꾸고 Get verification code로 문자 인증을 마치면 바로 저장됩니다. 번호가 없으면 빈 칸을 눌러 입력합니다.',
-  fo13: 'Passport name, Nationality부터 Date of birth까지, Mobile phone number, Messenger contact 칸을 누르면 예시 값이 들어갑니다. 클리닉 스토어로 바꾸면 동의 항목에 만 18세 체크 줄이 생기고, 체크해야 Book이 켜집니다. 생년월일로 나이를 판정하지 않습니다.',
+  fo13: 'Passport name, Nationality부터 Date of birth까지, Mobile phone number, Messenger contact 칸을 누르면 예시 값이 들어갑니다. Passport name은 누른 뒤 칸을 벗어난 것으로 보고 바로 회원 정보에 저장합니다(계정 설정에서 확인). 동의 항목 영역(클리닉 스토어 만 18세 동의 체크 포함)은 웹 예약 폼과 같고 이 기능에서 바꾸지 않습니다.',
   fo13c: 'Name, Mobile number, Social media ID 칸을 누르면 예시 값이 들어갑니다. 상담접수 폼에서 고친 값은 현행 상담접수 폼 로직 그대로라 회원 정보를 덮어쓰지 않습니다.'
 };
 var TOAST_T = null;
@@ -876,12 +876,12 @@ var VIEWS = [
   ['bo11', 'BO-CH-11 알리페이 회원']
 ];
 var CAPS = {
-  fo09: '권한 창은 알리페이 앱이 그립니다. 우리 화면에 합칠 수 없습니다. 알리페이에서 식별자를 받은 직후 한 번 뜹니다. 회원을 만들기 전이라 뒤 화면은 비어 있고 어둡게만 깔립니다. 이용 약관, 개인정보 처리방침, 알리페이 프로필 제공 셋이 필수라 셋을 다 체크해야 동의 버튼이 켜집니다. 권한 창의 다섯 항목(이름, 닉네임, 성별, 생년월일, 국적)은 모두 필수라 이름을 끄고 허용하면 진입 차단 화면으로 갑니다. 휴대폰 번호는 알리페이에서 받지 않습니다. 마케팅 정보 수신은 선택입니다. 동의를 누르면 알리페이가 권한 창을 한 번 더 띄웁니다. 권한 창에서 허용하면 회원이 만들어집니다.',
-  fo08: '상단 상태의 차단 이유 버튼으로 세 가지(동의 창 닫기 / 프로필 거부 / 식별 실패)를 바꿔 볼 수 있습니다. 헤더, 메뉴, 검색이 없습니다. 동의 창을 닫았을 때, 알리페이 권한 창에서 필수 권한(프로필)을 거부했을 때, 식별에 실패했을 때 머무는 화면입니다. 둘러보기는 없습니다. 버튼은 하나입니다. 식별 실패의 다시 시도는 계정 식별부터 다시 진행하고, 동의 창에서 동의하고 시작하기를 이미 눌렀으면 알리페이 권한 창부터, 아니면 동의 창부터 다시 띄웁니다.',
+  fo09: '권한 창은 알리페이 앱이 그립니다. 우리 화면에 합칠 수 없습니다. 알리페이에서 식별자를 받은 직후 한 번 뜹니다. 회원을 만들기 전이라 뒤 화면은 비어 있고 어둡게만 깔립니다. 이용 약관, 개인정보 처리방침, 알리페이 프로필 제공 셋이 필수라 셋을 다 체크해야 동의 버튼이 켜집니다. 권한 창의 다섯 항목(이름, 닉네임, 성별, 생년월일, 국적)은 모두 필수라 이름을 끄고 허용하면 진입 차단 화면으로 갑니다. 알리페이 중국은 다섯 항목을 묶음 하나(auth_user)로, 알리페이 홍콩은 항목별로 요청합니다. 이 시안의 권한 창은 항목별 모양입니다. 휴대폰 번호는 알리페이에서 받지 않습니다. 마케팅 정보 수신은 선택입니다. 동의를 누르면 알리페이가 권한 창을 한 번 더 띄웁니다. 권한 창에서 허용하면 회원이 만들어집니다.',
+  fo08: '상단 상태의 차단 이유 버튼으로 세 가지(동의 창 닫기 / 프로필 거부 / 식별 실패)를 바꿔 볼 수 있습니다. 헤더, 메뉴, 검색이 없습니다. 동의 창을 닫았을 때, 알리페이 권한 창에서 필수 권한(프로필)을 거부했을 때, 식별에 실패했을 때 머무는 화면입니다. 둘러보기는 없습니다. 버튼은 하나입니다. 식별 실패의 다시 시도는 계정 식별부터 다시 진행합니다. 이미 가입한 회원은 식별되면 바로 로그인하고, 가입 전 이용자는 동의 창에서 동의하고 시작하기를 이미 눌렀으면 알리페이 권한 창부터, 아니면 동의 창부터 다시 띄웁니다. 이 시안의 차단 화면은 가입 전 상태만 보여 줍니다.',
   fo10: '알리페이 식별이 로그인을 대신합니다. 로그인 주소로 직접 들어오면 My Page로 보냅니다. 알리페이 채널에서는 자체 로그인 경로를 숨깁니다. 점선 박스가 웹 채널에는 있고 알리페이 채널에는 없는 자리입니다. 진입 관문을 통과해야 들어오므로 비로그인 상태 자체가 없습니다.',
   fo11: 'My Page는 현행 화면과 같은 구성입니다. Nickname과 Joined, 알리페이 계정 안내, Booking History, My Activity, Explore, Customer Center가 있고 Change account information 버튼으로 Account Settings에 들어갑니다. Account Settings에서는 칸을 눌러 예시 값으로 바꾸고 Save를 눌러야 회원 정보에 저장됩니다(알리페이 회원 탭에서 확인). Phone Number는 예약이나 계정 설정에서 인증한 번호가 있으면 채워지고, 없으면 빈 칸을 눌러 입력해 Get verification code로 문자 인증을 마치면 바로 저장됩니다. Use a different number로 바꾼 뒤 문자 인증을 마쳐도 바로 저장됩니다. 이메일, 비밀번호 변경, 로그아웃 자리가 없습니다. Marketing messages는 여기서 켜고 끕니다. 알리페이 계정에 닉네임이 없으면 Nickname 자리에 알리페이 회원이 보입니다(회원이 되기 전에 상단 닉네임 비우기로 확인).',
   fo12: 'My Page > Account Settings의 기존 탈퇴 경로를 그대로 씁니다. 알리페이 연결과 권한이 끊기고 다시 들어오면 새 회원이 되어 진입 관문을 다시 거칩니다. 방문 전 예약(변경 요청 · 변경된 예약 포함)이 남아 있으면 탈퇴하지 않고 안내 창 안에 웹과 같은 빨간 문구를 띄웁니다.',
-  fo13: '회원 정보에서 채운 값은 고칠 수 있고 고친 값은 회원 정보에 저장됩니다. 이메일 칸이 없습니다. 휴대폰 번호는 알리페이에서 받지 않습니다. 첫 예약 때 직접 입력하고 문자 인증을 하며, 두 번째 예약부터는 회원 정보에 저장된 인증 번호가 채워지고 인증을 건너뜁니다. 고치면 그때 인증합니다. Passport name은 직접 입력합니다. Book은 웹 예약과 같은 필수값(이메일 제외)이 모두 차야 켜집니다. 클리닉 스토어(피부과·성형외과·치과·메디컬체크)는 방문 예정일 기준 만 18세 이상만 이용할 수 있어, 만 18세 미만이면 Book을 눌렀을 때 바로 보내지 않고 체크박스 1개가 있는 확인 창이 뜹니다(상단 클리닉 스토어로 바꿔 확인). 체크하고 Confirm을 누르면 예약되고, Cancel을 누르면 입력한 값이 그대로 남습니다. Nationality·Gender·Date of birth는 칸을 벗어나는 순간 회원 정보에 들어가고, Mobile phone number·Messenger contact·Passport name은 요청 전에 나가면 남지 않습니다. 상단 상담접수 폼 보기로 알리페이 채널 상담접수 폼을 볼 수 있습니다.',
+  fo13: '회원 정보에서 채운 값은 고칠 수 있고 고친 값은 회원 정보에 저장됩니다. 이메일 칸이 없습니다. 휴대폰 번호는 알리페이에서 받지 않습니다. 첫 예약 때 직접 입력하고 문자 인증을 하며, 두 번째 예약부터는 회원 정보에 저장된 인증 번호가 채워지고 인증을 건너뜁니다. 고치면 그때 인증합니다. Passport name은 미리 채우지 않고 직접 입력합니다. Book은 웹 예약과 같은 필수값(이메일 제외)이 모두 차야 켜집니다. 동의 항목 영역(클리닉 스토어 만 18세 동의 체크 포함)은 웹 예약 폼과 같고 이 기능에서 바꾸지 않습니다. Nationality·Gender·Date of birth와 Passport name은 칸을 벗어나는 순간 회원 정보에 들어가고(Passport name은 계정 설정에서 확인), Mobile phone number·Messenger contact는 요청 전에 나가면 남지 않습니다. 상단 상담접수 폼 보기로 알리페이 채널 상담접수 폼을 볼 수 있습니다.',
   bo11: '검색어는 알리페이 식별자, 닉네임, 이름, 연락처를 봅니다. 식별자는 완전 일치로 찾습니다. 빈 값은 알리페이 계정에 값이 없던 항목입니다. 회원 메뉴 아래에 새로 두는 화면입니다. 칼럼은 알리페이가 주는 항목에 맞춘 18개입니다. 이메일과 프로필 동의 여부 칼럼이 없습니다. 연락처는 예약이나 계정 설정에서 인증한 번호입니다. 회원이면 프로필 제공에 항상 동의한 상태입니다.'
 };
 
@@ -957,7 +957,7 @@ function fo09() {
 
 /* ─────────── FO-CH-08 진입 차단 화면 ─────────── */
 function fo08() {
-  if (S.joined) return phoneNote('진입 차단 화면', '회원이 만들어진 뒤에는 이 화면이 뜨지 않습니다. 차단 화면은 위쪽 처음으로를 누른 뒤 상태 버튼으로 볼 수 있습니다.', true);
+  if (S.joined) return phoneNote('진입 차단 화면', '회원이 만들어진 뒤에는 동의 창 닫기와 프로필 거부 차단이 뜨지 않습니다. 식별 실패는 뜰 수 있고, 다시 시도로 식별되면 바로 로그인합니다. 이 시안의 차단 화면은 가입 전 상태만 보여 주며, 위쪽 처음으로를 누른 뒤 상태 버튼으로 볼 수 있습니다.', true);
   return '<div class="phones"><div class="ph"><div class="st"><span>9:41</span><span>●●●</span></div>' + blockPage(S.blocked || 'consent') + '</div></div>';
 }
 function blockPage(b) {
@@ -1349,7 +1349,7 @@ function fo09() {
 
 /* ─────────── FO-CH-08 진입 차단 화면 ─────────── */
 function fo08() {
-  if (S.joined) return phoneNote('진입 차단 화면', '회원이 만들어진 뒤에는 이 화면이 뜨지 않습니다. 차단 화면은 위쪽 처음으로를 누른 뒤 상태 버튼으로 볼 수 있습니다.', true);
+  if (S.joined) return phoneNote('진입 차단 화면', '회원이 만들어진 뒤에는 동의 창 닫기와 프로필 거부 차단이 뜨지 않습니다. 식별 실패는 뜰 수 있고, 다시 시도로 식별되면 바로 로그인합니다. 이 시안의 차단 화면은 가입 전 상태만 보여 주며, 위쪽 처음으로를 누른 뒤 상태 버튼으로 볼 수 있습니다.', true);
   return rPhone(blockPage(S.blocked || 'consent'), '');
 }
 function blockPage(b) {
@@ -1454,7 +1454,7 @@ function fo13() {
   var selF = function (label, key, ph) { var v = p[key], tg = v && !S.userSet[key]; return '<div class="' + RBI + 'informationField" data-test="al-bk-' + key + '">' + rLabel(label, 1, tg ? rTag('회원 정보에서 채웠습니다') : '') + rSel(label, rEn(v), ph, "edit('" + key + "')") + '</div>'; };
   var bv = p.birth, btag = bv && !S.userSet.birth;
   var birth = '<div class="' + RBI + 'informationField" data-test="al-bk-birth">' + rLabel('Date of birth', 1, btag ? rTag('회원 정보에서 채웠습니다') : '') + '<input readonly name="birthDate" placeholder="YYYY-MM-DD" value="' + rEsc(bv || '') + '" onclick="edit(\'birth\')">' + '</div>';
-  var pass = '<div class="' + RBI + 'informationField" data-test="al-bk-pass">' + rLabel('Passport name', 1) + '<input readonly name="passportName" value="' + rEsc(S.passport) + '" onclick="S.passport=S.passport||\'WANG XIAOMEI\';render()"></div>';
+  var pass = '<div class="' + RBI + 'informationField" data-test="al-bk-pass">' + rLabel('Passport name', 1) + '<input readonly name="passportName" value="' + rEsc(S.passport) + '" onclick="S.passport=S.passport||\'WANG XIAOMEI\';S.passportSaved=S.passport;render()"></div>';
   var head = function (tg) { return '<div class="' + RBI + 'informationFieldHeading">' + rLabel('Mobile phone number', 1, tg ? rTag(tg) : '') + '<p>Booking confirmations and reminders will be sent to this number.</p></div>'; };
   var verified = function (t) { var c = rTel(t); return '<div class="' + RBI + 'verifiedPhoneForm"><div class="' + RBI + 'verifiedPhoneRow"><span class="' + RBI + 'verifiedCountryCode">' + c[0] + '</span><span class="' + RBI + 'verifiedPhoneNumber" data-test="al-bk-telno">' + rEsc(c[1]) + ' (Verified)</span></div><button type="button" class="' + RBI + 'changePhoneButton" data-test="al-bk-change" onclick="setTelNext()">Use a different number</button></div>'; };
   var unver = function (t) { var c = rTel(t); return '<div class="' + RBI + 'verifiedPhoneForm"><div class="' + RBI + 'phoneInputRow"><div class="' + RBI + 'countryCallingCode">' + rSel('Calling code', c[0], 'Select', 'rNA()') + '</div><input readonly placeholder="Phone number" value="' + rEsc(c[1]) + '" onclick="setTelNext()"></div>' + (t && !S.telVerified ? '<button type="button" class="' + RBI + 'verificationButton" data-test="al-bk-verify" onclick="S.telVerified=true;render()">Get verification code</button>' : '') + '</div>'; };
@@ -1466,7 +1466,7 @@ function fo13() {
   var msg = '<div class="' + RBI + 'informationField" data-test="al-bk-msg"><div class="' + RBI + 'informationFieldHeading">' + rLabel('Messenger contact', 1) + '<p>The store will contact you here if they need to discuss your booking.</p></div>' + rChips(S.rchip || mm[0] || 'WhatsApp', 'S.rchip') +
     '<input readonly name="messengerId" data-test="fo-msgid" placeholder="메신저 아이디를 직접 입력해 주세요" value="' + rEsc(mm[1]) + '" onclick="S.rmsg=S.rmsg||\'위챗 wxid_alipay01\';S.rchip=\'\';render()">' +
     '<button type="button" class="' + RBI + 'qrUploadButton"' + RNA + '>Upload ID with a QR code <span aria-hidden="true">›</span></button>' + rGone('알리페이 채널에서는<br>앱 열기 버튼이 없습니다') + '</div>';
-  var req = '<div class="' + RBI + 'informationField"><div class="' + RBI + 'informationFieldHeading">' + rLabel('Requests', 0) + '<p>Tell us about questions, preferred treatments, or interpretation needs. More detail helps the store prepare.</p></div><textarea name="customerRequest" rows="3" maxlength="1000" placeholder="e.g. I would like a consultation. Is English interpretation available I am also curious about recovery time."></textarea></div>';
+  var req = '<div class="' + RBI + 'informationField"><div class="' + RBI + 'informationFieldHeading">' + rLabel('Requests', 0) + '<p>Tell us about questions, preferred treatments, or interpretation needs. More detail helps the store prepare.</p></div><textarea name="customerRequest" rows="3" maxlength="1000" placeholder="e.g. I would like a consultation. Is English interpretation available? I am also curious about recovery time."></textarea></div>';
   /* 웹 예약과 같은 필수값. 이메일만 뺀다 */
   var ready = S.passport && p.nation && p.sex && p.birth && S.tel && S.telVerified && S.rmsg && (!S.clinic13 || S.age18chk);
   /* 클리닉 스토어: 동의 항목에 만 18세 체크 줄(다른 [Required] 줄과 같은 모양, 상세 보기 화살표 없음). 체크하지 않으면 Book 꺼짐 */
