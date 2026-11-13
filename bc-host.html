@@ -2743,6 +2743,14 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 /* 넓은 칸(1920급): 고객명 최소 30px 남기고, 모자란 칩만 스토어명 말줄임 */
 .bc-keepname .bc-chip .bc-n{min-width:30px!important}
 .bc-keepname .bc-chip .bc-rs{flex:0 1 auto!important;min-width:0}
+
+/* +N 창은 상세 창 어두운 덮개 위에 보이고 눌림(창 안 다른 칩을 누르면 상세 내용 · 보라 강조만 바뀜) */
+.bc-pop{z-index:1050!important}
+/* HOST 카드 머리: 간격을 줄여도 모자라면 이동 묶음을 제목 아래 줄 왼쪽으로(보기 버튼 자리 그대로) */
+.bc-headwrap .ant-card-head-wrapper{flex-wrap:wrap!important;row-gap:8px}
+.bc-headwrap .ant-card-head-title{order:1}
+.bc-headwrap .ant-card-extra{order:2;margin-left:auto}
+.bc-headwrap .bc-nav{order:3;flex:0 0 100%!important;margin:0 0 10px!important}
 </style></head>
 <body><div id="app"></div>
 <template id="T_h_res">
@@ -2910,7 +2918,7 @@ function chipsOf(list) {
 /* 칩 묶음: 다가오는 예약 / 끝난 예약 / 취소 · 노쇼 (왼쪽 막대 색) */
 var GRP = { '예약': 'up', '변경완료': 'up', '변경거절': 'up', '변경요청': 'up', '방문완료': 'done', '고객취소': 'cx', '매장취소': 'cx', '미방문': 'ns' };
 /* 상태 칩 줄의 묶음(필터 겸 범례) */
-var ROWG = [['예약', '예약', ['예약', '변경완료', '변경거절'], 'up'], ['변경요청', '변경요청', ['변경요청'], 'up'], ['방문완료', '방문완료', ['방문완료'], 'done'], ['취소노쇼', '취소 · 노쇼', ['고객취소', '매장취소', '미방문'], 'cx']];
+var ROWG = [['예약', '예약', ['예약', '변경완료', '변경거절'], 'up'], ['변경요청', '변경요청', ['변경요청'], 'up'], ['방문완료', '방문완료', ['방문완료'], 'done'], ['취소노쇼', '취소 · 미방문', ['고객취소', '매장취소', '미방문'], 'cx']];
 function rowKey(status) { for (var i = 0; i < ROWG.length; i++) if (ROWG[i][2].indexOf(status) >= 0) return ROWG[i][0]; return ''; }
 /* 상태 색: 예약류 파랑 / 변경요청 주황 / 방문완료 초록 / 취소 · 노쇼 회색 */
 var SCOL = { '예약': 'blue', '변경완료': 'blue', '변경거절': 'blue', '변경요청': 'orange', '방문완료': 'green', '고객취소': 'gray', '매장취소': 'gray', '미방문': 'gray' };
@@ -2931,10 +2939,12 @@ function chipEl(c, onOpen) {
   var x = o.st && o.st.cv === 'day' && !c.chg ? '<span class="bc-x"><span>' + esc(c.b.nation) + '</span><span>' + esc(langLabel(c.b.lang)) + '</span><span>' + esc(c.b.status) + '</span></span>' : '';
   var pn = 0;
   e.innerHTML = '<span class="bc-r1">' + (pn ? '<span class="bc-pn" data-test="pn-' + c.b.no + '">' + pn + '</span>' : '') + '<span class="bc-t">' + c.ts.slice(11, 16) + '</span>' + (o.showStore ? '<span class="bc-rs">' + esc(c.b.storeName || '') + '</span>' : '') + (badge ? '<span class="bc-badge">' + badge + '</span>' : '') + '</span><span class="bc-r2"><span class="bc-n">' + esc(c.b.name) + '</span>' + arr + man2 + x + '</span>';
-  e.setAttribute('aria-label', c.ts.slice(11, 16) + ' ' + c.b.name);
+  /* 마우스 올림: 시각 + (BO) 스토어명 + 고객명 전체. 줄임 단계에서 숨은 글자도 여기서 봄 */
+  var tip = c.ts.slice(11, 16) + ' ' + (o.showStore && c.b.storeName ? c.b.storeName + ' ' : '') + c.b.name;
+  e.setAttribute('aria-label', tip);
   e.setAttribute('data-test', (c.chg ? 'chip-chg-' : 'chip-') + c.b.no);
   e.onclick = function (ev) { ev.stopPropagation(); onOpen(c.b.no); };
-  e.title = c.ts.slice(11, 16) + ' ' + c.b.name;
+  e.title = tip;
   return e;
 }
 
@@ -3002,7 +3012,9 @@ function renderCal(opts) {
   /* 캘린더 영역 폭이 바뀌면(메뉴 접기 · 펼치기, 창 크기) 줄임 단계 다시 */
   if (window.ResizeObserver) { var lw = 0; new ResizeObserver(function (en) { var w = Math.round(en[0].contentRect.width); if (w && w !== lw) { lw = w; fitBadges(root); } }).observe(root); }
   if (opts.st.cv !== 'month') hScrollDay(root, opts.st);
-  wrap.appendChild(root); setTimeout(function () { layoutFit(root, opts); fitBadges(root); fitScroll(root, opts.st); if (opts.st.pop) { var pc = opts.st.pop.length > 10 ? (opts.st.cv !== 'month' && root.querySelector('[data-slot="' + opts.st.pop + '"]')) : (opts.st.cv === 'month' && root.querySelector('[data-date="' + opts.st.pop + '"]')); if (pc && pc._mine) dayPop(pc, opts.st.pop, pc._mine, CALOPT); else opts.st.pop = null; } }, 0); return wrap;
+  /* 주 · 일: 상세 창을 열고 닫아도(다시 그려도) 시간 칸 스크롤 위치 유지. 기간 · 보기 · 스토어가 바뀔 때만 첫 예약 근처로 */
+  var sk = opts.st.cv + opts.st.anchor + (opts.st.stores || []).join(','); root.addEventListener('scroll', function () { opts.st._ctop = root.scrollTop; opts.st._ctopK = sk; });
+  wrap.appendChild(root); setTimeout(function () { layoutFit(root, opts); fitBadges(root); fitScroll(root, opts.st); if (opts.st.cv !== 'month' && opts.st._ctopK === sk && opts.st._ctop != null) root.scrollTop = opts.st._ctop; if (opts.st.pop) { var pc = opts.st.pop.length > 10 ? (opts.st.cv !== 'month' && root.querySelector('[data-slot="' + opts.st.pop + '"]')) : (opts.st.cv === 'month' && root.querySelector('[data-date="' + opts.st.pop + '"]')); if (pc && pc._mine) dayPop(pc, opts.st.pop, pc._mine, CALOPT); else opts.st.pop = null; } }, 0); return wrap;
 }
 function monthView(root, o) {
   var a = o.st.anchor, first = a.slice(0, 8) + '01', ym = a.slice(0, 7), s = weekStart(first);
@@ -3075,12 +3087,14 @@ function dayPop(cell, d, list, o) {
   var r = cell.getBoundingClientRect(), vw = document.documentElement.clientWidth, vh = window.innerHeight; p.style.width = Math.max(r.width, 190) + 'px'; var w = p.offsetWidth, h = p.offsetHeight;
   var left = r.left; if (left + w > vw - 8) left = vw - 8 - w; left = Math.max(8, left);
   var top = r.top; if (top + h > vh - 8) top = Math.max(8, vh - 8 - h);
+  /* 상세 창이 열려 있으면 +N 창이 상세 창에 가리지 않게 그 왼쪽으로 */
+  var dwr = document.querySelector('.ant-drawer-open .ant-drawer-content-wrapper, .ant-drawer .ant-drawer-content-wrapper'); if (dwr) { var dl = dwr.getBoundingClientRect().left; if (dl > 0 && left + w > dl - 8) left = Math.max(8, dl - 8 - w); }
   p.style.left = (left + window.scrollX) + 'px'; p.style.top = (top + window.scrollY) + 'px';
   POP = p; document.addEventListener('mousedown', popOut, true); document.addEventListener('keydown', popKey, true); fitBadges(p);
 }
 
 /* 기간 라벨 칸 폭 고정: 더 긴 주 라벨 기준, 가운데 정렬(월 · 주 전환 · 이동 때 뒤 버튼이 움직이지 않게) */
-function fixLabel(lb) { var t = lb.cloneNode(false); t.textContent = '2026-11-08 ~ 11-14'; t.style.cssText = 'position:absolute;visibility:hidden;width:auto'; lb.parentNode.appendChild(t); var w = t.getBoundingClientRect().width; t.remove(); lb.style.width = Math.ceil(w) + 'px'; }
+function fixLabel(lb) { var t = lb.cloneNode(false); t.textContent = '2026-12-28 ~ 2027-01-03'; /* 가장 긴 라벨(해를 넘기는 주) 기준 */ t.style.cssText = 'position:absolute;visibility:hidden;width:auto'; lb.parentNode.appendChild(t); var w = t.getBoundingClientRect().width; t.remove(); lb.style.width = Math.ceil(w) + 'px'; }
 /* 캘린더일 때만: 검색 버튼을 위 필터 줄 검색어 입력칸 바로 옆으로 */
 function moveSearch(sb, inp) { if (!sb || !inp) return; var box = inp.closest('.ant-input-affix-wrapper') || inp, fi = box.closest('.ant-form-item'); var at = fi && fi.parentNode && !fi.contains(sb) ? fi : box; at.after(sb); sb.classList.add('bc-sbtn'); mark(sb);
   /* 줄이 좁으면 검색어 칸만 줄여 버튼이 같은 줄에 남게 */
@@ -3185,7 +3199,7 @@ function layoutFit(root, o) {
 window.addEventListener('resize', function () { var r = document.querySelector('.bc-cal'); if (r && CALOPT) { layoutFit(r, CALOPT); fitBadges(r); } });
 
 /* 보기 세그먼트 [목록 | 월 | 주 | 일] 고르기 */
-function pickView(st, v) { st.open = null; if (v === 'list') { st.mode = 'list'; return; } var wasList = st.mode === 'list'; st.mode = 'cal'; if (v === 'day') { if (wasList) { st.cv = 'day'; st.anchor = PB.TODAY; } else toDay(st); } else if (v === 'week') { if (wasList) { st.cv = 'week'; st.anchor = PB.TODAY; } else toRange(st, 'week'); } else st.cv = v; }
+function pickView(st, v) { st.open = null; if (v === 'list') { st.mode = 'list'; return; } var wasList = st.mode === 'list'; st.mode = 'cal'; if (v === 'day') { if (wasList) { st.cv = 'day'; st.anchor = PB.TODAY; } else toDay(st); } else if (v === 'week') { if (wasList) { st.cv = 'week'; st.anchor = PB.TODAY; } else toRange(st, 'week'); } else { if (wasList) st.anchor = PB.TODAY; st.cv = v; } }
 /* 필터 줄 한 줄 맞추기: 검색어 칸을 먼저 줄이고(최소 180px), 그래도 안 되면 이동 묶음만 다음 줄로. 보기 세그먼트는 줄 오른쪽 끝 고정 */
 function fitRow(row, inp, nav, seg, noWrap) {
   if (!noWrap) { row.style.flexWrap = 'wrap'; row.style.rowGap = '8px'; }
@@ -3245,7 +3259,7 @@ function multiStatus(sel, st, ph, label, acc, cxLabel) {
   if (!sts.length) { var p = document.createElement('div'); p.className = 'ant-select-placeholder'; p.textContent = ph; c.appendChild(p); }
   else {
     /* 표시 = 칩 줄 묶음 이름: 묶음 전체면 묶음 이름, 일부면 상태 이름. 2개 넘으면 앞 2개 + +N */
-    var parts = []; ROWG.forEach(function (g) { var gs = grpState(st, g); if (gs === 'on') parts.push(g[0] === '취소노쇼' ? (cxLabel || '취소 · 노쇼') : g[1]); else if (gs === 'part') g[2].forEach(function (x) { if (stOn(st, x)) parts.push(label(x)); }); });
+    var parts = []; ROWG.forEach(function (g) { var gs = grpState(st, g); if (gs === 'on') parts.push(g[0] === '취소노쇼' ? (cxLabel || '취소 · 미방문') : g[1]); else if (gs === 'part') g[2].forEach(function (x) { if (stOn(st, x)) parts.push(label(x)); }); });
     var tx = document.createElement('span'); tx.className = 'bc-mtext'; tx.setAttribute('data-test', 'st-text'); tx.textContent = parts.slice(0, 2).join(' · ') + (parts.length > 2 ? ' +' + (parts.length - 2) : ''); tx.title = parts.join(' · '); c.appendChild(tx);
     var x = document.createElement('span'); x.className = 'bc-mclear'; x.textContent = '×'; x.setAttribute('aria-label', '전체 지우기'); x.setAttribute('data-test', 'st-clear'); x.onmousedown = function (ev) { ev.stopPropagation(); ev.preventDefault(); st.sts = []; PB.render(); }; x.onclick = function (ev) { ev.stopPropagation(); }; c.appendChild(x); }
   sel.setAttribute('data-test', 'st-select'); mark(sel);
@@ -3472,10 +3486,13 @@ function calMode(card, rows, row1, seg) {
 /* 카드 머리 한 줄 맞추기: 폭이 모자라 › 가 보기 버튼에 닿으면 이동 묶음 안 간격 · 기간 라벨 글자를 줄임(보기 버튼 크기 · 자리는 그대로) */
 function headFit(card) {
   if (!card || !card.isConnected) return; var nx = $('[data-test=next]', card), sg = $('.bc-viewseg', card), lb = $('.bc-label', card); if (!nx || !sg) return;
-  card.classList.remove('bc-headtight'); if (lb) fixLabel(lb);
-  if (nx.getBoundingClientRect().right + 8 > sg.getBoundingClientRect().left) { card.classList.add('bc-headtight'); if (lb) fixLabel(lb); }
+  card.classList.remove('bc-headtight', 'bc-headwrap'); if (lb) fixLabel(lb);
+  var hit = function () { return nx.getBoundingClientRect().right + 4 > sg.getBoundingClientRect().left || Math.abs(nx.getBoundingClientRect().top - sg.getBoundingClientRect().top) > 4; };
+  if (hit()) { card.classList.add('bc-headtight'); if (lb) fixLabel(lb); }
+  /* 그래도 모자라면(1229 등) 이동 묶음만 제목 아래 줄로. 보기 버튼은 첫 줄 오른쪽 끝 그대로 */
+  if (hit()) { card.classList.remove('bc-headtight'); card.classList.add('bc-headwrap'); if (lb) fixLabel(lb); }
 }
-window.addEventListener('resize', function () { var c = $('.bc-headnav'); if (c) headFit(c); });
+window.addEventListener('resize', function () { var c = $('.bc-headnav'); if (!c) return; headFit(c); var r = $('.bc-cal'); if (r && CALOPT) { layoutFit(r, CALOPT); fitBadges(r); } });
 /* 지금 보이는 달 · 주 안의 예약인가(제목 건수용) */
 function calRange(st, b) {
   if (st.cv === 'month') return b.visit.slice(0, 7) === st.anchor.slice(0, 7);
