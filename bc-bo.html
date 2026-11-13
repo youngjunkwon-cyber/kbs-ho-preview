@@ -3077,9 +3077,11 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 .bc-headtight .bc-nav .bc-label{margin:0!important;font-size:14px!important}
 .bc-headtight .bc-nav [data-test=today]{padding-left:8px!important;padding-right:8px!important}
 .bc-headtight .bc-nav .bc-arrow{min-width:26px!important;width:26px!important}
-/* +N 창 · 일 보기: 단계를 올리지 않음. 시각 · 배지는 그대로, 고객명 말줄임(+N 창은 고객명을 글자 세 개 정도 남기고) 뒤 BO 스토어명 말줄임 */
+/* +N 창 · 일 보기: 단계를 올리지 않음. 시각 · 배지는 그대로, 칩마다 고객명이 먼저 말줄임되고 그다음 BO 스토어명 말줄임(시간 > 배지 > 스토어명 > 고객명) */
 .bc-pop .bc-chip .bc-rs,.bc-dgrid .bc-chip .bc-rs{flex:0 1 auto!important;min-width:0}
-.bc-pop .bc-chip .bc-n{min-width:44px!important}
+/* 넓은 칸(1920급): 고객명 최소 30px 남기고, 모자란 칩만 스토어명 말줄임 */
+.bc-keepname .bc-chip .bc-n{min-width:30px!important}
+.bc-keepname .bc-chip .bc-rs{flex:0 1 auto!important;min-width:0}
 </style></head>
 <body><div id="app"></div>
 <template id="T_b_res">
@@ -3465,6 +3467,9 @@ function fitBadges(root) {
   /* 한 단계로 안 되는 경우: 칩이 넘침, 또는 말줄임된 고객명 · 스토어명이 글자 두 개(30px)도 못 남김. 이때 화면 전체 칩을 다음 단계로 */
   /* 일 보기 · +N 창은 칸이 넓어 단계를 올리지 않고 고객명만 말줄임(시각 · 배지 유지). 글자 두 개 기준은 월 · 주 보기에만 */
   var soft = root.classList.contains('bc-pop') || !!root.querySelector('.bc-dgrid');
+  /* 넓은 칸(칸 폭 200px 이상, 1920급): 고객명을 숨김 단계로 올리지 않고 말줄임으로 남김. 고객명은 최소 글자 두 개(30px) 자리를 갖고, 모자란 칩만 스토어명을 말줄임. 칩이 넘칠 때만 다음 단계 */
+  root.classList.remove('bc-keepname'); var cell0 = root.querySelector('.bc-mgrid .bc-mcell, .bc-wgrid:not(.bc-dgrid) .bc-wc');
+  if (!soft && cell0 && cell0.getBoundingClientRect().width >= 200) { root.classList.add('bc-keepname'); soft = true; }
   var MINW = 30, cut = function (x) { return !soft && x && getComputedStyle(x).display !== 'none' && x.scrollWidth > x.clientWidth + 0.5 && x.clientWidth < MINW; };
   var tight = function () { return Array.prototype.some.call(root.querySelectorAll('.bc-chip'), function (c) { return c.offsetParent !== null && (c.scrollWidth > c.clientWidth + 0.5 || cut(c.querySelector('.bc-n')) || cut(c.querySelector('.bc-rs'))); }); };
   for (var i = 0; i < ST.length && tight(); i++) root.classList.add(ST[i]); /* 마지막 bc-nobadge 는 점도 못 들어갈 때만(비상) */
