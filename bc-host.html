@@ -2755,6 +2755,8 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 .bc-lnb-c .bc-lnb .ant-menu-root>li>.ant-menu-submenu-title:not(.bc-lnb-on),.bc-lnb-c .bc-lnb .ant-menu-root>li>.ant-menu-submenu-title:not(.bc-lnb-on) svg,.bc-lnb-c .bc-lnb .ant-menu-root>li>.ant-menu-submenu-title:not(.bc-lnb-on) .bc-lnb-ic{color:var(--bc-lnb-fg,rgba(0,0,0,.88))!important}
 /* 일 보기 칩: 남는 자리만 국적 · 언어 · 상태(말줄임), 고객명이 먼저 자리를 가짐. BO는 스토어명 > 고객명 */
 .bc-dgrid .bc-chip .bc-x{flex:1 1 0!important;min-width:0!important;display:block!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:pre!important}
+/* 드롭다운 목록 상자: 내용 높이에 맞춤(화면 높이 안에서) */
+.pb-dd{max-height:calc(100vh - 24px)!important}
 </style></head>
 <body><div id="app"></div>
 <template id="T_h_res">
@@ -3188,6 +3190,7 @@ function layoutFit(root, o) {
     var cap = 0;
     Array.prototype.forEach.call(cells, function (cell) {
       var chips = cell.querySelectorAll(':scope > .bc-chip'), mo = cell.querySelector('.bc-more'), n = chips.length; if (!n) return;
+      Array.prototype.forEach.call(chips, function (c0) { c0.hidden = false; }); /* 다시 잴 때 앞서 숨긴 칩(높이 0)으로 칸 수를 잘못 세지 않게 전부 보인 뒤 잼 */
       var cs = getComputedStyle(cell), dn = cell.querySelector('.bc-dn'), gap = 3;
       var inner = h - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - dn.offsetHeight, chipH = chips[0].offsetHeight + gap, moreH = 18 + gap;
       var k = Math.min(n, Math.max(0, Math.floor((inner + gap) / chipH)));
