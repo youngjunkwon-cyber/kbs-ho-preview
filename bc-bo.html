@@ -3164,6 +3164,17 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 .bc-mcell .bc-dn .bc-more{flex:none;margin-right:0}
 .bc-wc>.bc-chip:not(.bc-chipnoname){padding-left:5px!important;padding-right:5px!important;gap:4px!important}
 .bc-wc>.bc-smore{flex:0 0 28px!important;width:28px!important;min-width:28px!important}
+/* ===== 2026-11-16 결정: 상태 막대 제거, 맨 앞 상태 색 점(필터 칩 점 색), 처리 필요 칩 표시 없음 ===== */
+.bc-cal .bc-chip.bc-chip,.bc-pop .bc-chip.bc-chip{border-left:1px solid #e3e3e8!important}
+.bc-cal .bc-chip.bc-chip:hover,.bc-pop .bc-chip.bc-chip:hover{border-left-color:#bdbdc4!important}
+.bc-cal .bc-chip.bc-chip.bc-sel,.bc-pop .bc-chip.bc-chip.bc-sel{border-color:#6741D9!important;border-left:1px solid #6741D9!important}
+.bc-chip .bc-new.bc-sdot{order:-2;flex:none;display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--dot,#a3a3ab)!important;visibility:visible}
+.bc-chip.bc-sel .bc-new.bc-sdot{background:#fff!important}
+/* 시각 글자: 상태는 점이 알려 주므로 진한 기본 글자색(취소는 회색 + 취소선 그대로) */
+.bc-chip .bc-t{color:#1d1d22!important}
+.bc-chip.bc-g-cx .bc-t{color:#55555c!important}
+.bc-chip.bc-sel .bc-t{color:#fff!important}
+.bc-wc>.bc-chip:not(.bc-chipnoname){padding-left:4px!important;padding-right:4px!important;gap:3px!important}
 </style></head>
 <body><div id="app"></div>
 <template id="T_b_res">
@@ -3342,7 +3353,7 @@ function chipEl(c, onOpen) {
   var e = document.createElement('button'); e.type = 'button';
   var o = CALOPT, man = c.b.owner === '매장', need = !c.chg && o.need ? o.need(c.b) : '';
   e.className = 'bc-chip' + (man ? ' bc-manual' : '') + ' bc-g-' + (GRP[c.b.status] || 'up') + (c.chg ? ' bc-chg' : '') + (need ? ' bc-need' : '') + (o.sel != null && o.sel === c.b.no ? ' bc-sel' : '');
-  e.setAttribute('style', scStyle(c.b.status));
+  e.setAttribute('style', scStyle(c.b.status) + ';--dot:' + rowDot(c.b.status));
   /* 고정 2줄: 1줄 = 시각 + 오른쪽 배지 자리(처리 필요 > 변경 신청 > 수기), 2줄 = 고객명(+ 배지 자리를 못 쓴 수기) */
   var md = function (ts) { return '<span class="bc-ad">' + (+ts.slice(5, 7)) + '/' + (+ts.slice(8, 10)) + ' </span>' + ts.slice(11, 16); };
   var cr = c.b.status === '변경요청' && !!c.b.chg; /* 변경 요청 쌍: 원래 칩 = '변경 요청' 배지 + → 요청 시각, 요청 칩 = '요청 시간' 배지 + ← 원래 시각 */
@@ -3350,7 +3361,8 @@ function chipEl(c, onOpen) {
   /* 2026-11-16 리뷰: 칩에는 배지를 넣지 않음(처리 필요 · 변경 · 수기 글자 배지 모두 뺌). 상태는 왼쪽 막대 색, 수기는 모서리 회색 삼각형, 아직 안 열어 본 예약은 맨 앞 빨간 점 */
   var badge = '';
   /* 처리 필요 점: 처리 필요 예약(HOST 오른쪽 패널과 같은 건)만 칩 맨 앞에 "처리 필요" 칩과 같은 색 점. 처리 필요가 있는 화면(HOST)은 모든 칩에 점 자리를 비워 두어 시각 위치를 맞춤 */
-  var nw = o.need ? (need ? '<span class="bc-new" aria-label="처리 필요"></span>' : '<span class="bc-new bc-new-empty" aria-hidden="true"></span>') : '';
+  /* 2026-11-16 결정: 왼쪽 상태 막대 대신 맨 앞 상태 색 점(상단 상태 필터 칩 점과 같은 색). 처리 필요는 칩에 표시하지 않음 */
+  var nw = '<span class="bc-new bc-sdot" aria-hidden="true"></span>';
   var man2 = '';
   var arr = '', arr0 = c.chg ? '<span class="bc-arr">←<span class="bc-asp"> </span>' + md(c.b.visit) + '</span>' : cr ? '<span class="bc-arr">→<span class="bc-asp"> </span>' + md(c.b.chg) + '</span>' : '';
   /* 일 보기 국적 · 언어 · 상태: 한 덩어리 글자라 칸이 좁으면 끝에서 말줄임(…) */
@@ -3358,7 +3370,7 @@ function chipEl(c, onOpen) {
   var pn = 0;
   e.innerHTML = '<span class="bc-r1">' + nw + (pn ? '<span class="bc-pn" data-test="pn-' + c.b.no + '">' + pn + '</span>' : '') + '<span class="bc-t">' + c.ts.slice(11, 16) + '</span>' + (o.showStore ? '<span class="bc-rs">' + esc(c.b.storeName || '') + '</span>' : '') + (badge ? '<span class="bc-badge">' + badge + '</span>' : '') + '</span><span class="bc-r2"><span class="bc-n">' + esc(c.b.name) + '</span>' + arr + man2 + x + '</span>';
   /* 마우스 올림: 시각 + (BO) 스토어명 + 고객명 전체. 줄임 단계에서 숨은 글자도 여기서 봄 */
-  var tip = (need ? '[처리 필요] ' : '') + c.ts.slice(11, 16) + ' ' + (o.showStore && c.b.storeName ? c.b.storeName + ' ' : '') + c.b.name;
+  var tip = c.ts.slice(11, 16) + ' ' + (o.showStore && c.b.storeName ? c.b.storeName + ' ' : '') + c.b.name;
   e.setAttribute('aria-label', tip);
   e.setAttribute('data-test', (c.chg ? 'chip-chg-' : 'chip-') + c.b.no);
   e.onclick = function (ev) { ev.stopPropagation(); onOpen(c.b.no); };
@@ -3545,6 +3557,8 @@ function statusColors(pre) {
   });
   box.remove(); return SCOLORS;
 }
+/* 칩 앞 점 색 = 그 상태가 속한 상단 상태 필터 칩의 점 색(묶음 첫 상태 색) */
+function rowDot(status) { for (var i = 0; i < ROWG.length; i++) if (ROWG[i][2].indexOf(status) >= 0) { var m = SCOLORS && SCOLORS[ROWG[i][2][0]]; return m ? m.c : '#a3a3ab'; } return '#a3a3ab'; }
 function scStyle(status) { var m = SCOLORS && SCOLORS[status]; return m ? '--c:' + m.c + ';--cb:' + m.cb + ';--cf:' + m.fg + ';--ct:' + m.ct : '--c:#a3a3ab;--cb:#f4f4f6;--cf:#55555c'; }
 
 /* 색 계산: rgb() · #hex · color(srgb …) 읽기, 상대 휘도, 대비 */
@@ -3800,7 +3814,7 @@ var SLOT_MAX = { week: 2, day: 5 }, SLOT_MORE = 28, SLOT_GAP = 3;
 function slotFit(root, o) {
   var cells = root.querySelectorAll('.bc-wc[data-n]'); if (!cells.length) return; var max = SLOT_MAX[o.st.cv] || 2, GAP = SLOT_GAP, MORE = SLOT_MORE;
   var t = root.querySelector('.bc-wc .bc-chip .bc-t'), tw = t ? Math.ceil(t.getBoundingClientRect().width) : 42;
-  var pad = 3 + 1 + 3 + 2; /* 막대 3 + 테두리 1 + 고객명이 숨은 칩의 안쪽 여백 3 · 2 */
+  var pad = 1 + 1 + 3 + 2; /* 테두리 1 · 1 + 고객명이 숨은 칩의 안쪽 여백 3 · 2 */
   var minW = function (x) { return pad + tw + (x.querySelector('.bc-new') ? 10 : 0); };
   var c0 = root.querySelector('.bc-wc'), cs = getComputedStyle(c0), avail = Math.floor(c0.getBoundingClientRect().width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - 1);
   var caps = {};
