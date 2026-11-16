@@ -106,13 +106,15 @@ function seedBookings(){
  /* 수기이면서 처리 필요(방문결과): 배지 자리 = 처리 필요 배지, 수기는 모서리 회색 삼각형으로만 */
  [9,'2026-11-09 16:00','2026-11-08 14:10','Lily Evans','영국','en','-','예약','매장','방문결과',null]
  ];
+ /* 아직 열어 보지 않은 예약(상세 창을 한 번도 열지 않음): 입점사 · 운영사 따로 기록. 시안 예시 */
+ var UNSEEN_H=['Kaitlyn Chan','Grace Lim','Evelyn Lee','Nora Hill','Lena Fischer'],UNSEEN_B=['Kaitlyn Chan','Nora Hill','Noah Turner','Anna Kowalska','Ruby Clark'];
  var PH={'중국':'+86 138000001','홍콩':'+852 600001','일본':'+81 9000001','러시아':'+7 9000001','카자흐스탄':'+7 7000001','말레이시아':'+60 120001','싱가포르':'+65 80001'};
  /* 상품 예약(상품 예약 배포): 예약에 저장된 상품명 · 가격. 나머지는 스토어 예약 */
  var PROD={'Kaitlyn Chan':['Abijou Botox',89000],'Grace Lim':['Abijou Skin Booster',190000],'Haruka Ito':['Abijou スキンブースター',190000],'Wang Siyu':['Abijou 肉毒杆菌',99000],'Hannah Brooks':['Abijou Acne Care',120000],'Chloe Tan':['Abijou Laser Toning',150000],'Sofia Bianchi':['Celin Lifting',270000],'Noah Turner':['Cheongdam Hair Spa',80000]};
  var out=A.map(function(a,i){
   var st=a[7],cancel=/취소/.test(st);
   var pr=PROD[a[3]]||null;
-  return {prod:pr?pr[0]:null,price:pr?pr[1]:null,no:i+1,store:a[0],storeName:storeById(a[0]).name,visit:a[1],recv:a[2],name:a[3],nation:a[4],lang:a[5],contact:a[6],status:st,owner:a[8],need:a[9],chg:a[10],req:'',
+  return {prod:pr?pr[0]:null,price:pr?pr[1]:null,no:i+1,store:a[0],storeName:storeById(a[0]).name,visit:a[1],recv:a[2],name:a[3],nation:a[4],lang:a[5],contact:a[6],status:st,owner:a[8],need:a[9],chg:a[10],req:'',unseenH:UNSEEN_H.indexOf(a[3])>=0,unseenB:UNSEEN_B.indexOf(a[3])>=0,
    phone:a[8]==='매장'?'-':(PH[a[4]]||'+1 41655501')+(10+i),rno:null,
    cancelBy:st==='고객취소'?'고객':st==='매장취소'?'매장':null,cancelAt:cancel?addDays(a[1].slice(0,10),-2)+' 18:51:12':null,cancelReason:st==='고객취소'?'고객 직접 취소':st==='매장취소'?'매장 사정':null};
  });

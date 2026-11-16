@@ -2757,6 +2757,44 @@ body.pb-mark th.pb-new,body.pb-mark td.pb-new{outline-offset:-2px}
 .bc-dgrid .bc-chip .bc-x{flex:1 1 0!important;min-width:0!important;display:block!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:pre!important}
 /* 드롭다운 목록 상자: 내용 높이에 맞춤(화면 높이 안에서) */
 .pb-dd{max-height:calc(100vh - 24px)!important}
+
+/* ===== 2026-11-16 리뷰 반영 ===== */
+/* 처리 필요 테두리 강조 없음(테두리는 모두 연회색) */
+.bc-cal .bc-chip.bc-need,.bc-pop .bc-chip.bc-need{border-top-color:#e3e3e8!important;border-right-color:#e3e3e8!important;border-bottom-color:#e3e3e8!important}
+.bc-cal .bc-chip.bc-need.bc-sel,.bc-pop .bc-chip.bc-need.bc-sel{border-color:#6741D9!important;border-left-color:#fff!important}
+/* 아직 열어 보지 않은 예약: 칩 맨 앞 빨간 점 7px */
+.bc-new{order:-2;flex:none;display:inline-block;width:7px;height:7px;border-radius:50%;background:#e5383b;margin-right:-1px}
+.bc-chip.bc-sel .bc-new{background:#fff}
+.bc-dgrid .bc-chip .bc-new{order:-2}
+/* 날짜 구분선 진하게: 월 칸 경계, 주 · 일 날짜 열 경계 */
+.bc-mgrid{border-left-color:#c4c4cc!important;border-top-color:#c4c4cc!important}
+.bc-mcell{border-right-color:#c4c4cc!important;border-bottom-color:#c4c4cc!important}
+.bc-mhead{border-color:#c4c4cc!important}
+.bc-wgrid{border-left-color:#c4c4cc!important}
+.bc-wgrid>.bc-wc,.bc-wgrid>.bc-wh,.bc-wgrid>.bc-wt{border-right-color:#c4c4cc!important}
+.bc-wgrid>.bc-wh{border-bottom-color:#c4c4cc!important}
+/* 같은 시간 칸 예약은 가로로 나란히(칩 한 줄 높이) */
+.bc-wc{flex-direction:row!important;flex-wrap:nowrap!important;align-items:flex-start!important;gap:4px!important}
+.bc-wc>.bc-chip,.bc-dgrid .bc-wc>.bc-chip{flex:1 1 0!important;width:auto!important;min-width:0!important;max-width:none!important;align-self:auto!important}
+.bc-wc>.bc-smore{flex:none;align-self:center}
+.bc-wc.bc-isfull{padding-top:22px}
+/* HOST 카드 머리: 제목 · 이동 묶음 · 상태 칩 줄 · (오른쪽 끝) 보기 버튼 */
+.bc-headnav .ant-card-head-wrapper{flex-wrap:wrap!important;row-gap:8px;gap:8px 12px}
+.bc-headnav.bc-hl0 .ant-card-head-wrapper{flex-wrap:nowrap!important}
+.bc-headnav .ant-card-head-title{order:1}
+.bc-headnav .bc-nav{order:2}
+.bc-headnav .bc-srow-head{order:3;flex:0 1 auto!important;margin:0!important;min-width:0;flex-wrap:nowrap}
+.bc-headnav .bc-srow-head .bc-grp{flex-wrap:wrap}
+.bc-headnav .ant-card-extra{order:4;margin-left:auto}
+.bc-headnav.bc-hl1 .bc-srow-head{order:6;flex:0 0 100%!important;padding-bottom:10px}
+.bc-headnav.bc-headwrap .bc-nav{order:5}
+.bc-headnav .ant-card-head{padding-top:8px;padding-bottom:8px}
+.bc-slotstack .bc-wc{flex-wrap:wrap!important}
+.bc-slotstack .bc-wc>.bc-chip{flex:1 1 100%!important}
+.bc-slotstack .bc-wc>.bc-smore{align-self:flex-start}
+.bc-cellnoname>.bc-chip .bc-n,.bc-cellnoname>.bc-chip .bc-x{display:none!important}
+.bc-cellnoname>.bc-chip .bc-rs{flex:0 1 auto!important;min-width:0}
+.bc-cellnostore>.bc-chip .bc-rs{display:none!important}
 </style></head>
 <body><div id="app"></div>
 <template id="T_h_res">
@@ -2933,21 +2971,23 @@ var NEEDTAG = { '신규': '신규', '방문결과': '방문결과', '변경': '�
 function chipEl(c, onOpen) {
   var e = document.createElement('button'); e.type = 'button';
   var o = CALOPT, man = c.b.owner === '매장', need = !c.chg && o.need ? o.need(c.b) : '';
-  e.className = 'bc-chip' + (man ? ' bc-manual' : '') + ' bc-g-' + (GRP[c.b.status] || 'up') + (c.chg ? ' bc-chg' : '') + (need ? ' bc-need' : '') + (o.sel != null && o.sel === c.b.no ? ' bc-sel' : '');
+  e.className = 'bc-chip' + (nw ? ' bc-unseen' : '') + (man ? ' bc-manual' : '') + ' bc-g-' + (GRP[c.b.status] || 'up') + (c.chg ? ' bc-chg' : '') + (need ? ' bc-need' : '') + (o.sel != null && o.sel === c.b.no ? ' bc-sel' : '');
   e.setAttribute('style', scStyle(c.b.status));
   /* 고정 2줄: 1줄 = 시각 + 오른쪽 배지 자리(처리 필요 > 변경 신청 > 수기), 2줄 = 고객명(+ 배지 자리를 못 쓴 수기) */
   var md = function (ts) { return '<span class="bc-ad">' + (+ts.slice(5, 7)) + '/' + (+ts.slice(8, 10)) + ' </span>' + ts.slice(11, 16); };
   var cr = c.b.status === '변경요청' && !!c.b.chg; /* 변경 요청 쌍: 원래 칩 = '변경 요청' 배지 + → 요청 시각, 요청 칩 = '요청 시간' 배지 + ← 원래 시각 */
   /* 배지 자리는 하나: 변경 요청(HOST "변경" = 처리 필요 패널 탭 이름, BO "변경 요청") > 처리 필요 > 수기. 수기가 배지 자리를 못 쓰면 모서리 회색 삼각형(bc-manual)으로만 표시 */
-  var badge = c.chg ? '<span class="bc-cr">요청 시간</span>' : cr ? '<span class="bc-cr">' + (o.crLabel || '변경 요청') + '</span>' : need ? '<span class="bc-tag">' + NEEDTAG[need] + '</span>' : man ? '<span class="bc-mb">수기</span>' : '';
+  /* 2026-11-16 리뷰: 칩에는 배지를 넣지 않음(처리 필요 · 변경 · 수기 글자 배지 모두 뺌). 상태는 왼쪽 막대 색, 수기는 모서리 회색 삼각형, 아직 안 열어 본 예약은 맨 앞 빨간 점 */
+  var badge = '';
+  var nw = o.unseen && o.unseen(c.b) ? '<span class="bc-new" aria-label="새 예약(아직 열어 보지 않음)"></span>' : '';
   var man2 = '';
   var arr = '', arr0 = c.chg ? '<span class="bc-arr">←<span class="bc-asp"> </span>' + md(c.b.visit) + '</span>' : cr ? '<span class="bc-arr">→<span class="bc-asp"> </span>' + md(c.b.chg) + '</span>' : '';
   /* 일 보기 국적 · 언어 · 상태: 한 덩어리 글자라 칸이 좁으면 끝에서 말줄임(…) */
   var x = o.st && o.st.cv === 'day' && !c.chg ? '<span class="bc-x">' + esc(c.b.nation + '  ' + langLabel(c.b.lang) + '  ' + c.b.status) + '</span>' : '';
   var pn = 0;
-  e.innerHTML = '<span class="bc-r1">' + (pn ? '<span class="bc-pn" data-test="pn-' + c.b.no + '">' + pn + '</span>' : '') + '<span class="bc-t">' + c.ts.slice(11, 16) + '</span>' + (o.showStore ? '<span class="bc-rs">' + esc(c.b.storeName || '') + '</span>' : '') + (badge ? '<span class="bc-badge">' + badge + '</span>' : '') + '</span><span class="bc-r2"><span class="bc-n">' + esc(c.b.name) + '</span>' + arr + man2 + x + '</span>';
+  e.innerHTML = '<span class="bc-r1">' + nw + (pn ? '<span class="bc-pn" data-test="pn-' + c.b.no + '">' + pn + '</span>' : '') + '<span class="bc-t">' + c.ts.slice(11, 16) + '</span>' + (o.showStore ? '<span class="bc-rs">' + esc(c.b.storeName || '') + '</span>' : '') + (badge ? '<span class="bc-badge">' + badge + '</span>' : '') + '</span><span class="bc-r2"><span class="bc-n">' + esc(c.b.name) + '</span>' + arr + man2 + x + '</span>';
   /* 마우스 올림: 시각 + (BO) 스토어명 + 고객명 전체. 줄임 단계에서 숨은 글자도 여기서 봄 */
-  var tip = c.ts.slice(11, 16) + ' ' + (o.showStore && c.b.storeName ? c.b.storeName + ' ' : '') + c.b.name;
+  var tip = (nw ? '[새 예약] ' : '') + c.ts.slice(11, 16) + ' ' + (o.showStore && c.b.storeName ? c.b.storeName + ' ' : '') + c.b.name;
   e.setAttribute('aria-label', tip);
   e.setAttribute('data-test', (c.chg ? 'chip-chg-' : 'chip-') + c.b.no);
   e.onclick = function (ev) { ev.stopPropagation(); onOpen(c.b.no); };
@@ -3065,9 +3105,9 @@ function weekView(root, o, oneDay) {
       c.className = 'bc-wc' + (acc ? '' : ' bc-off'); c.setAttribute('data-slot', d + ' ' + hm(m));
       if (full) { var f = document.createElement('span'); f.className = 'bc-full'; f.textContent = '마감'; c.appendChild(f); c.classList.add('bc-isfull'); }
       var mine = chips.filter(function (x) { var xm = minOf(x.ts); return x.ts.slice(0, 10) === d && xm >= m && xm < m + iv; }); mine.forEach(function (x) { c.appendChild(chipEl(x, o.open)); });
-      /* 시간 칸 하나에 칩 최대 2개(처리 필요 → 정상 → 방문완료 → 취소 순으로 고르고 보이는 건 시간순), 나머지는 +N(누르면 그 칸 예약 전체 창) */
-      if (mine.length > 2) { var ce = c.querySelectorAll(':scope > .bc-chip'); var keep = chipPick(ce, 2); Array.prototype.forEach.call(ce, function (el, i) { el.hidden = keep.indexOf(i) < 0; });
-        var key = d + ' ' + hm(m), mo = document.createElement('button'); mo.type = 'button'; mo.className = 'bc-more bc-smore'; mo.textContent = '+' + (mine.length - 2); mo.setAttribute('data-test', 'more-' + key); c._mine = mine;
+      /* 같은 시간 칸 예약은 가로로 나란히(주 최대 2개, 일 최대 5개, 칸 폭에 시각이 들어가는 만큼). 나머지는 +N. 몇 개를 놓을지는 slotFit 에서 화면 전체 같은 수로 */
+      c.setAttribute('data-n', mine.length);
+      if (mine.length) { var key = d + ' ' + hm(m), mo = document.createElement('button'); mo.type = 'button'; mo.className = 'bc-more bc-smore'; mo.hidden = true; mo.setAttribute('data-test', 'more-' + key); c._mine = mine;
         (function (cl, kk, list) { mo.onclick = function (ev) { ev.stopPropagation(); dayPop(cl, kk, list, o); }; })(c, key, mine); c.appendChild(mo); }
       g.appendChild(c);
     });
@@ -3153,7 +3193,9 @@ function fitBadges(root) {
   root.classList.remove('bc-keepname'); var cell0 = root.querySelector('.bc-mgrid .bc-mcell, .bc-wgrid:not(.bc-dgrid) .bc-wc');
   if (!soft && cell0 && cell0.getBoundingClientRect().width >= 200) { root.classList.add('bc-keepname'); soft = true; }
   var MINW = 30, cut = function (x) { return !soft && x && getComputedStyle(x).display !== 'none' && x.scrollWidth > x.clientWidth + 0.5 && x.clientWidth < MINW; };
-  var tight = function () { return Array.prototype.some.call(root.querySelectorAll('.bc-chip'), function (c) { return c.offsetParent !== null && (c.scrollWidth > c.clientWidth + 0.5 || cut(c.querySelector('.bc-n')) || cut(c.querySelector('.bc-rs'))); }); };
+  var tight = function () { return Array.prototype.some.call(root.querySelectorAll('.bc-chip'), function (c) { return c.offsetParent !== null && !(c.parentNode.classList && c.parentNode.classList.contains('bc-cellnoname')) && (c.scrollWidth > c.clientWidth + 0.5 || cut(c.querySelector('.bc-n')) || cut(c.querySelector('.bc-rs'))); }); };
+  /* 일 보기: 한 칸에 여러 건이 나란히 놓여 칩이 좁아지면, 그 칸 칩만 고객명(그다음 BO 스토어명)을 숨김. 글자 두 개(30px)가 기준 */
+  Array.prototype.forEach.call(root.querySelectorAll('.bc-wgrid .bc-wc'), function (cell) { cell.classList.remove('bc-cellnoname', 'bc-cellnostore'); var vis = Array.prototype.filter.call(cell.querySelectorAll(':scope > .bc-chip'), function (x) { return !x.hidden && x.offsetParent; }); if (vis.length < 2) return; var tiny = function (sel) { return vis.some(function (x) { var e = x.querySelector(sel); return e && getComputedStyle(e).display !== 'none' && e.scrollWidth > e.clientWidth + 0.5 && e.clientWidth < 30; }) || vis.some(function (x) { return x.scrollWidth > x.clientWidth + 0.5; }); }; if (tiny('.bc-n')) cell.classList.add('bc-cellnoname'); if (cell.classList.contains('bc-cellnoname') && tiny('.bc-rs')) cell.classList.add('bc-cellnostore'); });
   for (var i = 0; i < ST.length && tight(); i++) root.classList.add(ST[i]);
   /* 일 보기 국적 · 언어 · 상태: 말줄임해도 글자 하나 + … 도 안 들어가면 통째로 숨김(잘린 글자 0) */
   Array.prototype.forEach.call(root.querySelectorAll('.bc-dgrid .bc-x'), function (x) { x.style.visibility = ''; if (x.scrollWidth > x.clientWidth + 0.5 && x.clientWidth < 28) x.style.visibility = 'hidden'; }); /* 마지막 bc-nobadge 는 점도 못 들어갈 때만(비상) */
@@ -3203,6 +3245,7 @@ function layoutFit(root, o) {
     });
     root.setAttribute('data-cap', Math.max(0, Math.floor((h - 28 - 21) / 43)));
   } else {
+    slotFit(root, o);
     root.style.maxHeight = CAL_MIN + 'px';
     var mh = Math.max(CAL_MIN, CAL_MIN + slack()); root.style.maxHeight = mh + 'px';
   }
@@ -3376,6 +3419,28 @@ function relayout() {
   var r = document.querySelector('.bc-cal'); if (r && r.isConnected && CALOPT) { layoutFit(r, CALOPT); fitBadges(r); }
 }
 
+/* 주 · 일 시간 칸: 칩을 가로로 나란히 놓을 수(화면 전체 같은 수) = min(최대 수, 칸 폭에 "시각" 칩이 들어가는 수). 넘치는 예약은 +N */
+var SLOT_MAX = { week: 2, day: 5 };
+function slotFit(root, o) {
+  var cells = root.querySelectorAll('.bc-wc[data-n]'); if (!cells.length) return; var max = SLOT_MAX[o.st.cv] || 2;
+  var c0 = root.querySelector('.bc-wc'), cs = getComputedStyle(c0), colW = c0.getBoundingClientRect().width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - 2, gap = 4;
+  var t = root.querySelector('.bc-wc .bc-chip .bc-t'), minChip = (t ? t.getBoundingClientRect().width : 42) + 30; /* 시각 + 칩 안 여백 · 막대 · 새 예약 점 */
+  var moreW = 34;
+  var fitN = function (withMore) { var w = colW - (withMore ? moreW + gap : 0); return Math.max(1, Math.floor((w + gap) / (minChip + gap))); };
+  var any = 0; Array.prototype.forEach.call(cells, function (c) { any = Math.max(any, +c.getAttribute('data-n')); });
+  var capNoMore = Math.min(max, fitN(false)), capMore = Math.min(max, fitN(true));
+  /* 칩 하나와 +N 도 한 줄에 못 놓을 만큼 좁으면(주 보기 1229~1366 등) +N 을 칩 아래 줄로 */
+  var stack = colW < minChip + gap + moreW; root.classList.toggle('bc-slotstack', stack); if (stack) capMore = 1;
+  root.setAttribute('data-slotcap', capNoMore + '/' + capMore);
+  Array.prototype.forEach.call(cells, function (c) {
+    var n = +c.getAttribute('data-n'), chips = c.querySelectorAll(':scope > .bc-chip'), mo = c.querySelector(':scope > .bc-more'); if (!n) return;
+    Array.prototype.forEach.call(chips, function (x) { x.hidden = false; });
+    var k = n <= capNoMore ? n : capMore; var keep = chipPick(chips, k);
+    Array.prototype.forEach.call(chips, function (x, i) { x.hidden = keep.indexOf(i) < 0; });
+    if (mo) { mo.hidden = k >= n; mo.textContent = '+' + (n - k); }
+  });
+}
+
 /* ===== HOST 예약 관리(예약 현황): 실화면 스냅샷 그대로 + [목록 | 캘린더] ===== */
 function H() { return PB.S.host; }
 function langLabel(l) { return PB.LANGS[l] || l; }
@@ -3459,9 +3524,9 @@ function pRes() {
   var row1 = stSel.parentNode; while (row1 && !row1.contains(inp)) row1 = row1.parentNode;
   var seg = segTabs([['list', '목록', 'mode-list'], ['month', '월', 'cv-month'], ['week', '주', 'cv-week'], ['day', '일', 'cv-day']], h.mode === 'list' ? 'list' : h.cv, function (v) { pickView(h, v); PB.render(); }, 'view'); /* HOST는 필터 영역이 좁아 세그먼트를 카드 머리 오른쪽(예전 [목록 | 캘린더] 자리)에 고정: 목록 · 캘린더 모두 같은 자리 */
   var hw = $('.ant-card-head-wrapper', card) || $('.ant-card-head', card), ex = document.createElement('div'); ex.className = 'ant-card-extra'; seg.classList.add('bc-viewseg'); ex.appendChild(seg); hw.appendChild(ex);
-  if (h.mode === 'cal') calMode(card, rows, row1, seg); else { listMode(rows); minSearch(row1, inp); listStatusRow(h, filtered(true), '취소 · 미방문', { n: PB.needList('전체').length }); }
+  if (h.mode === 'cal') calMode(card, rows, row1, seg); else { listMode(rows); minSearch(row1, inp); /* 상태 칩 줄은 목록도 카드 머리(제목 오른쪽)에: 캘린더와 같은 자리 원칙 */ var lsr = statusRow({ st: h, count: filtered(true), listMode: true, cxLabel: '취소 · 미방문', needChip: { n: PB.needList('전체').length } }); mark(lsr); lsr.classList.add('bc-srow-head'); $('.ant-card-head-title', card).after(lsr); card.classList.add('bc-headnav'); }
   needPanel();
-  growSearch($('.bc-sgrp')); /* 오른쪽 패널까지 그린 뒤 줄 폭이 정해지므로 다시 잼 */
+  growSearch($('.bc-sgrp')); headFit(card); /* 오른쪽 패널까지 그린 뒤 줄 폭이 정해지므로 다시 잼 */
 }
 function listMode(rows) {
   var h = H(), tb = $('tbody'), rt = $('tr.ant-table-row', tb).cloneNode(true); $$('tr.ant-table-row', tb).forEach(function (r) { r.remove(); });
@@ -3498,20 +3563,24 @@ function calMode(card, rows, row1, seg) {
   textSet($('.ant-card-head-title'), '예약목록 (' + shown.length + ')');
   tw.parentNode.appendChild(renderCal({ list: rows, all: all, set: PB.setOf(PB.DB.store.id), st: h, count: filtered(true), sel: h.open, pre: 'hd', cxLabel: '취소 · 미방문', crLabel: '변경', fit: true, stLabel: '예약상태',
     /* 상태 표시 = 목록 예약상태 칸 그대로(글자만). 처리 필요 = 오른쪽 처리 필요 패널에 올라가는 건 */
-    need: function (b) { return b.need || ''; }, needChip: { n: PB.needList('전체').length },
+    need: function (b) { return b.need || ''; }, unseen: function (b) { return !!b.unseenH; }, needChip: { n: PB.needList('전체').length },
     open: function (no) { h.open = no; PB.render(); } }));
   /* 캘린더일 때만: 상태 칩 줄을 카드 머리(제목 오른쪽)로, 위쪽 여백 축소 */
   var fwrap = $('form').parentElement; fwrap.style.paddingBottom = '12px'; /* 위 여백은 목록과 같게(보기 세그먼트가 위아래로 안 움직이게) */
   var cbody = $('.ant-card-body', card); cbody.style.padding = '12px 16px 16px';
+  /* 상태 칩 줄을 이동 묶음과 같은 줄(카드 머리)로 올려 캘린더 세로 자리를 확보 */
+  var sr = $('.bc-srow', cbody); if (sr) { sr.classList.add('bc-srow-head'); nav.after(sr); }
 }
-/* 카드 머리 한 줄 맞추기: 폭이 모자라 › 가 보기 버튼에 닿으면 이동 묶음 안 간격 · 기간 라벨 글자를 줄임(보기 버튼 크기 · 자리는 그대로) */
+/* 카드 머리 맞추기: [제목] [오늘 ‹ 라벨 ›] [상태 칩 · 처리 필요 칩] …… [보기 버튼]
+   1) 한 줄 → 2) 칩 묶음만 다음 줄 → 3) + 이동 묶음 간격 · 라벨 글자 줄임 → 4) 이동 묶음도 제목 아래 줄(칩 묶음은 그 아래). 보기 버튼은 늘 첫 줄 오른쪽 끝 */
 function headFit(card) {
-  if (!card || !card.isConnected) return; var nx = $('[data-test=next]', card), sg = $('.bc-viewseg', card), lb = $('.bc-label', card); if (!nx || !sg) return;
-  card.classList.remove('bc-headtight', 'bc-headwrap'); if (lb) fixLabel(lb);
-  var hit = function () { return nx.getBoundingClientRect().right + 4 > sg.getBoundingClientRect().left || Math.abs(nx.getBoundingClientRect().top - sg.getBoundingClientRect().top) > 4; };
-  if (hit()) { card.classList.add('bc-headtight'); if (lb) fixLabel(lb); }
-  /* 그래도 모자라면(1229 등) 이동 묶음만 제목 아래 줄로. 보기 버튼은 첫 줄 오른쪽 끝 그대로 */
-  if (hit()) { card.classList.remove('bc-headtight'); card.classList.add('bc-headwrap'); if (lb) fixLabel(lb); }
+  if (!card || !card.isConnected) return; var t = $('.ant-card-head-title', card), nav = $('.bc-nav', card), sr = $('.bc-srow', card), ex = $('.ant-card-extra', card), lb = $('.bc-label', card); if (!t || !ex) return;
+  var R = function (e) { return e.getBoundingClientRect(); }, cy = function (e) { var r = R(e); return (r.top + r.bottom) / 2; };
+  var ov = function (a, b) { var x = R(a), y = R(b); return Math.min(x.right, y.right) - Math.max(x.left, y.left) > -4 && Math.min(x.bottom, y.bottom) - Math.max(x.top, y.top) > 0.5; };
+  var items = [t, nav, sr, ex].filter(Boolean), wr = R($('.ant-card-head-wrapper', card));
+  var ok = function (line1) { for (var i = 0; i < items.length; i++) for (var j = i + 1; j < items.length; j++) if (ov(items[i], items[j])) return false; var g1 = sr && sr.querySelector('.bc-grp'); if (g1 && R(g1).height > 34) return false; if (R(ex).right > wr.right + 0.5) return false; return line1.every(function (e) { return Math.abs(cy(e) - cy(t)) < 8; }); };
+  var steps = [['bc-hl0'], ['bc-hl1'], ['bc-hl1', 'bc-headtight'], ['bc-hl1', 'bc-headwrap']], lines = [[nav, sr, ex], [nav, ex], [nav, ex], [ex]];
+  for (var k = 0; k < steps.length; k++) { card.classList.remove('bc-hl0', 'bc-hl1', 'bc-headtight', 'bc-headwrap'); steps[k].forEach(function (c) { card.classList.add(c); }); if (lb) fixLabel(lb); if (ok(lines[k].filter(Boolean))) return; }
 }
 window.addEventListener('resize', function () { var c = $('.bc-headnav'); if (!c) return; headFit(c); var r = $('.bc-cal'); if (r && CALOPT) { layoutFit(r, CALOPT); fitBadges(r); } });
 /* 지금 보이는 달 · 주 안의 예약인가(제목 건수용) */
@@ -3547,6 +3616,8 @@ function needPanel() {
 }
 function openDrawer() {
   var h = H(), b = PB.DB.books.filter(function (x) { return x.no === h.open; })[0]; if (!b) return;
+  /* 상세 창을 한 번 열면 입점사 기준 '아직 안 열어 본 예약' 점이 사라짐(운영사 기록과 따로). 다음 그리기부터 반영 */
+  if (b.unseenH) { b.unseenH = false; document.querySelectorAll('.bc-chip.bc-sel .bc-new').forEach(function (d) { d.remove(); }); }
   var dw = fillDrawer('hd', b, '_qrCodeLink_3bmum_151'); dw.setAttribute('data-test', 'drawer');
   var close = function () { h.open = null; PB.render(); };
   $('.ant-drawer-close', dw).onclick = close; var mask = $('.ant-drawer-mask', dw); if (mask) mask.onclick = close;
