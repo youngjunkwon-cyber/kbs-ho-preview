@@ -3360,8 +3360,9 @@ function renderCal(opts) {
   if (window.ResizeObserver) { var lw = 0; new ResizeObserver(function (en) { var w = Math.round(en[0].contentRect.width); if (w && w !== lw) { lw = w; fitBadges(root); } }).observe(root); }
   if (opts.st.cv !== 'month') hScrollDay(root, opts.st);
   /* 주 · 일: 상세 창을 열고 닫아도(다시 그려도) 시간 칸 스크롤 위치 유지. 기간 · 보기 · 스토어가 바뀔 때만 첫 예약 근처로 */
-  var sk = opts.st.cv + opts.st.anchor + (opts.st.stores || []).join(','); root.addEventListener('scroll', function () { opts.st._ctop = root.scrollTop; opts.st._ctopK = sk; });
-  wrap.appendChild(root); setTimeout(function () { layoutFit(root, opts); fitBadges(root); fitScroll(root, opts.st); if (opts.st.cv !== 'month' && opts.st._ctopK === sk && opts.st._ctop != null) root.scrollTop = opts.st._ctop; if (opts.st.pop) { var pc = opts.st.pop.length > 10 ? (opts.st.cv !== 'month' && root.querySelector('[data-slot="' + opts.st.pop + '"]')) : (opts.st.cv === 'month' && root.querySelector('[data-date="' + opts.st.pop + '"]')); if (pc && pc._mine) dayPop(pc, opts.st.pop, pc._mine, CALOPT); else opts.st.pop = null; } }, 0); return wrap;
+  /* 스크롤 기준 = 보기 · 기간 · 스토어 · 시간 칸 범위(첫 시각 · 줄 수). 이 중 하나라도 바뀌면(스토어 · 시간 범위가 바뀌는 거름 포함) 첫 예약 근처로, 같으면 위치 유지. 사용자가 스크롤한 위치만 기억 */
+  var sk = null; root.addEventListener('scroll', function () { if (!root._ready) return; opts.st._ctop = root.scrollTop; opts.st._ctopK = sk; });
+  wrap.appendChild(root); setTimeout(function () { layoutFit(root, opts); fitBadges(root); var wt = root.querySelectorAll('.bc-wt'); sk = opts.st.cv + opts.st.anchor + (opts.st.stores || []).join(',') + '|' + (wt[0] ? wt[0].textContent : '') + '|' + wt.length; var changed = opts.st._sk !== sk; fitScroll(root, opts.st, sk); if (changed) { opts.st._ctop = null; opts.st._ctopK = null; } else if (opts.st.cv !== 'month' && opts.st._ctopK === sk && opts.st._ctop != null) root.scrollTop = opts.st._ctop; setTimeout(function () { root._ready = true; }, 50); if (opts.st.pop) { var pc = opts.st.pop.length > 10 ? (opts.st.cv !== 'month' && root.querySelector('[data-slot="' + opts.st.pop + '"]')) : (opts.st.cv === 'month' && root.querySelector('[data-date="' + opts.st.pop + '"]')); if (pc && pc._mine) dayPop(pc, opts.st.pop, pc._mine, CALOPT); else opts.st.pop = null; } }, 0); return wrap;
 }
 function monthView(root, o) {
   var a = o.st.anchor, first = a.slice(0, 8) + '01', ym = a.slice(0, 7), s = weekStart(first);
@@ -3505,8 +3506,8 @@ function toDay(st) { toRange(st, 'day'); }
 function toRange(st, cv) { if (st.cv !== cv) st.anchor = inView(st, PB.TODAY) ? PB.TODAY : st.cv === 'month' ? st.anchor.slice(0, 8) + '01' : st.anchor; st.cv = cv; }
 
 /* BO: 주 · 일 보기는 캘린더 안에서만 세로 스크롤(머리줄 고정). 기간 · 보기가 바뀔 때만 첫 예약 시간 근처로 */
-function fitScroll(root, st) {
-  if (st.cv === 'month') return; var k = st.cv + st.anchor + (st.stores || []).join(',');
+function fitScroll(root, st, key) {
+  if (st.cv === 'month') return; var k = key || (st.cv + st.anchor + (st.stores || []).join(','));
   if (st._sk === k) return; st._sk = k;
   var first = root.querySelector('.bc-wc .bc-chip'), head = root.querySelector('.bc-wh');
   if (first) { var cell = first.closest('.bc-wc'); root.scrollTop = Math.max(0, cell.getBoundingClientRect().top - root.getBoundingClientRect().top + root.scrollTop - (head ? head.offsetHeight : 0) - 4); }
