@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>Frase 점수 패널 시안</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+body{margin:0;background:#F2F2F5;font-family:Pretendard,-apple-system,'Segoe UI',sans-serif;color:#212121}
+.wrap{max-width:1480px;margin:0 auto;padding:24px 20px 60px}
+h1{font-size:20px;margin:0 0 4px}
+.sub{font-size:13px;color:#6B6B72;margin:0 0 20px}
+.sec{margin:0 0 36px}
+.sec h2{font-size:16px;margin:0 0 8px}
+.bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 10px}
+.bar button{border:1px solid #D9D9DE;background:#fff;border-radius:6px;padding:6px 12px;font-size:13px;cursor:pointer;color:#212121}
+.bar button.on{border-color:#212121;font-weight:600}
+.bar label{margin-left:auto;font-size:13px;color:#45454B;display:flex;gap:6px;align-items:center}
+.frame{width:1440px;border:1px solid #D9D9DE;background:#fff;display:block}
+.scroll{overflow-x:auto}
+</style></head><body><div class="wrap">
+<h1>Frase 점수 패널 시안</h1>
+<p class="sub">STG 실화면(2026-11-16)에 점수 패널만 넣었습니다. 분홍 점선이 새로 넣은 부분입니다. 숫자와 문구는 예시입니다.</p>
+
+<div class="sec">
+ <h2>HOST 스토어 칼럼 수정</h2>
+ <div class="bar" data-for="host">
+  <button data-s="scored" class="on">점수 있음</button>
+  <button data-s="scored" data-open="1">전체 보기 펼침</button>
+  <button data-s="busy">다시 채점 중</button>
+  <button data-s="unpub">게시 전 언어</button>
+  <button data-s="orig">원본 탭</button>
+  <label><input type="checkbox" checked data-new> 새 요소 표시</label>
+ </div>
+ <div class="scroll"><iframe class="frame" id="host" src="frase-host-column-edit.html" height="1500"></iframe></div>
+</div>
+
+<div class="sec">
+ <h2>BO 매거진 수정</h2>
+ <div class="bar" data-for="bo">
+  <button data-s="scored" class="on">점수 있음</button>
+  <button data-s="scored" data-open="1">전체 보기 펼침</button>
+  <button data-s="busy">다시 채점 중</button>
+  <button data-s="unpub">게시 전</button>
+  <label><input type="checkbox" checked data-new> 새 요소 표시</label>
+ </div>
+ <div class="scroll"><iframe class="frame" id="bo" src="frase-bo-magazine-edit.html" height="1500"></iframe></div>
+</div>
+</div>
+<script>
+function send(id,msg){var f=document.getElementById(id);f.contentWindow.postMessage(msg,'*');setTimeout(function(){f.contentWindow.postMessage({fzHeight:1,id:id},'*')},120);}
+document.querySelectorAll('.bar').forEach(function(bar){
+ var id=bar.getAttribute('data-for');
+ bar.querySelectorAll('button').forEach(function(b){b.addEventListener('click',function(){
+  bar.querySelectorAll('button').forEach(function(x){x.classList.remove('on')});b.classList.add('on');
+  send(id,{fzState:b.getAttribute('data-s'),open:!!b.getAttribute('data-open')});
+ })});
+ bar.querySelector('[data-new]').addEventListener('change',function(e){send(id,{fzNew:e.target.checked})});
+});
+window.addEventListener('message',function(e){if(e.data&&e.data.fzH){document.getElementById(e.data.id).height=e.data.fzH+20;}});
+['host','bo'].forEach(function(id){document.getElementById(id).addEventListener('load',function(){send(id,{})})});
+</script>
+</body></html>
