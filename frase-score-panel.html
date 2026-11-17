@@ -15,8 +15,8 @@ h1{font-size:20px;margin:0 0 4px}
 .frame{width:1440px;border:1px solid #D9D9DE;background:#fff;display:block}
 .scroll{overflow-x:auto}
 </style></head><body><div class="wrap">
-<h1>Frase 점수 패널 시안 v7</h1>
-<p class="sub">STG 실화면(2026-11-16)에 점수 패널만 넣었습니다. 분홍 점선이 새로 넣은 부분입니다. 숫자와 문구는 예시입니다. 원본 탭의 다음에 할 일은 Frase가 주지 않아, 점수가 낮은 항목을 낮은 순으로 골라 항목마다 정해 둔 문구로 보여 줍니다.</p>
+<h1>Frase 점수 패널 시안 v8</h1>
+<p class="sub">STG 실화면(2026-11-16)에 점수 패널과 점수 열만 넣었습니다. 분홍 점선이 새로 넣은 부분입니다. 숫자와 제목은 예시입니다. 원본 탭의 다음에 할 일은 낮은 세부 항목에서, 언어 탭의 다음에 할 일은 Frase가 준 문제 유형에서 우리 문구로 만듭니다.</p>
 
 <div class="sec">
  <h2>HOST 스토어 칼럼 수정</h2>
@@ -32,6 +32,16 @@ h1{font-size:20px;margin:0 0 4px}
 </div>
 
 <div class="sec">
+ <h2>HOST 스토어 칼럼 목록</h2>
+ <div class="bar" data-for="hostlist" data-kind="list">
+  <button data-sort="0" class="on">기본 순서</button>
+  <button data-sort="1">점수 낮은 순</button>
+  <label><input type="checkbox" checked data-new> 새 요소 표시</label>
+ </div>
+ <div class="scroll"><iframe class="frame" id="hostlist" src="frase-host-column-list.html" height="900"></iframe></div>
+</div>
+
+<div class="sec">
  <h2>BO 매거진 수정</h2>
  <div class="bar" data-for="bo">
   <button data-s="scored" class="on">점수 있음</button>
@@ -42,6 +52,16 @@ h1{font-size:20px;margin:0 0 4px}
  </div>
  <div class="scroll"><iframe class="frame" id="bo" src="frase-bo-magazine-edit.html" height="1500"></iframe></div>
 </div>
+
+<div class="sec">
+ <h2>BO 매거진 목록</h2>
+ <div class="bar" data-for="bolist" data-kind="list">
+  <button data-sort="0" class="on">기본 순서</button>
+  <button data-sort="1">점수 낮은 순</button>
+  <label><input type="checkbox" checked data-new> 새 요소 표시</label>
+ </div>
+ <div class="scroll"><iframe class="frame" id="bolist" src="frase-bo-magazine-list.html" height="900"></iframe></div>
+</div>
 </div>
 <script>
 function send(id,msg){var f=document.getElementById(id);f.contentWindow.postMessage(msg,'*');setTimeout(function(){f.contentWindow.postMessage({fzHeight:1,id:id},'*')},120);}
@@ -49,11 +69,11 @@ document.querySelectorAll('.bar').forEach(function(bar){
  var id=bar.getAttribute('data-for');
  bar.querySelectorAll('button').forEach(function(b){b.addEventListener('click',function(){
   bar.querySelectorAll('button').forEach(function(x){x.classList.remove('on')});b.classList.add('on');
-  send(id,{fzState:b.getAttribute('data-s'),open:!!b.getAttribute('data-open')});
+  if(b.hasAttribute('data-sort'))send(id,{fzSort:b.getAttribute('data-sort')==='1'});else send(id,{fzState:b.getAttribute('data-s'),open:!!b.getAttribute('data-open')});
  })});
  bar.querySelector('[data-new]').addEventListener('change',function(e){send(id,{fzNew:e.target.checked})});
 });
 window.addEventListener('message',function(e){if(e.data&&e.data.fzH){document.getElementById(e.data.id).height=e.data.fzH+20;}});
-['host','bo'].forEach(function(id){document.getElementById(id).addEventListener('load',function(){send(id,{})})});
+['host','bo','hostlist','bolist'].forEach(function(id){document.getElementById(id).addEventListener('load',function(){send(id,{})})});
 </script>
 </body></html>
