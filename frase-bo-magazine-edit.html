@@ -6295,7 +6295,6 @@ html body { overflow-y: hidden; }
  var x=document.createElement('button');x.type='button';x.className='fz-close';x.textContent='닫기 ✕';p.querySelector('.fz-head').appendChild(x);
  var forms=[].slice.call(rightCol.querySelectorAll('.ant-form-item'));var box=document.createElement('div');box.className='fz-moved';box.style.marginBottom='16px';box.style.padding='8px';forms.forEach(function(f){box.appendChild(f);});edCol.prepend(box);
  rightCol.style.display='none';edCol.style.flex='0 0 100%';edCol.style.maxWidth='100%';
- var w=[].slice.call(document.querySelectorAll('.ant-typography')).find(function(e){return e.textContent.trim()==='에디터/미리보기 폭';});if(w){var bar=w.closest('div[style*="justify-content"]');if(bar)bar.style.display='none';}
  var btns=[].slice.call(document.querySelectorAll('.ant-drawer-extra button'));var list=btns.find(function(b){return b.textContent.trim()==='목록으로';});var save=btns.find(function(b){return b.textContent.trim()==='저장';});
  if(list&&save){var a=document.createElement('a');a.href=new URL("frase-bo-magazine-preview.html",location.href).href;a.target='_blank';a.className=list.className;a.setAttribute('data-fz-preview','');a.innerHTML='<span>미리보기 ↗</span>';var item=document.createElement('div');item.className='ant-space-item';item.appendChild(a);save.closest('.ant-space-item').before(item);}
  var on=document.querySelector('.ant-radio-button-wrapper-checked .ant-radio-button-label');if(on){var c=document.createElement('span');c.className='fz-chip';c.textContent="52";on.appendChild(c);}
