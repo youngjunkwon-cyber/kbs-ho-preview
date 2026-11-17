@@ -6515,5 +6515,6 @@ body { background-color: rgb(240, 242, 245); }
   if('fzNew' in d)root.classList.toggle('fz-new',!!d.fzNew);
   if(d.fzHeight)parent.postMessage({fzH:document.documentElement.scrollHeight,id:d.id},'*');});
  root.classList.add('fz-new');
+ var th=document.querySelector('th.fz-mark'); if(th){var c=th.closest('.ant-table-content,.ant-table-body'); if(c&&c.scrollWidth>c.clientWidth)c.scrollLeft=Math.max(0,th.offsetLeft-c.clientWidth/2);}
 })();
 </script></body></html>
