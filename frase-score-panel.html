@@ -19,13 +19,13 @@ body{margin:0;font-family:"Pretendard Variable",Pretendard,sans-serif;color:var(
 .tools{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
 .tools button,.fl button{border:1px solid var(--line);background:#fff;border-radius:6px;padding:6px 10px;cursor:pointer;font:inherit}
 .tools button.on{background:#222;color:#fff;border-color:#222}
-.main{display:flex;gap:20px;padding:20px;align-items:flex-start;max-width:1680px;margin:0 auto}
-.left{position:sticky;top:70px;flex:none;width:820px}
+.main{display:flex;gap:16px;padding:16px;align-items:flex-start}
+.left{position:sticky;top:70px;flex:1;min-width:0}
 .frame{width:100%;height:700px;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;position:relative}
 .frame iframe{width:1440px;border:0;display:block;transform-origin:0 0}
 .where{font-size:12px;color:var(--muted);margin:8px 2px}
-.right{flex:1;min-width:0}
-body.big .left{width:calc(100vw - 40px);max-width:1640px}
+.right{flex:none;width:440px}
+body.real .frame{overflow:auto}
 body.big .right{display:none}
 .fl{display:flex;gap:6px;margin:0 0 10px;align-items:center;flex-wrap:wrap}
 .fl button.on{background:#222;color:#fff;border-color:#222}
@@ -52,7 +52,8 @@ body.big .right{display:none}
  <div class="tools">
   <button onclick="reloadFrame()">새로고침</button>
   <button id="nwbtn" class="on" onclick="toggleNew()">새 요소 표시</button>
-  <button id="bigbtn" onclick="toggleBig()">화면 크게</button>
+  <button id="realbtn" onclick="toggleReal()">실제 크기</button>
+  <button id="bigbtn" onclick="toggleBig()">목록 숨기기</button>
   <button onclick="window.open('https://flow.team/flowiki/document/sSTH8','_blank')">기획 문서</button>
   <button onclick="window.open(PAGE,'_blank')">새 창</button>
   <button onclick="copyResult()">결과 복사</button>
@@ -135,9 +136,11 @@ const KEY='qa-frase-v1';let ST={};try{ST=JSON.parse(localStorage.getItem(KEY)||'
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(ST))}catch(e){}};
 let GRP='H',FIL='all',PAGE=P.he,NEW=true,CUR=-1;
 const F=()=>document.getElementById('fr');const W=()=>F().contentWindow;
-function fit(){const top=document.querySelector('.top').offsetHeight;const L=document.querySelector('.left');L.style.top=(top+12)+'px';const fr=document.getElementById('frm');const h=Math.max(420,innerHeight-top-12-60);fr.style.height=h+'px';const s=fr.clientWidth/1440;const f=F();f.style.transform='scale('+s+')';f.style.height=(h/s)+'px'}
+function fit(){const top=document.querySelector('.top').offsetHeight;const L=document.querySelector('.left');L.style.top=(top+12)+'px';const fr=document.getElementById('frm');const h=Math.max(420,innerHeight-top-12-50);fr.style.height=h+'px';const real=document.body.classList.contains('real');const s=real?1:Math.min(1,fr.clientWidth/1440);const f=F();f.style.transform='scale('+s+')';f.style.height=(real?h-2:h/s)+'px';document.getElementById('where').dataset.z=Math.round(s*100);upWhere()}
+function upWhere(){const w=document.getElementById('where');w.textContent=(w.dataset.t||'')+(w.dataset.z?' · 보기 '+w.dataset.z+'%':'')}
+function toggleReal(){document.body.classList.toggle('real');document.getElementById('realbtn').classList.toggle('on',document.body.classList.contains('real'));fit()}
 function after(){try{const w=W();w.postMessage({fzNew:NEW},'*');const c=CASES[CUR];if(c&&c[5])w.eval(c[5]);}catch(e){alert('세팅 실패: '+e.message)}}
-function load(page,cb){PAGE=P[page];const f=F();f.onload=()=>{f.onload=null;setTimeout(cb,700)};f.src=PAGE+'?t='+Date.now();document.getElementById('where').textContent='시안 현재 화면: '+PN[page];}
+function load(page,cb){PAGE=P[page];const f=F();f.onload=()=>{f.onload=null;setTimeout(cb,700)};f.src=PAGE+'?t='+Date.now();const w=document.getElementById('where');w.dataset.t='시안 현재 화면: '+PN[page];upWhere();}
 function open_(i){CUR=i;const c=CASES[i];load(c[4],after);document.querySelectorAll('.case .open').forEach(b=>b.classList.remove('open'));const b=document.getElementById('o'+i);if(b)b.classList.add('open')}
 function reloadFrame(){if(CUR>=0)open_(CUR)}
 function toggleNew(){NEW=!NEW;document.getElementById('nwbtn').classList.toggle('on',NEW);try{W().postMessage({fzNew:NEW},'*')}catch(e){}}
