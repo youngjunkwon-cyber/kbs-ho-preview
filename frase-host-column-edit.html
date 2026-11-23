@@ -6806,6 +6806,7 @@ body { background-color: rgb(240, 242, 245); }
    <div class="fz-busy">수정한 내용으로 다시 채점하고 있어요. 끝나면 점수가 바뀌어요.</div>
   </div>
   <div class="fz-state" data-s="unpub"><div class="fz-empty">게시중으로 바꾸면 점수가 나와요.</div></div>
+  <div class="fz-state" data-s="fail"><div class="fz-empty">점수를 아직 매기지 못했어요.</div></div>
   <div class="fz-state" data-s="orig"><div class="fz-desc">마지막 채점 2026-11-17 12:19</div>
    <div class="fz-total"><b>51</b><span class="fz-of">/ 100</span></div>
    <div class="fz-sub3"><div><span>SEO</span><strong>64</strong></div><div><span>GEO</span><strong>60</strong></div><div><span>EEAT</span><strong>30</strong></div></div>
@@ -6823,7 +6824,8 @@ body { background-color: rgb(240, 242, 245); }
  function show(s){document.querySelectorAll('.fz-state').forEach(function(e){e.style.display=e.getAttribute('data-s')===s?'block':'none'});
   var p=document.querySelector('[data-fz]'); if(p){p.classList.remove('fz-open');var l=p.querySelector('.fz-lang');if(!l.dataset.o)l.dataset.o=l.textContent;l.textContent=s==='orig'?'원본':l.dataset.o;}
   document.querySelectorAll('[data-fz-more]').forEach(function(b){b.textContent='전체 보기'});
-  tab(s==='orig'?'original':'zh-CN'); chip(s==='unpub');}
+  tab(s==='orig'?'original':'zh-CN'); chip(s==='unpub');
+  setTimeout(function(){document.querySelectorAll('.fz-chip').forEach(function(c){c.style.display='';});var cur=document.querySelector('.ant-tabs-tab-active .fz-chip,.ant-radio-button-wrapper-checked .fz-chip');if(cur&&(s==='fail'||s==='unpub'))cur.style.display='none';},0);}
  function tab(k){var tabs=document.querySelectorAll('.ant-tabs-tab[data-node-key]');if(!tabs.length)return;var on=null;tabs.forEach(function(x){var a=x.getAttribute('data-node-key')===k;x.classList.toggle('ant-tabs-tab-active',a);var b=x.querySelector('[role=tab]');if(b)b.setAttribute('aria-selected',a);if(a)on=x;});var ink=document.querySelector('.ant-tabs-ink-bar');if(on&&ink){var tb=on.querySelector('.ant-tabs-tab-btn')||on;ink.style.width=tb.offsetWidth+'px';ink.style.left=(on.offsetLeft+on.offsetWidth/2)+'px';}}
  function chip(hide){var c=document.querySelector('[class*=_languageStatusToggle_]');if(!c)return;var P=[].find.call(c.classList,function(x){return /StatusTogglePublished/.test(x)})||c.dataset.p;if(P)c.dataset.p=P;var H='_languageStatusToggleHidden_1dckd_398';c.classList.toggle(c.dataset.p,!hide);c.classList.toggle(H,hide);var v=c.querySelector('[class*=_languageStatusValue_]');if(v)v.textContent=hide?'숨김':'게시중';}
  document.addEventListener('click',function(e){
