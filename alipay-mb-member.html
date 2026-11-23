@@ -919,7 +919,7 @@ function fo09() {
   var rows = [
     ['agTerms', '이용 약관', true, TERMS_FULL, ''],
     ['agPriv', '개인정보 처리방침', true, PRIV_FULL, ''],
-    ['agProf', '알리페이 프로필 제공', true, '', '이름, 닉네임, 성별, 생년월일, 국적을 가져옵니다.' + ' 닉네임은 리뷰와 채팅에 작성자 이름으로 표시됩니다.'],
+    ['agProf', '알리페이 프로필 제공', true, '', '이름, 닉네임, 성별, 생년월일, 국적을 가져옵니다.' + ' 닉네임은 리뷰와 채팅에 작성자 이름으로 표시됩니다. 회원 탈퇴 시까지 보관하며, 동의하지 않으면 이용할 수 없습니다.'],
     ['agMkt', '마케팅 정보 수신', false, '', 'K-Beauty Station의 혜택·이벤트 정보를 휴대폰 번호로 받습니다.']
   ];
   var body = rows.map(function (r) {
@@ -1340,7 +1340,7 @@ function fo09() {
       '<div class="' + RBI + 'agreements rf-agree">' +
       rAgreeRow('agTerms', '이용 약관', true, TERMS_FULL, '') + '<div class="' + RBI + 'agreementDivider"></div>' +
       rAgreeRow('agPriv', '개인정보 처리방침', true, PRIV_FULL, '') + '<div class="' + RBI + 'agreementDivider"></div>' +
-      rAgreeRow('agProf', '알리페이 프로필 제공', true, '', '이름, 닉네임, 성별, 생년월일, 국적을 가져옵니다. 닉네임은 리뷰와 채팅에 작성자 이름으로 표시됩니다.') + '<div class="' + RBI + 'agreementDivider"></div>' +
+      rAgreeRow('agProf', '알리페이 프로필 제공', true, '', '이름, 닉네임, 성별, 생년월일, 국적을 가져옵니다. 닉네임은 리뷰와 채팅에 작성자 이름으로 표시됩니다. 회원 탈퇴 시까지 보관하며, 동의하지 않으면 이용할 수 없습니다.') + '<div class="' + RBI + 'agreementDivider"></div>' +
       rAgreeRow('agMkt', '마케팅 정보 수신', false, '', 'K-Beauty Station의 혜택·이벤트 정보를 휴대폰 번호로 받습니다.') + '</div>' +
       '<div class="rf-modal__actions"><button type="button" class="rf-modal__close" data-test="al-consent-close" onclick="S.step=\'blocked\';S.blocked=\'consent\';S.view=\'fo08\';render()">닫기</button><button type="button" class="rf-modal__primary" data-test="al-consent-ok"' + (ready ? ' onclick="S.agreed=true;S.step=\'perm\';render()"' : ' disabled') + '>동의하고 시작하기</button></div></div></div></div>';
   }
