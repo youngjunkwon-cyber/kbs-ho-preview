@@ -55,7 +55,7 @@ body.big .right{display:none}
   <button id="realbtn" onclick="toggleReal()">실제 크기</button>
   <button id="bigbtn" onclick="toggleBig()">목록 숨기기</button>
   <button onclick="window.open('https://flow.team/flowiki/document/sSTH8','_blank')">기획 문서</button>
-  <button onclick="window.open(PAGE,'_blank')">새 창</button>
+  <button onclick="openNew()">새 창</button>
   <button onclick="copyResult()">결과 복사</button>
  </div>
 </div>
@@ -145,6 +145,7 @@ function toggleReal(){document.body.classList.toggle('real');document.getElement
 function after(){try{const w=W();w.postMessage({fzNew:NEW},'*');const c=CASES[CUR];if(c&&c[5])w.eval(c[5]);}catch(e){alert('세팅 실패: '+e.message)}}
 function load(page,cb){PAGE=P[page];const f=F();f.onload=()=>{f.onload=null;setTimeout(cb,700)};f.src=PAGE+'?t='+Date.now();const w=document.getElementById('where');w.dataset.t='시안 현재 화면: '+PN[page];upWhere();}
 function open_(i){CUR=i;const c=CASES[i];load(c[4],after);document.querySelectorAll('.case .open').forEach(b=>b.classList.remove('open'));const b=document.getElementById('o'+i);if(b)b.classList.add('open')}
+function openNew(){const c=CASES[CUR];const w=window.open(PAGE+'?t='+Date.now(),'_blank');if(!w)return;let done=false;const go=()=>{if(done)return;done=true;setTimeout(()=>{try{w.postMessage({fzNew:NEW},'*');if(c&&c[5])w.eval(c[5]);}catch(e){alert('새 창 세팅 실패: '+e.message)}},700)};w.addEventListener('load',go);const t=setInterval(()=>{try{if(w.document.readyState==='complete'&&w.location.href.includes(PAGE)){clearInterval(t);go()}}catch(e){}},200);setTimeout(()=>clearInterval(t),15000)}
 function reloadFrame(){if(CUR>=0)open_(CUR)}
 function toggleNew(){NEW=!NEW;document.getElementById('nwbtn').classList.toggle('on',NEW);try{W().postMessage({fzNew:NEW},'*')}catch(e){}}
 function toggleBig(){document.body.classList.toggle('big');document.getElementById('bigbtn').classList.toggle('on',document.body.classList.contains('big'));fit()}
