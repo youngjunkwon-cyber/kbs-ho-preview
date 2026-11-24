@@ -1807,7 +1807,7 @@ function init(){
  /* 1차 입력 도구: 동영상(모든 채널), 1:1 상담 안내(스토어·상품 채팅만) */
  /* 1차 저장된 답장: 상담창과 상담 정보 사이 고정 패널 */
  buildSR();
- EL.vidBtn=mkBtn('동영상','vidBtn');EL.vidBtn.classList.add('txt');tools.appendChild(EL.vidBtn);EL.vidBtn.addEventListener('click',function(e){e.preventDefault();P.sendVideo(P.S.bo.room);});
+ EL.vidBtn=QA('button',tools).filter(function(x){return /이미지/.test((x.title||'')+(x.getAttribute('aria-label')||'')+x.textContent);})[0];if(!EL.vidBtn){EL.vidBtn=mkBtn('이미지·동영상','vidBtn');tools.appendChild(EL.vidBtn);}EL.vidBtn.setAttribute('data-click','');EL.vidBtn.addEventListener('click',function(e){e.preventDefault();P.sendVideo(P.S.bo.room);}); /* 이미지·동영상 한 버튼 (CSM-CHAT-16) */
  EL.guideBtn=mkBtn('1:1 상담 안내','guideBtn');EL.guideBtn.classList.add('txt');tools.appendChild(EL.guideBtn);EL.guideBtn.addEventListener('click',function(e){e.preventDefault();P.sendGuide(P.S.bo.room);});
  EL.pv=document.createElement('div');EL.pv.id='pv';EL.pv.style.display='none';EL.pv.setAttribute('data-new','');ta.parentElement.after(EL.pv);
  EL.note=document.createElement('div');EL.note.id='cnote';EL.note.setAttribute('data-new','');EL.composer.insertBefore(EL.note,EL.composer.firstChild);
@@ -1907,6 +1907,7 @@ function init(){
   +'.cv{display:flex!important;gap:10px;align-items:flex-start;text-align:left}.cv .av{flex:none;width:32px;height:32px;margin-top:1px}.cv .av svg{display:block}.cv .c1 .nm{flex:0 1 auto}.cv .av .ini{font-size:14px;font-weight:600;color:#667085}.cv .av .bd{position:absolute;right:-3px;bottom:-3px;width:18px;height:18px;border-radius:6px;background:#fff;display:flex;align-items:center;justify-content:center}.cv .av .bd svg{display:block}'
   +'.cv .cm{flex:1;min-width:0}.cv .c1{display:flex;align-items:center;gap:5px;min-width:0}.cv .c1 .cs{flex:none;font-size:10px;color:#667085;background:#f2f4f7;border-radius:3px;padding:0 4px;line-height:15px}.cv .c1 .tm{margin-left:auto}.cv .c2{margin-top:3px;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.45}'
   +'.cv .c3{display:flex;align-items:center;gap:6px;margin-top:4px;min-width:0}.cv .c3 .mt{flex:1;min-width:0;font-size:11px;color:#8c8c8c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cv .c3 .tg{flex:none;display:flex;gap:4px;align-items:center}.cv .sp{font-size:10px;line-height:16px;padding:0 6px;border-radius:8px;background:#f2f4f7;color:#475467;font-weight:600}.cv .sp.wait{background:#344054;color:#fff}.cv .sp.done{background:#f2f4f7;color:#98a2b3}.cv.dn .av{opacity:.55}'
+  +'.tgt .tgq{width:100%;box-sizing:border-box;border:1px solid #d0d5dd;border-radius:6px;padding:5px 8px;font:12px Pretendard,sans-serif}'
   +'.chi{display:inline-flex;align-items:center;gap:2px;flex:none;vertical-align:middle}.chi svg{display:block}.chi em{font-style:normal;font-size:10px;color:#667085;font-weight:500}#hsub .chi{margin-right:2px;position:relative;top:-1px}'
   +'#srp{display:flex;flex-direction:column;min-height:0;overflow:hidden;background:#fff}#srp .sh{display:flex;align-items:center;padding:14px 16px 8px}#srp .sh b{font-size:14px;color:#1d2939}#srp .sh a{margin-left:auto;font-size:12px;color:#1677ff;cursor:pointer}#srp .sq{padding:0 16px 8px}#srp .sq input{width:100%;box-sizing:border-box;border:1px solid #d0d5dd;border-radius:6px;padding:6px 10px;font:12px Pretendard,sans-serif}#srp .sb{flex:1;overflow:auto;padding:0 12px 12px}'
   +'#srp .fd{margin-top:6px}#srp .fh{display:flex;align-items:center;gap:6px;padding:6px 4px;font-size:12px;font-weight:700;color:#344054;cursor:pointer}#srp .fh i{font-style:normal;color:#98a2b3;font-weight:400;width:10px}#srp .fh small{font-weight:400;color:#98a2b3}#srp .fd.cl .it{display:none}'
@@ -1987,6 +1988,8 @@ function openPw(){
 /* 1차 상담 분류: 완료 때 고른 값. 완료 전은 없음 */
 function tpOf(r){if(!P.S.p1)return P.topics(r).list;if(r.impSess&&r.session<=r.impSess)return [];if(r.status!=='상담종료')return [];return r.doneTopics||P.topics(r).list;}
 var STORES=['k-beauty의원','A피부과 강남점','B헤어 명동점','C스튜디오 성수','D의원 압구정'];
+/* 문의 대상 후보: 스토어만 또는 스토어 · 상품 (상품을 고르면 스토어가 따라 정해진다) */
+var TGT=STORES.concat(['k-beauty의원 · 리쥬란 스킨부스터','k-beauty의원 · 보톡스 (사각턱)','A피부과 강남점 · 레이저 토닝','B헤어 명동점 · 헤드스파','B헤어 명동점 · 펌','C스튜디오 성수 · 프로필 촬영 베이직','D의원 압구정 · 울쎄라']);
 function isMsgr(r){return r.ch!=='플랫폼';}
 function storeLine(r){return P.storeLabel(r)+(r.type==='상품 문의'&&r.prod?' · '+(r.prod.name||r.prod):'');} /* 카드 3줄·머리 = 입점사명 (CSM-CHAT-09, 11) */
 /* ===== 상품 카드 모달 ===== */
@@ -2210,7 +2213,7 @@ function draw(){
  else{EL.note.className='';}
  var lock=T==='done'||waOver||waOff||lineZero;
  EL.lq.style.display=p1&&r.ch==='LINE'?'':'none';EL.lq.textContent='이번 달 남은 발송 '+Math.max(0,DB.store.lineLeft)+' / 500';EL.lq.classList.toggle('zero',DB.store.lineLeft<=0);
- EL.vidBtn.style.display=p1?'':'none';EL.guideBtn.style.display=p1&&r.ch==='플랫폼'&&r.type!=='고객지원'?'':'none';
+ EL.guideBtn.style.display=p1&&r.ch==='플랫폼'&&r.type!=='고객지원'?'':'none';
  EL.srLock=lock;drawSR();[EL.vidBtn,EL.guideBtn].forEach(function(b){b.disabled=lock;b.style.opacity=lock?'.5':'';});
  [EL.ta,EL.send,EL.pvBtn].forEach(function(e){e.disabled=lock;e.style.opacity=lock?'.5':'';});EL.tools.style.display=T==='done'?'none':'';EL.sendRow.style.display=T==='done'?'none':'flex';EL.ta.parentElement.style.display=T==='done'?'none':'';
  EL.ta.placeholder=lang!=='ko'&&!own?'메시지 입력 ('+(LN[lang]||lang)+' 자동번역)':'메시지 입력';
@@ -2254,17 +2257,17 @@ function draw(){
  var link=function(html){var d=document.createElement('a');d.href='#';d.className='bk';d.setAttribute('data-click','');d.innerHTML=html;return d;};
  if(pt==='ai'&&p1){ /* 1차 상담 개요: 상담 분류(완료 때 고른 값), 문의 대상, 접수 정보 */
   var imp=r.impSess&&r.session<=r.impSess,dt=tpOf(r);
-  ctx.appendChild(H('상담 분류',imp?'가져온 기록':T==='done'?'완료할 때 고름':null));
+  ctx.appendChild(H('상담 분류',imp?'가져온 기록':null));
   var tw1=document.createElement('div');tw1.className='tpw';tw1.setAttribute('data-new','');tw1.innerHTML=dt.length?dt.map(function(t){return '<span class="tpchip" style="padding-right:10px">'+esc(t)+'</span>';}).join(''):'<span class="tpnone">'+(imp?'없음 (통계 제외)':'상담 완료할 때 고릅니다')+'</span>';ctx.appendChild(tw1);
   ctx.appendChild(H('문의 대상'));
   var tg=document.createElement('div');tg.className='tgt';tg.setAttribute('data-new','');
   if(!isMsgr(r)&&r.type!=='고객지원'){tg.innerHTML='<b>'+esc(storeLine(r))+'</b><small>자동</small>';}
-  else{tg.innerHTML=(r.target?'<b>'+esc(r.target)+'</b><a data-clr data-click title="비우기">✕</a>':'<select data-click><option value="">지정 안 됨 · 스토어 또는 상품 이름</option>'+STORES.map(function(s){return '<option>'+esc(s)+'</option>';}).join('')+'</select>');
-   tg.addEventListener('change',function(e){if(e.target.tagName==='SELECT'&&e.target.value)P.setTarget(r.id,e.target.value);});
+  else{tg.innerHTML=(r.target?'<b>'+esc(r.target)+'</b><a data-clr data-click title="비우기">✕</a>':'<input class="tgq" list="tgl" placeholder="지정 안 됨 · 스토어 또는 상품 이름" data-click><datalist id="tgl">'+TGT.map(function(s){return '<option value="'+esc(s)+'">';}).join('')+'</datalist>');
+   tg.addEventListener('change',function(e){if(e.target.classList.contains('tgq')&&TGT.indexOf(e.target.value)>=0)P.setTarget(r.id,e.target.value);});
    tg.addEventListener('click',function(e){if(e.target.closest('[data-clr]'))P.setTarget(r.id,'');});}
   ctx.appendChild(tg);
   ctx.appendChild(H('접수 정보'));
-  ctx.appendChild(fact('채널',chLabel(r)));(function(){var f=ctx.lastChild,v=f&&f.lastElementChild;if(v)v.innerHTML=chIcon(r,true)+' '+esc(chLabel(r));})();ctx.appendChild(fact('채널 ID',r.cid));ctx.appendChild(fact('연결 상태',(r.ch==='WhatsApp'&&S.waOff)?'연결 끊김':r.chState));
+  ctx.appendChild(fact('채널',chLabel(r)));(function(){var f=ctx.lastChild,v=f&&f.lastElementChild;if(v)v.innerHTML='<span class="chi">'+chSvg(r,18)+'</span> '+esc(chLabel(r));})();ctx.appendChild(fact('채널 ID',r.cid));if(isMsgr(r))ctx.appendChild(fact('연결 상태',(r.ch==='WhatsApp'&&S.waOff)?'연결 끊김':r.chState));
   ctx.appendChild(fact('접수 일시',P.fmtTs((function(){var a=r.first;r.msgs.forEach(function(m){if(m.newSession)a=m.at;});return a;})())));
  }
  if(pt==='ai'&&!p1){
@@ -2279,7 +2282,7 @@ function draw(){
   var sd=document.createElement('div');sd.className='aisum';sd.setAttribute('data-new','');sd.innerHTML=sm?'<div class="l1">'+esc(sm.l1)+'</div><div class="l2">'+esc(sm.l2)+'</div><a href="#" class="resum" data-click>다시 요약</a><a href="#" class="tomemo" data-click>메모로 저장</a><a href="#" class="cpsum" data-click>복사</a>':'<div class="l2 ph">'+(T==='ai'?'AI 응대 중':'-')+'</div>';ctx.appendChild(sd);
   sd.addEventListener('click',function(e){var txt=sm?sm.l1+' '+sm.l2:'';if(e.target.closest('.resum')){e.preventDefault();draw();return;}if(e.target.closest('.tomemo')){e.preventDefault();P.S.bo.noteOpen=true;draw();var ta2=Q('#notebox textarea');if(ta2){ta2.value='[AI 요약] '+txt;ta2.focus();ta2.scrollIntoView({block:'nearest'});}return;}if(e.target.closest('.cpsum')){e.preventDefault();try{navigator.clipboard.writeText(txt);}catch(_){}var a=e.target.closest('.cpsum');a.textContent='복사됨';setTimeout(function(){a.textContent='복사';},1200);}});
   ctx.appendChild(H('접수 정보'));
-  ctx.appendChild(fact('입점사',r.store?P.storeLabel(r)+' (#'+r.store+')':'K-Beauty Station'));ctx.appendChild(fact('채널 ID',r.cid));ctx.appendChild(fact('연결 상태',r.chState));
+  ctx.appendChild(fact('입점사',r.store?P.storeLabel(r)+' (#'+r.store+')':'K-Beauty Station'));ctx.appendChild(fact('채널 ID',r.cid));if(isMsgr(r))ctx.appendChild(fact('연결 상태',r.chState));
   ctx.appendChild(fact('접수 일시',P.fmtTs((function(){var a=r.first;r.msgs.forEach(function(m){if(m.newSession)a=m.at;});return a;})())));
   ctx.appendChild(H('AI 응대'));
   ctx.appendChild(fact('AI 상태',!allowed?'미사용 매장':on?'응대 중':T==='prog'?(r.byStore?'OFF · 입점사 응대':'OFF · 상담사 응대'):T==='done'?'상담 완료':'중단'));
