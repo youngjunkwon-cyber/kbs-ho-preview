@@ -6832,7 +6832,7 @@ body { background-color: rgb(240, 242, 245); }
   var h=e.target.closest('[data-fz-help]'); if(h){document.querySelector('[data-fz]').classList.toggle('fz-helpopen');return;}
  },true);
  window.addEventListener('message',function(e){var d=e.data||{};
-  if(d.fzState){show(d.fzState);var pz=document.querySelector('[data-fz]');if(pz)pz.scrollIntoView({block:'center'}); if(d.open){var p=document.querySelector('[data-fz]');p.classList.add('fz-open');document.querySelectorAll('[data-fz-more]').forEach(function(b){b.textContent='접기'});}}
+  if(d.fzState){show(d.fzState);var dk=document.querySelector('.fz-dock');if(dk)dk.scrollTop=0; if(d.open){var p=document.querySelector('[data-fz]');p.classList.add('fz-open');document.querySelectorAll('[data-fz-more]').forEach(function(b){b.textContent='접기'});}}
   if('fzNew' in d){root.classList.toggle('fz-new',!!d.fzNew);}
   if(d.fzHeight){parent.postMessage({fzH:document.documentElement.scrollHeight,id:d.id},'*');}
  });

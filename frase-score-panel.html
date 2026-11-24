@@ -20,7 +20,7 @@ body{margin:0;font-family:"Pretendard Variable",Pretendard,sans-serif;color:var(
 .tools button,.fl button{border:1px solid var(--line);background:#fff;border-radius:6px;padding:6px 10px;cursor:pointer;font:inherit}
 .tools button.on{background:#222;color:#fff;border-color:#222}
 .main{display:flex;gap:16px;padding:16px;align-items:flex-start}
-.left{position:sticky;top:70px;flex:1;min-width:0}
+.left{position:sticky;top:70px;flex:1;min-width:0;max-width:1922px}
 .frame{width:100%;height:700px;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;position:relative}
 .frame iframe{width:1440px;border:0;display:block;transform-origin:0 0}
 .where{font-size:12px;color:var(--muted);margin:8px 2px}
@@ -139,7 +139,7 @@ const KEY='qa-frase-v1';let ST={};try{ST=JSON.parse(localStorage.getItem(KEY)||'
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(ST))}catch(e){}};
 let GRP='H',FIL='all',PAGE=P.he,NEW=true,CUR=-1;
 const F=()=>document.getElementById('fr');const W=()=>F().contentWindow;
-function fit(){const top=document.querySelector('.top').offsetHeight;const L=document.querySelector('.left');L.style.top=(top+12)+'px';const fr=document.getElementById('frm');const h=Math.max(420,innerHeight-top-12-50);fr.style.height=h+'px';const real=document.body.classList.contains('real');const s=real?1:Math.min(1,fr.clientWidth/1440);const f=F();f.style.transform='scale('+s+')';f.style.height=(real?h-2:h/s)+'px';document.getElementById('where').dataset.z=Math.round(s*100);upWhere()}
+function fit(){const top=document.querySelector('.top').offsetHeight;const L=document.querySelector('.left');L.style.top=(top+12)+'px';const fr=document.getElementById('frm');const h=Math.max(420,innerHeight-top-12-50);fr.style.height=h+'px';const real=document.body.classList.contains('real');const W=fr.clientWidth;const vw=Math.min(1920,Math.max(1440,W));const s=real?1:Math.min(1,W/vw);const f=F();f.style.width=vw+'px';f.style.transform='scale('+s+')';f.style.height=(real?h-2:h/s)+'px';document.getElementById('where').dataset.z=Math.round(s*100);upWhere()}
 function upWhere(){const w=document.getElementById('where');w.textContent=(w.dataset.t||'')+(w.dataset.z?' · 보기 '+w.dataset.z+'%':'')}
 function toggleReal(){document.body.classList.toggle('real');document.getElementById('realbtn').classList.toggle('on',document.body.classList.contains('real'));fit()}
 function after(){try{const w=W();w.postMessage({fzNew:NEW},'*');const c=CASES[CUR];if(c&&c[5])w.eval(c[5]);}catch(e){alert('세팅 실패: '+e.message)}}
