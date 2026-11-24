@@ -6374,6 +6374,9 @@ div.ck.ck-balloon-panel.ck-mention-balloon { z-index: calc(var(--ck-z-dialog) + 
 .fz-todo li{border-top-color:#f0f0f0}
 .fz-todo li div{line-height:1.6}
 .fz-secd{font-size:14px;color:rgba(0,0,0,.65);margin:0 0 4px}
+.fz-chk-d.fz-err{color:var(--fz-warn)}
+.fz-stale{margin:0 0 10px;font-size:14px;color:rgba(0,0,0,.88)}
+.fz-stale::before{content:'!';display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;margin-right:6px;border-radius:50%;background:var(--fz-acc);color:#fff;font-size:11px;font-weight:700;vertical-align:-2px}
 .fz-good{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:15px;color:rgba(0,0,0,.88)}
 .fz-good::before{content:'✓';display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--fz-acc);color:#fff;font-size:12px;font-weight:700;flex:none}
 .fz-panel .fz-sec{margin-top:20px;padding-top:16px;border-top:1px solid #f0f0f0}
@@ -6450,6 +6453,7 @@ div.ck.ck-balloon-panel.ck-mention-balloon { z-index: calc(var(--ck-z-dialog) + 
   </div>
   
   
+  
   <div class="fz-state" data-s="good"><div class="fz-desc">마지막 채점 2026-11-17 10:39</div>
    <div class="fz-top"><div class="fz-ring"><svg viewBox="0 0 100 100"><circle class="fz-rr" cx="50" cy="50" r="42"></circle><circle class="fz-rv" cx="50" cy="50" r="42" stroke-dasharray="134.58 263.89"></circle></svg><i><b>51</b><small>점</small></i></div><div class="fz-msg"><strong>100점에 가까울수록 좋아요</strong>검색과 AI 답변에 이 글이 얼마나 잘 보일지 매긴 점수예요.</div></div>
    <div class="fz-bars"><div class="fz-bar"><div class="fz-bt"><b>검색 노출</b><span>SEO</span><em>61</em></div><div class="fz-bd">구글 같은 검색에 잘 나오는지</div><div class="fz-tr"><i style="width:61%"></i></div></div><div class="fz-bar"><div class="fz-bt"><b>AI 답변</b><span>GEO</span><em>65</em></div><div class="fz-bd">ChatGPT 같은 AI가 답할 때 이 글을 쓰는지</div><div class="fz-tr"><i style="width:65%"></i></div></div><div class="fz-bar"><div class="fz-bt"><b>신뢰도</b><span>EEAT</span><em>28</em></div><div class="fz-bd">경험과 전문성이 드러나 믿을 만한지</div><div class="fz-tr"><i style="width:28%"></i></div></div></div>
@@ -6483,16 +6487,17 @@ div.ck.ck-balloon-panel.ck-mention-balloon { z-index: calc(var(--ck-z-dialog) + 
  function failBox(msg){return '<div class="cd-fail"><b>⚠ 채점 실패</b>'+msg+'</div><button type="button" class="cd-retry" data-retry>다시 채점</button>';}
  var fp=st('busy').cloneNode(true);fp.setAttribute('data-s','failprev');fp.querySelector('.fz-busy').outerHTML=failBox("Frase 응답 없음(10분 넘김) · 2026-11-21 10:22 · 1시간 간격으로 3번 자동으로 다시 채점했지만 실패 · 이전 점수를 보여 주는 중");panel.appendChild(fp);
  st('fail').insertAdjacentHTML('beforeend',failBox("Frase 오류 · 2026-11-20 16:40 · 1시간 간격으로 3번 자동으로 다시 채점했지만 실패"));
+ var fq=st('fail').cloneNode(true);fq.setAttribute('data-s','quota');fq.querySelector('.cd-fail').outerHTML='<div class="cd-fail"><b>⚠ 채점 실패</b>'+"Frase 월 한도 소진 · 2026-11-22 09:10 · 한도가 다시 차면 자동으로 다시 채점"+'</div>';panel.appendChild(fq);
  var fb=document.createElement('div');fb.className='fz-state';fb.setAttribute('data-s','busyfirst');fb.innerHTML='<div class="fz-empty">다시 채점 중</div>';panel.appendChild(fb);
  var LANG='zh-CN';
  function tab(k){LANG=k;document.querySelectorAll('.cd-tab').forEach(function(x){x.classList.toggle('on',x.getAttribute('data-k')===k)});
   document.getElementById('cdLang').textContent=k==='original'?'원본':'중국어(간체)';
   document.getElementById('cdRe').textContent=k==='original'?'언어 탭을 선택하면 표시됩니다':'재심사 요청 상태가 아닙니다';
   document.getElementById('cdHist').textContent=k==='original'?'제재·조치 이력 (전체 언어)':'제재·조치 이력 (중국어(간체))';}
- function show(s){if(s==='orig')tab('original');else tab('zh-CN');
+ function show(s){card.style.display=s==='off'?'none':'';if(s==='orig')tab('original');else tab('zh-CN');
   panel.querySelectorAll('.fz-state').forEach(function(e){e.style.display=e.getAttribute('data-s')===s?'block':'none'});
   panel.classList.remove('fz-open');panel.querySelectorAll('[data-fz-more]').forEach(function(b){b.textContent='전체 보기'});
-  var hide=(s==='unpub'||s==='fail'||s==='busyfirst');var c=document.querySelector('[data-chip="zh-CN"]');if(c)c.style.display=hide?'none':'';
+  var hide=(s==='unpub'||s==='fail'||s==='busyfirst'||s==='quota');var c=document.querySelector('[data-chip="zh-CN"]');if(c)c.style.display=hide?'none':'';document.querySelectorAll('[data-chip]').forEach(function(x){if(s==='off')x.style.display='none';else if(x!==c)x.style.display='';});
   var pub=document.getElementById('cdPub');pub.textContent=s==='unpub'?'숨김':'게시중';pub.className='ant-tag ant-tag-filled css-19u5a7b css-var-root'+(s==='unpub'?'':' ant-tag-green');}
  document.addEventListener('click',function(e){
   var t=e.target.closest('.cd-tab');if(t){show(t.getAttribute('data-k')==='original'?'orig':'scored');return;}
