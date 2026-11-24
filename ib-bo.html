@@ -1936,19 +1936,19 @@ function buildSR(){var p=document.createElement('section');p.id='srp';p.classNam
   var dl=t.closest('[data-del]');if(dl){var i=+dl.getAttribute('data-del');if(confirm('"'+SR[i].t+'" 답장을 삭제할까요?')){SR.splice(i,1);SRS.ed=-1;drawSR();}return;}
   if(t.closest('.sf .cc')){SRS.ed=-1;drawSR();return;}
   if(t.closest('.sf .ok')){var f=p.querySelector('.sf'),fo=f.querySelector('.ff').value.trim(),ti=f.querySelector('.ft').value.trim(),bd=f.querySelector('textarea').value.trim(),er=f.querySelector('.er');
-   if(!fo){er.textContent='폴더를 입력해주세요.';return;}if(!ti){er.textContent='제목을 입력해주세요.';return;}if(!bd){er.textContent='내용을 입력해주세요.';return;}
+   if(!fo&&!P.S.p1){er.textContent='폴더를 입력해주세요.';return;}if(!fo)fo=(SRS.ed<SR.length&&SR[SRS.ed].f)||'상담 안내';if(!ti){er.textContent='제목을 입력해주세요.';return;}if(!bd){er.textContent='내용을 입력해주세요.';return;}
    var v={f:fo,t:ti,b:bd};if(SRS.ed>=SR.length)SR.push(v);else SR[SRS.ed]=v;SRS.ed=-1;drawSR();return;}
   var ins=t.closest('[data-ins]');if(ins){if(EL.srLock)return;var r=SR[+ins.getAttribute('data-ins')],ta=EL.ta;ta.value=ta.value.trim()?ta.value.replace(/\s+$/,'')+'\n'+r.b:r.b;ta.dispatchEvent(new Event('input',{bubbles:true}));ta.focus();return;}
   var ih=t.closest('[data-op]');if(ih){var k=ih.getAttribute('data-op');SRS.op[k]=!SRS.op[k];drawSR();}
  });
  drawSR();}
 function drawSR(){var p=EL.sr;if(!p)return;var q=SRS.q.trim().toLowerCase();
- p.querySelector('.mgt').textContent=SRS.mg?'완료':'관리';
- var folders=[];SR.forEach(function(r){if(folders.indexOf(r.f)<0)folders.push(r.f);});
- var form=function(r){return '<div class="sf"><input class="ff" list="srfl" placeholder="폴더 (새 이름을 쓰면 새 폴더)" value="'+esc(r?r.f:'')+'" data-click><datalist id="srfl">'+folders.map(function(f){return '<option value="'+esc(f)+'">';}).join('')+'</datalist><input class="ft" placeholder="제목" value="'+esc(r?r.t:'')+'" data-click><textarea placeholder="내용" data-click>'+esc(r?r.b:'')+'</textarea><div class="er"></div><div class="bt"><button type="button" class="cc" data-click>취소</button><button type="button" class="ok" data-click>저장</button></div></div>';};
+ p.querySelector('.mgt').textContent=SRS.mg?'완료':'관리';p.querySelector('.sq input').placeholder=P.S.p1?'제목, 내용 검색':'폴더, 제목, 내용 검색';
+ var folders=[];SR.forEach(function(r){if(folders.indexOf(r.f)<0)folders.push(r.f);});var FO=P.S.p1?['*']:folders;
+ var p1=!!P.S.p1;var form=function(r){return '<div class="sf"><input class="ff"'+(p1?' type="hidden"':'')+' list="srfl" placeholder="폴더 (새 이름을 쓰면 새 폴더)" value="'+esc(r?r.f:'')+'" data-click><datalist id="srfl">'+folders.map(function(f){return '<option value="'+esc(f)+'">';}).join('')+'</datalist><input class="ft" placeholder="제목" value="'+esc(r?r.t:'')+'" data-click><textarea placeholder="내용" data-click>'+esc(r?r.b:'')+'</textarea><div class="er"></div><div class="bt"><button type="button" class="cc" data-click>취소</button><button type="button" class="ok" data-click>저장</button></div></div>';};
  var h='',n=0;
- folders.forEach(function(f){var rows=SR.map(function(r,i){return {r:r,i:i};}).filter(function(x){return x.r.f===f&&(!q||(x.r.f+' '+x.r.t+' '+x.r.b).toLowerCase().indexOf(q)>=0);});if(!rows.length)return;n+=rows.length;
-  var cl=!q&&SRS.cl[f];h+='<div class="fd'+(cl?' cl':'')+'"><div class="fh" data-fh="'+esc(f)+'" data-click><i>'+(cl?'▸':'▾')+'</i>'+esc(f)+' <small>'+rows.length+'</small></div>';
+ FO.forEach(function(f){var rows=SR.map(function(r,i){return {r:r,i:i};}).filter(function(x){return (f==='*'||x.r.f===f)&&(!q||(x.r.f+' '+x.r.t+' '+x.r.b).toLowerCase().indexOf(q)>=0);});if(!rows.length)return;n+=rows.length;
+  var cl=!q&&!p1&&SRS.cl[f];h+='<div class="fd'+(cl?' cl':'')+'"><div class="fh"'+(p1?' style="display:none"':'')+' data-fh="'+esc(f)+'" data-click><i>'+(cl?'▸':'▾')+'</i>'+esc(f)+' <small>'+rows.length+'</small></div>';
   rows.forEach(function(x){if(SRS.mg&&SRS.ed===x.i){h+=form(x.r);return;}var op=!!(SRS.op[x.i]||q);
    h+='<div class="it'+(op?' op':'')+'"><div class="ih" data-op="'+x.i+'" data-click><b>'+esc(x.r.t)+'</b><span>'+(op?'접기':'펼치기')+'</span></div><div class="ib">'+esc(x.r.b)
     +'<div class="ia">'+(SRS.mg?'<a data-ed="'+x.i+'" data-click>수정</a><a class="del" data-del="'+x.i+'" data-click>삭제</a>':'<button type="button" data-ins="'+x.i+'"'+(EL.srLock?' disabled title="지금은 입력창을 쓸 수 없습니다"':'')+' data-click>입력창에 넣기</button>')+'</div></div></div>';});
