@@ -2046,7 +2046,7 @@ function buildListHead(){
  var head=document.createElement('div');head.id='lhead';head.setAttribute('data-new','');
  head.innerHTML='<div class="lh-s"></div><div id="tabs" data-click></div><div class="lh-f"></div>';
  Q('.lh-s',head).appendChild(search);
- var inp=Q('input',search);inp.placeholder='고객, 연락처, 매장, 대화 내용 검색';inp.setAttribute('data-click','');EL.q=inp;
+ var inp=Q('input',search);inp.placeholder='고객, 연락처, 스토어, 대화 내용 검색';inp.setAttribute('data-click','');EL.q=inp;
  var clr=Q('.ant-input-clear-icon',search);
  inp.addEventListener('input',function(){P.S.bo.q=inp.value;draw();});
  if(clr)clr.addEventListener('click',function(){inp.value='';P.S.bo.q='';draw();});
@@ -2178,7 +2178,7 @@ function draw(){
   if(h.memo||(h.sum&&!p1)){var hm=document.createElement('div');hm.className='why';hm.style.color='#8c8c8c';hm.innerHTML=(h.sum?'요약: '+hiq(h.sum,q):'메모: '+hiq(h.memo,q));cm.appendChild(hm);}
   var tps=tpOf(r),meta=[hiq(storeLine(r),q),r.lang?esc(LN[r.lang]||r.lang):''].filter(Boolean).join(' · ')+(tps.length?' · <span class="tpc">'+tps.map(function(x){return hiq(x,q);}).join(', ')+'</span>':'');
   var stt=t==='wait'?'대기':t==='ai'?'AI':t==='done'?'완료':(t==='prog'&&p1)?'진행':'';
-  var tags=(t==='wait'&&r.priority?'<span class="nt" title="불만·당일 연락처럼 먼저 볼 대화">우선</span>':'')+(r.byStore?'<span class="nt" title="입점사가 응대하는 대화">입점사 응대</span>':'')+(hasNote(r)?'<span class="nt" title="메모 있음">메모</span>':'')+(stt&&tab==='all'?'<span class="sp '+t+'">'+stt+'</span>':'');
+  var tags=(t==='wait'&&r.priority?'<span class="nt" title="불만·당일 연락처럼 먼저 볼 대화">우선</span>':'')+(r.byStore?'<span class="nt" title="스토어 응대">스토어 응대</span>':'')+(hasNote(r)?'<span class="nt" title="메모 있음">메모</span>':'')+(stt&&tab==='all'?'<span class="sp '+t+'">'+stt+'</span>':'');
   var c3=document.createElement('div');c3.className='c3';c3.setAttribute('data-new','');c3.innerHTML='<span class="mt">'+meta+'</span>'+(tags?'<span class="tg">'+tags+'</span>':'');cm.appendChild(c3);
   list.appendChild(b);
  });
@@ -2206,7 +2206,7 @@ function draw(){
   if(i===0||m.newSession){var s=TPL.sys.cloneNode(true);if(m.newSession)sess++;var sn=i===0?1:sess;s.classList.add('sdv');s.textContent=(r.impSess&&sn<=r.impSess?'가져온 기록':sn+'차 상담');w.insertBefore(s,w.firstChild);}
   var br=Q('[class*=_bubbleRow_]',w),metas=QA('[class*=_meta_]',br);
   if(m.who==='auto'){w.classList.add('autob');w.setAttribute('data-new','');}
-  metas[0].textContent=m.who==='cust'?'고객':m.who==='auto'?'자동 응답':m.who==='ai'?'AI':(r.byStore?(r.card.owner||'입점사')+' (입점사)':'상담사');
+  metas[0].textContent=m.who==='cust'?'고객':m.who==='auto'?'자동 응답':m.who==='ai'?'AI':(r.byStore?(r.card.owner||'입점사')+' (스토어)':'상담사');
   var bub=Q('[class*=_bubble_]',br);bub.children[0].innerHTML=m.kind==='image'?'(사진)':m.kind==='product'?'<span class="pcard"><i class="pc-img i'+(m.prod?m.prod.img:0)+'"></i><span><small>상품 카드</small><b>'+esc(m.prod?m.prod.name:'')+'</b>'+(m.prod?m.prod.price.toLocaleString('en-US')+' KRW':'')+'</span></span>':esc(m.text).replace(/\n/g,'<br>');
   if(m.kind!=='image'&&m.kind!=='product'&&m.kind!=='video'){var ml=detectLang(m.text),tr=null;
    if(m.who==='cust'&&ml&&ml!=='ko'){tr=document.createElement('span');tr.className='tr'+(m.ko?'':' ph');tr.textContent=m.ko||'번역 대기';}
@@ -2248,7 +2248,7 @@ function draw(){
  var bks=(c.bookings||[]).slice(),today=S.now.slice(0,10),upN=bks.filter(function(x){return x.d>=today;}).length;
  var ownBar=Q('#ownbar');if(!ownBar){ownBar=document.createElement('div');ownBar.id='ownbar';ownBar.setAttribute('data-new','');Q('[class*=_panelHeader_]',EL.aside).after(ownBar);
   ownBar.addEventListener('click',function(e){var t=e.target.closest('[data-k]');if(!t)return;var rr=P.room(P.S.bo.room),inp=document.createElement('input');inp.className='edin';inp.style.width='120px';inp.value=rr.card.owner||'';t.replaceWith(inp);inp.focus();var fin=function(){P.updateCard(rr.id,'owner',inp.value.trim());};inp.addEventListener('blur',fin);inp.addEventListener('keydown',function(ev){if(ev.key==='Enter')inp.blur();});});}
- ownBar.innerHTML='<span class="ol">담당자</span><b class="ed" data-k="owner" data-click title="수정">'+(c.owner?esc(c.owner):'<span class="ph">미배정</span>')+'</b>'+(c.owner&&r.agentAt?'<small>'+esc(relTs(r.agentAt))+' 시작</small>':'')+'<span class="os '+T+'">'+esc(T==='prog'&&r.byStore?'입점사 응대 중':(p1&&T==='wait')?'대기':STATE[T])+'</span>';
+ ownBar.innerHTML='<span class="ol">담당자</span><b class="ed" data-k="owner" data-click title="수정">'+(c.owner?esc(c.owner):'<span class="ph">미배정</span>')+'</b>'+(c.owner&&r.agentAt?'<small>'+esc(relTs(r.agentAt))+' 시작</small>':'')+'<span class="os '+T+'">'+esc(T==='prog'&&r.byStore?'스토어 응대 중':(p1&&T==='wait')?'대기':STATE[T])+'</span>';
  var nbx=Q('#notebox');if(!nbx){nbx=document.createElement('div');nbx.id='notebox';nbx.setAttribute('data-new','');EL.aside.appendChild(nbx); /* 패널 맨 아래 고정 */
   nbx.addEventListener('click',function(e){
    if(e.target.closest('.nadd')){var inp=nbx.querySelector('textarea');if(inp.value.trim()){P.addNote(P.S.bo.room,inp.value);inp.value='';}return;}
@@ -2304,10 +2304,10 @@ function draw(){
   var sd=document.createElement('div');sd.className='aisum';sd.setAttribute('data-new','');sd.innerHTML=sm?'<div class="l1">'+esc(sm.l1)+'</div><div class="l2">'+esc(sm.l2)+'</div><a href="#" class="resum" data-click>다시 요약</a><a href="#" class="tomemo" data-click>메모로 저장</a><a href="#" class="cpsum" data-click>복사</a>':'<div class="l2 ph">'+(T==='ai'?'AI 응대 중':'-')+'</div>';ctx.appendChild(sd);
   sd.addEventListener('click',function(e){var txt=sm?sm.l1+' '+sm.l2:'';if(e.target.closest('.resum')){e.preventDefault();draw();return;}if(e.target.closest('.tomemo')){e.preventDefault();P.S.bo.noteOpen=true;draw();var ta2=Q('#notebox textarea');if(ta2){ta2.value='[AI 요약] '+txt;ta2.focus();ta2.scrollIntoView({block:'nearest'});}return;}if(e.target.closest('.cpsum')){e.preventDefault();try{navigator.clipboard.writeText(txt);}catch(_){}var a=e.target.closest('.cpsum');a.textContent='복사됨';setTimeout(function(){a.textContent='복사';},1200);}});
   ctx.appendChild(H('접수 정보'));
-  ctx.appendChild(fact('입점사',r.store?P.storeLabel(r)+' (#'+r.store+')':'K-Beauty Station'));ctx.appendChild(fact('채널 ID',r.cid));if(isMsgr(r))ctx.appendChild(fact('연결 상태',r.chState));
+  ctx.appendChild(fact('스토어',r.store?P.storeLabel(r)+' (#'+r.store+')':'K-Beauty Station'));ctx.appendChild(fact('채널 ID',r.cid));if(isMsgr(r))ctx.appendChild(fact('연결 상태',r.chState));
   ctx.appendChild(fact('접수 일시',P.fmtTs((function(){var a=r.first;r.msgs.forEach(function(m){if(m.newSession)a=m.at;});return a;})())));
   ctx.appendChild(H('AI 응대'));
-  ctx.appendChild(fact('AI 상태',!allowed?'미사용 매장':on?'응대 중':T==='prog'?(r.byStore?'OFF · 입점사 응대':'OFF · 상담사 응대'):T==='done'?'상담 완료':'중단'));
+  ctx.appendChild(fact('AI 상태',!allowed?'미사용 스토어':on?'응대 중':T==='prog'?(r.byStore?'OFF · 스토어 응대':'OFF · 상담사 응대'):T==='done'?'상담 완료':'중단'));
   ctx.appendChild(fact('운영시간',P.inHours(S.now)?'운영 중':'운영 외 · AI 자동 ON'));
   var ss=P.scnState(r);if(ss){ctx.appendChild(fact('시나리오',ss.flow+(ss.step?' · '+ss.step:''),true));ss.got.forEach(function(g){ctx.appendChild(fact(g[0],g[1],true));});}
   if(r.need){var wy=document.createElement('div');wy.className='why';wy.style.whiteSpace='normal';wy.style.margin='2px 0 6px';wy.textContent='AI 중단사유: '+r.need.reason+' · '+relTs(r.need.at);ctx.appendChild(wy);}
@@ -2336,7 +2336,7 @@ function draw(){
   var k=t.getAttribute('data-k'),inp=document.createElement('input');inp.className='edin';inp.value=c[k]||'';t.replaceWith(inp);inp.focus();
   var done=function(){P.updateCard(r.id,k,inp.value.trim());};inp.addEventListener('blur',done);inp.addEventListener('keydown',function(ev){if(ev.key==='Enter')inp.blur();});};
  if(EL.L==='L4'){EL.aside.style.display=S.bo.drawer?'':'none';
-  EL.sum.innerHTML='<span>입점사<b>'+esc(P.storeLabel(r))+'</b></span><span>채널<b>'+esc(chLabel(r))+'</b></span><span>고객<b>'+esc(c.name)+'</b></span><span>연락처<b>'+esc(c.phone)+'</b></span><span>담당자<b>'+esc(c.owner)+'</b></span><a href="#" data-click>'+(S.bo.drawer?'정보 닫기':'자세히 ›')+'</a>';}
+  EL.sum.innerHTML='<span>스토어<b>'+esc(P.storeLabel(r))+'</b></span><span>채널<b>'+esc(chLabel(r))+'</b></span><span>고객<b>'+esc(c.name)+'</b></span><span>연락처<b>'+esc(c.phone)+'</b></span><span>담당자<b>'+esc(c.owner)+'</b></span><a href="#" data-click>'+(S.bo.drawer?'정보 닫기':'자세히 ›')+'</a>';}
  requestAnimationFrame(function(){box.scrollTop=box.scrollHeight;}); /* 추천 답변·입력창 크기가 정해진 뒤 맨 아래로 */
 }
 window.draw=draw;

@@ -628,7 +628,7 @@ function hist(r){var out=[],gi=0,groups=[];r.msgs.map(function(m){var v=p1View(m
  var who=r.card&&r.card.owner||'상담사';
  groups.forEach(function(g,k){var last=k===groups.length-1,next=groups[k+1],end=g.list[g.list.length-1].at,agent=false,ev=[[g.at,'문의 접수']];
   (r.scnLog||[]).forEach(function(x){if(x[0]>=g.at&&(!next||x[0]<next.at))ev.push([x[0],x[1]]);});
-  g.list.forEach(function(m){if(m.who==='agent'&&!agent){agent=true;ev.push([m.at,(S.p1?'상담사 첫 답장 · ':'상담 시작 · ')+who+(r.byStore?' (입점사)':'')]);}if(m.stopped)ev.push([m.at,'AI 중단'+(last&&r.need?' · '+r.need.reason:'')]);});
+  g.list.forEach(function(m){if(m.who==='agent'&&!agent){agent=true;ev.push([m.at,(S.p1?'상담사 첫 답장 · ':'상담 시작 · ')+who+(r.byStore?' (스토어)':'')]);}if(m.stopped)ev.push([m.at,'AI 중단'+(last&&r.need?' · '+r.need.reason:'')]);});
   if(last&&!agent&&r.agentAt&&r.agentAt>=g.at){agent=true;ev.push([r.agentAt,'상담 시작 · '+who]);}
   (r.ownerLog||[]).forEach(function(o){if(o[0]>=g.at&&(!next||o[0]<next.at))ev.push([o[0],'담당 변경 · '+o[1]+' → '+o[2]]);});
   (r.p1Log||[]).forEach(function(o){if(o[0]>=g.at&&(!next||o[0]<next.at))ev.push([o[0],o[1]]);});
@@ -695,7 +695,7 @@ function summarize(r){
  var res=prices.map(function(p){return ro((prices.length>1?p[0]+' ':'')+p[1])+' 안내';});
  var out;
  if(r.need)out=(/의료/.test(r.need.reason)?'의료 판단 필요':ro(r.need.reason.replace(/\s*\(.*\)/,'')).replace(/(으로|로)$/,''))+(/의료/.test(r.need.reason)?'로':(/[가-힯]$/.test(r.need.reason.replace(/\s*\(.*\)/,''))?ro(r.need.reason.replace(/\s*\(.*\)/,'')).slice(r.need.reason.replace(/\s*\(.*\)/,'').length):'로'))+' AI 중단'+(r.handler==='agent'?', 상담사 응대 중':', 미응대');
- else if(r.handler==='agent')out=(res.length?'AI가 '+res.join(', ')+', ':'')+(r.byStore?'입점사 응대 중':'상담사 응대 중');
+ else if(r.handler==='agent')out=(res.length?'AI가 '+res.join(', ')+', ':'')+(r.byStore?'스토어 응대 중':'상담사 응대 중');
  else if(!r.aiOn&&r.status!=='상담종료')out='미응대';
  else out=res.length?'AI가 '+res.join(', '):'AI 응대 중';
  if(r.status==='상담종료')out=out.replace(/응대 중$/,'응대 완료').replace(/미응대$/,'완료');
