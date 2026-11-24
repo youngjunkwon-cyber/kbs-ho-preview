@@ -185,7 +185,7 @@ function storeLabel(r){return r.storeName||(r.store?DB.store.name:'K-Beauty Stat
 /* 상담함·상담창은 확정안으로 고정. 아래 안은 상담 정보 패널 배치만 다름 */
 var LAYOUTS=[['R','3단 · 추천 답변 오른쪽 패널 (확정)']];
 var LAYOUT=window.top!==window?'R':(function(){try{var v=localStorage.getItem('ib-layout');return LAYOUTS.some(function(x){return x[0]===v;})?v:'R';}catch(e){return 'R';}})();
-function freshState(){return {p1:true,waOff:false,login:false,surf:'BO',mark:window.top!==window,hint:false,now:CLOCKS[0][0],ch:'LINE',layout:LAYOUT,bo:{room:'r3',filter:null,q:'',tr:true,ptab:'ai',noteOpen:true,topicF:[],langF:null,drawer:false},cust:{sheet:null}};}
+function freshState(){return {p1:true,waOff:false,rtOff:false,failSend:false,failTr:false,login:false,surf:'BO',mark:window.top!==window,hint:false,now:CLOCKS[0][0],ch:'LINE',layout:LAYOUT,bo:{room:'r3',filter:null,q:'',tr:true,ptab:'ai',noteOpen:true,topicF:[],langF:null,drawer:false},cust:{sheet:null}};}
 function room(id){return DB.rooms.filter(function(r){return r.id===id;})[0];}
 function isClinic(){return DB.store.clinic;}
 
@@ -723,9 +723,13 @@ function suggest(r){
  else base=T('greet',lang);
  return [{k:'간단 안내',t:base},{k:'부드러운 안내',t:L(SUGX.soft,lang)+base},{k:'재질문',t:L(SUGX.ask,lang)}];
 }
+/* 시안 번역: 받은 고객 메시지의 한국어 번역 자리 (실제는 번역 API) */
+var KO_TR=[[/予約/,'예약할 수 있나요?'],[/何時|営業時間/,'몇 시까지 영업하나요?'],[/いくら|料金|値段/,'가격이 얼마인가요?'],[/場所|どこ/,'위치가 어디인가요?'],[/ありがとう/,'감사합니다'],[/こんにちは/,'안녕하세요'],[/book|reserv/i,'예약하고 싶어요'],[/price|how much/i,'가격이 얼마인가요?'],[/thank/i,'감사합니다'],[/hello|hi\b/i,'안녕하세요']];
+function koOf(t){for(var i=0;i<KO_TR.length;i++)if(KO_TR[i][0].test(t))return KO_TR[i][1];return '문의 내용 (한국어 번역)';}
 /* 고객 메시지 수신 */
 function custSend(id,text,kind){
  var r=room(id),m={who:'cust',text:text,kind:kind||'text'},wasDone=r.status==='상담종료';
+ if(m.kind==='text'&&detectLang(text)){var pr=r.lang,pl=pr||'ko',nl=lastLangOf(r,text);if(nl==='ko'&&!pr)r.lang=pr; /* 한국어로만 쓴 대화는 언어 표시 없음 */m.lang=nl;if(nl!==pl)r.msgs.forEach(function(z){if(z.who==='agent'&&!z.tl){z.tl=pl;z.untr=(S.bo.readLangs||[]).indexOf(pl)>=0;}});if(nl!=='ko')m.koT=koOf(text);} /* CSM-CHAT-15 언어가 바뀔 때: 대화 언어 = 고객이 마지막에 쓴 언어. 이미 보낸 답은 보낼 때 언어 그대로 */
  if(wasDone){var gn=grpN(r);(r.sessOwner=r.sessOwner||{})[gn]=r.card.owner||'';(r.sessTopics=r.sessTopics||{})[gn]=(r.doneTopics||topics(r).list).slice();(r.sessTarget=r.sessTarget||{})[gn]=r.target||'';} /* 지난 회차 값은 그대로 남긴다 (SYS-CHAT-09) */
  push(r,m);
  if(wasDone){r.status='상담중';r.session++;m.newSession=true;r.card.owner='';r.agentAt=null;r.target='';r.doneTopics=null;r.p1NoAsk=false;r.topicFix=null;} /* 새 회차: 담당자·문의 대상(CSM-CHAT-35)·분류 비움 */
@@ -749,7 +753,9 @@ function aiResume(r){
  }
 }
 /* 상담사 */
-function agentSend(id,text){var r=room(id);if(!text.trim())return;r.flow=null;agentOut(r,{who:'agent',text:text.trim()});}
+function agentSend(id,text){var r=room(id);if(!text.trim())return;var lg=r.lang||'ko';if(S.failTr&&lg!=='ko'&&(S.bo.readLangs||[]).indexOf(lg)<0&&!lineBlocked(r)&&!waBlocked(r)){S.failTr=false;r.trFail={text:text.trim(),at:S.now};render();return 'trfail';} /* 데모: 다음 번역 실패 (CSM-CHAT-16) */
+ r.trFail=null;r.flow=null;agentOut(r,{who:'agent',text:text.trim()});}
+function retryTr(id){var r=room(id);if(!r.trFail)return;var t=r.trFail.text;r.trFail=null;r.flow=null;agentOut(r,{who:'agent',text:t});render();} /* 다시 보내기: 번역부터 다시 한 뒤 보냄 */
 function complete(id,tp,memo){ /* P10 상담 완료 = 확인 완료 + 상담 종료. 1차: 분류 필수 + 메모 선택 (CSM-CHAT-17) */
  var r=room(id);
  if(S.p1){if(!tp||!tp.length)return false;r.doneTopics=tp.slice();r.p1NoAsk=false;r.doneMemo=memo||'';(r.p1Log=r.p1Log||[]).push([S.now,'상담 완료 · '+(r.card.owner||'김상담')+' · 분류 '+tp.join(', '),grpN(r)]);if(memo)push(r,{who:'note',text:memo,by:r.card.owner||'김상담'});}r.need=null;r.noticeAt=null;r.handler='ai';r.status='상담종료';r.pending=false;r.asked=null;r.flow=null;r.req={};r.priority=false;r.expect=null;r.pick=null;
@@ -766,10 +772,11 @@ function p1View(m){if(!S||!S.p1||m.who!=='ai')return m;if(P1_DROP[m.text])return
 /* 1차 입력 도구 */
 function lineBlocked(r){return r.ch==='LINE'&&DB.store.lineLeft<=0;}
 function waBlocked(r){if(r.ch!=='WhatsApp')return '';if(S.waOff)return 'off';var lc=null;r.msgs.forEach(function(m){if(m.who==='cust')lc=m.at;});return lc&&tsMin(S.now)-tsMin(lc)>24*60?'24h':'';}
-function agentOut(r,m){if(lineBlocked(r)||waBlocked(r))return false;push(r,m);r.msgs.forEach(function(z){if(z.who==='cust')z.answered=true;});r.handler='agent';r.agentAt=S.now;r.aiOn=false;if(!r.card.owner)r.card.owner='김상담';if(r.ch==='LINE')DB.store.lineLeft--;render();return true;}
+function agentOut(r,m){if(lineBlocked(r)||waBlocked(r))return false;m.tl=r.lang||'ko';m.untr=(S.bo.readLangs||[]).indexOf(m.tl)>=0;if(S.failSend){m.fail=true;S.failSend=false;} /* 데모: 다음 전송 실패 (CSM-CHAT-14) */push(r,m);r.msgs.forEach(function(z){if(z.who==='cust')z.answered=true;});r.handler='agent';r.agentAt=S.now;r.aiOn=false;if(!r.card.owner)r.card.owner='김상담';if(r.ch==='LINE'&&!m.fail)DB.store.lineLeft--;render();return true;}
 function sendGuide(id){var r=room(id);push(r,{who:'agent',kind:'guide',text:'1:1 상담 안내'});(r.p1Log=r.p1Log||[]).push([S.now,'1:1 상담 안내 보냄',grpN(r)]);render();} /* CSM-CHAT-34. 답장으로 치지 않는다 (SYS-CHAT-02는 답장·상품 카드만) */
 function sendVideo(id){agentOut(room(id),{who:'agent',kind:'video',text:'[동영상] clinic_tour.mp4 · 12.4MB'});} /* MP4 16MB 이하 */
-function sendImage(id){agentOut(room(id),{who:'agent',kind:'image',text:'[이미지] clinic_map.jpg · 1.2MB'});} /* 1차: 이미지만 (JPG·PNG·WebP 10MB) */
+function sendImage(id,f){var m={who:'agent',kind:'image',text:'[이미지] '+(f?f.name:'clinic_map.jpg · 1.2MB')};if(f){m.img=f.url;m.sending=true;}if(agentOut(room(id),m)&&f)setTimeout(function(){m.sending=false;render();},1000);} /* 1차: 이미지만 (JPG·PNG·WebP 10MB). 파일을 고르면 약 1초 "이미지를 보내는 중입니다" 뒤 이미지 (CSM-CHAT-16) */
+function retrySend(id,ix){var r=room(id),m=r.msgs[ix];if(!m||!m.fail||lineBlocked(r)||waBlocked(r))return false;m.fail=false;m.at=S.now;if(S.failSend){m.fail=true;S.failSend=false;}if(m.img){m.sending=true;setTimeout(function(){m.sending=false;render();},1000);}if(r.ch==='LINE'&&!m.fail)DB.store.lineLeft--;render();return true;} /* CSM-CHAT-14 전송 실패한 이미지 다시 보내기: 같은 말풍선을 다시 보냄 (새 말풍선 없음) */
 function setTarget(id,v){var r=room(id);r.target=v;render();} /* CSM-CHAT-35 문의 대상 */
 function addNote(id,text){var r=room(id);if(!text.trim())return;push(r,{who:'note',text:text.trim(),by:r.card.owner||'김상담'});render();} /* 상담 메모: 대화 안 내부 글, 고객에게 안 감 */ /* 상담 시작 = 상담사가 잡음 (AI 끄기와 같은 동작, 답장 전에도 진행으로) */
 /* 시계 */
@@ -789,7 +796,10 @@ function setClock(ts){
 function swHTML(){
  return '<b>통합인박스 시안</b>'
  +'<label style="background:#e8537a;color:#fff;border-radius:4px;padding:2px 8px;font-weight:700"><input type="checkbox" data-sw="p1"'+(S.p1?' checked':'')+'>1차 범위로 보기</label>'
- +(S.p1?'<label><input type="checkbox" data-sw="waOff"'+(S.waOff?' checked':'')+'>WhatsApp 연결 끊김</label><span>LINE 남은 발송</span><select data-sw="lineLeft">'+[312,1,0].concat([312,1,0].indexOf(DB.store.lineLeft)<0?[DB.store.lineLeft]:[]).sort(function(a,b){return b-a;}).map(function(v){return '<option value="'+v+'"'+(DB.store.lineLeft===v?' selected':'')+'>'+v+'</option>';}).join('')+'</select><label><input type="checkbox" data-sw="login"'+(S.login?' checked':'')+'>로그인 화면</label>':'')
+ +(S.p1?'<label><input type="checkbox" data-sw="waOff"'+(S.waOff?' checked':'')+'>WhatsApp 연결 끊김</label>'
+  +'<label><input type="checkbox" data-sw="rtOff"'+(S.rtOff?' checked':'')+'>실시간 연결 끊김</label>'
+  +'<label><input type="checkbox" data-sw="failSend"'+(S.failSend?' checked':'')+'>다음 전송 실패</label>'
+  +'<label><input type="checkbox" data-sw="failTr"'+(S.failTr?' checked':'')+'>다음 번역 실패</label><span>LINE 남은 발송</span><select data-sw="lineLeft">'+[312,1,0].concat([312,1,0].indexOf(DB.store.lineLeft)<0?[DB.store.lineLeft]:[]).sort(function(a,b){return b-a;}).map(function(v){return '<option value="'+v+'"'+(DB.store.lineLeft===v?' selected':'')+'>'+v+'</option>';}).join('')+'</select><label><input type="checkbox" data-sw="login"'+(S.login?' checked':'')+'>로그인 화면</label>':'')
  +(LAYOUTS.length>1?'<span style="margin-left:4px">레이아웃</span><select data-sw="layout" style="background:#e8537a;border-color:#e8537a;color:#fff;font-weight:700">'+LAYOUTS.map(function(x){return '<option value="'+x[0]+'"'+(S.layout===x[0]?' selected':'')+'>'+x[1]+'</option>';}).join('')+'</select><span style="width:8px"></span>':'')+[['BO','CSM 상담 (우리 CS)'],['MGMT','어드민 상담 관리']].map(function(x){return '<button class="s'+(S.surf===x[0]?' on':'')+'" data-surf="'+x[0]+'">'+x[1]+'</button>';}).join('')
  +'<span class="sp"></span>'
   +'<span>기준 시각</span><select data-sw="now">'+CLOCKS.map(function(c){return '<option value="'+c[0]+'"'+(S.now===c[0]?' selected':'')+'>'+c[1]+'</option>';}).join('')+'</select>'
@@ -814,15 +824,15 @@ window.IB={get DB(){return DB;},get S(){return S;},get SLACK(){return SLACK;},CH
  room:room,fmtTs:fmtTs,unans:unans,storeLabel:storeLabel,suggest:function(r){return suggest(r);},inHours:inHours,fmtDay:fmtDay,custSend:custSend,agentSend:agentSend,complete:complete,setAI:setAI,takeOver:takeOver,updateCard:updateCard,addNote:addNote,sendProduct:sendProduct,get RECENT(){return RECENT;},summary:function(r){return summarize(r);},topics:function(r){return topics(r);},editTopic:editTopic,TOPICS:TOPICS,NOASK:NOASK,tick:tick,scnState:scnState,hist:hist,
  scn:{get:function(){return JSON.parse(JSON.stringify(DB.scn));},save:function(v){DB.scn=JSON.parse(JSON.stringify(v));try{localStorage.setItem('ib-scn',JSON.stringify(DB.scn));}catch(e){}render();},defaults:function(){return defaultScn();},idleTest:idleTest,reset:function(){DB.scn=defaultScn();try{localStorage.removeItem('ib-scn');}catch(e){}render();return JSON.parse(JSON.stringify(DB.scn));},INTENTS:INTENTS,EXITS:SCN_EXITS,FIELDS:FIELDS,SLOT:SLOT,
   test:function(text,o){o=o||{};var keep=DB.scn;if(o.scn)DB.scn=o.scn;try{return scnTest(text,o);}finally{DB.scn=keep;}}},
-aiAllowed:aiAllowed,render:render,p1View:p1View,sendGuide:sendGuide,sendVideo:sendVideo,sendImage:sendImage,setTarget:setTarget,lineBlocked:lineBlocked,waBlocked:waBlocked,
+aiAllowed:aiAllowed,render:render,p1View:p1View,sendGuide:sendGuide,sendVideo:sendVideo,sendImage:sendImage,retryTr:retryTr,retrySend:retrySend,setTarget:setTarget,lineBlocked:lineBlocked,waBlocked:waBlocked,
  login:function(){S.login=false;render();},logout:function(){S.login=true;render();},
- openRoom:function(id){S.bo.room=id;render();},
+ openRoom:function(id){S.bo.room=id;S.bo.unsel=false;render();},
  ready:function(){render();}};
 /* ===== 검수 콘솔용 전역 ===== */
 window.render=render;
 window.resetDB=function(){freshDB();S=freshState();render();};
 window.go=function(s){S.surf=s;render();};
-window.setChannel=function(ch){S.ch=ch;S.bo.room=CH_ROOM[ch];render();};
+window.setChannel=function(ch){S.ch=ch;S.bo.room=CH_ROOM[ch];S.bo.unsel=false;render();};
 window.cust=function(text,kind){custSend(CH_ROOM[S.ch],text,kind);}; /* 지금 채널 고객이 보냄 */
 window.custTo=function(ch,text,kind){custSend(CH_ROOM[ch],text,kind);};
 window.agent=function(text){agentSend(S.bo.room,text);};
@@ -830,7 +840,7 @@ window.completeRoom=function(id,tp,memo){complete(id||S.bo.room,tp||['기타'],m
 window.aiSwitch=function(on,id){setAI(id||S.bo.room,on);};
 window.setClock=setClock;
 window.setStore=function(p){Object.assign(DB.store,p);render();};
-window.openRoom=function(id){S.bo.room=id;render();};
+window.openRoom=function(id){S.bo.room=id;S.bo.unsel=false;render();};
 window.classifyText=function(t){return classify(t,room(CH_ROOM[S.ch]));};
 Object.defineProperty(window,'DBX',{get:function(){return DB;}});
 Object.defineProperty(window,'STATE',{get:function(){return S;}});
@@ -838,7 +848,7 @@ Object.defineProperty(window,'SLACKLOG',{get:function(){return SLACK;}});
 document.addEventListener('click',function(e){var t=e.target.closest('[data-surf]');if(t){S.surf=t.getAttribute('data-surf');render();}});
 document.addEventListener('change',function(e){var t=e.target;if(!t.hasAttribute('data-sw'))return;var k=t.getAttribute('data-sw');
  if(k==='layout'){S.layout=LAYOUT=t.value;try{localStorage.setItem('ib-layout',LAYOUT);}catch(_){}S.bo.drawer=false;S.bo.side=true;frame('BO').contentWindow.location.reload();render();return;} /* 레이아웃은 화면 골격을 바꾸므로 뷰티톡 프레임을 다시 그림 */
- if(k==='mark')S.mark=t.checked;else if(k==='hint')S.hint=t.checked;else if(k==='ch'){S.ch=t.value;S.bo.room=CH_ROOM[t.value];}else if(k==='now'){setClock(t.value);return;}else if(k==='booking')DB.store.booking=t.checked;else if(k==='pilot')DB.store.aiPilot=t.checked;else if(k==='p1'){S.p1=t.checked;S.bo.ptab='ai';}else if(k==='waOff')S.waOff=t.checked;else if(k==='lineLeft')DB.store.lineLeft=+t.value;else if(k==='login')S.login=t.checked;render();});
+ if(k==='mark')S.mark=t.checked;else if(k==='hint')S.hint=t.checked;else if(k==='ch'){S.ch=t.value;S.bo.room=CH_ROOM[t.value];}else if(k==='now'){setClock(t.value);return;}else if(k==='booking')DB.store.booking=t.checked;else if(k==='pilot')DB.store.aiPilot=t.checked;else if(k==='p1'){S.p1=t.checked;S.bo.ptab='ai';}else if(k==='waOff')S.waOff=t.checked;else if(k==='rtOff')S.rtOff=t.checked;else if(k==='failSend')S.failSend=t.checked;else if(k==='failTr')S.failTr=t.checked;else if(k==='lineLeft')DB.store.lineLeft=+t.value;else if(k==='login')S.login=t.checked;render();});
 freshDB();S=freshState();render();
 </script>
 </body>
