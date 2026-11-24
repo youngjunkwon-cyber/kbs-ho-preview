@@ -1794,7 +1794,7 @@ function init(){
   /* 발송 언어 드롭다운 → "고객 언어: ○○" 글자. 원문 발송 → 삭제(자동번역 스위치로 합침). Push 안내는 유지 */
   var lsel=Q('.ant-select',holder);EL.langTxt=document.createElement('span');EL.langTxt.setAttribute('data-new','');if(lsel)lsel.replaceWith(EL.langTxt);else holder.insertBefore(EL.langTxt,holder.firstChild);
   QA('.ant-select',holder).forEach(function(s){if(/원문|발송 언어/.test(s.textContent+(Q('input',s)||{}).getAttribute('aria-label')))s.style.display='none';});
-  var sw=Q('.ant-switch',holder);EL.sw=sw;EL.trSpace=sw?sw.closest('.ant-space'):null;if(sw){sw.classList.add('ant-switch-checked');sw.setAttribute('aria-checked','true');sw.setAttribute('data-click','');sw.addEventListener('click',function(){var on=sw.classList.toggle('ant-switch-checked');sw.setAttribute('aria-checked',on?'true':'false');});} /* 자동번역 기본 ON */
+  var sw=Q('.ant-switch',holder);EL.sw=sw;EL.trSpace=sw?sw.closest('.ant-space'):null;if(sw){sw.classList.add('ant-switch-checked');sw.setAttribute('aria-checked','true');sw.setAttribute('data-click','');sw.addEventListener('click',function(){var on=sw.classList.toggle('ant-switch-checked');sw.setAttribute('aria-checked',on?'true':'false');syncPv();});} /* 자동번역 기본 ON */
   var push=QA('.ant-typography',sendRow).filter(function(x){return /Push/.test(x.textContent);})[0];EL.push=push;if(push){push.style.cssText+=';font-size:11px;color:#8c8c8c;margin-left:2px;min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis';push.title=push.textContent;holder.appendChild(push);holder.style.gap='8px';}
   EL.lq=document.createElement('span');EL.lq.id='lq';EL.lq.setAttribute('data-new','');holder.appendChild(EL.lq); /* LINE 발송 한도 (CSM-CHAT-16) */
   EL.pvBtn=mkBtn('번역 미리보기','pvBtn');sendRow.insertBefore(EL.pvBtn,send);
@@ -1905,7 +1905,7 @@ function init(){
   +'.ov{position:fixed;inset:0;z-index:1000;font-family:Pretendard,sans-serif}.ov .bg{position:absolute;inset:0;background:rgba(0,0,0,.45)}.ov .bx{position:absolute;left:50%;top:12%;transform:translateX(-50%);width:440px;background:#fff;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.25);padding:20px 22px;font-size:13px;color:#1d2939}.ov h3{margin:0 0 12px;font-size:16px}.ov .lb{font-size:12px;font-weight:700;color:#344054;margin:12px 0 6px}.ov .lb small{font-weight:400;color:#98a2b3;margin-left:4px}'
   +'.ov .ck{display:flex;flex-wrap:wrap;gap:6px}.ov .ck button{border:1px solid #d0d5dd;background:#fff;border-radius:14px;padding:4px 12px;font:12px Pretendard,sans-serif;color:#344054;cursor:pointer}.ov .ck button.on{background:#1677ff;border-color:#1677ff;color:#fff}.ov textarea,.ov input{width:100%;box-sizing:border-box;border:1px solid #d0d5dd;border-radius:6px;padding:7px 10px;font:13px Pretendard,sans-serif}.ov textarea{min-height:72px;resize:vertical}.ov .nl{font-size:12px;color:#475467;background:#f7f8fa;border-radius:6px;padding:6px 10px}'
   +'.cv{display:flex!important;gap:10px;align-items:flex-start;text-align:left}.cv .av{flex:none;width:32px;height:32px;margin-top:1px}.cv .av svg{display:block}.cv .c1 .nm{flex:0 1 auto}.cv .av .ini{font-size:14px;font-weight:600;color:#667085}.cv .av .bd{position:absolute;right:-3px;bottom:-3px;width:18px;height:18px;border-radius:6px;background:#fff;display:flex;align-items:center;justify-content:center}.cv .av .bd svg{display:block}'
-  +'.cv .cm{flex:1;min-width:0}.cv .c1{display:flex;align-items:center;gap:5px;min-width:0}.cv .c1 .cs{flex:none;font-size:10px;color:#667085;background:#f2f4f7;border-radius:3px;padding:0 4px;line-height:15px}.cv .c1 .tm{margin-left:auto}.cv .c2{margin-top:3px;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.45}'
+  +'.cv .cm{flex:1;min-width:0}.cv .c1{display:flex;align-items:center;gap:5px;min-width:0}.cv .c1 .cs{flex:none;font-size:10px;color:#667085;background:#f2f4f7;border-radius:3px;padding:0 4px;line-height:15px}.cv .c1 .tm{margin-left:auto}.cv .c1{height:20px}.cv .c3{height:18px}.cv .c2{margin-top:3px;height:36px;line-height:18px!important;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.45}'
   +'.cv .c3{display:flex;align-items:center;gap:6px;margin-top:4px;min-width:0}.cv .c3 .mt{flex:1;min-width:0;font-size:11px;color:#8c8c8c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cv .c3 .tg{flex:none;display:flex;gap:4px;align-items:center}.cv .sp{font-size:10px;line-height:16px;padding:0 6px;border-radius:8px;background:#f2f4f7;color:#475467;font-weight:600}.cv .sp.wait{background:#344054;color:#fff}.cv .sp.done{background:#f2f4f7;color:#98a2b3}.cv.dn .av{opacity:.55}'
   +'.tgt .tgq{width:100%;box-sizing:border-box;border:1px solid #d0d5dd;border-radius:6px;padding:5px 8px;font:12px Pretendard,sans-serif}'
   +'.chi{display:inline-flex;align-items:center;gap:2px;flex:none;vertical-align:middle}.chi svg{display:block}.chi em{font-style:normal;font-size:10px;color:#667085;font-weight:500}#hsub .chi{margin-right:2px;position:relative;top:-1px}'
@@ -1921,6 +1921,8 @@ function init(){
  document.head.appendChild(st);
  layout();
 }
+/* 번역 미리보기 = 자동번역 스위치에 딸린 버튼. 스위치가 꺼졌거나 안 보이면(한국어 대화) 숨긴다 */
+function syncPv(){if(!EL.pvBtn)return;var sp=EL.trSpace,on=!!(EL.sw&&EL.sw.classList.contains('ant-switch-checked')&&sp&&sp.offsetParent!==null&&getComputedStyle(sp).display!=='none');EL.pvBtn.style.display=on?'':'none';if(!on&&EL.pv)EL.pv.style.display='none';}
 /* ===== 1차: 저장된 답장 ===== */
 var SR=[
  {f:'예약',t:'예약 변경·취소 방법',b:'사이트에서 예약하셨다면 마이페이지 > 예약 내역에서 날짜·시간 변경과 취소를 직접 하실 수 있습니다. 방문 전날 자정까지 가능합니다.'},
@@ -2166,7 +2168,7 @@ function draw(){
  var r=P.room(S.bo.room),T=tabOf(r),lang=r.lang||'ko',allowed=P.aiAllowed(r),on=allowed&&r.aiOn;
  var hd=EL.hd;Q('strong',hd).textContent=r.name;
  var sub=Q('strong',hd).nextElementSibling;sub.id='hsub';sub.setAttribute('data-new','');
- sub.innerHTML=chIcon(r,true)+' '+[r.lang?esc(LN[r.lang]||r.lang):null,esc(storeLine(r))].filter(Boolean).join(' · ');
+ sub.innerHTML='<span class="chi" title="'+esc(chLabel(r))+'">'+chSvg(r,18)+'</span> '+[r.lang?esc(LN[r.lang]||r.lang):null,esc(storeLine(r))].filter(Boolean).join(' · ');
  hd.children[0].classList.add('hone');
  EL.done.style.display=T==='done'?'none':'';
  EL.chip.style.display=(p1||T==='done'||(T==='prog'&&!allowed))?'none':''; /* 1차: 상담 시작·AI 재개 숨김 */QA('span',EL.chip).pop().textContent=T==='prog'?'AI 재개':'상담 시작';
@@ -2214,7 +2216,7 @@ function draw(){
  var lock=T==='done'||waOver||waOff||lineZero;
  EL.lq.style.display=p1&&r.ch==='LINE'?'':'none';EL.lq.textContent='이번 달 남은 발송 '+Math.max(0,DB.store.lineLeft)+' / 500';EL.lq.classList.toggle('zero',DB.store.lineLeft<=0);
  EL.guideBtn.style.display=p1&&r.ch==='플랫폼'&&r.type!=='고객지원'?'':'none';
- EL.srLock=lock;drawSR();[EL.vidBtn,EL.guideBtn].forEach(function(b){b.disabled=lock;b.style.opacity=lock?'.5':'';});
+ EL.srLock=lock;drawSR();setTimeout(syncPv,0);[EL.vidBtn,EL.guideBtn].forEach(function(b){b.disabled=lock;b.style.opacity=lock?'.5':'';});
  [EL.ta,EL.send,EL.pvBtn].forEach(function(e){e.disabled=lock;e.style.opacity=lock?'.5':'';});EL.tools.style.display=T==='done'?'none':'';EL.sendRow.style.display=T==='done'?'none':'flex';EL.ta.parentElement.style.display=T==='done'?'none':'';
  EL.ta.placeholder=lang!=='ko'&&!own?'메시지 입력 ('+(LN[lang]||lang)+' 자동번역)':'메시지 입력';
  EL.langTxt.textContent='고객 언어: '+(LN[lang]||lang);
