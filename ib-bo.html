@@ -1825,7 +1825,7 @@ function init(){
  EL.chip=mkBtn('AI 재개','aiChip');cb.parentElement.insertBefore(EL.chip,cb);
  EL.chip.addEventListener('click',function(){var r=P.room(P.S.bo.room);if(tabOf(r)==='prog')P.setAI(r.id,true);else P.takeOver(r.id);});
  EL.tr=mkBtn('번역 ON','trBtn');cb.parentElement.insertBefore(EL.tr,EL.chip);
- EL.tr.addEventListener('click',function(){P.S.bo.tr=!P.S.bo.tr;draw();});EL.tr.style.display='none'; /* 번역 보기·보내기는 우측 상단 "번역 없이 응대할 언어" 설정 하나로 정한다 */
+ EL.tr.addEventListener('click',function(){P.S.bo.tr=!P.S.bo.tr;draw();});EL.tr.style.display='none'; /* 번역 보기·보내기는 우측 상단 "원문으로 응대할 언어" 설정 하나로 정한다 */
  EL.hd.style.alignItems='flex-start';EL.hd.children[0].style.cssText+=';min-width:0;flex:1';var hr=cb.parentElement;hr.style.cssText+=';flex:none;flex-wrap:nowrap;white-space:nowrap;display:flex;gap:8px;align-items:center';EL.tr.style.marginRight='4px';if(hr.parentElement!==EL.hd)hr.parentElement.style.cssText+=';flex:none;flex-wrap:nowrap';
  /* 확인 필요 띠, 추천 답변 */
  EL.band=document.createElement('div');EL.band.id='band';EL.band.setAttribute('data-new','');EL.conv.insertBefore(EL.band,EL.msgs);
@@ -1951,14 +1951,14 @@ function buildSR(){SR0=JSON.stringify(SR);var p=document.createElement('section'
   if(t.closest('.sf .ok')){var f=p.querySelector('.sf'),fo=f.querySelector('.ff').value.trim(),ti=f.querySelector('.ft').value.trim(),bd=f.querySelector('textarea').value.trim(),er=f.querySelector('.er');
    if(!fo&&!P.S.p1){er.textContent='폴더를 입력해주세요.';return;}if(!fo)fo=(SRS.ed<SR.length&&SR[SRS.ed].f)||'상담 안내';if(!ti){er.textContent='제목을 입력해주세요.';return;}if(!bd){er.textContent='내용을 입력해주세요.';return;}
    var v={f:fo,t:ti,b:bd};if(SRS.ed>=SR.length)SR.push(v);else SR[SRS.ed]=v;SRS.ed=-1;drawSR();return;}
-  var ins=t.closest('[data-ins]');if(ins){if(EL.srLock)return;var r=SR[+ins.getAttribute('data-ins')],ta=EL.ta,nv=ta.value.trim()?ta.value.replace(/\s+$/,'')+'\n'+r.b:r.b;if([...nv].length>5000){alert('입력칸 글자 수(5,000자)를 넘어 넣을 수 없습니다. 입력칸 글을 줄인 뒤 다시 넣어 주세요.');return;}ta.value=nv;ta.dispatchEvent(new Event('input',{bubbles:true}));ta.focus();return;}
+  var ins=t.closest('[data-ins]');if(ins){if(EL.srLock)return;var r=SR[+ins.getAttribute('data-ins')],ta=EL.ta,nv=ta.value.trim()?ta.value.replace(/\s+$/,'')+'\n'+r.b:r.b;if([...nv].length>5000){alert('입력칸 5,000자를 넘어 넣을 수 없습니다.');return;}ta.value=nv;ta.dispatchEvent(new Event('input',{bubbles:true}));ta.focus();return;}
   var ih=t.closest('[data-op]');if(ih){var k=ih.getAttribute('data-op');SRS.op[k]=!SRS.op[k];drawSR();}
  });
  drawSR();}
 function drawSR(){var p=EL.sr;if(!p)return;if(EL.srS!==P.S){if(EL.srS)SR=JSON.parse(SR0);EL.srS=P.S;SRS={q:'',mg:false,ed:-1,op:{},cl:{}};p.querySelector('.sq input').value='';} /* 시드 초기화·검수 케이스 시작 때 저장된 답장도 처음 상태로 */var q=SRS.q.trim().toLowerCase();
  p.querySelector('.mgt').textContent=SRS.mg?'완료':'관리';p.querySelector('.sq input').placeholder=P.S.p1?'제목, 내용 검색':'폴더, 제목, 내용 검색';
  var folders=[];SR.forEach(function(r){if(folders.indexOf(r.f)<0)folders.push(r.f);});var FO=P.S.p1?['*']:folders;
- var p1=!!P.S.p1;var form=function(r){return '<div class="sf"><input class="ff"'+(p1?' type="hidden"':'')+' list="srfl" placeholder="폴더 (새 이름을 쓰면 새 폴더)" value="'+esc(r?r.f:'')+'" data-click><datalist id="srfl">'+folders.map(function(f){return '<option value="'+esc(f)+'">';}).join('')+'</datalist><div class="cn"><input class="ft" maxlength="20" placeholder="제목 (20자까지)" value="'+esc(r?r.t:'')+'" data-click><small class="cft">'+[...(r?r.t:'')].length+' / 20</small></div><div class="cn"><textarea maxlength="1000" placeholder="내용 (1,000자까지)" data-click>'+esc(r?r.b:'')+'</textarea><small class="cfb">'+[...(r?r.b:'')].length+' / 1000</small></div><div class="er"></div><div class="bt"><button type="button" class="cc" data-click>취소</button><button type="button" class="ok" data-click>저장</button></div></div>';};
+ var p1=!!P.S.p1;var form=function(r){return '<div class="sf"><input class="ff"'+(p1?' type="hidden"':'')+' list="srfl" placeholder="폴더" value="'+esc(r?r.f:'')+'" data-click><datalist id="srfl">'+folders.map(function(f){return '<option value="'+esc(f)+'">';}).join('')+'</datalist><div class="cn"><input class="ft" maxlength="20" placeholder="제목" value="'+esc(r?r.t:'')+'" data-click><small class="cft">'+[...(r?r.t:'')].length+' / 20</small></div><div class="cn"><textarea maxlength="1000" placeholder="내용" data-click>'+esc(r?r.b:'')+'</textarea><small class="cfb">'+[...(r?r.b:'')].length+' / 1000</small></div><div class="er"></div><div class="bt"><button type="button" class="cc" data-click>취소</button><button type="button" class="ok" data-click>저장</button></div></div>';};
  var h='',n=0;
  FO.forEach(function(f){var rows=SR.map(function(r,i){return {r:r,i:i};}).filter(function(x){return (f==='*'||x.r.f===f)&&(!q||(x.r.f+' '+x.r.t+' '+x.r.b).toLowerCase().indexOf(q)>=0);});if(!rows.length)return;n+=rows.length;
   var cl=!q&&!p1&&SRS.cl[f];h+='<div class="fd'+(cl?' cl':'')+'"><div class="fh"'+(p1?' style="display:none"':'')+' data-fh="'+esc(f)+'" data-click><i>'+(cl?'▸':'▾')+'</i>'+esc(f)+' <small>'+rows.length+'</small></div>';
@@ -1966,16 +1966,16 @@ function drawSR(){var p=EL.sr;if(!p)return;if(EL.srS!==P.S){if(EL.srS)SR=JSON.pa
    h+='<div class="it'+(op?' op':'')+'"><div class="ih" data-op="'+x.i+'" data-click><i class="ar'+(op?' op':'')+'" title="'+(op?'접기':'펼치기')+'"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M3 1.5 6.5 5 3 8.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></i><b>'+esc(x.r.t)+'</b>'+(op?'':'<a class="qi'+(EL.srLock?' off':'')+'" data-ins="'+x.i+'" data-click title="펼치지 않고 입력창에 넣기">넣기</a>')+'</div><div class="ib">'+esc(x.r.b)
     +'<div class="ia">'+(SRS.mg?'<a data-ed="'+x.i+'" data-click>수정</a><a class="del" data-del="'+x.i+'" data-click>삭제</a>':'')+'<button type="button" data-ins="'+x.i+'"'+(EL.srLock?' disabled title="지금은 입력창을 쓸 수 없습니다"':'')+' data-click>입력창에 넣기</button></div></div></div>';}); /* 넣기는 관리 중에도, 접힌 제목 줄에서도 바로 */
   h+='</div>';});
- if(!n)h='<div class="se">'+(q?'"'+esc(SRS.q)+'" 검색 결과 없음':'저장된 답장이 없습니다.')+'</div>';
+ if(!n)h='<div class="se">'+(q?'"'+esc(SRS.q)+'" 검색 결과 없음':'저장된 답장 없음')+'</div>';
  if(SRS.mg)h+=SRS.ed>=SR.length?form(null):'<div class="add" data-click>+ 새 답장 추가</div>';
  p.querySelector('.sb').innerHTML=h;
- p.querySelector('.sn').textContent=SRS.mg?'모든 상담사가 같은 목록을 씁니다. 한국어로 저장하면 고객 언어로 바뀌어 나갑니다 (번역 없이 응대할 언어 대화는 그대로).':'제목을 눌러 내용을 보고, 입력창에 넣은 뒤 고쳐서 보낼 수 있습니다.';}
+ p.querySelector('.sn').style.display='none';}
 /* ===== 1차: 상담 완료 창 (CSM-CHAT-17) ===== */
 function ov(html){var m=document.createElement('div');m.className='ov';m.setAttribute('data-new','');m.innerHTML='<div class="bg"></div><div class="bx">'+html+'</div>';document.body.appendChild(m);m.querySelector('.bg').addEventListener('click',function(){m.remove();});return m;}
 function openDone(r){
  var sel=[],lastN=null,cur=false;for(var i=r.msgs.length-1;i>=0;i--){var x=r.msgs[i];if(x.who==='note'&&!lastN)lastN=x;if(x.newSession&&i>0)break;}cur=hasNote(r);
  var m=ov('<h3>상담 완료</h3><div class="lb">상담 분류<small>하나 이상 선택</small></div><div class="ck">'+P.TOPICS.concat([P.NOASK]).map(function(t){return '<button type="button" data-t="'+esc(t)+'" data-click>'+esc(t)+'</button>';}).join('')+'</div>'
-  +'<div class="lb">상담 메모<small>선택</small></div>'+(cur&&lastN?'<div class="nl">'+esc(lastN.text.split('\n')[0])+'</div>':'<textarea placeholder="메모 입력 (비워도 됩니다)" data-click></textarea>')
+  +'<div class="lb">상담 메모<small>선택</small></div>'+(cur&&lastN?'<div class="nl">'+esc(lastN.text.split('\n')[0])+'</div>':'<textarea placeholder="메모 입력" data-click></textarea>')
   +'<div class="ft"><button type="button" class="cc" data-click>취소</button><button type="button" class="ok" disabled data-click>완료</button></div>');
  var ok=m.querySelector('.ok');
  m.addEventListener('click',function(e){var b=e.target.closest('[data-t]');if(b){var t=b.getAttribute('data-t'),i=sel.indexOf(t);if(i>=0)sel.splice(i,1);else if(t===P.NOASK)sel=[t];else{sel=sel.filter(function(z){return z!==P.NOASK;});sel.push(t);}
@@ -2280,11 +2280,11 @@ function draw(){
  if(pt==='ai'&&p1){ /* 1차 상담 개요: 상담 분류(완료 때 고른 값), 문의 대상, 접수 정보 */
   var imp=r.impSess&&r.session<=r.impSess,dt=tpOf(r);
   ctx.appendChild(H('상담 분류',imp?'가져온 기록 · 자동 분류':null));
-  var tw1=document.createElement('div');tw1.className='tpw';tw1.setAttribute('data-new','');tw1.innerHTML=dt.length?dt.map(function(t){return '<span class="tpchip" style="padding-right:10px">'+esc(t)+'</span>';}).join(''):'<span class="tpnone">'+(imp?'없음 (통계 제외)':'상담 완료할 때 고릅니다')+'</span>';ctx.appendChild(tw1);
+  var tw1=document.createElement('div');tw1.className='tpw';tw1.setAttribute('data-new','');tw1.innerHTML=dt.length?dt.map(function(t){return '<span class="tpchip" style="padding-right:10px">'+esc(t)+'</span>';}).join(''):'<span class="tpnone">'+(imp?'없음':'-')+'</span>';ctx.appendChild(tw1);
   ctx.appendChild(H('문의 대상'));
   var tg=document.createElement('div');tg.className='tgt';tg.setAttribute('data-new','');
   if(!isMsgr(r)&&r.type!=='고객지원'){tg.innerHTML='<b>'+esc(storeLine(r))+'</b><small>자동</small>';}
-  else{tg.innerHTML=(r.target?'<b>'+esc(r.target)+'</b><a data-clr data-click title="비우기">✕</a>':'<input class="tgq" list="tgl" placeholder="지정 안 됨 · 스토어 또는 상품 이름" data-click><datalist id="tgl">'+TGT.map(function(s){return '<option value="'+esc(s)+'">';}).join('')+'</datalist>');
+  else{tg.innerHTML=(r.target?'<b>'+esc(r.target)+'</b><a data-clr data-click title="비우기">✕</a>':'<input class="tgq" list="tgl" placeholder="스토어 또는 상품 검색" data-click><datalist id="tgl">'+TGT.map(function(s){return '<option value="'+esc(s)+'">';}).join('')+'</datalist>');
    tg.addEventListener('change',function(e){if(e.target.classList.contains('tgq')&&TGT.indexOf(e.target.value)>=0)P.setTarget(r.id,e.target.value);});
    tg.addEventListener('click',function(e){if(e.target.closest('[data-clr]'))P.setTarget(r.id,'');});}
   ctx.appendChild(tg);
@@ -2341,7 +2341,7 @@ function draw(){
 }
 window.draw=draw;
 function drawMe(){var mp=EL.mepop;if(!mp)return;var a=P.S.bo.readLangs||[];
- mp.innerHTML='<div class="mp-h">번역 없이 응대할 언어</div><div class="mp-s">고른 언어 대화는 받은 말 번역을 숨기고, 보내는 말도 번역하지 않습니다.</div>'+Object.keys(LN).filter(function(l){return l!=='ko';}).map(function(l){var on=a.indexOf(l)>=0;return '<button type="button" data-rl="'+l+'" class="'+(on?'on':'')+'" data-click><i>'+(on?'✓':'')+'</i>'+LN[l]+'</button>';}).join('')
+ mp.innerHTML='<div class="mp-h">원문으로 응대할 언어</div>'+Object.keys(LN).filter(function(l){return l!=='ko';}).map(function(l){var on=a.indexOf(l)>=0;return '<button type="button" data-rl="'+l+'" class="'+(on?'on':'')+'" data-click><i>'+(on?'✓':'')+'</i>'+LN[l]+'</button>';}).join('')
   +(P.S.p1?'<div class="mp-a" data-new><button type="button" data-act="pw" data-click>비밀번호 변경</button><button type="button" data-act="out" data-click>로그아웃</button></div>':'');}
 function start(){try{init();}catch(e){console.error(e);}if(P&&P.ready)P.ready();else draw();}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
