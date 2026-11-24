@@ -2146,7 +2146,7 @@ function draw(){
   var av=document.createElement('div');av.className='av';av.setAttribute('data-new','');av.title=chLabel(r);av.innerHTML=chSvg(r,32);b.appendChild(av);
   var cm=document.createElement('div');cm.className='cm';b.appendChild(cm);
   var c1=document.createElement('div');c1.className='c1';
-  c1.innerHTML='<span class="nm" title="'+esc(r.name)+'">'+hiq(r.name,q)+'</span>'+(chSub(r)?'<span class="cs">'+esc(chSub(r))+'</span>':'')+'<span class="tm">'+esc(relTs(lastAt(r)))+'</span>'+((t==='prog'&&n>0)?'<i class="nd" title="새 메시지"></i>':'');
+  c1.innerHTML='<span class="nm" title="'+esc(r.name)+'">'+hiq(r.name,q)+'</span>'+'<span class="tm">'+esc(relTs(lastAt(r)))+'</span>'+((t==='prog'&&n>0)?'<i class="nd" title="새 메시지"></i>':'');
   cm.appendChild(c1);
   var c2=document.createElement('div');c2.className='c2';c2.innerHTML=h.msg?'<span style="color:#8c8c8c">(이전 메시지)</span> '+hiq(h.msg.text,q):hiq(lastMsg(r,t==='wait'),q);cm.appendChild(c2);
   if(t==='wait'&&r.need&&!p1){var w=document.createElement('div');w.className='why';w.setAttribute('data-new','');w.textContent='상담사 확인 필요: '+r.need.reason;cm.appendChild(w);}
