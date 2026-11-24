@@ -60,6 +60,7 @@ function draw(){
  var h='',sess=0;
  r.msgs.forEach(function(m,i){
   if(m.newSession)h+='<div class="sys">새 상담</div>';
+  if(m.who==='note')return; /* 상담 메모는 내부용, 고객 화면에 안 보임 */
   if(m.who==='cust'){h+='<div class="r me">'+(m.kind==='image'?'<div class="img">사진</div>':'<div class="b">'+esc(m.text)+'</div>')+'<div class="t">'+hm(m.at)+'</div></div>';}
   else{
    h+='<div class="r biz"><div class="nm">K-Beauty Station</div><div class="b">'+esc(m.text)

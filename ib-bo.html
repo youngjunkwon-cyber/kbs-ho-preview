@@ -2120,7 +2120,7 @@ function draw(){
  if(EL.gband)EL.gband.classList.toggle('on',p1&&!!S.waOff);
  if(EL.rsel)EL.rsel.style.display=p1?'none':''; /* 1차: 응대 드롭다운 숨김 (CSM-CHAT-08) */
  var vis=function(r){return !(p1&&r.ch==='WeChat')&&(r.msgs||[]).some(function(m){return m.who==='cust';});}; /* 1차: WeChat 범위 밖. 고객 메시지가 한 번도 없는 대화(환영 문구만, LINE 친구 추가만)는 목록·건수에 넣지 않는다 (SYS-CHAT-15) */
- if(!vis(P.room(S.bo.room)))S.bo.room=DB.rooms.filter(vis)[0].id;
+ if(p1&&P.room(S.bo.room).ch==='WeChat')S.bo.room=DB.rooms.filter(vis)[0].id; /* 고객 메시지가 아직 없는 대화는 목록에만 안 보이고, 열려 있던 대화는 그대로 둔다 */
  if(p1&&S.bo.filter==='ai')S.bo.filter=null;
  var TABS_=p1?TABS.filter(function(t){return t[0]!=='ai';}):TABS;
  /* ===== 상담함 ===== */
