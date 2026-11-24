@@ -6322,7 +6322,7 @@ th.fz-th:hover{background:#f0f0f0}
  window.addEventListener('message',function(e){var d=e.data||{};
   if('fzSort' in d)sort(+d.fzSort||0);
   if('fzExpand' in d){document.querySelectorAll('[data-fz-exp]').forEach(function(q){exp(q.getAttribute('data-fz-exp'),!!d.fzExpand)});var xa=document.querySelector('[data-fz-expall]');if(xa)xa.lastElementChild.textContent=d.fzExpand?'모두 접기':'모두 펼치기';setTimeout(function(){window.fzShow&&fzShow()},0);}
-  if('fzOff' in d){root.classList.toggle('fz-off',!!d.fzOff);setTimeout(function(){window.fzShow&&fzShow()},0);}
+  if('fzOff' in d){root.classList.toggle('fz-off',!!d.fzOff);setTimeout(function(){if(d.fzOff)document.querySelectorAll('.ant-table-content,.ant-table-body').forEach(function(c){c.scrollLeft=0;});else window.fzShow&&fzShow();},0);}
   if('fzNew' in d)root.classList.toggle('fz-new',!!d.fzNew);
   if(d.fzHeight)parent.postMessage({fzH:document.documentElement.scrollHeight,id:d.id},'*');});
  root.classList.add('fz-new');
