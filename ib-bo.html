@@ -1929,8 +1929,8 @@ var SR=[
  {f:'예약',t:'클리닉 예약 양식',b:'아래 내용을 알려 주시면 예약을 도와드리겠습니다.\n1. 이름 (여권 영문)\n2. 연락처 (국가번호 포함)\n3. 희망 클리닉\n4. 희망 시술\n5. 희망 날짜와 시간\n6. 인원'},
  {f:'결제·예약금',t:'예약금 안내',b:'예약금은 매장마다 다릅니다. 희망하시는 매장을 알려 주시면 확인해 드리겠습니다.'},
  {f:'상담 안내',t:'상담 시간 안내',b:'상담 시간은 평일 10:00~19:00 (한국 시간)입니다. 상담 시간 밖에 남겨 주신 문의는 다음 영업일에 순서대로 답변드립니다.'}
-],SRS={q:'',mg:false,ed:-1,op:{},cl:{}};
-function buildSR(){var p=document.createElement('section');p.id='srp';p.className=EL.aside.className;p.setAttribute('data-new','');
+],SR0=null,SRS={q:'',mg:false,ed:-1,op:{},cl:{}};
+function buildSR(){SR0=JSON.stringify(SR);var p=document.createElement('section');p.id='srp';p.className=EL.aside.className;p.setAttribute('data-new','');
  p.innerHTML='<div class="sh"><b>저장된 답장</b><a class="mgt" data-click>관리</a></div><div class="sq"><input placeholder="폴더, 제목, 내용 검색" data-click></div><div class="sb"></div><div class="sn"></div>';
  EL.ws.insertBefore(p,EL.aside);EL.sr=p;
  p.querySelector('.sq input').addEventListener('input',function(){SRS.q=this.value;drawSR();});
@@ -1949,7 +1949,7 @@ function buildSR(){var p=document.createElement('section');p.id='srp';p.classNam
   var ih=t.closest('[data-op]');if(ih){var k=ih.getAttribute('data-op');SRS.op[k]=!SRS.op[k];drawSR();}
  });
  drawSR();}
-function drawSR(){var p=EL.sr;if(!p)return;var q=SRS.q.trim().toLowerCase();
+function drawSR(){var p=EL.sr;if(!p)return;if(EL.srS!==P.S){if(EL.srS)SR=JSON.parse(SR0);EL.srS=P.S;SRS={q:'',mg:false,ed:-1,op:{},cl:{}};p.querySelector('.sq input').value='';} /* 시드 초기화·검수 케이스 시작 때 저장된 답장도 처음 상태로 */var q=SRS.q.trim().toLowerCase();
  p.querySelector('.mgt').textContent=SRS.mg?'완료':'관리';p.querySelector('.sq input').placeholder=P.S.p1?'제목, 내용 검색':'폴더, 제목, 내용 검색';
  var folders=[];SR.forEach(function(r){if(folders.indexOf(r.f)<0)folders.push(r.f);});var FO=P.S.p1?['*']:folders;
  var p1=!!P.S.p1;var form=function(r){return '<div class="sf"><input class="ff"'+(p1?' type="hidden"':'')+' list="srfl" placeholder="폴더 (새 이름을 쓰면 새 폴더)" value="'+esc(r?r.f:'')+'" data-click><datalist id="srfl">'+folders.map(function(f){return '<option value="'+esc(f)+'">';}).join('')+'</datalist><div class="cn"><input class="ft" maxlength="20" placeholder="제목 (20자까지)" value="'+esc(r?r.t:'')+'" data-click><small class="cft">'+[...(r?r.t:'')].length+' / 20</small></div><div class="cn"><textarea maxlength="1000" placeholder="내용 (1,000자까지)" data-click>'+esc(r?r.b:'')+'</textarea><small class="cfb">'+[...(r?r.b:'')].length+' / 1000</small></div><div class="er"></div><div class="bt"><button type="button" class="cc" data-click>취소</button><button type="button" class="ok" data-click>저장</button></div></div>';};
