@@ -6494,6 +6494,7 @@ div.ck.ck-balloon-panel.ck-mention-balloon { z-index: calc(var(--ck-z-dialog) + 
  var fp=st('busy').cloneNode(true);fp.setAttribute('data-s','failprev');fp.querySelector('.fz-busy').outerHTML=failBox("Frase 응답 없음(10분 넘김) · 2026-11-21 10:22 · 1시간 간격으로 3번 자동으로 다시 채점했지만 실패 · 이전 점수를 보여 주는 중");panel.appendChild(fp);
  st('fail').insertAdjacentHTML('beforeend',failBox("Frase 오류 · 2026-11-20 16:40 · 1시간 간격으로 3번 자동으로 다시 채점했지만 실패"));
  var fq=st('fail').cloneNode(true);fq.setAttribute('data-s','quota');var qb=fq.querySelector('[data-retry]');if(qb){qb.disabled=true;qb.removeAttribute('data-retry');qb.title='Frase 월 한도 소진';qb.style.cursor='not-allowed';qb.style.opacity='.5';}fq.querySelector('.cd-fail').outerHTML='<div class="cd-fail"><b>⚠ 채점 실패</b>'+"Frase 월 한도 소진 · 2026-11-22 09:10 · 한도가 다시 차면 자동으로 다시 채점"+'</div>';panel.appendChild(fq);
+ var bl=st('unpub').cloneNode(true);bl.setAttribute('data-s','blind');bl.querySelector('.fz-empty').textContent='블라인드를 풀면 점수가 나와요.';panel.appendChild(bl);
  var fb=document.createElement('div');fb.className='fz-state';fb.setAttribute('data-s','busyfirst');fb.innerHTML='<div class="fz-empty">다시 채점 중</div>';panel.appendChild(fb);
  var LANG='zh-CN';
  function tab(k){LANG=k;document.querySelectorAll('.cd-tab').forEach(function(x){x.classList.toggle('on',x.getAttribute('data-k')===k)});
@@ -6503,8 +6504,8 @@ div.ck.ck-balloon-panel.ck-mention-balloon { z-index: calc(var(--ck-z-dialog) + 
  function show(s){card.style.display=s==='off'?'none':'';if(s==='orig')tab('original');else tab('zh-CN');
   panel.querySelectorAll('.fz-state').forEach(function(e){e.style.display=e.getAttribute('data-s')===s?'block':'none'});
   panel.classList.remove('fz-open');panel.querySelectorAll('[data-fz-more]').forEach(function(b){b.textContent='전체 보기'});
-  var hide=(s==='unpub'||s==='fail'||s==='busyfirst'||s==='quota'||s==='partial');var c=document.querySelector('[data-chip="zh-CN"]');if(c)c.style.display=hide?'none':'';document.querySelectorAll('[data-chip]').forEach(function(x){if(s==='off')x.style.display='none';else if(x!==c)x.style.display='';});
-  var pub=document.getElementById('cdPub');pub.textContent=s==='unpub'?'숨김':'게시중';pub.className='ant-tag ant-tag-filled css-19u5a7b css-var-root'+(s==='unpub'?'':' ant-tag-green');}
+  var hide=(s==='unpub'||s==='fail'||s==='busyfirst'||s==='quota'||s==='partial'||s==='blind');var c=document.querySelector('[data-chip="zh-CN"]');if(c)c.style.display=hide?'none':'';document.querySelectorAll('[data-chip]').forEach(function(x){if(s==='off')x.style.display='none';else if(x!==c)x.style.display='';});
+  var pub=document.getElementById('cdPub');pub.textContent=s==='unpub'?'숨김':s==='blind'?'블라인드':'게시중';pub.className='ant-tag ant-tag-filled css-19u5a7b css-var-root'+(s==='unpub'?'':s==='blind'?' ant-tag-red':' ant-tag-green');}
  document.addEventListener('click',function(e){
   var t=e.target.closest('.cd-tab');if(t){show(t.getAttribute('data-k')==='original'?'orig':'scored');return;}
   var m=e.target.closest('[data-fz-more]');if(m){panel.classList.toggle('fz-open');var o=panel.classList.contains('fz-open');panel.querySelectorAll('[data-fz-more]').forEach(function(b){b.textContent=o?'접기':'전체 보기'});e.preventDefault();return;}
