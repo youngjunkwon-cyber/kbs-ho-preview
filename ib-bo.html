@@ -1807,7 +1807,7 @@ function init(){
  /* 1차 입력 도구: 동영상(모든 채널), 1:1 상담 안내(스토어·상품 채팅만) */
  /* 1차 저장된 답장: 상담창과 상담 정보 사이 고정 패널 */
  buildSR();
- EL.vidBtn=QA('button',tools).filter(function(x){return /이미지/.test((x.title||'')+(x.getAttribute('aria-label')||'')+x.textContent);})[0];if(!EL.vidBtn){EL.vidBtn=mkBtn('이미지·동영상','vidBtn');tools.appendChild(EL.vidBtn);}EL.vidBtn.setAttribute('data-click','');EL.vidBtn.addEventListener('click',function(e){e.preventDefault();P.sendVideo(P.S.bo.room);}); /* 이미지·동영상 한 버튼 (CSM-CHAT-16) */
+ EL.vidBtn=QA('button',tools).filter(function(x){return /이미지/.test((x.title||'')+(x.getAttribute('aria-label')||'')+x.textContent);})[0];if(!EL.vidBtn){EL.vidBtn=mkBtn('이미지·동영상','vidBtn');tools.appendChild(EL.vidBtn);}EL.vidBtn.setAttribute('data-click','');EL.vidBtn.addEventListener('click',function(e){e.preventDefault();if(P.S.p1)P.sendImage(P.S.bo.room);else P.sendVideo(P.S.bo.room);}); /* 이미지·동영상 한 버튼 (CSM-CHAT-16). 1차는 이미지만, 동영상은 나중 */
  EL.guideBtn=mkBtn('1:1 상담 안내','guideBtn');EL.guideBtn.classList.add('txt');tools.appendChild(EL.guideBtn);EL.guideBtn.addEventListener('click',function(e){e.preventDefault();P.sendGuide(P.S.bo.room);});
  EL.pv=document.createElement('div');EL.pv.id='pv';EL.pv.style.display='none';EL.pv.setAttribute('data-new','');ta.parentElement.after(EL.pv);
  EL.note=document.createElement('div');EL.note.id='cnote';EL.note.setAttribute('data-new','');EL.composer.insertBefore(EL.note,EL.composer.firstChild);
@@ -1988,7 +1988,7 @@ function openPw(){
   if(!er.textContent){er.style.color='#067647';er.textContent='비밀번호가 변경되었습니다.';setTimeout(function(){m.remove();},900);}});
 }
 /* 1차 상담 분류: 완료 때 고른 값. 완료 전은 없음 */
-function tpOf(r){if(!P.S.p1)return P.topics(r).list;if(r.impSess&&r.session<=r.impSess)return [];if(r.status!=='상담종료')return [];return r.doneTopics||P.topics(r).list;}
+function tpOf(r){if(!P.S.p1)return P.topics(r).list;if(r.impSess&&r.session<=r.impSess)return P.topics(r).list; /* 가져온 기록: 가져올 때 자동분류, 통계 포함 */if(r.status!=='상담종료')return [];return r.doneTopics||P.topics(r).list;}
 var STORES=['k-beauty의원','A피부과 강남점','B헤어 명동점','C스튜디오 성수','D의원 압구정'];
 /* 문의 대상 후보: 스토어만 또는 스토어 · 상품 (상품을 고르면 스토어가 따라 정해진다) */
 var TGT=STORES.concat(['k-beauty의원 · 리쥬란 스킨부스터','k-beauty의원 · 보톡스 (사각턱)','A피부과 강남점 · 레이저 토닝','B헤어 명동점 · 헤드스파','B헤어 명동점 · 펌','C스튜디오 성수 · 프로필 촬영 베이직','D의원 압구정 · 울쎄라']);
@@ -2216,7 +2216,7 @@ function draw(){
  var lock=T==='done'||waOver||waOff||lineZero;
  EL.lq.style.display=p1&&r.ch==='LINE'?'':'none';EL.lq.textContent='이번 달 남은 발송 '+Math.max(0,DB.store.lineLeft)+' / 500';EL.lq.classList.toggle('zero',DB.store.lineLeft<=0);
  EL.guideBtn.style.display=p1&&r.ch==='플랫폼'&&r.type!=='고객지원'?'':'none';
- EL.srLock=lock;drawSR();setTimeout(syncPv,0);[EL.vidBtn,EL.guideBtn].forEach(function(b){b.disabled=lock;b.style.opacity=lock?'.5':'';});
+ EL.srLock=lock;drawSR();EL.vidBtn.title=p1?'이미지':'이미지·동영상';EL.vidBtn.setAttribute('aria-label',EL.vidBtn.title);setTimeout(syncPv,0);[EL.vidBtn,EL.guideBtn].forEach(function(b){b.disabled=lock;b.style.opacity=lock?'.5':'';});
  [EL.ta,EL.send,EL.pvBtn].forEach(function(e){e.disabled=lock;e.style.opacity=lock?'.5':'';});EL.tools.style.display=T==='done'?'none':'';EL.sendRow.style.display=T==='done'?'none':'flex';EL.ta.parentElement.style.display=T==='done'?'none':'';
  EL.ta.placeholder=lang!=='ko'&&!own?'메시지 입력 ('+(LN[lang]||lang)+' 자동번역)':'메시지 입력';
  EL.langTxt.textContent='고객 언어: '+(LN[lang]||lang);
@@ -2259,7 +2259,7 @@ function draw(){
  var link=function(html){var d=document.createElement('a');d.href='#';d.className='bk';d.setAttribute('data-click','');d.innerHTML=html;return d;};
  if(pt==='ai'&&p1){ /* 1차 상담 개요: 상담 분류(완료 때 고른 값), 문의 대상, 접수 정보 */
   var imp=r.impSess&&r.session<=r.impSess,dt=tpOf(r);
-  ctx.appendChild(H('상담 분류',imp?'가져온 기록':null));
+  ctx.appendChild(H('상담 분류',imp?'가져온 기록 · 자동 분류':null));
   var tw1=document.createElement('div');tw1.className='tpw';tw1.setAttribute('data-new','');tw1.innerHTML=dt.length?dt.map(function(t){return '<span class="tpchip" style="padding-right:10px">'+esc(t)+'</span>';}).join(''):'<span class="tpnone">'+(imp?'없음 (통계 제외)':'상담 완료할 때 고릅니다')+'</span>';ctx.appendChild(tw1);
   ctx.appendChild(H('문의 대상'));
   var tg=document.createElement('div');tg.className='tgt';tg.setAttribute('data-new','');

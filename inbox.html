@@ -760,6 +760,7 @@ function waBlocked(r){if(r.ch!=='WhatsApp')return '';if(S.waOff)return 'off';var
 function agentOut(r,m){if(lineBlocked(r)||waBlocked(r))return false;push(r,m);r.msgs.forEach(function(z){if(z.who==='cust')z.answered=true;});r.handler='agent';r.agentAt=S.now;r.aiOn=false;if(!r.card.owner)r.card.owner='김상담';if(r.ch==='LINE')DB.store.lineLeft--;render();return true;}
 function sendGuide(id){var r=room(id);push(r,{who:'agent',kind:'guide',text:'1:1 상담 안내'});(r.p1Log=r.p1Log||[]).push([S.now,'1:1 상담 안내 보냄']);render();} /* CSM-CHAT-34. 답장으로 치지 않는다 (SYS-CHAT-02는 답장·상품 카드만) */
 function sendVideo(id){agentOut(room(id),{who:'agent',kind:'video',text:'[동영상] clinic_tour.mp4 · 12.4MB'});} /* MP4 16MB 이하 */
+function sendImage(id){agentOut(room(id),{who:'agent',kind:'image',text:'[이미지] clinic_map.jpg · 1.2MB'});} /* 1차: 이미지만 (JPG·PNG·WebP 10MB) */
 function setTarget(id,v){var r=room(id);r.target=v;render();} /* CSM-CHAT-35 문의 대상 */
 function addNote(id,text){var r=room(id);if(!text.trim())return;push(r,{who:'note',text:text.trim(),by:r.card.owner||'김상담'});render();} /* 상담 메모: 대화 안 내부 글, 고객에게 안 감 */ /* 상담 시작 = 상담사가 잡음 (AI 끄기와 같은 동작, 답장 전에도 진행으로) */
 /* 시계 */
@@ -804,7 +805,7 @@ window.IB={get DB(){return DB;},get S(){return S;},get SLACK(){return SLACK;},CH
  room:room,fmtTs:fmtTs,unans:unans,storeLabel:storeLabel,suggest:function(r){return suggest(r);},inHours:inHours,fmtDay:fmtDay,custSend:custSend,agentSend:agentSend,complete:complete,setAI:setAI,takeOver:takeOver,updateCard:updateCard,addNote:addNote,sendProduct:sendProduct,get RECENT(){return RECENT;},summary:function(r){return summarize(r);},topics:function(r){return topics(r);},editTopic:editTopic,TOPICS:TOPICS,NOASK:NOASK,tick:tick,scnState:scnState,hist:hist,
  scn:{get:function(){return JSON.parse(JSON.stringify(DB.scn));},save:function(v){DB.scn=JSON.parse(JSON.stringify(v));try{localStorage.setItem('ib-scn',JSON.stringify(DB.scn));}catch(e){}render();},defaults:function(){return defaultScn();},idleTest:idleTest,reset:function(){DB.scn=defaultScn();try{localStorage.removeItem('ib-scn');}catch(e){}render();return JSON.parse(JSON.stringify(DB.scn));},INTENTS:INTENTS,EXITS:SCN_EXITS,FIELDS:FIELDS,SLOT:SLOT,
   test:function(text,o){o=o||{};var keep=DB.scn;if(o.scn)DB.scn=o.scn;try{return scnTest(text,o);}finally{DB.scn=keep;}}},
-aiAllowed:aiAllowed,render:render,p1View:p1View,sendGuide:sendGuide,sendVideo:sendVideo,setTarget:setTarget,lineBlocked:lineBlocked,waBlocked:waBlocked,
+aiAllowed:aiAllowed,render:render,p1View:p1View,sendGuide:sendGuide,sendVideo:sendVideo,sendImage:sendImage,setTarget:setTarget,lineBlocked:lineBlocked,waBlocked:waBlocked,
  login:function(){S.login=false;render();},logout:function(){S.login=true;render();},
  openRoom:function(id){S.bo.room=id;render();},
  ready:function(){render();}};
