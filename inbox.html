@@ -632,7 +632,7 @@ function hist(r){var out=[],gi=0,groups=[];r.msgs.map(function(m){var v=p1View(m
   if(last&&!agent&&r.agentAt&&r.agentAt>=g.at){agent=true;ev.push([r.agentAt,'상담 시작 · '+who]);}
   (r.ownerLog||[]).forEach(function(o){if(o[0]>=g.at&&(!next||o[0]<next.at))ev.push([o[0],'담당 변경 · '+o[1]+' → '+o[2]]);});
   (r.p1Log||[]).forEach(function(o){if(o[0]>=g.at&&(!next||o[0]<next.at))ev.push([o[0],o[1]]);});
-  if(r.impSess&&g.n<=r.impSess){var itp=[];g.list.forEach(function(m){if(m.who!=='cust'||m.kind==='image')return;var c=classify(m.text,r);if(c.kind==='greet')return;var t=topicOf(c,(m.ko||'')+' '+m.text);if(itp.indexOf(t)<0)itp.push(t);});if(itp.length>1)itp=itp.filter(function(x){return x!=='기타';});ev=[[g.at,'가져온 기록 · 자동 분류 '+(itp.length?itp.join(', '):'문의 없음')+' (통계 포함)']];}
+  if(r.impSess&&g.n<=r.impSess){var itp=[];g.list.forEach(function(m){if(m.who!=='cust'||m.kind==='image')return;var c=classify(m.text,r);if(c.kind==='greet')return;var t=topicOf(c,(m.ko||'')+' '+m.text);if(itp.indexOf(t)<0)itp.push(t);});if(itp.length>1)itp=itp.filter(function(x){return x!=='기타';});ev=[[g.at,'가져온 기록 · 자동 분류 '+(itp.length?itp.join(', '):'문의 없음')+'']];}
   else if((!last||r.status==='상담종료')&&!(last&&r.p1Log&&r.p1Log.some(function(o){return /^상담 완료/.test(o[1])&&o[0]>=g.at;})))ev.push([end,'상담 완료'+(agent?' · '+who:S.p1?'':' (AI 단독)')]);
   ev.sort(function(a,b){return a[0]<b[0]?-1:a[0]>b[0]?1:0;});ev.forEach(function(e){out.push({n:g.n,at:e[0],t:e[1]});});});
  return out;}
