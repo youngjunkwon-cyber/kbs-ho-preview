@@ -2085,6 +2085,7 @@ function chSvg(r,z){if(r.ch==='플랫폼'||!CHI[r.ch])return '<img src="'+KBS_IC
 function chIcon(r,big){return '<span class="chi" title="'+esc(chLabel(r))+'">'+chSvg(r,big?18:16)+(chSub(r)?'<em>'+esc(chSub(r))+'</em>':'')+'</span>';}
 var LINE_NAME={'메인':'K-Beauty Station','TW':'K-Beauty Station TW'}; /* LINE 공식계정 표시 이름을 연결 때 가져온 값 (사람이 정하지 않음, CSM-CHAT-08) */
 function chName(r){return r.ch==='LINE'?(LINE_NAME[r.lineAcct||'메인']||r.lineAcct):chLabel(r);}
+function maskId(ch,id){id=String(id||'');if(ch!=='WhatsApp')return id;var p=id.trim().split(/\s+/);if(p.length<2)return id;var cc=p[0],rest=p.slice(1).join('').replace(/\D/g,'');if(rest.length<6)return id;return cc+' '+rest.slice(0,rest.length-8)+(rest.length>8?'-':'')+'****-'+rest.slice(-4);} /* 채널 ID가 전화번호면 가운데 가림 (CSM-CHAT-28) */
 function chLabel(r){if(r.ch==='LINE')return 'LINE '+(LINE_NAME[r.lineAcct||'메인']||r.lineAcct);if(r.ch!=='플랫폼')return r.ch;return {'고객지원':'CS채팅','스토어 문의':'스토어채팅','상품 문의':'상품채팅'}[r.type]||'인앱채팅';}
 function relTs(ts){var S=P.S,d=ts.slice(0,10),n=S.now.slice(0,10);if(d===n)return ts.slice(11,16);var y=new Date(n+'T00:00:00');y.setDate(y.getDate()-1);var ys=y.getFullYear()+'-'+('0'+(y.getMonth()+1)).slice(-2)+'-'+('0'+y.getDate()).slice(-2);if(d===ys)return '어제';return (+d.slice(5,7))+'. '+(+d.slice(8,10))+'.';}
 function tsMin(ts){return new Date(ts.replace(' ','T')+':00').getTime()/60000;}
@@ -2289,7 +2290,7 @@ function draw(){
    tg.addEventListener('click',function(e){if(e.target.closest('[data-clr]'))P.setTarget(r.id,'');});}
   ctx.appendChild(tg);
   ctx.appendChild(H('접수 정보'));
-  ctx.appendChild(fact('채널',chLabel(r)));(function(){var f=ctx.lastChild,v=f&&f.lastElementChild;if(v)v.innerHTML='<span class="chi">'+chSvg(r,18)+'</span> '+esc(chName(r));})();ctx.appendChild(fact('채널 ID',r.cid));if(isMsgr(r))ctx.appendChild(fact('연결 상태',(r.ch==='WhatsApp'&&S.waOff)?'연결 끊김':r.chState));
+  ctx.appendChild(fact('채널',chLabel(r)));(function(){var f=ctx.lastChild,v=f&&f.lastElementChild;if(v)v.innerHTML='<span class="chi">'+chSvg(r,18)+'</span> '+esc(chName(r));})();ctx.appendChild(fact('채널 ID',maskId(r.ch,r.cid)));if(isMsgr(r))ctx.appendChild(fact('연결 상태',(r.ch==='WhatsApp'&&S.waOff)?'연결 끊김':r.chState));
   ctx.appendChild(fact('접수 일시',P.fmtTs((function(){var a=r.first;r.msgs.forEach(function(m){if(m.newSession)a=m.at;});return a;})())));
  }
  if(pt==='ai'&&!p1){
@@ -2304,7 +2305,7 @@ function draw(){
   var sd=document.createElement('div');sd.className='aisum';sd.setAttribute('data-new','');sd.innerHTML=sm?'<div class="l1">'+esc(sm.l1)+'</div><div class="l2">'+esc(sm.l2)+'</div><a href="#" class="resum" data-click>다시 요약</a><a href="#" class="tomemo" data-click>메모로 저장</a><a href="#" class="cpsum" data-click>복사</a>':'<div class="l2 ph">'+(T==='ai'?'AI 응대 중':'-')+'</div>';ctx.appendChild(sd);
   sd.addEventListener('click',function(e){var txt=sm?sm.l1+' '+sm.l2:'';if(e.target.closest('.resum')){e.preventDefault();draw();return;}if(e.target.closest('.tomemo')){e.preventDefault();P.S.bo.noteOpen=true;draw();var ta2=Q('#notebox textarea');if(ta2){ta2.value='[AI 요약] '+txt;ta2.focus();ta2.scrollIntoView({block:'nearest'});}return;}if(e.target.closest('.cpsum')){e.preventDefault();try{navigator.clipboard.writeText(txt);}catch(_){}var a=e.target.closest('.cpsum');a.textContent='복사됨';setTimeout(function(){a.textContent='복사';},1200);}});
   ctx.appendChild(H('접수 정보'));
-  ctx.appendChild(fact('스토어',r.store?P.storeLabel(r)+' (#'+r.store+')':'K-Beauty Station'));ctx.appendChild(fact('채널 ID',r.cid));if(isMsgr(r))ctx.appendChild(fact('연결 상태',r.chState));
+  ctx.appendChild(fact('스토어',r.store?P.storeLabel(r)+' (#'+r.store+')':'K-Beauty Station'));ctx.appendChild(fact('채널 ID',maskId(r.ch,r.cid)));if(isMsgr(r))ctx.appendChild(fact('연결 상태',r.chState));
   ctx.appendChild(fact('접수 일시',P.fmtTs((function(){var a=r.first;r.msgs.forEach(function(m){if(m.newSession)a=m.at;});return a;})())));
   ctx.appendChild(H('AI 응대'));
   ctx.appendChild(fact('AI 상태',!allowed?'미사용 스토어':on?'응대 중':T==='prog'?(r.byStore?'OFF · 스토어 응대':'OFF · 상담사 응대'):T==='done'?'상담 완료':'중단'));
