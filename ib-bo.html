@@ -1798,7 +1798,7 @@ function init(){
   var push=QA('.ant-typography',sendRow).filter(function(x){return /Push/.test(x.textContent);})[0];EL.push=push;if(push){push.style.cssText+=';font-size:11px;color:#8c8c8c;margin-left:2px;min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis';push.title=push.textContent;holder.appendChild(push);holder.style.gap='8px';}
   EL.lq=document.createElement('span');EL.lq.id='lq';EL.lq.setAttribute('data-new','');holder.appendChild(EL.lq); /* LINE 발송 한도 (CSM-CHAT-16) */
   EL.pvBtn=mkBtn('번역 미리보기','pvBtn');sendRow.insertBefore(EL.pvBtn,send);
-  EL.pvBtn.addEventListener('click',function(){var on=EL.pv.style.display==='none';EL.pv.style.display=on?'':'none';if(on)EL.pv.textContent=ta.value.trim()?'번역 미리보기 · '+(LN[P.room(P.S.bo.room).lang]||'고객 언어')+': (시안: 번역 결과 자리) '+ta.value.trim():'메시지를 입력하세요';});
+  EL.pvBtn.style.display='none';ta.addEventListener('input',function(){syncPv();}); /* 번역 미리보기 버튼 없음: 자동번역이 켜져 있으면 입력하는 대로 아래에 바로 보인다 */
   EL.sendRow=sendRow;
  }
  /* 상품 카드 모달: 언어 탭 + 즉시 검색 + 최근 보낸 상품 + 미리보기 */
@@ -1921,8 +1921,8 @@ function init(){
  document.head.appendChild(st);
  layout();
 }
-/* 번역 미리보기 = 자동번역 스위치에 딸린 버튼. 스위치가 꺼졌거나 안 보이면(한국어 대화) 숨긴다 */
-function syncPv(){if(!EL.pvBtn)return;var sp=EL.trSpace,on=!!(EL.sw&&EL.sw.classList.contains('ant-switch-checked')&&sp&&sp.offsetParent!==null&&getComputedStyle(sp).display!=='none');EL.pvBtn.style.display=on?'':'none';if(!on&&EL.pv)EL.pv.style.display='none';}
+/* 번역 미리보기 = 자동번역에 딸린 기능. 별도 버튼 없이, 자동번역 ON이고 입력한 글이 있으면 입력칸 아래에 바로 보인다. OFF·한국어 대화면 숨김 */
+function syncPv(){if(!EL.pvBtn)return;var sp=EL.trSpace,on=!!(EL.sw&&EL.sw.classList.contains('ant-switch-checked')&&sp&&sp.offsetParent!==null&&getComputedStyle(sp).display!=='none');EL.pvBtn.style.display='none';var tx=EL.ta?EL.ta.value.trim():'';if(!EL.pv)return;if(!on||!tx){EL.pv.style.display='none';return;}EL.pv.style.display='';EL.pv.textContent='번역 미리보기 · '+(LN[P.room(P.S.bo.room).lang]||'고객 언어')+': (시안: 번역 결과 자리) '+tx;}
 /* ===== 1차: 저장된 답장 ===== */
 var SR=[
  {f:'예약',t:'예약 변경·취소 방법',b:'사이트에서 예약하셨다면 마이페이지 > 예약 내역에서 날짜·시간 변경과 취소를 직접 하실 수 있습니다. 방문 전날 자정까지 가능합니다.'},
@@ -2118,7 +2118,7 @@ function draw(){
  if(EL.login)EL.login.classList.toggle('on',p1&&!!S.login);
  if(EL.gband)EL.gband.classList.toggle('on',p1&&!!S.waOff);
  if(EL.rsel)EL.rsel.style.display=p1?'none':''; /* 1차: 응대 드롭다운 숨김 (CSM-CHAT-08) */
- var vis=function(r){return !(p1&&r.ch==='WeChat');}; /* 1차: WeChat 범위 밖 */
+ var vis=function(r){return !(p1&&r.ch==='WeChat')&&(r.msgs||[]).some(function(m){return m.who==='cust';});}; /* 1차: WeChat 범위 밖. 고객 메시지가 한 번도 없는 대화(환영 문구만, LINE 친구 추가만)는 목록·건수에 넣지 않는다 (SYS-CHAT-15) */
  if(!vis(P.room(S.bo.room)))S.bo.room=DB.rooms.filter(vis)[0].id;
  if(p1&&S.bo.filter==='ai')S.bo.filter=null;
  var TABS_=p1?TABS.filter(function(t){return t[0]!=='ai';}):TABS;
