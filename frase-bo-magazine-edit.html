@@ -6213,10 +6213,14 @@ html body { overflow-y: hidden; }
 .fz-panel{--fz-acc:#EF4F7B;--fz-trk:#F1F2F5}
 .fz-panel.fz-bo{--fz-acc:#1677FF}
 .fz-top{display:flex;align-items:center;gap:16px;margin-top:2px}
-.fz-ring{width:88px;height:88px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center}
-.fz-ring i{width:70px;height:70px;border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-style:normal}
-.fz-ring b{font-size:26px;line-height:1;font-weight:700;color:var(--fz-tx)}
-.fz-ring small{font-size:14px;color:var(--fz-sub);margin-top:2px}
+.fz-ring{position:relative;width:96px;height:96px;flex:none}
+.fz-ring svg{position:absolute;inset:0;width:96px;height:96px;transform:rotate(-90deg)}
+.fz-ring circle{fill:none;stroke-width:8}
+.fz-ring .fz-rr{stroke:rgba(0,0,0,.06)}
+.fz-ring .fz-rv{stroke:var(--fz-acc);stroke-linecap:round}
+.fz-ring i{position:absolute;inset:0;display:flex;align-items:baseline;justify-content:center;padding-top:30px;box-sizing:border-box;font-style:normal}
+.fz-ring b{font-size:30px;line-height:1;font-weight:600;color:var(--fz-tx);letter-spacing:-.5px}
+.fz-ring small{font-size:14px;color:var(--fz-tx);margin-left:1px}
 .fz-msg{font-size:15px;line-height:1.5;color:var(--fz-tx);word-break:keep-all}
 .fz-msg strong{display:block;font-size:17px;margin-bottom:2px}
 .fz-bars{margin:14px 0 4px;display:flex;flex-direction:column;gap:10px}
@@ -6227,7 +6231,7 @@ html body { overflow-y: hidden; }
 .fz-bar .fz-bd{font-size:14px;color:var(--fz-sub);margin:1px 0 5px}
 .fz-bar .fz-tr{height:8px;border-radius:4px;background:var(--fz-trk);overflow:hidden}
 .fz-bar .fz-tr i{display:block;height:100%;border-radius:4px;background:var(--fz-acc)}
-.fz-ring0{background:var(--fz-trk)}
+.fz-ring0{background:none}
 .fz-ring0 b{color:var(--fz-sub)}
 .fz-bars0 .fz-bt em{color:var(--fz-sub);font-weight:600}
 .fz-chk{display:flex;align-items:center;gap:8px;margin:12px 0 4px}
@@ -6278,13 +6282,15 @@ html body { overflow-y: hidden; }
 .fz-todo .fz-how b{color:rgba(0,0,0,.88);font-weight:600;margin-right:6px}
 .fz-pretag{background:#fff;border:1px solid #d9d9d9;color:rgba(0,0,0,.88);border-radius:4px;font-weight:400}
 .fz-note{background:#fff;border:1px solid #f0f0f0;border-radius:8px;color:rgba(0,0,0,.65)}
-.fz-empty{border:1px dashed #d9d9d9;border-radius:8px;color:rgba(0,0,0,.65)}
+.fz-empty{display:flex;align-items:center;gap:16px;margin-top:4px;padding:0;border:0;border-radius:0;text-align:left;font-size:15px;font-weight:600;color:rgba(0,0,0,.88)}
+.fz-empty::before{content:'';width:96px;height:96px;border-radius:50%;box-shadow:inset 0 0 0 8px rgba(0,0,0,.06);flex:none}
 .fz-help{border-color:#d9d9d9;border-radius:8px;color:rgba(0,0,0,.88)}
 .fz-left{border-color:#d9d9d9;color:rgba(0,0,0,.88)}
 .fz-ring0 b,.fz-bars0 .fz-bt em{color:rgba(0,0,0,.25)}
 .fz-todo li{border-top-color:#f0f0f0}
 .fz-todo li div{line-height:1.6}
 .fz-secd{font-size:14px;color:rgba(0,0,0,.65);margin:0 0 4px}
+.fz-panel .fz-sec{margin-top:20px;padding-top:16px;border-top:1px solid #f0f0f0}
 .fz-ckl li{align-items:center;gap:10px;padding:12px 0}
 .fz-ckl li::before{content:none!important;display:none!important}
 .fz-box{width:18px;height:18px;border:1.5px solid #d9d9d9;border-radius:4px;flex:none;background:#fff}
@@ -6308,24 +6314,24 @@ html body { overflow-y: hidden; }
   <div class="fz-head"><span class="fz-title">콘텐츠 점수</span><span class="fz-q" data-fz-help>?</span><span class="fz-lang">영어</span></div>
   <div class="fz-help"><b>세 점수의 평균이에요.</b> 검색 노출(SEO), AI 답변(GEO), 신뢰도(EEAT)를 각각 매겨 평균을 냅니다. 점수가 낮아도 저장과 게시는 그대로 돼요.</div>
   <div class="fz-state" data-s="scored"><div class="fz-desc">마지막 채점 2026-11-17 15:59</div>
-   <div class="fz-top"><div class="fz-ring" style="background:conic-gradient(var(--fz-acc) 52%,var(--fz-trk) 0)"><i><b>52</b><small>/ 100</small></i></div><div class="fz-msg"><strong>100점에 가까울수록 좋아요</strong>검색과 AI 답변에 이 글이 얼마나 잘 보일지 매긴 점수예요.</div></div>
+   <div class="fz-top"><div class="fz-ring"><svg viewBox="0 0 100 100"><circle class="fz-rr" cx="50" cy="50" r="42"/><circle class="fz-rv" cx="50" cy="50" r="42" stroke-dasharray="137.22 263.89"/></svg><i><b>52</b><small>점</small></i></div><div class="fz-msg"><strong>100점에 가까울수록 좋아요</strong>검색과 AI 답변에 이 글이 얼마나 잘 보일지 매긴 점수예요.</div></div>
    <div class="fz-bars"><div class="fz-bar"><div class="fz-bt"><b>검색 노출</b><span>SEO</span><em>70</em></div><div class="fz-bd">구글 같은 검색에 잘 나오는지</div><div class="fz-tr"><i style="width:70%"></i></div></div><div class="fz-bar"><div class="fz-bt"><b>AI 답변</b><span>GEO</span><em>63</em></div><div class="fz-bd">ChatGPT 같은 AI가 답할 때 이 글을 쓰는지</div><div class="fz-tr"><i style="width:63%"></i></div></div><div class="fz-bar"><div class="fz-bt"><b>신뢰도</b><span>EEAT</span><em>24</em></div><div class="fz-bd">경험과 전문성이 드러나 믿을 만한지</div><div class="fz-tr"><i style="width:24%"></i></div></div></div><div class="fz-chk"><span class="fz-chk-d">저장 전 글로 점수를 확인해요</span><span class="fz-left">오늘 10회 남음</span><button type="button" class="ant-btn css-19u5a7b css-var-root ant-btn-default ant-btn-color-default ant-btn-variant-outlined" data-fz-check>점수 확인</button></div>
    <div class="fz-sec">개선 제안 3개</div><div class="fz-secd">고치면 점수가 올라요</div><ol class="fz-todo fz-ckl"><li><div class="fz-it"><b>제목 29자 줄이기</b><span>지금 89자 · 60자까지</span></div><button type="button" class="fz-go ant-btn css-19u5a7b css-var-root ant-btn-default ant-btn-color-default ant-btn-variant-outlined" data-fz-go="title">제목 칸으로</button></li><li><div class="fz-it"><b>시술 뜻을 한 문장으로 쓰기</b><span>"울쎄라는 ~ 시술입니다"처럼</span></div><button type="button" class="fz-go ant-btn css-19u5a7b css-var-root ant-btn-default ant-btn-color-default ant-btn-variant-outlined" data-fz-go="body">본문으로</button></li><li><div class="fz-it"><b>글 끝에 핵심 요약 넣기</b><span>가장 중요한 내용을 3~5줄로</span></div><button type="button" class="fz-go ant-btn css-19u5a7b css-var-root ant-btn-default ant-btn-color-default ant-btn-variant-outlined" data-fz-go="body">본문으로</button></li></ol>
    <button type="button" class="fz-more ant-btn css-19u5a7b css-var-root ant-btn-default ant-btn-color-default ant-btn-variant-outlined" data-fz-more>전체 보기</button>
    <div class="fz-detail"><div class="fz-grp"><h4><span>검색 노출 <span class="fz-of2">SEO</span></span><span>70<span class="fz-of2">/ 100</span></span></h4><div class="fz-row"><div class="fz-n">메타</div><div class="fz-v">75<span class="fz-of2">/ 100</span></div></div><div class="fz-row"><div class="fz-n">구조</div><div class="fz-v">65<span class="fz-of2">/ 100</span></div></div><div class="fz-row"><div class="fz-n">가독성</div><div class="fz-v">75<span class="fz-of2">/ 100</span></div></div></div><div class="fz-grp"><h4><span>AI 답변 <span class="fz-of2">GEO</span></span><span>63<span class="fz-of2">/ 100</span></span></h4><div class="fz-row"><div class="fz-n">인용 가능성</div><div class="fz-v">72<span class="fz-of2">/ 100</span></div></div><div class="fz-row"><div class="fz-n">구조</div><div class="fz-v">75<span class="fz-of2">/ 100</span></div></div><div class="fz-row"><div class="fz-n">정의</div><div class="fz-v">70<span class="fz-of2">/ 100</span></div></div><div class="fz-row"><div class="fz-n">핵심 요약</div><div class="fz-v">67<span class="fz-of2">/ 100</span></div></div><div class="fz-row"><div class="fz-n">인용</div><div class="fz-v">40<span class="fz-of2">/ 100</span></div></div></div><div class="fz-grp"><h4><span>신뢰도 <span class="fz-of2">EEAT</span></span><span>24<span class="fz-of2">/ 100</span></span></h4><div class="fz-row"><div class="fz-n">경험</div><div class="fz-v">20<span class="fz-of2">/ 100</span></div></div><div class="fz-row"><div class="fz-n">전문성</div><div class="fz-v">20<span class="fz-of2">/ 100</span></div></div><div class="fz-row"><div class="fz-n">신뢰</div><div class="fz-v">45<span class="fz-of2">/ 100</span></div></div></div>
    </div></div>
   <div class="fz-state" data-s="busy"><div class="fz-desc">마지막 채점 2026-11-17 15:59</div>
-   <div class="fz-top"><div class="fz-ring" style="background:conic-gradient(var(--fz-acc) 52%,var(--fz-trk) 0)"><i><b>52</b><small>/ 100</small></i></div><div class="fz-msg"><strong>100점에 가까울수록 좋아요</strong>검색과 AI 답변에 이 글이 얼마나 잘 보일지 매긴 점수예요.</div></div>
+   <div class="fz-top"><div class="fz-ring"><svg viewBox="0 0 100 100"><circle class="fz-rr" cx="50" cy="50" r="42"/><circle class="fz-rv" cx="50" cy="50" r="42" stroke-dasharray="137.22 263.89"/></svg><i><b>52</b><small>점</small></i></div><div class="fz-msg"><strong>100점에 가까울수록 좋아요</strong>검색과 AI 답변에 이 글이 얼마나 잘 보일지 매긴 점수예요.</div></div>
    <div class="fz-bars"><div class="fz-bar"><div class="fz-bt"><b>검색 노출</b><span>SEO</span><em>70</em></div><div class="fz-bd">구글 같은 검색에 잘 나오는지</div><div class="fz-tr"><i style="width:70%"></i></div></div><div class="fz-bar"><div class="fz-bt"><b>AI 답변</b><span>GEO</span><em>63</em></div><div class="fz-bd">ChatGPT 같은 AI가 답할 때 이 글을 쓰는지</div><div class="fz-tr"><i style="width:63%"></i></div></div><div class="fz-bar"><div class="fz-bt"><b>신뢰도</b><span>EEAT</span><em>24</em></div><div class="fz-bd">경험과 전문성이 드러나 믿을 만한지</div><div class="fz-tr"><i style="width:24%"></i></div></div></div>
    <div class="fz-busy">수정한 내용으로 다시 채점하고 있어요. 끝나면 점수가 바뀌어요.</div>
   </div>
   <div class="fz-state" data-s="new">
-   <div class="fz-top"><div class="fz-ring fz-ring0"><i><b>–</b><small>/ 100</small></i></div><div class="fz-msg"><strong>저장하면 점수가 나와요</strong>이 글이 검색과 AI 답변에 얼마나 잘 보일지 100점 만점으로 알려 드려요. 저장하기 전에도 미리 확인할 수 있어요.</div></div>
+   <div class="fz-top"><div class="fz-ring fz-ring0"><svg viewBox="0 0 100 100"><circle class="fz-rr" cx="50" cy="50" r="42"/></svg><i><b>–</b></i></div><div class="fz-msg"><strong>저장하면 점수가 나와요</strong>이 글이 검색과 AI 답변에 얼마나 잘 보일지 100점 만점으로 알려 드려요. 저장하기 전에도 미리 확인할 수 있어요.</div></div>
    <div class="fz-bars fz-bars0"><div class="fz-bar"><div class="fz-bt"><b>검색 노출</b><span>SEO</span><em>–</em></div><div class="fz-tr"><i style="width:0"></i></div></div><div class="fz-bar"><div class="fz-bt"><b>AI 답변</b><span>GEO</span><em>–</em></div><div class="fz-tr"><i style="width:0"></i></div></div><div class="fz-bar"><div class="fz-bt"><b>신뢰도</b><span>EEAT</span><em>–</em></div><div class="fz-tr"><i style="width:0"></i></div></div></div>
    <div class="fz-chk"><span class="fz-chk-d">저장 전 글로 점수를 확인해요</span><span class="fz-left">오늘 10회 남음</span><button type="button" class="ant-btn css-19u5a7b css-var-root ant-btn-default ant-btn-color-default ant-btn-variant-outlined" data-fz-check>점수 확인</button></div>
   </div>
   <div class="fz-state" data-s="pre"><div class="fz-desc"><span class="fz-pretag">저장 전 점수</span>저장하면 정식 점수로 바뀌어요</div>
-   <div class="fz-top"><div class="fz-ring" style="background:conic-gradient(var(--fz-acc) 52%,var(--fz-trk) 0)"><i><b>52</b><small>/ 100</small></i></div><div class="fz-msg"><strong>100점에 가까울수록 좋아요</strong>검색과 AI 답변에 이 글이 얼마나 잘 보일지 매긴 점수예요.</div></div>
+   <div class="fz-top"><div class="fz-ring"><svg viewBox="0 0 100 100"><circle class="fz-rr" cx="50" cy="50" r="42"/><circle class="fz-rv" cx="50" cy="50" r="42" stroke-dasharray="137.22 263.89"/></svg><i><b>52</b><small>점</small></i></div><div class="fz-msg"><strong>100점에 가까울수록 좋아요</strong>검색과 AI 답변에 이 글이 얼마나 잘 보일지 매긴 점수예요.</div></div>
    <div class="fz-bars"><div class="fz-bar"><div class="fz-bt"><b>검색 노출</b><span>SEO</span><em>70</em></div><div class="fz-bd">구글 같은 검색에 잘 나오는지</div><div class="fz-tr"><i style="width:70%"></i></div></div><div class="fz-bar"><div class="fz-bt"><b>AI 답변</b><span>GEO</span><em>63</em></div><div class="fz-bd">ChatGPT 같은 AI가 답할 때 이 글을 쓰는지</div><div class="fz-tr"><i style="width:63%"></i></div></div><div class="fz-bar"><div class="fz-bt"><b>신뢰도</b><span>EEAT</span><em>24</em></div><div class="fz-bd">경험과 전문성이 드러나 믿을 만한지</div><div class="fz-tr"><i style="width:24%"></i></div></div></div><div class="fz-chk"><span class="fz-chk-d">저장 전 글로 점수를 확인해요</span><span class="fz-left">오늘 10회 남음</span><button type="button" class="ant-btn css-19u5a7b css-var-root ant-btn-default ant-btn-color-default ant-btn-variant-outlined" data-fz-check>점수 확인</button></div>
    <div class="fz-sec">개선 제안 3개</div><div class="fz-secd">고치면 점수가 올라요 · 숫자는 Frase가 예상한 AI 답변 점수 상승</div><ol class="fz-todo fz-ckl"><li><div class="fz-it"><b>글로 적은 비교 부분을 2열 2행 이상의 표로 바꿔 주세요.</b></div><em class="fz-gain">+5</em><button type="button" class="fz-go ant-btn css-19u5a7b css-var-root ant-btn-default ant-btn-color-default ant-btn-variant-outlined" data-fz-go="body">본문으로</button></li><li><div class="fz-it"><b>쥬베룩과 엑소좀의 허가 상태를 확인할 수 있게 식약처 공식 자료나 임상 연구 링크를 넣어 주세요.</b></div><em class="fz-gain">+4</em><button type="button" class="fz-go ant-btn css-19u5a7b css-var-root ant-btn-default ant-btn-color-default ant-btn-variant-outlined" data-fz-go="body">본문으로</button></li><li><div class="fz-it"><b>글 끝에 '핵심 요약'을 따로 두고 요점을 글머리표로 정리해 주세요.</b></div><em class="fz-gain">+3</em><button type="button" class="fz-go ant-btn css-19u5a7b css-var-root ant-btn-default ant-btn-color-default ant-btn-variant-outlined" data-fz-go="body">본문으로</button></li></ol>
   </div>
