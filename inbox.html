@@ -140,7 +140,7 @@ EX.push(
   sum:{l1:'헤드스파 50% 이벤트 진행 여부 문의, 매장 확인 중',l2:''},card:{name:'Emily R.',phone:'+44 7700900123',email:''}}
 );
 var EX_LINE={x1:'TW',x7:'메인'}; /* LINE 계정 구분 (1차 결정 4) */
-var EX_META={x11:['+33 612345678','24시간 창 열림'],x9:['oP3k····Zt8','구독 중'],x10:['+44 7700900123','24시간 창 열림'],x1:['U3f9····a12c','친구 추가됨'],x2:['chat-20114','-'],x3:['+976 99112233','24시간 창 열림'],x4:['chat-20131','-',{name:'프로필 촬영 베이직',no:3021}],x5:['chat-20087','-'],x6:['oQ7v····Lm2','구독 중'],x7:['U77a····0e1','친구 추가됨'],x8:['chat-20140','-']};
+var EX_META={x11:['+33 612345678','24시간 창 열림'],x9:['oP3k····Zt8','구독 중'],x10:['+44 7700900123','24시간 창 열림'],x1:['U3f9····a12c','친구 추가됨'],x2:['chat-20114','-'],x3:['chat-20117','-'],x4:['chat-20131','-',{name:'프로필 촬영 베이직',no:3021}],x5:['chat-20087','-'],x6:['oQ7v····Lm2','구독 중'],x7:['U77a····0e1','친구 추가됨'],x8:['chat-20140','-']};
 /* 긴 대화 예시: Mina Park 1차 40건, Anna Kim 2회차(1차 10. 14.) */
 (function(){
  var QA=[['Hi, I am visiting Seoul next week.','안녕하세요, 다음 주에 서울 방문해요.','Welcome! How can we help you?','환영합니다! 무엇을 도와드릴까요?'],
@@ -178,9 +178,10 @@ function seedExtra(){return EX.map(function(x){
 var CH_ROOM={LINE:'r1',WhatsApp:'r2',WeChat:'r3','CS채팅':'r4'};
 var DB,S,SLACK;
 function loadScn(){try{var v=JSON.parse(localStorage.getItem('ib-scn')||'null');if(v&&v.ver===2&&v.nodes)return v;}catch(e){}return null;}
-function freshDB(){var keep=(window.DB&&DB.scn)||null;DB={scn:keep||loadScn()||defaultScn(),store:seedStore(),rooms:seedRooms().concat(window.NO_EXTRA?[]:seedExtra())};DB.rooms.forEach(function(r){var c=CARD[r.id];if(!c)return;r.cid=c.cid;r.chState=c.chState;r.card=JSON.parse(JSON.stringify(c.card));});DB.rooms.forEach(function(r){r.dispNm=r.card.name||'';});SLACK=[];}
+function freshDB(){var keep=(window.DB&&DB.scn)||null;DB={scn:keep||loadScn()||defaultScn(),store:seedStore(),rooms:seedRooms().concat(window.NO_EXTRA?[]:seedExtra())};DB.rooms.forEach(function(r){var c=CARD[r.id];if(!c)return;r.cid=c.cid;r.chState=c.chState;r.card=JSON.parse(JSON.stringify(c.card));});DB.rooms.forEach(function(r){if(r.byStore)r.msgs.forEach(function(m){if(m.who==='agent'&&!m.cs)m.st=r.card.owner;});}); /* 지난 스토어 말은 그때 보낸 사람 이름 그대로 (담당자가 바뀌어도) */
+ DB.rooms.forEach(function(r){r.dispNm=r.card.name||'';});SLACK=[];}
 function unans(r){var n=0;for(var i=r.msgs.length-1;i>=0;i--){var m=r.msgs[i];if(m.who==='note'||m.kind==='guide')continue; /* 1:1 상담 안내는 답장이 아님 (CSM-CHAT-34) */if(m.who!=='cust')break;if(!m.answered)n++;}return n;} /* U8: 마지막 고객 메시지들 중 아직 답이 없는 수 */
-function storeLabel(r){return r.storeName||(r.store?DB.store.name:'K-Beauty Station');}
+function storeLabel(r){if(S&&S.p1&&/^(WhatsApp|LINE|WeChat)$/.test(r.ch))return 'K-Beauty Station'; /* 1차 메신저는 우리 CS 계정 → CS채팅과 같이 K-Beauty Station. 어느 매장 문의인지는 문의 대상 (CSM-CHAT-35) */return r.storeName||(r.store?DB.store.name:'K-Beauty Station');}
 /* 큰 틀(머리글 / 필터 줄 / 상담함 | 상담창 | 정보패널) 단위 안 */
 /* 상담함·상담창은 확정안으로 고정. 아래 안은 상담 정보 패널 배치만 다름 */
 var LAYOUTS=[['R','3단 · 추천 답변 오른쪽 패널 (확정)']];
@@ -634,7 +635,7 @@ function hist(r){var out=[],gi=0,groups=[];r.msgs.map(function(m){var v=p1View(m
  groups.forEach(function(g,k){var last=k===groups.length-1,next=groups[k+1],end=g.list[g.list.length-1].at,agent=false,ev=[[g.at,'문의 접수']],W=function(t,mi){return whoAt(g,next,last,t,mi);},
   p1In=function(o){return o[2]!=null?o[2]===g.n:inG(g,next,o[0]);};
   (r.scnLog||[]).forEach(function(x){if(x[0]>=g.at&&(!next||x[0]<next.at))ev.push([x[0],x[1]]);});
-  g.list.forEach(function(m){if(m.who==='agent'&&m.kind!=='guide'&&!m.fail&&!agent){agent=true;ev.push([m.at,(S.p1?'상담사 첫 답장 · ':'상담 시작 · ')+W(m.at,r.msgs.findIndex(function(z){return z.at===m.at&&z.text===m.text;}))+(r.byStore?' (스토어)':'')]);}if(m.stopped)ev.push([m.at,'AI 중단'+(last&&r.need?' · '+r.need.reason:'')]);}); /* 1:1 상담 안내는 답장이 아님 (CSM-CHAT-34) */
+  g.list.forEach(function(m){if(m.who==='agent'&&m.kind!=='guide'&&!m.fail&&!agent){agent=true;ev.push([m.at,(S.p1?'상담사 첫 답장 · ':'상담 시작 · ')+(m.st?m.st+' (스토어)':W(m.at,r.msgs.findIndex(function(z){return z.at===m.at&&z.text===m.text;})))]);}if(m.stopped)ev.push([m.at,'AI 중단'+(last&&r.need?' · '+r.need.reason:'')]);}); /* 1:1 상담 안내는 답장이 아님 (CSM-CHAT-34) */
   if(!S.p1&&last&&!agent&&r.agentAt&&r.agentAt>=g.at){agent=true;ev.push([r.agentAt,'상담 시작 · '+W(r.agentAt)]);}
   if(!S.p1)(r.ownerLog||[]).forEach(function(o){if(inG(g,next,o[0],o[3]))ev.push([o[0],'담당 변경 · '+o[1]+' → '+o[2]]);});
   (r.p1Log||[]).forEach(function(o){if(p1In(o))ev.push([o[0],o[1]]);});
@@ -732,7 +733,7 @@ function custSend(id,text,kind){
  if(m.kind==='text'&&detectLang(text)){var pr=r.lang,pl=pr||'ko',nl=lastLangOf(r,text);if(nl==='ko'&&!pr)r.lang=pr; /* 한국어로만 쓴 대화는 언어 표시 없음 */m.lang=nl;if(nl!==pl)r.msgs.forEach(function(z){if(z.who==='agent'&&!z.tl){z.tl=pl;z.untr=(S.bo.readLangs||[]).indexOf(pl)>=0;}});if(nl!=='ko')m.koT=koOf(text);} /* CSM-CHAT-15 언어가 바뀔 때: 대화 언어 = 고객이 마지막에 쓴 언어. 이미 보낸 답은 보낼 때 언어 그대로 */
  if(wasDone){var gn=grpN(r);(r.sessOwner=r.sessOwner||{})[gn]=r.card.owner||'';(r.sessTopics=r.sessTopics||{})[gn]=(r.doneTopics||topics(r).list).slice();(r.sessTarget=r.sessTarget||{})[gn]=r.target||'';} /* 지난 회차 값은 그대로 남긴다 (SYS-CHAT-09) */
  push(r,m);
- if(wasDone){r.status='상담중';r.session++;m.newSession=true;r.card.owner='';r.agentAt=null;r.target='';r.doneTopics=null;r.p1NoAsk=false;r.topicFix=null;} /* 새 회차: 담당자·문의 대상(CSM-CHAT-35)·분류 비움 */
+ if(wasDone){r.status='상담중';r.session++;m.newSession=true;r.card.owner='';r.byStore=false;r.agentAt=null;r.target='';r.doneTopics=null;r.p1NoAsk=false;r.topicFix=null;} /* 새 회차: 담당자·문의 대상(CSM-CHAT-35)·분류 비움 */
  if(aiActive(r))handle(r,m);
  render();
 }
@@ -763,7 +764,7 @@ function complete(id,tp,memo){ /* P10 상담 완료 = 확인 완료 + 상담 종
 }
 function setAI(id,on){var r=room(id);if(on){aiResume(r);}else{r.aiOn=false;}render();}
 function takeOver(id){var r=room(id);r.flow=null;r.aiOn=false;r.handler='agent';r.agentAt=S.now;if(!r.card.owner)r.card.owner='김상담';render();} /* I4: 잡은 사람이 담당자 */
-function updateCard(id,k,v){var r=room(id);if(k==='name'){if(!v)v=r.dispNm||'';r.name=dispName(v,r.ch,r.cid,r.card.phone);} /* SYS-CHAT-08: 이름을 지우면 메신저 표시명(이름 칸의 처음 값)으로 */ /* 이름을 고치면 카드·머리도 */if(k==='owner'&&r.card.owner&&v&&r.card.owner!==v)(r.ownerLog=r.ownerLog||[]).push([S.now,r.card.owner,v,r.msgs.length]); /* 담당 변경은 처리 이력에 */r.card[k]=v;if(k==='owner')r.byStore=false; /* 담당자를 바꾸면 상담사 담당 (CSM-CHAT-27) */render();}
+function updateCard(id,k,v){var r=room(id),ownPrev=r.card.owner;if(k==='name'){if(!v)v=r.dispNm||'';r.name=dispName(v,r.ch,r.cid,r.card.phone);} /* SYS-CHAT-08: 이름을 지우면 메신저 표시명(이름 칸의 처음 값)으로 */ /* 이름을 고치면 카드·머리도 */if(k==='owner'&&r.card.owner&&v&&r.card.owner!==v)(r.ownerLog=r.ownerLog||[]).push([S.now,r.card.owner,v,r.msgs.length]); /* 담당 변경은 처리 이력에 */r.card[k]=v;if(k==='owner'&&ownPrev!==v)r.byStore=false; /* 담당자를 바꾸면 상담사 담당 (CSM-CHAT-27) */render();}
 function sendProduct(id,pid){var r=room(id),p=DB.store.catalog.filter(function(x){return x.id===pid;})[0];if(!p||lineBlocked(r)||waBlocked(r))return;reopen(r);if(r.ch==='LINE')DB.store.lineLeft--; /* 상품 카드도 LINE 발송 1건 */push(r,{who:'agent',kind:'product',text:'[상품 카드] '+p.name+' · '+p.price.toLocaleString('en-US')+' KRW',prod:p});r.msgs.forEach(function(m){if(m.who==='cust')m.answered=true;});r.handler='agent';r.agentAt=r.agentAt||S.now;r.aiOn=false;if(!r.card.owner)r.card.owner='김상담';(r.msgs[r.msgs.length-1]||{}).cs=true;RECENT=[pid].concat(RECENT.filter(function(x){return x!==pid;})).slice(0,3);render();}
 var RECENT=[];
 /* 1차 보기: 예시 대화의 AI 메시지. AI 고지·AI 보류 문구는 1차에 생기지 않으므로 빼고, 사람이 한 답과 같은 것은 상담사 답으로 본다 */
