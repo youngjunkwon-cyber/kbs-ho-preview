@@ -2057,7 +2057,7 @@ var STORES=['k-beauty의원','A피부과 강남점','B헤어 명동점','C스튜
 /* 문의 대상 후보: 스토어만 또는 스토어 · 상품 (상품을 고르면 스토어가 따라 정해진다) */
 var TGT=STORES.concat(['k-beauty의원 · 리쥬란 스킨부스터','k-beauty의원 · 보톡스 (사각턱)','A피부과 강남점 · 레이저 토닝','B헤어 명동점 · 헤드스파','B헤어 명동점 · 펌','C스튜디오 성수 · 프로필 촬영 베이직','D의원 압구정 · 울쎄라']);
 function isMsgr(r){return r.ch!=='플랫폼';}
-function hdLinks(r){var a=function(t){return '<a class="hlk" href="#" target="_blank" rel="noopener" data-click title="새 탭에서 열기">'+esc(t)+'</a>';};var s=P.storeLabel(r);return (s!=='K-Beauty Station'&&(r.store||r.storeName)?a(s):esc(s))+(r.type==='상품 문의'&&r.prod?' · '+a(r.prod.name||r.prod):'');} /* 대화 머리: 스토어명·상품명은 새 탭 링크 (CSM-CHAT-11) */
+function hdLinks(r){var a=function(t){return '<a class="hlk" href="#" target="_blank" rel="noopener" data-click title="새 탭에서 열기">'+esc(t)+'</a>';};var s=P.storeLabel(r);return ((!/^(WhatsApp|LINE|WeChat)$/.test(r.ch)||!P.S.p1)&&s!=='K-Beauty Station'&&(r.store||r.storeName)?a(s):esc(s))+(r.type==='상품 문의'&&r.prod?' · '+a(r.prod.name||r.prod):'');} /* 대화 머리: 스토어명·상품명은 새 탭 링크 (CSM-CHAT-11) */
 function storeLine(r){return P.storeLabel(r)+(r.type==='상품 문의'&&r.prod?' · '+(r.prod.name||r.prod):'');} /* 카드 3줄·머리 = 입점사명 (CSM-CHAT-09, 11) */
 /* ===== 상품 카드 모달 ===== */
 var PL={en:'영어',ja:'일본어',zh:'중국어(간체)','zh-TW':'중국어(번체)',th:'태국어',mn:'몽골어',id:'인도네시아어'},PM={q:'',lang:null,sel:[],cat:'all',sub:[]};

@@ -181,7 +181,7 @@ function loadScn(){try{var v=JSON.parse(localStorage.getItem('ib-scn')||'null');
 function freshDB(){var keep=(window.DB&&DB.scn)||null;DB={scn:keep||loadScn()||defaultScn(),store:seedStore(),rooms:seedRooms().concat(window.NO_EXTRA?[]:seedExtra())};DB.rooms.forEach(function(r){var c=CARD[r.id];if(!c)return;r.cid=c.cid;r.chState=c.chState;r.card=JSON.parse(JSON.stringify(c.card));});DB.rooms.forEach(function(r){if(r.byStore)r.msgs.forEach(function(m){if(m.who==='agent'&&!m.cs)m.st=r.card.owner;});}); /* 지난 스토어 말은 그때 보낸 사람 이름 그대로 (담당자가 바뀌어도) */
  DB.rooms.forEach(function(r){r.dispNm=r.card.name||'';});SLACK=[];}
 function unans(r){var n=0;for(var i=r.msgs.length-1;i>=0;i--){var m=r.msgs[i];if(m.who==='note'||m.kind==='guide')continue; /* 1:1 상담 안내는 답장이 아님 (CSM-CHAT-34) */if(m.who!=='cust')break;if(!m.answered)n++;}return n;} /* U8: 마지막 고객 메시지들 중 아직 답이 없는 수 */
-function storeLabel(r){if(S&&S.p1&&/^(WhatsApp|LINE|WeChat)$/.test(r.ch))return 'K-Beauty Station'; /* 1차 메신저는 우리 CS 계정 → CS채팅과 같이 K-Beauty Station. 어느 매장 문의인지는 문의 대상 (CSM-CHAT-35) */return r.storeName||(r.store?DB.store.name:'K-Beauty Station');}
+function storeLabel(r){if(S&&S.p1&&/^(WhatsApp|LINE|WeChat)$/.test(r.ch))return r.ch==='LINE'?({'메인':'K-Beauty Station','TW':'K-Beauty Station TW'}[r.lineAcct||'메인']||r.lineAcct):'K-Beauty Station'; /* 1차 메신저: 연결된 우리 채널 이름 (LINE 계정 표시 이름, WhatsApp 비즈니스 프로필 이름) */ /* 1차 메신저는 우리 CS 계정 → CS채팅과 같이 K-Beauty Station. 어느 매장 문의인지는 문의 대상 (CSM-CHAT-35) */return r.storeName||(r.store?DB.store.name:'K-Beauty Station');}
 /* 큰 틀(머리글 / 필터 줄 / 상담함 | 상담창 | 정보패널) 단위 안 */
 /* 상담함·상담창은 확정안으로 고정. 아래 안은 상담 정보 패널 배치만 다름 */
 var LAYOUTS=[['R','3단 · 추천 답변 오른쪽 패널 (확정)']];
