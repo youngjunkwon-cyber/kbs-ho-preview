@@ -1906,7 +1906,7 @@ function init(){
   +'#csmbar .csmOn.off{color:#b42318;background:#fef3f2}#csmbar .csmOn.off:before{background:#f04438}'
   +'#ibmsg{position:fixed;left:50%;top:8px;transform:translateX(-50%);z-index:2000;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}#ibmsg .mn{display:inline-flex;align-items:center;gap:8px;padding:9px 12px;background:#fff;border-radius:8px;box-shadow:0 6px 16px rgba(0,0,0,.08),0 3px 6px -4px rgba(0,0,0,.12),0 9px 28px 8px rgba(0,0,0,.05);font:14px Pretendard,sans-serif;color:rgba(0,0,0,.88)}#ibmsg .mn i{flex:none;width:16px;height:16px;border-radius:8px;background:#ff4d4f;color:#fff;font:700 10px/16px sans-serif;text-align:center;font-style:normal}'
   +'.imgs{font-size:13px;color:rgba(0,0,0,.88)}.imgb{display:block;max-width:220px;max-height:220px;border-radius:6px}.trf{color:#d92d20}.trf a{color:#d92d20;text-decoration:underline;cursor:pointer}'
-  +'#cempty{display:none;flex:1;align-items:center;justify-content:center;font-size:14px;color:rgba(0,0,0,.88)}body.unsel #cempty{display:flex}body.unsel section.cpanel>*:not(#cempty){display:none!important}body.unsel aside[class*=_contextPanel_]>*:not([class*=_panelHeader_]){display:none!important}'
+  +'#cempty{display:none;flex:1;align-items:center;justify-content:center;font-size:14px;color:rgba(0,0,0,.88)}body.unsel #cempty{display:flex}body.unsel section.cpanel>*:not(#cempty){display:none!important}body.unsel aside[class*=_contextPanel_]>*:not([class*=_panelHeader_]){display:none!important}body.unsel #srp{display:none!important}'
   +'#gband{display:none;padding:8px 20px;background:#d92d20;color:#fff;font-size:13px;font-weight:600}#gband.on{display:block}'
   +'#lq{font-size:12px;color:#475467;white-space:nowrap}#lq.zero{color:#b42318;font-weight:600}'
   +'.autob [class*=_bubble_]{background:#eef0f3!important;color:#475467!important;border:1px dashed #c4c9d1!important}.sysln{text-align:center;font-size:12px;color:#667085;margin:4px 0 10px}'
@@ -2003,7 +2003,7 @@ function buildLogin(){var d=document.createElement('div');d.id='login';d.setAttr
 function openPw(){
  var m=ov('<h3>비밀번호 변경</h3><div class="lb">현재 비밀번호</div><input type="password" class="p0" data-click><div class="lb">새 비밀번호</div><input type="password" class="p1" data-click><div class="lb">새 비밀번호 확인</div><input type="password" class="p2" data-click><div class="er"></div><div class="ft"><button type="button" class="cc" data-click>취소</button><button type="button" class="ok" data-click>변경</button></div>');
  m.addEventListener('click',function(e){if(e.target.closest('.cc')){m.remove();return;}if(!e.target.closest('.ok'))return;var a=m.querySelector('.p1').value,b=m.querySelector('.p2').value,er=m.querySelector('.er');
-  er.style.color='';er.textContent=a.length<8?'비밀번호는 최소 8자 이상이어야 합니다.':/\s/.test(a)?'비밀번호에 공백을 포함할 수 없습니다.':!(/[A-Za-z]/.test(a)&&/\d/.test(a)&&/[^A-Za-z0-9]/.test(a))?'비밀번호는 영문, 숫자, 특수문자를 포함해야 합니다.':a!==b?'비밀번호가 일치하지 않습니다.':'';
+  er.style.color='';er.textContent=!m.querySelector('.p0').value?'현재 비밀번호를 입력해주세요.':a.length<8?'비밀번호는 최소 8자 이상이어야 합니다.':/\s/.test(a)?'비밀번호에 공백을 포함할 수 없습니다.':!(/[A-Za-z]/.test(a)&&/\d/.test(a)&&/[^A-Za-z0-9]/.test(a))?'비밀번호는 영문, 숫자, 특수문자를 포함해야 합니다.':a!==b?'비밀번호가 일치하지 않습니다.':'';
   if(!er.textContent){er.style.color='#067647';er.textContent='비밀번호가 변경되었습니다.';setTimeout(function(){m.remove();},900);}});
 }
 /* 1차 상담 분류: 완료 때 고른 값. 완료 전은 없음 */
@@ -2030,8 +2030,9 @@ function openProdModal(){
  m.querySelector('.pm-ft').addEventListener('click',function(e){if(e.target.closest('.pm-send')){sendProd();return;}var x=e.target.closest('[data-rm]');if(x){var id=+x.getAttribute('data-rm');PM.sel=PM.sel.filter(function(v){return v!==id;});drawProd();}});
  drawProd();setTimeout(function(){m.querySelector('input').focus();},50);
 }
+function pmOver(){var r=P.room(P.S.bo.room);return !!(P.S.p1&&r&&r.ch==='LINE'&&PM.sel.length>P.DB.store.lineLeft);} /* LINE 남은 발송보다 많이 고르면 보내기를 막는다 (CSM-CHAT-16) */
 function closeProdModal(){if(EL.pm){EL.pm.remove();EL.pm=null;}}
-function sendProd(){if(!PM.sel.length)return;var ids=PM.sel.slice();closeProdModal();ids.forEach(function(id){P.sendProduct(P.S.bo.room,id);});}
+function sendProd(){if(!PM.sel.length||pmOver())return;var ids=PM.sel.slice();closeProdModal();ids.forEach(function(id){P.sendProduct(P.S.bo.room,id);});}
 function drawProd(){
  var m=EL.pm;if(!m)return;var all=P.DB.store.catalog,q=PM.q.trim().toLowerCase();
  var byBase={};all.forEach(function(p){(byBase[p.base]=byBase[p.base]||[]).push(p.name.toLowerCase());});
@@ -2050,7 +2051,7 @@ function drawProd(){
  var recent=P.RECENT.map(function(id){return all.filter(function(p){return p.id===id;})[0];}).filter(Boolean).filter(function(p){return !q&&(PM.lang==='all'||p.lang===PM.lang);});
  m.querySelector('.pm-body').innerHTML=(recent.length?'<div class="pm-gh">최근 보낸 상품</div><div class="pm-grid">'+recent.map(card).join('')+'</div><div class="pm-gh">전체</div>':'')+(list.length?'<div class="pm-grid">'+list.map(card).join('')+'</div>':'<div class="pm-empty">'+(q?'"'+esc(PM.q)+'" 검색 결과 없음':'데이터 없음')+'</div>');
  var sels=PM.sel.map(function(id){return all.filter(function(p){return p.id===id;})[0];}).filter(Boolean);
- m.querySelector('.pm-ft').innerHTML=sels.length?'<div class="pm-sels"><small>선택 '+sels.length+'개</small><div class="pm-chips">'+sels.map(function(p){return '<span class="pm-chip"><i class="pc-img i'+p.img+'"></i>'+esc(p.name)+' <b>'+p.price.toLocaleString('en-US')+'</b><a data-rm="'+p.id+'" data-click title="빼기">✕</a></span>';}).join('')+'</div></div><button class="pm-send ant-btn ant-btn-primary" data-click>'+sels.length+'개 보내기</button>':'<span class="pm-hint">선택한 상품 없음</span>';
+ m.querySelector('.pm-ft').innerHTML=sels.length?'<div class="pm-sels"><small>선택 '+sels.length+'개</small><div class="pm-chips">'+sels.map(function(p){return '<span class="pm-chip"><i class="pc-img i'+p.img+'"></i>'+esc(p.name)+' <b>'+p.price.toLocaleString('en-US')+'</b><a data-rm="'+p.id+'" data-click title="빼기">✕</a></span>';}).join('')+'</div></div>'+(pmOver()?'<span class="pm-hint">남은 발송 '+P.DB.store.lineLeft+'건</span>':'')+'<button class="pm-send ant-btn ant-btn-primary"'+(pmOver()?' disabled':'')+' data-click>'+sels.length+'개 보내기</button>':'<span class="pm-hint">선택한 상품 없음</span>';
 }
 /* ===== 상담함 머리 ===== */
 function buildListHead(){
@@ -2107,13 +2108,13 @@ function detectLang(t){if(/[぀-ヿ]/.test(t))return 'ja';if(/[가-힯ㄱ-ㆎ]/.
 function searchHit(r,q){
  if(!q)return {hit:true};
  var k=q.toLowerCase(),has=function(s){return String(s||'').toLowerCase().indexOf(k)>=0;},c=r.card||{};
- if(has(r.name)||has(c.name)||has(c.phone)||has(c.email)||has(r.cid)||has(P.storeLabel(r)))return {hit:true};
+ if(has(r.name)||has(c.name)||has(r.dispNm)||has(c.phone)||has(c.email)||has(r.cid)||has(P.storeLabel(r)))return {hit:true};
  if(tpOf(r).some(function(t){return has(t);}))return {hit:true}; /* 화면에 보이는 분류만 (1차: 완료 회차) */
  /* 카드 2줄에 보이는 메시지에 걸리면 그대로, 그 밖의 메시지에 걸리면 "(이전 메시지)"로 그 메시지를 보여 준다 */
  var shown=shownMsg(r,tabOf(r)==='wait');
  if(shown&&(has(shown.text)||has(shown.ko)))return {hit:true};
  for(var i=r.msgs.length-1;i>=0;i--){var mi=r.msgs[i];if(mi.who==='note'){if(has(mi.text))return {hit:true,memo:mi.text.split(/\n/)[0]};continue;}if(!P.p1View(mi))continue;if(mi!==shown&&(has(mi.text)||has(mi.ko)))return {hit:true,msg:mi};}
- var sm0=P.summary(r);if(sm0&&(has(sm0.l1)||has(sm0.l2)))return {hit:true,sum:sm0.l1};
+ var sm0=P.S.p1?null:P.summary(r); /* 1차: AI 요약 없음 → 검색 대상 아님 */if(sm0&&(has(sm0.l1)||has(sm0.l2)))return {hit:true,sum:sm0.l1};
  if(has(c.memo))return {hit:true,memo:c.memo};
  return {hit:false};
 }
@@ -2122,7 +2123,7 @@ function tag(text,color,isNew){var t=TPL.tag.cloneNode(true);t.className=t.class
 function lastVis(r){for(var i=r.msgs.length-1;i>=0;i--){var v=P.p1View(r.msgs[i]);if(v&&v.who!=='note')return v;}return null;}
 function shownMsg(r,custOnly){var i;if(custOnly){for(i=r.msgs.length-1;i>=0;i--)if(r.msgs[i].who==='cust')return r.msgs[i];}for(i=r.msgs.length-1;i>=0;i--){var v=P.p1View(r.msgs[i]);if(v&&v.who!=='note')return r.msgs[i];}return null;} /* 카드 2줄에 보이는 원래 메시지 */
 function connState(r){if(r.ch!=='WhatsApp')return r.chState;if(P.S.waOff)return '연결 끊김';return P.waBlocked(r)==='24h'?'24시간 창 닫힘':r.chState;} /* CSM-CHAT-28 연결 상태: WhatsApp은 고객 마지막 메시지 후 24시간이 지나면 닫힘 */
-function lastMsg(r,custOnly){var m=null;if(custOnly){for(var i=r.msgs.length-1;i>=0;i--)if(r.msgs[i].who==='cust'){m=r.msgs[i];break;}}m=m||lastVis(r);return m?(m.kind==='image'?'사진':m.kind==='product'?'상품 카드':m.kind==='guide'?'1:1 상담 안내':m.kind==='video'?'동영상':m.text):'';}
+function lastMsg(r,custOnly){var m=null;if(custOnly){for(var i=r.msgs.length-1;i>=0;i--)if(r.msgs[i].who==='cust'){m=r.msgs[i];break;}}m=m||lastVis(r);return m?(m.kind==='image'?'사진':m.kind==='product'?'상품 카드':m.kind==='guide'?'1:1 상담 안내':m.kind==='video'?'동영상':(m.who==='agent'&&m.ko)?m.ko:m.text):'';} /* 우리가 보낸 말은 한국어 원문 */
 function lastAt(r){var m=lastVis(r);return m?m.at:r.first;}
 function hasNote(r){var n=false;for(var i=r.msgs.length-1;i>=0;i--){var m=r.msgs[i];if(m.newSession&&i>0)break;if(m.who==='note')n=true;}return n;}
 function fact(label,val,isNew){var f=TPL.fact.cloneNode(true);f.innerHTML=esc(label)+'<b>'+esc(val)+'</b>';if(isNew)f.setAttribute('data-new','');return f;}
@@ -2146,7 +2147,7 @@ function layout(){
 function draw(){
  if(!P||!P.DB||!TPL.row)return;
  var S=P.S,DB=P.DB;document.body.classList.toggle('mk',!!S.mark);document.body.classList.toggle('hl',!!S.hint);var rr=P.room(S.bo.room),own=rr&&rr.lang&&(S.bo.readLangs||[]).indexOf(rr.lang)>=0;document.body.classList.toggle('notr',S.bo.tr===false); /* 번역 줄은 말풍선마다 그 말풍선 언어 기준으로 숨긴다 (CSM-CHAT-15 언어가 바뀔 때) */
- if(EL.taRoom!==S.bo.room&&EL.ta){var pr0=EL.taRoom&&P.room(EL.taRoom);if(pr0)pr0.draft=EL.ta.value;var nr0=P.room(S.bo.room);EL.ta.value=EL.taS===S&&nr0&&nr0.draft||'';EL.taS=S;EL.taRoom=S.bo.room;QA('.ov').forEach(function(o){o.remove();});} /* 입력하던 글은 대화마다 따로 남는다. 대화를 바꾸면 열린 창은 닫는다 */
+ if((EL.taRoom!==S.bo.room||EL.taS!==S)&&EL.ta){var pr0=EL.taS===S&&EL.taRoom&&P.room(EL.taRoom);if(pr0)pr0.draft=EL.ta.value;var nr0=P.room(S.bo.room);EL.ta.value=EL.taS===S&&nr0&&nr0.draft||'';EL.taS=S;EL.taRoom=S.bo.room;QA('.ov').forEach(function(o){o.remove();});closeProdModal();} /* 입력하던 글은 대화마다 따로 남는다. 대화를 바꾸면 열린 창은 닫는다 */
  if(EL.sw&&EL.swRoom!==S.bo.room){EL.swRoom=S.bo.room;EL.sw.classList.toggle('ant-switch-checked',!own);EL.sw.setAttribute('aria-checked',own?'false':'true');} /* 대화를 열 때 자동번역 기본값 */
  var p1=!!S.p1;
  if(EL.login)EL.login.classList.toggle('on',p1&&!!S.login);
@@ -2190,7 +2191,7 @@ function draw(){
   var av=document.createElement('div');av.className='av';av.setAttribute('data-new','');av.title=chLabel(r);av.innerHTML=chSvg(r,32);b.appendChild(av);
   var cm=document.createElement('div');cm.className='cm';b.appendChild(cm);
   var c1=document.createElement('div');c1.className='c1';
-  c1.innerHTML='<span class="nm" title="'+esc(r.name)+'">'+hiq(r.name,q)+'</span>'+'<span class="tm">'+esc(relTs(lastAt(r)))+'</span>'+((t==='prog'&&n>0)?'<i class="nd" title="새 메시지"></i>':'');
+  c1.innerHTML='<span class="nm" title="'+esc(r.name)+'">'+hiq(r.name,q)+'</span>'+'<span class="tm">'+esc(relTs((t==='wait'&&shownMsg(r,true)||{}).at||lastAt(r)))+'</span>'+((t==='prog'&&n>0)?'<i class="nd" title="새 메시지"></i>':'');
   cm.appendChild(c1);
   var c2=document.createElement('div');c2.className='c2';c2.innerHTML=h.msg?'<span>(이전 메시지)</span> '+hiq(h.msg.text,q):hiq(lastMsg(r,t==='wait'),q);cm.appendChild(c2);
   if(t==='wait'&&r.need&&!p1){var w=document.createElement('div');w.className='why';w.setAttribute('data-new','');w.textContent='상담사 확인 필요: '+r.need.reason;cm.appendChild(w);}
@@ -2228,7 +2229,7 @@ function draw(){
   if(i===0||m.newSession){var s=TPL.sys.cloneNode(true);if(m.newSession)sess++;var sn=i===0?1:sess;s.classList.add('sdv');s.textContent=(r.impSess&&sn<=r.impSess?'가져온 기록':sn+'차 상담');w.insertBefore(s,w.firstChild);w.setAttribute('data-sess',sn);}
   var br=Q('[class*=_bubbleRow_]',w),metas=QA('[class*=_meta_]',br);
   if(m.who==='auto'){w.classList.add('autob');w.setAttribute('data-new','');}
-  metas[0].textContent=m.who==='cust'?'고객':m.who==='auto'?'자동 응답':m.who==='ai'?'AI':(r.byStore?(r.card.owner||'입점사')+' (스토어)':'상담사');
+  metas[0].textContent=m.who==='cust'?'고객':m.who==='auto'?'자동 응답':m.who==='ai'?'AI':((r.byStore&&!m.cs)?(r.card.owner||'입점사')+' (스토어)':'상담사'); /* 스토어 담당 대화라도 상담사가 보낸 말은 상담사 */
   var bub=Q('[class*=_bubble_]',br);bub.children[0].innerHTML=m.kind==='image'?(m.sending?'<span class="imgs" data-new>이미지 보내는 중</span>':m.img?'<img class="imgb" data-new src="'+esc(m.img)+'" alt="이미지">':'(사진)'):m.kind==='product'?'<span class="pcard"><i class="pc-img i'+(m.prod?m.prod.img:0)+'"></i><span><small>상품 카드</small><b>'+esc(m.prod?m.prod.name:'')+'</b>'+(m.prod?m.prod.price.toLocaleString('en-US')+' KRW':'')+'</span></span>':esc(m.text).replace(/\n/g,'<br>');
   if(m.kind!=='image'&&m.kind!=='product'&&m.kind!=='video'){var ml=(m.who==='cust'&&m.lang)||detectLang(m.text);if(ml==='zh'&&(m.tl||lang)==='zh-TW')ml='zh-TW';var tr=null,RL=S.bo.readLangs||[],rd=function(l){return RL.indexOf(l)>=0;},tl=m.tl||lang,ownM=m.tl?!!m.untr:own;
    if(m.who==='cust'&&ml&&ml!=='ko'){tr=document.createElement('span');tr.className='tr'+(m.ko||m.koT?'':' ph');tr.textContent=m.ko||m.koT||'번역 대기';}
@@ -2240,10 +2241,10 @@ function draw(){
   else QA('button',br).forEach(function(b){if(b.textContent.trim()==='번역')b.style.display='none';}); /* 이미지·상품 카드는 번역 버튼 없음 */
   if(m.link){var a=document.createElement('span');a.className='lk';a.setAttribute('data-new','');a.textContent=m.link.url;bub.appendChild(a);var me=document.createElement('span');me.className='memo';me.setAttribute('data-new','');me.textContent='요청사항: '+m.link.memo;bub.appendChild(me);}
   if(m.notice)bub.setAttribute('data-new','');
-  var tm=metas[metas.length-1];tm.childNodes[0].nodeValue=P.fmtTs(m.at)+(m.who==='cust'||m.sending?'':m.fail?' · 전송 실패':' · 전송됨');if(m.fail&&!m.sending)tm.setAttribute('data-new','');if(m.fail&&!m.sending&&m.kind==='image'){tm.childNodes[0].nodeValue=P.fmtTs(m.at)+' · ';var rf=document.createElement('span');rf.className='trf';rf.setAttribute('data-new','');rf.innerHTML='전송 실패 · <a class="rts rsi" data-click>다시 보내기</a>';tm.insertBefore(rf,tm.childNodes[1]||null);(function(ix){rf.querySelector('a').addEventListener('click',function(){P.retrySend(r.id,ix);});})(i);} /* CSM-CHAT-14 이미지 전송 실패: 같은 말풍선을 다시 보냄 */ /* CSM-CHAT-14 */
+  var tm=metas[metas.length-1];tm.childNodes[0].nodeValue=P.fmtTs(m.at)+(m.who==='cust'||m.sending?'':m.fail?' · 전송 실패':' · 전송됨');if(m.fail&&!m.sending)tm.setAttribute('data-new','');if(m.fail&&!m.sending){tm.childNodes[0].nodeValue=P.fmtTs(m.at)+' · ';var rf=document.createElement('span');rf.className='trf';rf.setAttribute('data-new','');rf.innerHTML='전송 실패 · <a class="rts rsi" data-click>다시 보내기</a>';tm.insertBefore(rf,tm.childNodes[1]||null);(function(ix){rf.querySelector('a').addEventListener('click',function(){P.retrySend(r.id,ix);});})(i);} /* CSM-CHAT-14 이미지 전송 실패: 같은 말풍선을 다시 보냄 */ /* CSM-CHAT-14 */
   box.appendChild(w);
  });
- if(r.trFail){var fw=TPL.out.cloneNode(true);fw.removeAttribute('id');fw.setAttribute('data-new','');var fbr=Q('[class*=_bubbleRow_]',fw),fms=QA('[class*=_meta_]',fbr);fms[0].textContent=r.byStore?(r.card.owner||'입점사')+' (스토어)':'상담사';var fb=Q('[class*=_bubble_]',fbr);fb.innerHTML='<div>'+esc(r.trFail.text).replace(/\n/g,'<br>')+'</div>';var fm=fms[fms.length-1];fm.innerHTML='<span class="trf">번역 실패 · <a class="rts" data-click>다시 보내기</a></span>';
+ if(r.trFail){var fw=TPL.out.cloneNode(true);fw.removeAttribute('id');fw.setAttribute('data-new','');var fbr=Q('[class*=_bubbleRow_]',fw),fms=QA('[class*=_meta_]',fbr);fms[0].textContent='상담사';var fb=Q('[class*=_bubble_]',fbr);fb.innerHTML='<div>'+esc(r.trFail.text).replace(/\n/g,'<br>')+'</div>';var fm=fms[fms.length-1];fm.innerHTML='<span class="trf">번역 실패 · <a class="rts" data-click>다시 보내기</a></span>';
   fm.querySelector('.rts').addEventListener('click',function(){var id=r.id,t=r.trFail&&r.trFail.text;P.retryTr(id);if(t&&EL.ta.value.trim()===t){EL.ta.value='';syncPv();}});box.appendChild(fw);} /* CSM-CHAT-16 보낼 때 번역 실패 */
  box.scrollTop=box.scrollHeight;
  /* 추천 답변: 대기·진행에서만 */
@@ -2273,7 +2274,7 @@ function draw(){
  var ctx=Q('[class*=_context_]');ctx.innerHTML='';var c=r.card,pt=S.bo.ptab||'ai';
  var bks=(c.bookings||[]).slice(),today=S.now.slice(0,10),isUp=function(x){return (x.d+' '+(x.t||'00:00'))>=S.now;},upN=bks.filter(isUp).length; /* 기준 시각보다 뒤면 다가오는 예약 */
  var ownBar=Q('#ownbar');if(!ownBar){ownBar=document.createElement('div');ownBar.id='ownbar';ownBar.setAttribute('data-new','');Q('[class*=_panelHeader_]',EL.aside).after(ownBar);
-  ownBar.addEventListener('click',function(e){var t=e.target.closest('[data-k]');if(!t)return;var rr=P.room(P.S.bo.room),inp=document.createElement('input');inp.className='edin';inp.style.width='120px';inp.value=rr.card.owner||'';t.replaceWith(inp);inp.focus();var fin=function(){P.updateCard(rr.id,'owner',inp.value.trim());};inp.addEventListener('blur',fin);inp.addEventListener('keydown',function(ev){if(ev.key==='Enter')inp.blur();});});}
+  ownBar.addEventListener('click',function(e){var t=e.target.closest('[data-k]');if(!t)return;var rr=P.room(P.S.bo.room),inp=document.createElement('input');inp.className='edin';inp.style.width='120px';inp.value=rr.card.owner||'';t.replaceWith(inp);inp.focus();var fin=function(){var v=inp.value.trim();if(v)P.updateCard(rr.id,'owner',v);else P.render();}; /* 담당자는 비울 수 없다. 지우면 그대로 */inp.addEventListener('blur',fin);inp.addEventListener('keydown',function(ev){if(ev.key==='Enter')inp.blur();});});}
  ownBar.innerHTML='<span class="ol">담당자</span><b class="ed" data-k="owner" data-click title="수정">'+(c.owner?esc(c.owner):'<span class="ph">미배정</span>')+'</b>'+(c.owner&&r.agentAt?'<small>'+esc(relTs(r.agentAt))+' 시작</small>':'')+'<span class="os '+T+'">'+esc(T==='prog'&&r.byStore?'스토어 응대 중':(p1&&T==='wait')?'대기':STATE[T])+'</span>';
  var nbx=Q('#notebox');if(!nbx){nbx=document.createElement('div');nbx.id='notebox';nbx.setAttribute('data-new','');EL.aside.appendChild(nbx); /* 패널 맨 아래 고정 */
   nbx.addEventListener('click',function(e){
@@ -2305,13 +2306,13 @@ function draw(){
  var link=function(html){var d=document.createElement('a');d.href='#';d.className='bk';d.setAttribute('data-click','');d.innerHTML=html;return d;};
  if(pt==='ai'&&p1){ /* 1차 상담 개요: 상담 분류(완료 때 고른 값), 문의 대상, 접수 정보 */
   var imp=r.impSess&&r.session<=r.impSess,dt=tpOf(r);
-  ctx.appendChild(H('상담 분류',imp?'가져온 기록 · 자동 분류':null));
+  ctx.appendChild(H('상담 분류',imp&&r.status==='상담종료'&&!r.doneTopics?'가져온 기록 · 자동 분류':null));
   /* CSM-CHAT-29: 완료 뒤(또는 가져온 기록)에는 칩마다 ✕, "+ 분류"로 더하기. 문의 없음은 칩 대신 글자 */
-  var canEd=imp||r.status==='상담종료',na=dt.length===1&&dt[0]===P.NOASK,tw1=document.createElement('div');tw1.className='tpw';tw1.setAttribute('data-new','');
+  var canEd=r.status==='상담종료',na=dt.length===1&&dt[0]===P.NOASK,tw1=document.createElement('div');tw1.className='tpw';tw1.setAttribute('data-new','');
   tw1.innerHTML=(na?'<span class="tpnone na">'+esc(P.NOASK)+'</span>':dt.length?dt.map(function(t){return '<span class="tpchip">'+esc(t)+(canEd?'<a data-rm="'+esc(t)+'" data-click title="빼기">✕</a>':'')+'</span>';}).join(''):'<span class="tpnone">'+(canEd?'분류 없음':'-')+'</span>')
    +(canEd&&(na||dt.length<P.TOPICS.length)?'<span class="tpadd" data-click>+ 분류</span><div class="tpmenu" style="display:none">'+P.TOPICS.filter(function(t){return dt.indexOf(t)<0;}).map(function(t){return '<button data-add="'+esc(t)+'" data-click>'+esc(t)+'</button>';}).join('')+'</div>':'');
   tw1.addEventListener('click',function(e){var a=e.target.closest('[data-rm]'),ad=e.target.closest('[data-add]');
-   if(a||ad){var t=(a||ad).getAttribute(a?'data-rm':'data-add');P.freezeDone(r);if(imp){P.editTopic(r.id,t,!!ad);return;}
+   if(a||ad){var t=(a||ad).getAttribute(a?'data-rm':'data-add');P.freezeDone(r);if(imp&&!r.doneTopics){P.editTopic(r.id,t,!!ad);return;}
     var cur=(r.doneTopics||P.topics(r).list).filter(function(x){return x!==P.NOASK;}),wasNone=r.p1NoAsk||(r.doneTopics||[]).indexOf(P.NOASK)>=0;
     if(ad){if(cur.indexOf(t)<0)cur.push(t);}else cur=cur.filter(function(x){return x!==t;});
     r.p1NoAsk=wasNone;r.doneTopics=cur.length?cur:(wasNone?[P.NOASK]:[]);P.render();return;} /* 문의 없음에 더한 분류를 다 빼면 다시 문의 없음 */
@@ -2353,13 +2354,13 @@ function draw(){
  if(pt==='cust'){
   ctx.appendChild(H('기본 정보',''));
   ctx.appendChild(KV('이름','name',c.name));ctx.appendChild(KV('연락처','phone',c.phone,'전화번호 입력'));ctx.appendChild(KV('이메일','email',c.email,'이메일 입력'));
-  ctx.appendChild(KV('고객 메모','memo',c.memo,'메모 입력'));
-  ctx.appendChild(H('예약 내역',''));
+  if(!p1){ctx.appendChild(KV('고객 메모','memo',c.memo,'메모 입력')); /* 고객 메모: 상담 메모가 대신해 뺌 */
+  ctx.appendChild(H('예약 내역','')); /* CSM-CHAT-22 나중 */
   if(!c.phone&&!c.email)ctx.appendChild(note('없음 (연락처 미등록)')); /* CSM-CHAT-22-e1: 예약은 연락처로 잇는다. 연락처가 없으면 잇지 못함 */
   else if(!bks.length)ctx.appendChild(note('없음'));
   else{var key=function(x){return x.d+' '+(x.t||'');},up=bks.filter(isUp).sort(function(x,y){return key(x)<key(y)?-1:1;}),past=bks.filter(function(x){return !isUp(x);}).sort(function(x,y){return key(x)<key(y)?1:-1;});
    [['다가오는 예약',up],['지난 예약',past]].forEach(function(g){if(!g[1].length)return;var gh=document.createElement('div');gh.className='bgh';gh.textContent=g[0];ctx.appendChild(gh);
-    g[1].forEach(function(x){ctx.appendChild(link(esc(P.fmtDay(x.d,'ko')+' '+x.t+' · '+x.p+' · '+x.n+'명 · '+x.st)+(x.memo?'<span>메모: '+esc(x.memo)+'</span>':'')));});});}
+    g[1].forEach(function(x){ctx.appendChild(link(esc(P.fmtDay(x.d,'ko')+' '+x.t+' · '+x.p+' · '+x.n+'명 · '+x.st)+(x.memo?'<span>메모: '+esc(x.memo)+'</span>':'')));});});}}
   if(!p1){ctx.appendChild(H('다른 채널 상담','')); /* CSM-CHAT-23 나중 */
   if(!(c.links||[]).length)ctx.appendChild(note('없음'));
   (c.links||[]).forEach(function(l){ctx.appendChild(link(esc(l.ch+' · '+P.fmtDay(l.d,'ko')+' · '+l.st)));});}
