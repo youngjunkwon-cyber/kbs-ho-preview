@@ -87,7 +87,7 @@ var CS_GUIDE={ /* 플랫폼 CS 안내 문구 (방향결정 Q12, 문안은 작성
  howbook:{keys:['어떻게 예약','예약 방법','how to book','how do i book'],ko:'원하는 스토어 페이지의 예약 버튼에서 날짜와 시간을 골라 바로 예약할 수 있어요',en:'You can book directly by choosing a date and time from the booking button on the store page'}
 };
 /* 채널 ID·고객 카드는 시안용 예시 값 */
-var CARD={r1:{cid:'Ua1f3····e2711',chState:'친구 추가됨',card:{name:'고객 A',phone:'',email:'',tags:[],memo:'',owner:'',bookings:[],links:[]}},r2:{cid:'+1 4165550188',chState:'24시간 창 열림',card:{name:'Emma Lee',phone:'+1 4165550188',email:'emma.lee@example.com',tags:['재방문'],memo:'지난번 시술 후 붓기 문의 있었음',owner:'',bookings:[{id:'B2610300014',d:'2026-10-30',t:'14:00',p:'Rejuran Skin Booster',n:2,st:'확정',memo:'친구와 함께, 연속 시간으로'},{d:'2026-09-12',t:'11:00',p:'Skinvive',n:1,st:'방문',memo:''},{d:'2026-08-02',t:'15:30',p:'Rejuran Skin Booster',n:1,st:'취소',memo:''}],links:[{ch:'스토어채팅',d:'2026-09-10',st:'완료'}]}},r3:{cid:'oX9k····QkN30',chState:'구독 중',card:{name:'王丽',phone:'',email:'',tags:[],memo:'',owner:'',bookings:[],links:[]}},r4:{cid:'게스트 8b58f990',chState:'인앱 채팅',card:{name:'',phone:'',email:'',tags:[],memo:'',owner:'',bookings:[],links:[]}}};
+var CARD={r1:{cid:'Ua1f3c29d7b04e8f6a5d1c3b90e4e2711',chState:'친구 추가됨',card:{name:'고객 A',phone:'',email:'',tags:[],memo:'',owner:'',bookings:[],links:[]}},r2:{cid:'+1 4165550188',chState:'24시간 창 열림',card:{name:'Emma Lee',phone:'+1 4165550188',email:'emma.lee@example.com',tags:['재방문'],memo:'지난번 시술 후 붓기 문의 있었음',owner:'',bookings:[{id:'B2610300014',d:'2026-10-30',t:'14:00',p:'Rejuran Skin Booster',n:2,st:'확정',memo:'친구와 함께, 연속 시간으로'},{d:'2026-09-12',t:'11:00',p:'Skinvive',n:1,st:'방문',memo:''},{d:'2026-08-02',t:'15:30',p:'Rejuran Skin Booster',n:1,st:'취소',memo:''}],links:[{ch:'스토어채팅',d:'2026-09-10',st:'완료'}]}},r3:{cid:'oX9k····QkN30',chState:'구독 중',card:{name:'王丽',phone:'',email:'',tags:[],memo:'',owner:'',bookings:[],links:[]}},r4:{cid:'게스트 8b58f990',chState:'인앱 채팅',card:{name:'',phone:'',email:'',tags:[],memo:'',owner:'',bookings:[],links:[]}}};
 function seedRooms(){return [
  {id:'r1',name:'고객 A',ch:'LINE',lineAcct:'메인',type:'스토어 문의',store:1,lang:null,msgs:[],session:1,status:'상담중',aiOn:true,need:null,handler:'ai',noticeAt:null,aiIntroDone:false,req:{},asked:null,first:'2026-10-21 13:50',agentAt:null},
  {id:'r2',name:'Emma Lee',ch:'WhatsApp',type:'스토어 문의',store:1,lang:'en',msgs:[
@@ -107,9 +107,9 @@ var EX=[
  {id:'x2',cat:'헤어·메이크업',member:'회원',name:'Anna Kim',ch:'스토어채팅',store:'B헤어 명동점',lang:'en',tab:'wait',who:null,owner:'',session:2,topics:['불만'],aiOnly:false,
   msgs:[['cust','I waited 40 minutes past my booking time yesterday. This is unacceptable.','어제 예약 시간보다 40분을 기다렸어요. 받아들일 수 없습니다.','2026-10-21 11:40'],['ai','We are sorry for the inconvenience. A staff member will check and reply shortly.','불편을 드려 죄송합니다. 담당자가 확인 후 곧 답변드리겠습니다.','2026-10-21 11:40',1]],
   sum:{l1:'어제 예약 시간보다 40분 기다린 데 대한 불만, AI 안내문 발송 후 미응대',l2:''},card:{name:'Anna Kim',phone:'+1 2125550147',email:''},need:'불만'},
- {id:'x3',cat:'피부과',name:'Bat-Erdene',ch:'스토어채팅',store:'A피부과 강남점',lang:'mn',tab:'prog',who:'입점사',owner:'박지은',session:1,topics:['가격','시술 상담'],aiOnly:false,first:4,
+ {id:'x3',cat:'피부과',name:'',ch:'스토어채팅',store:'A피부과 강남점',lang:'mn',tab:'prog',who:'입점사',owner:'박지은',session:1,topics:['가격','시술 상담'],aiOnly:false,first:4,
   msgs:[['cust','Ботокс хэд вэ?','보톡스 얼마예요?','2026-10-21 12:02'],['agent','Ботокс 99,000 вон.','보톡스는 99,000원입니다.','2026-10-21 12:06'],['cust','Өвдөлттэй юу?','아픈가요?','2026-10-21 12:10']],
-  sum:{l1:'보톡스 가격 안내 후 통증 여부 추가 문의',l2:''},card:{name:'Bat-Erdene',phone:'+976 99112233',email:''}},
+  sum:{l1:'보톡스 가격 안내 후 통증 여부 추가 문의',l2:''},card:{name:'',phone:'',email:''}},
  {id:'x4',cat:'사진관',sub:'프로필 촬영',src:'알리페이',member:'회원',name:'林小姐',ch:'상품채팅',store:'C스튜디오 성수',lang:'zh-TW',tab:'done',who:'AI',owner:'김상담',session:1,topics:['위치·운영시간'],aiOnly:true,first:0,
   msgs:[['cust','請問營業時間到幾點？','영업시간 몇 시까지예요?','2026-10-20 16:10'],['ai','營業時間為上午10點至晚上8點。','영업시간은 오전 10시부터 저녁 8시까지입니다.','2026-10-20 16:10']],
   sum:{l1:'영업시간 문의, AI가 오후 8시까지로 안내',l2:''},card:{name:'林小姐',phone:'',email:''}},
@@ -140,7 +140,7 @@ EX.push(
   sum:{l1:'헤드스파 50% 이벤트 진행 여부 문의, 매장 확인 중',l2:''},card:{name:'Emily R.',phone:'+44 7700900123',email:''}}
 );
 var EX_LINE={x1:'TW',x7:'메인'}; /* LINE 계정 구분 (1차 결정 4) */
-var EX_META={x11:['+33 612345678','24시간 창 열림'],x9:['oP3k····Zt8','구독 중'],x10:['+44 7700900123','24시간 창 열림'],x1:['U3f9····a12c','친구 추가됨'],x2:['chat-20114','-'],x3:['chat-20117','-'],x4:['chat-20131','-',{name:'프로필 촬영 베이직',no:3021}],x5:['chat-20087','-'],x6:['oQ7v····Lm2','구독 중'],x7:['U77a····0e1','친구 추가됨'],x8:['chat-20140','-']};
+var EX_META={x11:['+33 612345678','24시간 창 열림'],x9:['oP3k····Zt8','구독 중'],x10:['+44 7700900123','24시간 창 열림'],x1:['U3f9d2c81a7e6b540f9c3d17e80b4a12c','친구 추가됨'],x2:['chat-20114','-'],x3:['chat-20117','-'],x4:['chat-20131','-',{name:'프로필 촬영 베이직',no:3021}],x5:['chat-20087','-'],x6:['oQ7v····Lm2','구독 중'],x7:['U77a4c1e9b3d2f6058a7c4e1b9d3f20e1','친구 추가됨'],x8:['chat-20140','-']};
 /* 긴 대화 예시: Mina Park 1차 40건, Anna Kim 2회차(1차 10. 14.) */
 (function(){
  var QA=[['Hi, I am visiting Seoul next week.','안녕하세요, 다음 주에 서울 방문해요.','Welcome! How can we help you?','환영합니다! 무엇을 도와드릴까요?'],
