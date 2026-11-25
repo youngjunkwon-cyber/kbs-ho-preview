@@ -2308,7 +2308,7 @@ function draw(){
   ctx.appendChild(H('상담 분류',imp?'가져온 기록 · 자동 분류':null));
   /* CSM-CHAT-29: 완료 뒤(또는 가져온 기록)에는 칩마다 ✕, "+ 분류"로 더하기. 문의 없음은 칩 대신 글자 */
   var canEd=imp||r.status==='상담종료',na=dt.length===1&&dt[0]===P.NOASK,tw1=document.createElement('div');tw1.className='tpw';tw1.setAttribute('data-new','');
-  tw1.innerHTML=(na?'<span class="tpnone na">'+esc(P.NOASK)+'</span>':dt.length?dt.map(function(t){return '<span class="tpchip">'+esc(t)+(canEd?'<a data-rm="'+esc(t)+'" data-click title="빼기">✕</a>':'')+'</span>';}).join(''):'<span class="tpnone">'+(imp?'없음':'-')+'</span>')
+  tw1.innerHTML=(na?'<span class="tpnone na">'+esc(P.NOASK)+'</span>':dt.length?dt.map(function(t){return '<span class="tpchip">'+esc(t)+(canEd?'<a data-rm="'+esc(t)+'" data-click title="빼기">✕</a>':'')+'</span>';}).join(''):'<span class="tpnone">'+(canEd?'분류 없음':'-')+'</span>')
    +(canEd&&(na||dt.length<P.TOPICS.length)?'<span class="tpadd" data-click>+ 분류</span><div class="tpmenu" style="display:none">'+P.TOPICS.filter(function(t){return dt.indexOf(t)<0;}).map(function(t){return '<button data-add="'+esc(t)+'" data-click>'+esc(t)+'</button>';}).join('')+'</div>':'');
   tw1.addEventListener('click',function(e){var a=e.target.closest('[data-rm]'),ad=e.target.closest('[data-add]');
    if(a||ad){var t=(a||ad).getAttribute(a?'data-rm':'data-add');if(imp){P.editTopic(r.id,t,!!ad);return;}
