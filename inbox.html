@@ -733,7 +733,7 @@ function custSend(id,text,kind){
  if(m.kind==='text'&&detectLang(text)){var pr=r.lang,pl=pr||'ko',nl=lastLangOf(r,text);if(nl==='ko'&&!pr)r.lang=pr; /* 한국어로만 쓴 대화는 언어 표시 없음 */m.lang=nl;if(nl!==pl)r.msgs.forEach(function(z){if(z.who==='agent'&&!z.tl){z.tl=pl;z.untr=(S.bo.readLangs||[]).indexOf(pl)>=0;}});if(nl!=='ko')m.koT=koOf(text);} /* CSM-CHAT-15 언어가 바뀔 때: 대화 언어 = 고객이 마지막에 쓴 언어. 이미 보낸 답은 보낼 때 언어 그대로 */
  if(wasDone){var gn=grpN(r);(r.sessOwner=r.sessOwner||{})[gn]=r.card.owner||'';(r.sessTopics=r.sessTopics||{})[gn]=(r.doneTopics||topics(r).list).slice();(r.sessTarget=r.sessTarget||{})[gn]=r.target||'';} /* 지난 회차 값은 그대로 남긴다 (SYS-CHAT-09) */
  push(r,m);
- if(wasDone){r.status='상담중';r.session++;m.newSession=true;r.card.owner='';r.byStore=false;r.agentAt=null;r.target='';r.doneTopics=null;r.p1NoAsk=false;r.topicFix=null;} /* 새 회차: 담당자·문의 대상(CSM-CHAT-35)·분류 비움 */
+ if(wasDone){r.status='상담중';r.session++;m.newSession=true;r.card.owner='';r.byStore=false;r.agentAt=null;if(S.p1)r.handler='ai';r.target='';r.doneTopics=null;r.p1NoAsk=false;r.topicFix=null;} /* 새 회차: 담당자·문의 대상(CSM-CHAT-35)·분류 비움 */
  if(aiActive(r))handle(r,m);
  render();
 }
@@ -772,7 +772,7 @@ var P1_DROP={'Hello, this is the K-Beauty Station AI assistant. Rejuran Skin Boo
 function p1View(m){if(!S||!S.p1||m.who!=='ai')return m;if(P1_DROP[m.text])return null;var c={};for(var k in m)c[k]=m[k];c.who='agent';return c;}
 /* 1차 입력 도구 */
 function lineBlocked(r){return r.ch==='LINE'&&DB.store.lineLeft<=0;}
-function waBlocked(r){if(r.ch!=='WhatsApp')return '';if(S.waOff)return 'off';var lc=null;r.msgs.forEach(function(m){if(m.who==='cust')lc=m.at;});return lc&&tsMin(S.now)-tsMin(lc)>24*60?'24h':'';}
+function waBlocked(r){if(r.ch!=='WhatsApp')return '';if(S.waOff)return 'off';var lc=null;r.msgs.forEach(function(m){if(m.who==='cust')lc=m.at;});return lc&&tsMin(S.now)-tsMin(lc)>=24*60?'24h':'';}
 function freezeDone(r){if(!S.p1||r.status!=='상담종료')return;var gn=grpN(r),dn=hist(r).filter(function(e){return e.n===gn&&/^상담 완료|^가져온 기록 · 자동 분류/.test(e.t);}).pop();r.p1Log=r.p1Log||[];if(dn&&/^상담 완료/.test(dn.t)&&!r.p1Log.some(function(o){return o[2]===gn&&/^상담 완료/.test(o[1]);}))r.p1Log.push([dn.at,dn.t,gn]);} /* 완료 줄을 그때 값으로 고정: 뒤에 보내거나 분류를 고쳐도 지난 줄은 그대로 (SYS-CHAT-09) */
 function reopen(r){if(!S.p1||r.status!=='상담종료')return;freezeDone(r);var imp=r.impSess&&r.session<=r.impSess;r.doneTopics=(r.doneTopics||topics(r).list).slice();r.status='상담중'; /* 분류는 그대로 둔다 (CSM-CHAT-29) */r.p1Log.push([S.now,'상담 재개 · 김상담',grpN(r),EVSEQ++]);} /* 이름 = 보낸 상담사(로그인한 사람) */ /* 완료된 대화에서 답장·상품 카드·이미지를 보내면 같은 회차가 진행으로 (CSM-CHAT-16-e2). 분류는 다시 완료할 때 미리 골라 둠 */
 var EVSEQ=1; /* 처리 이력 줄이 일어난 순서 (같은 시각 정렬용) */
