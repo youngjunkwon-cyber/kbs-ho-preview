@@ -1982,7 +1982,7 @@ function drawSR(){var p=EL.sr;if(!p)return;if(EL.srS!==P.S){if(EL.srS)SR=JSON.pa
 /* ===== 1차: 상담 완료 창 (CSM-CHAT-17) ===== */
 function ov(html){var m=document.createElement('div');m.className='ov';m.setAttribute('data-new','');m.innerHTML='<div class="bg"></div><div class="bx">'+html+'</div>';document.body.appendChild(m);m.querySelector('.bg').addEventListener('click',function(){m.remove();});return m;}
 function openDone(r){
- var sel=(r.reTopics||[]).slice(),lastN=null,cur=false;for(var i=r.msgs.length-1;i>=0;i--){var x=r.msgs[i];if(x.who==='note'&&!lastN)lastN=x;if(x.newSession&&i>0)break;}cur=hasNote(r);
+ var sel=tpOf(r).slice(),lastN=null,cur=false;for(var i=r.msgs.length-1;i>=0;i--){var x=r.msgs[i];if(x.who==='note'&&!lastN)lastN=x;if(x.newSession&&i>0)break;}cur=hasNote(r);
  var m=ov('<h3>상담 완료</h3><div class="lb">상담 분류<small>하나 이상 선택</small></div><div class="ck">'+P.TOPICS.concat([P.NOASK]).map(function(t){return '<button type="button" data-t="'+esc(t)+'"'+(sel.indexOf(t)>=0?' class="on"':'')+' data-click>'+esc(t)+'</button>';}).join('')+'</div>'
   +'<div class="lb">상담 메모<small>(선택)</small></div>'+(cur&&lastN?'<div class="nl">'+esc(lastN.text.split('\n')[0])+'</div>':'<textarea placeholder="메모 입력" data-click></textarea>')
   +'<div class="ft"><button type="button" class="cc" data-click>취소</button><button type="button" class="ok"'+(sel.length?'':' disabled')+' data-click>완료</button></div>');
@@ -2007,7 +2007,7 @@ function openPw(){
   if(!er.textContent){er.style.color='#067647';er.textContent='비밀번호가 변경되었습니다.';setTimeout(function(){m.remove();},900);}});
 }
 /* 1차 상담 분류: 완료 때 고른 값. 완료 전은 없음 */
-function tpOf(r){if(!P.S.p1)return P.topics(r).list;if(r.status!=='상담종료')return []; /* 진행으로 돌아온 회차도 다시 완료할 때까지 비움 (CSM-CHAT-16-e2) */if(r.impSess&&r.session<=r.impSess&&!r.doneTopics)return P.topics(r).list; /* 가져온 기록: 가져올 때 자동분류, 통계 포함 */return r.doneTopics||P.topics(r).list;}
+function tpOf(r){if(!P.S.p1)return P.topics(r).list;if(r.doneTopics)return r.doneTopics;if(r.status==='상담종료')return P.topics(r).list; /* 예시 완료 대화·가져온 기록: 처음 값 */return [];} /* 1차 상담 분류: 상담사가 어느 단계에서든 고른 값 (CSM-CHAT-29) */
 var STORES=['k-beauty의원','A피부과 강남점','B헤어 명동점','C스튜디오 성수','D의원 압구정'];
 /* 문의 대상 후보: 스토어만 또는 스토어 · 상품 (상품을 고르면 스토어가 따라 정해진다) */
 var TGT=STORES.concat(['k-beauty의원 · 리쥬란 스킨부스터','k-beauty의원 · 보톡스 (사각턱)','A피부과 강남점 · 레이저 토닝','B헤어 명동점 · 헤드스파','B헤어 명동점 · 펌','C스튜디오 성수 · 프로필 촬영 베이직','D의원 압구정 · 울쎄라']);
@@ -2308,12 +2308,12 @@ function draw(){
   var imp=r.impSess&&r.session<=r.impSess,dt=tpOf(r);
   ctx.appendChild(H('상담 분류',imp&&r.status==='상담종료'&&!r.doneTopics?'가져온 기록 · 자동 분류':null));
   /* CSM-CHAT-29: 완료 뒤(또는 가져온 기록)에는 칩마다 ✕, "+ 분류"로 더하기. 문의 없음은 칩 대신 글자 */
-  var canEd=r.status==='상담종료',na=dt.length===1&&dt[0]===P.NOASK,tw1=document.createElement('div');tw1.className='tpw';tw1.setAttribute('data-new','');
-  tw1.innerHTML=(na?'<span class="tpnone na">'+esc(P.NOASK)+'</span>':dt.length?dt.map(function(t){return '<span class="tpchip">'+esc(t)+(canEd?'<a data-rm="'+esc(t)+'" data-click title="빼기">✕</a>':'')+'</span>';}).join(''):'<span class="tpnone">'+(canEd?'분류 없음':'-')+'</span>')
+  var canEd=true,na=dt.length===1&&dt[0]===P.NOASK,tw1=document.createElement('div');tw1.className='tpw';tw1.setAttribute('data-new','');
+  tw1.innerHTML=(na?'<span class="tpnone na">'+esc(P.NOASK)+'</span>':dt.length?dt.map(function(t){return '<span class="tpchip">'+esc(t)+(canEd?'<a data-rm="'+esc(t)+'" data-click title="빼기">✕</a>':'')+'</span>';}).join(''):'<span class="tpnone">'+(r.status==='상담종료'?'분류 없음':'-')+'</span>')
    +(canEd&&(na||dt.length<P.TOPICS.length)?'<span class="tpadd" data-click>+ 분류</span><div class="tpmenu" style="display:none">'+P.TOPICS.filter(function(t){return dt.indexOf(t)<0;}).map(function(t){return '<button data-add="'+esc(t)+'" data-click>'+esc(t)+'</button>';}).join('')+'</div>':'');
   tw1.addEventListener('click',function(e){var a=e.target.closest('[data-rm]'),ad=e.target.closest('[data-add]');
    if(a||ad){var t=(a||ad).getAttribute(a?'data-rm':'data-add');P.freezeDone(r);if(imp&&!r.doneTopics){P.editTopic(r.id,t,!!ad);return;}
-    var cur=(r.doneTopics||P.topics(r).list).filter(function(x){return x!==P.NOASK;}),wasNone=r.p1NoAsk||(r.doneTopics||[]).indexOf(P.NOASK)>=0;
+    var cur=tpOf(r).filter(function(x){return x!==P.NOASK;}),wasNone=r.p1NoAsk||(r.doneTopics||[]).indexOf(P.NOASK)>=0;
     if(ad){if(cur.indexOf(t)<0)cur.push(t);}else cur=cur.filter(function(x){return x!==t;});
     r.p1NoAsk=wasNone;r.doneTopics=cur.length?cur:(wasNone?[P.NOASK]:[]);P.render();return;} /* 문의 없음에 더한 분류를 다 빼면 다시 문의 없음 */
    if(e.target.closest('.tpadd')){var mm=tw1.querySelector('.tpmenu');mm.style.display=mm.style.display==='none'?'flex':'none';}});
