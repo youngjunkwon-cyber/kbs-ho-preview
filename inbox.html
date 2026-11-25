@@ -101,9 +101,9 @@ function seedRooms(){return [
 
 /* 예시 대화: 여러 입점사 · 입점사 직접 응대 · 불만 · 2회차 · 긴 대화 (CSM·상담 관리 공통) */
 var EX=[
- {id:'x1',cat:'피부과',name:'Sato Yui',ch:'LINE',store:'A피부과 강남점',lang:'ja',tab:'wait',who:null,owner:'',session:1,topics:['예약'],aiOnly:false,
+ {id:'x1',cat:'피부과',name:'ゆい🌸',ch:'LINE',store:'A피부과 강남점',lang:'ja',tab:'wait',who:null,owner:'',session:1,topics:['예약'],aiOnly:false,
   msgs:[['cust','来週の土曜日、2名で予約できますか？','다음 주 토요일 2명 예약 가능한가요?','2026-10-21 13:20']],
-  sum:{l1:'10월 31일(토) 2명 예약 가능 여부 문의, 입점사 미응대',l2:''},card:{name:'Sato Yui',phone:'',email:''},note:'입점사 직접 응대 매장'},
+  sum:{l1:'10월 31일(토) 2명 예약 가능 여부 문의, 입점사 미응대',l2:''},card:{name:'ゆい🌸',phone:'',email:''},note:'입점사 직접 응대 매장'},
  {id:'x2',cat:'헤어·메이크업',member:'회원',acct:'anna.kim@example.com',name:'Anna Kim',ch:'스토어채팅',store:'B헤어 명동점',lang:'en',tab:'wait',who:null,owner:'',session:2,topics:['불만'],aiOnly:false,
   msgs:[['cust','I waited 40 minutes past my booking time yesterday. This is unacceptable.','어제 예약 시간보다 40분을 기다렸어요. 받아들일 수 없습니다.','2026-10-21 11:40'],['ai','We are sorry for the inconvenience. A staff member will check and reply shortly.','불편을 드려 죄송합니다. 담당자가 확인 후 곧 답변드리겠습니다.','2026-10-21 11:40',1]],
   sum:{l1:'어제 예약 시간보다 40분 기다린 데 대한 불만, AI 안내문 발송 후 미응대',l2:''},card:{name:'Anna Kim',phone:'+1 2125550147',email:''},need:'불만'},
@@ -137,10 +137,10 @@ EX.push(
   sum:{l1:'인사만 하고 문의 없이 종료',l2:''},card:{name:'',phone:'',email:''}},
  {id:'x10',cat:'헤어·메이크업',name:'Emily R.',ch:'WhatsApp',store:'B헤어 명동점',lang:'en',tab:'prog',who:'CS팀',owner:'김상담',session:1,topics:['이벤트·혜택'],aiOnly:false,first:5,
   msgs:[['cust','Is the 50% head spa event still available this month?','이번 달에도 헤드스파 50% 이벤트 하나요?','2026-10-21 13:30'],['agent','Let me check with the salon and get back to you.','매장에 확인 후 안내드리겠습니다.','2026-10-21 13:35']],
-  sum:{l1:'헤드스파 50% 이벤트 진행 여부 문의, 매장 확인 중',l2:''},card:{name:'Emily R.',phone:'+44 7700900123',email:''}}
+  sum:{l1:'헤드스파 50% 이벤트 진행 여부 문의, 매장 확인 중',l2:''},card:{name:'Emily R.',phone:'',email:''}}
 );
 var EX_LINE={x1:'TW',x7:'메인'}; /* LINE 계정 구분 (1차 결정 4) */
-var EX_META={x11:['+33 612345678','24시간 창 열림'],x9:['oP3k····Zt8','구독 중'],x10:['+44 7700900123','24시간 창 열림'],x1:['U3f9d2c81a7e6b540f9c3d17e80b4a12c','친구 추가됨'],x2:['chat-20114','-'],x3:['chat-20117','-'],x4:['chat-20131','-',{name:'프로필 촬영 베이직',no:3021}],x5:['chat-20087','-'],x6:['oQ7v····Lm2','구독 중'],x7:['U77a4c1e9b3d2f6058a7c4e1b9d3f20e1','친구 추가됨'],x8:['chat-20140','-']};
+var EX_META={x11:['+33 612345678','24시간 창 열림'],x9:['oP3k····Zt8','구독 중'],x10:['@emily.r','24시간 창 열림'],x1:['U3f9d2c81a7e6b540f9c3d17e80b4a12c','친구 추가됨'],x2:['chat-20114','-'],x3:['chat-20117','-'],x4:['chat-20131','-',{name:'프로필 촬영 베이직',no:3021}],x5:['chat-20087','-'],x6:['oQ7v····Lm2','구독 중'],x7:['U77a4c1e9b3d2f6058a7c4e1b9d3f20e1','친구 추가됨'],x8:['chat-20140','-']};
 /* 긴 대화 예시: Mina Park 1차 40건, Anna Kim 2회차(1차 10. 14.) */
 (function(){
  var QA=[['Hi, I am visiting Seoul next week.','안녕하세요, 다음 주에 서울 방문해요.','Welcome! How can we help you?','환영합니다! 무엇을 도와드릴까요?'],
