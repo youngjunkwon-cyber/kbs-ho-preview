@@ -2146,7 +2146,8 @@ function chSvg(r,z){if(r.ch==='플랫폼'||!CHI[r.ch])return '<img src="'+KBS_IC
 function chIcon(r,big){return '<span class="chi" title="'+esc(chLabel(r))+'">'+chSvg(r,big?18:16)+(chSub(r)?'<em>'+esc(chSub(r))+'</em>':'')+'</span>';}
 var LINE_NAME={'메인':'K-Beauty Station','TW':'K-Beauty Station TW'}; /* LINE 공식계정 표시 이름을 연결 때 가져온 값 (사람이 정하지 않음, CSM-CHAT-08) */
 function chName(r){return r.ch==='LINE'?(LINE_NAME[r.lineAcct||'메인']||r.lineAcct):chLabel(r);}
-function maskId(ch,id){id=String(id||'');if(ch!=='WhatsApp')return id;var p=id.trim().split(/\s+/);if(p.length<2)return id;var cc=p[0],rest=p.slice(1).join('').replace(/\D/g,'');if(rest.length<6)return id;return cc+' '+rest.slice(0,rest.length-8)+(rest.length>8?'-':'')+'****-'+rest.slice(-4);} /* 채널 ID가 전화번호면 가운데 가림 (CSM-CHAT-28) */
+function maskId(ch,id){return String(id||""); /* 2026-11-25: 전화번호 가운데 가림 없앰 (CSM-CHAT-28) */}
+function maskIdOld(ch,id){id=String(id||'');if(ch!=='WhatsApp')return id;var p=id.trim().split(/\s+/);if(p.length<2)return id;var cc=p[0],rest=p.slice(1).join('').replace(/\D/g,'');if(rest.length<6)return id;return cc+' '+rest.slice(0,rest.length-8)+(rest.length>8?'-':'')+'****-'+rest.slice(-4);} /* 채널 ID가 전화번호면 가운데 가림 (CSM-CHAT-28) */
 function chLabel(r){if(r.ch==='LINE')return 'LINE '+(LINE_NAME[r.lineAcct||'메인']||r.lineAcct);if(r.ch!=='플랫폼')return r.ch;return {'고객지원':'CS채팅','스토어 문의':'스토어채팅','상품 문의':'상품채팅'}[r.type]||'인앱채팅';}
 function relTs(ts){var S=P.S,d=ts.slice(0,10),n=S.now.slice(0,10);if(d===n)return ts.slice(11,16);var y=new Date(n+'T00:00:00');y.setDate(y.getDate()-1);var ys=y.getFullYear()+'-'+('0'+(y.getMonth()+1)).slice(-2)+'-'+('0'+y.getDate()).slice(-2);if(d===ys)return '어제';return (+d.slice(5,7))+'. '+(+d.slice(8,10))+'.';}
 function tsMin(ts){return new Date(ts.replace(' ','T')+':00').getTime()/60000;}
