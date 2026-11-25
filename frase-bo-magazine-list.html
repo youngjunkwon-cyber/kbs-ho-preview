@@ -6326,7 +6326,7 @@ th.fz-th:hover{background:#f0f0f0}
   if('fzNew' in d)root.classList.toggle('fz-new',!!d.fzNew);
   if(d.fzHeight)parent.postMessage({fzH:document.documentElement.scrollHeight,id:d.id},'*');});
  root.classList.add('fz-new');
- function fzShow(){var th=document.querySelector('th.fz-mark');if(!th)return;var c=th.closest('.ant-table-content,.ant-table-body');if(!c||c.scrollWidth<=c.clientWidth)return;var cb=c.getBoundingClientRect(),edge=cb.right;th.parentNode.querySelectorAll('.ant-table-cell-fix-right,.ant-table-cell-fix-end').forEach(function(h){edge=Math.min(edge,h.getBoundingClientRect().left)});var t=th.getBoundingClientRect();if(t.right>edge)c.scrollLeft+=t.right-edge+24;else if(t.left<cb.left)c.scrollLeft-=cb.left-t.left+24;}
+ function fzShow(){var th=document.querySelector('th.fz-mark');if(!th)return;var c=th.closest('.ant-table-content,.ant-table-body');if(!c||c.scrollWidth<=c.clientWidth)return;var cb=c.getBoundingClientRect(),edge=cb.right;th.parentNode.querySelectorAll('.ant-table-cell-fix-right,.ant-table-cell-fix-end').forEach(function(h){edge=Math.min(edge,h.getBoundingClientRect().left)});var t=th.getBoundingClientRect();if(t.right>edge)c.scrollLeft+=Math.ceil(t.right-edge);else if(t.left<cb.left)c.scrollLeft-=Math.ceil(cb.left-t.left);}
  fzShow(); window.fzShow=fzShow;
 })();
 </script></body></html>
