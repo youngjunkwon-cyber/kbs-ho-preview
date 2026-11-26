@@ -749,7 +749,7 @@ function aiResume(r){
  var q=r.msgs.filter(function(m){return m.who==='cust'&&!m.answered;});
  for(var i=0;i<q.length;i++){
   var m=q[i];
-  if(r.ch==='WhatsApp'&&tsMin(S.now)-tsMin(m.at)>24*60){r.need={reason:'WhatsApp 24시간 경과',at:S.now};r.aiOn=false;notifySlack(r,'WhatsApp 24시간 경과');return;}
+  if(r.ch==='WhatsApp'&&tsMin(S.now)-tsMin(m.at)>=24*60){r.need={reason:'WhatsApp 24시간 경과',at:S.now};r.aiOn=false;notifySlack(r,'WhatsApp 24시간 경과');return;}
   if(!r.aiOn)break;
   handle(r,m);
  }
