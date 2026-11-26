@@ -4,138 +4,328 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KBS 시안 모아보기</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
 <style>
   :root {
-    --bg: #f6f6f4; --card: #fff; --line: #e7e5e0; --text: #1c1b19; --muted: #77746d;
-    --accent: #2f5bea; --accent-soft: #e9eefe; --new: #d9480f; --chip: #efeeea;
-    --k-시안: #2f5bea; --k-검수: #2b8a3e; --k-리뷰: #9c36b5; --k-가이드: #e67700; --k-문서: #5c6b7a; --k-Figma: #c2255c;
+    --bg: #f4f4f1; --card: #ffffff; --line: #e6e4de; --line2: #efeee9; --text: #1b1a18; --muted: #76736b; --faint: #a7a49b;
+    --accent: #2b59e8; --accent-soft: #eaf0ff; --hover: #f7f7f4; --new: #e8590c; --new-soft: #fff1e6;
+    --c-시안: #2b59e8; --c-검수: #2b8a3e; --c-리뷰: #9c36b5; --c-가이드: #d9480f; --c-문서: #5c6b7a;
+    --w-어드민: #364fc7; --w-입점사: #0c8599; --w-고객: #c2255c;
+    --shadow: 0 1px 2px rgba(20,20,15,.05), 0 4px 14px rgba(20,20,15,.04);
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --bg: #151514; --card: #1e1e1c; --line: #302f2c; --text: #ecebe7; --muted: #9a978f;
-      --accent: #7d9bff; --accent-soft: #232b45; --new: #ff8a50; --chip: #2a2927;
+      --bg: #131312; --card: #1c1c1a; --line: #2e2d2a; --line2: #262523; --text: #eceae5; --muted: #9b988f; --faint: #6c6a64;
+      --accent: #7b9bff; --accent-soft: #212a44; --hover: #22221f; --new: #ff8f4d; --new-soft: #3a2416;
+      --c-시안: #7b9bff; --c-검수: #69db7c; --c-리뷰: #da77f2; --c-가이드: #ffa94d; --c-문서: #a5b4c3;
+      --w-어드민: #91a7ff; --w-입점사: #66d9e8; --w-고객: #f783ac; --shadow: none;
     }
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.5 -apple-system, BlinkMacSystemFont, 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; }
-  .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 16px 60px; }
-  header h1 { margin: 0; font-size: 22px; letter-spacing: -0.3px; }
-  header p { margin: 4px 0 18px; color: var(--muted); font-size: 13px; }
-  .bar { position: sticky; top: 0; z-index: 5; background: var(--bg); padding: 10px 0 12px; border-bottom: 1px solid var(--line); margin-bottom: 8px; }
-  .search { width: 100%; padding: 11px 14px; font-size: 15px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--text); outline: none; }
-  .search:focus { border-color: var(--accent); }
-  .row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; align-items: center; }
-  .chip { border: 1px solid transparent; background: var(--chip); color: var(--text); padding: 5px 11px; border-radius: 999px; font-size: 12.5px; cursor: pointer; white-space: nowrap; }
-  .chip span { color: var(--muted); margin-left: 3px; }
-  .chip.on { background: var(--accent); color: #fff; }
-  .chip.on span { color: #ffffffb0; }
-  .spacer { flex: 1; }
-  .seg { display: inline-flex; background: var(--chip); border-radius: 8px; padding: 2px; }
-  .seg button { border: 0; background: none; color: var(--muted); padding: 5px 10px; font-size: 12.5px; border-radius: 6px; cursor: pointer; }
-  .seg button.on { background: var(--card); color: var(--text); box-shadow: 0 1px 2px #0002; }
-  h2 { font-size: 13px; color: var(--muted); font-weight: 600; margin: 22px 0 8px; display: flex; gap: 8px; align-items: baseline; }
-  h2 b { color: var(--text); font-size: 15px; }
-  .list { background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
-  .item { display: grid; grid-template-columns: 54px 1fr auto; gap: 12px; align-items: center; padding: 11px 14px; border-top: 1px solid var(--line); }
+  html, body { margin: 0; }
+  body { background: var(--bg); color: var(--text); font: 14px/1.5 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; -webkit-font-smoothing: antialiased; }
+  button { font: inherit; }
+  a { color: inherit; }
+
+  /* 상단 */
+  .top { background: var(--card); border-bottom: 1px solid var(--line); }
+  .top-in { max-width: 1240px; margin: 0 auto; padding: 26px 20px 22px; }
+  .brand { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .brand h1 { margin: 0; font-size: 24px; font-weight: 750; letter-spacing: -0.5px; }
+  .brand p { margin: 0; color: var(--muted); font-size: 13px; }
+  .sbox { position: relative; margin-top: 16px; }
+  .sbox svg { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--faint); }
+  .search { width: 100%; height: 52px; padding: 0 90px 0 46px; font: inherit; font-size: 16px; border: 1.5px solid var(--line); border-radius: 14px; background: var(--bg); color: var(--text); outline: none; transition: border-color .15s, background .15s; }
+  .search:focus { border-color: var(--accent); background: var(--card); }
+  .kbd { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--faint); border: 1px solid var(--line); border-radius: 6px; padding: 2px 7px; background: var(--card); }
+  .hint { margin-top: 8px; font-size: 12px; color: var(--faint); min-height: 18px; }
+
+  /* 최근 작업 */
+  .recent { max-width: 1240px; margin: 0 auto; padding: 22px 20px 0; }
+  .sec-t { display: flex; align-items: baseline; gap: 8px; margin: 0 0 10px; font-size: 15px; font-weight: 700; }
+  .sec-t small { font-size: 12px; color: var(--muted); font-weight: 500; }
+  .cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 13px 14px 12px; cursor: pointer; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 6px; min-width: 0; text-align: left; color: var(--text); transition: border-color .15s, transform .15s; }
+  .card:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .card .tp { font-size: 11.5px; color: var(--muted); display: flex; justify-content: space-between; gap: 6px; }
+  .card .tp b { color: var(--accent); font-weight: 600; }
+  .card .nm { font-weight: 650; font-size: 14px; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 38px; }
+  .card .bd { display: flex; gap: 4px; flex-wrap: wrap; }
+
+  /* 본문 */
+  .main { max-width: 1240px; margin: 0 auto; padding: 26px 20px 80px; display: grid; grid-template-columns: 232px 1fr; gap: 26px; align-items: start; }
+  .side { position: sticky; top: 16px; display: flex; flex-direction: column; gap: 18px; max-height: calc(100vh - 32px); overflow: auto; }
+  .side h3 { margin: 0 0 6px; font-size: 11.5px; letter-spacing: .4px; color: var(--muted); font-weight: 600; }
+  .nav { display: flex; flex-direction: column; gap: 1px; }
+  .nav button { display: flex; align-items: center; gap: 8px; width: 100%; border: 0; background: none; color: var(--text); padding: 7px 10px; border-radius: 8px; cursor: pointer; text-align: left; font-size: 13.5px; }
+  .nav button:hover { background: var(--card); }
+  .nav button.on { background: var(--card); box-shadow: var(--shadow); font-weight: 650; color: var(--accent); }
+  .nav .n { margin-left: auto; color: var(--faint); font-size: 12px; font-variant-numeric: tabular-nums; }
+  .nav .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--new); flex: none; }
+  .nav .dot.off { background: transparent; }
+  .pills { display: flex; flex-wrap: wrap; gap: 5px; }
+  .pill { border: 1px solid var(--line); background: var(--card); color: var(--text); padding: 4px 10px; border-radius: 999px; font-size: 12.5px; cursor: pointer; }
+  .pill.on { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .toggle { display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--muted); cursor: pointer; user-select: none; }
+
+  .content { min-width: 0; }
+  .bar { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
+  .bar .count { font-size: 13px; color: var(--muted); }
+  .bar .count b { color: var(--text); }
+  .seg { margin-left: auto; display: inline-flex; background: var(--line2); border-radius: 9px; padding: 3px; }
+  .seg button { border: 0; background: none; color: var(--muted); padding: 5px 11px; font-size: 12.5px; border-radius: 7px; cursor: pointer; }
+  .seg button.on { background: var(--card); color: var(--text); box-shadow: var(--shadow); font-weight: 600; }
+
+  .group { margin-top: 18px; scroll-margin-top: 12px; }
+  .gh { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+  .gh h2 { margin: 0; font-size: 17px; font-weight: 720; letter-spacing: -0.2px; }
+  .gh .gm { font-size: 12px; color: var(--muted); }
+  .gh .qa { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; }
+  .qa a { font-size: 12px; text-decoration: none; color: var(--c-검수); border: 1px solid color-mix(in srgb, var(--c-검수) 35%, transparent); padding: 3px 9px; border-radius: 7px; background: var(--card); }
+  .qa a:hover { background: color-mix(in srgb, var(--c-검수) 10%, var(--card)); }
+  .list { background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; box-shadow: var(--shadow); }
+  .item { display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; padding: 12px 16px; border-top: 1px solid var(--line2); cursor: pointer; }
   .item:first-child { border-top: 0; }
-  .item:hover { background: var(--accent-soft); }
-  .kind { font-size: 11px; font-weight: 600; text-align: center; padding: 2px 0; border-radius: 5px; color: var(--kc); border: 1px solid color-mix(in srgb, var(--kc) 40%, transparent); }
-  .t { min-width: 0; }
-  .t a { color: var(--text); text-decoration: none; font-weight: 550; }
-  .t a:hover { color: var(--accent); text-decoration: underline; }
-  .meta { color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .new { color: var(--new); font-weight: 600; font-size: 11px; margin-left: 6px; }
+  .item:hover { background: var(--hover); }
+  .item.arch { opacity: .55; }
+  .it { min-width: 0; }
+  .tl { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .tl .nm { font-weight: 620; font-size: 14.5px; }
+  .meta { color: var(--muted); font-size: 12px; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .meta .fn { font-family: ui-monospace, 'SF Mono', Consolas, monospace; font-size: 11.5px; }
+  .b { font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 5px; white-space: nowrap; line-height: 17px; }
+  .b.k { color: var(--kc); background: color-mix(in srgb, var(--kc) 11%, transparent); }
+  .b.w { color: var(--wc); border: 1px solid color-mix(in srgb, var(--wc) 35%, transparent); }
+  .b.new { color: var(--new); background: var(--new-soft); }
+  .b.old { color: var(--muted); border: 1px dashed var(--line); }
+  mark { background: color-mix(in srgb, var(--accent) 22%, transparent); color: inherit; border-radius: 3px; padding: 0 1px; }
   .act { display: flex; gap: 6px; }
-  .act button { border: 1px solid var(--line); background: var(--card); color: var(--text); font-size: 12px; padding: 5px 10px; border-radius: 7px; cursor: pointer; white-space: nowrap; }
-  .act button:hover { border-color: var(--accent); color: var(--accent); }
-  .empty { padding: 40px; text-align: center; color: var(--muted); }
-  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--text); color: var(--bg); padding: 8px 14px; border-radius: 8px; font-size: 13px; opacity: 0; transition: opacity .2s; pointer-events: none; }
-  .toast.on { opacity: 1; }
-  @media (max-width: 600px) {
-    .item { grid-template-columns: 1fr auto; }
-    .kind { display: none; }
-    .act .open { display: none; }
+  .btn { border: 1px solid var(--line); background: var(--card); color: var(--text); font-size: 12.5px; padding: 6px 11px; border-radius: 8px; cursor: pointer; white-space: nowrap; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.pri { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.pri:hover { filter: brightness(1.08); color: #fff; }
+  .empty { padding: 56px 20px; text-align: center; color: var(--muted); background: var(--card); border: 1px dashed var(--line); border-radius: 14px; margin-top: 14px; }
+
+  /* 미리보기 */
+  .scrim { position: fixed; inset: 0; background: rgba(10,10,8,.38); opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 20; }
+  .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(1100px, 78vw); background: var(--card); z-index: 21; transform: translateX(102%); transition: transform .25s ease; display: flex; flex-direction: column; box-shadow: -8px 0 30px rgba(0,0,0,.15); }
+  .pv-open .scrim { opacity: 1; pointer-events: auto; }
+  .pv-open .drawer { transform: none; }
+  .dh { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  .dh .dt { min-width: 0; flex: 1; }
+  .dh .dt b { display: block; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dh .dt span { font-size: 12px; color: var(--muted); }
+  .x { border: 0; background: none; font-size: 22px; line-height: 1; color: var(--muted); cursor: pointer; padding: 4px 8px; border-radius: 6px; }
+  .x:hover { background: var(--hover); color: var(--text); }
+  .drawer iframe { flex: 1; border: 0; width: 100%; background: #fff; }
+
+  .toast { position: fixed; left: 50%; bottom: 26px; transform: translate(-50%, 10px); background: var(--text); color: var(--bg); padding: 9px 16px; border-radius: 10px; font-size: 13px; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; z-index: 30; }
+  .toast.on { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (max-width: 1000px) { .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 820px) {
+    .main { grid-template-columns: 1fr; gap: 12px; padding-top: 18px; }
+    .side { position: static; max-height: none; overflow: visible; gap: 10px; }
+    .nav { flex-direction: row; overflow-x: auto; gap: 4px; padding-bottom: 4px; scrollbar-width: none; }
+    .nav button { width: auto; white-space: nowrap; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; }
+    .nav .dot { display: none; }
+    .side h3 { display: none; }
+    .drawer { width: 100vw; }
+  }
+  @media (max-width: 560px) {
+    .top-in { padding: 20px 16px 16px; }
+    .recent, .main { padding-left: 16px; padding-right: 16px; }
+    .cards { grid-template-columns: minmax(0, 1fr); }
+    .card:nth-child(n+4) { display: none; }
+    .item { grid-template-columns: 1fr; gap: 8px; }
+    .kbd { display: none; }
+    .search { padding-right: 16px; }
   }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <h1>KBS 시안 모아보기</h1>
-    <p id="sub"></p>
-  </header>
-  <div class="bar">
-    <input id="q" class="search" type="search" placeholder="제목·파일명으로 찾기 (예: 운영시간, alipay, 검수)" autofocus>
-    <div class="row" id="topics"></div>
-    <div class="row">
-      <div class="seg" id="kinds"></div>
-      <div class="spacer"></div>
-      <div class="seg" id="view">
-        <button data-v="topic" class="on">주제별</button>
-        <button data-v="recent">최근 수정순</button>
-      </div>
-    </div>
+<div class="top"><div class="top-in">
+  <div class="brand"><h1>KBS 시안 모아보기</h1><p id="sub"></p></div>
+  <div class="sbox">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input id="q" class="search" type="search" placeholder="무엇을 찾으세요? 예) 운영시간, 알리페이 검수, 입점사 예약" autocomplete="off">
+    <span class="kbd">/ 로 검색</span>
   </div>
-  <main id="out"></main>
+  <div class="hint" id="hint"></div>
+</div></div>
+
+<section class="recent" id="recentSec">
+  <div class="sec-t">최근 작업 <small>최근에 고친 순서</small></div>
+  <div class="cards" id="cards"></div>
+</section>
+
+<div class="main">
+  <aside class="side">
+    <div><h3>주제</h3><div class="nav" id="nav"></div></div>
+    <div><h3>종류</h3><div class="pills" id="kinds"></div></div>
+    <div><h3>화면 대상</h3><div class="pills" id="whos"></div></div>
+    <label class="toggle"><input type="checkbox" id="arch"> 보관본도 보기</label>
+  </aside>
+  <section class="content">
+    <div class="bar">
+      <div class="count" id="count"></div>
+      <div class="seg" id="view"><button data-v="topic">주제별</button><button data-v="recent">최근 수정순</button></div>
+    </div>
+    <div id="out"></div>
+  </section>
 </div>
-<div class="toast" id="toast">URL 복사했어요</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <div class="dh">
+    <div class="dt"><b id="pvT"></b><span id="pvM"></span></div>
+    <button class="btn" id="pvCopy">URL 복사</button>
+    <a class="btn pri" id="pvOpen" target="_blank" rel="noopener">새 탭으로 열기 ↗</a>
+    <button class="x" id="pvClose" aria-label="닫기">×</button>
+  </div>
+  <iframe id="pvF" title="미리보기"></iframe>
+</aside>
+<div class="toast" id="toast"></div>
+
 <script>
-const DATA = {"built":"2026-11-26","items":[{"f":"alimtalk-setup-prd.html","title":"예약 알림톡 템플릿 등록 (운영) · NHN Cloud","topic":"상품 예약","kind":"문서","created":"2026-09-09","updated":"2026-09-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/alimtalk-setup-prd.html","commits":1},{"f":"alimtalk-setup.html","title":"예약 알림톡 템플릿 등록 · NHN Cloud","topic":"상품 예약","kind":"시안","created":"2026-09-09","updated":"2026-09-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/alimtalk-setup.html","commits":1},{"f":"alipay-cs-admin.html","title":"알리페이 채널 분기 어드민 화면 (동작 시안)","topic":"알리페이 채널","kind":"시안","created":"2026-11-12","updated":"2026-11-12","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/alipay-cs-admin.html","commits":2},{"f":"alipay-cs-ops-admin.html","title":"어드민 유입 채널 동작 시안","topic":"알리페이 채널","kind":"시안","created":"2026-11-12","updated":"2026-11-12","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/alipay-cs-ops-admin.html","commits":3},{"f":"alipay-cs-ops-host.html","title":"호스트 유입 채널 동작 시안","topic":"알리페이 채널","kind":"시안","created":"2026-11-12","updated":"2026-11-12","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/alipay-cs-ops-host.html","commits":3},{"f":"alipay-mb-member.html","title":"알리페이 채널 회원 동작 시안","topic":"알리페이 채널","kind":"시안","created":"2026-11-12","updated":"2026-11-24","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/alipay-mb-member.html","commits":4},{"f":"alipay-member.html","title":"알리페이 채널 회원 동작 시안","topic":"알리페이 채널","kind":"시안","created":"2026-09-15","updated":"2026-11-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/alipay-member.html","commits":59},{"f":"alipay-ops-admin.html","title":"어드민 유입 채널 동작 시안","topic":"알리페이 채널","kind":"시안","created":"2026-10-07","updated":"2026-10-30","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/alipay-ops-admin.html","commits":14},{"f":"alipay-ops-host.html","title":"호스트 유입 채널 동작 시안","topic":"알리페이 채널","kind":"시안","created":"2026-10-07","updated":"2026-10-30","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/alipay-ops-host.html","commits":19},{"f":"bc-bo.html","title":"예약 캘린더 · 운영사 화면","topic":"상품 예약","kind":"시안","created":"2026-11-10","updated":"2026-11-16","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/bc-bo.html","commits":49},{"f":"bc-host.html","title":"예약 캘린더 · 입점사 화면","topic":"상품 예약","kind":"시안","created":"2026-11-10","updated":"2026-11-16","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/bc-host.html","commits":47},{"f":"bo-alipay-channel.html","title":"알리페이 채널 분기 어드민 화면 (동작 시안)","topic":"알리페이 채널","kind":"시안","created":"2026-09-08","updated":"2026-11-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/bo-alipay-channel.html","commits":139},{"f":"bo-lnb-common-options.html","title":"BO LNB 시안 — 공통옵션관리 신설","topic":"스토어 상세 v3","kind":"시안","created":"2026-04-30","updated":"2026-04-30","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/bo-lnb-common-options.html","commits":1},{"f":"bo-operating-hours.html","title":"운영시간 설정 시안 (로직 확인용)","topic":"운영시간","kind":"시안","created":"2026-10-06","updated":"2026-10-06","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/bo-operating-hours.html","commits":12},{"f":"bo-store-translation.html","title":"BO 스토어 설정 시안","topic":"스토어 상세 v3","kind":"시안","created":"2026-04-29","updated":"2026-05-06","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/bo-store-translation.html","commits":22},{"f":"booking-calendar.html","title":"예약 캘린더 보기 시안","topic":"상품 예약","kind":"시안","created":"2026-11-10","updated":"2026-11-16","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/booking-calendar.html","commits":12},{"f":"booking-notify-matrix.html","title":"예약 알림 발송 확인표 · stg","topic":"상품 예약","kind":"문서","created":"2026-09-09","updated":"2026-09-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/booking-notify-matrix.html","commits":1},{"f":"booking-qa.html","title":"스토어 예약 stg QA 결과 · 시크릿의원 · 2026-08-04","topic":"상품 예약","kind":"문서","created":"2026-09-09","updated":"2026-09-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/booking-qa.html","commits":1},{"f":"btn-clicks-100d.html","title":"버튼 클릭 192일","topic":"리포트·분석","kind":"문서","created":"2026-09-09","updated":"2026-09-10","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/btn-clicks-100d.html","commits":20},{"f":"column-decisions.html","title":"칼럼 기능 — 의사결정 요청","topic":"칼럼·매거진","kind":"문서","created":"2026-06-15","updated":"2026-06-16","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/column-decisions.html","commits":9},{"f":"column-prd.html","title":"칼럼 PRD","topic":"칼럼·매거진","kind":"문서","created":"2026-06-16","updated":"2026-09-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/column-prd.html","commits":54},{"f":"decisions.html","title":"KBS 스토어 상세 v3 — 결정 & 확인 리스트","topic":"스토어 상세 v3","kind":"문서","created":"2026-04-27","updated":"2026-04-27","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/decisions.html","commits":1},{"f":"dwell-report.html","title":"체류 구간 분석","topic":"리포트·분석","kind":"문서","created":"2026-07-03","updated":"2026-07-03","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/dwell-report.html","commits":1},{"f":"fo-catalog-explore-spec.html","title":"FO 카탈로그·탐색 화면 스펙","topic":"FO 탐색","kind":"문서","created":"2026-09-15","updated":"2026-09-15","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/fo-catalog-explore-spec.html","commits":2},{"f":"fo-catalog-explore.html","title":"FO 탐색 화면","topic":"FO 탐색","kind":"시안","created":"2026-09-15","updated":"2026-09-15","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/fo-catalog-explore.html","commits":4},{"f":"fo-google-login-v2.html","title":"구글 로그인 화면 시안","topic":"구글 로그인","kind":"시안","created":"2026-10-26","updated":"2026-10-26","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/fo-google-login-v2.html","commits":5},{"f":"fo-login-google.html","title":"FO 로그인 시안 · 구글","topic":"구글 로그인","kind":"시안","created":"2026-10-23","updated":"2026-10-23","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/fo-login-google.html","commits":2},{"f":"fo-store-detail.html","title":"Store Detail — K-Beauty Station","topic":"스토어 상세 v3","kind":"시안","created":"2026-04-28","updated":"2026-04-28","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/fo-store-detail.html","commits":1},{"f":"fo-v18-screens.html","title":"FO v1.8 화면","topic":"FO 탐색","kind":"시안","created":"2026-09-15","updated":"2026-09-15","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/fo-v18-screens.html","commits":2},{"f":"frase-bo-column-detail.html","title":"칼럼 상세 · 어드민","topic":"칼럼·매거진","kind":"시안","created":"2026-11-23","updated":"2026-11-25","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/frase-bo-column-detail.html","commits":24},{"f":"frase-bo-column-list.html","title":"칼럼 목록 · 어드민","topic":"칼럼·매거진","kind":"시안","created":"2026-11-17","updated":"2026-11-25","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/frase-bo-column-list.html","commits":15},{"f":"frase-bo-magazine-edit.html","title":"매거진 편집 · 어드민","topic":"칼럼·매거진","kind":"시안","created":"2026-11-16","updated":"2026-11-25","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/frase-bo-magazine-edit.html","commits":42},{"f":"frase-bo-magazine-list.html","title":"매거진 목록 · 어드민","topic":"칼럼·매거진","kind":"시안","created":"2026-11-17","updated":"2026-11-25","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/frase-bo-magazine-list.html","commits":15},{"f":"frase-bo-magazine-preview.html","title":"매거진 미리보기 · 어드민","topic":"칼럼·매거진","kind":"시안","created":"2026-11-17","updated":"2026-11-17","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/frase-bo-magazine-preview.html","commits":2},{"f":"frase-host-column-edit.html","title":"칼럼 편집 · 입점사","topic":"칼럼·매거진","kind":"시안","created":"2026-11-16","updated":"2026-11-25","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/frase-host-column-edit.html","commits":44},{"f":"frase-host-column-list.html","title":"칼럼 목록 · 입점사","topic":"칼럼·매거진","kind":"시안","created":"2026-11-17","updated":"2026-11-25","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/frase-host-column-list.html","commits":16},{"f":"frase-host-column-preview.html","title":"칼럼 미리보기 · 입점사","topic":"칼럼·매거진","kind":"시안","created":"2026-11-17","updated":"2026-11-24","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/frase-host-column-preview.html","commits":3},{"f":"frase-score-panel.html","title":"Frase 점수 검수 콘솔","topic":"칼럼·매거진","kind":"검수","created":"2026-11-16","updated":"2026-11-25","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/frase-score-panel.html","commits":60},{"f":"geo-seo-survey.html","title":"[K-Beauty Station] GEO·SEO 킥오프 사전 서베이","topic":"리포트·분석","kind":"문서","created":"2026-08-05","updated":"2026-08-05","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/geo-seo-survey.html","commits":3},{"f":"gl-bo.html","title":"구글 로그인 · 어드민 화면","topic":"구글 로그인","kind":"시안","created":"2026-10-27","updated":"2026-10-29","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/gl-bo.html","commits":9},{"f":"gl-proto.html","title":"구글 로그인 프로토타입","topic":"구글 로그인","kind":"시안","created":"2026-10-26","updated":"2026-11-16","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/gl-proto.html","commits":78},{"f":"google-review-widget-guide.html","title":"구글리뷰 위젯 생성 및 삽입 가이드","topic":"가이드·도구","kind":"리뷰","created":"2026-06-23","updated":"2026-06-23","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/google-review-widget-guide.html","commits":7},{"f":"host-gallery.html","title":"전/후 사진 관리","topic":"스토어 상세 v3","kind":"시안","created":"2026-04-27","updated":"2026-04-29","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/host-gallery.html","commits":11},{"f":"host-image-upload-guide.html","title":"이미지 등록 화면 개선 안내","topic":"가이드·도구","kind":"가이드","created":"2026-10-06","updated":"2026-10-06","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/host-image-upload-guide.html","commits":1},{"f":"host-store-settings.html","title":"스토어 설정","topic":"스토어 상세 v3","kind":"시안","created":"2026-04-27","updated":"2026-05-04","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/host-store-settings.html","commits":23},{"f":"ib-bo.html","title":"뷰티톡 (통합인박스 시안)","topic":"통합인박스","kind":"시안","created":"2026-10-21","updated":"2026-11-26","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/ib-bo.html","commits":100},{"f":"ib-cust.html","title":"고객 메신저 (모의)","topic":"통합인박스","kind":"시안","created":"2026-10-21","updated":"2026-11-24","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/ib-cust.html","commits":3},{"f":"ib-mgmt.html","title":"상담 관리 (통합인박스 시안)","topic":"통합인박스","kind":"시안","created":"2026-10-22","updated":"2026-11-24","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/ib-mgmt.html","commits":25},{"f":"ib-stat-cc.html","title":"상담ㆍ채팅 통계 (통합인박스 시안)","topic":"통합인박스","kind":"시안","created":"2026-10-23","updated":"2026-11-24","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/ib-stat-cc.html","commits":7},{"f":"ib-stat-si.html","title":"스토어 문의 통계 (통합인박스 시안)","topic":"통합인박스","kind":"시안","created":"2026-10-23","updated":"2026-11-24","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/ib-stat-si.html","commits":7},{"f":"inbox-layouts.html","title":"뷰티톡 레이아웃 안","topic":"통합인박스","kind":"시안","created":"2026-10-21","updated":"2026-10-21","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/inbox-layouts.html","commits":1},{"f":"inbox.html","title":"통합인박스 시안","topic":"통합인박스","kind":"시안","created":"2026-10-21","updated":"2026-11-26","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/inbox.html","commits":60},{"f":"index.html","title":"KBS 스토어 상세 v3 — 구조 정리","topic":"스토어 상세 v3","kind":"시안","created":"2026-04-27","updated":"2026-04-27","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/index.html","commits":1},{"f":"int-al-admin.html","title":"알리페이 채널 분기 어드민 화면 (동작 시안) (통합본)","topic":"알리페이 채널","kind":"시안","created":"2026-10-15","updated":"2026-11-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/int-al-admin.html","commits":27},{"f":"int-al-member.html","title":"알리페이 채널 회원 동작 시안 (통합본)","topic":"알리페이 채널","kind":"시안","created":"2026-10-15","updated":"2026-11-12","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/int-al-member.html","commits":12},{"f":"int-al-ops-admin.html","title":"어드민 유입 채널 동작 시안 (통합본)","topic":"알리페이 채널","kind":"시안","created":"2026-10-15","updated":"2026-11-12","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/int-al-ops-admin.html","commits":8},{"f":"int-al-ops-host.html","title":"호스트 유입 채널 동작 시안 | K-Beauty Station (통합본)","topic":"알리페이 채널","kind":"시안","created":"2026-10-15","updated":"2026-11-12","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/int-al-ops-host.html","commits":8},{"f":"int-booking.html","title":"통합 · 상품 예약 시안","topic":"상품 예약","kind":"시안","created":"2026-10-14","updated":"2026-11-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/int-booking.html","commits":12},{"f":"int-pb-bo.html","title":"상품 예약 · 운영사 화면 (통합본)","topic":"상품 예약","kind":"시안","created":"2026-10-14","updated":"2026-11-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/int-pb-bo.html","commits":23},{"f":"int-pb-fo.html","title":"상품 예약 · 고객 화면 (통합본)","topic":"상품 예약","kind":"시안","created":"2026-10-14","updated":"2026-11-06","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/int-pb-fo.html","commits":19},{"f":"int-pb-host.html","title":"상품 예약 · 입점사 화면 (통합본)","topic":"상품 예약","kind":"시안","created":"2026-10-14","updated":"2026-11-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/int-pb-host.html","commits":18},{"f":"kbs-mn-designer.html","title":"몽골어 썸네일 요청","topic":"몽골어 상품","kind":"시안","created":"2026-06-12","updated":"2026-06-12","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/kbs-mn-designer.html","commits":1},{"f":"kbs-mn-verify.html","title":"몽골어 본문 검증","topic":"몽골어 상품","kind":"시안","created":"2026-06-11","updated":"2026-06-11","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/kbs-mn-verify.html","commits":1},{"f":"kbs-mn.html","title":"몽골어 상품 등록 대시보드","topic":"몽골어 상품","kind":"시안","created":"2026-06-09","updated":"2026-06-12","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/kbs-mn.html","commits":51},{"f":"legal/privacy.html","title":"Privacy Policy","topic":"입점·약관","kind":"시안","created":"2026-10-22","updated":"2026-10-22","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/legal/privacy.html","commits":1},{"f":"legal/terms.html","title":"Terms of Use","topic":"입점·약관","kind":"시안","created":"2026-10-22","updated":"2026-10-22","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/legal/terms.html","commits":1},{"f":"login-google-screens.html","title":"구글 로그인 화면 재구성안","topic":"구글 로그인","kind":"시안","created":"2026-10-23","updated":"2026-10-23","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/login-google-screens.html","commits":1},{"f":"magazine-translation-guide.html","title":"매거진 운영 가이드","topic":"칼럼·매거진","kind":"가이드","created":"2026-05-04","updated":"2026-05-04","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/magazine-translation-guide.html","commits":31},{"f":"merchant-contract-esign.html","title":"K-Beauty Station 입점 신청서","topic":"입점·약관","kind":"시안","created":"2026-09-16","updated":"2026-09-17","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/merchant-contract-esign.html","commits":14},{"f":"option-editor.html","title":"K-Beauty Station 옵션 체계 편집 도구","topic":"가이드·도구","kind":"시안","created":"2026-07-12","updated":"2026-07-13","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/option-editor.html","commits":18},{"f":"pb-bo.html","title":"상품 예약 · 운영사 화면","topic":"상품 예약","kind":"시안","created":"2026-10-12","updated":"2026-11-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/pb-bo.html","commits":30},{"f":"pb-fo.html","title":"상품 예약 · 고객 화면","topic":"상품 예약","kind":"시안","created":"2026-10-12","updated":"2026-11-10","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/pb-fo.html","commits":54},{"f":"pb-host.html","title":"상품 예약 · 입점사 화면","topic":"상품 예약","kind":"시안","created":"2026-10-12","updated":"2026-11-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/pb-host.html","commits":25},{"f":"product-booking.html","title":"상품 예약 선행 배포 시안","topic":"상품 예약","kind":"시안","created":"2026-10-12","updated":"2026-11-10","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/product-booking.html","commits":28},{"f":"qa-alipay-channel-split.html","title":"알리페이 채널 분리 검수","topic":"알리페이 채널","kind":"검수","created":"2026-11-12","updated":"2026-11-25","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-alipay-channel-split.html","commits":14},{"f":"qa-alipay-channel.html","title":"알리페이 채널 분기 시안 검수 (통합 전 보관본)","topic":"알리페이 채널","kind":"검수","created":"2026-09-11","updated":"2026-11-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-alipay-channel.html","commits":174},{"f":"qa-alipay-member.html","title":"알리페이 회원연동 검수","topic":"알리페이 채널","kind":"검수","created":"2026-11-12","updated":"2026-11-25","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-alipay-member.html","commits":16},{"f":"qa-fo-catalog-explore.html","title":"FO 카탈로그·탐색 · 화면 검수","topic":"FO 탐색","kind":"검수","created":"2026-09-15","updated":"2026-09-15","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-fo-catalog-explore.html","commits":2},{"f":"qa-fo-figma-v18.html","title":"FO Figma v1.8 제작 검수","topic":"FO 탐색","kind":"검수","created":"2026-09-15","updated":"2026-09-15","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-fo-figma-v18.html","commits":3},{"f":"qa-google-login.html","title":"구글 로그인 검수 콘솔","topic":"구글 로그인","kind":"검수","created":"2026-10-26","updated":"2026-11-16","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-google-login.html","commits":143},{"f":"qa-inbox.html","title":"통합인박스 시안 검수","topic":"통합인박스","kind":"검수","created":"2026-10-21","updated":"2026-11-26","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-inbox.html","commits":45},{"f":"qa-integrated.html","title":"알리페이 + 상품 예약 통합 검수","topic":"상품 예약","kind":"검수","created":"2026-10-14","updated":"2026-11-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-integrated.html","commits":64},{"f":"qa-operating-hours.html","title":"운영시간 설정 시안 검수","topic":"운영시간","kind":"검수","created":"2026-10-06","updated":"2026-10-06","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-operating-hours.html","commits":8},{"f":"qa-product-booking.html","title":"상품 예약 선행 배포 검수","topic":"상품 예약","kind":"검수","created":"2026-10-12","updated":"2026-11-10","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-product-booking.html","commits":78},{"f":"review-alipay-channel.html","title":"알리페이 채널 분기 리뷰 메모 (v3.30)","topic":"알리페이 채널","kind":"리뷰","created":"2026-09-21","updated":"2026-11-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/review-alipay-channel.html","commits":100},{"f":"review-google-login.html","title":"구글 로그인 리뷰","topic":"구글 로그인","kind":"리뷰","created":"2026-11-06","updated":"2026-11-16","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/review-google-login.html","commits":2},{"f":"spec.html","title":"KBS 스토어 상세 v3 — 기능정의서","topic":"스토어 상세 v3","kind":"문서","created":"2026-04-27","updated":"2026-04-27","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/spec.html","commits":1},{"f":"store-column-guide.html","title":"스토어 칼럼 작성 가이드","topic":"칼럼·매거진","kind":"가이드","created":"2026-07-03","updated":"2026-07-06","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/store-column-guide.html","commits":6},{"f":"store-hours-check.html","title":"운영시간 확인요청 발송용","topic":"운영시간","kind":"시안","created":"2026-06-08","updated":"2026-06-15","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/store-hours-check.html","commits":8},{"f":"store-hours.html","title":"운영시간 설정 프로토타입","topic":"운영시간","kind":"시안","created":"2026-09-09","updated":"2026-09-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/store-hours.html","commits":1},{"f":"survey-email-report.html","title":"K-Beauty Station 설문 이메일 발송 분석 리포트","topic":"리포트·분석","kind":"문서","created":"2026-06-05","updated":"2026-06-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/survey-email-report.html","commits":8},{"f":"","title":"운영시간 개선 · Figma 정본 (626:2)","topic":"운영시간","kind":"Figma","created":"","updated":"","url":"https://www.figma.com/design/AU6dyHug3Sy4NsiMyA7Hmu/?node-id=626-2","commits":0}],"order":["운영시간","통합인박스","알리페이 채널","상품 예약","구글 로그인","칼럼·매거진","FO 탐색","스토어 상세 v3","몽골어 상품","리포트·분석","입점·약관","가이드·도구","미분류"]};
-const S = { q: '', topic: '전체', kind: '전체', view: 'topic' };
-try { const s = JSON.parse(localStorage.getItem('kbs-hub') || '{}'); if (s.view) S.view = s.view; } catch (e) {}
+const DATA = {"built":"2026-11-26","items":[{"f":"alimtalk-setup-prd.html","title":"예약 알림톡 템플릿 등록 (운영) · NHN Cloud","topic":"상품 예약","who":"","archived":false,"kind":"문서","created":"2026-09-09","updated":"2026-09-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/alimtalk-setup-prd.html","commits":1},{"f":"alimtalk-setup.html","title":"예약 알림톡 템플릿 등록 · NHN Cloud","topic":"상품 예약","who":"","archived":false,"kind":"시안","created":"2026-09-09","updated":"2026-09-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/alimtalk-setup.html","commits":1},{"f":"alipay-cs-admin.html","title":"알리페이 채널 분기 어드민 화면 (동작 시안)","topic":"알리페이 채널","who":"어드민","archived":false,"kind":"시안","created":"2026-11-12","updated":"2026-11-12","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/alipay-cs-admin.html","commits":2},{"f":"alipay-cs-ops-admin.html","title":"어드민 유입 채널 동작 시안","topic":"알리페이 채널","who":"어드민","archived":false,"kind":"시안","created":"2026-11-12","updated":"2026-11-12","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/alipay-cs-ops-admin.html","commits":3},{"f":"alipay-cs-ops-host.html","title":"호스트 유입 채널 동작 시안","topic":"알리페이 채널","who":"입점사","archived":false,"kind":"시안","created":"2026-11-12","updated":"2026-11-12","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/alipay-cs-ops-host.html","commits":3},{"f":"alipay-mb-member.html","title":"알리페이 채널 회원 동작 시안","topic":"알리페이 채널","who":"고객","archived":false,"kind":"시안","created":"2026-11-12","updated":"2026-11-24","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/alipay-mb-member.html","commits":4},{"f":"alipay-member.html","title":"알리페이 채널 회원 동작 시안","topic":"알리페이 채널","who":"고객","archived":false,"kind":"시안","created":"2026-09-15","updated":"2026-11-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/alipay-member.html","commits":59},{"f":"alipay-ops-admin.html","title":"어드민 유입 채널 동작 시안","topic":"알리페이 채널","who":"어드민","archived":false,"kind":"시안","created":"2026-10-07","updated":"2026-10-30","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/alipay-ops-admin.html","commits":14},{"f":"alipay-ops-host.html","title":"호스트 유입 채널 동작 시안","topic":"알리페이 채널","who":"입점사","archived":false,"kind":"시안","created":"2026-10-07","updated":"2026-10-30","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/alipay-ops-host.html","commits":19},{"f":"bc-bo.html","title":"예약 캘린더 · 운영사 화면","topic":"상품 예약","who":"어드민","archived":false,"kind":"시안","created":"2026-11-10","updated":"2026-11-26","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/bc-bo.html","commits":50},{"f":"bc-host.html","title":"예약 캘린더 · 입점사 화면","topic":"상품 예약","who":"입점사","archived":false,"kind":"시안","created":"2026-11-10","updated":"2026-11-26","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/bc-host.html","commits":48},{"f":"bo-alipay-channel.html","title":"알리페이 채널 분기 어드민 화면 (동작 시안)","topic":"알리페이 채널","who":"어드민","archived":false,"kind":"시안","created":"2026-09-08","updated":"2026-11-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/bo-alipay-channel.html","commits":139},{"f":"bo-lnb-common-options.html","title":"BO LNB 시안 — 공통옵션관리 신설","topic":"스토어 상세 v3","who":"어드민","archived":false,"kind":"시안","created":"2026-04-30","updated":"2026-04-30","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/bo-lnb-common-options.html","commits":1},{"f":"bo-operating-hours.html","title":"운영시간 설정 시안 (로직 확인용)","topic":"운영시간","who":"어드민","archived":false,"kind":"시안","created":"2026-10-06","updated":"2026-10-06","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/bo-operating-hours.html","commits":12},{"f":"bo-store-translation.html","title":"BO 스토어 설정 시안","topic":"스토어 상세 v3","who":"어드민","archived":false,"kind":"시안","created":"2026-04-29","updated":"2026-05-06","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/bo-store-translation.html","commits":22},{"f":"booking-calendar.html","title":"예약 캘린더 보기 시안","topic":"상품 예약","who":"","archived":false,"kind":"시안","created":"2026-11-10","updated":"2026-11-16","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/booking-calendar.html","commits":12},{"f":"booking-notify-matrix.html","title":"예약 알림 발송 확인표 · stg","topic":"상품 예약","who":"","archived":false,"kind":"문서","created":"2026-09-09","updated":"2026-09-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/booking-notify-matrix.html","commits":1},{"f":"booking-qa.html","title":"스토어 예약 stg QA 결과 · 시크릿의원 · 2026-08-04","topic":"상품 예약","who":"","archived":false,"kind":"문서","created":"2026-09-09","updated":"2026-09-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/booking-qa.html","commits":1},{"f":"btn-clicks-100d.html","title":"버튼 클릭 192일","topic":"리포트·분석","who":"","archived":false,"kind":"문서","created":"2026-09-09","updated":"2026-09-10","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/btn-clicks-100d.html","commits":20},{"f":"column-decisions.html","title":"칼럼 기능 — 의사결정 요청","topic":"칼럼·매거진","who":"","archived":false,"kind":"문서","created":"2026-06-15","updated":"2026-06-16","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/column-decisions.html","commits":9},{"f":"column-prd.html","title":"칼럼 PRD","topic":"칼럼·매거진","who":"","archived":false,"kind":"문서","created":"2026-06-16","updated":"2026-09-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/column-prd.html","commits":54},{"f":"decisions.html","title":"KBS 스토어 상세 v3 — 결정 & 확인 리스트","topic":"스토어 상세 v3","who":"","archived":false,"kind":"문서","created":"2026-04-27","updated":"2026-04-27","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/decisions.html","commits":1},{"f":"dwell-report.html","title":"체류 구간 분석","topic":"리포트·분석","who":"","archived":false,"kind":"문서","created":"2026-07-03","updated":"2026-07-03","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/dwell-report.html","commits":1},{"f":"fo-catalog-explore-spec.html","title":"FO 카탈로그·탐색 화면 스펙","topic":"FO 탐색","who":"고객","archived":false,"kind":"문서","created":"2026-09-15","updated":"2026-09-15","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/fo-catalog-explore-spec.html","commits":2},{"f":"fo-catalog-explore.html","title":"FO 탐색 화면","topic":"FO 탐색","who":"고객","archived":false,"kind":"시안","created":"2026-09-15","updated":"2026-09-15","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/fo-catalog-explore.html","commits":4},{"f":"fo-google-login-v2.html","title":"구글 로그인 화면 시안","topic":"구글 로그인","who":"고객","archived":false,"kind":"시안","created":"2026-10-26","updated":"2026-10-26","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/fo-google-login-v2.html","commits":5},{"f":"fo-login-google.html","title":"FO 로그인 시안 · 구글","topic":"구글 로그인","who":"고객","archived":false,"kind":"시안","created":"2026-10-23","updated":"2026-10-23","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/fo-login-google.html","commits":2},{"f":"fo-store-detail.html","title":"Store Detail — K-Beauty Station","topic":"스토어 상세 v3","who":"고객","archived":false,"kind":"시안","created":"2026-04-28","updated":"2026-04-28","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/fo-store-detail.html","commits":1},{"f":"fo-v18-screens.html","title":"FO v1.8 화면","topic":"FO 탐색","who":"고객","archived":false,"kind":"시안","created":"2026-09-15","updated":"2026-09-15","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/fo-v18-screens.html","commits":2},{"f":"frase-bo-column-detail.html","title":"칼럼 상세 · 어드민","topic":"칼럼·매거진","who":"어드민","archived":false,"kind":"시안","created":"2026-11-23","updated":"2026-11-25","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/frase-bo-column-detail.html","commits":24},{"f":"frase-bo-column-list.html","title":"칼럼 목록 · 어드민","topic":"칼럼·매거진","who":"어드민","archived":false,"kind":"시안","created":"2026-11-17","updated":"2026-11-25","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/frase-bo-column-list.html","commits":15},{"f":"frase-bo-magazine-edit.html","title":"매거진 편집 · 어드민","topic":"칼럼·매거진","who":"어드민","archived":false,"kind":"시안","created":"2026-11-16","updated":"2026-11-25","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/frase-bo-magazine-edit.html","commits":42},{"f":"frase-bo-magazine-list.html","title":"매거진 목록 · 어드민","topic":"칼럼·매거진","who":"어드민","archived":false,"kind":"시안","created":"2026-11-17","updated":"2026-11-25","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/frase-bo-magazine-list.html","commits":15},{"f":"frase-bo-magazine-preview.html","title":"매거진 미리보기 · 어드민","topic":"칼럼·매거진","who":"어드민","archived":false,"kind":"시안","created":"2026-11-17","updated":"2026-11-17","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/frase-bo-magazine-preview.html","commits":2},{"f":"frase-host-column-edit.html","title":"칼럼 편집 · 입점사","topic":"칼럼·매거진","who":"입점사","archived":false,"kind":"시안","created":"2026-11-16","updated":"2026-11-25","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/frase-host-column-edit.html","commits":44},{"f":"frase-host-column-list.html","title":"칼럼 목록 · 입점사","topic":"칼럼·매거진","who":"입점사","archived":false,"kind":"시안","created":"2026-11-17","updated":"2026-11-25","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/frase-host-column-list.html","commits":16},{"f":"frase-host-column-preview.html","title":"칼럼 미리보기 · 입점사","topic":"칼럼·매거진","who":"입점사","archived":false,"kind":"시안","created":"2026-11-17","updated":"2026-11-24","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/frase-host-column-preview.html","commits":3},{"f":"frase-score-panel.html","title":"Frase 점수 검수 콘솔","topic":"칼럼·매거진","who":"","archived":false,"kind":"검수","created":"2026-11-16","updated":"2026-11-25","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/frase-score-panel.html","commits":60},{"f":"geo-seo-survey.html","title":"[K-Beauty Station] GEO·SEO 킥오프 사전 서베이","topic":"리포트·분석","who":"","archived":false,"kind":"문서","created":"2026-08-05","updated":"2026-08-05","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/geo-seo-survey.html","commits":3},{"f":"gl-bo.html","title":"구글 로그인 · 어드민 화면","topic":"구글 로그인","who":"어드민","archived":false,"kind":"시안","created":"2026-10-27","updated":"2026-10-29","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/gl-bo.html","commits":9},{"f":"gl-proto.html","title":"구글 로그인 프로토타입","topic":"구글 로그인","who":"고객","archived":false,"kind":"시안","created":"2026-10-26","updated":"2026-11-16","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/gl-proto.html","commits":78},{"f":"google-review-widget-guide.html","title":"구글리뷰 위젯 생성 및 삽입 가이드","topic":"가이드·도구","who":"","archived":false,"kind":"리뷰","created":"2026-06-23","updated":"2026-06-23","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/google-review-widget-guide.html","commits":7},{"f":"host-gallery.html","title":"전/후 사진 관리","topic":"스토어 상세 v3","who":"입점사","archived":false,"kind":"시안","created":"2026-04-27","updated":"2026-04-29","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/host-gallery.html","commits":11},{"f":"host-image-upload-guide.html","title":"이미지 등록 화면 개선 안내","topic":"가이드·도구","who":"입점사","archived":false,"kind":"가이드","created":"2026-10-06","updated":"2026-10-06","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/host-image-upload-guide.html","commits":1},{"f":"host-store-settings.html","title":"스토어 설정","topic":"스토어 상세 v3","who":"입점사","archived":false,"kind":"시안","created":"2026-04-27","updated":"2026-05-04","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/host-store-settings.html","commits":23},{"f":"ib-bo.html","title":"뷰티톡","topic":"통합인박스","who":"어드민","archived":false,"kind":"시안","created":"2026-10-21","updated":"2026-11-26","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/ib-bo.html","commits":100},{"f":"ib-cust.html","title":"고객 메신저 (모의)","topic":"통합인박스","who":"고객","archived":false,"kind":"시안","created":"2026-10-21","updated":"2026-11-24","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/ib-cust.html","commits":3},{"f":"ib-mgmt.html","title":"상담 관리","topic":"통합인박스","who":"","archived":false,"kind":"시안","created":"2026-10-22","updated":"2026-11-24","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/ib-mgmt.html","commits":25},{"f":"ib-stat-cc.html","title":"상담ㆍ채팅 통계","topic":"통합인박스","who":"","archived":false,"kind":"시안","created":"2026-10-23","updated":"2026-11-24","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/ib-stat-cc.html","commits":7},{"f":"ib-stat-si.html","title":"스토어 문의 통계","topic":"통합인박스","who":"","archived":false,"kind":"시안","created":"2026-10-23","updated":"2026-11-24","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/ib-stat-si.html","commits":7},{"f":"inbox-layouts.html","title":"뷰티톡 레이아웃 안","topic":"통합인박스","who":"","archived":false,"kind":"시안","created":"2026-10-21","updated":"2026-10-21","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/inbox-layouts.html","commits":1},{"f":"inbox.html","title":"통합인박스 시안","topic":"통합인박스","who":"","archived":false,"kind":"시안","created":"2026-10-21","updated":"2026-11-26","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/inbox.html","commits":60},{"f":"index.html","title":"KBS 스토어 상세 v3 — 구조 정리","topic":"스토어 상세 v3","who":"","archived":false,"kind":"시안","created":"2026-04-27","updated":"2026-04-27","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/index.html","commits":1},{"f":"int-al-admin.html","title":"알리페이 채널 분기 어드민 화면 (동작 시안) (통합본)","topic":"알리페이 채널","who":"어드민","archived":false,"kind":"시안","created":"2026-10-15","updated":"2026-11-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/int-al-admin.html","commits":27},{"f":"int-al-member.html","title":"알리페이 채널 회원 동작 시안 (통합본)","topic":"알리페이 채널","who":"고객","archived":false,"kind":"시안","created":"2026-10-15","updated":"2026-11-12","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/int-al-member.html","commits":12},{"f":"int-al-ops-admin.html","title":"어드민 유입 채널 동작 시안 (통합본)","topic":"알리페이 채널","who":"어드민","archived":false,"kind":"시안","created":"2026-10-15","updated":"2026-11-12","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/int-al-ops-admin.html","commits":8},{"f":"int-al-ops-host.html","title":"호스트 유입 채널 동작 시안 | K-Beauty Station (통합본)","topic":"알리페이 채널","who":"입점사","archived":false,"kind":"시안","created":"2026-10-15","updated":"2026-11-12","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/int-al-ops-host.html","commits":8},{"f":"int-booking.html","title":"통합 · 상품 예약 시안","topic":"상품 예약","who":"","archived":false,"kind":"시안","created":"2026-10-14","updated":"2026-11-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/int-booking.html","commits":12},{"f":"int-pb-bo.html","title":"상품 예약 · 운영사 화면 (통합본)","topic":"상품 예약","who":"어드민","archived":false,"kind":"시안","created":"2026-10-14","updated":"2026-11-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/int-pb-bo.html","commits":23},{"f":"int-pb-fo.html","title":"상품 예약 · 고객 화면 (통합본)","topic":"상품 예약","who":"고객","archived":false,"kind":"시안","created":"2026-10-14","updated":"2026-11-06","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/int-pb-fo.html","commits":19},{"f":"int-pb-host.html","title":"상품 예약 · 입점사 화면 (통합본)","topic":"상품 예약","who":"입점사","archived":false,"kind":"시안","created":"2026-10-14","updated":"2026-11-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/int-pb-host.html","commits":18},{"f":"kbs-mn-designer.html","title":"몽골어 썸네일 요청","topic":"몽골어 상품","who":"","archived":false,"kind":"시안","created":"2026-06-12","updated":"2026-06-12","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/kbs-mn-designer.html","commits":1},{"f":"kbs-mn-verify.html","title":"몽골어 본문 검증","topic":"몽골어 상품","who":"","archived":false,"kind":"시안","created":"2026-06-11","updated":"2026-06-11","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/kbs-mn-verify.html","commits":1},{"f":"kbs-mn.html","title":"몽골어 상품 등록 대시보드","topic":"몽골어 상품","who":"","archived":false,"kind":"시안","created":"2026-06-09","updated":"2026-06-12","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/kbs-mn.html","commits":51},{"f":"legal/privacy.html","title":"Privacy Policy","topic":"입점·약관","who":"고객","archived":false,"kind":"시안","created":"2026-10-22","updated":"2026-10-22","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/legal/privacy.html","commits":1},{"f":"legal/terms.html","title":"Terms of Use","topic":"입점·약관","who":"고객","archived":false,"kind":"시안","created":"2026-10-22","updated":"2026-10-22","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/legal/terms.html","commits":1},{"f":"login-google-screens.html","title":"구글 로그인 화면 재구성안","topic":"구글 로그인","who":"","archived":false,"kind":"시안","created":"2026-10-23","updated":"2026-10-23","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/login-google-screens.html","commits":1},{"f":"magazine-translation-guide.html","title":"매거진 운영 가이드","topic":"칼럼·매거진","who":"","archived":false,"kind":"가이드","created":"2026-05-04","updated":"2026-05-04","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/magazine-translation-guide.html","commits":31},{"f":"merchant-contract-esign.html","title":"K-Beauty Station 입점 신청서","topic":"입점·약관","who":"","archived":false,"kind":"시안","created":"2026-09-16","updated":"2026-09-17","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/merchant-contract-esign.html","commits":14},{"f":"option-editor.html","title":"K-Beauty Station 옵션 체계 편집 도구","topic":"가이드·도구","who":"","archived":false,"kind":"시안","created":"2026-07-12","updated":"2026-07-13","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/option-editor.html","commits":18},{"f":"pb-bo.html","title":"상품 예약 · 운영사 화면","topic":"상품 예약","who":"어드민","archived":false,"kind":"시안","created":"2026-10-12","updated":"2026-11-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/pb-bo.html","commits":30},{"f":"pb-fo.html","title":"상품 예약 · 고객 화면","topic":"상품 예약","who":"고객","archived":false,"kind":"시안","created":"2026-10-12","updated":"2026-11-10","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/pb-fo.html","commits":54},{"f":"pb-host.html","title":"상품 예약 · 입점사 화면","topic":"상품 예약","who":"입점사","archived":false,"kind":"시안","created":"2026-10-12","updated":"2026-11-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/pb-host.html","commits":25},{"f":"product-booking.html","title":"상품 예약 선행 배포 시안","topic":"상품 예약","who":"","archived":false,"kind":"시안","created":"2026-10-12","updated":"2026-11-10","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/product-booking.html","commits":28},{"f":"qa-alipay-channel-split.html","title":"알리페이 채널 분리 검수","topic":"알리페이 채널","who":"","archived":false,"kind":"검수","created":"2026-11-12","updated":"2026-11-25","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-alipay-channel-split.html","commits":14},{"f":"qa-alipay-channel.html","title":"알리페이 채널 분기 시안 검수 (통합 전 보관본)","topic":"알리페이 채널","who":"","archived":true,"kind":"검수","created":"2026-09-11","updated":"2026-11-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-alipay-channel.html","commits":174},{"f":"qa-alipay-member.html","title":"알리페이 회원연동 검수","topic":"알리페이 채널","who":"고객","archived":false,"kind":"검수","created":"2026-11-12","updated":"2026-11-25","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-alipay-member.html","commits":16},{"f":"qa-fo-catalog-explore.html","title":"FO 카탈로그·탐색 · 화면 검수","topic":"FO 탐색","who":"","archived":false,"kind":"검수","created":"2026-09-15","updated":"2026-09-15","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-fo-catalog-explore.html","commits":2},{"f":"qa-fo-figma-v18.html","title":"FO Figma v1.8 제작 검수","topic":"FO 탐색","who":"","archived":false,"kind":"검수","created":"2026-09-15","updated":"2026-09-15","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-fo-figma-v18.html","commits":3},{"f":"qa-google-login.html","title":"구글 로그인 검수 콘솔","topic":"구글 로그인","who":"","archived":false,"kind":"검수","created":"2026-10-26","updated":"2026-11-16","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-google-login.html","commits":143},{"f":"qa-inbox.html","title":"통합인박스 시안 검수","topic":"통합인박스","who":"","archived":false,"kind":"검수","created":"2026-10-21","updated":"2026-11-26","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-inbox.html","commits":45},{"f":"qa-integrated.html","title":"알리페이 + 상품 예약 통합 검수","topic":"상품 예약","who":"","archived":false,"kind":"검수","created":"2026-10-14","updated":"2026-11-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-integrated.html","commits":64},{"f":"qa-operating-hours.html","title":"운영시간 설정 시안 검수","topic":"운영시간","who":"","archived":false,"kind":"검수","created":"2026-10-06","updated":"2026-10-06","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-operating-hours.html","commits":8},{"f":"qa-product-booking.html","title":"상품 예약 선행 배포 검수","topic":"상품 예약","who":"","archived":false,"kind":"검수","created":"2026-10-12","updated":"2026-11-10","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/qa-product-booking.html","commits":78},{"f":"review-alipay-channel.html","title":"알리페이 채널 분기 리뷰 메모 (v3.30)","topic":"알리페이 채널","who":"","archived":false,"kind":"리뷰","created":"2026-09-21","updated":"2026-11-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/review-alipay-channel.html","commits":100},{"f":"review-google-login.html","title":"구글 로그인 리뷰","topic":"구글 로그인","who":"","archived":false,"kind":"리뷰","created":"2026-11-06","updated":"2026-11-16","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/review-google-login.html","commits":2},{"f":"spec.html","title":"KBS 스토어 상세 v3 — 기능정의서","topic":"스토어 상세 v3","who":"","archived":false,"kind":"문서","created":"2026-04-27","updated":"2026-04-27","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/spec.html","commits":1},{"f":"store-column-guide.html","title":"스토어 칼럼 작성 가이드","topic":"칼럼·매거진","who":"","archived":false,"kind":"가이드","created":"2026-07-03","updated":"2026-07-06","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/store-column-guide.html","commits":6},{"f":"store-hours-check.html","title":"운영시간 확인요청 발송용","topic":"운영시간","who":"","archived":false,"kind":"시안","created":"2026-06-08","updated":"2026-06-15","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/store-hours-check.html","commits":8},{"f":"store-hours.html","title":"운영시간 설정 프로토타입","topic":"운영시간","who":"","archived":false,"kind":"시안","created":"2026-09-09","updated":"2026-09-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/store-hours.html","commits":1},{"f":"survey-email-report.html","title":"K-Beauty Station 설문 이메일 발송 분석 리포트","topic":"리포트·분석","who":"","archived":false,"kind":"문서","created":"2026-06-05","updated":"2026-06-09","url":"https://youngjunkwon-cyber.github.io/kbs-ho-preview/survey-email-report.html","commits":8}],"order":["운영시간","통합인박스","알리페이 채널","상품 예약","구글 로그인","칼럼·매거진","FO 탐색","스토어 상세 v3","몽골어 상품","리포트·분석","입점·약관","가이드·도구","미분류"]};
+const items = DATA.items;
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const daysAgo = (d) => d ? (Date.parse(DATA.built) - Date.parse(d)) / 864e5 : 999;
-const items = DATA.items;
+const age = (d) => (Date.parse(DATA.built) - Date.parse(d)) / 864e5;
+const KINDS = ['시안', '검수', '리뷰', '문서', '가이드'];
+const WHOS = ['어드민', '입점사', '고객'];
+// 검색 별칭: 영문 파일명·줄임말로 쳐도 잡히게
+const ALIAS = { '알리페이': 'alipay', '인박스': 'inbox 뷰티톡 상담', '예약': 'booking 예약', '로그인': 'login google', '칼럼': 'column frase', '매거진': 'magazine frase', '몽골': 'mn', '어드민': 'bo admin 운영사', '입점사': 'host', '고객': 'fo member', '검수': 'qa', '운영시간': 'hours operating' };
 
-$('sub').textContent = `preview 저장소에 배포된 시안·검수 콘솔·문서 ${items.length}개 · ${DATA.built} 기준`;
+const S = { q: '', topic: '전체', kind: '전체', who: '전체', view: 'topic', arch: false };
+try { const s = JSON.parse(localStorage.getItem('kbs-hub') || '{}'); if (s.view) S.view = s.view; } catch (e) {}
+const save = () => { try { localStorage.setItem('kbs-hub', JSON.stringify({ view: S.view })); } catch (e) {} };
 
-function counts(key, list) { const m = {}; list.forEach((i) => (m[i[key]] = (m[i[key]] || 0) + 1)); return m; }
-function chips() {
-  const tc = counts('topic', items);
-  const topics = ['전체', ...DATA.order.filter((t) => tc[t])];
-  $('topics').innerHTML = topics.map((t) => `<button class="chip ${S.topic === t ? 'on' : ''}" data-t="${esc(t)}">${esc(t)}<span>${t === '전체' ? items.length : tc[t]}</span></button>`).join('');
-  const kinds = ['전체', '시안', '검수', '리뷰', '문서', '가이드', 'Figma'].filter((k) => k === '전체' || items.some((i) => i.kind === k));
-  $('kinds').innerHTML = kinds.map((k) => `<button class="${S.kind === k ? 'on' : ''}" data-k="${k}">${k}</button>`).join('');
+items.forEach((i) => {
+  i.hay = [i.title, i.f, i.topic, i.kind, i.who].join(' ').toLowerCase();
+  Object.entries(ALIAS).forEach(([k, v]) => { if (i.hay.includes(k.toLowerCase())) i.hay += ' ' + v; });
+  i.fresh = age(i.updated) <= 7;
+});
+const live = items.filter((i) => !i.archived);
+$('sub').textContent = `배포된 시안·검수 콘솔·문서 ${live.length}개 · ${DATA.built} 기준`;
+
+function hl(text, q) {
+  const t = esc(text); if (!q) return t;
+  const words = q.split(/\s+/).filter(Boolean).map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  return words.length ? t.replace(new RegExp('(' + words.join('|') + ')', 'gi'), '<mark>$1</mark>') : t;
+}
+const kindB = (k) => `<span class="b k" style="--kc:var(--c-${k})">${k}</span>`;
+const whoB = (w) => (w ? `<span class="b w" style="--wc:var(--w-${w})">${w}</span>` : '');
+
+function filtered(ignoreTopic) {
+  const words = S.q.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  return items.filter((i) =>
+    (S.arch || !i.archived) &&
+    (ignoreTopic || S.topic === '전체' || i.topic === S.topic) &&
+    (S.kind === '전체' || i.kind === S.kind) &&
+    (S.who === '전체' || i.who === S.who) &&
+    words.every((w) => i.hay.includes(w)));
+}
+const latest = (g) => g.reduce((m, i) => (i.updated > m ? i.updated : m), '');
+const byRecent = (a, b) => b.updated.localeCompare(a.updated) || a.title.localeCompare(b.title);
+
+function renderSide() {
+  const pool = filtered(true);
+  const tc = {}; const tf = {};
+  pool.forEach((i) => { tc[i.topic] = (tc[i.topic] || 0) + 1; if (i.fresh) tf[i.topic] = 1; });
+  const topics = DATA.order.filter((t) => items.some((i) => i.topic === t));
+  $('nav').innerHTML = [['전체', pool.length, pool.some((i) => i.fresh)]].concat(topics.map((t) => [t, tc[t] || 0, tf[t]]))
+    .map(([t, n, f]) => `<button class="${S.topic === t ? 'on' : ''}" data-t="${esc(t)}"><span class="dot ${f ? '' : 'off'}" title="${f ? '최근 7일 안에 수정됨' : ''}"></span>${esc(t)}<span class="n">${n}</span></button>`).join('');
+  $('kinds').innerHTML = ['전체', ...KINDS].map((k) => `<button class="pill ${S.kind === k ? 'on' : ''}" data-k="${k}">${k}</button>`).join('');
+  $('whos').innerHTML = ['전체', ...WHOS].map((w) => `<button class="pill ${S.who === w ? 'on' : ''}" data-w="${w}">${w}</button>`).join('');
   document.querySelectorAll('#view button').forEach((b) => b.classList.toggle('on', b.dataset.v === S.view));
 }
-function row(i) {
-  const fresh = daysAgo(i.updated) <= 7 ? '<span class="new">최근</span>' : '';
-  const meta = i.f ? `${esc(i.f)} · 수정 ${i.updated}${i.created && i.created !== i.updated ? ` · 처음 ${i.created}` : ''}` : esc(new URL(i.url).host);
-  return `<div class="item"><span class="kind" style="--kc:var(--k-${i.kind})">${i.kind}</span>
-    <div class="t"><a href="${esc(i.url)}" target="_blank" rel="noopener">${esc(i.title)}</a>${fresh}<div class="meta">${meta}</div></div>
-    <div class="act"><button data-copy="${esc(i.url)}">URL 복사</button><button class="open" data-open="${esc(i.url)}">열기</button></div></div>`;
+
+function renderCards() {
+  const show = !S.q && S.topic === '전체' && S.kind === '전체' && S.who === '전체';
+  $('recentSec').style.display = show ? '' : 'none';
+  if (!show) return;
+  const top = live.slice().sort(byRecent).slice(0, 8);
+  $('cards').innerHTML = top.map((i) => `<button class="card" data-pv="${esc(i.f)}">
+    <div class="tp"><b>${esc(i.topic)}</b><span>${i.updated.slice(5).replace('-', '.')}</span></div>
+    <div class="nm">${esc(i.title)}</div>
+    <div class="bd">${kindB(i.kind)}${whoB(i.who)}</div></button>`).join('');
 }
+
+function row(i, q) {
+  const badges = kindB(i.kind) + whoB(i.who) + (i.fresh ? '<span class="b new">최근</span>' : '') + (i.archived ? '<span class="b old">보관본</span>' : '');
+  const since = i.created !== i.updated ? ` · 처음 ${i.created}` : '';
+  return `<div class="item ${i.archived ? 'arch' : ''}" data-pv="${esc(i.f)}">
+    <div class="it"><div class="tl"><span class="nm">${hl(i.title, q)}</span>${badges}</div>
+    <div class="meta"><span class="fn">${hl(i.f, q)}</span> · 수정 ${i.updated}${since}</div></div>
+    <div class="act"><button class="btn" data-copy="${esc(i.url)}">URL 복사</button><a class="btn" href="${esc(i.url)}" target="_blank" rel="noopener">새 탭 ↗</a></div></div>`;
+}
+
 function render() {
-  chips();
-  const q = S.q.trim().toLowerCase();
-  const list = items.filter((i) =>
-    (S.topic === '전체' || i.topic === S.topic) &&
-    (S.kind === '전체' || i.kind === S.kind) &&
-    (!q || (i.title + ' ' + i.f + ' ' + i.topic + ' ' + i.kind).toLowerCase().includes(q)));
-  const byRecent = (a, b) => (b.updated || '').localeCompare(a.updated || '') || a.title.localeCompare(b.title);
-  if (!list.length) { $('out').innerHTML = '<div class="empty">맞는 시안이 없어요</div>'; return; }
-  if (S.view === 'recent') { $('out').innerHTML = `<h2><b>최근 수정순</b>${list.length}개</h2><div class="list">${list.sort(byRecent).map(row).join('')}</div>`; return; }
+  renderSide(); renderCards();
+  const list = filtered(false);
+  const q = S.q.trim();
+  $('count').innerHTML = `<b>${list.length}</b>개${S.topic !== '전체' ? ` · ${esc(S.topic)}` : ''}`;
+  $('hint').innerHTML = q ? (list.length ? `Enter 를 누르면 첫 번째 결과 <b>${esc(list.slice().sort(byRecent)[0].title)}</b> 를 미리봐요` : '') : '';
+  if (!list.length) {
+    $('out').innerHTML = `<div class="empty">맞는 시안이 없어요.<br>다른 말로 찾거나 왼쪽 필터를 풀어보세요.</div>`;
+    return;
+  }
+  if (S.view === 'recent') { $('out').innerHTML = `<div class="list" style="margin-top:12px">${list.sort(byRecent).map((i) => row(i, q)).join('')}</div>`; return; }
   const groups = {};
   list.forEach((i) => (groups[i.topic] = groups[i.topic] || []).push(i));
-  const latest = (g) => g.reduce((m, i) => (i.updated > m ? i.updated : m), '');
   const names = Object.keys(groups).sort((a, b) => latest(groups[b]).localeCompare(latest(groups[a])));
-  $('out').innerHTML = names.map((t) => `<h2><b>${esc(t)}</b>${groups[t].length}개 · 마지막 수정 ${latest(groups[t]) || '-'}</h2><div class="list">${groups[t].sort(byRecent).map(row).join('')}</div>`).join('');
+  $('out').innerHTML = names.map((t) => {
+    const g = groups[t].sort(byRecent);
+    const qa = items.filter((i) => i.topic === t && i.kind === '검수' && !i.archived).sort(byRecent).slice(0, 3);
+    const qaHtml = qa.length && S.kind !== '검수' ? `<div class="qa">${qa.map((i) => `<a href="${esc(i.url)}" target="_blank" rel="noopener" title="${esc(i.title)}">✓ ${esc(i.title.replace(/\s*(시안 )?검수( 콘솔)?$/, '') || i.title)} 검수</a>`).join('')}</div>` : '';
+    return `<div class="group" id="g-${esc(t)}"><div class="gh"><h2>${esc(t)}</h2><span class="gm">${g.length}개 · 마지막 수정 ${latest(g)}</span>${qaHtml}</div><div class="list">${g.map((i) => row(i, q)).join('')}</div></div>`;
+  }).join('');
 }
+
+// 미리보기
+let cur = null;
+function openPv(f) {
+  const i = items.find((x) => x.f === f); if (!i) return;
+  cur = i;
+  $('pvT').textContent = i.title;
+  $('pvM').textContent = `${i.topic} · ${i.kind}${i.who ? ' · ' + i.who : ''} · 수정 ${i.updated}`;
+  $('pvOpen').href = i.url;
+  $('pvF').src = i.f; // 같은 저장소라 상대경로 (로컬 미리보기에서도 뜸)
+  document.body.classList.add('pv-open');
+  $('drawer').setAttribute('aria-hidden', 'false');
+}
+function closePv() { document.body.classList.remove('pv-open'); $('drawer').setAttribute('aria-hidden', 'true'); setTimeout(() => { if (!document.body.classList.contains('pv-open')) $('pvF').src = 'about:blank'; }, 260); }
+function copy(url) {
+  const t = $('toast');
+  const done = () => { t.textContent = 'URL 복사했어요'; t.classList.add('on'); setTimeout(() => t.classList.remove('on'), 1300); };
+  (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(done, () => prompt('복사하세요', url));
+}
+
 document.addEventListener('click', (e) => {
-  const b = e.target.closest('button'); if (!b) return;
-  if (b.dataset.t) S.topic = b.dataset.t;
-  else if (b.dataset.k) S.kind = b.dataset.k;
-  else if (b.dataset.v) { S.view = b.dataset.v; try { localStorage.setItem('kbs-hub', JSON.stringify({ view: S.view })); } catch (e) {} }
-  else if (b.dataset.open) { window.open(b.dataset.open, '_blank', 'noopener'); return; }
-  else if (b.dataset.copy) {
-    const done = () => { $('toast').classList.add('on'); setTimeout(() => $('toast').classList.remove('on'), 1200); };
-    navigator.clipboard ? navigator.clipboard.writeText(b.dataset.copy).then(done, () => prompt('복사하세요', b.dataset.copy)) : prompt('복사하세요', b.dataset.copy);
-    return;
-  } else return;
-  render();
+  const c = e.target.closest('[data-copy]'); if (c) { e.stopPropagation(); copy(c.dataset.copy); return; }
+  if (e.target.closest('a')) return;
+  const b = e.target.closest('button');
+  if (b && b.dataset.t) { S.topic = b.dataset.t; render(); window.scrollTo({ top: document.querySelector('.main').offsetTop - 8, behavior: 'smooth' }); return; }
+  if (b && b.dataset.k) { S.kind = b.dataset.k; render(); return; }
+  if (b && b.dataset.w) { S.who = b.dataset.w; render(); return; }
+  if (b && b.dataset.v) { S.view = b.dataset.v; save(); render(); return; }
+  const pv = e.target.closest('[data-pv]'); if (pv) openPv(pv.dataset.pv);
 });
+$('pvClose').onclick = closePv; $('scrim').onclick = closePv;
+$('pvCopy').onclick = () => cur && copy(cur.url);
+$('arch').onchange = (e) => { S.arch = e.target.checked; render(); };
 $('q').addEventListener('input', (e) => { S.q = e.target.value; render(); });
+$('q').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { const l = filtered(false).sort(byRecent); if (l[0]) openPv(l[0].f); }
+  if (e.key === 'Escape') { e.target.value = ''; S.q = ''; render(); }
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.body.classList.contains('pv-open')) { closePv(); return; }
+  if (e.key === '/' && document.activeElement !== $('q')) { e.preventDefault(); $('q').focus(); }
+});
 render();
 </script>
 </body>
