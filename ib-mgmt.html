@@ -2291,14 +2291,14 @@ function tag(text,color,attrs){return '<span class="ant-tag ant-tag-filled'+(col
 function group(title,inner){return '<span class="ant-tag ant-tag-filled '+CSS_H+'"><div class="ant-space ant-space-horizontal ant-space-align-center '+CSS_H+'" style="gap:8px"><div class="ant-space-item"><h5 class="ant-typography '+CSS_H+'" style="margin:0">'+title+'</h5></div>'+inner.map(function(x){return '<div class="ant-space-item">'+x+'</div>';}).join('')+'</div></span>';}
 function draw(){
  if(!P||!P.DB||!EL.tbody)return;
- document.body.classList.toggle('mk',!!P.S.mark);document.body.classList.toggle('hl',!!P.S.hint);
+ document.body.classList.toggle('mk',!!P.S.mark);document.body.classList.toggle('p1v',P1()); /* 1차 보기: 응답지연 칼럼 숨김 */if(EL.sLi)EL.sLi.style.display=P1()?'none':''; /* 1차: 상담 설정 없음 (채널 연결은 기존 창) */if(P1()&&M.page==='set'){M.page='list';drawPage();}document.body.classList.toggle('hl',!!P.S.hint);
  var b0=base(),rows=b0.filter(function(w){return pass(w);}),b=rows; /* 요약 숫자도 모든 필터를 따른다 */
  /* 요약 */
  var cnt=function(f){return b.filter(f).length;};
  var on=function(k,v){return sel(k).length===1&&sel(k)[0]===v;};
  EL.sum.innerHTML=group('총',[tag(String(b.length),'',' data-q="all" data-click')])
   +group('상태',(P1()?['wait','prog','done']:['wait','prog','done','ai']).map(function(t){return tag(ST[t][0]+' '+cnt(function(w){return w.tab===t;}),on('st',t)?'blue':'',' data-q="st:'+t+'" data-click');}))
-  +'<span data-new>'+group('응답지연',[tag(String(cnt(function(w){return w.long;}))+'',M.quick==='long'?'blue':'',' data-q="long" data-click title="운영시간(우리 CS 건은 CS 운영시간, 입점사 건은 매장 영업시간) 기준 '+LONG_MIN+'분 이상 미응답"')])+'</span>'
+  +(P1()?'':'<span data-new>'+group('응답지연',[tag(String(cnt(function(w){return w.long;}))+'',M.quick==='long'?'blue':'',' data-q="long" data-click title="운영시간(우리 CS 건은 CS 운영시간, 입점사 건은 매장 영업시간) 기준 '+LONG_MIN+'분 이상 미응답"')])+'</span>')
   +(P1()?'':'<span data-new>'+group('AI 단독처리',[tag(String(cnt(function(w){return w.aiOnly;})),M.quick==='aionly'?'blue':'',' data-q="aionly" data-click')])+'</span>')
   +'<span data-new>'+group('불만',[tag(String(cnt(function(w){return w.complaint;})),on('tp','불만')?'blue':'',' data-q="complaint" data-click')])+'</span>'
   +group('언어별',Object.keys(LN).filter(function(l){return l!=='ko';}).map(function(l){return tag(LN[l]+' '+cnt(function(w){return w.lang===l;}),on('lang',l)?'blue':'',' data-q="lang:'+l+'" data-click');}));
@@ -2318,7 +2318,7 @@ function draw(){
  EL.tbody.innerHTML=rows.length?rows.map(function(w,i){
   var st='<span class="sp '+w.tab+'">'+ST[w.tab][0]+'</span>';
   return '<tr class="ant-table-row ant-table-row-level-0'+(M.open===w.id?' mg-sel':'')+'" data-row="'+w.id+'" data-click>'
-   +td(String(rows.length-i))+td(esc(P.fmtTs(w.lastAt)),'nw')+td(st,'nw')+td(w.tab==='wait'&&w.wait!=null?esc(dur(w.wait)):'<span class="mg-dim">-</span>','nw')+td(w.who?esc(w.who):'<span class="mg-dim">-</span>','nw')
+   +td(String(rows.length-i))+td(esc(P.fmtTs(w.lastAt)),'nw')+td(st,'nw')+td(w.tab==='wait'&&w.wait!=null?esc(dur(w.wait)):'<span class="mg-dim">-</span>','nw mg-cw')+td(w.who?esc(w.who):'<span class="mg-dim">-</span>','nw')
    +td(esc(w.store||'K-Beauty Station'),'nw')+td(chCell(w.r),'nw')+td(esc(LN[w.lang]||w.lang),'nw')+td(esc(w.name),'nw')
    +td(w.topics.length?esc(w.topics.join(', ')):'<span class="mg-dim">-</span>','nw')+td('<div class="mg-last">'+esc(w.last)+'</div>')
    +td(w.owner?esc(w.owner):'<span class="mg-dim">-</span>','nw')+td(esc(dur(w.first)),'nw')+td(w.session+'차','nw')+'</tr>';}).join('')
@@ -2347,7 +2347,7 @@ function drawDrawer(){
  Q('.ant-drawer-title',EL.dw).innerHTML='<div class="mg-t1">'+esc(w.name)+' <span class="sp '+w.tab+'">'+ST[w.tab][0]+'</span></div><div class="mg-sub">'+chCell(w.r)+' · '+esc(w.store||'K-Beauty Station')+' · '+esc(LN[w.lang]||w.lang)+' · '+w.session+'차</div>';
  var cell=function(k,v){return '<div class="mg-cell"><span>'+esc(k)+'</span><b>'+v+'</b></div>';};
  /* 탭 위: 정보 4칸 + AI 중단사유 (항상 보임) */
- var top='<div class="mg-grid">'+cell('응대주체',esc(w.who||'-'))+cell('담당자',w.owner?esc(w.owner):'-')+cell('첫응답',esc(dur(w.first)))+cell('마지막대화',esc(P.fmtTs(w.lastAt)))+cell('응답지연',w.tab==='wait'&&w.wait!=null?esc(dur(w.wait)):'-')+'</div>';
+ var top='<div class="mg-grid">'+cell('응대주체',esc(w.who||'-'))+cell('담당자',w.owner?esc(w.owner):'-')+cell('첫응답',esc(dur(w.first)))+cell('마지막대화',esc(P.fmtTs(w.lastAt)))+(P1()?'':cell('응답지연',w.tab==='wait'&&w.wait!=null?esc(dur(w.wait)):'-'))+'</div>';
  /* 회차 묶음 + 처리 이력(문의 접수 · 상담 시작 · AI 중단 · 상담 완료) */
  var groups=[];w.msgs.forEach(function(m){var n=m[5]||1,g=groups[groups.length-1];if(!g||g.n!==n){g={n:n,at:m[3],end:m[3],list:[]};groups.push(g);}g.list.push(m);g.end=m[3];});
  var who=w.owner||'상담사',whoAt=function(t,n){var o=(w.ownerLog||[]).filter(function(x){return x[0]>t;})[0];if(o)return o[1];var so=(w.r&&w.r.sessOwner)||{};return (n!=null&&n<w.session&&so[n])?so[n]:who;}; /* 담당 변경 전에는 그때 담당자 */
@@ -2469,7 +2469,7 @@ function init(){
  EL.table=Q('.ant-table',tc);
  var cols=['No','마지막대화','상태','응답지연','응대주체','입점사','채널','언어','고객명','상담 분류','마지막메시지','담당자','첫응답','회차'];
  var newCols={'상태':1,'응답지연':1,'응대주체':1,'상담 분류':1,'마지막메시지':1,'담당자':0,'첫응답':1,'회차':1};
- Q('thead',tc).innerHTML='<tr>'+cols.map(function(c){return '<th class="ant-table-cell'+(c==='마지막대화'?' ant-table-column-has-sorters ant-table-column-sort':'')+'" scope="col"'+(newCols[c]?' data-new':'')+'>'+(c==='마지막대화'?'<div class="ant-table-column-sorters"><span class="ant-table-column-title">마지막대화날짜</span><span class="mg-sort">▼</span></div>':c)+'</th>';}).join('')+'</tr>';
+ Q('thead',tc).innerHTML='<tr>'+cols.map(function(c){return '<th class="ant-table-cell'+(c==='마지막대화'?' ant-table-column-has-sorters ant-table-column-sort':'')+(c==='응답지연'?' mg-cw':'')+'" scope="col"'+(newCols[c]?' data-new':'')+'>'+(c==='마지막대화'?'<div class="ant-table-column-sorters"><span class="ant-table-column-title">마지막대화날짜</span><span class="mg-sort">▼</span></div>':c)+'</th>';}).join('')+'</tr>';
  QA('colgroup',tc).forEach(function(g){g.remove();});
  EL.tbody=Q('tbody',tc);
  EL.tbody.addEventListener('click',function(e){var tr=e.target.closest('[data-row]');if(!tr)return;M.open=tr.getAttribute('data-row');draw();});
@@ -2497,7 +2497,7 @@ function init(){
  EL.setp.addEventListener('change',function(e){if(e.target.getAttribute('data-act')==='store'){SET.store=e.target.value;drawPage();}});
  var st=document.createElement('style');st.textContent=
   'body.mk [data-new]{outline:2px dashed #e8537a;outline-offset:1px}body.hl [data-click]{box-shadow:0 0 0 2px #16a34a!important}'
-  +'.mg-nw{white-space:nowrap}.mg-dim{color:#1d2939}.mg-last{max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#1d2939}'
+  +'.p1v .mg-cw{display:none}.mg-nw{white-space:nowrap}.mg-dim{color:#1d2939}.mg-last{max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#1d2939}'
   +'tr.ant-table-row{cursor:pointer}tr.ant-table-row:hover>td{background:#f5f8ff}tr.mg-sel>td{background:#e6f0ff!important}.mg-empty{padding:40px;text-align:center;color:#98a2b3}.mg-sort{font-size:9px;color:#1677ff;margin-left:4px}'
   +'.ant-select.mg-on{border-color:#91caff}.mg-val{color:#0958d9}.ant-card-small .ant-tag[data-q]{cursor:pointer}'
   +'#mgpop{position:absolute;z-index:1100;width:230px;background:#fff;border:1px solid #e3e6ea;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.12);padding:8px;display:none;font-family:inherit}'
