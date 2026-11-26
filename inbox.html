@@ -167,7 +167,7 @@ var STORE_ID={'k-beauty의원':1,'A피부과 강남점':2,'B헤어 명동점':3,
 function dispName(name,ch,cid,phone){if(name)return name;if(ch==='WhatsApp')return phone||cid;var t=String(cid||'').replace(/[^0-9A-Za-z]/g,'').slice(-4);if(ch==='LINE')return 'LINE ····'+t;if(ch==='WeChat')return 'WeChat ····'+t;return '게스트 '+t;} /* 이름이 없으면 채널마다 고객 쪽 값 */
 function seedExtra(){return EX.map(function(x){
  var inApp={'CS채팅':'고객지원','스토어채팅':'스토어 문의','상품채팅':'상품 문의'}[x.ch],meta=EX_META[x.id]||[],sess=0,prev=null;
- var msgs=x.msgs.map(function(t){var sn=t[5]||x.session;var mm={who:t[0],text:t[1],ko:t[2],at:t[3],answered:true};if(x.tab==='prog'&&t[0]==='cust'&&!x.msgs.slice(x.msgs.indexOf(t)+1).some(function(z){return z[0]!=='cust';}))mm.answered=false; /* 진행 중: 마지막 답 뒤 고객 메시지는 새 메시지 */if(t[4])mm.notice=true;if(prev!==null&&sn!==prev)mm.newSession=true;prev=sn;return mm;});
+ var msgs=x.msgs.map(function(t){var sn=t[5]||x.session;var mm={who:t[0],text:t[1],ko:t[2],at:t[3],answered:true};if(x.lang&&t[0]!=='cust')mm.ml=x.lang; /* 예시 데이터의 우리 쪽 말은 대화 언어로 보낸 것 */if(x.tab==='prog'&&t[0]==='cust'&&!x.msgs.slice(x.msgs.indexOf(t)+1).some(function(z){return z[0]!=='cust';}))mm.answered=false; /* 진행 중: 마지막 답 뒤 고객 메시지는 새 메시지 */if(t[4])mm.notice=true;if(prev!==null&&sn!==prev)mm.newSession=true;prev=sn;return mm;});
  (x.notes||[]).forEach(function(n){var nt={who:'note',by:n[0],at:n[1],text:n[2]},i=msgs.findIndex(function(z){return z.at>n[1];});if(i<0)msgs.push(nt);else msgs.splice(i,0,nt);});
  var lastCust=null;msgs.forEach(function(z){if(z.who==='cust')lastCust=z.at;});
  var ag=msgs.filter(function(z){return z.who==='agent';})[0];
