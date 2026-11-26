@@ -87,7 +87,7 @@ var CS_GUIDE={ /* 플랫폼 CS 안내 문구 (방향결정 Q12, 문안은 작성
  signup:{keys:['회원가입','가입','sign up','signup','会員登録','注册'],ko:'회원가입은 K-Beauty Station 웹사이트 오른쪽 위 Sign up에서 이메일로 할 수 있어요',en:'You can sign up with your email from Sign up at the top right of the K-Beauty Station website'},
  howbook:{keys:['어떻게 예약','예약 방법','how to book','how do i book'],ko:'원하는 스토어 페이지의 예약 버튼에서 날짜와 시간을 골라 바로 예약할 수 있어요',en:'You can book directly by choosing a date and time from the booking button on the store page'}
 };
-/* 채널 ID·고객 카드는 시안용 예시 값 */
+/* 고객 계정·고객 카드는 시안용 예시 값 */
 var CARD={r1:{cid:'Ua1f3c29d7b04e8f6a5d1c3b90e4e2711',chState:'친구 추가됨',card:{name:'고객 A',phone:'',email:'',tags:[],memo:'',owner:'',bookings:[],links:[]}},r2:{cid:'+1 4165550188',chState:'24시간 창 열림',card:{name:'Emma Lee',phone:'+1 4165550188',email:'emma.lee@example.com',tags:['재방문'],memo:'지난번 시술 후 붓기 문의 있었음',owner:'',bookings:[{id:'B2610300014',d:'2026-10-30',t:'14:00',p:'Rejuran Skin Booster',n:2,st:'확정',memo:'친구와 함께, 연속 시간으로'},{d:'2026-09-12',t:'11:00',p:'Skinvive',n:1,st:'방문',memo:''},{d:'2026-08-02',t:'15:30',p:'Rejuran Skin Booster',n:1,st:'취소',memo:''}],links:[{ch:'스토어채팅',d:'2026-09-10',st:'완료'}]}},r3:{cid:'oX9k····QkN30',chState:'구독 중',card:{name:'王丽',phone:'',email:'',tags:[],memo:'',owner:'',bookings:[],links:[]}},r4:{cid:'게스트 8b58f990',chState:'인앱 채팅',card:{name:'',phone:'',email:'',tags:[],memo:'',owner:'',bookings:[],links:[]}}};
 function seedRooms(){return [
  {id:'r1',name:'고객 A',ch:'LINE',lineAcct:'메인',type:'스토어 문의',store:1,lang:null,msgs:[],session:1,status:'상담중',aiOn:true,need:null,handler:'ai',noticeAt:null,aiIntroDone:false,req:{},asked:null,first:'2026-10-21 13:50',agentAt:null},
@@ -123,7 +123,7 @@ var EX=[
  {id:'x7',cat:'헤어·메이크업',bookings:[{d:'2026-10-23',t:'11:00',p:'커트',n:1,st:'확정'},{d:'2026-10-21',t:'11:00',p:'커트',n:1,st:'취소'}],name:'Putri',ch:'LINE',store:'B헤어 명동점',lang:'id',tab:'done',who:'CS팀',owner:'이상담',session:1,topics:['취소·환불'],aiOnly:false,first:22,
   msgs:[['cust','Saya ingin membatalkan reservasi besok.','내일 예약 취소하고 싶어요','2026-10-20 10:30'],['agent','Reservasi Anda sudah kami batalkan.','취소 처리했습니다.','2026-10-20 10:52']],
   sum:{l1:'내일 예약 취소 요청, 입점사가 취소 처리',l2:''},card:{name:'Putri',phone:'+62 81234567890',email:''}},
- {id:'x8',cat:'피부과',name:'Kenji T.',ch:'스토어채팅',store:'A피부과 강남점',lang:'ja',tab:'wait',who:null,owner:'',session:1,topics:['시술 상담'],aiOnly:false,
+ {id:'x8',cat:'피부과',member:'회원',acct:'kenji.t@example.com',name:'Kenji T.',ch:'스토어채팅',store:'A피부과 강남점',lang:'ja',tab:'wait',who:null,owner:'',session:1,topics:['시술 상담'],aiOnly:false,
   msgs:[['cust','妊娠中でもレーザーはできますか？','임신 중에도 레이저 가능한가요?','2026-10-21 13:45'],['ai','確認してご案内いたします。','확인 후 안내드리겠습니다.','2026-10-21 13:45',1]],
   sum:{l1:'임신 중 레이저 시술 가능 여부 문의, 의료 판단 필요로 AI 중단',l2:''},card:{name:'Kenji T.',phone:'',email:''},need:'시술 상담(의료 판단 필요)'}
 ];
