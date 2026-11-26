@@ -512,7 +512,7 @@ function fillSlots(r,t,fields){
 }
 function askFields(n){return n.fields.concat(n.clinic&&isClinic()?['gender','nation','birth'].filter(function(f){return n.fields.indexOf(f)<0;}):[]);}
 function scnText(n,lang){var t=n.text||{};if(lang!=='ko'&&t.ko){KOBUF.push(t.ko);}return t[lang]||t.ko||'';}
-var LNK={ko:'한국어',en:'영어',ja:'일본어',zh:'중국어(간체)','zh-TW':'중국어(번체)',th:'태국어',mn:'몽골어',id:'인도네시아어'};
+var LNK={ko:'한국어',en:'영어',ja:'일본어',zh:'중국어(간체)','zh-TW':'중국어(번체)',mn:'몽골어',id:'인도네시아어'};
 function scnMemo(r,it){var q=r.req,out=[];if(it)out.push('의도 '+it);
  if(r.pick)out.push('매장 '+r.pick.name);if(q.bk)out.push('예약 '+fmtDay(q.bk.d,'ko')+' '+q.bk.t+' '+q.bk.p);
  if(q.treat||q.prod)out.push('시술 '+(q.treat||q.prod.ko));if(q.date)out.push('희망일 '+fmtDay(q.date,'ko'));if(q.time)out.push('시간 '+q.time);

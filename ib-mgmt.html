@@ -2195,7 +2195,7 @@ body { margin: 0px; }
 var P=parent.IB,EL={},Q=function(s,r){return (r||document).querySelector(s);},QA=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));};
 var CSS_H='css-19u5a7b css-var-root';
 var LONG_MIN=10,LIM_MSG=20;
-var LN={ko:'한국어',en:'영어',ja:'일본어',zh:'중국어(간체)','zh-TW':'중국어(번체)',th:'태국어',mn:'몽골어',id:'인도네시아어'};
+var LN={ko:'한국어',en:'영어',ja:'일본어',zh:'중국어(간체)','zh-TW':'중국어(번체)',mn:'몽골어',id:'인도네시아어'};
 (function(){var st=document.createElement('style');st.textContent="/* MGMT WASH */svg text{fill:rgba(0,0,0,.88)!important}.ant-picker-input>input{color:rgba(0,0,0,.88)!important}.sp-desc,.sp-tabs button,.mg-tabs button{color:rgba(0,0,0,.88)!important}.sp-tabs button.on,.mg-tabs button.on{color:#0958d9!important}[class*=_pageHeaderTopSubtitle_]{color:rgba(0,0,0,.88)!important}div.ant-select-placeholder,.ant-select-placeholder{color:rgba(0,0,0,.5)!important}.ant-card-small .ant-card-body .ant-tag{border:0!important;background:none!important;padding:0 4px!important;margin:0!important;font-size:14px!important;line-height:22px!important}.ant-card-small .ant-card-body .ant-tag[data-click]{cursor:pointer}.ant-card-small .ant-card-body .ant-tag[data-click]:hover{text-decoration:underline}.ant-card-small .ant-card-body .ant-tag.ant-tag-blue{color:#0958d9!important;font-weight:600}.ant-card-small .ant-card-body>*{margin-right:20px!important}.ant-card-small .ant-card-body h5{font-size:14px!important}.ant-drawer-body :is(span,div,td,th,dt,dd,li,p,label,small):not(.ant-tabs-tab-btn):not(.ant-tabs-tab-btn *):not(.ant-btn-primary):not(.ant-btn-primary *),.ant-drawer-header .mg-sub,.ant-drawer-header .mg-sub *{color:rgba(0,0,0,.88)!important}.ant-layout-content [class*=sub],.ant-page-header-heading-sub-title,.ant-layout-content p{color:rgba(0,0,0,.88)!important}.cpi{display:inline-flex;vertical-align:middle;margin-right:6px}.cpi img,.cpi svg{display:block}.sp{display:inline-flex;align-items:center;gap:6px;font-size:12px;line-height:20px;color:rgba(0,0,0,.88);white-space:nowrap}.sp::before{content:'';width:6px;height:6px;border-radius:50%;background:rgba(0,0,0,.88);flex:none}.sp.wait::before{background:#fa8c16}.sp.prog::before{background:#1677ff}.sp.ai::before{background:#389e0d}.mg-dim,.mg-sub,.mg-last,[class*=description],.ant-typography-secondary,.ant-table-cell,.ant-descriptions-item-label,.ant-empty-description,small{color:rgba(0,0,0,.88)!important}input::placeholder,textarea::placeholder,.ant-select-selection-placeholder,.ant-picker-input input::placeholder{color:rgba(0,0,0,.5)!important}.ant-table-thead>tr>th,.ant-table-thead>tr>td{background:#fff!important;color:rgba(0,0,0,.88)!important;border-bottom:1px solid #c9ced6!important}.ant-table-tbody>tr>td{border-bottom:1px solid #d3d8df!important}.ant-table-thead>tr>th::before{background:#d3d8df!important}.ant-tag{background:#fff!important;border:1px solid #c9ced6!important;color:rgba(0,0,0,.88)!important}.ant-tag.ant-tag-blue{border-color:#1677ff!important;color:#0958d9!important;background:#f0f6ff!important}.ant-card,.ant-drawer-content,.ant-input,.ant-select-selector,.ant-picker,.ant-btn-default{border-color:#c9ced6!important}.ant-btn-primary,.ant-btn-primary *{color:#fff!important}";document.head.appendChild(st);})();
 var ST={wait:['대기',''],prog:['진행',''],ai:['AI 응대',''],done:['완료','']};
 var WHO=['AI','CS팀','입점사'];
@@ -2303,7 +2303,7 @@ function draw(){
  /* 필터 칸 표시 */
  FL.forEach(function(d){var sv=sel(d.k);setSel(EL.sel[d.k],d.label,sv.length?(sv.length===1?optLabel(d,sv[0]):d.label+' '+sv.length):null);});
  var moreN=FL.filter(function(d){return d.more&&sel(d.k).length;}).length;
- EL.moreBtn.innerHTML='<span>상세검색'+(moreN?' '+moreN:'')+' '+(M.more?'▴':'▾')+'</span>';EL.moreBtn.classList.toggle('mg-on',!!moreN);EL.more.style.display=M.more?'':'none';
+ EL.moreBtn.innerHTML='<span>상세검색'+(moreN?' '+moreN:'')+' '+(M.more?'▴':'▾')+'</span>';EL.moreBtn.classList.toggle('mg-on',!!moreN);EL.more.style.display='none';
  var chips=[];FL.forEach(function(d){sel(d.k).forEach(function(v){chips.push('<span class="mg-fchip">'+esc(d.label)+': '+esc(optLabel(d,v))+'<a data-rm="'+d.k+'|'+esc(v)+'" data-click title="빼기">✕</a></span>');});});
  if(M.quick)chips.push('<span class="mg-fchip">'+(M.quick==='long'?'응답지연':'AI 단독처리')+'<a data-rm="quick|" data-click title="빼기">✕</a></span>');
  if(M.store.trim())chips.push('<span class="mg-fchip">입점사: '+esc(M.store)+'<a data-rm="store|" data-click title="빼기">✕</a></span>');
@@ -2437,10 +2437,10 @@ function init(){
  EL.more.innerHTML='<span class="mg-fl">상세검색</span>';
  FL.filter(function(d){return d.more;}).forEach(function(d){EL.more.appendChild(d.k==='who'?whoItem:mk(d));});
  EL.moreBtn=document.createElement('button');EL.moreBtn.type='button';EL.moreBtn.id='moreBtn';EL.moreBtn.className='ant-btn '+CSS_H+' ant-btn-default ant-btn-color-default ant-btn-variant-outlined';EL.moreBtn.setAttribute('data-click','');EL.moreBtn.setAttribute('data-new','');
- var mbItem=document.createElement('div');mbItem.className='ant-form-item ant-form-item-inline '+CSS_H;mbItem.appendChild(EL.moreBtn);lgItem.after(mbItem);
+ var mbItem=document.createElement('div');mbItem.className='ant-form-item ant-form-item-inline '+CSS_H;mbItem.appendChild(EL.moreBtn);/* 상세검색 없음 */
  EL.moreBtn.addEventListener('click',function(){M.more=!M.more;M.pop=null;draw();});
  EL.chips=document.createElement('div');EL.chips.className='mg-chips';EL.chips.setAttribute('data-new','');
- form.after(EL.more);EL.more.after(EL.chips);
+ form.after(EL.more);EL.more.after(EL.chips);EL.more.hidden=true; /* 상세검색 없음: 줄은 숨김 */
  EL.chips.addEventListener('click',function(e){var a=e.target.closest('[data-rm]');if(!a)return;var p=a.getAttribute('data-rm').split('|');
   if(p[0]==='*'){M.f={};M.quick=null;M.store='';EL.store.value='';}else if(p[0]==='quick')M.quick=null;else if(p[0]==='store'){M.store='';EL.store.value='';}else M.f[p[0]]=sel(p[0]).filter(function(v){return v!==p[1];});draw();});
  EL.sel={};FL.forEach(function(d){var s=selOf(d.id);EL.sel[d.k]=s;s.style.width=(d.w||110)+'px';s.setAttribute('data-click','');s.style.cursor='pointer';
@@ -2601,7 +2601,7 @@ var TN={};TYPES.forEach(function(t){TN[t[0]]=t[1];});
 var EXN={next:'다음',fail:'못 받으면',ok:'가능',no:'불가',yes:'예',pick:'고름',found:'찾음'};
 function exName(n,k){if(k==='no'&&(n.type==='branch'||n.type==='confirm'))return '아니오';if(k==='none')return n.type==='info'?'정보 없음':n.type==='recommend'?'추천 없음':'없음';return EXN[k];}
 var COND=[['booking','매장 예약 기능 ON'],['hours','운영시간 안 (평일 10:00~19:00)'],['lang','고객 언어'],['channel','채널'],['member','회원'],['field','받은 정보 있음'],['store','매장 정해짐']];
-var LANGS=[['ko','한국어'],['en','영어'],['ja','일본어'],['zh','중국어(간체)'],['zh-TW','중국어(번체)'],['th','태국어'],['mn','몽골어'],['id','인도네시아어']];
+var LANGS=[['ko','한국어'],['en','영어'],['ja','일본어'],['zh','중국어(간체)'],['zh-TW','중국어(번체)'],['mn','몽골어'],['id','인도네시아어']];
 var CHS=['WhatsApp','LINE','WeChat','인앱채팅'];
 var FLD=['treat','date','time','people','name','phone','when','gender','nation','birth','late','reason'];
 var W=200,HH=100; /* 노드 폭·높이 (위에서 아래로 흐름) */
