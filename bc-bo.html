@@ -3327,6 +3327,20 @@ function prodLine(cell, text, secTpl, testId) {
   var ln = document.createElement('div'), s = secTpl.cloneNode(true); s.textContent = text; s.title = text; s.setAttribute('data-test', testId); ln.appendChild(mark(s)); w.appendChild(ln);
 }
 
+/* v0.7 목록 "접수일시" 칸: 방문일시 칸 둘째 줄("접수 …")을 꺼내 방문일시 바로 오른쪽 칸으로. 같은 칸 부품을 복제해 씀 */
+function recvCol(vi, recvs) {
+  var tbl = $('.ant-table-wrapper table'); if (!tbl) return;
+  var th = $$('thead th', tbl)[vi], th2 = th.cloneNode(true); th2.textContent = '접수일시'; th2.setAttribute('data-test', 'recv-col'); mark(th2); th.after(th2);
+  var cg = $('colgroup', tbl); if (cg) { var c = cg.children[vi], c2 = c.cloneNode(true); c2.style.width = '150px'; c.after(c2); tbl.style.width = (parseInt(tbl.style.width, 10) + 150) + 'px'; } /* 날짜·시각 한 줄(16자)이 들어가는 폭 */
+  var mr = $('tr.ant-table-measure-row', tbl); if (mr) { var m = mr.children[vi], m2 = m.cloneNode(true); m2.querySelector('div').textContent = '접수일시'; m.after(m2); }
+  $$('tr.ant-table-row', tbl).forEach(function (r, i) {
+    var td = r.children[vi], sp = $$('.ant-typography', td), br = td.querySelector('br');
+    if (sp[1]) sp[1].parentNode.removeChild(sp[1]); if (br) br.parentNode.removeChild(br);
+    var td2 = td.cloneNode(true); $('.ant-typography', td2).textContent = recvs[i]; td.after(td2);
+  });
+  $$('tbody td[colspan]', tbl).forEach(function (t) { t.colSpan = t.colSpan + 1; });
+}
+
 /* ===== 예약 캘린더(월 · 주): HOST · BO 공용. 새 요소라 전부 pb-new 로 표시 ===== */
 var WD = ['일', '월', '화', '수', '목', '금', '토'], DOW = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 function dow(d) { return new Date(d + 'T00:00:00Z').getUTCDay(); }
@@ -3951,6 +3965,7 @@ function pRes() {
     tb.appendChild(r);
   });
   if (!rows.length) { var er = document.createElement('tr'); er.innerHTML = '<td colspan="8" style="text-align:center;padding:40px;color:#999">데이터 없음</td>'; tb.appendChild(er); }
+  recvCol(1, rows.map(function (x) { return x.recv; }));
   $$('.ant-pagination-item').forEach(function (li, i) { if (i > 0) li.remove(); });
 }
 function openDrawer() {
