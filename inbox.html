@@ -158,7 +158,7 @@ var EX_META={x11:['+33 612345678','24시간 창 열림'],x9:['oP3k····Zt8','
  for(var i=0;i<19;i++){var q=QA[i%QA.length],a=new Date(t.getTime()+i*3*60000),b=new Date(a.getTime()+60000);
   gen.push(['cust',q[0],q[1],xdstr(a)+' '+pad(a.getHours())+':'+pad(a.getMinutes())]);gen.push(['agent',q[2],q[3],xdstr(b)+' '+pad(b.getHours())+':'+pad(b.getMinutes())]);}
  x5.msgs=gen.concat(x5.msgs);
- var x2=EX.filter(function(x){return x.id==='x2';})[0];x2.sessOwner={1:'김상담'};x2.sessTopics={1:['예약']};x2.msgs.forEach(function(m){m[4]=m[4]||0;m[5]=2;});
+ var x2=EX.filter(function(x){return x.id==='x2';})[0];x2.sessOwner={1:'김상담'};var x11=EX.filter(function(x){return x.id==='x11';})[0];x11.sessOwner={1:'김상담'}; /* Lucas M. 1차는 김상담이 응대 */x2.sessTopics={1:['예약']};x2.msgs.forEach(function(m){m[4]=m[4]||0;m[5]=2;});
  x2.msgs=[['cust','Can I book a perm for Saturday?','토요일에 펌 예약할 수 있나요?','2026-10-14 15:10',0,1],['ai','Yes, Saturday 2 PM is available.','네, 토요일 오후 2시 가능합니다.','2026-10-14 15:10',0,1],['cust','Great, see you then.','좋아요, 그때 봬요.','2026-10-14 15:12',0,1]].concat(x2.msgs);
 })();
 
@@ -233,7 +233,7 @@ var R_UNAV={sun:{ko:'일요일은 예약을 받지 않아요',en:'we do not take
 function altText(a,lang){if(!a.list.length)return '';var days={};a.list.forEach(function(o){days[o.d]=1;});var one=Object.keys(days).length===1,x=a.list.map(function(o,i){return (!a.same&&(!one||i===0)?fmtDay(o.d,lang)+' ':'')+o.t;}).join(', ');return T(a.same?'altSame':'altNext',lang,{x:x});}
 var FIELDS={name:{ko:'이름',en:'Name',ja:'お名前',zh:'姓名'},phone:{ko:'연락처(국가번호 포함)',en:'Phone (with country code)',ja:'連絡先（国番号含む）',zh:'联系方式（含国家区号）'},people:{ko:'인원',en:'Number of people',ja:'人数',zh:'人数'},treat:{ko:'희망 시술',en:'Desired treatment',ja:'ご希望の施術',zh:'希望项目'},when:{ko:'희망 일시',en:'Preferred date and time',ja:'ご希望の日時',zh:'希望日期和时间'},gender:{ko:'성별',en:'Gender',ja:'性別',zh:'性别'},nation:{ko:'국적',en:'Nationality',ja:'国籍',zh:'国籍'},birth:{ko:'생년월일',en:'Date of birth',ja:'生年月日',zh:'出生日期'}};
 var KOBUF=[]; /* 고객 언어로 만든 문장의 한국어 원문을 모아 두었다가 aiSay가 번역 줄(m.ko)로 붙인다 */
-function T(key,lang,v){v=v||{};var fill=function(s){return s.replace(/\{(\w+)\}/g,function(m,k){return v[k]!=null?v[k]:'';});};if(lang!=='ko'&&TX[key].ko)KOBUF.push(fill(TX[key].ko));return fill(TX[key][lang]||TX[key].ko);}
+function T(key,lang,v){v=v||{};var fill=function(s){return s.replace(/\{(\w+)\}/g,function(m,k){return v[k]!=null?v[k]:'';});},fillK=function(s){return s.replace(/\{(\w+)\}/g,function(m,k){if(v[k]==null)return '';var x=String(v[k]);Object.keys(FMTD).forEach(function(f){if(x.indexOf(f)>=0)x=x.split(f).join(fmtDay0(FMTD[f],'ko'));});return x;});};if(lang!=='ko'&&TX[key].ko)KOBUF.push(fillK(TX[key].ko)); /* 한국어 줄의 날짜는 한국어 표기 */return fill(TX[key][lang]||TX[key].ko);}
 function L(o,lang){return o[lang]||o.ko;}
 function fmtDay(d,lang){var m=+d.slice(5,7),dd=+d.slice(8,10),w=wd(d);if(lang==='en')return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][w]+', '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m-1]+' '+dd;if(lang==='ja')return m+'月'+dd+'日('+['日','月','火','水','木','金','土'][w]+')';if(lang==='zh')return m+'月'+dd+'日(周'+['日','一','二','三','四','五','六'][w]+')';return m+'월 '+dd+'일('+WD[w]+')';}
 
@@ -270,6 +270,9 @@ function parseDate(t,today){
  if(/내일|tomorrow|明日|明天/i.test(t))return addDays(today,1);
  if(/모레|day after tomorrow|明後日|后天/i.test(t))return addDays(today,2);
  if((m=t.match(/(\d{1,2})\s*(?:월|\/|月)\s*(\d{1,2})\s*(?:일|日)?/)))return '2026-'+pad(+m[1])+'-'+pad(+m[2]);
+ var MON={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+ if((m=t.match(/\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+(\d{1,2})(?:st|nd|rd|th)?\b/i)))return '2026-'+pad(MON[m[1].toLowerCase()])+'-'+pad(+m[2]); /* October 30 */
+ if((m=t.match(/\b(\d{1,2})(?:st|nd|rd|th)?\s+(?:of\s+)?(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*/i)))return '2026-'+pad(MON[m[2].toLowerCase()])+'-'+pad(+m[1]); /* 30 October */
  var w=null,nextWeek=/다음 ?주|next week|next (sun|mon|tue|wed|thu|fri|sat)|来週|下周/i.test(t),thisWeek=/이번 ?주|this week|今週|这周|本周/i.test(t);
  if((m=t.match(/([일월화수목금토])요일/)))w=WDK[m[1]];
  else if((m=t.match(/\b(sun|mon|tue|wed|thu|fri|sat)[a-z]*/i)))w=WDE[m[1].toLowerCase()];
@@ -290,7 +293,7 @@ function parseTime(t){
  if(pm&&h<12)h+=12;if(!pm&&!am&&h>=1&&h<=8)h+=12; /* "2시"처럼 오전·오후가 없으면 영업시간대로 본다 */
  return pad(h)+':'+pad(mi);
 }
-function parsePeople(t){var all=t.match(/\d+\s*(?:명|people|persons|pax|ppl|名|人|位)/gi);if(all)return Math.max.apply(null,all.map(function(x){return parseInt(x,10);}));if(/친구(랑|와|하고)|같이|with (my )?(friend|mom|sister|husband|wife)|友達と|和朋友/i.test(t))return 2;return null;}
+function parsePeople(t){var NW={one:1,two:2,three:3,four:4,five:5,six:6};var wm=t.match(/\b(one|two|three|four|five|six)\s+(?:people|persons?|pax|ppl)\b/i);if(wm)return NW[wm[1].toLowerCase()];var all=t.match(/\d+\s*(?:명|people|persons?|pax|ppl|名|人|位)/gi);if(all)return Math.max.apply(null,all.map(function(x){return parseInt(x,10);}));if(/친구(랑|와|하고)|같이|with (my )?(friend|mom|sister|husband|wife)|友達と|和朋友/i.test(t))return 2;return null;}
 function classify(t,r){
  if(r.ch==='플랫폼'&&r.type==='고객지원'){for(var k in CS_GUIDE){if(CS_GUIDE[k].keys.some(function(x){return t.toLowerCase().indexOf(x.toLowerCase())>=0;}))return {kind:'cs',key:k};}}
  if(KW.inject.test(t))return {kind:'refuse'};
@@ -617,6 +620,7 @@ function scnTick(list){(list||DB.rooms.concat(window.__scnT?[window.__scnT]:[]))
  if(!r.flow||!r.aiOn||!r.waitAt)return;var idle=tsMin(S.now)-tsMin(r.waitAt);if(idle<30)return;
  if(!r.nudged){var la=r.lastAsk;aiSay(r,T('nudge',r.lang||'ko')+' '+(la?la.text.replace(/^안녕하세요, K-Beauty Station AI 상담 도우미입니다\. |^Hello, this is the K-Beauty Station AI assistant\. /,''):''));if(la&&la.ko&&r.msgs[r.msgs.length-1].ko)r.msgs[r.msgs.length-1].ko=T_KO('nudge')+' '+la.ko.replace(/^안녕하세요, K-Beauty Station AI 상담 도우미입니다\. /,'');r.nudged=true;r.waitAt=S.now;return;}
  r.flow=null;r.expect=null;r.asked=null;r.pending=false;r.req={};(r.scnLog=r.scnLog||[]).push([S.now,'시나리오 · 무응답 종료']);r.status='상담종료';r.need=null;});}
+var FMTD={},fmtDay0=fmtDay;fmtDay=function(d,l){var s=fmtDay0(d,l);if(l&&l!=='ko')FMTD[s]=d;return s;}; /* 고객 언어 날짜 → 원래 날짜 */
 function T_KO(k){return TX[k].ko;}
 function idleTest(min){var r=window.__scnT;if(!r||!r.waitAt)return r;var back=new Date(dt(dOf(r.waitAt)).getTime()+((tsMin(r.waitAt)%1440)-min)*60000);r.waitAt=back.toISOString().slice(0,10)+' '+pad(back.getUTCHours())+':'+pad(back.getUTCMinutes());scnTick([r]);return r;}
 function tick(min){var d=new Date(dt(dOf(S.now)).getTime()+(tsMin(S.now)%1440+min)*60000);S.now=d.toISOString().slice(0,10)+' '+pad(d.getUTCHours())+':'+pad(d.getUTCMinutes());scnTick();render();}
