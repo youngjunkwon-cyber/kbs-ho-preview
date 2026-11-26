@@ -2174,7 +2174,7 @@ function tag(text,color,isNew){var t=TPL.tag.cloneNode(true);t.className=t.class
 function lastVis(r){for(var i=r.msgs.length-1;i>=0;i--){var v=P.p1View(r.msgs[i]);if(v&&v.who!=='note'&&v.who!=='auto'&&!v.fail)return v;}return null;} /* 전송 실패한 말, 메신저 자동 응답은 카드에 안 보인다 */ /* 전송 실패한 말은 카드에 안 보인다 */
 function shownMsg(r,custOnly){var i;if(custOnly){for(i=r.msgs.length-1;i>=0;i--)if(r.msgs[i].who==='cust')return r.msgs[i];}for(i=r.msgs.length-1;i>=0;i--){var v=P.p1View(r.msgs[i]);if(v&&v.who!=='note')return r.msgs[i];}return null;} /* 카드 2줄에 보이는 원래 메시지 */
 function waLeft(r){for(var i=r.msgs.length-1;i>=0;i--)if(r.msgs[i].who==='cust'){var m=24*60-(tsMin(P.S.now)-tsMin(r.msgs[i].at));return m;}return null;} /* 고객 마지막 메시지 뒤 남은 분 */
-function connState(r){if(r.ch!=='WhatsApp')return r.chState;if(P.S.waOff)return '연결 끊김';if(P.waBlocked(r)==='24h')return '24시간 창 닫힘';var m=waLeft(r);return r.chState+(m!=null&&m>0?' · '+(m>=60?Math.floor(m/60)+'시간':m+'분')+' 남음':'');} /* CSM-CHAT-28 연결 상태: WhatsApp은 고객 마지막 메시지 후 24시간이 지나면 닫힘 */
+function connState(r){if(r.ch==='LINE'&&P.S.lnOff)return '연결 끊김';if(r.ch!=='WhatsApp')return r.chState;if(P.S.waOff)return '연결 끊김';if(P.waBlocked(r)==='24h')return '24시간 창 닫힘';var m=waLeft(r);return r.chState+(m!=null&&m>0?' · '+(m>=60?Math.floor(m/60)+'시간':m+'분')+' 남음':'');} /* CSM-CHAT-28 연결 상태: WhatsApp은 고객 마지막 메시지 후 24시간이 지나면 닫힘 */
 function lastMsg(r,custOnly){var m=null;if(custOnly){for(var i=r.msgs.length-1;i>=0;i--)if(r.msgs[i].who==='cust'){m=r.msgs[i];break;}}m=m||lastVis(r);return m?(m.kind==='image'?'사진':m.kind==='product'?'상품 카드':m.kind==='guide'?'1:1 상담 안내':m.kind==='video'?'동영상':((m.who==='agent'||m.who==='ai')&&m.ko)?m.ko:m.text):'';} /* 우리가 보낸 말(상담사, AI)은 한국어 원문 */
 function lastAt(r){var m=lastVis(r);return m?m.at:r.first;}
 function hasNote(r){var n=false;for(var i=r.msgs.length-1;i>=0;i--){var m=r.msgs[i];if(m.newSession&&i>0)break;if(m.who==='note')n=true;}return n;}
@@ -2212,7 +2212,7 @@ function draw(){
  if(EL.sw&&EL.swRoom!==S.bo.room){EL.swRoom=S.bo.room;EL.sw.classList.toggle('ant-switch-checked',!own);EL.sw.setAttribute('aria-checked',own?'false':'true');} /* 대화를 열 때 자동번역 기본값 */
  var p1=!!S.p1;
  if(EL.login)EL.login.classList.toggle('on',p1&&!!S.login);
- if(EL.gband)EL.gband.classList.toggle('on',p1&&!!S.waOff);
+ if(EL.gband){var offs=[S.waOff?'WhatsApp':'',S.lnOff?'LINE':''].filter(Boolean);EL.gband.textContent=offs.join(', ')+' 연결 끊김 · 메시지 수신·발신 불가';EL.gband.classList.toggle('on',p1&&offs.length>0);} /* 끊긴 채널 이름을 띠에 (CSM-CHAT-00) */
  var con=Q('#csmbar .csmOn');if(con){var rto=p1&&!!S.rtOff;con.classList.toggle('off',rto);con.textContent=rto?'연결 끊김 · 다시 연결 중':'실시간 연결됨';} /* CSM-CHAT-00 연결 상태 */
  if(EL.rsel)EL.rsel.style.display=p1?'none':''; /* 1차: 응대 드롭다운 숨김 (CSM-CHAT-08) */
  var vis=function(r){return !(p1&&r.ch==='WeChat')&&(r.msgs||[]).some(function(m){return m.who==='cust';});}; /* 1차: WeChat 범위 밖. 고객 메시지가 한 번도 없는 대화(환영 문구만, LINE 친구 추가만)는 목록·건수에 넣지 않는다 (SYS-CHAT-15) */
@@ -2320,13 +2320,13 @@ function draw(){
  EL.sug.classList.toggle('on',!p1&&sg.length>0&&(S.bo.ptab||'ai')==='ai');
  /* 입력창 */
  var waOver=r.ch==='WhatsApp'&&(function(){for(var i=r.msgs.length-1;i>=0;i--)if(r.msgs[i].who==='cust')return tsMin(S.now)-tsMin(r.msgs[i].at)>=24*60;return false;})(); /* 24시간 정각부터 막힌다 */
- var waOff=p1&&S.waOff&&r.ch==='WhatsApp',lineZero=p1&&r.ch==='LINE'&&DB.store[P.lineKey(r)]<=0;
+ var waOff=p1&&S.waOff&&r.ch==='WhatsApp',lnOff=p1&&S.lnOff&&r.ch==='LINE',lineZero=p1&&r.ch==='LINE'&&DB.store[P.lineKey(r)]<=0;
  EL.composer.classList.remove('off');
- if(waOff){EL.note.className='warn';EL.note.textContent='WhatsApp 연결 끊김';}
+ if(waOff||lnOff){EL.note.className='warn';EL.note.textContent=(waOff?'WhatsApp':'LINE')+' 연결 끊김';}
  else if(waOver){EL.note.className='warn';EL.note.textContent='고객 마지막 메시지 후 24시간 경과 · WhatsApp 앱에서 답장';}
  else if(lineZero){EL.note.className='warn';EL.note.textContent='이번 달 LINE 발송 한도 소진 · LINE Official Account Manager에서 답장';}
  else{EL.note.className='';}
- var lock=waOver||waOff||lineZero; /* 완료된 대화도 보낼 수 있다. 보내면 진행으로 (CSM-CHAT-16-e2) */
+ var lock=waOver||waOff||lnOff||lineZero; /* 완료된 대화도 보낼 수 있다. 보내면 진행으로 (CSM-CHAT-16-e2) */
  EL.lq.style.display=p1&&r.ch==='LINE'?'':'none';EL.lq.textContent='이번 달 발송 '+(500-Math.max(0,DB.store[P.lineKey(r)]))+' / 500';EL.lq.classList.toggle('zero',DB.store[P.lineKey(r)]<=0);
  EL.guideBtn.style.display=p1&&r.ch==='플랫폼'&&r.type!=='고객지원'?'':'none';
  QA('input[type=file]').forEach(function(fi){fi.accept=p1?'image/jpeg,image/png,image/webp':'image/jpeg,image/png,image/webp,video/mp4';}); /* CSM-CHAT-16: 1차는 이미지만 (JPG, PNG, WebP) */

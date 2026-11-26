@@ -187,7 +187,7 @@ function storeLabel(r){if(S&&S.p1&&/^(WhatsApp|LINE|WeChat)$/.test(r.ch))return 
 /* 상담함·상담창은 확정안으로 고정. 아래 안은 상담 정보 패널 배치만 다름 */
 var LAYOUTS=[['R','3단 · 추천 답변 오른쪽 패널 (확정)']];
 var LAYOUT=window.top!==window?'R':(function(){try{var v=localStorage.getItem('ib-layout');return LAYOUTS.some(function(x){return x[0]===v;})?v:'R';}catch(e){return 'R';}})();
-function freshState(){return {p1:true,waOff:false,rtOff:false,failSend:false,failTr:false,login:false,surf:'BO',mark:window.top!==window,hint:false,now:CLOCKS[0][0],ch:'LINE',layout:LAYOUT,bo:{room:'r3',filter:null,q:'',tr:true,ptab:'ai',noteOpen:true,topicF:[],langF:null,drawer:false},cust:{sheet:null}};}
+function freshState(){return {p1:true,waOff:false,lnOff:false,rtOff:false,failSend:false,failTr:false,login:false,surf:'BO',mark:window.top!==window,hint:false,now:CLOCKS[0][0],ch:'LINE',layout:LAYOUT,bo:{room:'r3',filter:null,q:'',tr:true,ptab:'ai',noteOpen:true,topicF:[],langF:null,drawer:false},cust:{sheet:null}};}
 function room(id){return DB.rooms.filter(function(r){return r.id===id;})[0];}
 function isClinic(){return DB.store.clinic;}
 
@@ -772,7 +772,7 @@ var RECENT=[];
 var P1_DROP={'Hello, this is the K-Beauty Station AI assistant. Rejuran Skin Booster at k-beauty Clinic is KRW 260,000 (VAT included).':1,'We are sorry for the inconvenience. A staff member will check and reply shortly.':1,'確認してご案内いたします。':1};
 function p1View(m){if(!S||!S.p1||m.who!=='ai')return m;if(P1_DROP[m.text])return null;var c={};for(var k in m)c[k]=m[k];c.who='agent';return c;}
 /* 1차 입력 도구 */
-function lineBlocked(r){return r.ch==='LINE'&&DB.store[lineKey(r)]<=0;}
+function lineBlocked(r){return r.ch==='LINE'&&(S.lnOff||DB.store[lineKey(r)]<=0);} /* LINE 연결 끊김도 막힘 */
 function waBlocked(r){if(r.ch!=='WhatsApp')return '';if(S.waOff)return 'off';var lc=null;r.msgs.forEach(function(m){if(m.who==='cust')lc=m.at;});return lc&&tsMin(S.now)-tsMin(lc)>=24*60?'24h':'';}
 function freezeDone(r){if(!S.p1||r.status!=='상담종료')return;var gn=grpN(r),dn=hist(r).filter(function(e){return e.n===gn&&/^상담 완료|^가져온 기록 · 자동 분류/.test(e.t);}).pop();r.p1Log=r.p1Log||[];if(dn&&/^상담 완료/.test(dn.t)&&!r.p1Log.some(function(o){return o[2]===gn&&/^상담 완료/.test(o[1]);}))r.p1Log.push([dn.at,dn.t,gn]);} /* 완료 줄을 그때 값으로 고정: 뒤에 보내거나 분류를 고쳐도 지난 줄은 그대로 (SYS-CHAT-09) */
 function reopen(r){if(!S.p1||r.status!=='상담종료')return;freezeDone(r);var imp=r.impSess&&r.session<=r.impSess;r.doneTopics=(r.doneTopics||topics(r).list).slice();r.status='상담중'; /* 분류는 그대로 둔다 (CSM-CHAT-29) */r.p1Log.push([S.now,'상담 재개 · 김상담',grpN(r),EVSEQ++]);} /* 이름 = 보낸 상담사(로그인한 사람) */ /* 완료된 대화에서 답장·상품 카드·이미지를 보내면 같은 회차가 진행으로 (CSM-CHAT-16-e2). 분류는 다시 완료할 때 미리 골라 둠 */
@@ -802,7 +802,7 @@ function setClock(ts){
 function swHTML(){
  return '<b>통합인박스 시안</b>'
  +'<label style="background:#e8537a;color:#fff;border-radius:4px;padding:2px 8px;font-weight:700"><input type="checkbox" data-sw="p1"'+(S.p1?' checked':'')+'>1차 범위로 보기</label>'
- +(S.p1?'<label><input type="checkbox" data-sw="waOff"'+(S.waOff?' checked':'')+'>WhatsApp 연결 끊김</label>'
+ +(S.p1?'<label><input type="checkbox" data-sw="waOff"'+(S.waOff?' checked':'')+'>WhatsApp 연결 끊김</label><label><input type="checkbox" data-sw="lnOff"'+(S.lnOff?' checked':'')+'>LINE 연결 끊김</label>'
   +'<label><input type="checkbox" data-sw="rtOff"'+(S.rtOff?' checked':'')+'>실시간 연결 끊김</label>'
   +'<label><input type="checkbox" data-sw="failSend"'+(S.failSend?' checked':'')+'>다음 전송 실패</label>'
   +'<label><input type="checkbox" data-sw="failTr"'+(S.failTr?' checked':'')+'>다음 번역 실패</label><button type="button" data-newmsg style="margin:0 6px;padding:2px 8px;border:1px solid #666;border-radius:4px;background:#333;color:#fff;font-size:12px;cursor:pointer">고객 새 메시지</button>'+((room(S.bo.room)||{}).ch==='LINE'?'<span>LINE 남은 발송</span><select data-sw="lineLeft">'+[312,1,0].concat([312,1,0].indexOf(DB.store[lineKey(room(S.bo.room))])<0?[DB.store[lineKey(room(S.bo.room))]]:[]).sort(function(a,b){return b-a;}).map(function(v){return '<option value="'+v+'"'+(DB.store[lineKey(room(S.bo.room))]===v?' selected':'')+'>'+v+'</option>';}).join('')+'</select>':'')+'<label><input type="checkbox" data-sw="login"'+(S.login?' checked':'')+'>로그인 화면</label>':'')
@@ -855,7 +855,7 @@ Object.defineProperty(window,'SLACKLOG',{get:function(){return SLACK;}});
 document.addEventListener('click',function(e){var t=e.target.closest('[data-surf]');if(t){S.surf=t.getAttribute('data-surf');render();}});
 document.addEventListener('change',function(e){var t=e.target;if(!t.hasAttribute('data-sw'))return;var k=t.getAttribute('data-sw');
  if(k==='layout'){S.layout=LAYOUT=t.value;try{localStorage.setItem('ib-layout',LAYOUT);}catch(_){}S.bo.drawer=false;S.bo.side=true;frame('BO').contentWindow.location.reload();render();return;} /* 레이아웃은 화면 골격을 바꾸므로 뷰티톡 프레임을 다시 그림 */
- if(k==='mark')S.mark=t.checked;else if(k==='hint')S.hint=t.checked;else if(k==='ch'){S.ch=t.value;S.bo.room=CH_ROOM[t.value];}else if(k==='now'){setClock(t.value);return;}else if(k==='booking')DB.store.booking=t.checked;else if(k==='pilot')DB.store.aiPilot=t.checked;else if(k==='p1'){S.p1=t.checked;S.bo.ptab='ai';}else if(k==='waOff')S.waOff=t.checked;else if(k==='rtOff')S.rtOff=t.checked;else if(k==='failSend')S.failSend=t.checked;else if(k==='failTr')S.failTr=t.checked;else if(k==='lineLeft')DB.store[lineKey(room(S.bo.room))]=+t.value;else if(k==='login')S.login=t.checked;render();});
+ if(k==='mark')S.mark=t.checked;else if(k==='hint')S.hint=t.checked;else if(k==='ch'){S.ch=t.value;S.bo.room=CH_ROOM[t.value];}else if(k==='now'){setClock(t.value);return;}else if(k==='booking')DB.store.booking=t.checked;else if(k==='pilot')DB.store.aiPilot=t.checked;else if(k==='p1'){S.p1=t.checked;S.bo.ptab='ai';}else if(k==='waOff')S.waOff=t.checked;else if(k==='lnOff')S.lnOff=t.checked;else if(k==='rtOff')S.rtOff=t.checked;else if(k==='failSend')S.failSend=t.checked;else if(k==='failTr')S.failTr=t.checked;else if(k==='lineLeft')DB.store[lineKey(room(S.bo.room))]=+t.value;else if(k==='login')S.login=t.checked;render();});
 freshDB();S=freshState();render();
 </script>
 </body>
