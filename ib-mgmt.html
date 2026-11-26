@@ -2576,7 +2576,7 @@ function drawPage(){
 function toast(s){EL.toast.textContent=s;EL.toast.style.display='block';clearTimeout(EL.tt);EL.tt=setTimeout(function(){EL.toast.style.display='none';},1800);}
 window.draw=draw;
 window.MGU={CSS_H:CSS_H,btn:btn,toast:toast};
-window.MG={state:M,rows:function(){return base().filter(function(w){return pass(w);});},open:function(id){M.open=id;draw();}};
+window.MG={reset:function(){Object.assign(M,{dtab:'info',preset:'week',f:{},store:'',q:'',quick:null,open:null,pop:null,more:false,page:'list'});if(EL.kw)EL.kw.value='';if(EL.store)EL.store.value='';if(EL.mLi)drawPage();draw();}, /* 콘솔에서 케이스를 새로 열면 필터·상세 창을 처음 상태로 */state:M,rows:function(){return base().filter(function(w){return pass(w);});},open:function(id){M.open=id;draw();}};
 
 /* 사이드바 하위 메뉴를 펼쳐 시안 페이지로 연결 */
 function subMenu(title,items,open){var t=QA('.ant-layout-sider .ant-menu-submenu-title').filter(function(x){return x.textContent.trim()===title;})[0];if(!t)return;var li=t.parentNode,ul=Q('ul.ant-menu-sub',li);
