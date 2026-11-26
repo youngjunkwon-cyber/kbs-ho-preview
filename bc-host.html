@@ -3155,8 +3155,9 @@ function weekView(root, o, oneDay) {
   /* 세로 범위: 이 주 예약 받는 가장 이른 ~ 늦은 시간, 그 밖의 예약(수기 등)이 있으면 그 시간까지 넓힘 */
   var lo = 1e9, hi = -1;
   days.forEach(function (d) { var sc = sched(o.set, d); if (sc && sc.isActive) { lo = Math.min(lo, sc.startMinute); hi = Math.max(hi, sc.endMinute); } });
+  /* v0.11 §4.3: 보이는 날이 모두 휴무면(예약 유무와 관계없이) 예약 설정에서 켜진 요일 전체 범위. 켜진 요일이 하나도 없으면 전체 요일 */
+  if (hi < 0) { var on = o.set.schedules.filter(function (sc) { return sc.isActive; }); (on.length ? on : o.set.schedules).forEach(function (sc) { lo = Math.min(lo, sc.startMinute); hi = Math.max(hi, sc.endMinute); }); }
   chips.forEach(function (c) { var m = Math.floor(minOf(c.ts) / iv) * iv; lo = Math.min(lo, m); hi = Math.max(hi, m + iv); });
-  if (hi < 0) { o.set.schedules.forEach(function (sc) { lo = Math.min(lo, sc.startMinute); hi = Math.max(hi, sc.endMinute); }); }
   var g = document.createElement('div'); g.className = 'bc-wgrid' + (oneDay ? ' bc-dgrid' : '');
   var corner = document.createElement('div'); corner.className = 'bc-wh bc-wcorner'; g.appendChild(corner);
   days.forEach(function (d) { var h = document.createElement('div'); h.className = 'bc-wh' + (d === PB.TODAY ? ' bc-today' : ''); h.innerHTML = '<span class="bc-wd">' + WD[dow(d)] + '</span><span class="bc-wdn">' + (+d.slice(8, 10)) + '</span>'; h.setAttribute('data-date', d); g.appendChild(h); });
