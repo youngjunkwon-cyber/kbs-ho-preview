@@ -3357,7 +3357,7 @@ function slotCount(all, d, m, set) { var iv = set.intervalMinute; return all.fil
 function chipsOf(list) {
   var out = [];
   list.forEach(function (b) { out.push({ b: b, ts: b.visit, chg: false }); /* 변경요청은 원래 시간 칩 하나만(요청 시간 칩 · 짝 번호 · 화살표 시각 없음) */ });
-  return out.sort(function (a, c) { return a.ts < c.ts ? -1 : a.ts > c.ts ? 1 : (a.chg ? 1 : 0) - (c.chg ? 1 : 0); });
+  return out.sort(function (a, c) { return a.ts < c.ts ? -1 : a.ts > c.ts ? 1 : ((a.chg ? 1 : 0) - (c.chg ? 1 : 0)) || ((a.b.recv || '') < (c.b.recv || '') ? -1 : (a.b.recv || '') > (c.b.recv || '') ? 1 : 0); }); /* v0.13 §7.3: 같은 시각이면 접수일시 이른 순 */
 }
 /* 칩 묶음: 다가오는 예약 / 끝난 예약 / 취소 · 노쇼 (왼쪽 막대 색) */
 var GRP = { '예약': 'up', '변경완료': 'up', '변경거절': 'up', '변경요청': 'up', '방문완료': 'done', '고객취소': 'cx', '매장취소': 'cx', '미방문': 'ns' };
