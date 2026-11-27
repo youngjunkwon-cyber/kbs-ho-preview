@@ -2199,7 +2199,8 @@ var LN={ko:'한국어',en:'영어',ja:'일본어',zh:'중국어(간체)','zh-TW'
 (function(){var st=document.createElement('style');st.textContent="/* MGMT WASH */svg text{fill:rgba(0,0,0,.88)!important}.ant-picker-input>input{color:rgba(0,0,0,.88)!important}.sp-desc,.sp-tabs button,.mg-tabs button{color:rgba(0,0,0,.88)!important}.sp-tabs button.on,.mg-tabs button.on{color:#0958d9!important}[class*=_pageHeaderTopSubtitle_]{color:rgba(0,0,0,.88)!important}div.ant-select-placeholder,.ant-select-placeholder{color:rgba(0,0,0,.5)!important}.ant-card-small .ant-card-body .ant-tag{border:0!important;background:none!important;padding:0 4px!important;margin:0!important;font-size:14px!important;line-height:22px!important}.ant-card-small .ant-card-body .ant-tag[data-click]{cursor:pointer}.ant-card-small .ant-card-body .ant-tag[data-click]:hover{text-decoration:underline}.ant-card-small .ant-card-body .ant-tag.ant-tag-blue{color:#0958d9!important;font-weight:600}.ant-card-small .ant-card-body>*{margin-right:20px!important}.ant-card-small .ant-card-body h5{font-size:14px!important}.ant-drawer-body :is(span,div,td,th,dt,dd,li,p,label,small):not(.ant-tabs-tab-btn):not(.ant-tabs-tab-btn *):not(.ant-btn-primary):not(.ant-btn-primary *),.ant-drawer-header .mg-sub,.ant-drawer-header .mg-sub *{color:rgba(0,0,0,.88)!important}.ant-layout-content [class*=sub],.ant-page-header-heading-sub-title,.ant-layout-content p{color:rgba(0,0,0,.88)!important}.cpi{display:inline-flex;vertical-align:middle;margin-right:6px}.cpi img,.cpi svg{display:block}.sp{display:inline-flex;align-items:center;gap:6px;font-size:12px;line-height:20px;color:rgba(0,0,0,.88);white-space:nowrap}.sp::before{content:'';width:6px;height:6px;border-radius:50%;background:rgba(0,0,0,.88);flex:none}.sp.wait::before{background:#fa8c16}.sp.prog::before{background:#1677ff}.sp.ai::before{background:#389e0d}.mg-dim,.mg-sub,.mg-last,[class*=description],.ant-typography-secondary,.ant-table-cell,.ant-descriptions-item-label,.ant-empty-description,small{color:rgba(0,0,0,.88)!important}input::placeholder,textarea::placeholder,.ant-select-selection-placeholder,.ant-picker-input input::placeholder{color:rgba(0,0,0,.5)!important}.ant-table-thead>tr>th,.ant-table-thead>tr>td{background:#fff!important;color:rgba(0,0,0,.88)!important;border-bottom:1px solid #c9ced6!important}.ant-table-tbody>tr>td{border-bottom:1px solid #d3d8df!important}.ant-table-thead>tr>th::before{background:#d3d8df!important}.ant-tag{background:#fff!important;border:1px solid #c9ced6!important;color:rgba(0,0,0,.88)!important}.ant-tag.ant-tag-blue{border-color:#1677ff!important;color:#0958d9!important;background:#f0f6ff!important}.ant-card,.ant-drawer-content,.ant-input,.ant-select-selector,.ant-picker,.ant-btn-default{border-color:#c9ced6!important}.ant-btn-primary,.ant-btn-primary *{color:#fff!important}";document.head.appendChild(st);})();
 var ST={wait:['대기',''],prog:['진행',''],ai:['AI 응대',''],done:['완료','']};
 var WHO=['AI','CS팀','입점사'];
-function P1(){return !!(P&&P.S&&P.S.p1);} /* 1차 범위로 보기: AI 항목, WeChat 없음 */
+function P1(){return !!(P&&P.S&&P.S.p1);}
+function tp1(r){if(r.doneTopics)return r.doneTopics;if(r.status==='상담종료')return P.topics(r).list;return [];} /* CSM 1차와 같은 상담 분류 (CSM-CHAT-29) */ /* 1차 범위로 보기: AI 항목, WeChat 없음 */
 var CHR=[{ch:'플랫폼',type:'고객지원'},{ch:'플랫폼',type:'스토어 문의'},{ch:'플랫폼',type:'상품 문의'},{ch:'WhatsApp'},{ch:'LINE',lineAcct:'메인'},{ch:'LINE',lineAcct:'TW'},{ch:'WeChat'}];var CHS=null;
 var M={dtab:'info',preset:'week',f:{},store:'',q:'',quick:null,open:null,pop:null,more:false};
 var CATS=['피부과','치과','성형외과','헤어·메이크업','사진관','에스테틱'];
@@ -2208,7 +2209,7 @@ function uniq(fn){var o=[];allRows().forEach(function(w){var v=fn(w);if(v&&o.ind
 var FL=[
  {k:'st',id:'mode',label:'상태',w:80,get:function(w){return w.tab;},opts:function(){return (P1()?['wait','prog','done']:['wait','prog','done','ai']).map(function(t){return [t,ST[t][0]];});}},
  {k:'ch',id:'channel',label:'채널',w:80,multi:1,get:function(w){return w.ch;},opts:function(){return CHR.filter(function(o){return !(P1()&&o.ch==='WeChat');}).map(function(o){return [chLabel(o),chName(o),o];});}},
- {k:'cat',id:'f-cat',label:'카테고리',w:100,multi:1,get:function(w){return w.cat||'none';},opts:function(){return CATS.map(function(x){return [x,x];}).concat([['none','CS채팅']]);}},
+ {k:'cat',id:'f-cat',label:'카테고리',w:100,multi:1,get:function(w){return w.cat||'none';},opts:function(){return CATS.map(function(x){return [x,x];}).concat([['none','CS채팅·메신저']]);}},
  {k:'tp',id:'topic',label:'상담 분류',w:104,multi:1,get:function(w){return w.topics;},opts:function(){return P.TOPICS.concat([P.NOASK]).map(function(t){return [t,t];});}},
  {k:'lang',id:'languageId',label:'언어',w:80,multi:1,get:function(w){return w.lang;},opts:function(){return Object.keys(LN).filter(function(l){return l!=='ko';}).map(function(l){return [l,LN[l]];});}},
  {k:'who',id:'isAnswered',label:'응대주체',more:1,get:function(w){return w.who||'none';},opts:function(){return WHO.map(function(x){return [x,x];}).concat([['none','미응대']]);}},
@@ -2260,9 +2261,9 @@ function rowLive(r){
  var since=null;if(T==='wait'){for(var i=ms.length-1;i>=0;i--){var m=ms[i];if(m.who==='cust')since=m.at;else if(!m.notice)break;if(m.newSession)break; /* 이번 회차 안에서만 */}}
  var notes=r.msgs.filter(function(m){return m.who==='note';}).map(function(m){return [m.by||'상담사',m.at,m.text];});
  return {id:r.id,live:true,r:r,name:c.name||r.name,ch:chLabel(r),store:r.store?P.storeLabel(r):'',lang:r.lang||'ko',tab:T,who:(P1()&&who==='AI')?null:who,owner:(T==='done'&&!agentIn)?'':(c.owner||''),session:r.session,
-  topics:P.topics(r).list,topicEd:P.topics(r).edited,sum:(T==='ai'||P1())?null:P.summary(r),last:last?(last.kind==='image'?'사진':last.kind==='product'?'상품 카드':last.text):'',lastAt:last?last.at:r.first,
+  topics:P1()?tp1(r):P.topics(r).list,topicEd:P1()?false:P.topics(r).edited,sum:(T==='ai'||P1())?null:P.summary(r),last:last?(last.kind==='image'?'사진':last.kind==='product'?'상품 카드':last.text):'',lastAt:last?last.at:r.first,
   first:fc&&fr?bizOrRaw(fc.at,fr.at):null,since:since,aiOnly:!P1()&&T==='done'&&!agentIn,need:(!P1()&&r.need)?r.need.reason:null,
-  ownerLog:r.ownerLog||[],cat:r.cat||(r.store?'피부과':null),sub:r.sub||null,cid:r.cid,chState:r.chState,prod:r.prod||null,agentAt:r.agentAt,src:r.src||(r.ch==='플랫폼'?'웹':'메신저'),member:r.member||(r.ch==='플랫폼'&&!/^게스트/.test(r.name)?'회원':'비회원'),
+  ownerLog:r.ownerLog||[],cat:r.ch!=='플랫폼'?null:(r.cat||(r.store?'피부과':null)),sub:r.sub||null,cid:r.cid,chState:r.chState,prod:r.prod||null,agentAt:r.agentAt,src:r.src||(r.ch==='플랫폼'?'웹':'메신저'),member:r.member||(r.ch==='플랫폼'&&!/^게스트/.test(r.name)?'회원':'비회원'),
   msgs:(function(){var sn=1;return ms.map(function(m,i){if(m.newSession&&i>0)sn++;return [m.who==='auto'&&m.bot?'bot':m.who,m.kind==='product'?'[상품 카드] '+(m.prod?m.prod.name:''):m.text,m.ko||'',m.at,m.notice?1:0,sn];});})(),notes:notes,card:c,bookings:c.bookings||[],links:c.links||[]};}
 function bizOrRaw(a,b){return Math.round((toD(b)-toD(a))/60000);}
 function allRows(){var now=P.S.now;var rows=P.DB.rooms.filter(function(r){return !(P1()&&r.ch==='WeChat')&&r.msgs.some(function(m){return m.who==='cust';});}).map(rowLive);
@@ -2291,7 +2292,7 @@ function tag(text,color,attrs){return '<span class="ant-tag ant-tag-filled'+(col
 function group(title,inner){return '<span class="ant-tag ant-tag-filled '+CSS_H+'"><div class="ant-space ant-space-horizontal ant-space-align-center '+CSS_H+'" style="gap:8px"><div class="ant-space-item"><h5 class="ant-typography '+CSS_H+'" style="margin:0">'+title+'</h5></div>'+inner.map(function(x){return '<div class="ant-space-item">'+x+'</div>';}).join('')+'</div></span>';}
 function draw(){
  if(!P||!P.DB||!EL.tbody)return;
- document.body.classList.toggle('mk',!!P.S.mark);document.body.classList.toggle('p1v',P1()); /* 1차 보기: 응답지연 칼럼 숨김 */if(EL.sLi)EL.sLi.style.display=P1()?'none':''; /* 1차: 상담 설정 없음 (채널 연결은 기존 창) */if(P1()&&M.page==='set'){M.page='list';drawPage();}document.body.classList.toggle('hl',!!P.S.hint);
+ document.body.classList.toggle('mk',!!P.S.mark);document.body.classList.toggle('p1v',P1()); /* 1차 보기: 응답지연 칼럼 숨김 */if(EL.sLi)EL.sLi.style.display=P1()?'none':'';(EL.oldMenus||[]).forEach(function(li){li.style.display=P1()?'':'none';}); /* 기존 채팅 조회 메뉴 4개는 1차 동안 그대로 (BO-MGMT-01) */ /* 1차: 상담 설정 없음 (채널 연결은 기존 창) */if(P1()&&M.page==='set'){M.page='list';drawPage();}document.body.classList.toggle('hl',!!P.S.hint);
  var b0=base(),rows=b0.filter(function(w){return pass(w);}),b=rows; /* 요약 숫자도 모든 필터를 따른다 */
  /* 요약 */
  var cnt=function(f){return b.filter(f).length;};
@@ -2360,6 +2361,7 @@ function drawDrawer(){
   var rr=P.room(w.id);((rr&&rr.scnLog)||[]).forEach(function(x){if(x[0]>=g.at&&(gi===groups.length-1||x[0]<groups[gi+1].at)){var at=evs.findIndex(function(e){return e[0]==='ev'?e[2]>x[0]:e[3]>x[0];});var row=['ev',x[1],x[0]];if(at<0)evs.push(row);else evs.splice(at,0,row);}}); /* 시나리오 흐름 시작 (CSM 처리 이력과 같은 줄) */
   (w.ownerLog||[]).forEach(function(o){if(o[0]>=g.at&&(gi===groups.length-1||o[0]<=groups[gi+1].at)){var at=evs.findIndex(function(e){return e[0]==='ev'?e[2]>o[0]:e[3]>o[0];});var row=['ev','담당 변경 · '+o[1]+' → '+o[2],o[0]];if(at<0)evs.push(row);else evs.splice(at,0,row);}});
   if(!live)evs.push(['ev','상담 완료'+(agentSeen?' · '+whoAt(g.end,g.n):(P1()?'':' (AI 단독)')),g.end]);
+  if(P1()){evs=g.list.slice();P.hist(w.r).filter(function(h){return h.n===g.n&&h.t!=='문의 접수';}).forEach(function(h){var at=evs.findIndex(function(e){return e[0]==='ev'?e[2]>h.at:e[3]>h.at;});var row=['ev',h.t,h.at];if(at<0)evs.push(row);else evs.splice(at,0,row);});} /* 1차: CSM 처리 이력과 같은 줄 */
   g.evs=evs;g.last=last;g.live=live;});
  var dt=M.dtab||'info',pane='';
  if(dt==='info'){
@@ -2368,7 +2370,7 @@ function drawDrawer(){
   var mg=STORE_MGR[w.store],tgt=w.prod?esc(w.prod.name)+' #'+w.prod.no:(w.ch==='스토어채팅'?esc(w.store)+' 스토어':'-');
   var meta='<div class="mg-kvgrid">'+kv('입점사',w.store?esc(w.store)+(w.cat?' · '+esc(w.cat):''):'K-Beauty Station (CS채팅)')+kv('스토어 담당',mg?esc(mg[0])+' '+esc(mg[1]):'-')
    +kv('문의 대상',tgt)+kv('접수 일시',esc(P.fmtTs(groups[groups.length-1].at)))+kv('고객 계정',esc(acctW(w)))+kv('연결 상태',esc(w.chState||'-'))+kv('유입경로',esc(w.src||'-'))+'</div>';
-  var tl=[];groups.forEach(function(g){tl.push([g.n,g.at,'문의 접수']);g.evs.forEach(function(e){if(e[0]==='ev')tl.push([g.n,e[2],e[1]]);});});
+  var tl=[];if(P1())P.hist(w.r).forEach(function(h){tl.push([h.n,h.at,h.t]);});else groups.forEach(function(g){tl.push([g.n,g.at,'문의 접수']);g.evs.forEach(function(e){if(e[0]==='ev')tl.push([g.n,e[2],e[1]]);});});
   var hist='<div class="mg-tl">'+tl.map(function(t){return '<div><span>'+t[0]+'차</span><i>'+esc(P.fmtTs(t[1]))+'</i><b>'+esc(t[2])+'</b></div>';}).join('')+'</div>';
   pane=sec('상담 내용','',kv('상담 분류',w.topics.length?esc(w.topics.join(', '))+(w.topicEd?' (수정됨)':''):'-')+(P1()?'':kv('AI 요약',esc(sumTxt))+(w.need?kv('AI 중단사유',esc(w.need)):'')))
    +sec('상담 메모','',notes)+sec('접수 정보','',meta)+sec('처리 이력','',hist);
@@ -2378,7 +2380,7 @@ function drawDrawer(){
   var bk=w.bookings.length?w.bookings.map(function(x){return '<div class="mg-li">'+esc(P.fmtDay(x.d,'ko')+' '+x.t+' · '+x.p+' · '+x.n+'명 · '+x.st)+'</div>';}).join(''):'<div class="mg-dim">'+(c.phone||c.email?'없음':'없음 (연락처 미등록)')+'</div>';
   var ln=w.links.length?w.links.map(function(l){return '<div class="mg-li">'+esc(l.ch+' · '+P.fmtDay(l.d,'ko')+' · '+l.st)+'</div>';}).join(''):'<div class="mg-dim">없음</div>';
   pane=sec('기본 정보','',kv('이름',esc(c.name||w.name))+kv('연락처',c.phone?esc(c.phone):'-')+kv('이메일',c.email?esc(c.email):'-')+kv('회원여부',esc(w.member))+kv('첫 상담일',esc(P.fmtDay(w.msgs[0][3].slice(0,10),'ko')))+'')
-   +sec('예약 내역','',bk)+sec('다른 채널 상담','',ln);
+   +(P1()?'':sec('예약 내역','',bk)+sec('다른 채널 상담','',ln)); /* 1차: 기본 정보만 */
  }
  /* 상담 내역: 회차마다 한 줄(최신 위), 누르면 그 회차 대화. 진행 중 회차는 실시간 반영 */
  EL.cOpen=EL.cOpen||{};EL.cMore=EL.cMore||{};EL.cSeen=EL.cSeen||{};
@@ -2391,7 +2393,7 @@ function drawDrawer(){
   var conv=groups.slice().reverse().map(function(g){var k=w.id+':'+g.n,solo=groups.length===1,open=solo||((k in EL.cOpen)?EL.cOpen[k]:g.last);
    var st=g.last?'<span class="sp '+w.tab+'">'+ST[w.tab][0]+'</span>':'<span class="sp done">완료</span>';
    var rng=esc(P.fmtTs(g.at))+' ~ '+(g.live?'':esc(g.end.slice(0,10)===g.at.slice(0,10)?hm(g.end):P.fmtTs(g.end)));
-   var head='<div class="mg-hrow'+(open?' on':'')+(solo?' solo':'')+'"'+(solo?'':' data-g="'+k+'" data-click')+'><b>'+g.n+'차 상담</b>'+st+(g.live?'<span class="mg-live">실시간</span>':'')+'<span class="mg-rng">'+rng+'</span>'+(solo?'':'<span class="mg-cnt">'+(open?'▴':'▾')+'</span>')+'</div>';
+   var head='<div class="mg-hrow'+(open?' on':'')+(solo?' solo':'')+'"'+(solo?'':' data-g="'+k+'" data-click')+'><b>'+(w.r&&w.r.impSess&&g.n<=w.r.impSess?'가져온 기록':g.n+'차 상담')+'</b>'+st+(g.live?'<span class="mg-live">실시간</span>':'')+'<span class="mg-rng">'+rng+'</span>'+(solo?'':'<span class="mg-cnt">'+(open?'▴':'▾')+'</span>')+'</div>';
    if(!open)return '<div class="mg-hist">'+head+'</div>';
    var list=g.evs,more='',nMsg=g.list.length;if(nMsg>LIM_MSG&&!EL.cMore[k]){var cut=0,c=0;for(var j=list.length-1;j>=0;j--){if(list[j][0]!=='ev')c++;if(c===LIM_MSG){cut=j;break;}}more='<button type="button" class="mg-morebtn" data-more="'+k+'" data-click>이전 메시지 '+(nMsg-LIM_MSG)+'건 더보기</button>';list=list.slice(cut);}
    return '<div class="mg-hist open">'+head+'<div class="mg-conv" data-conv="'+k+'">'+more+list.map(bubble).join('')+'</div>'+(g.live?'<button type="button" class="mg-newpill" data-jump="'+k+'" data-click style="display:none">새 메시지 ↓</button>':'')+'</div>';}).join('');
@@ -2413,7 +2415,7 @@ function init(){
  /* 메뉴: 채팅 > 상담 관리 / 입점사 고객 관리. 뷰티톡은 CSM으로, 채팅 목록 3개는 상담 관리로 합쳐 뺀다 */
  QA('.ant-layout-sider li.ant-menu-item').forEach(function(li){var t=li.textContent.trim();
   if(t==='뷰티톡'){var s=QA('span',li).filter(function(x){return x.textContent.trim()==='뷰티톡'&&!x.children.length;})[0]||li;s.textContent='상담 관리';li.classList.add('ant-menu-item-selected');li.setAttribute('data-new','');}
-  if(t==='전체채팅조회'||t==='고객1:1문의'||t==='스토어채팅조회'||t==='상품채팅조회'){li.style.display='none';li.classList.remove('ant-menu-item-selected');}});
+  if(t==='전체채팅조회'||t==='고객1:1문의'||t==='스토어채팅조회'||t==='상품채팅조회'){(EL.oldMenus=EL.oldMenus||[]).push(li);li.classList.remove('ant-menu-item-selected');}});
  /* 머리 */
  var h1=Q('[class*=_pageHeaderTopTitleText_]');h1.textContent='상담 관리';
  var sub=Q('[class*=_pageHeaderTopSubtitle_]');sub.textContent='우리 CS와 입점사의 전체 채팅 상담 내역을 확인할 수 있습니다.';
