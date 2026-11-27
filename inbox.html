@@ -124,7 +124,7 @@ var EX=[
   msgs:[['cust','Saya ingin membatalkan reservasi besok.','내일 예약 취소하고 싶어요','2026-10-20 10:30'],['agent','Reservasi Anda sudah kami batalkan.','취소 처리했습니다.','2026-10-20 10:52']],
   sum:{l1:'내일 예약 취소 요청, 입점사가 취소 처리',l2:''},card:{name:'Putri',phone:'+62 81234567890',email:''}},
  {id:'x8',cat:'피부과',member:'회원',acct:'kenji.t@example.com',name:'Kenji T.',ch:'스토어채팅',store:'A피부과 강남점',lang:'ja',tab:'wait',who:null,owner:'',session:1,topics:['시술 상담'],aiOnly:false,
-  msgs:[['cust','妊娠中でもレーザーはできますか？','임신 중에도 레이저 가능한가요?','2026-10-21 13:45'],['ai','確認してご案内いたします。','확인 후 안내드리겠습니다.','2026-10-21 13:45',1]],
+  msgs:[['cust','営業時間を教えてください','영업시간을 알려 주세요','2026-10-21 13:40'],['bot','営業時間は平日10:00〜19:00、土曜10:00〜15:00です。','영업시간은 평일 10:00~19:00, 토요일 10:00~15:00입니다.','2026-10-21 13:40'],['cust','妊娠中でもレーザーはできますか？','임신 중에도 레이저 가능한가요?','2026-10-21 13:45'],['ai','確認してご案内いたします。','확인 후 안내드리겠습니다.','2026-10-21 13:45',1]],
   sum:{l1:'임신 중 레이저 시술 가능 여부 문의, 의료 판단 필요로 AI 중단',l2:''},card:{name:'Kenji T.',phone:'',email:''},need:'시술 상담(의료 판단 필요)'}
 ];
 EX.push(
@@ -167,7 +167,7 @@ var STORE_ID={'k-beauty의원':1,'A피부과 강남점':2,'B헤어 명동점':3,
 function dispName(name,ch,cid,phone){if(name)return name;if(ch==='WhatsApp')return phone||cid;var t=String(cid||'').replace(/[^0-9A-Za-z]/g,'').slice(-4);if(ch==='LINE')return 'LINE ····'+t;if(ch==='WeChat')return 'WeChat ····'+t;return '게스트 '+t;} /* 이름이 없으면 채널마다 고객 쪽 값 */
 function seedExtra(){return EX.map(function(x){
  var inApp={'CS채팅':'고객지원','스토어채팅':'스토어 문의','상품채팅':'상품 문의'}[x.ch],meta=EX_META[x.id]||[],sess=0,prev=null;
- var msgs=x.msgs.map(function(t){var sn=t[5]||x.session;var mm={who:t[0],text:t[1],ko:t[2],at:t[3],answered:true};if(x.lang&&t[0]!=='cust')mm.ml=x.lang; /* 예시 데이터의 우리 쪽 말은 대화 언어로 보낸 것 */if(x.tab==='prog'&&t[0]==='cust'&&!x.msgs.slice(x.msgs.indexOf(t)+1).some(function(z){return z[0]!=='cust';}))mm.answered=false; /* 진행 중: 마지막 답 뒤 고객 메시지는 새 메시지 */if(t[4])mm.notice=true;if(prev!==null&&sn!==prev)mm.newSession=true;prev=sn;return mm;});
+ var msgs=x.msgs.map(function(t){var sn=t[5]||x.session;var mm={who:t[0],text:t[1],ko:t[2],at:t[3],answered:true};if(t[0]==='bot'){mm.who='auto';mm.bot=true;} /* 스토어 챗봇 말: 자동 응답과 같은 규칙, 이름만 "챗봇" */if(x.lang&&t[0]!=='cust')mm.ml=x.lang; /* 예시 데이터의 우리 쪽 말은 대화 언어로 보낸 것 */if(x.tab==='prog'&&t[0]==='cust'&&!x.msgs.slice(x.msgs.indexOf(t)+1).some(function(z){return z[0]!=='cust';}))mm.answered=false; /* 진행 중: 마지막 답 뒤 고객 메시지는 새 메시지 */if(t[4])mm.notice=true;if(prev!==null&&sn!==prev)mm.newSession=true;prev=sn;return mm;});
  (x.notes||[]).forEach(function(n){var nt={who:'note',by:n[0],at:n[1],text:n[2]},i=msgs.findIndex(function(z){return z.at>n[1];});if(i<0)msgs.push(nt);else msgs.splice(i,0,nt);});
  var lastCust=null;msgs.forEach(function(z){if(z.who==='cust')lastCust=z.at;});
  var ag=msgs.filter(function(z){return z.who==='agent';})[0];

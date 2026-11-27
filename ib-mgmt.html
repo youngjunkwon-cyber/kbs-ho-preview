@@ -2263,7 +2263,7 @@ function rowLive(r){
   topics:P.topics(r).list,topicEd:P.topics(r).edited,sum:(T==='ai'||P1())?null:P.summary(r),last:last?(last.kind==='image'?'사진':last.kind==='product'?'상품 카드':last.text):'',lastAt:last?last.at:r.first,
   first:fc&&fr?bizOrRaw(fc.at,fr.at):null,since:since,aiOnly:!P1()&&T==='done'&&!agentIn,need:(!P1()&&r.need)?r.need.reason:null,
   ownerLog:r.ownerLog||[],cat:r.cat||(r.store?'피부과':null),sub:r.sub||null,cid:r.cid,chState:r.chState,prod:r.prod||null,agentAt:r.agentAt,src:r.src||(r.ch==='플랫폼'?'웹':'메신저'),member:r.member||(r.ch==='플랫폼'&&!/^게스트/.test(r.name)?'회원':'비회원'),
-  msgs:(function(){var sn=1;return ms.map(function(m,i){if(m.newSession&&i>0)sn++;return [m.who,m.kind==='product'?'[상품 카드] '+(m.prod?m.prod.name:''):m.text,m.ko||'',m.at,m.notice?1:0,sn];});})(),notes:notes,card:c,bookings:c.bookings||[],links:c.links||[]};}
+  msgs:(function(){var sn=1;return ms.map(function(m,i){if(m.newSession&&i>0)sn++;return [m.who==='auto'&&m.bot?'bot':m.who,m.kind==='product'?'[상품 카드] '+(m.prod?m.prod.name:''):m.text,m.ko||'',m.at,m.notice?1:0,sn];});})(),notes:notes,card:c,bookings:c.bookings||[],links:c.links||[]};}
 function bizOrRaw(a,b){return Math.round((toD(b)-toD(a))/60000);}
 function allRows(){var now=P.S.now;var rows=P.DB.rooms.filter(function(r){return !(P1()&&r.ch==='WeChat')&&r.msgs.some(function(m){return m.who==='cust';});}).map(rowLive);
  rows.forEach(function(w){w.wait=w.since?bizMin(w.since,now,hrsOf(w)):null;w.long=w.tab==='wait'&&w.wait!=null&&w.wait>=LONG_MIN;w.complaint=w.topics.indexOf('불만')>=0;});
@@ -2385,7 +2385,7 @@ function drawDrawer(){
  var keep={};QA('.mg-conv[data-conv]',EL.dw).forEach(function(cv){keep[cv.getAttribute('data-conv')]={top:cv.scrollTop,bottom:cv.scrollTop+cv.clientHeight>=cv.scrollHeight-4};});
  EL.scrollConv=EL.lastOpen!==w.id||EL.lastTab!=='hist';EL.lastOpen=w.id;EL.lastTab=dt;
  if(dt==='hist'){
-  var bubble=function(m){if(m[0]==='ev')return '<div class="mg-ev" data-new><span>'+esc(m[2].slice(11,16))+' '+esc(m[1])+'</span></div>';var by=m[0]==='cust'?'고객':m[0]==='ai'?'AI':m[0]==='auto'?'자동 응답':whoAt(m[3],m[5]||1)+(w.who==='입점사'?' (입점사)':''); /* 답한 사람 이름 */
+  var bubble=function(m){if(m[0]==='ev')return '<div class="mg-ev" data-new><span>'+esc(m[2].slice(11,16))+' '+esc(m[1])+'</span></div>';var by=m[0]==='cust'?'고객':m[0]==='ai'?'AI':m[0]==='auto'?'자동 응답':m[0]==='bot'?'챗봇':whoAt(m[3],m[5]||1)+(w.who==='입점사'?' (입점사)':''); /* 답한 사람 이름 */
    return '<div class="mg-msg '+(m[0]==='cust'?'in':'out')+'"><div class="mg-by">'+by+(m[4]?' (안내문)':'')+'</div><div class="mg-b">'+esc(m[1])+(m[2]&&m[2]!==m[1]?'<span class="mg-ko">'+esc(m[2])+'</span>':'')+'</div><div class="mg-at">'+esc(P.fmtTs(m[3]))+'</div></div>';};
   var hm=function(ts){return ts.slice(11,16);};
   var conv=groups.slice().reverse().map(function(g){var k=w.id+':'+g.n,solo=groups.length===1,open=solo||((k in EL.cOpen)?EL.cOpen[k]:g.last);

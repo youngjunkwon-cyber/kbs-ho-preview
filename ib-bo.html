@@ -2293,7 +2293,7 @@ function draw(){
   if(i===0||m.newSession){var s=TPL.sys.cloneNode(true);if(m.newSession)sess++;var sn=i===0?1:sess;s.classList.add('sdv');s.textContent=(r.impSess&&sn<=r.impSess?'가져온 기록':sn+'차 상담');w.insertBefore(s,w.firstChild);w.setAttribute('data-sess',sn);}
   var br=Q('[class*=_bubbleRow_]',w),metas=QA('[class*=_meta_]',br);
   if(m.who==='auto'){w.classList.add('autob');w.setAttribute('data-new','');}
-  metas[0].textContent=m.who==='cust'?'고객':m.who==='auto'?'자동 응답':m.who==='ai'?'AI':(m.st?m.st+' (스토어)':'상담사'); /* 스토어 담당 대화라도 상담사가 보낸 말은 상담사 */
+  metas[0].textContent=m.who==='cust'?'고객':m.who==='auto'?(m.bot?'챗봇':'자동 응답'):m.who==='ai'?'AI':(m.st?m.st+' (스토어)':'상담사'); /* 스토어 담당 대화라도 상담사가 보낸 말은 상담사 */
   var bub=Q('[class*=_bubble_]',br);bub.children[0].innerHTML=m.kind==='image'?(m.sending?'<span class="imgs" data-new>이미지 보내는 중</span>':m.img?'<img class="imgb" data-new src="'+esc(m.img)+'" alt="이미지">':'(사진)'):m.kind==='product'?'<span class="pcard"><i class="pc-img i'+(m.prod?m.prod.img:0)+'"></i><span><small>상품 카드</small><b>'+esc(m.prod?m.prod.name:'')+'</b>'+(m.prod?m.prod.price.toLocaleString('en-US')+' KRW':'')+'</span></span>':lk(esc(m.text)).replace(/\n/g,'<br>');
   if(m.kind!=='image'&&m.kind!=='product'&&m.kind!=='video'){var ml=(m.who==='cust'&&m.lang)||m.ml||detectLang(m.text);if(ml==='zh'&&(m.tl||lang)==='zh-TW')ml='zh-TW';var tr=null,RL=S.bo.readLangs||[],rd=function(l){return RL.indexOf(l)>=0;},tl=m.tl||lang,ownM=m.tl?!!m.untr:own;
    if(m.who==='cust'&&ml&&ml!=='ko'){tr=document.createElement('span');tr.className='tr'+(m.ko||m.koT?'':' ph');tr.innerHTML=lk(esc(m.ko||m.koT||'번역 대기'));}
