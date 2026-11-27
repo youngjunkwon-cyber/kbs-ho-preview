@@ -841,7 +841,7 @@ aiAllowed:aiAllowed,render:render,p1View:p1View,sendGuide:sendGuide,sendVideo:se
 /* ===== 검수 콘솔용 전역 ===== */
 window.render=render;
 document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('[data-newmsg]')&&S.bo.room&&!S.bo.unsel)custSend(S.bo.room,'One more question, please.');}); /* 검수용: 열어 둔 대화에 고객 메시지 한 건 */
-window.resetDB=function(){freshDB();S=freshState();try{var mf=document.getElementById('f-MGMT');if(mf&&mf.contentWindow&&mf.contentWindow.MG&&mf.contentWindow.MG.reset)mf.contentWindow.MG.reset();}catch(e){}render();}; /* 상담 관리 필터도 처음 상태로 */
+window.resetDB=function(){freshDB();S=freshState();RECENT=[]; /* 최근 보낸 상품도 처음 상태로 */try{var mf=document.getElementById('f-MGMT');if(mf&&mf.contentWindow&&mf.contentWindow.MG&&mf.contentWindow.MG.reset)mf.contentWindow.MG.reset();}catch(e){}render();}; /* 상담 관리 필터도 처음 상태로 */
 window.go=function(s){S.surf=s;render();};
 window.setChannel=function(ch){S.ch=ch;S.bo.room=CH_ROOM[ch];S.bo.unsel=false;render();};
 window.cust=function(text,kind){custSend(CH_ROOM[S.ch],text,kind);}; /* 지금 채널 고객이 보냄 */
