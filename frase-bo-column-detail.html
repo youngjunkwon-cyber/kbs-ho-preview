@@ -6452,6 +6452,10 @@ div.ck.ck-balloon-panel.ck-mention-balloon { z-index: calc(var(--ck-z-dialog) + 
    <div class="fz-busy">수정한 내용으로 다시 채점하고 있어요. 끝나면 점수가 바뀌어요.</div>
   </div>
   
+  <div class="fz-state" data-s="busyfirst">
+   <div class="fz-top"><div class="fz-ring fz-ring0"><svg viewBox="0 0 100 100"><circle class="fz-rr" cx="50" cy="50" r="42"></circle></svg><i><b>–</b></i></div><div class="fz-msg"><strong>채점하고 있어요</strong>저장한 글로 점수를 매기는 중이에요. 끝나면 점수가 나와요.</div></div>
+   <div class="fz-bars fz-bars0"><div class="fz-bar"><div class="fz-bt"><b>검색 노출</b><span>SEO</span><em>–</em></div><div class="fz-tr"><i style="width:0"></i></div></div><div class="fz-bar"><div class="fz-bt"><b>AI 답변</b><span>GEO</span><em>–</em></div><div class="fz-tr"><i style="width:0"></i></div></div><div class="fz-bar"><div class="fz-bt"><b>신뢰도</b><span>EEAT</span><em>–</em></div><div class="fz-tr"><i style="width:0"></i></div></div></div>
+  </div>
   
   
   <div class="fz-state" data-s="partial"><div class="fz-desc">마지막 채점 2026-11-17 10:39</div>
@@ -6508,7 +6512,7 @@ div.ck.ck-balloon-panel.ck-mention-balloon { z-index: calc(var(--ck-z-dialog) + 
  var fq=st('fail').cloneNode(true);fq.setAttribute('data-s','quota');var qb=fq.querySelector('[data-retry]');if(qb){qb.disabled=true;qb.removeAttribute('data-retry');qb.title='Frase 월 한도 소진';qb.style.cursor='not-allowed';qb.style.opacity='.5';}fq.querySelector('.cd-fail').outerHTML='<div class="cd-fail"><b>⚠ 채점 실패</b>'+"Frase 월 한도 소진 · 2026-11-22 09:10 · 한도가 다시 차면 자동으로 다시 채점"+'</div>';panel.appendChild(fq);
  var bl=st('unpub').cloneNode(true);bl.setAttribute('data-s','blind');bl.querySelector('.fz-hold').textContent='블라인드라 새로 채점하지 않아요. 블라인드를 풀면 다시 채점해요.';panel.appendChild(bl);
  var ia=st('inactive');if(ia){ia.querySelector('.fz-hold').textContent='비활성 언어라 새로 채점하지 않아요. 스토어 지원언어에 다시 추가하면 채점해요.';}
- var fb=document.createElement('div');fb.className='fz-state';fb.setAttribute('data-s','busyfirst');fb.innerHTML='<div class="fz-empty">다시 채점 중</div>';panel.appendChild(fb);
+ if(!st('busyfirst')){var fb=document.createElement('div');fb.className='fz-state';fb.setAttribute('data-s','busyfirst');fb.innerHTML='<div class="fz-empty">다시 채점 중</div>';panel.appendChild(fb);}
  var LANG='zh-CN';
  function tab(k){LANG=k;document.querySelectorAll('.cd-tab').forEach(function(x){x.classList.toggle('on',x.getAttribute('data-k')===k)});
   document.getElementById('cdLang').textContent=k==='original'?'원본':'중국어(간체)';
